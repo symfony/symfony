@@ -28,8 +28,11 @@ use Symfony\Component\Console\Exception\RuntimeException;
 class Table
 {
     private const SEPARATOR_TOP = 0;
-    private const SEPARATOR_MID = 1;
-    private const SEPARATOR_BOTTOM = 2;
+    private const SEPARATOR_TOP_BOTTOM = 1;
+    private const SEPARATOR_MID = 2;
+    private const SEPARATOR_BOTTOM = 3;
+    private const BORDER_OUTSIDE = 0;
+    private const BORDER_INSIDE = 1;
 
     /**
      * Table headers.
@@ -328,7 +331,7 @@ class Table
             }
 
             if ($isHeader || $isFirstRow) {
-                $this->renderRowSeparator($isFirstRow ? self::SEPARATOR_MID : self::SEPARATOR_TOP);
+                $this->renderRowSeparator($isFirstRow ? self::SEPARATOR_TOP_BOTTOM : self::SEPARATOR_TOP);
                 if ($isFirstRow) {
                     $isFirstRow = false;
                 }
@@ -353,22 +356,25 @@ class Table
             return;
         }
 
-        if (!$this->style->getHorizontalBorderChar() && !$this->style->getCrossingChar()) {
+        $borders = $this->style->getBorderChars();
+        if (!$borders[0] && !$borders[2] && !$this->style->getCrossingChar()) {
             return;
         }
 
-        $chars = $this->style->getCrossingChars();
+        $crossings = $this->style->getCrossingChars();
         if (self::SEPARATOR_MID === $type) {
-            list($leftChar, $midChar, $rightChar) = array($chars[8], $chars[0], $chars[4]);
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[2], $crossings[8], $crossings[0], $crossings[4]);
         } elseif (self::SEPARATOR_TOP === $type) {
-            list($leftChar, $midChar, $rightChar) = array($chars[1], $chars[2], $chars[3]);
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[0], $crossings[1], $crossings[2], $crossings[3]);
+        } elseif (self::SEPARATOR_TOP_BOTTOM === $type) {
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[0], $crossings[9], $crossings[10], $crossings[11]);
         } else {
-            list($leftChar, $midChar, $rightChar) = array($chars[7], $chars[6], $chars[5]);
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[0], $crossings[7], $crossings[6], $crossings[5]);
         }
 
         $markup = $leftChar;
         for ($column = 0; $column < $count; ++$column) {
-            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->effectiveColumnWidths[$column]);
+            $markup .= str_repeat($horizontal, $this->effectiveColumnWidths[$column]);
             $markup .= $column === $count - 1 ? $rightChar : $midChar;
         }
 
@@ -378,9 +384,11 @@ class Table
     /**
      * Renders vertical column separator.
      */
-    private function renderColumnSeparator()
+    private function renderColumnSeparator($type = self::BORDER_OUTSIDE)
     {
-        return sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar());
+        $borders = $this->style->getBorderChars();
+
+        return sprintf($this->style->getBorderFormat(), self::BORDER_OUTSIDE === $type ? $borders[1] : $borders[3]);
     }
 
     /**
@@ -390,10 +398,12 @@ class Table
      */
     private function renderRow(array $row, string $cellFormat)
     {
-        $rowContent = $this->renderColumnSeparator();
-        foreach ($this->getRowColumns($row) as $column) {
+        $rowContent = $this->renderColumnSeparator(self::BORDER_OUTSIDE);
+        $columns = $this->getRowColumns($row);
+        $last = count($columns) - 1;
+        foreach ($columns as $i => $column) {
             $rowContent .= $this->renderCell($row, $column, $cellFormat);
-            $rowContent .= $this->renderColumnSeparator();
+            $rowContent .= $this->renderColumnSeparator($last === $i ? self::BORDER_OUTSIDE : self::BORDER_INSIDE);
         }
         $this->output->writeln($rowContent);
     }
@@ -420,7 +430,7 @@ class Table
         $style = $this->getColumnStyle($column);
 
         if ($cell instanceof TableSeparator) {
-            return sprintf($style->getBorderFormat(), str_repeat($style->getHorizontalBorderChar(), $width));
+            return sprintf($style->getBorderFormat(), str_repeat($style->getBorderChars()[2], $width));
         }
 
         $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
@@ -648,7 +658,7 @@ class Table
 
     private function getColumnSeparatorWidth(): int
     {
-        return strlen(sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar()));
+        return strlen(sprintf($this->style->getBorderFormat(), $this->style->getBorderChars()[3]));
     }
 
     private function getCellWidth(array $row, int $column): int
@@ -678,31 +688,37 @@ class Table
     {
         $borderless = new TableStyle();
         $borderless
-            ->setHorizontalBorderChar('=')
-            ->setVerticalBorderChar(' ')
+            ->setHorizontalBorderChars('=')
+            ->setVerticalBorderChars(' ')
             ->setDefaultCrossingChar(' ')
         ;
 
         $compact = new TableStyle();
         $compact
-            ->setHorizontalBorderChar('')
-            ->setVerticalBorderChar(' ')
+            ->setHorizontalBorderChars('')
+            ->setVerticalBorderChars(' ')
             ->setDefaultCrossingChar('')
             ->setCellRowContentFormat('%s')
         ;
 
         $styleGuide = new TableStyle();
         $styleGuide
-            ->setHorizontalBorderChar('-')
-            ->setVerticalBorderChar(' ')
+            ->setHorizontalBorderChars('-')
+            ->setVerticalBorderChars(' ')
             ->setDefaultCrossingChar(' ')
             ->setCellHeaderFormat('%s')
         ;
 
         $box = (new TableStyle())
-            ->setHorizontalBorderChar('─')
-            ->setVerticalBorderChar('│')
+            ->setHorizontalBorderChars('─')
+            ->setVerticalBorderChars('│')
             ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
+        ;
+
+        $boxDouble = (new TableStyle())
+            ->setHorizontalBorderChars('═', '─')
+            ->setVerticalBorderChars('║', '│')
+            ->setCrossingChars('┼', '╔', '╤', '╗', '╢', '╝', '╧', '╚', '╟', '╠', '╪', '╣')
         ;
 
         return array(
@@ -711,6 +727,7 @@ class Table
             'compact' => $compact,
             'symfony-style-guide' => $styleGuide,
             'box' => $box,
+            'box-double' => $boxDouble,
         );
     }
 

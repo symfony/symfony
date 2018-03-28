@@ -12,6 +12,10 @@ Console
 
  * Deprecated the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
  * The `Processor` class has been made final
+ * Deprecated the `setHorizontalBorderChar()` method in favor of the `setDefaultCrossingChars()` method in `TableStyle`.
+ * Deprecated the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
+ * Deprecated the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
+ * Deprecated the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
 
 DependencyInjection
 -------------------

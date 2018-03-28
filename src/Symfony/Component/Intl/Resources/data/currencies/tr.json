@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "ADP": [
             "ADP",
@@ -683,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Moritanya Ouguiyası (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Moritanya Ouguiyası"
         ],
         "MTL": [
@@ -915,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé ve Príncipe Dobrası (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé ve Príncipe Dobrası"
         ],
         "SUR": [

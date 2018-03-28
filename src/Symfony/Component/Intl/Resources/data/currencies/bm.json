@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -123,6 +123,10 @@
         ],
         "MRO": [
             "MRO",
+            "mɔritani Uguwiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mɔritani Uguwiya"
         ],
         "MUR": [
@@ -179,6 +183,10 @@
         ],
         "STD": [
             "STD",
+            "sawotome Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "sawotome Dobra"
         ],
         "SZL": [

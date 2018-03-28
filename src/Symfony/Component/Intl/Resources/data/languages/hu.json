@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "aa": "afar",
         "ab": "abház",
@@ -25,6 +25,7 @@
         "arc": "arámi",
         "arn": "mapucse",
         "arp": "arapaho",
+        "ars": "nedzsdi arab",
         "arw": "aravak",
         "as": "asszámi",
         "asa": "asu",

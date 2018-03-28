@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.39.11",
     "Names": {
         "ADP": [
             "ADP",
@@ -608,6 +608,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaania ugia (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaania ugia"
         ],
         "MTL": [
@@ -836,6 +840,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé ja Príncipe dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé ja Príncipe dobra"
         ],
         "SUR": [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -391,6 +391,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaniese ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaniese ouguiya"
         ],
         "MUR": [
@@ -547,6 +551,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé en Príncipe dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé en Príncipe dobra"
         ],
         "SYP": [

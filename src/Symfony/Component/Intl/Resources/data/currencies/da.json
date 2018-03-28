@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "ADP": [
             "ADP",
@@ -603,6 +603,10 @@
         ],
         "MRO": [
             "MRO",
+            "mauritansk ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mauritansk ouguiya"
         ],
         "MTL": [
@@ -823,6 +827,10 @@
         ],
         "STD": [
             "STD",
+            "dobra fra Sao Tome og Principe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra fra Sao Tome og Principe"
         ],
         "SUR": [

@@ -71,7 +71,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
         )), array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension($this->extension);
-        $environment->setCharset('ISO-8859-15');
+        $environment->setCharset('ISO-8859-1');
 
         $this->extension->initRuntime($environment);
 

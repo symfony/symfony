@@ -63,7 +63,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 
     public function testMoneyWidgetInIso()
     {
-        $this->engine->setCharset('ISO-8859-15');
+        $this->engine->setCharset('ISO-8859-1');
 
         $view = $this->factory
             ->createNamed('name', 'money')

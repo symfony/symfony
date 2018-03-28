@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-03-22T12:45:34Z
+
+I've tested this out - it works really well. Wow :p. The only imperfection (for the main use-case of controller args) is that the message contains only the controller *class*, not the method. I can see technically why that is - it's tricky. But, is this possible by either passing some extra context information from `RegisterControllerArgumentLocatorsPass` or by catching the `RuntimeException` in `ServiceValueResolver` and adding more context with a new exception?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-22T13:48:30Z
+
+what happens if multiple controllers are referencing the same broken typehint ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T14:16:42Z
+
+~PR embeds #26636 until it's merged.~
+@stof I was fixing that while you commented :)
+@weaverryan I'm surprised you did not ask for the name of the argument also. So I added it ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-24T16:55:10Z
+
+Comments addressed.

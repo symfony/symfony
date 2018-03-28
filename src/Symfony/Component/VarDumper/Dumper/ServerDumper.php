@@ -11,8 +11,16 @@
 
 namespace Symfony\Component\VarDumper\Dumper;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\CliContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * ServerDumper forwards serialized Data clones to a server.
@@ -40,6 +48,42 @@ class ServerDumper implements DataDumperInterface
         $this->host = $host;
         $this->wrappedDumper = $wrappedDumper;
         $this->contextProviders = $contextProviders;
+    }
+
+    /**
+     * @final
+     */
+    public static function getDefaultContextProviders(Request $request = null, string $projectDir = null): array
+    {
+        $contextProviders = array();
+
+        if ('cli' !== PHP_SAPI && ($request || class_exists(Request::class))) {
+            $requestStack = new RequestStack();
+            $requestStack->push($request ?? Request::createFromGlobals());
+            $contextProviders['request'] = new RequestContextProvider($requestStack);
+        }
+
+        $fileLinkFormatter = class_exists(FileLinkFormatter::class) ? new FileLinkFormatter(null, $requestStack ?? null, $projectDir) : null;
+
+        return $contextProviders + array(
+            'cli' => new CliContextProvider(),
+            'source' => new SourceContextProvider(null, $projectDir, $fileLinkFormatter),
+        );
+    }
+
+    /**
+     * @final
+     */
+    public static function register(string $host = null, array $contextProviders = array()): ?callable
+    {
+        $contextProviders += self::getDefaultContextProviders();
+        $host = $host ?? $_SERVER['VAR_DUMPER_SERVER'] ?? '127.0.0.1:9912';
+        $cloner = new VarCloner();
+        $dumper = new self($host, VarDumper::getDefaultDumper(), $contextProviders);
+
+        return VarDumper::setHandler(function ($var) use ($dumper, $cloner) {
+            $dumper->dump($cloner->cloneVar($var));
+        });
     }
 
     public function getContextProviders(): array

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -844,5 +845,19 @@ class AutowirePassTest extends TestCase
 
         (new DecoratorServicePass())->process($container);
         (new AutowirePass())->process($container);
+    }
+
+    public function testErroredServiceLocator()
+    {
+        $container = new ContainerBuilder();
+        $container->register('some_locator', 'stdClass')
+            ->addArgument(new TypedReference(MissingClass::class, MissingClass::class, ContainerBuilder::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE))
+            ->addTag('container.service_locator');
+
+        (new AutowirePass())->process($container);
+
+        $erroredDefinition = new Definition(MissingClass::class);
+
+        $this->assertEquals($erroredDefinition->addError('Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'), $container->getDefinition('_errored.some_locator.'.MissingClass::class));
     }
 }

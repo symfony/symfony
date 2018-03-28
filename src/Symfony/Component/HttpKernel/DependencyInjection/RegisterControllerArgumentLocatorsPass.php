@@ -126,7 +126,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     if (isset($arguments[$r->name][$p->name])) {
                         $target = $arguments[$r->name][$p->name];
                         if ('?' !== $target[0]) {
-                            $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+                            $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
                         } elseif ('' === $target = (string) substr($target, 1)) {
                             throw new InvalidArgumentException(sprintf('A "%s" tag must have non-empty "id" attributes for service "%s".', $this->controllerTag, $id));
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
@@ -150,6 +150,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         continue;
                     } elseif (!$type || !$autowire) {
                         continue;
+                    } elseif (!$p->allowsNull()) {
+                        $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
                     }
 
                     if (Request::class === $type) {

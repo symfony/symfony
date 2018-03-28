@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Errored_Definition extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -130,7 +130,7 @@ class ProjectServiceContainer extends Container
     {
         $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
 
-        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
+        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, 'foo_bar');
 
         $a->configure($instance);
 
@@ -498,6 +498,7 @@ class ProjectServiceContainer extends Container
             'baz_class' => 'BazClass',
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
+            'foo_bar' => 'foo_bar',
         );
     }
 }

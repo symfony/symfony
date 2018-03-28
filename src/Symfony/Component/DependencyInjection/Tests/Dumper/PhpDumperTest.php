@@ -967,6 +967,24 @@ class PhpDumperTest extends TestCase
         $this->assertSame('bar', $container->getParameter('Foo'));
         $this->assertSame('foo', $container->getParameter('BAR'));
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Service "errored_definition" is broken.
+     */
+    public function testErroredDefinition()
+    {
+        $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->setParameter('foo_bar', 'foo_bar');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Errored_Definition'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_errored_definition.php', str_replace(str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), '%path%', $dump));
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Errored_Definition();
+        $container->get('runtime_error');
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

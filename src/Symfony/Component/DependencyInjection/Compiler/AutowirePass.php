@@ -86,7 +86,16 @@ class AutowirePass extends AbstractRecursivePass
             if ($ref = $this->getAutowiredReference($value)) {
                 return $ref;
             }
-            $this->container->log($this, $this->createTypeNotFoundMessage($value, 'it'));
+            $message = $this->createTypeNotFoundMessage($value, 'it');
+
+            if (ContainerBuilder::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior()) {
+                // since the error message varies by referenced id and $this->currentId, so should the id of the dummy errored definition
+                $this->container->register($id = sprintf('_errored.%s.%s', $this->currentId, (string) $value), $value->getType())
+                    ->addError($message);
+
+                return new TypedReference($id, $value->getType(), $value->getInvalidBehavior());
+            }
+            $this->container->log($this, $message);
         }
         $value = parent::processValue($value, $isRoot);
 

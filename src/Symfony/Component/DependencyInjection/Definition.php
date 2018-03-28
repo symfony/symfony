@@ -873,10 +873,14 @@ class Definition
      * Add an error that occurred when building this Definition.
      *
      * @param string $error
+     *
+     * @return $this
      */
     public function addError($error)
     {
         $this->errors[] = $error;
+
+        return $this;
     }
 
     /**

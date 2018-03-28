@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "aa": "afarščina",
         "ab": "abhaščina",
@@ -374,6 +374,7 @@
         "rm": "retoromanščina",
         "rn": "rundščina",
         "ro": "romunščina",
+        "ro_MD": "moldavščina",
         "rof": "rombo",
         "rom": "romščina",
         "root": "rootščina",

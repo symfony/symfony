@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.6",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -287,6 +287,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ouguiya da Mauritânia (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ouguiya da Mauritânia"
         ],
         "MVR": [
@@ -397,6 +401,10 @@
         "SRD": [
             "SRD",
             "dólar do Suriname"
+        ],
+        "STN": [
+            "STN",
+            "São Tomé & Príncipe Dobra (2018)"
         ],
         "SZL": [
             "SZL",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "aa": "Tiếng Afar",
         "ab": "Tiếng Abkhazia",
@@ -29,6 +29,7 @@
         "aro": "Tiếng Araona",
         "arp": "Tiếng Arapaho",
         "arq": "Tiếng Ả Rập Algeria",
+        "ars": "Tiếng Ả Rập Najdi",
         "arw": "Tiếng Arawak",
         "arz": "Tiếng Ả Rập Ai Cập",
         "as": "Tiếng Assam",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.20",
     "Names": {
         "aa": "afar",
         "ab": "abkhaze",
@@ -30,6 +30,7 @@
         "aro": "araona",
         "arp": "arapaho",
         "arq": "arabe algérien",
+        "ars": "arabe najdi",
         "arw": "arawak",
         "ary": "arabe marocain",
         "arz": "arabe égyptien",

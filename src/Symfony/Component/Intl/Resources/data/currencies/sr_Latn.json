@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.8",
+    "Version": "2.1.39.37",
     "Names": {
         "ADP": [
             "ADP",
@@ -623,6 +623,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanijska ogija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanijska ogija"
         ],
         "MTL": [
@@ -763,11 +767,11 @@
         ],
         "ROL": [
             "ROL",
-            "Rumunski lej"
+            "Rumunski lej (1952–2006)"
         ],
         "RON": [
             "RON",
-            "Rumunski lej (1952–2006)"
+            "Rumunski lej"
         ],
         "RSD": [
             "RSD",
@@ -851,6 +855,10 @@
         ],
         "STD": [
             "STD",
+            "Saotomska dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Saotomska dobra"
         ],
         "SUR": [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -379,6 +379,10 @@
         ],
         "MRO": [
             "MRO",
+            "i-Mauritanian Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "i-Mauritanian Ouguiya"
         ],
         "MUR": [
@@ -527,6 +531,10 @@
         ],
         "STD": [
             "STD",
+            "i-São Tomé kanye ne-Príncipe Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "i-São Tomé kanye ne-Príncipe Dobra"
         ],
         "SYP": [

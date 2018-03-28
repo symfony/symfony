@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.17",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -643,6 +643,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ouguiya Mauritania (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ouguiya Mauritania"
         ],
         "MTL": [
@@ -859,6 +863,10 @@
         ],
         "STD": [
             "STD",
+            "Dobra São Tomé a Príncipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobra São Tomé a Príncipe"
         ],
         "SVC": [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "ADP": [
             "ADP",
@@ -611,6 +611,10 @@
         ],
         "MRO": [
             "MRO",
+            "mauritanske ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mauritanske ouguiya"
         ],
         "MTL": [
@@ -839,6 +843,10 @@
         ],
         "STD": [
             "STD",
+            "saotomesiske dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "saotomesiske dobra"
         ],
         "SUR": [
@@ -871,7 +879,7 @@
         ],
         "TMM": [
             "TMM",
-            "turkmenske manat (1993–2009)"
+            "turkmensk manat (1993–2009)"
         ],
         "TMT": [
             "TMT",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.96",
+    "Version": "2.1.39.41",
     "Names": {
         "ADP": [
             "ADP",
@@ -683,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauretanischer Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauretanischer Ouguiya"
         ],
         "MTL": [
@@ -915,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "São-toméischer Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São-toméischer Dobra"
         ],
         "SUR": [

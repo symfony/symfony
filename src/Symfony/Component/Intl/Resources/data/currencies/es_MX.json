@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.32",
+    "Version": "2.1.38.73",
     "Names": {
         "CNH": [
             "CNH",
@@ -16,6 +16,10 @@
         "MYR": [
             "MYR",
             "ringit"
+        ],
+        "STN": [
+            "STN",
+            "dobra santotomense"
         ],
         "THB": [
             "THB",

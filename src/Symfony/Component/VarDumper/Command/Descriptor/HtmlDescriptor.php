@@ -42,7 +42,11 @@ class HtmlDescriptor implements DumpDescriptorInterface
         }
 
         $title = '-';
-        if (isset($context['request'])) {
+        if (isset($context['phpunit'])) {
+            $phpunit = $context['phpunit'];
+            $title = '<code>PhpUnit</code>'.sprintf('%s::%s', $phpunit['test_class'], $phpunit['test_case']);
+            $dedupIdentifier = $phpunit['identifier'];
+        } elseif (isset($context['request'])) {
             $request = $context['request'];
             $title = sprintf('<code>%s</code> <a href="%s">%s</a>', $request['method'], $uri = $request['uri'], $uri);
             $dedupIdentifier = $request['identifier'];

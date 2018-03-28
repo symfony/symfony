@@ -60,7 +60,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $dom = new \DOMDocument('UTF-8');
         try {
-            $dom->loadHTML('<!DOCTYPE html><html><body>'.$html.'</body></html>');
+            // Wrap in <root> node so we can load HTML with multiple tags at
+            // the top level
+            $dom->loadXML('<root>'.$html.'</root>');
         } catch (\Exception $e) {
             $this->fail(sprintf(
                 "Failed loading HTML:\n\n%s\n\nError: %s",
@@ -69,15 +71,17 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             ));
         }
         $xpath = new \DOMXPath($dom);
-        $nodeList = $xpath->evaluate('/html/body'.$expression);
+        $nodeList = $xpath->evaluate('/root'.$expression);
 
         if ($nodeList->length != $count) {
+            $dom->formatOutput = true;
             $this->fail(sprintf(
                 "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
                 $expression,
                 1 == $count ? 'once' : $count.' times',
                 1 == $nodeList->length ? 'once' : $nodeList->length.' times',
-                $html
+                // strip away <root> and </root>
+                substr($dom->saveHTML(), 6, -8)
             ));
         } else {
             $this->addToAssertionCount(1);

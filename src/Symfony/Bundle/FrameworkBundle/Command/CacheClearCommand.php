@@ -93,8 +93,8 @@ EOF
         // The current event dispatcher is stale, let's not use it anymore
         $this->getApplication()->setDispatcher(new EventDispatcher());
 
-        $containerDir = new \ReflectionObject($kernel->getContainer());
-        $containerDir = basename(dirname($containerDir->getFileName()));
+        $containerFile = (new \ReflectionObject($kernel->getContainer()))->getFileName();
+        $containerDir = basename(dirname($containerFile));
 
         // the warmup cache dir name must have the same length as the real one
         // to avoid the many problems in serialized resources files
@@ -104,34 +104,50 @@ EOF
             $io->comment('Clearing outdated warmup directory...');
         }
         $fs->remove($warmupDir);
-        $fs->mkdir($warmupDir);
 
-        if (!$input->getOption('no-warmup')) {
+        if ($_SERVER['REQUEST_TIME'] <= filemtime($containerFile) && filemtime($containerFile) <= time()) {
             if ($output->isVerbose()) {
-                $io->comment('Warming up cache...');
+                $io->comment('Cache is fresh.');
             }
-            $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
-        }
+            if (!$input->getOption('no-warmup') && !$input->getOption('no-optional-warmers')) {
+                if ($output->isVerbose()) {
+                    $io->comment('Warming up optional cache...');
+                }
+                $warmer = $kernel->getContainer()->get('cache_warmer');
+                // non optional warmers already ran during container compilation
+                $warmer->enableOnlyOptionalWarmers();
+                $warmer->warmUp($realCacheDir);
+            }
+        } else {
+            $fs->mkdir($warmupDir);
 
-        $containerDir = $fs->exists($warmupDir.'/'.$containerDir) ? false : $containerDir;
+            if (!$input->getOption('no-warmup')) {
+                if ($output->isVerbose()) {
+                    $io->comment('Warming up cache...');
+                }
+                $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
+            }
 
-        $fs->rename($realCacheDir, $oldCacheDir);
-        $fs->rename($warmupDir, $realCacheDir);
+            $containerDir = $fs->exists($warmupDir.'/'.$containerDir) ? false : $containerDir;
 
-        if ($containerDir) {
-            $fs->rename($oldCacheDir.'/'.$containerDir, $realCacheDir.'/'.$containerDir);
-            touch($realCacheDir.'/'.$containerDir.'.legacy');
-        }
+            $fs->rename($realCacheDir, $oldCacheDir);
+            $fs->rename($warmupDir, $realCacheDir);
 
-        if ($output->isVerbose()) {
-            $io->comment('Removing old cache directory...');
-        }
+            if ($containerDir) {
+                $fs->rename($oldCacheDir.'/'.$containerDir, $realCacheDir.'/'.$containerDir);
+                touch($realCacheDir.'/'.$containerDir.'.legacy');
+            }
 
-        try {
-            $fs->remove($oldCacheDir);
-        } catch (IOException $e) {
             if ($output->isVerbose()) {
-                $io->warning($e->getMessage());
+                $io->comment('Removing old cache directory...');
+            }
+
+            try {
+                $fs->remove($oldCacheDir);
+            } catch (IOException $e) {
+                if ($output->isVerbose()) {
+                    $io->warning($e->getMessage());
+                }
             }
         }
 
@@ -152,11 +168,12 @@ EOF
         $kernel->reboot($warmupDir);
 
         // warmup temporary dir
-        $warmer = $kernel->getContainer()->get('cache_warmer');
         if ($enableOptionalWarmers) {
-            $warmer->enableOptionalWarmers();
+            $warmer = $kernel->getContainer()->get('cache_warmer');
+            // non optional warmers already ran during container compilation
+            $warmer->enableOnlyOptionalWarmers();
+            $warmer->warmUp($warmupDir);
         }
-        $warmer->warmUp($warmupDir);
 
         // fix references to cached files with the real cache directory name
         $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));

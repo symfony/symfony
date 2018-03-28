@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "aa": "afar",
         "ab": "abkhasiskt",
@@ -39,7 +39,7 @@
         "bin": "bini",
         "bla": "siksika",
         "bm": "bambara",
-        "bn": "bengalskt",
+        "bn": "bangla",
         "bo": "tibetskt",
         "br": "bretonskt",
         "brx": "bodo",
@@ -124,7 +124,7 @@
         "hr": "kroatiskt",
         "hsb": "ovara sorbian",
         "hsn": "xiang kinesiskt",
-        "ht": "haitiskt",
+        "ht": "haitiskt creole",
         "hu": "ungarskt",
         "hup": "hupa",
         "hy": "armenskt",
@@ -267,7 +267,7 @@
         "nyn": "nyankole",
         "oc": "occitanskt",
         "om": "oromo",
-        "or": "oriya",
+        "or": "odia",
         "os": "ossetiskt",
         "pa": "punjabi",
         "pag": "pangasinan",

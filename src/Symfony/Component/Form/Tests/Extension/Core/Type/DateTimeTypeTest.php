@@ -293,7 +293,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertEquals('datetime', $view->vars['type']);
+        $this->assertEquals('datetime-local', $view->vars['type']);
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
@@ -443,7 +443,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertSame('datetime', $view->vars['type']);
+        $this->assertSame('datetime-local', $view->vars['type']);
     }
 
     public function testDontPassHtml5TypeIfHtml5NotAllowed()

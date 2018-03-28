@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.15",
     "Names": {
         "ADP": [
             "ADP",
@@ -595,6 +595,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya mauretańska (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya mauretańska"
         ],
         "MTL": [
@@ -819,6 +823,10 @@
         ],
         "STD": [
             "STD",
+            "dobra Wysp Świętego Tomasza i Książęcej (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra Wysp Świętego Tomasza i Książęcej"
         ],
         "SUR": [

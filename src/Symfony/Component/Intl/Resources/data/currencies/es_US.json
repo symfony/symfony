@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.38.73",
     "Names": {
         "JPY": [
             "¥",
@@ -8,6 +8,10 @@
         "MYR": [
             "MYR",
             "ringit"
+        ],
+        "STN": [
+            "STN",
+            "dobra santotomense"
         ],
         "THB": [
             "THB",

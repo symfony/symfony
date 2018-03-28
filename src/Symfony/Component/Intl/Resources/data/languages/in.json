@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhaz",
@@ -28,6 +28,7 @@
         "arn": "Mapuche",
         "arp": "Arapaho",
         "arq": "Arab Aljazair",
+        "ars": "Arab Najdi",
         "arw": "Arawak",
         "ary": "Arab Maroko",
         "arz": "Arab Mesir",

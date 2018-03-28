@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.27",
     "Languages": [
         "aa",
         "ab",
@@ -512,6 +512,7 @@
         "sog",
         "sq",
         "sr",
+        "sr_ME",
         "srn",
         "srr",
         "ss",
@@ -671,6 +672,7 @@
         "chv": "cv",
         "cld": "syr",
         "cmn": "zh",
+        "cnr": "sr_ME",
         "cor": "kw",
         "cos": "co",
         "cre": "cr",

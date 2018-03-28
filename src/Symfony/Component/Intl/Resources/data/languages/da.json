@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -25,6 +25,7 @@
         "arc": "aramæisk",
         "arn": "mapudungun",
         "arp": "arapaho",
+        "ars": "najd-arabisk",
         "arw": "arawak",
         "as": "assamesisk",
         "asa": "asu",

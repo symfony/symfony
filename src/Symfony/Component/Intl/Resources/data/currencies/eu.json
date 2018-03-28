@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -384,6 +384,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaniako ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaniako ouguiya"
         ],
         "MUR": [
@@ -532,6 +536,10 @@
         ],
         "STD": [
             "STD",
+            "Sao Tomeko eta Principeko dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Sao Tomeko eta Principeko dobra"
         ],
         "SYP": [

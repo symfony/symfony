@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "ADP": [
             "ADP",
@@ -499,6 +499,10 @@
         ],
         "MRO": [
             "MRO",
+            "márítönsk úgía (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "márítönsk úgía"
         ],
         "MTL": [
@@ -707,6 +711,10 @@
         ],
         "STD": [
             "STD",
+            "Saó Tóme og Prinsípe-dóbra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Saó Tóme og Prinsípe-dóbra"
         ],
         "SUR": [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.11",
+    "Version": "2.1.39.15",
     "Names": {
         "aa": "afarština",
         "ab": "abcházština",
@@ -30,6 +30,7 @@
         "aro": "araonština",
         "arp": "arapažština",
         "arq": "arabština (alžírská)",
+        "ars": "arabština (nadžd)",
         "arw": "arawacké jazyky",
         "ary": "arabština (marocká)",
         "arz": "arabština (egyptská)",

@@ -1500,7 +1500,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="datetime"]
+    [@type="datetime-local"]
     [@name="name"]
     [@value="2011-02-03T04:05:06Z"]
 '
@@ -1520,7 +1520,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="datetime"]
+    [@type="datetime-local"]
     [@name="name"]
     [@value="2011-02-03T04:05:06Z"]
 '

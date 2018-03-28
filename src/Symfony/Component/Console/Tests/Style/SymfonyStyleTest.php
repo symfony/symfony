@@ -74,7 +74,15 @@ class SymfonyStyleTest extends TestCase
     {
         $baseDir = __DIR__.'/../Fixtures/Style/SymfonyStyle';
 
-        return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
+        return array_map(function ($cmd) use ($baseDir) {
+            $basename = 'output_'.substr(basename($cmd, '.php'), 8).'.txt';
+            $output = $baseDir.'/output/'.$basename;
+            if ('\\' === \DIRECTORY_SEPARATOR && is_file($outputWin = $baseDir.'/output/win/'.$basename)) {
+                return array($cmd, $outputWin);
+            }
+
+            return array($cmd, $output);
+        }, glob($baseDir.'/command/command_*.php'));
     }
 
     public function testGetErrorStyle()

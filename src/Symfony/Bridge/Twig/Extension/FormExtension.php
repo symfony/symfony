@@ -170,15 +170,17 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     /**
      * @internal
      */
-    public function encodeCurrency(Environment $environment, $text)
+    public function encodeCurrency(Environment $environment, $text, $widget = '')
     {
         if ('UTF-8' === $charset = $environment->getCharset()) {
-            return htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
         }
 
-        $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
-
-        return iconv('UTF-8', $charset, $text);
+        return str_replace('{{ widget }}', $widget, $text);
     }
 
     /**

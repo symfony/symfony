@@ -264,14 +264,16 @@ class FormHelper extends Helper
     /**
      * @internal
      */
-    public function formEncodeCurrency($text)
+    public function formEncodeCurrency($text, $widget = '')
     {
-        if ('UTF-8' === $charset = $this->getCharset()) {
-            return htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
         }
 
-        $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
-
-        return iconv('UTF-8', $charset, $text);
+        return str_replace('{{ widget }}', $widget, $text);
     }
 }

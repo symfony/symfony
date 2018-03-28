@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-03-28T15:31:51Z
+
+> small API additions, improvements, and bug fixes.
+
+these small API additions are irrelevant for this PR though, as this is only about the CLDR data. The ICU API is what the PHP Intl extension is about.

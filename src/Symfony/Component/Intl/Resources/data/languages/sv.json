@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.20",
     "Names": {
         "aa": "afar",
         "ab": "abchaziska",
@@ -30,6 +30,7 @@
         "aro": "araoniska",
         "arp": "arapaho",
         "arq": "algerisk arabiska",
+        "ars": "najdiarabiska",
         "arw": "arawakiska",
         "ary": "marockansk arabiska",
         "arz": "egyptisk arabiska",

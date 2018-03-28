@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "ADP": [
             "ADP",
@@ -671,6 +671,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya da la Mauretania (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya da la Mauretania"
         ],
         "MTL": [
@@ -899,6 +903,10 @@
         ],
         "STD": [
             "STD",
+            "dobra da São Tomé e Principe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra da São Tomé e Principe"
         ],
         "SUR": [

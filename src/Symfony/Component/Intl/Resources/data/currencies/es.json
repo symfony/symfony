@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.39.20",
     "Names": {
         "ADP": [
             "ADP",
@@ -615,6 +615,10 @@
         ],
         "MRO": [
             "MRO",
+            "uguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "uguiya"
         ],
         "MTL": [
@@ -843,6 +847,10 @@
         ],
         "STD": [
             "STD",
+            "dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra"
         ],
         "SUR": [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -39,7 +39,7 @@
         ],
         "AZN": [
             "AZN",
-            "Manata e Azerbajxhanit"
+            "Manata azerbajxhanase"
         ],
         "BAM": [
             "BAM",
@@ -123,7 +123,7 @@
         ],
         "CNH": [
             "CNH",
-            "Juani kinez (tregu i jashtëm)"
+            "Juani kinez (për treg të jashtëm)"
         ],
         "CNY": [
             "CN¥",
@@ -151,7 +151,7 @@
         ],
         "CZK": [
             "CZK",
-            "Koruna e Republikës Çeke"
+            "Koruna e Çekisë"
         ],
         "DJF": [
             "DJF",
@@ -171,7 +171,7 @@
         ],
         "EGP": [
             "EGP",
-            "Stërlina egjiptiane"
+            "Sterlina egjiptiane"
         ],
         "ERN": [
             "ERN",
@@ -375,6 +375,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ugija mauritane (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ugija mauritane"
         ],
         "MUR": [
@@ -491,7 +495,7 @@
         ],
         "SDG": [
             "SDG",
-            "Stërlina sudaneze"
+            "Sterlina sudaneze"
         ],
         "SEK": [
             "SEK",
@@ -503,7 +507,7 @@
         ],
         "SHP": [
             "SHP",
-            "Stërlina e Ishullit të Shën-Helenës"
+            "Sterlina e Ishullit të Shën-Helenës"
         ],
         "SLL": [
             "SLL",
@@ -519,10 +523,14 @@
         ],
         "SSP": [
             "SSP",
-            "Stërlina e Sudanit të Jugut"
+            "Sterlina sudanezo-jugore"
         ],
         "STD": [
             "STD",
+            "Dobra e Sao-Tomes dhe Prinsipes (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobra e Sao-Tomes dhe Prinsipes"
         ],
         "SYP": [

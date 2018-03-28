@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.8",
+    "Version": "2.1.39.37",
     "Names": {
         "BYN": [
             "BYN",
@@ -16,6 +16,10 @@
         "PEN": [
             "PEN",
             "Peruanischer Neuer Sol"
+        ],
+        "STN": [
+            "STN",
+            "São-toméischer Dobra (2018)"
         ]
     }
 }

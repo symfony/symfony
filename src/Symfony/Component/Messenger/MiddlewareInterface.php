@@ -20,6 +20,7 @@ interface MiddlewareInterface
 {
     /**
      * @param object $message
+     * @param callable $next
      *
      * @return mixed
      */

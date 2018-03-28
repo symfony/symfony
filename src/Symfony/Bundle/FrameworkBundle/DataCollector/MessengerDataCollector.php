@@ -34,7 +34,7 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
      */
     public function getName()
     {
-        return 'messages';
+        return 'messenger';
     }
 
     /**

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-19T10:07:30Z
+
+@chalasr much better! If I may, I'd like to propose another tweak to your latest proposal:
+
+```
+Cannot autowire service "_____": argument "_____" of method "_____" is ambiguous
+because it references interface "_____" which is implemented by multiple
+services. You should alias this interface to one of these services: "_____",
+"_____", "_____".
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-29T11:33:06Z
+
+@javiereguiluz Not that I dislike your suggestion, but it applies for interfaces only whereas this code deals with classes as well and I'm just not in the mood for adding more conditions into it. This PR removes a bad suggestion, please feel free to improve the correct one in another :)
+
+Ready on my side.

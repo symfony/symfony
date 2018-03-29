@@ -67,12 +67,12 @@ class MessengerPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $handles = $tag['handles'] ?? $this->guessHandledClass($container, $serviceId);
+                $handles = $tag['handles'] ?? $this->guessHandledClass($r = $container->getReflectionClass($container->getParameterBag()->resolveValue($container->getDefinition($serviceId)->getClass())), $serviceId);
 
                 if (!class_exists($handles)) {
-                    $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : 'declared in `__invoke` function';
+                    $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::__invoke()"', $r->getName());
 
-                    throw new RuntimeException(sprintf('The message class "%s" %s of service "%s" does not exist.', $messageClassLocation, $handles, $serviceId));
+                    throw new RuntimeException(sprintf('Invalid handler service "%s": message class "%s" %s does not exist.', $serviceId, $handles, $messageClassLocation));
                 }
 
                 $priority = $tag['priority'] ?? 0;
@@ -108,27 +108,28 @@ class MessengerPass implements CompilerPassInterface
         $handlerResolver->replaceArgument(0, ServiceLocatorTagPass::register($container, $handlersLocatorMapping));
     }
 
-    private function guessHandledClass(ContainerBuilder $container, string $serviceId): string
+    private function guessHandledClass(\ReflectionClass $handlerClass, string $serviceId): string
     {
-        $reflection = $container->getReflectionClass($container->getDefinition($serviceId)->getClass());
-
         try {
-            $method = $reflection->getMethod('__invoke');
+            $method = $handlerClass->getMethod('__invoke');
         } catch (\ReflectionException $e) {
-            throw new RuntimeException(sprintf('Service "%s" should have an `__invoke` function.', $serviceId));
+            throw new RuntimeException(sprintf('Invalid handler service "%s": class "%s" must have an "__invoke()" method.', $serviceId, $handlerClass->getName()));
         }
 
         $parameters = $method->getParameters();
         if (1 !== count($parameters)) {
-            throw new RuntimeException(sprintf('`__invoke` function of service "%s" must have exactly one parameter.', $serviceId));
+            throw new RuntimeException(sprintf('Invalid handler service "%s": method "%s::__invoke()" must have exactly one argument corresponding to the message it handles.', $serviceId, $handlerClass->getName()));
         }
 
-        $parameter = $parameters[0];
-        if (null === $parameter->getClass()) {
-            throw new RuntimeException(sprintf('The parameter of `__invoke` function of service "%s" must type hint the message class it handles.', $serviceId));
+        if (!$type = $parameters[0]->getType()) {
+            throw new RuntimeException(sprintf('Invalid handler service "%s": argument "$%s" of method "%s::__invoke()" must have a type-hint corresponding to the message class it handles.', $serviceId, $parameters[0]->getName(), $handlerClass->getName()));
         }
 
-        return $parameter->getClass()->getName();
+        if ($type->isBuiltin()) {
+            throw new RuntimeException(sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::__invoke()" must be a class , "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $type));
+        }
+
+        return $parameters[0]->getType();
     }
 
     private function registerReceivers(ContainerBuilder $container)

@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "symfony/serializer": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/dependency-injection": "~3.4.6|~4.0",
         "symfony/property-access": "~3.4|~4.0"
     },
     "suggest": {

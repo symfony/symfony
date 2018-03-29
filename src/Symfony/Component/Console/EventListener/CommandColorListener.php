@@ -3,11 +3,10 @@
 namespace Symfony\Component\Console\EventListener;
 
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Adds support for an environment variable to enable/disable colors
+ * Adds support for an environment variable to enable/disable colors.
  *
  * Example use case:
  *     Running commands from crontab, rather than adding '--no-asci' to all
@@ -29,7 +28,7 @@ class CommandColorListener implements EventSubscriberInterface
     }
 
     /**
-     * Sets the decorated output option when an environment variable is set
+     * Sets the decorated output option when an environment variable is set.
      *
      * @param ConsoleCommandEvent $event
      */
@@ -41,13 +40,13 @@ class CommandColorListener implements EventSubscriberInterface
             return;
         }
 
-        $event->getOutput()->setDecorated(in_array($color, ['true', 'y', 'yes']));
+        $event->getOutput()->setDecorated(in_array($color, array('true', 'y', 'yes')));
     }
 
     public static function getSubscribedEvents()
     {
-        return [
+        return array(
             ConsoleEvents::COMMAND => array('onConsoleCommand', 0),
-        ];
+        );
     }
 }

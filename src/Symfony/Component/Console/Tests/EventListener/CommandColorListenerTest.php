@@ -53,41 +53,41 @@ class CommandColorListenerTest extends TestCase
         $this->fixture->onConsoleCommand(
             $this->createConfiguredMock(
                 ConsoleCommandEvent::class,
-                [
+                array(
                     'getOutput' => $output,
-                ]
+                )
             )
         );
     }
 
     public function sampleValueList()
     {
-        return [
-            [
+        return array(
+            array(
                 'TRUE',
                 true,
-            ],
-            [
+            ),
+            array(
                 'y',
                 true,
-            ],
-            [
+            ),
+            array(
                 'yes',
                 true,
-            ],
-            [
+            ),
+            array(
                 'n',
                 false,
-            ],
-            [
+            ),
+            array(
                 'false',
                 false,
-            ],
-            [
+            ),
+            array(
                 uniqid(),
                 false,
-            ],
-        ];
+            ),
+        );
     }
 
     public function testNotSet()
@@ -100,9 +100,9 @@ class CommandColorListenerTest extends TestCase
         $this->fixture->onConsoleCommand(
             $this->createConfiguredMock(
                 ConsoleCommandEvent::class,
-                [
+                array(
                     'getOutput' => $output,
-                ]
+                )
             )
         );
     }
@@ -110,11 +110,10 @@ class CommandColorListenerTest extends TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
-            [
+            array(
                 ConsoleEvents::COMMAND => array('onConsoleCommand', 0),
-            ],
+            ),
             CommandColorListener::getSubscribedEvents()
         );
     }
-
 }

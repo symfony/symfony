@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Parser;
  */
 class YamlEncoder implements EncoderInterface, DecoderInterface
 {
-    const FORMAT = 'yaml';
+    const FORMAT = array('yaml', 'yml');
 
     private $dumper;
     private $parser;
@@ -54,7 +54,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
      */
     public function supportsEncoding($format)
     {
-        return self::FORMAT === $format;
+        return in_array($format, self::FORMAT);
     }
 
     /**
@@ -72,6 +72,6 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
      */
     public function supportsDecoding($format)
     {
-        return self::FORMAT === $format;
+        return in_array($format, self::FORMAT);
     }
 }

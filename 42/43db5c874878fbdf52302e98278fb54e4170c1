@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-25T17:34:02Z
+
+Tests are red (and lowest deps need to be updated.)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-27T13:45:09Z
+
+I consider this solution "too big" for the tiny use case being solved. Can't this be solved using some PHP code somewhere in Symfony Forms? Roland suggested this: `htmlentities(self::getPattern($options['currency']), ENT_QUOTES | (defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8')` but Nico said that the place was wrong (https://github.com/symfony/symfony/pull/25167#discussion_r162824181). Could some Form expert help us here? Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-27T15:50:20Z
+
+@javiereguiluz
+
+> I consider this solution "too big" for the tiny use case being solved.
+
+I understand your point, but then again, to me anything related to escaping, raw vars, encoding etc. is serious topic. I prefer the twig filter to properly solve this on the right level, the templating level. Doing it beforehand in PHP / ignoring the issue feels weird.
+
+To me the fix is just OK, this is really about 2.7 vs. master.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-28T10:36:52Z
+
+apart from tests; this seems the proper fix. As discussed with @nicolas-grekas to move widget replacement to extension level, making the template concise.
+
+functional-wise, ive tested both ISO+UTF on 2.7 without any problems.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-28T11:53:39Z
+
+HHVM strikes again :( https://3v4l.org/NCWh2

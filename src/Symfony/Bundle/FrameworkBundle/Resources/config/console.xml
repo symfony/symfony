@@ -13,11 +13,6 @@
             <tag name="monolog.logger" channel="console" />
         </service>
 
-        <service id="console.color_listener" class="Symfony\Component\Console\EventListener\CommandColorListener">
-            <tag name="kernel.event_subscriber" />
-            <argument>SYM_COLOR</argument>
-        </service>
-
         <service id="console.command.about" class="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">
             <tag name="console.command" command="about" />
         </service>

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\EventListener;
 
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

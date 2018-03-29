@@ -3,8 +3,9 @@
 namespace Symfony\Component\Console\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\EventListener\CommandColorListener;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CommandColorListenerTest extends TestCase

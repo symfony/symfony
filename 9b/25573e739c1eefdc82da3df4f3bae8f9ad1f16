@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T07:49:42Z
+
+I've rebased my PR on master to make Travis happy.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-27T07:55:04Z
+
+I'm not sure about this because translations will have different kinds of `id` depending on its contents:
+
+```xml
+<trans-unit id="http_error_403.suggestion"> ... </trans-unit>
+<trans-unit id="ca41fec"> ... </trans-unit>
+```
+
+Why can't we just apply this md5 ID to all translation nodes? Why it's important to duplicate the translation contents in the `id` too? XLIFF is already verbose and this is not helping 😓
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T08:00:08Z
+
+As mentioned in https://github.com/symfony/symfony/issues/25758
+
+> For backward compatibility I don't expect to see a change to the way the <source> element is used, but for the 1.2 and 2.0 formats to be treated as equivalent it seems the same logic should be applied.
+
+So we use `source` as `name` to be similar to 1.2.

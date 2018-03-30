@@ -32,10 +32,10 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
 Parent types
 ------------
 
- • Symfony\Component\Form\Extension\Core\Type\FormType
+ * Symfony\Component\Form\Extension\Core\Type\FormType
 
 Type extensions
 ---------------
 
- • Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
+ * Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
 

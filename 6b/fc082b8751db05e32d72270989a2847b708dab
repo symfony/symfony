@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-28T13:45:36Z
+
+Be careful. That's one of the multiple characters that don't work on Windows. See https://github.com/sindresorhus/figures
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-28T15:00:41Z
+
+Now ready :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-28T16:32:31Z
+
+Duplicating expected outputs for Windows may be unwanted. Can't we use matchesFormat or str_replace bullets instead (and create a dedicated test case for this behavior)?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-28T16:38:54Z
+
+the files are globbed.. i found this the easiest, To maintain and be future proof. Not aiming for in-test formatting hassle / excluding these fixtures into separate tests.

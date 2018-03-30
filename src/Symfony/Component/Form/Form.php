@@ -713,6 +713,22 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
+    public function getChildrenTransformationFailures()
+    {
+        $failures = array();
+
+        foreach ($this->children as $childName => $child) {
+            if ($failure = $child->getTransformationFailure()) {
+                $failures[$childName] = $failure;
+            }
+        }
+
+        return $failures;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isEmpty()
     {
         foreach ($this->children as $child) {

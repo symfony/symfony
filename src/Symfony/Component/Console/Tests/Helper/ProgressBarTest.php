@@ -554,7 +554,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x0D\x1B[2K\x1B[1A\x1B[2K".
+            "\x0D\x1B[1A\x1B[2K".
             $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())
         );
@@ -663,6 +663,6 @@ class ProgressBarTest extends TestCase
     {
         $count = substr_count($expected, "\n");
 
-        return "\x0D\x1B[2K".($count ? str_repeat("\x1B[1A\x1B[2K", $count) : '').$expected;
+        return "\x0D".($count ? str_repeat("\x1B[1A\x1B[2K", $count) : '').$expected;
     }
 }

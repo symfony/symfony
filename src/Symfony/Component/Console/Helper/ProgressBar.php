@@ -520,9 +520,6 @@ class ProgressBar
                 // Move the cursor to the beginning of the line
                 $this->output->write("\x0D");
 
-                // Erase the line
-                $this->output->write("\x1B[2K");
-
                 // Erase previous lines
                 if ($this->formatLineCount > 0) {
                     $this->output->write(str_repeat("\x1B[1A\x1B[2K", $this->formatLineCount));

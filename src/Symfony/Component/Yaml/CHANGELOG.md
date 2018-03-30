@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Added support to dump `null` values as `~` through the `Yaml::DUMP_NULL_AS_TILDE` flag.
+
 4.0.0
 -----
 

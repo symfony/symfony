@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by emodric at 2018-03-27T09:55:08Z
+
+eZ Platform would also greatly benefit from this, since it also uses shared response across different sessions with the same user context.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-27T10:29:38Z
+
+If you share a response between sessions, you still have an issue with the cookie header containing one of the session ids. How do you handle it in this case ?
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-03-27T10:31:10Z
+
+@stof In eZ Platform case, and probably in FOS HTTP Cache bundle, `Vary` header does not contain `Cookie` header by default.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-03-27T11:42:22Z
+
+@stof There's a lot more to consider, you are right. This is why Symfony defaults to setting the response `private` and it's what I meant by "requires a more complex caching setup". All this PR is about is that it's very hard to disable the current behaviour of Symfony and I don't think this is a good thing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-27T11:48:05Z
+
+But any new feature on Symfony would not be applicable to 3rd party bundles, unless they plan to support Symfony 4.1 only.
+Since decorating this listener or adding a one next to it is all that is required, is it really worth it?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-03-27T11:49:53Z
+
+I'm sorry but I don't think I understand what you're saying, @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by dbu at 2018-03-27T15:11:02Z
+
+To illustrate the FOSHttpCache (and afaik ez publish) use case:
+
+1. Caching proxy does a request to get a cache context token. Usually, this is md5 of all groups the current user is part of.
+2. Caching proxy sends a request with a header Cache-Context-Hash using the hash it got, and also the original session cookie / auth header
+3. Symfony handles the request, renders a response, and decides that the response does not depend on the actual user in question, but only on the roles of that user, and is thus cacheable with a `Vary: Cache-Context-Hash`
+
+Its ok that symfony by default ignores what the application is telling about caching when the session has been used to generate the response. But for special cases like this, we need a way to disable this behaviour. Doing it with a response header seems the best solution because then it can be per response, but without needing a complicated configuration for the symfony listener as to which responses to handle or not.
+
+For symfony 4.0, we simply decorate the SessionListener and only call the inner listener it when there is no `Vary: Cache-Context-Hash` header present. Symfony 4.1 breaks this solution, because the SaveSessionListener is now integrated into the SessionListener. Plus the SessionListener is now more complicated to improve lazyness. We [started a pull request in FOSHttpCache](https://github.com/FriendsOfSymfony/FOSHttpCacheBundle/pull/438) to port most of that lazyness logic into our decorator, but it feels really complicated and clumsy, and might break again at any time because the coupling with Symfony itself is too high.
+
+---------------------------------------------------------------------------
+
+by dbu at 2018-03-27T15:12:20Z
+
+> But any new feature on Symfony would not be applicable to 3rd party bundles, unless they plan to support Symfony 4.1 only.
+
+We only register our decorator for symfony 3.4 or newer because before, the caching headers are not overwritten. If we can get such a solution into Symfony 4.1, we can limit the decorator to just 3.4 - 4.0
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-27T16:08:08Z
+
+@Toflar @dbu thanks for the details, OK on my side then :)
+
+> This check should also be moved upper in the method.
+
+I mean as early as possible in the method, eg not sure we need to check for the session service at all.
+
+> Symfony-NoPrivateIfSessionStarted
+
+this name is not accurate: max-age and must-revalidate also are removed.
+What about `Symfony-Session-NoAutoCacheControl`?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-03-27T16:12:40Z
+
+> What about Symfony-Session-NoAutoCacheControl?
+
+Naming things, right? 😄 Sounds perfect to me, changed.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-03-28T07:02:57Z
+
+I agree but at the same time, I don't want to change a PR that has been approved already. Waiting for mergers to comment on that. BTW: Failing tests are unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-28T13:57:02Z
+
+The const looks good to me.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-03-28T15:01:03Z
+
+Done then, thanks for the feedback!
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-03-28T16:11:30Z
+
+Done.

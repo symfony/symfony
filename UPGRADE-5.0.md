@@ -11,6 +11,10 @@ Console
 -------
 
  * Removed the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
+ * Removed the `setHorizontalBorderChar()` method in favor of the `setDefaultCrossingChars()` method in `TableStyle`.
+ * Removed the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
+ * Removed the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
+ * Removed the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
 
 DependencyInjection
 -------------------

@@ -190,4 +190,58 @@ class RepeatedTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, array('first' => null, 'second' => null));
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetOptionsForComparatorNotCallableOrNull()
+    {
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'comparator' => 'test',
+        ));
+    }
+
+    public function testSetOptionsForComparatorCallableAsNull()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'comparator' => null,
+        ));
+
+        $this->assertNull($form->getConfig()->getOption('comparator'));
+    }
+
+    public function testSetOptionsForComparatorCallableAsCallable()
+    {
+        $callable = function ($value1, $value2) {
+            return $value1 === $value2;
+        };
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'comparator' => $callable,
+        ));
+
+        $this->assertSame($callable, $form->getConfig()->getOption('comparator'));
+    }
+
+    public function comparator($value1, $value2)
+    {
+        return 0 === strcmp($value1, $value2);
+    }
+
+    public function testSetOptionsForComparatorNativeFunction()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'comparator' => array($this, 'comparator'),
+        ));
+
+        $input = array('first' => 'foo', 'second' => 'foo');
+
+        $form->submit($input);
+
+        $this->assertSame('foo', $form['first']->getViewData());
+        $this->assertSame('foo', $form['second']->getViewData());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($input, $form->getViewData());
+        $this->assertSame('foo', $form->getData());
+    }
 }

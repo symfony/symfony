@@ -43,6 +43,7 @@ CHANGELOG
  * added `Symfony\Component\Form\FormErrorIterator::findByCodes()`
  * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
  * added `FormPass`
+ * added `comparator` option to `RepeatedType`
 
 3.2.0
 -----

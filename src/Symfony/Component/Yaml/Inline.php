@@ -127,7 +127,7 @@ class Inline
                     throw new DumpException(sprintf('Unable to dump PHP resources in a YAML file ("%s").', get_resource_type($value)));
                 }
 
-                return 'null';
+                return self::getNullRepresentationValue($flags);
             case $value instanceof \DateTimeInterface:
                 return $value->format('c');
             case is_object($value):
@@ -153,11 +153,11 @@ class Inline
                     throw new DumpException('Object support when dumping a YAML file has been disabled.');
                 }
 
-                return 'null';
+                return self::getNullRepresentationValue($flags);
             case is_array($value):
                 return self::dumpArray($value, $flags);
             case null === $value:
-                return 'null';
+                return self::getNullRepresentationValue($flags);
             case true === $value:
                 return 'true';
             case false === $value:
@@ -737,5 +737,14 @@ EOF;
     private static function getHexRegex(): string
     {
         return '~^0x[0-9a-f_]++$~i';
+    }
+
+    private static function getNullRepresentationValue(int $flags): string
+    {
+        if (Yaml::DUMP_NULL_AS_TILDE & $flags) {
+            return '~';
+        }
+
+        return 'null';
     }
 }

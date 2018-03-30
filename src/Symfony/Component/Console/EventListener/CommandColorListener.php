@@ -50,7 +50,7 @@ class CommandColorListener implements EventSubscriberInterface
             return;
         }
 
-        $event->getOutput()->setDecorated(in_array($color, array('true', 'y', 'yes')));
+        $event->getOutput()->setDecorated(in_array($color, array('true', 'y', 'yes', '1')));
     }
 
     public static function getSubscribedEvents()

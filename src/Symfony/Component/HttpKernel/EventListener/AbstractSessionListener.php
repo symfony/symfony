@@ -20,13 +20,22 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Sets the session in the request.
+ * Sets the session onto the request on the "kernel.request" event and saves
+ * it on the "kernel.response" event.
+ *
+ * In addition, if the session has been started it overrides the Cache-Control
+ * header in such a way that all caching is disabled in that case.
+ * If you have a scenario where caching responses with session information in
+ * them makes sense, you can disable this behaviour by setting the header
+ * AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER on the response.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {
+    const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
+
     protected $container;
 
     public function __construct(ContainerInterface $container = null)
@@ -60,12 +69,19 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
+        $response = $event->getResponse();
+
         if ($session->isStarted() || ($session instanceof Session && $session->hasBeenStarted())) {
-            $event->getResponse()
-                ->setPrivate()
-                ->setMaxAge(0)
-                ->headers->addCacheControlDirective('must-revalidate');
+            if (!$response->headers->has(self::NO_AUTO_CACHE_CONTROL_HEADER)) {
+                $response
+                    ->setPrivate()
+                    ->setMaxAge(0)
+                    ->headers->addCacheControlDirective('must-revalidate');
+            }
         }
+
+        // Always remove the internal header if present
+        $response->headers->remove(self::NO_AUTO_CACHE_CONTROL_HEADER);
 
         if ($session->isStarted()) {
             /*

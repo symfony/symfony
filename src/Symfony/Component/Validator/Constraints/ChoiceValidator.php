@@ -34,7 +34,7 @@ class ChoiceValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Choice');
         }
 
-        if (!is_array($constraint->choices) && !$constraint->callback) {
+        if (!is_array($constraint->choices) && !$constraint->callback && !$constraint->enum) {
             throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
         }
 
@@ -54,6 +54,9 @@ class ChoiceValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
             }
             $choices = call_user_func($choices);
+        } elseif ($constraint->enum) {
+            $enum = new \ReflectionClass($constraint->enum);
+            $choices = $enum->getConstants();
         } else {
             $choices = $constraint->choices;
         }

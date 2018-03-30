@@ -22,6 +22,9 @@ function choice_callback()
 
 class ChoiceValidatorTest extends ConstraintValidatorTestCase
 {
+    const FOO = 'foo';
+    const BAR = 'bar';
+
     protected function createValidator()
     {
         return new ChoiceValidator();
@@ -67,7 +70,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testChoicesOrCallbackExpected()
+    public function testChoicesOrCallbackOrEnumExpected()
     {
         $this->validator->validate('foobar', new Choice());
     }
@@ -142,6 +145,15 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Choice(array('callback' => 'objectMethodCallback'));
 
         $this->validator->validate('bar', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidChoiceClassConstantsEnum()
+    {
+        $constraint = new Choice(array('enum' => __CLASS__));
+
+        $this->validator->validate('foo', $constraint);
 
         $this->assertNoViolation();
     }

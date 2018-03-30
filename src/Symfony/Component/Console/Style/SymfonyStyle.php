@@ -103,7 +103,7 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
         $elements = array_map(function ($element) {
-            return sprintf(' * %s', $element);
+            return sprintf(' %s %s', '\\' === DIRECTORY_SEPARATOR ? '*' : '•', $element);
         }, $elements);
 
         $this->writeln($elements);

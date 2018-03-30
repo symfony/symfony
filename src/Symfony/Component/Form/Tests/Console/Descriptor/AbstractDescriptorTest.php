@@ -127,7 +127,14 @@ abstract class AbstractDescriptorTest extends TestCase
 
     private function getFixtureFilename($name)
     {
-        return sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
+        $format = $this->getFormat();
+        $baseDir = __DIR__.'/../../Fixtures/Descriptor';
+        $file = $baseDir.'/'.$name.'.'.$format;
+        if ('\\' === DIRECTORY_SEPARATOR && is_file($winFile = $baseDir.'/win/'.$name.'.'.$format)) {
+            return $winFile;
+        }
+
+        return $file;
     }
 }
 

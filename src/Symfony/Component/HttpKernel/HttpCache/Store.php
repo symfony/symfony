@@ -387,16 +387,22 @@ class Store implements StoreInterface
 
             $tmpFile = tempnam(dirname($path), basename($path));
             if (false === $fp = @fopen($tmpFile, 'wb')) {
+                @unlink($tmpFile);
+
                 return false;
             }
             @fwrite($fp, $data);
             @fclose($fp);
 
             if ($data != file_get_contents($tmpFile)) {
+                @unlink($tmpFile);
+
                 return false;
             }
 
             if (false === @rename($tmpFile, $path)) {
+                @unlink($tmpFile);
+
                 return false;
             }
         }

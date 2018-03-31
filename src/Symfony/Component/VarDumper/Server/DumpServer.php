@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper\Server;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * A server collecting Data clones sent by a ServerDumper.
@@ -51,7 +52,7 @@ class DumpServer
         }
 
         foreach ($this->getMessages() as $clientId => $message) {
-            $payload = @unserialize(base64_decode($message));
+            $payload = @unserialize(base64_decode($message), array('allowed_classes' => array(Data::class, Stub::class)));
 
             // Impossible to decode the message, give up.
             if (false === $payload) {

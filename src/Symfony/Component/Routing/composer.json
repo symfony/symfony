@@ -21,7 +21,6 @@
     "require-dev": {
         "symfony/config": "~3.4|~4.0",
         "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",
@@ -30,13 +29,11 @@
     },
     "conflict": {
         "symfony/config": "<3.4",
-        "symfony/dependency-injection": "<3.4",
-        "symfony/yaml": "<3.4"
+        "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
         "symfony/http-foundation": "For using a Symfony Request object",
         "symfony/config": "For using the all-in-one router or any loader",
-        "symfony/yaml": "For using the YAML loader",
         "symfony/expression-language": "For using expression matching",
         "doctrine/annotations": "For using the annotation loader",
         "symfony/dependency-injection": "For loading routes from a service"

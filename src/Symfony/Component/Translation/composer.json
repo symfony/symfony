@@ -24,18 +24,15 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/intl": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0",
         "symfony/finder": "~2.8|~3.0|~4.0",
         "psr/log": "~1.0"
     },
     "conflict": {
         "symfony/config": "<3.4",
-        "symfony/dependency-injection": "<3.4",
-        "symfony/yaml": "<3.4"
+        "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
         "symfony/config": "",
-        "symfony/yaml": "",
         "psr/log": "To use logging capability in translator"
     },
     "autoload": {

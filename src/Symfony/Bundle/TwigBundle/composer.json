@@ -32,7 +32,6 @@
         "symfony/form": "~3.4|~4.0",
         "symfony/routing": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0",
         "symfony/framework-bundle": "~3.4|~4.0",
         "symfony/web-link": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",

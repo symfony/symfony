@@ -80,8 +80,7 @@
         "symfony/web-link": "self.version",
         "symfony/web-profiler-bundle": "self.version",
         "symfony/web-server-bundle": "self.version",
-        "symfony/workflow": "self.version",
-        "symfony/yaml": "self.version"
+        "symfony/workflow": "self.version"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

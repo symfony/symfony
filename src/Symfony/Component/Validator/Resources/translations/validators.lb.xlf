@@ -314,6 +314,10 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Dëst ass kee gëltege "Business Identifier Code" (BIC).</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Feeler</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

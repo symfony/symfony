@@ -25,7 +25,6 @@
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/intl": "~4.1",
-        "symfony/yaml": "~3.4|~4.0",
         "symfony/config": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
@@ -39,8 +38,7 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/http-kernel": "<3.4",
-        "symfony/intl": "<4.1",
-        "symfony/yaml": "<3.4"
+        "symfony/intl": "<4.1"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",
@@ -48,7 +46,6 @@
         "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/http-foundation": "",
         "symfony/intl": "",
-        "symfony/yaml": "",
         "symfony/config": "",
         "egulias/email-validator": "Strict (RFC compliant) email validation",
         "symfony/property-access": "For accessing properties within comparison constraints",

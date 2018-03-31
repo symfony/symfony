@@ -22,14 +22,10 @@
     "require-dev": {
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
-        "symfony/finder": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0"
+        "symfony/finder": "~3.4|~4.0"
     },
     "conflict": {
         "symfony/finder": "<3.4"
-    },
-    "suggest": {
-        "symfony/yaml": "To use the yaml reference dumper"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Config\\": "" },

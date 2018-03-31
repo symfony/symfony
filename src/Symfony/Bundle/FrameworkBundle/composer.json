@@ -51,7 +51,6 @@
         "symfony/validator": "^4.1",
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/workflow": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/lock": "~3.4|~4.0",
         "symfony/web-link": "~3.4|~4.0",
@@ -79,7 +78,6 @@
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",
         "symfony/validator": "For using validation",
-        "symfony/yaml": "For using the debug:config and lint:yaml commands",
         "symfony/property-info": "For using the property_info service",
         "symfony/web-link": "For using web links, features such as preloading, prefetching or prerendering"
     },

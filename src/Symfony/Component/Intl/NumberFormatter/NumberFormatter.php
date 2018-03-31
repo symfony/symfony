@@ -868,11 +868,7 @@ class NumberFormatter
      */
     private function isInvalidRoundingMode($value)
     {
-        if (in_array($value, self::$roundingModes, true)) {
-            return false;
-        }
-
-        return true;
+        return !in_array($value, self::$roundingModes, true);
     }
 
     /**

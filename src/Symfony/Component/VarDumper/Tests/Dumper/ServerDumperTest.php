@@ -37,27 +37,6 @@ class ServerDumperTest extends TestCase
         $dumper->dump($data);
     }
 
-    public function testIsServerListening()
-    {
-        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER);
-
-        $this->assertFalse($dumper->isServerListening());
-
-        $process = $this->getServerProcess();
-        $process->start(function ($type) use ($process) {
-            if (Process::ERR === $type) {
-                $process->stop();
-                $this->fail();
-            }
-        });
-
-        sleep(3);
-
-        $this->assertTrue($dumper->isServerListening());
-
-        $process->stop();
-    }
-
     public function testDump()
     {
         $wrappedDumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();

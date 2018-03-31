@@ -97,17 +97,6 @@ class ServerDumper implements DataDumperInterface
         }
     }
 
-    public function isServerListening(): bool
-    {
-        set_error_handler(array(self::class, 'nullErrorHandler'));
-
-        try {
-            return $this->socket || $this->socket = $this->createSocket();
-        } finally {
-            restore_error_handler();
-        }
-    }
-
     private static function nullErrorHandler()
     {
         // noop

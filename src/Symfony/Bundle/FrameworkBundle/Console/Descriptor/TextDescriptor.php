@@ -139,6 +139,21 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerAutoconfiguringTags(ContainerBuilder $builder, array $options = array())
+    {
+        $options['output']->title('Symfony Container Autoconfiguring Tags');
+
+        $autoconfiguredInstanceofByTag = $this->getAutoconfiguredInstanceofByTag($builder);
+
+        foreach ($autoconfiguredInstanceofByTag as $tag => $autoconfiguredInstanceofList) {
+            $options['output']->section(sprintf('"%s" tag', $tag));
+            $options['output']->listing($autoconfiguredInstanceofList);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {

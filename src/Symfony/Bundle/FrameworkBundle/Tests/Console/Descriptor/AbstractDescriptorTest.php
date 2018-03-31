@@ -218,6 +218,7 @@ abstract class AbstractDescriptorTest extends TestCase
             'tag1' => array('show_private' => true, 'tag' => 'tag1'),
             'tags' => array('group_by' => 'tags', 'show_private' => true),
             'arguments' => array('show_private' => false, 'show_arguments' => true),
+            'autoconfigure' => array('autoconfigure' => true),
         );
 
         $data = array();

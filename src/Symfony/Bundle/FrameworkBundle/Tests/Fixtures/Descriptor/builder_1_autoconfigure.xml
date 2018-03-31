@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tags>
+  <tag name="autoconfiguring_interface_tag">
+    <autoconfigured-instanceof>Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\AutoconfiguringInterface</autoconfigured-instanceof>
+  </tag>
+</tags>

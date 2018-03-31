@@ -64,6 +64,14 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerAutoconfiguringTags(ContainerBuilder $builder, array $options = array())
+    {
+        $this->writeDocument($this->getContainerAutoconfiguringTagsDocument($builder));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -141,7 +149,10 @@ class XmlDescriptor extends Descriptor
         $this->write($dom->saveXML());
     }
 
-    private function getRouteCollectionDocument(RouteCollection $routes): \DOMDocument
+    /**
+     * @return \DOMDocument
+     */
+    private function getRouteCollectionDocument(RouteCollection $routes)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($routesXML = $dom->createElement('routes'));
@@ -243,6 +254,26 @@ class XmlDescriptor extends Descriptor
             foreach ($definitions as $serviceId => $definition) {
                 $definitionXML = $this->getContainerDefinitionDocument($definition, $serviceId, true);
                 $tagXML->appendChild($dom->importNode($definitionXML->childNodes->item(0), true));
+            }
+        }
+
+        return $dom;
+    }
+
+    private function getContainerAutoconfiguringTagsDocument(ContainerBuilder $builder): \DOMDocument
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($containerXML = $dom->createElement('tags'));
+
+        $autoconfiguredInstanceofByTag = $this->getAutoconfiguredInstanceofByTag($builder);
+
+        foreach ($autoconfiguredInstanceofByTag as $tag => $autoconfiguredInstanceofList) {
+            $containerXML->appendChild($tagXML = $dom->createElement('tag'));
+            $tagXML->setAttribute('name', $tag);
+
+            foreach ($autoconfiguredInstanceofList as $autoconfiguredInstanceof) {
+                $tagXML->appendChild($autoconfiguredInstanceofXML = $dom->createElement('autoconfigured-instanceof'));
+                $autoconfiguredInstanceofXML->appendChild(new \DOMText($autoconfiguredInstanceof));
             }
         }
 

@@ -55,6 +55,7 @@ class ContainerDebugCommand extends Command
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
                 new InputOption('types', null, InputOption::VALUE_NONE, 'Displays types (classes/interfaces) available in the container'),
+                new InputOption('autoconfigure', null, InputOption::VALUE_NONE, 'Displays autoconfiguration interfaces for an application'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
@@ -71,6 +72,10 @@ To get specific information about a service, specify its name:
 To see available types that can be used for autowiring, use the <info>--types</info> flag:
 
   <info>php %command.full_name% --types</info>
+  
+To see available autoconfiguration interfaces, use the <info>--autoconfigure</info> flag:
+
+  <info>php %command.full_name% --autoconfigure</info>  
 
 By default, private services are hidden. You can display all services by
 using the <info>--show-private</info> flag:
@@ -107,6 +112,9 @@ EOF
         $errorIo = $io->getErrorStyle();
 
         $this->validateInput($input);
+        if ($input->getOption('autoconfigure')) {
+            @unlink($this->getApplication()->getKernel()->getContainer()->getParameter('debug.container.dump'));
+        }
         $object = $this->getContainerBuilder();
 
         if ($input->getOption('types')) {
@@ -121,6 +129,8 @@ EOF
             $options = array();
         } elseif ($parameter = $input->getOption('parameter')) {
             $options = array('parameter' => $parameter);
+        } elseif ($input->getOption('autoconfigure')) {
+            $options = array('autoconfigure' => true, 'show_private' => $input->getOption('show-private'));
         } elseif ($input->getOption('tags')) {
             $options = array('group_by' => 'tags', 'show_private' => $input->getOption('show-private'));
         } elseif ($tag = $input->getOption('tag')) {
@@ -139,7 +149,7 @@ EOF
         $options['output'] = $io;
         $helper->describe($io, $object, $options);
 
-        if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && $input->isInteractive()) {
+        if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && !$input->getOption('autoconfigure') && $input->isInteractive()) {
             if ($input->getOption('tags')) {
                 $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
             } elseif ($input->getOption('parameters')) {
@@ -157,7 +167,7 @@ EOF
      */
     protected function validateInput(InputInterface $input)
     {
-        $options = array('tags', 'tag', 'parameters', 'parameter');
+        $options = array('tags', 'tag', 'parameters', 'parameter', 'autoconfigure');
 
         $optionsCount = 0;
         foreach ($options as $option) {
@@ -168,9 +178,9 @@ EOF
 
         $name = $input->getArgument('name');
         if ((null !== $name) && ($optionsCount > 0)) {
-            throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
+            throw new \InvalidArgumentException('The options tags, tag, parameters, parameter & autoconfigure can not be combined with the service name argument.');
         } elseif ((null === $name) && $optionsCount > 1) {
-            throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
+            throw new \InvalidArgumentException('The options tags, tag, parameters, parameter & autoconfigure can not be combined together.');
         }
     }
 

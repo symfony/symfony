@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-30T18:07:02Z
+
+Shouldn't target be 2.7?
+
+---------------------------------------------------------------------------
+
+by mweimerskirch at 2018-03-30T22:32:36Z
+
+@ostrolucky No, this is related to #26327 which was only merged into 3.4 and 4.0
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-31T05:17:00Z
+
+@ostrolucky is correct. We are always merging translation on the lowest branch to ease our life.

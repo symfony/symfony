@@ -76,7 +76,7 @@ class SymfonyQuestionHelper extends QuestionHelper
             }
         }
 
-        $output->write(' ⏵ ');
+        $output->write(' ▸ ');
     }
 
     /**

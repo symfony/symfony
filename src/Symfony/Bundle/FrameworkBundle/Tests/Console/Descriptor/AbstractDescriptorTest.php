@@ -203,7 +203,7 @@ abstract class AbstractDescriptorTest extends TestCase
     {
         $data = array();
         foreach ($objects as $name => $object) {
-            $description = file_get_contents($this->getFixtureFilename($name));
+            $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat()));
             $data[] = array($object, $description);
         }
 
@@ -223,7 +223,7 @@ abstract class AbstractDescriptorTest extends TestCase
         $data = array();
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $description = file_get_contents($this->getFixtureFilename($name.'_'.$suffix));
+                $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s_%s.%s', __DIR__, $name, $suffix, $this->getFormat()));
                 $data[] = array($object, $description, $options);
             }
         }
@@ -241,23 +241,11 @@ abstract class AbstractDescriptorTest extends TestCase
         $data = array();
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $description = file_get_contents($this->getFixtureFilename($name.'_'.$suffix));
+                $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s_%s.%s', __DIR__, $name, $suffix, $this->getFormat()));
                 $data[] = array($object, $description, $options);
             }
         }
 
         return $data;
-    }
-
-    private function getFixtureFilename($name)
-    {
-        $format = $this->getFormat();
-        $baseDir = __DIR__.'/../../Fixtures/Descriptor';
-        $file = $baseDir.'/'.$name.'.'.$format;
-        if ('\\' === DIRECTORY_SEPARATOR && is_file($winFile = $baseDir.'/win/'.$name.'.'.$format)) {
-            return $winFile;
-        }
-
-        return $file;
     }
 }

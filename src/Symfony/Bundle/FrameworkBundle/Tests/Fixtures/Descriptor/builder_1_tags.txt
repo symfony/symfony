@@ -5,10 +5,10 @@
 [33m"tag1" tag[39m
 [33m----------[39m
 
- • definition_2
+ * definition_2
 
 [33m"tag2" tag[39m
 [33m----------[39m
 
- • definition_2
+ * definition_2
 

@@ -1,0 +1,21 @@
+
+Built-in form types (Symphony\Component\Form\Extension\Core\Type)
+----------------------------------------------------------------
+
+ FormType
+
+Service form types
+------------------
+
+ * Symphony\Bridge\Doctrine\Form\Type\EntityType
+
+Type extensions
+---------------
+
+ * Symphony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
+
+Type guessers
+-------------
+
+ * Symphony\Component\Form\Extension\Validator\ValidatorTypeGuesser
+

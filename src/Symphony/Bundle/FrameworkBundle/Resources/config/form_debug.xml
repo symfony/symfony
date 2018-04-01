@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="form.resolved_type_factory" class="Symphony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy">
+            <argument type="service">
+                <service class="Symphony\Component\Form\ResolvedFormTypeFactory" />
+            </argument>
+            <argument type="service" id="data_collector.form" />
+        </service>
+
+        <!-- DataCollectorTypeExtension -->
+        <service id="form.type_extension.form.data_collector" class="Symphony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension">
+            <tag name="form.type_extension" extended-type="Symphony\Component\Form\Extension\Core\Type\FormType" />
+            <argument type="service" id="data_collector.form" />
+        </service>
+
+        <!-- DataCollector -->
+        <service id="data_collector.form.extractor" class="Symphony\Component\Form\Extension\DataCollector\FormDataExtractor" />
+
+        <service id="data_collector.form" class="Symphony\Component\Form\Extension\DataCollector\FormDataCollector">
+            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="310" />
+            <argument type="service" id="data_collector.form.extractor" />
+        </service>
+    </services>
+</container>

@@ -1,8 +1,8 @@
 CONTRIBUTORS
 ============
 
-Symfony is the result of the work of many people who made the code better
-(see https://symfony.com/contributors for more information):
+Symphony is the result of the work of many people who made the code better
+(see https://symphony.com/contributors for more information):
 
  - Fabien Potencier (fabpot)
  - Nicolas Grekas (nicolas-grekas)

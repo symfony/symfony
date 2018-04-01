@@ -1,0 +1,74 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Bundle\FrameworkBundle\CacheWarmer;
+
+use Psr\Container\ContainerInterface;
+use Symphony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symphony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symphony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symphony\Component\Routing\RouterInterface;
+
+/**
+ * Generates the router matcher and generator classes.
+ *
+ * @author Fabien Potencier <fabien@symphony.com>
+ *
+ * @final
+ */
+class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
+{
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        // As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
+        $this->container = $container;
+    }
+
+    /**
+     * Warms up the cache.
+     *
+     * @param string $cacheDir The cache directory
+     */
+    public function warmUp($cacheDir)
+    {
+        $router = $this->container->get('router');
+
+        if ($router instanceof WarmableInterface) {
+            $router->warmUp($cacheDir);
+
+            return;
+        }
+
+        @trigger_error(sprintf('Passing a %s without implementing %s is deprecated since Symphony 4.1.', RouterInterface::class, WarmableInterface::class), \E_USER_DEPRECATED);
+    }
+
+    /**
+     * Checks whether this warmer is optional or not.
+     *
+     * @return bool always true
+     */
+    public function isOptional()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'router' => RouterInterface::class,
+        );
+    }
+}

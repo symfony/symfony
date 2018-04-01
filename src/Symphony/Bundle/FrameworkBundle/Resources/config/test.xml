@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="test.client.parameters" type="collection"></parameter>
+    </parameters>
+
+    <services>
+        <defaults public="false" />
+
+        <service id="test.client" class="Symphony\Bundle\FrameworkBundle\Client" shared="false" public="true">
+            <argument type="service" id="kernel" />
+            <argument>%test.client.parameters%</argument>
+            <argument type="service" id="test.client.history" />
+            <argument type="service" id="test.client.cookiejar" />
+            <argument type="service" id="test.service_container" />
+        </service>
+
+        <service id="test.client.history" class="Symphony\Component\BrowserKit\History" shared="false" />
+
+        <service id="test.client.cookiejar" class="Symphony\Component\BrowserKit\CookieJar" shared="false" />
+
+        <service id="test.session.listener" class="Symphony\Component\HttpKernel\EventListener\TestSessionListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service">
+                <service class="Symphony\Component\DependencyInjection\ServiceLocator">
+                    <tag name="container.service_locator" />
+                    <argument type="collection">
+                        <argument key="session" type="service" id="session" on-invalid="ignore" />
+                    </argument>
+                </service>
+            </argument>
+        </service>
+
+        <service id="test.service_container" class="Symphony\Bundle\FrameworkBundle\Test\TestContainer" public="true">
+            <argument type="service" id="parameter_bag" on-invalid="null" />
+            <argument type="service" id="service_container" />
+            <argument type="service">
+                <service class="Symphony\Component\DependencyInjection\ServiceLocator">
+                    <argument type="collection" />
+                </service>
+            </argument>
+        </service>
+    </services>
+</container>

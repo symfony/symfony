@@ -1,0 +1,103 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+
+use PHPUnit\Framework\TestCase;
+use Symphony\Component\DependencyInjection\ContainerBuilder;
+use Symphony\Component\DependencyInjection\Definition;
+use Symphony\Component\DependencyInjection\Reference;
+use Symphony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
+
+class AddExpressionLanguageProvidersPassTest extends TestCase
+{
+    public function testProcessForRouter()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+
+        $definition = new Definition('Symphony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TestProvider');
+        $definition->addTag('routing.expression_language_provider');
+        $container->setDefinition('some_routing_provider', $definition->setPublic(true));
+
+        $container->register('router', '\stdClass')->setPublic(true);
+        $container->compile();
+
+        $router = $container->getDefinition('router');
+        $calls = $router->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
+        $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
+    }
+
+    public function testProcessForRouterAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+
+        $definition = new Definition('Symphony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TestProvider');
+        $definition->addTag('routing.expression_language_provider');
+        $container->setDefinition('some_routing_provider', $definition->setPublic(true));
+
+        $container->register('my_router', '\stdClass')->setPublic(true);
+        $container->setAlias('router', 'my_router');
+        $container->compile();
+
+        $router = $container->getDefinition('my_router');
+        $calls = $router->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
+        $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
+    }
+
+    public function testProcessForSecurity()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+
+        $definition = new Definition('Symphony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TestProvider');
+        $definition->addTag('security.expression_language_provider');
+        $container->setDefinition('some_security_provider', $definition->setPublic(true));
+
+        $container->register('security.access.expression_voter', '\stdClass')->setPublic(true);
+        $container->compile();
+
+        $router = $container->getDefinition('security.access.expression_voter');
+        $calls = $router->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
+        $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
+    }
+
+    public function testProcessForSecurityAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+
+        $definition = new Definition('Symphony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TestProvider');
+        $definition->addTag('security.expression_language_provider');
+        $container->setDefinition('some_security_provider', $definition->setPublic(true));
+
+        $container->register('my_security.access.expression_voter', '\stdClass')->setPublic(true);
+        $container->setAlias('security.access.expression_voter', 'my_security.access.expression_voter');
+        $container->compile();
+
+        $router = $container->getDefinition('my_security.access.expression_voter');
+        $calls = $router->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
+        $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
+    }
+}
+
+class TestProvider
+{
+}

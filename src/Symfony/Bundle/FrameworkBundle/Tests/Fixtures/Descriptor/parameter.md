@@ -1,4 +1,0 @@
-database_name
-=============
-
-symfony

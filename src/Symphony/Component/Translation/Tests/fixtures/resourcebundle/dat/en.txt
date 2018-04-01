@@ -1,0 +1,3 @@
+en{
+    symphony{"Symphony is great"}
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<constraint-mapping xmlns="http://symphony.com/schema/dic/constraint-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/constraint-mapping http://symphony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+  <class name="Symphony\Component\Form\Form">
+    <constraint name="Symphony\Component\Form\Extension\Validator\Constraints\Form" />
+    <property name="children">
+        <constraint name="Valid" />
+    </property>
+  </class>
+</constraint-mapping>

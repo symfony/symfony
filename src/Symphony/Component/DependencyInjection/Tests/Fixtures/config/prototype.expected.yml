@@ -1,0 +1,25 @@
+
+services:
+    service_container:
+        class: Symphony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    Symphony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo:
+        class: Symphony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
+        public: true
+        tags:
+            - { name: foo }
+            - { name: baz }
+        deprecated: %service_id%
+        arguments: [1]
+        factory: f
+    Symphony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar:
+        class: Symphony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
+        public: true
+        tags:
+            - { name: foo }
+            - { name: baz }
+        deprecated: %service_id%
+        lazy: true
+        arguments: [1]
+        factory: f

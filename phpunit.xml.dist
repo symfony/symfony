@@ -22,11 +22,11 @@
     </php>
 
     <testsuites>
-        <testsuite name="Symfony Test Suite">
-            <directory>./src/Symfony/Bridge/*/Tests/</directory>
-            <directory>./src/Symfony/Component/*/Tests/</directory>
-            <directory>./src/Symfony/Component/*/*/Tests/</directory>
-            <directory>./src/Symfony/Bundle/*/Tests/</directory>
+        <testsuite name="Symphony Test Suite">
+            <directory>./src/Symphony/Bridge/*/Tests/</directory>
+            <directory>./src/Symphony/Component/*/Tests/</directory>
+            <directory>./src/Symphony/Component/*/*/Tests/</directory>
+            <directory>./src/Symphony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
 
@@ -39,36 +39,36 @@
 
     <filter>
         <whitelist>
-            <directory>./src/Symfony/</directory>
+            <directory>./src/Symphony/</directory>
             <exclude>
-                <directory>./src/Symfony/Bridge/*/Tests</directory>
-                <directory>./src/Symfony/Component/*/Tests</directory>
-                <directory>./src/Symfony/Component/*/*/Tests</directory>
-                <directory>./src/Symfony/Bundle/*/Tests</directory>
-                <directory>./src/Symfony/Bundle/*/Resources</directory>
-                <directory>./src/Symfony/Component/*/Resources</directory>
-                <directory>./src/Symfony/Component/*/*/Resources</directory>
-                <directory>./src/Symfony/Bridge/*/vendor</directory>
-                <directory>./src/Symfony/Bundle/*/vendor</directory>
-                <directory>./src/Symfony/Component/*/vendor</directory>
-                <directory>./src/Symfony/Component/*/*/vendor</directory>
+                <directory>./src/Symphony/Bridge/*/Tests</directory>
+                <directory>./src/Symphony/Component/*/Tests</directory>
+                <directory>./src/Symphony/Component/*/*/Tests</directory>
+                <directory>./src/Symphony/Bundle/*/Tests</directory>
+                <directory>./src/Symphony/Bundle/*/Resources</directory>
+                <directory>./src/Symphony/Component/*/Resources</directory>
+                <directory>./src/Symphony/Component/*/*/Resources</directory>
+                <directory>./src/Symphony/Bridge/*/vendor</directory>
+                <directory>./src/Symphony/Bundle/*/vendor</directory>
+                <directory>./src/Symphony/Component/*/vendor</directory>
+                <directory>./src/Symphony/Component/*/*/vendor</directory>
             </exclude>
         </whitelist>
     </filter>
 
     <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
+        <listener class="Symphony\Bridge\PhpUnit\SymphonyTestsListener">
             <arguments>
                 <array>
                     <element key="time-sensitive">
                         <array>
                             <element><string>Cache\IntegrationTests</string></element>
                             <element><string>Doctrine\Common\Cache</string></element>
-                            <element><string>Symfony\Component\Cache</string></element>
-                            <element><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
-                            <element><string>Symfony\Component\Cache\Traits</string></element>
-                            <element><string>Symfony\Component\Console</string></element>
-                            <element><string>Symfony\Component\HttpFoundation</string></element>
+                            <element><string>Symphony\Component\Cache</string></element>
+                            <element><string>Symphony\Component\Cache\Tests\Fixtures</string></element>
+                            <element><string>Symphony\Component\Cache\Traits</string></element>
+                            <element><string>Symphony\Component\Console</string></element>
+                            <element><string>Symphony\Component\HttpFoundation</string></element>
                         </array>
                     </element>
                 </array>

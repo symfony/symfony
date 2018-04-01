@@ -1,0 +1,4 @@
+dn: dc=symphony,dc=com
+objectClass: dcObject
+objectClass: organizationalUnit
+ou: Organization

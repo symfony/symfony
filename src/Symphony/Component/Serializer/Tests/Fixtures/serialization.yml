@@ -1,0 +1,20 @@
+'Symphony\Component\Serializer\Tests\Fixtures\GroupDummy':
+  attributes:
+    foo:
+      groups: ['group1', 'group2']
+    bar:
+      groups: ['group2']
+'Symphony\Component\Serializer\Tests\Fixtures\MaxDepthDummy':
+  attributes:
+    foo:
+      max_depth: 2
+    bar:
+      max_depth: 3
+'Symphony\Component\Serializer\Tests\Fixtures\AbstractDummy':
+  discriminator_map:
+    type_property: type
+    mapping:
+      first: 'Symphony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild'
+      second: 'Symphony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild'
+  attributes:
+    foo: ~

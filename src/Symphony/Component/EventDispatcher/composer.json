@@ -1,0 +1,47 @@
+{
+    "name": "symphony/event-dispatcher",
+    "type": "library",
+    "description": "Symphony EventDispatcher Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "require-dev": {
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/expression-language": "~3.4|~4.0",
+        "symphony/config": "~3.4|~4.0",
+        "symphony/stopwatch": "~3.4|~4.0",
+        "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symphony/dependency-injection": "<3.4"
+    },
+    "suggest": {
+        "symphony/dependency-injection": "",
+        "symphony/http-kernel": ""
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\EventDispatcher\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

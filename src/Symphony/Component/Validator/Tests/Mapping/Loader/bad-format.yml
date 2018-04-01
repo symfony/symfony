@@ -1,0 +1,9 @@
+namespaces:
+	custom: Symphony\Component\Validator\Tests\Fixtures\
+
+Symphony\Component\Validator\Tests\Fixtures\Entity:
+	constraints:
+		# Custom constraint
+		- Symphony\Component\Validator\Tests\Fixtures\ConstraintA: ~
+		# Custom constraint with namespaces prefix
+		- "custom:ConstraintB": ~

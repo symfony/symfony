@@ -1,0 +1,50 @@
+{
+    "name": "symphony/phpunit-bridge",
+    "type": "symphony-bridge",
+    "description": "Symphony PHPUnit Bridge",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3 EVEN ON LATEST SYMPHONY VERSIONS TO ALLOW USING",
+        "php": "THIS BRIDGE WHEN TESTING LOWEST SYMPHONY VERSIONS.",
+        "php": ">=5.3.3"
+    },
+    "suggest": {
+        "symphony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader",
+        "ext-zip": "Zip support is required when using bin/simple-phpunit"
+    },
+    "conflict": {
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+    },
+    "autoload": {
+        "files": [ "bootstrap.php" ],
+        "psr-4": { "Symphony\\Bridge\\PhpUnit\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "bin": [
+        "bin/simple-phpunit"
+    ],
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        },
+        "thanks": {
+            "name": "phpunit/phpunit",
+            "url": "https://github.com/sebastianbergmann/phpunit"
+        }
+    }
+}

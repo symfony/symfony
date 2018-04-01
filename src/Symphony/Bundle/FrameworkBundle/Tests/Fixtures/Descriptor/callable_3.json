@@ -1,0 +1,5 @@
+{
+    "type": "function",
+    "name": "method",
+    "class": "Symphony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass"
+}

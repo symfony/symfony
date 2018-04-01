@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symphony.com/schema/routing"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/routing http://symphony.com/schema/routing/routing-1.0.xsd">
+
+    <route path="/test"></route>
+</routes>

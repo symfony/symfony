@@ -1,0 +1,9 @@
+Symphony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Category:
+    properties:
+        id:
+            - Type: int
+
+Symphony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\SubCategory:
+    properties:
+        id:
+            - Type: int

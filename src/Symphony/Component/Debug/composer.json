@@ -1,0 +1,40 @@
+{
+    "name": "symphony/debug",
+    "type": "library",
+    "description": "Symphony Debug Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symphony/http-kernel": "<3.4"
+    },
+    "require-dev": {
+        "symphony/http-kernel": "~3.4|~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Debug\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

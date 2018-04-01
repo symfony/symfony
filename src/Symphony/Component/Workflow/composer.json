@@ -1,0 +1,43 @@
+{
+    "name": "symphony/workflow",
+    "type": "library",
+    "description": "Symphony Workflow Component",
+    "keywords": ["workflow", "petrinet", "place", "transition", "statemachine", "state"],
+    "homepage": "http://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Grégoire Pineau",
+            "email": "lyrixx@lyrixx.info"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "http://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/property-access": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "psr/log": "~1.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/event-dispatcher": "~3.4|~4.0",
+        "symphony/expression-language": "~3.4|~4.0",
+        "symphony/security-core": "~3.4|~4.0",
+        "symphony/validator": "~3.4|~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Workflow\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

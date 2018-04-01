@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="parameter_bag" class="Symphony\Component\DependencyInjection\ParameterBag\ContainerBag">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="Symphony\Component\DependencyInjection\ParameterBag\ContainerBagInterface" alias="parameter_bag" />
+        <service id="Symphony\Component\DependencyInjection\ParameterBag\ParameterBagInterface" alias="parameter_bag" />
+
+        <service id="event_dispatcher" class="Symphony\Component\EventDispatcher\EventDispatcher" public="true">
+            <tag name="container.hot_path" />
+        </service>
+        <service id="Symphony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" />
+
+        <service id="http_kernel" class="Symphony\Component\HttpKernel\HttpKernel" public="true">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="argument_resolver" />
+            <tag name="container.hot_path" />
+        </service>
+        <service id="Symphony\Component\HttpKernel\HttpKernelInterface" alias="http_kernel" />
+
+        <service id="request_stack" class="Symphony\Component\HttpFoundation\RequestStack" public="true" />
+        <service id="Symphony\Component\HttpFoundation\RequestStack" alias="request_stack" />
+
+        <service id="cache_warmer" class="Symphony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate" public="true">
+            <argument type="tagged" tag="kernel.cache_warmer" />
+        </service>
+
+        <service id="cache_clearer" class="Symphony\Component\HttpKernel\CacheClearer\ChainCacheClearer" public="true">
+            <argument type="tagged" tag="kernel.cache_clearer" />
+        </service>
+
+        <service id="kernel" synthetic="true" public="true" />
+        <service id="Symphony\Component\HttpKernel\KernelInterface" alias="kernel" />
+
+        <service id="filesystem" class="Symphony\Component\Filesystem\Filesystem" public="true" />
+        <service id="Symphony\Component\Filesystem\Filesystem" alias="filesystem" />
+
+        <service id="file_locator" class="Symphony\Component\HttpKernel\Config\FileLocator">
+            <argument type="service" id="kernel" />
+            <argument>%kernel.root_dir%/Resources</argument>
+            <argument type="collection">
+                <argument>%kernel.root_dir%</argument>
+            </argument>
+        </service>
+        <service id="Symphony\Component\HttpKernel\Config\FileLocator" alias="file_locator" />
+
+        <service id="uri_signer" class="Symphony\Component\HttpKernel\UriSigner">
+            <argument>%kernel.secret%</argument>
+        </service>
+
+        <service id="config_cache_factory" class="Symphony\Component\Config\ResourceCheckerConfigCacheFactory">
+            <argument type="tagged" tag="config_cache.resource_checker" />
+        </service>
+
+        <service id="dependency_injection.config.container_parameters_resource_checker" class="Symphony\Component\DependencyInjection\Config\ContainerParametersResourceChecker">
+            <argument type="service" id="service_container" />
+            <tag name="config_cache.resource_checker" priority="-980" />
+        </service>
+
+        <service id="config.resource.self_checking_resource_checker" class="Symphony\Component\Config\Resource\SelfCheckingResourceChecker">
+            <tag name="config_cache.resource_checker" priority="-990" />
+        </service>
+
+        <service id="services_resetter" class="Symphony\Component\HttpKernel\DependencyInjection\ServicesResetter" public="true" />
+    </services>
+</container>

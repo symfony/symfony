@@ -1,0 +1,68 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\Security\Http\Firewall;
+
+use Symphony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symphony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symphony\Component\Security\Core\Exception\AuthenticationException;
+use Psr\Log\LoggerInterface;
+use Symphony\Component\HttpKernel\Event\GetResponseEvent;
+use Symphony\Component\Security\Core\Authentication\Token\AnonymousToken;
+
+/**
+ * AnonymousAuthenticationListener automatically adds a Token if none is
+ * already present.
+ *
+ * @author Fabien Potencier <fabien@symphony.com>
+ */
+class AnonymousAuthenticationListener implements ListenerInterface
+{
+    private $tokenStorage;
+    private $secret;
+    private $authenticationManager;
+    private $logger;
+
+    public function __construct(TokenStorageInterface $tokenStorage, string $secret, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
+    {
+        $this->tokenStorage = $tokenStorage;
+        $this->secret = $secret;
+        $this->authenticationManager = $authenticationManager;
+        $this->logger = $logger;
+    }
+
+    /**
+     * Handles anonymous authentication.
+     */
+    public function handle(GetResponseEvent $event)
+    {
+        if (null !== $this->tokenStorage->getToken()) {
+            return;
+        }
+
+        try {
+            $token = new AnonymousToken($this->secret, 'anon.', array());
+            if (null !== $this->authenticationManager) {
+                $token = $this->authenticationManager->authenticate($token);
+            }
+
+            $this->tokenStorage->setToken($token);
+
+            if (null !== $this->logger) {
+                $this->logger->info('Populated the TokenStorage with an anonymous Token.');
+            }
+        } catch (AuthenticationException $failed) {
+            if (null !== $this->logger) {
+                $this->logger->info('Anonymous authentication failed.', array('exception' => $failed));
+            }
+        }
+    }
+}

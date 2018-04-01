@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="validator.mapping.cache.prefix" />
+        <parameter key="validator.mapping.cache.file">%kernel.cache_dir%/validation.php</parameter>
+    </parameters>
+
+    <services>
+        <defaults public="false" />
+
+        <service id="validator" class="Symphony\Component\Validator\Validator\ValidatorInterface" public="true">
+            <factory service="validator.builder" method="getValidator" />
+        </service>
+        <service id="Symphony\Component\Validator\Validator\ValidatorInterface" alias="validator" />
+
+        <service id="validator.builder" class="Symphony\Component\Validator\ValidatorBuilderInterface">
+            <factory class="Symphony\Component\Validator\Validation" method="createValidatorBuilder" />
+            <call method="setConstraintValidatorFactory">
+                <argument type="service" id="validator.validator_factory" />
+            </call>
+            <call method="setTranslator">
+                <argument type="service" id="translator" />
+            </call>
+            <call method="setTranslationDomain">
+                <argument>%validator.translation_domain%</argument>
+            </call>
+        </service>
+
+        <service id="validator.mapping.class_metadata_factory" alias="validator" />
+
+        <service id="validator.mapping.cache_warmer" class="Symphony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
+            <argument type="service" id="validator.builder" />
+            <argument>%validator.mapping.cache.file%</argument>
+            <argument type="service" id="cache.validator" />
+            <tag name="kernel.cache_warmer" />
+        </service>
+
+        <service id="validator.mapping.cache.symphony" class="Symphony\Component\Validator\Mapping\Cache\Psr6Cache">
+            <argument type="service">
+                <service class="Symphony\Component\Cache\Adapter\PhpArrayAdapter">
+                    <factory class="Symphony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
+                    <argument>%validator.mapping.cache.file%</argument>
+                    <argument type="service" id="cache.validator" />
+                </service>
+            </argument>
+        </service>
+
+        <service id="validator.validator_factory" class="Symphony\Component\Validator\ContainerConstraintValidatorFactory">
+            <argument /> <!-- Constraint validators locator -->
+        </service>
+
+        <service id="validator.expression" class="Symphony\Component\Validator\Constraints\ExpressionValidator">
+            <tag name="validator.constraint_validator" alias="validator.expression" />
+        </service>
+
+        <service id="validator.email" class="Symphony\Component\Validator\Constraints\EmailValidator">
+            <argument></argument>
+            <tag name="validator.constraint_validator" alias="Symphony\Component\Validator\Constraints\EmailValidator" />
+        </service>
+    </services>
+</container>

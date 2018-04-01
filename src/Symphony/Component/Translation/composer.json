@@ -1,0 +1,53 @@
+{
+    "name": "symphony/translation",
+    "type": "library",
+    "description": "Symphony Translation Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/polyfill-mbstring": "~1.0"
+    },
+    "require-dev": {
+        "symphony/config": "~3.4|~4.0",
+        "symphony/console": "~3.4|~4.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/intl": "~3.4|~4.0",
+        "symphony/yaml": "~3.4|~4.0",
+        "symphony/finder": "~2.8|~3.0|~4.0",
+        "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symphony/config": "<3.4",
+        "symphony/dependency-injection": "<3.4",
+        "symphony/yaml": "<3.4"
+    },
+    "suggest": {
+        "symphony/config": "",
+        "symphony/yaml": "",
+        "psr/log": "To use logging capability in translator"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Translation\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

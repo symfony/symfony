@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="translator.default" class="Symphony\Bundle\FrameworkBundle\Translation\Translator">
+            <argument /> <!-- translation loaders locator -->
+            <argument type="service" id="translator.formatter" />
+            <argument>%kernel.default_locale%</argument>
+            <argument type="collection" /> <!-- translation loaders ids -->
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <call method="setConfigCacheFactory">
+                <argument type="service" id="config_cache_factory" />
+            </call>
+        </service>
+        <service id="Symphony\Component\Translation\TranslatorInterface" alias="translator" />
+
+        <service id="translator.logging" class="Symphony\Component\Translation\LoggingTranslator">
+            <argument type="service" id="translator.logging.inner" />
+            <argument type="service" id="logger" />
+            <tag name="monolog.logger" channel="translation" />
+        </service>
+
+        <service id="translator.formatter.default" class="Symphony\Component\Translation\Formatter\MessageFormatter">
+            <argument type="service" id="translator.selector" />
+        </service>
+
+        <service id="translation.loader.php" class="Symphony\Component\Translation\Loader\PhpFileLoader">
+            <tag name="translation.loader" alias="php" />
+        </service>
+
+        <service id="translation.loader.yml" class="Symphony\Component\Translation\Loader\YamlFileLoader">
+            <tag name="translation.loader" alias="yaml" legacy-alias="yml" />
+        </service>
+
+        <service id="translation.loader.xliff" class="Symphony\Component\Translation\Loader\XliffFileLoader">
+            <tag name="translation.loader" alias="xlf" legacy-alias="xliff" />
+        </service>
+
+        <service id="translation.loader.po" class="Symphony\Component\Translation\Loader\PoFileLoader">
+            <tag name="translation.loader" alias="po" />
+        </service>
+
+        <service id="translation.loader.mo" class="Symphony\Component\Translation\Loader\MoFileLoader">
+            <tag name="translation.loader" alias="mo" />
+        </service>
+
+        <service id="translation.loader.qt" class="Symphony\Component\Translation\Loader\QtFileLoader">
+            <tag name="translation.loader" alias="ts" />
+        </service>
+
+        <service id="translation.loader.csv" class="Symphony\Component\Translation\Loader\CsvFileLoader">
+            <tag name="translation.loader" alias="csv" />
+        </service>
+
+        <service id="translation.loader.res" class="Symphony\Component\Translation\Loader\IcuResFileLoader">
+            <tag name="translation.loader" alias="res" />
+        </service>
+
+        <service id="translation.loader.dat" class="Symphony\Component\Translation\Loader\IcuDatFileLoader">
+            <tag name="translation.loader" alias="dat" />
+        </service>
+
+        <service id="translation.loader.ini" class="Symphony\Component\Translation\Loader\IniFileLoader">
+            <tag name="translation.loader" alias="ini" />
+        </service>
+
+        <service id="translation.loader.json" class="Symphony\Component\Translation\Loader\JsonFileLoader">
+            <tag name="translation.loader" alias="json" />
+        </service>
+
+        <service id="translation.dumper.php" class="Symphony\Component\Translation\Dumper\PhpFileDumper">
+            <tag name="translation.dumper" alias="php" />
+        </service>
+
+        <service id="translation.dumper.xliff" class="Symphony\Component\Translation\Dumper\XliffFileDumper">
+            <tag name="translation.dumper" alias="xlf" />
+        </service>
+
+        <service id="translation.dumper.po" class="Symphony\Component\Translation\Dumper\PoFileDumper">
+            <tag name="translation.dumper" alias="po" />
+        </service>
+
+        <service id="translation.dumper.mo" class="Symphony\Component\Translation\Dumper\MoFileDumper">
+            <tag name="translation.dumper" alias="mo" />
+        </service>
+
+        <service id="translation.dumper.yml" class="Symphony\Component\Translation\Dumper\YamlFileDumper">
+            <tag name="translation.dumper" alias="yml" />
+        </service>
+
+        <service id="translation.dumper.yaml" class="Symphony\Component\Translation\Dumper\YamlFileDumper">
+            <argument>yaml</argument>
+            <tag name="translation.dumper" alias="yaml" />
+        </service>
+
+        <service id="translation.dumper.qt" class="Symphony\Component\Translation\Dumper\QtFileDumper">
+            <tag name="translation.dumper" alias="ts" />
+        </service>
+
+        <service id="translation.dumper.csv" class="Symphony\Component\Translation\Dumper\CsvFileDumper">
+            <tag name="translation.dumper" alias="csv" />
+        </service>
+
+        <service id="translation.dumper.ini" class="Symphony\Component\Translation\Dumper\IniFileDumper">
+            <tag name="translation.dumper" alias="ini" />
+        </service>
+
+        <service id="translation.dumper.json" class="Symphony\Component\Translation\Dumper\JsonFileDumper">
+            <tag name="translation.dumper" alias="json" />
+        </service>
+
+        <service id="translation.dumper.res" class="Symphony\Component\Translation\Dumper\IcuResFileDumper">
+            <tag name="translation.dumper" alias="res" />
+        </service>
+
+        <service id="translation.extractor.php" class="Symphony\Component\Translation\Extractor\PhpExtractor">
+            <tag name="translation.extractor" alias="php" />
+        </service>
+
+        <service id="translation.reader" class="Symphony\Component\Translation\Reader\TranslationReader" />
+        <service id="Symphony\Component\Translation\Reader\TranslationReaderInterface" alias="translation.reader" />
+
+        <service id="translation.extractor" class="Symphony\Component\Translation\Extractor\ChainExtractor" />
+        <service id="Symphony\Component\Translation\Extractor\ExtractorInterface" alias="translation.extractor" />
+
+        <service id="translation.writer" class="Symphony\Component\Translation\Writer\TranslationWriter" />
+        <service id="Symphony\Component\Translation\Writer\TranslationWriterInterface" alias="translation.writer" />
+
+        <service id="translation.warmer" class="Symphony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
+            <tag name="container.service_subscriber" id="translator" />
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="Psr\Container\ContainerInterface" />
+        </service>
+
+        <service id="translator_listener" class="Symphony\Component\HttpKernel\EventListener\TranslatorListener">
+            <argument type="service" id="translator" />
+            <argument type="service" id="request_stack" />
+            <tag name="kernel.event_subscriber" />
+        </service>
+    </services>
+</container>

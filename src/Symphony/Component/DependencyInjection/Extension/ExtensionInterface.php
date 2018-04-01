@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\DependencyInjection\Extension;
+
+use Symphony\Component\DependencyInjection\ContainerBuilder;
+
+/**
+ * ExtensionInterface is the interface implemented by container extension classes.
+ *
+ * @author Fabien Potencier <fabien@symphony.com>
+ */
+interface ExtensionInterface
+{
+    /**
+     * Loads a specific configuration.
+     *
+     * @throws \InvalidArgumentException When provided tag is not defined in this extension
+     */
+    public function load(array $configs, ContainerBuilder $container);
+
+    /**
+     * Returns the namespace to be used for this extension (XML namespace).
+     *
+     * @return string The XML namespace
+     */
+    public function getNamespace();
+
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath();
+
+    /**
+     * Returns the recommended alias to use in XML.
+     *
+     * This alias is also the mandatory prefix to use when using YAML.
+     *
+     * @return string The alias
+     */
+    public function getAlias();
+}

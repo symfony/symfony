@@ -1,0 +1,40 @@
+{
+    "name": "symphony/property-access",
+    "type": "library",
+    "description": "Symphony PropertyAccess Component",
+    "keywords": ["property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property path"],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/inflector": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "symphony/cache": "~3.4|~4.0"
+    },
+    "suggest": {
+        "psr/cache-implementation": "To cache access methods."
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\PropertyAccess\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

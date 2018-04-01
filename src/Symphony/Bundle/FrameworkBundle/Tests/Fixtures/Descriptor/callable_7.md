@@ -1,0 +1,3 @@
+
+- Type: `object`
+- Name: `Symphony\Bundle\FrameworkBundle\Tests\Console\Descriptor\CallableClass`

@@ -1,0 +1,57 @@
+{
+    "name": "symphony/twig-bundle",
+    "type": "symphony-bundle",
+    "description": "Symphony TwigBundle",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/config": "~3.4|~4.0",
+        "symphony/twig-bridge": "^3.4.3|^4.0.3",
+        "symphony/http-foundation": "~3.4|~4.0",
+        "symphony/http-kernel": "~3.4|~4.0",
+        "twig/twig": "~1.34|~2.4"
+    },
+    "require-dev": {
+        "symphony/asset": "~3.4|~4.0",
+        "symphony/stopwatch": "~3.4|~4.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/expression-language": "~3.4|~4.0",
+        "symphony/finder": "~3.4|~4.0",
+        "symphony/form": "~3.4|~4.0",
+        "symphony/routing": "~3.4|~4.0",
+        "symphony/templating": "~3.4|~4.0",
+        "symphony/yaml": "~3.4|~4.0",
+        "symphony/framework-bundle": "~3.4|~4.0",
+        "symphony/web-link": "~3.4|~4.0",
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.0"
+    },
+    "conflict": {
+        "symphony/dependency-injection": "<3.4",
+        "symphony/event-dispatcher": "<3.4"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Bundle\\TwigBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

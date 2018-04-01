@@ -1,0 +1,64 @@
+{
+    "name": "symphony/form",
+    "type": "library",
+    "description": "Symphony Form Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/event-dispatcher": "~3.4|~4.0",
+        "symphony/intl": "~3.4|~4.0",
+        "symphony/options-resolver": "~3.4|~4.0",
+        "symphony/polyfill-mbstring": "~1.0",
+        "symphony/property-access": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "doctrine/collections": "~1.0",
+        "symphony/validator": "~3.4|~4.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/config": "~3.4|~4.0",
+        "symphony/console": "~3.4|~4.0",
+        "symphony/http-foundation": "~3.4|~4.0",
+        "symphony/http-kernel": "~3.4|~4.0",
+        "symphony/security-csrf": "~3.4|~4.0",
+        "symphony/translation": "~3.4|~4.0",
+        "symphony/var-dumper": "~3.4|~4.0"
+    },
+    "conflict": {
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
+        "symphony/dependency-injection": "<3.4",
+        "symphony/doctrine-bridge": "<3.4",
+        "symphony/framework-bundle": "<3.4",
+        "symphony/http-kernel": "<3.4",
+        "symphony/twig-bridge": "<3.4.5|<4.0.5,>=4.0"
+    },
+    "suggest": {
+        "symphony/validator": "For form validation.",
+        "symphony/security-csrf": "For protecting forms against CSRF attacks.",
+        "symphony/twig-bridge": "For templating with Twig.",
+        "symphony/framework-bundle": "For templating with PHP."
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Form\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

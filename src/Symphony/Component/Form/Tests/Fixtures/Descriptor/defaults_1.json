@@ -1,0 +1,14 @@
+{
+    "builtin_form_types": [
+        "Symphony\\Component\\Form\\Extension\\Core\\Type\\FormType"
+    ],
+    "service_form_types": [
+        "Symphony\\Bridge\\Doctrine\\Form\\Type\\EntityType"
+    ],
+    "type_extensions": [
+        "Symphony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension"
+    ],
+    "type_guessers": [
+        "Symphony\\Component\\Form\\Extension\\Validator\\ValidatorTypeGuesser"
+    ]
+}

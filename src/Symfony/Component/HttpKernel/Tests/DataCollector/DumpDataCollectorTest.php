@@ -63,7 +63,6 @@ class DumpDataCollectorTest extends TestCase
         // Server is up, server dumper is used
         $serverDumper = $this->getMockBuilder(ServerDumper::class)->disableOriginalConstructor()->getMock();
         $serverDumper->expects($this->once())->method('dump');
-        $serverDumper->method('isServerListening')->willReturn(true);
 
         $collector = new DumpDataCollector(null, null, null, null, $serverDumper);
         $collector->dump($data);

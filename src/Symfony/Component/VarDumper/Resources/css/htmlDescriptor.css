@@ -2,6 +2,9 @@ body {
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-end;
+    max-width: 1140px;
+    margin: auto;
+    padding: 15px;
     word-wrap: break-word;
     background-color: #F9F9F9;
     color: #222;

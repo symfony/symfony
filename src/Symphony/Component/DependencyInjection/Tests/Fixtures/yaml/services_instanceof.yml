@@ -1,0 +1,11 @@
+services:
+    _instanceof:
+        Symphony\Component\DependencyInjection\Tests\Fixtures\BarInterface:
+            autowire: true
+            lazy: true
+            tags:
+                - { name: foo }
+                - { name: bar }
+
+    Symphony\Component\DependencyInjection\Tests\Fixtures\Bar: ~
+    Symphony\Component\DependencyInjection\Tests\Fixtures\BarInterface: '@Symphony\Component\DependencyInjection\Tests\Fixtures\Bar'

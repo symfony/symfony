@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<serializer xmlns="http://symphony.com/schema/dic/serializer-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symphony.com/schema/dic/serializer-mapping
+        http://symphony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd"
+>
+    <class name="Symphony\Bundle\FrameworkBundle\Tests\Fixtures\Serialization\Person">
+        <attribute name="gender">
+            <group>group1</group>
+            <group>group2</group>
+        </attribute>
+    </class>
+</serializer>

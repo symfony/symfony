@@ -1,0 +1,56 @@
+{
+    "name": "symphony/routing",
+    "type": "library",
+    "description": "Symphony Routing Component",
+    "keywords": ["routing", "router", "URL", "URI"],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "require-dev": {
+        "symphony/config": "~3.4|~4.0",
+        "symphony/http-foundation": "~3.4|~4.0",
+        "symphony/yaml": "~3.4|~4.0",
+        "symphony/expression-language": "~3.4|~4.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "doctrine/annotations": "~1.0",
+        "doctrine/common": "~2.2",
+        "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symphony/config": "<3.4",
+        "symphony/dependency-injection": "<3.4",
+        "symphony/yaml": "<3.4"
+    },
+    "suggest": {
+        "symphony/http-foundation": "For using a Symphony Request object",
+        "symphony/config": "For using the all-in-one router or any loader",
+        "symphony/yaml": "For using the YAML loader",
+        "symphony/expression-language": "For using expression matching",
+        "doctrine/annotations": "For using the annotation loader",
+        "symphony/dependency-injection": "For loading routes from a service"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Routing\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

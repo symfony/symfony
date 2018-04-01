@@ -1,18 +1,18 @@
 {
-    "name": "symfony/symfony",
+    "name": "symphony/symphony",
     "type": "library",
-    "description": "The Symfony PHP framework",
+    "description": "The Symphony PHP framework",
     "keywords": ["framework"],
-    "homepage": "https://symfony.com",
+    "homepage": "https://symphony.com",
     "license": "MIT",
     "authors": [
         {
             "name": "Fabien Potencier",
-            "email": "fabien@symfony.com"
+            "email": "fabien@symphony.com"
         },
         {
-            "name": "Symfony Community",
-            "homepage": "https://symfony.com/contributors"
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
         }
     ],
     "require": {
@@ -26,62 +26,62 @@
         "psr/link": "^1.0",
         "psr/log": "~1.0",
         "psr/simple-cache": "^1.0",
-        "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php72": "~1.5"
+        "symphony/polyfill-intl-icu": "~1.0",
+        "symphony/polyfill-mbstring": "~1.0",
+        "symphony/polyfill-php72": "~1.5"
     },
     "replace": {
-        "symfony/asset": "self.version",
-        "symfony/browser-kit": "self.version",
-        "symfony/cache": "self.version",
-        "symfony/config": "self.version",
-        "symfony/console": "self.version",
-        "symfony/css-selector": "self.version",
-        "symfony/dependency-injection": "self.version",
-        "symfony/debug": "self.version",
-        "symfony/debug-bundle": "self.version",
-        "symfony/doctrine-bridge": "self.version",
-        "symfony/dom-crawler": "self.version",
-        "symfony/dotenv": "self.version",
-        "symfony/event-dispatcher": "self.version",
-        "symfony/expression-language": "self.version",
-        "symfony/filesystem": "self.version",
-        "symfony/finder": "self.version",
-        "symfony/form": "self.version",
-        "symfony/framework-bundle": "self.version",
-        "symfony/http-foundation": "self.version",
-        "symfony/http-kernel": "self.version",
-        "symfony/inflector": "self.version",
-        "symfony/intl": "self.version",
-        "symfony/ldap": "self.version",
-        "symfony/lock": "self.version",
-        "symfony/messenger": "self.version",
-        "symfony/monolog-bridge": "self.version",
-        "symfony/options-resolver": "self.version",
-        "symfony/process": "self.version",
-        "symfony/property-access": "self.version",
-        "symfony/property-info": "self.version",
-        "symfony/proxy-manager-bridge": "self.version",
-        "symfony/routing": "self.version",
-        "symfony/security": "self.version",
-        "symfony/security-core": "self.version",
-        "symfony/security-csrf": "self.version",
-        "symfony/security-guard": "self.version",
-        "symfony/security-http": "self.version",
-        "symfony/security-bundle": "self.version",
-        "symfony/serializer": "self.version",
-        "symfony/stopwatch": "self.version",
-        "symfony/templating": "self.version",
-        "symfony/translation": "self.version",
-        "symfony/twig-bridge": "self.version",
-        "symfony/twig-bundle": "self.version",
-        "symfony/validator": "self.version",
-        "symfony/var-dumper": "self.version",
-        "symfony/web-link": "self.version",
-        "symfony/web-profiler-bundle": "self.version",
-        "symfony/web-server-bundle": "self.version",
-        "symfony/workflow": "self.version",
-        "symfony/yaml": "self.version"
+        "symphony/asset": "self.version",
+        "symphony/browser-kit": "self.version",
+        "symphony/cache": "self.version",
+        "symphony/config": "self.version",
+        "symphony/console": "self.version",
+        "symphony/css-selector": "self.version",
+        "symphony/dependency-injection": "self.version",
+        "symphony/debug": "self.version",
+        "symphony/debug-bundle": "self.version",
+        "symphony/doctrine-bridge": "self.version",
+        "symphony/dom-crawler": "self.version",
+        "symphony/dotenv": "self.version",
+        "symphony/event-dispatcher": "self.version",
+        "symphony/expression-language": "self.version",
+        "symphony/filesystem": "self.version",
+        "symphony/finder": "self.version",
+        "symphony/form": "self.version",
+        "symphony/framework-bundle": "self.version",
+        "symphony/http-foundation": "self.version",
+        "symphony/http-kernel": "self.version",
+        "symphony/inflector": "self.version",
+        "symphony/intl": "self.version",
+        "symphony/ldap": "self.version",
+        "symphony/lock": "self.version",
+        "symphony/messenger": "self.version",
+        "symphony/monolog-bridge": "self.version",
+        "symphony/options-resolver": "self.version",
+        "symphony/process": "self.version",
+        "symphony/property-access": "self.version",
+        "symphony/property-info": "self.version",
+        "symphony/proxy-manager-bridge": "self.version",
+        "symphony/routing": "self.version",
+        "symphony/security": "self.version",
+        "symphony/security-core": "self.version",
+        "symphony/security-csrf": "self.version",
+        "symphony/security-guard": "self.version",
+        "symphony/security-http": "self.version",
+        "symphony/security-bundle": "self.version",
+        "symphony/serializer": "self.version",
+        "symphony/stopwatch": "self.version",
+        "symphony/templating": "self.version",
+        "symphony/translation": "self.version",
+        "symphony/twig-bridge": "self.version",
+        "symphony/twig-bundle": "self.version",
+        "symphony/validator": "self.version",
+        "symphony/var-dumper": "self.version",
+        "symphony/web-link": "self.version",
+        "symphony/web-profiler-bundle": "self.version",
+        "symphony/web-server-bundle": "self.version",
+        "symphony/workflow": "self.version",
+        "symphony/yaml": "self.version"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
@@ -95,8 +95,8 @@
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
         "predis/predis": "~1.0",
         "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
-        "symfony/phpunit-bridge": "~3.4|~4.0",
-        "symfony/security-acl": "~2.8|~3.0",
+        "symphony/phpunit-bridge": "~3.4|~4.0",
+        "symphony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
@@ -112,22 +112,22 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
-            "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
-            "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
-            "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
-            "Symfony\\Bundle\\": "src/Symfony/Bundle/",
-            "Symfony\\Component\\": "src/Symfony/Component/"
+            "Symphony\\Bridge\\Doctrine\\": "src/Symphony/Bridge/Doctrine/",
+            "Symphony\\Bridge\\Monolog\\": "src/Symphony/Bridge/Monolog/",
+            "Symphony\\Bridge\\ProxyManager\\": "src/Symphony/Bridge/ProxyManager/",
+            "Symphony\\Bridge\\Twig\\": "src/Symphony/Bridge/Twig/",
+            "Symphony\\Bundle\\": "src/Symphony/Bundle/",
+            "Symphony\\Component\\": "src/Symphony/Component/"
         },
         "classmap": [
-            "src/Symfony/Component/Intl/Resources/stubs"
+            "src/Symphony/Component/Intl/Resources/stubs"
         ],
         "exclude-from-classmap": [
             "**/Tests/"
         ]
     },
     "autoload-dev": {
-        "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
+        "files": [ "src/Symphony/Component/VarDumper/Resources/functions/dump.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

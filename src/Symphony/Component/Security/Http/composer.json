@@ -1,0 +1,47 @@
+{
+    "name": "symphony/security-http",
+    "type": "library",
+    "description": "Symphony Security Component - HTTP Integration",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/security-core": "~3.4|~4.0",
+        "symphony/event-dispatcher": "~3.4|~4.0",
+        "symphony/http-foundation": "~3.4|~4.0",
+        "symphony/http-kernel": "~3.4|~4.0",
+        "symphony/property-access": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "symphony/routing": "~3.4|~4.0",
+        "symphony/security-csrf": "~3.4|~4.0",
+        "psr/log": "~1.0"
+    },
+    "suggest": {
+        "symphony/security-csrf": "For using tokens to protect authentication/logout attempts",
+        "symphony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Security\\Http\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

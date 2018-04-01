@@ -1,0 +1,40 @@
+{
+    "name": "symphony/dom-crawler",
+    "type": "library",
+    "description": "Symphony DomCrawler Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/polyfill-mbstring": "~1.0"
+    },
+    "require-dev": {
+        "symphony/css-selector": "~3.4|~4.0"
+    },
+    "suggest": {
+        "symphony/css-selector": ""
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\DomCrawler\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

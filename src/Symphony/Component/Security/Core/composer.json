@@ -1,0 +1,50 @@
+{
+    "name": "symphony/security-core",
+    "type": "library",
+    "description": "Symphony Security Component - Core Library",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "require-dev": {
+        "psr/container": "^1.0",
+        "symphony/event-dispatcher": "~3.4|~4.0",
+        "symphony/expression-language": "~3.4|~4.0",
+        "symphony/http-foundation": "~3.4|~4.0",
+        "symphony/ldap": "~3.4|~4.0",
+        "symphony/validator": "~3.4|~4.0",
+        "psr/log": "~1.0"
+    },
+    "suggest": {
+        "psr/container": "To instantiate the Security class",
+        "symphony/event-dispatcher": "",
+        "symphony/http-foundation": "",
+        "symphony/validator": "For using the user password constraint",
+        "symphony/expression-language": "For using the expression voter",
+        "symphony/ldap": "For using LDAP integration"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Security\\Core\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

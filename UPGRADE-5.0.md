@@ -52,7 +52,7 @@ FrameworkBundle
    bundle_controller:
        path: /
        defaults:
-           _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+           _controller: Symphony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
 
    service_controller:
        path: /
@@ -60,9 +60,9 @@ FrameworkBundle
            _controller: app.my_controller::myAction
    ```
 
- * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.
+ * Removed `Symphony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.
  * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is not supported anymore.
- * The `RequestDataCollector` class has been removed. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
+ * The `RequestDataCollector` class has been removed. Use the `Symphony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
 
 HttpFoundation
 --------------
@@ -75,7 +75,7 @@ Security
 --------
 
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
- * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
+ * The `Symphony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
 
 SecurityBundle
 --------------

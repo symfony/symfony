@@ -4,8 +4,8 @@ CHANGELOG for 4.0.x
 This changelog references the relevant changes (bug and security fixes) done
 in 4.0 minor versions.
 
-To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
-To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
+To get the diff for a specific change, go to https://github.com/symphony/symphony/commit/XXX where XXX is the change hash
+To get the diff between two versions, go to https://github.com/symphony/symphony/compare/v4.0.0...v4.0.1
 
 * 4.0.6 (2018-03-05)
 
@@ -58,7 +58,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #26067 [YAML] Issue #26065: leading spaces in YAML multi-line string literals (tamc)
  * bug #26012 Exit as late as possible (greg0ire)
  * bug #26082 [Cache][WebProfiler] fix collecting cache stats with sub-requests + allow clearing calls (dmaicher)
- * bug #26024 [PhpBridge] add PHPUnit 7 support to SymfonyTestsListener (shieldo)
+ * bug #26024 [PhpBridge] add PHPUnit 7 support to SymphonyTestsListener (shieldo)
  * bug #26020 [Lock] Log already-locked errors as "notice" instead of "warning" (Simperfit)
  * bug #26043 [Serialized] add context to serialize and deserialize (andrey1s)
  * bug #26127 Deterministic time in cache items for reproducible builds (lstrojny)
@@ -111,7 +111,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #25837 [SecurityBundle] Don't register in memory users as services (chalasr)
  * bug #25835 [HttpKernel] DebugHandlersListener should always replace the existing exception handler (nicolas-grekas)
  * bug #25829 [Debug] Always decorate existing exception handlers to deal with fatal errors (nicolas-grekas)
- * bug #25823 [Security] Notify that symfony/expression-language is not installed if ExpressionLanguage is used (giovannialbero1992)
+ * bug #25823 [Security] Notify that symphony/expression-language is not installed if ExpressionLanguage is used (giovannialbero1992)
  * bug #25824 Fixing a bug where the dump() function depended on bundle ordering (weaverryan)
  * bug #25763 [OptionsResolver] Fix options resolver with array allowed types (mcg-web)
  * bug #25789  Enableable ArrayNodeDefinition is disabled for empty configuration (kejwmen)
@@ -259,7 +259,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #25163 [DI] Fix tracking of env vars in exceptions (nicolas-grekas)
  * bug #25162 [HttpKernel] Read $_ENV when checking SHELL_VERBOSITY (nicolas-grekas)
  * bug #25158 [DI] Remove unreachable code (GawainLynch)
- * bug #25152 [Form] Don't rely on `Symfony\Component\HttpFoundation\File\File` if http-foundation isn't in FileType (issei-m)
+ * bug #25152 [Form] Don't rely on `Symphony\Component\HttpFoundation\File\File` if http-foundation isn't in FileType (issei-m)
  * bug #24987 [Console] Fix global console flag when used in chain (Simperfit)
  * bug #25137 Adding checks for the expression language (weaverryan)
  * bug #25151 [FrameworkBundle] Automatically enable the CSRF protection if CSRF manager exists (sroze)
@@ -350,7 +350,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #24802 [TwigBridge] [Bootstrap 4] Fix hidden errors (ostrolucky)
  * bug #24816 [Serializer] Fix extra attributes when no group specified (ogizanagi)
  * bug #24822 [DI] Fix "almost-circular" dependencies handling (nicolas-grekas)
- * bug #24821 symfony/form auto-enables symfony/validator, even when not present (weaverryan)
+ * bug #24821 symphony/form auto-enables symphony/validator, even when not present (weaverryan)
  * bug #24824 [FrameworkBundle][Config] fix: do not add resource checkers for no-debug (dmaicher)
  * bug #24814 [Intl] Make intl-data tests pass and save language aliases again (jakzal)
  * bug #24810 [Serializer] readd default argument value (xabbuh)
@@ -580,7 +580,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #23519 [TwigBundle] Commands as a service (ro0NL)
  * feature #23591 [VarDumper] Add time zone caster (maidmaid)
  * feature #23614 [VarDumper] Remove low PHP version and hhvm compat in interval caster (maidmaid)
- * feature #22317 [Console] Make SymfonyQuestionHelper::ask optional by default (ro0NL)
+ * feature #22317 [Console] Make SymphonyQuestionHelper::ask optional by default (ro0NL)
  * feature #23510 [Console] Add a factory command loader for standalone application with lazy-loading needs (ogizanagi)
  * feature #23357 [VarDumper] Add interval caster (maidmaid)
  * feature #23550 [DebugBundle] Added min_depth to Configuration (james-johnston-thumbtack)
@@ -699,8 +699,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #22797 [Ldap] remove deprecated features (xabbuh)
  * feature #22794 [ExpressionLanguage] remove deprecated features (xabbuh)
  * feature #22779 [BC Break] Removed BC layers for ControllerResolver::getArguments() (iltar)
- * feature #22782 [Debug][VarDumper] Remove the symfony_debug C extension (nicolas-grekas)
+ * feature #22782 [Debug][VarDumper] Remove the symphony_debug C extension (nicolas-grekas)
  * feature #22771 [Workflow] Removed deprecated features (lyrixx)
  * feature #22741 [Serializer] Remove deprecated DoctrineCache support (dunglas)
- * feature #22733 Bump minimum version to PHP 7.1 for Symfony 4 (fabpot, dunglas, nicolas-grekas)
+ * feature #22733 Bump minimum version to PHP 7.1 for Symphony 4 (fabpot, dunglas, nicolas-grekas)
 

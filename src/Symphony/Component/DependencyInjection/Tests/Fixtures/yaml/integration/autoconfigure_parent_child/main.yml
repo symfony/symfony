@@ -1,0 +1,8 @@
+imports:
+    - { resource: _child.yml }
+
+services:
+    parent_service:
+        class: Symphony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        autoconfigure: true
+        public: true

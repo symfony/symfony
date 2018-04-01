@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symphony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="monolog.logger" parent="monolog.logger_prototype" public="false">
+            <argument index="0">app</argument>
+        </service>
+
+        <service id="logger" alias="monolog.logger" />
+
+        <service id="monolog.logger" parent="monolog.logger_prototype" public="false">
+            <argument index="0">app</argument>
+        </service>
+        <service id="monolog.logger_prototype" class="Symphony\Bridge\Monolog\Logger" abstract="true">
+            <argument /><!-- Channel -->
+        </service>
+    </services>
+</container>

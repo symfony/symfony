@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symphony.com/schema/dic/symphony"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd
+                        http://symphony.com/schema/dic/symphony http://symphony.com/schema/dic/symphony/symphony-1.0.xsd">
+
+    <framework:config>
+        <framework:workflow name="my_workflow">
+            <framework:marking-store type="multiple_state"/>
+            <framework:place name="first" />
+            <framework:place name="last" />
+            <framework:transition name="foobar">
+                <framework:from>a</framework:from>
+                <framework:to>a</framework:to>
+            </framework:transition>
+        </framework:workflow>
+    </framework:config>
+</container>

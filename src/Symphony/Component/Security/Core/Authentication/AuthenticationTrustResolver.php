@@ -1,0 +1,67 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\Security\Core\Authentication;
+
+use Symphony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+/**
+ * The default implementation of the authentication trust resolver.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
+class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
+{
+    private $anonymousClass;
+    private $rememberMeClass;
+
+    public function __construct(string $anonymousClass, string $rememberMeClass)
+    {
+        $this->anonymousClass = $anonymousClass;
+        $this->rememberMeClass = $rememberMeClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAnonymous(TokenInterface $token = null)
+    {
+        if (null === $token) {
+            return false;
+        }
+
+        return $token instanceof $this->anonymousClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRememberMe(TokenInterface $token = null)
+    {
+        if (null === $token) {
+            return false;
+        }
+
+        return $token instanceof $this->rememberMeClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isFullFledged(TokenInterface $token = null)
+    {
+        if (null === $token) {
+            return false;
+        }
+
+        return !$this->isAnonymous($token) && !$this->isRememberMe($token);
+    }
+}

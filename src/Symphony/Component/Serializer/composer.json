@@ -1,0 +1,63 @@
+{
+    "name": "symphony/serializer",
+    "type": "library",
+    "description": "Symphony Serializer Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "require-dev": {
+        "symphony/yaml": "~3.4|~4.0",
+        "symphony/config": "~3.4|~4.0",
+        "symphony/property-access": "~3.4|~4.0",
+        "symphony/http-foundation": "~3.4|~4.0",
+        "symphony/cache": "~3.4|~4.0",
+        "symphony/property-info": "~3.4|~4.0",
+        "symphony/validator": "~3.4|~4.0",
+        "doctrine/annotations": "~1.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "doctrine/cache": "~1.0",
+        "phpdocumentor/reflection-docblock": "^3.0|^4.0"
+    },
+    "conflict": {
+        "phpdocumentor/type-resolver": "<0.2.1",
+        "symphony/dependency-injection": "<3.4",
+        "symphony/property-access": "<3.4",
+        "symphony/property-info": "<3.4",
+        "symphony/yaml": "<3.4"
+    },
+    "suggest": {
+        "psr/cache-implementation": "For using the metadata cache.",
+        "symphony/property-info": "To deserialize relations.",
+        "symphony/yaml": "For using the default YAML mapping loader.",
+        "symphony/config": "For using the XML mapping loader.",
+        "symphony/property-access": "For using the ObjectNormalizer.",
+        "symphony/http-foundation": "To use the DataUriNormalizer.",
+        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache."
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Serializer\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

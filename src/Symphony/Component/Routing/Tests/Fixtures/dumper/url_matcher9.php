@@ -1,0 +1,53 @@
+<?php
+
+use Symphony\Component\Routing\Exception\MethodNotAllowedException;
+use Symphony\Component\Routing\Exception\ResourceNotFoundException;
+use Symphony\Component\Routing\RequestContext;
+
+/**
+ * This class has been auto-generated
+ * by the Symphony Routing Component.
+ */
+class ProjectUrlMatcher extends Symphony\Component\Routing\Matcher\UrlMatcher
+{
+    public function __construct(RequestContext $context)
+    {
+        $this->context = $context;
+    }
+
+    public function match($rawPathinfo)
+    {
+        $allow = $allowSchemes = array();
+        $pathinfo = rawurldecode($rawPathinfo);
+        $context = $this->context;
+        $requestMethod = $canonicalMethod = $context->getMethod();
+        $host = strtolower($context->getHost());
+
+        if ('HEAD' === $requestMethod) {
+            $canonicalMethod = 'GET';
+        }
+
+        switch ($pathinfo) {
+            case '/':
+                // a
+                if (preg_match('#^(?P<d>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
+                    return $this->mergeDefaults(array('_route' => 'a') + $hostMatches, array());
+                }
+                // c
+                if (preg_match('#^(?P<e>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
+                    return $this->mergeDefaults(array('_route' => 'c') + $hostMatches, array());
+                }
+                // b
+                if ('d.c.b.a' === $host) {
+                    return array('_route' => 'b');
+                }
+                break;
+        }
+
+        if ('/' === $pathinfo) {
+            throw new Symphony\Component\Routing\Exception\NoConfigurationException();
+        }
+
+        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+    }
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="security.csrf.token_generator" class="Symphony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator" />
+        <service id="Symphony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface" alias="security.csrf.token_generator" />
+
+        <service id="security.csrf.token_storage" class="Symphony\Component\Security\Csrf\TokenStorage\SessionTokenStorage">
+            <argument type="service" id="session" />
+        </service>
+        <service id="Symphony\Component\Security\Csrf\TokenStorage\TokenStorageInterface" alias="security.csrf.token_storage" />
+
+        <service id="security.csrf.token_manager" class="Symphony\Component\Security\Csrf\CsrfTokenManager" public="true">
+            <argument type="service" id="security.csrf.token_generator" />
+            <argument type="service" id="security.csrf.token_storage" />
+            <argument type="service" id="request_stack" on-invalid="ignore" />
+        </service>
+        <service id="Symphony\Component\Security\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" />
+
+        <service id="twig.extension.security_csrf" class="Symphony\Bridge\Twig\Extension\CsrfExtension">
+            <tag name="twig.extension" />
+            <argument type="service" id="security.csrf.token_manager" />
+        </service>
+    </services>
+</container>

@@ -1,0 +1,12 @@
+services:
+    _defaults: {public: true}
+
+    Symphony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy: { 0: ~, $apiKey: ABCD }
+
+    another_one:
+        class: Symphony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy
+        arguments:
+            $apiKey: ABCD
+            Symphony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass: ~
+        calls:
+            - ['setApiKey', { $apiKey: '123' }]

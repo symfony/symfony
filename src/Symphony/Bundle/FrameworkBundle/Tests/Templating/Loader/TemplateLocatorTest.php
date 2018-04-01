@@ -1,0 +1,98 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Bundle\FrameworkBundle\Tests\Templating\Loader;
+
+use Symphony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
+use Symphony\Bundle\FrameworkBundle\Templating\TemplateReference;
+use Symphony\Bundle\FrameworkBundle\Tests\TestCase;
+
+class TemplateLocatorTest extends TestCase
+{
+    public function testLocateATemplate()
+    {
+        $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
+
+        $fileLocator = $this->getFileLocator();
+
+        $fileLocator
+            ->expects($this->once())
+            ->method('locate')
+            ->with($template->getPath())
+            ->will($this->returnValue('/path/to/template'))
+        ;
+
+        $locator = new TemplateLocator($fileLocator);
+
+        $this->assertEquals('/path/to/template', $locator->locate($template));
+
+        // Assert cache is used as $fileLocator->locate should be called only once
+        $this->assertEquals('/path/to/template', $locator->locate($template));
+    }
+
+    public function testLocateATemplateFromCacheDir()
+    {
+        $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
+
+        $fileLocator = $this->getFileLocator();
+
+        $locator = new TemplateLocator($fileLocator, __DIR__.'/../../Fixtures');
+
+        $this->assertEquals(realpath(__DIR__.'/../../Fixtures/Resources/views/this.is.a.template.format.engine'), $locator->locate($template));
+    }
+
+    public function testThrowsExceptionWhenTemplateNotFound()
+    {
+        $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
+
+        $fileLocator = $this->getFileLocator();
+
+        $errorMessage = 'FileLocator exception message';
+
+        $fileLocator
+            ->expects($this->once())
+            ->method('locate')
+            ->will($this->throwException(new \InvalidArgumentException($errorMessage)))
+        ;
+
+        $locator = new TemplateLocator($fileLocator);
+
+        try {
+            $locator->locate($template);
+            $this->fail('->locate() should throw an exception when the file is not found.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertContains(
+                $errorMessage,
+                $e->getMessage(),
+                'TemplateLocator exception should propagate the FileLocator exception message'
+            );
+        }
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface()
+    {
+        $locator = new TemplateLocator($this->getFileLocator());
+        $locator->locate('template');
+    }
+
+    protected function getFileLocator()
+    {
+        return $this
+            ->getMockBuilder('Symphony\Component\Config\FileLocator')
+            ->setMethods(array('locate'))
+            ->setConstructorArgs(array('/path/to/fallback'))
+            ->getMock()
+        ;
+    }
+}

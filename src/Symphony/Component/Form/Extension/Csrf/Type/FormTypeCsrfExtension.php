@@ -1,0 +1,114 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\Form\Extension\Csrf\Type;
+
+use Symphony\Component\Form\AbstractTypeExtension;
+use Symphony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
+use Symphony\Component\Form\FormBuilderInterface;
+use Symphony\Component\Form\FormView;
+use Symphony\Component\Form\FormInterface;
+use Symphony\Component\Form\Util\ServerParams;
+use Symphony\Component\OptionsResolver\OptionsResolver;
+use Symphony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symphony\Component\Translation\TranslatorInterface;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class FormTypeCsrfExtension extends AbstractTypeExtension
+{
+    private $defaultTokenManager;
+    private $defaultEnabled;
+    private $defaultFieldName;
+    private $translator;
+    private $translationDomain;
+    private $serverParams;
+
+    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, bool $defaultEnabled = true, string $defaultFieldName = '_token', TranslatorInterface $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
+    {
+        $this->defaultTokenManager = $defaultTokenManager;
+        $this->defaultEnabled = $defaultEnabled;
+        $this->defaultFieldName = $defaultFieldName;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
+        $this->serverParams = $serverParams;
+    }
+
+    /**
+     * Adds a CSRF field to the form when the CSRF protection is enabled.
+     *
+     * @param FormBuilderInterface $builder The form builder
+     * @param array                $options The options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if (!$options['csrf_protection']) {
+            return;
+        }
+
+        $builder
+            ->addEventSubscriber(new CsrfValidationListener(
+                $options['csrf_field_name'],
+                $options['csrf_token_manager'],
+                $options['csrf_token_id'] ?: ($builder->getName() ?: get_class($builder->getType()->getInnerType())),
+                $options['csrf_message'],
+                $this->translator,
+                $this->translationDomain,
+                $this->serverParams
+            ))
+        ;
+    }
+
+    /**
+     * Adds a CSRF field to the root form view.
+     *
+     * @param FormView      $view    The form view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
+            $factory = $form->getConfig()->getFormFactory();
+            $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: get_class($form->getConfig()->getType()->getInnerType()));
+            $data = (string) $options['csrf_token_manager']->getToken($tokenId);
+
+            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symphony\Component\Form\Extension\Core\Type\HiddenType', $data, array(
+                'mapped' => false,
+            ));
+
+            $view->children[$options['csrf_field_name']] = $csrfForm->createView($view);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'csrf_protection' => $this->defaultEnabled,
+            'csrf_field_name' => $this->defaultFieldName,
+            'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
+            'csrf_token_manager' => $this->defaultTokenManager,
+            'csrf_token_id' => null,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedType()
+    {
+        return 'Symphony\Component\Form\Extension\Core\Type\FormType';
+    }
+}

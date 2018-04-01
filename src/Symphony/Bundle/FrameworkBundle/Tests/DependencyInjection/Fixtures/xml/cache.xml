@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symphony.com/schema/dic/symphony"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd
+        http://symphony.com/schema/dic/symphony http://symphony.com/schema/dic/symphony/symphony-1.0.xsd">
+
+    <framework:config>
+        <framework:cache>
+            <framework:pool name="cache.foo" adapter="cache.adapter.apcu" default-lifetime="30" />
+            <framework:pool name="cache.bar" adapter="cache.adapter.doctrine" default-lifetime="5" provider="app.doctrine_cache_provider" />
+            <framework:pool name="cache.baz" adapter="cache.adapter.filesystem" default-lifetime="7" />
+            <framework:pool name="cache.foobar" adapter="cache.adapter.psr6" default-lifetime="10" provider="app.cache_pool" />
+            <framework:pool name="cache.def" default-lifetime="11" />
+        </framework:cache>
+    </framework:config>
+</container>

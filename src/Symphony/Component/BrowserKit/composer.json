@@ -1,0 +1,41 @@
+{
+    "name": "symphony/browser-kit",
+    "type": "library",
+    "description": "Symphony BrowserKit Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/dom-crawler": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "symphony/process": "~3.4|~4.0",
+        "symphony/css-selector": "~3.4|~4.0"
+    },
+    "suggest": {
+        "symphony/process": ""
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\BrowserKit\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

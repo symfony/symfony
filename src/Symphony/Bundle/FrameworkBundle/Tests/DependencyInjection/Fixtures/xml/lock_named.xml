@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symphony.com/schema/dic/symphony"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd
+        http://symphony.com/schema/dic/symphony http://symphony.com/schema/dic/symphony/symphony-1.0.xsd">
+
+
+    <parameters>
+        <parameter key="env(REDIS_URL)">redis://paas.com</parameter>
+    </parameters>
+
+    <framework:config>
+        <framework:lock>
+            <framework:resource name="foo">semaphore</framework:resource>
+            <framework:resource name="bar">flock</framework:resource>
+            <framework:resource name="baz">semaphore</framework:resource>
+            <framework:resource name="baz">flock</framework:resource>
+            <framework:resource name="qux">%env(REDIS_URL)%</framework:resource>
+        </framework:lock>
+    </framework:config>
+</container>

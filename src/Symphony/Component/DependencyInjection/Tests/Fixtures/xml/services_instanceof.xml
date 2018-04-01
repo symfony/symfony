@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symphony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <instanceof id="Symphony\Component\DependencyInjection\Tests\Fixtures\BarInterface" lazy="true" autowire="true">
+            <tag name="foo" />
+            <tag name="bar" />
+        </instanceof>
+
+        <service id="Symphony\Component\DependencyInjection\Tests\Fixtures\Bar" class="Symphony\Component\DependencyInjection\Tests\Fixtures\Bar" />
+        <service id="Symphony\Component\DependencyInjection\Tests\Fixtures\BarInterface" alias="Symphony\Component\DependencyInjection\Tests\Fixtures\Bar" />
+    </services>
+</container>

@@ -1,4 +1,0 @@
-services:
-    dir1:
-        namespace: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\
-        tags: [foo]

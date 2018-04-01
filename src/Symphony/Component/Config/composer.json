@@ -1,0 +1,46 @@
+{
+    "name": "symphony/config",
+    "type": "library",
+    "description": "Symphony Config Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/filesystem": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/event-dispatcher": "~3.4|~4.0",
+        "symphony/finder": "~3.4|~4.0",
+        "symphony/yaml": "~3.4|~4.0"
+    },
+    "conflict": {
+        "symphony/finder": "<3.4"
+    },
+    "suggest": {
+        "symphony/yaml": "To use the yaml reference dumper"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Config\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

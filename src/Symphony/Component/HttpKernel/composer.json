@@ -1,0 +1,70 @@
+{
+    "name": "symphony/http-kernel",
+    "type": "library",
+    "description": "Symphony HttpKernel Component",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/event-dispatcher": "~4.1",
+        "symphony/http-foundation": "~4.1",
+        "symphony/debug": "~3.4|~4.0",
+        "psr/log": "~1.0"
+    },
+    "require-dev": {
+        "symphony/browser-kit": "~3.4|~4.0",
+        "symphony/config": "~3.4|~4.0",
+        "symphony/console": "~3.4|~4.0",
+        "symphony/css-selector": "~3.4|~4.0",
+        "symphony/dependency-injection": "^4.1",
+        "symphony/dom-crawler": "~3.4|~4.0",
+        "symphony/expression-language": "~3.4|~4.0",
+        "symphony/finder": "~3.4|~4.0",
+        "symphony/process": "~3.4|~4.0",
+        "symphony/routing": "~3.4|~4.0",
+        "symphony/stopwatch": "~3.4|~4.0",
+        "symphony/templating": "~3.4|~4.0",
+        "symphony/translation": "~3.4|~4.0",
+        "symphony/var-dumper": "~4.1",
+        "psr/cache": "~1.0"
+    },
+    "provide": {
+        "psr/log-implementation": "1.0"
+    },
+    "conflict": {
+        "symphony/config": "<3.4",
+        "symphony/dependency-injection": "<4.1",
+        "symphony/var-dumper": "<3.4",
+        "twig/twig": "<1.34|<2.4,>=2"
+    },
+    "suggest": {
+        "symphony/browser-kit": "",
+        "symphony/config": "",
+        "symphony/console": "",
+        "symphony/dependency-injection": "",
+        "symphony/var-dumper": ""
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\HttpKernel\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

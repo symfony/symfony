@@ -1,0 +1,1 @@
+Symphony\Bundle\FrameworkBundle\Tests\Console\Descriptor\ExtendedCallableClass::parent::staticMethod()

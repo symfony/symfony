@@ -1,0 +1,49 @@
+{
+    "name": "symphony/debug-bundle",
+    "type": "symphony-bundle",
+    "description": "Symphony DebugBundle",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "ext-xml": "*",
+        "symphony/http-kernel": "~3.4|~4.0",
+        "symphony/twig-bridge": "~3.4|~4.0",
+        "symphony/var-dumper": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "symphony/config": "~3.4|~4.0",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "symphony/web-profiler-bundle": "~3.4|~4.0"
+    },
+    "conflict": {
+        "symphony/dependency-injection": "<3.4"
+    },
+    "suggest": {
+        "symphony/config": "For service container configuration",
+        "symphony/dependency-injection": "For using as a service from the container"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Bundle\\DebugBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

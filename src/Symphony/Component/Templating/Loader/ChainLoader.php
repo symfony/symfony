@@ -1,0 +1,76 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\Templating\Loader;
+
+use Symphony\Component\Templating\Storage\Storage;
+use Symphony\Component\Templating\TemplateReferenceInterface;
+
+/**
+ * ChainLoader is a loader that calls other loaders to load templates.
+ *
+ * @author Fabien Potencier <fabien@symphony.com>
+ */
+class ChainLoader extends Loader
+{
+    protected $loaders = array();
+
+    /**
+     * @param LoaderInterface[] $loaders An array of loader instances
+     */
+    public function __construct(array $loaders = array())
+    {
+        foreach ($loaders as $loader) {
+            $this->addLoader($loader);
+        }
+    }
+
+    /**
+     * Adds a loader instance.
+     */
+    public function addLoader(LoaderInterface $loader)
+    {
+        $this->loaders[] = $loader;
+    }
+
+    /**
+     * Loads a template.
+     *
+     * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
+     */
+    public function load(TemplateReferenceInterface $template)
+    {
+        foreach ($this->loaders as $loader) {
+            if (false !== $storage = $loader->load($template)) {
+                return $storage;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if the template is still fresh.
+     *
+     * @param TemplateReferenceInterface $template A template
+     * @param int                        $time     The last modification time of the cached template (timestamp)
+     *
+     * @return bool
+     */
+    public function isFresh(TemplateReferenceInterface $template, $time)
+    {
+        foreach ($this->loaders as $loader) {
+            return $loader->isFresh($template, $time);
+        }
+
+        return false;
+    }
+}

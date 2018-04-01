@@ -1,0 +1,67 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\Serializer\Mapping;
+
+/**
+ * Stores metadata needed for serializing and deserializing objects of specific class.
+ *
+ * Primarily, the metadata stores the set of attributes to serialize or deserialize.
+ *
+ * There may only exist one metadata for each attribute according to its name.
+ *
+ * @internal
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+interface ClassMetadataInterface
+{
+    /**
+     * Returns the name of the backing PHP class.
+     *
+     * @return string The name of the backing class
+     */
+    public function getName();
+
+    /**
+     * Adds an {@link AttributeMetadataInterface}.
+     */
+    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata);
+
+    /**
+     * Gets the list of {@link AttributeMetadataInterface}.
+     *
+     * @return AttributeMetadataInterface[]
+     */
+    public function getAttributesMetadata();
+
+    /**
+     * Merges a {@link ClassMetadataInterface} in the current one.
+     */
+    public function merge(ClassMetadataInterface $classMetadata);
+
+    /**
+     * Returns a {@link \ReflectionClass} instance for this class.
+     *
+     * @return \ReflectionClass
+     */
+    public function getReflectionClass();
+
+    /**
+     * @return ClassDiscriminatorMapping|null
+     */
+    public function getClassDiscriminatorMapping();
+
+    /**
+     * @param ClassDiscriminatorMapping|null $mapping
+     */
+    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null);
+}

@@ -1,0 +1,32 @@
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symphony\Component\Form\Console\Helper;
+
+use Symphony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
+use Symphony\Component\Form\Console\Descriptor\JsonDescriptor;
+use Symphony\Component\Form\Console\Descriptor\TextDescriptor;
+
+/**
+ * @author Yonel Ceruto <yonelceruto@gmail.com>
+ *
+ * @internal
+ */
+class DescriptorHelper extends BaseDescriptorHelper
+{
+    public function __construct()
+    {
+        $this
+            ->register('txt', new TextDescriptor())
+            ->register('json', new JsonDescriptor())
+        ;
+    }
+}

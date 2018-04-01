@@ -1,7 +1,0 @@
-imports:
-    - { resource: ./../config/default.yml }
-
-services:
-    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SubRequestController:
-        tags:
-            - { name: controller.service_arguments, action: indexAction, argument: handler, id: fragment.handler }

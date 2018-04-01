@@ -1,9 +1,0 @@
-Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Category:
-    properties:
-        id:
-            - Type: int
-
-Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\SubCategory:
-    properties:
-        id:
-            - Type: int

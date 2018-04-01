@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="esi" class="Symphony\Component\HttpKernel\HttpCache\Esi" />
+
+        <service id="esi_listener" class="Symphony\Component\HttpKernel\EventListener\SurrogateListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="esi" on-invalid="ignore" />
+        </service>
+    </services>
+</container>

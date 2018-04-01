@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Symphony package.
+ *
+ * (c) Fabien Potencier <fabien@symphony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+/**
+ * Starts a dump server to collect and output dumps on a single place with multiple formats support.
+ *
+ * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+ */
+
+use Psr\Log\LoggerInterface;
+use Symphony\Component\Console\Application;
+use Symphony\Component\Console\Input\ArgvInput;
+use Symphony\Component\Console\Input\InputOption;
+use Symphony\Component\Console\Logger\ConsoleLogger;
+use Symphony\Component\Console\Output\ConsoleOutput;
+use Symphony\Component\VarDumper\Command\ServerDumpCommand;
+use Symphony\Component\VarDumper\Server\DumpServer;
+
+function includeIfExists(string $file): bool
+{
+    return file_exists($file) && include $file;
+}
+
+if (
+    !includeIfExists(__DIR__ . '/../../../../autoload.php') &&
+    !includeIfExists(__DIR__ . '/../../vendor/autoload.php') &&
+    !includeIfExists(__DIR__ . '/../../../../../../vendor/autoload.php')
+) {
+    fwrite(STDERR, 'Install dependencies using Composer.'.PHP_EOL);
+    exit(1);
+}
+
+if (!class_exists(Application::class)) {
+    fwrite(STDERR, 'You need the "symphony/console" component in order to run the VarDumper server.'.PHP_EOL);
+    exit(1);
+}
+
+$input = new ArgvInput();
+$output = new ConsoleOutput();
+$defaultHost = '127.0.0.1:9912';
+$host = $input->getParameterOption(['--host'], $_SERVER['VAR_DUMPER_SERVER'] ?? $defaultHost, true);
+$logger = interface_exists(LoggerInterface::class) ? new ConsoleLogger($output->getErrorOutput()) : null;
+
+$app = new Application();
+
+$app->getDefinition()->addOption(
+    new InputOption('--host', null, InputOption::VALUE_REQUIRED, 'The address the server should listen to', $defaultHost)
+);
+
+$app->add($command = new ServerDumpCommand(new DumpServer($host, $logger)))
+    ->getApplication()
+    ->setDefaultCommand($command->getName(), true)
+    ->run($input, $output)
+;

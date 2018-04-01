@@ -1,0 +1,38 @@
+{
+    "name": "symphony/proxy-manager-bridge",
+    "type": "symphony-bridge",
+    "description": "Symphony ProxyManager Bridge",
+    "keywords": [],
+    "homepage": "https://symphony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symphony/dependency-injection": "~3.4|~4.0",
+        "ocramius/proxy-manager": "~0.4|~1.0|~2.0"
+    },
+    "require-dev": {
+        "symphony/config": "~3.4|~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Bridge\\ProxyManager\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

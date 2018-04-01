@@ -1,0 +1,36 @@
+{
+    "name": "symphony/dotenv",
+    "type": "library",
+    "description": "Registers environment variables from a .env file",
+    "keywords": ["environment", "env", "dotenv"],
+    "homepage": "https://symphony.com",
+    "license" : "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symphony.com"
+        },
+        {
+            "name": "Symphony Community",
+            "homepage": "https://symphony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "require-dev": {
+        "symphony/process": "~3.4|~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Symphony\\Component\\Dotenv\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
+    }
+}

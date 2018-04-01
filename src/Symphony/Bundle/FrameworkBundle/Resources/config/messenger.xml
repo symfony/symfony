@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symphony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symphony.com/schema/dic/services http://symphony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <!-- Bus -->
+        <service id="message_bus" class="Symphony\Component\Messenger\MessageBus" public="true">
+            <argument type="tagged" tag="message_bus_middleware" /> <!-- Middlewares -->
+        </service>
+
+        <service id="Symphony\Component\Messenger\MessageBusInterface" alias="message_bus" />
+
+        <!-- Handlers -->
+        <service id="messenger.handler_resolver" class="Symphony\Component\Messenger\ContainerHandlerLocator">
+            <argument type="service" id="service_container"/>
+        </service>
+
+        <service id="messenger.middleware.call_message_handler" class="Symphony\Component\Messenger\Middleware\HandleMessageMiddleware">
+            <argument type="service" id="messenger.handler_resolver" />
+
+            <tag name="message_bus_middleware" priority="-10" />
+        </service>
+
+        <service id="messenger.middleware.doctrine_transaction" class="Symphony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware">
+            <argument type="service" id="doctrine" />
+            <argument /> <!-- Entity manager name -->
+
+            <tag name="message_bus_middleware" priority="9" />
+        </service>
+
+        <!-- Asynchronous -->
+        <service id="messenger.asynchronous.routing.sender_locator" class="Symphony\Component\Messenger\Asynchronous\Routing\SenderLocator">
+            <argument type="service" id="messenger.sender_locator" />
+            <argument /> <!-- Message to sender ID mapping -->
+        </service>
+        <service id="messenger.asynchronous.middleware.send_message_to_producer" class="Symphony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware">
+            <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
+
+            <tag name="message_bus_middleware" priority="-5" />
+        </service>
+
+        <!-- Message encoding/decoding -->
+        <service id="messenger.transport.serialize_message_with_type_in_headers" class="Symphony\Component\Messenger\Transport\Serialization\Serializer">
+            <argument type="service" id="serializer" />
+        </service>
+
+        <service id="messenger.transport.default_encoder" alias="messenger.transport.serialize_message_with_type_in_headers" public="true" />
+        <service id="messenger.transport.default_decoder" alias="messenger.transport.serialize_message_with_type_in_headers" public="true" />
+
+        <!-- Logging & Debug -->
+        <service id="messenger.middleware.debug.logging" class="Symphony\Component\Messenger\Debug\LoggingMiddleware">
+            <argument type="service" id="logger" />
+
+            <tag name="message_bus_middleware" priority="10" />
+            <tag name="monolog.logger" channel="messenger" />
+        </service>
+
+        <service id="data_collector.messenger" class="Symphony\Bundle\FrameworkBundle\DataCollector\MessengerDataCollector">
+            <tag name="data_collector" template="@WebProfiler/Collector/messenger.html.twig" id="messenger" priority="100" />
+            <tag name="message_bus_middleware" />
+        </service>
+
+        <!-- Discovery -->
+        <service id="messenger.receiver_locator">
+            <tag name="container.service_locator" />
+            <argument type="collection" />
+        </service>
+        <service id="messenger.sender_locator">
+            <tag name="container.service_locator" />
+            <argument type="collection" />
+        </service>
+    </services>
+</container>

@@ -118,7 +118,6 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 }
             }
 
-
             $instanceofCalls = array_filter($instanceofCalls);
             $instanceofCalls = array_map('current', $instanceofCalls);
             $definition->setMethodCalls(array_merge($instanceofCalls, $definition->getMethodCalls()));

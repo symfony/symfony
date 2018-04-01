@@ -60,8 +60,8 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $expected = array(
-            array('foo', array('foo')),
             array('foo', array('bar')),
+            array('foo', array('foo')),
         );
 
         $this->assertSame($expected, $container->getDefinition('parent')->getMethodCalls());

@@ -118,11 +118,10 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 }
             }
 
-            foreach ($instanceofCalls as $calls) {
-                foreach ($calls as $call) {
-                    $definition->addMethodCall($call[0], $call[1]);
-                }
-            }
+
+            $instanceofCalls = array_filter($instanceofCalls);
+            $instanceofCalls = array_map('current', $instanceofCalls);
+            $definition->setMethodCalls(array_merge($instanceofCalls, $definition->getMethodCalls()));
 
             // reset fields with "merge" behavior
             $abstract

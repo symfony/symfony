@@ -22,17 +22,21 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     /**
      * Constructs a transformer.
      *
-     * @param int  $scale        Unused
+     * @param int  $scale        Number of decimals
      * @param bool $grouping     Whether thousands should be grouped
      * @param int  $roundingMode One of the ROUND_ constants in this class
      */
     public function __construct($scale = 0, $grouping = false, $roundingMode = self::ROUND_DOWN)
     {
+        if (null === $scale) {
+            $scale = 0;
+        }
+
         if (null === $roundingMode) {
             $roundingMode = self::ROUND_DOWN;
         }
 
-        parent::__construct(0, $grouping, $roundingMode);
+        parent::__construct($scale, $grouping, $roundingMode);
     }
 
     /**

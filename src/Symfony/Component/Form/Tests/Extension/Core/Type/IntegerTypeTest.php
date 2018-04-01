@@ -34,6 +34,14 @@ class IntegerTypeTest extends BaseTypeTest
         $this->assertSame('1', $form->getViewData());
     }
 
+    public function testRoundingWithScale()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 2));
+        $form->setData('12345.67890');
+
+        $this->assertSame('12345.67', $form->createView()->vars['value']);
+    }
+
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');

@@ -7,6 +7,28 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.37 (2018-04-02)
+
+ * bug #26727 [HttpCache] Unlink tmp file on error (Chansig)
+ * bug #26675 [HttpKernel] DumpDataCollector: do not flush when a dumper is provided (ogizanagi)
+ * bug #26663 [TwigBridge] Fix rendering of currency by MoneyType (ro0NL)
+ * bug #26677 Support phpdbg SAPI in Debug::enable() (hkdobrev)
+ * bug #26589 [Ldap] cast to string when checking empty passwords (ismail1432)
+ * bug #26621 [Form] no type errors with invalid submitted data types (xabbuh)
+ * bug #26337 [Finder] Fixed leading/trailing / in filename (lyrixx)
+ * bug #26584 [TwigBridge] allow html5 compatible rendering of forms with null names (systemist)
+ * bug #24401 [Form] Change datetime to datetime-local for HTML5 datetime input (pierredup)
+ * bug #26370 [Security] added userChecker to SimpleAuthenticationProvider (i3or1s)
+ * bug #26569 [BrowserKit] Fix cookie path handling when $domain is null (dunglas)
+ * bug #26598 Fixes #26563 (open_basedir restriction in effect) (temperatur)
+ * bug #26568 [Debug] Reset previous exception handler earlier to prevent infinite loop (nicolas-grekas)
+ * bug #26567 [DoctrineBridge] Don't rely on ClassMetadataInfo->hasField in DoctrineOrmTypeGuesser anymore (fancyweb)
+ * bug #26356 [FrameworkBundle] HttpCache is not longer abstract (lyrixx)
+ * bug #26548 [DomCrawler] Change bad wording in ChoiceFormField::untick (dunglas)
+ * bug #26433 [DomCrawler] extract(): fix a bug when the attribute list is empty (dunglas)
+ * bug #26452 [Intl] Load locale aliases to support alias fallbacks (jakzal)
+ * bug #26450 [CssSelector] Fix CSS identifiers parsing - they can start with dash (jakubkulhan)
+
 * 2.8.36 (2018-03-05)
 
  * bug #26368 [WebProfilerBundle] Fix Debug toolbar breaks app (xkobal)

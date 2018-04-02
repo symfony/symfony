@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -27,7 +27,7 @@
         "BH": "Barein",
         "BI": "Burundi",
         "BJ": "Benin",
-        "BL": "St-Barthélemy",
+        "BL": "St. Barthélemy",
         "BM": "Bermuda",
         "BN": "Brunei",
         "BO": "Bolivia",
@@ -64,7 +64,7 @@
         "DM": "Dominika",
         "DO": "Dominikalýðveldið",
         "DZ": "Algeria",
-        "EA": "Ceuta og Melilla",
+        "EA": "Ceuta & Melilla",
         "EC": "Ekvador",
         "EE": "Estland",
         "EG": "Egyptaland",
@@ -183,7 +183,7 @@
         "PH": "Filipsoyggjar",
         "PK": "Pakistan",
         "PL": "Pólland",
-        "PM": "Saint Pierre og Miquelon",
+        "PM": "Saint Pierre & Miquelon",
         "PN": "Pitcairnoyggjar",
         "PR": "Puerto Riko",
         "PS": "Palestinskt landøki",

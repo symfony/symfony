@@ -1,10 +1,11 @@
 {
-    "Version": "2.1.37.6",
+    "Version": "2.1.39.11",
     "Names": {
         "af": "africanês",
         "ang": "inglês antigo",
         "ar_001": "árabe moderno padrão",
         "arn": "mapuche",
+        "ars": "árabe do Négede",
         "av": "avaric",
         "bax": "bamun",
         "bbj": "ghomala",
@@ -28,6 +29,7 @@
         "en_US": "inglês americano",
         "es_419": "espanhol latino-americano",
         "es_ES": "espanhol europeu",
+        "es_MX": "espanhol mexicano",
         "et": "estónio",
         "fon": "fon",
         "fr_CA": "francês canadiano",

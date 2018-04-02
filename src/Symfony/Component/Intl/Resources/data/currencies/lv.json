@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -443,6 +443,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritānijas ugija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritānijas ugija"
         ],
         "MTL": [
@@ -631,6 +635,10 @@
         ],
         "STD": [
             "STD",
+            "Santome un Prinsipi dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Santome un Prinsipi dobra"
         ],
         "SVC": [

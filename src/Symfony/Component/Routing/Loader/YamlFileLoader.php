@@ -163,63 +163,66 @@ class YamlFileLoader extends FileLoader
 
         $this->setCurrentDir(dirname($path));
 
-        /** @var RouteCollection $subCollection */
-        $subCollection = $this->import($config['resource'], $type, false, $file);
+        $imported = $this->import($config['resource'], $type, false, $file);
 
-        if (!\is_array($prefix)) {
-            $subCollection->addPrefix($prefix);
-            if (!$trailingSlashOnRoot) {
-                $rootPath = (new Route(trim(trim($prefix), '/').'/'))->getPath();
-                foreach ($subCollection->all() as $route) {
-                    if ($route->getPath() === $rootPath) {
-                        $route->setPath(rtrim($rootPath, '/'));
+        if (!is_array($imported)) {
+            $imported = array($imported);
+        }
+
+        foreach ($imported as $subCollection) {
+            /* @var $subCollection RouteCollection */
+            if (!\is_array($prefix)) {
+                $subCollection->addPrefix($prefix);
+                if (!$trailingSlashOnRoot) {
+                    $rootPath = (new Route(trim(trim($prefix), '/').'/'))->getPath();
+                    foreach ($subCollection->all() as $route) {
+                        if ($route->getPath() === $rootPath) {
+                            $route->setPath(rtrim($rootPath, '/'));
+                        }
+                    }
+                }
+            } else {
+                foreach ($prefix as $locale => $localePrefix) {
+                    $prefix[$locale] = trim(trim($localePrefix), '/');
+                }
+                foreach ($subCollection->all() as $name => $route) {
+                    if (null === $locale = $route->getDefault('_locale')) {
+                        $subCollection->remove($name);
+                        foreach ($prefix as $locale => $localePrefix) {
+                            $localizedRoute = clone $route;
+                            $localizedRoute->setDefault('_locale', $locale);
+                            $localizedRoute->setDefault('_canonical_route', $name);
+                            $localizedRoute->setPath($localePrefix.(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
+                            $subCollection->add($name.'.'.$locale, $localizedRoute);
+                        }
+                    } elseif (!isset($prefix[$locale])) {
+                        throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix when imported in "%s".', $name, $locale, $file));
+                    } else {
+                        $route->setPath($prefix[$locale].(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
+                        $subCollection->add($name, $route);
                     }
                 }
             }
-        } else {
-            foreach ($prefix as $locale => $localePrefix) {
-                $prefix[$locale] = trim(trim($localePrefix), '/');
+
+            if (null !== $host) {
+                $subCollection->setHost($host);
             }
-            foreach ($subCollection->all() as $name => $route) {
-                if (null === $locale = $route->getDefault('_locale')) {
-                    $subCollection->remove($name);
-                    foreach ($prefix as $locale => $localePrefix) {
-                        $localizedRoute = clone $route;
-                        $localizedRoute->setDefault('_locale', $locale);
-                        $localizedRoute->setDefault('_canonical_route', $name);
-                        $localizedRoute->setPath($localePrefix.(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
-                        $subCollection->add($name.'.'.$locale, $localizedRoute);
-                    }
-                } elseif (!isset($prefix[$locale])) {
-                    throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix when imported in "%s".', $name, $locale, $file));
-                } else {
-                    $route->setPath($prefix[$locale].(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
-                    $subCollection->add($name, $route);
-                }
+            if (null !== $condition) {
+                $subCollection->setCondition($condition);
             }
-        }
+            if (null !== $schemes) {
+                $subCollection->setSchemes($schemes);
+            }
+            if (null !== $methods) {
+                $subCollection->setMethods($methods);
+            }
 
-        if (null !== $host) {
-            $subCollection->setHost($host);
-        }
-        if (null !== $condition) {
-            $subCollection->setCondition($condition);
-        }
-        if (null !== $schemes) {
-            $subCollection->setSchemes($schemes);
-        }
-        if (null !== $methods) {
-            $subCollection->setMethods($methods);
-        }
-        $subCollection->addDefaults($defaults);
-        $subCollection->addRequirements($requirements);
-        $subCollection->addOptions($options);
+            if (isset($config['name_prefix'])) {
+                $subCollection->addNamePrefix($config['name_prefix']);
+            }
 
-        if (isset($config['name_prefix'])) {
-            $subCollection->addNamePrefix($config['name_prefix']);
+            $collection->addCollection($subCollection);
         }
-
-        $collection->addCollection($subCollection);
     }
 
     /**

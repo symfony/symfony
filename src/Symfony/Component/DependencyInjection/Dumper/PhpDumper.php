@@ -249,7 +249,7 @@ return new \\Container{$hash}\\{$options['class']}(array(
     'container.build_hash' => '$hash',
     'container.build_id' => '$id',
     'container.build_time' => $time,
-));
+), __DIR__.\\DIRECTORY_SEPARATOR.'Container{$hash}');
 
 EOF;
         } else {
@@ -762,7 +762,7 @@ EOF;
         $code .= $this->addServiceInclude($id, $definition, $inlinedDefinitions);
 
         if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-            $factoryCode = $asFile ? "\$this->load(__DIR__.'/%s.php', false)" : '$this->%s(false)';
+            $factoryCode = $asFile ? "\$this->load('%s.php', false)" : '$this->%s(false)';
             $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
         }
 
@@ -925,7 +925,7 @@ class $class extends $baseClass
 
 EOF;
         if (null !== $this->targetDirRegex) {
-            $dir = $this->asFiles ? '$this->targetDirs[0] = \\dirname(__DIR__)' : '__DIR__';
+            $dir = $this->asFiles ? '$this->targetDirs[0] = \\dirname($containerDir)' : '__DIR__';
             $code .= <<<EOF
         \$dir = {$dir};
         for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
@@ -935,9 +935,10 @@ EOF;
 EOF;
         }
         if ($this->asFiles) {
-            $code = str_replace('$parameters', "\$buildParameters;\n    private \$parameters", $code);
-            $code = str_replace('__construct()', '__construct(array $buildParameters = array())', $code);
+            $code = str_replace('$parameters', "\$buildParameters;\n    private \$containerDir;\n    private \$parameters", $code);
+            $code = str_replace('__construct()', '__construct(array $buildParameters = array(), $containerDir = __DIR__)', $code);
             $code .= "        \$this->buildParameters = \$buildParameters;\n";
+            $code .= "        \$this->containerDir = \$containerDir;\n";
         }
 
         if (Container::class !== $baseClassWithNamespace) {
@@ -989,7 +990,7 @@ EOF;
 
     protected function load(\$file, \$lazyLoad = true)
     {
-        return require \$file;
+        return require \$this->containerDir.\\DIRECTORY_SEPARATOR.\$file;
     }
 
 EOF;
@@ -1001,7 +1002,7 @@ EOF;
                 continue;
             }
             if ($this->asFiles) {
-                $proxyLoader = '$this->load(__DIR__."/{$class}.php")';
+                $proxyLoader = '$this->load("{$class}.php")';
             } elseif ($this->namespace) {
                 $proxyLoader = 'class_alias("'.$this->namespace.'\\\\{$class}", $class, false)';
             } else {
@@ -1050,7 +1051,7 @@ EOF;
             return '';
         }
         if ($this->asFiles) {
-            $code = "require __DIR__.'/removed-ids.php'";
+            $code = "require \$this->containerDir.\\DIRECTORY_SEPARATOR.'removed-ids.php'";
         } else {
             $code = '';
             $ids = array_keys($ids);
@@ -1093,7 +1094,7 @@ EOF;
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if (!$definition->isSynthetic() && $definition->isPublic() && !$this->isHotPath($definition)) {
-                $code .= sprintf("            %s => __DIR__.'/%s.php',\n", $this->doExport($id), $this->generateMethodName($id));
+                $code .= sprintf("            %s => '%s.php',\n", $this->doExport($id), $this->generateMethodName($id));
             }
         }
 
@@ -1665,7 +1666,7 @@ EOF;
                     $code = sprintf('$this->%s[\'%s\'] = %s', $definition->isPublic() ? 'services' : 'privates', $id, $code);
                 }
             } elseif ($this->asFiles && !$this->isHotPath($definition)) {
-                $code = sprintf("\$this->load(__DIR__.'/%s.php')", $this->generateMethodName($id));
+                $code = sprintf("\$this->load('%s.php')", $this->generateMethodName($id));
                 if (!$definition->isShared()) {
                     $factory = sprintf('$this->factories%s[\'%s\']', $definition->isPublic() ? '' : "['service_container']", $id);
                     $code = sprintf('(isset(%s) ? %1$s() : %s)', $factory, $code);
@@ -1803,7 +1804,7 @@ EOF;
             $prefix = $matches[0][1] ? $this->doExport(substr($value, 0, $matches[0][1]), true).'.' : '';
             $suffix = $matches[0][1] + strlen($matches[0][0]);
             $suffix = isset($value[$suffix]) ? '.'.$this->doExport(substr($value, $suffix), true) : '';
-            $dirname = '__DIR__';
+            $dirname = $this->asFiles ? '$this->containerDir' : '__DIR__';
             $offset = 1 + $this->targetDirMaxMatches - count($matches);
 
             if ($this->asFiles || 0 < $offset) {

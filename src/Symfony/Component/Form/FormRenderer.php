@@ -282,4 +282,20 @@ class FormRenderer implements FormRendererInterface
     {
         return ucfirst(strtolower(trim(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
     }
+
+    /**
+     * @internal
+     */
+    public function encodeCurrency(Environment $environment, $text, $widget = '')
+    {
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
+        }
+
+        return str_replace('{{ widget }}', $widget, $text);
+    }
 }

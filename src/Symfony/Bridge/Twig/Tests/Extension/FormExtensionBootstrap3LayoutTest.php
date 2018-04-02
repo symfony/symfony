@@ -75,6 +75,31 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
+    public function testMoneyWidgetInIso()
+    {
+        $environment = new Environment(new StubFilesystemLoader(array(
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        )), array('strict_variables' => true));
+        $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addExtension($this->extension);
+        $environment->setCharset('ISO-8859-1');
+
+        $this->extension->initRuntime($environment);
+
+        $view = $this->factory
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
+            ->createView()
+        ;
+
+        $this->assertSame(<<<'HTML'
+<div class="input-group">
+                            <span class="input-group-addon">&euro; </span>
+            <input type="text" id="name" name="name" required="required" class="form-control" />        </div>
+HTML
+        , trim($this->renderWidget($view)));
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);

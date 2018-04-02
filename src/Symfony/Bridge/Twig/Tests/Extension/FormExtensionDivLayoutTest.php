@@ -165,6 +165,26 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
     }
 
+    public function testMoneyWidgetInIso()
+    {
+        $environment = new Environment(new StubFilesystemLoader(array(
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        )), array('strict_variables' => true));
+        $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addExtension($this->extension);
+        $environment->setCharset('ISO-8859-1');
+
+        $this->extension->initRuntime($environment);
+
+        $view = $this->factory
+            ->createNamed('name', 'money')
+            ->createView()
+        ;
+
+        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);

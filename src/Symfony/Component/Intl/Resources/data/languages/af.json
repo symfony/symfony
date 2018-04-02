@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.39.11",
     "Names": {
         "aa": "Afar",
         "ab": "Abkasies",
@@ -399,6 +399,8 @@
         "yue": "Kantonees",
         "zgh": "Standaard Marokkaanse Tamazight",
         "zh": "Sjinees",
+        "zh_Hans": "Chinees (Vereenvoudig)",
+        "zh_Hant": "Chinees (Tradisioneel)",
         "zu": "Zoeloe",
         "zun": "Zuni",
         "zxx": "Geen taalinhoud nie",

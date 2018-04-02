@@ -1573,7 +1573,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
 '/input
-    [@type="datetime"]
+    [@type="datetime-local"]
     [@name="name"]
     [@class="my&class form-control"]
     [@value="2011-02-03T04:05:06Z"]
@@ -1594,7 +1594,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
 '/input
-    [@type="datetime"]
+    [@type="datetime-local"]
     [@name="name"]
     [@class="my&class form-control"]
     [@value="2011-02-03T04:05:06Z"]

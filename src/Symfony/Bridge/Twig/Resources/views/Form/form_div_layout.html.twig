@@ -181,7 +181,7 @@
 {%- endblock integer_widget -%}
 
 {%- block money_widget -%}
-    {{ money_pattern|replace({ '{{ widget }}': block('form_widget_simple') })|raw }}
+    {{ money_pattern|form_encode_currency(block('form_widget_simple')) }}
 {%- endblock money_widget -%}
 
 {%- block url_widget -%}
@@ -350,7 +350,7 @@
     {%- else -%}
         {% set form_method = "POST" %}
     {%- endif -%}
-    <form name="{{ name }}" method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}

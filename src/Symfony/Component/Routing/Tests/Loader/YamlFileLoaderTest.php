@@ -183,6 +183,27 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('import_override_defaults.yml');
     }
 
+    public function testImportRouteWithGlobMatchingSingleFile()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/glob')));
+        $routeCollection = $loader->load('import_single.yml');
+
+        $route = $routeCollection->get('bar_route');
+        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+    }
+
+    public function testImportRouteWithGlobMatchingMultipleFiles()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/glob')));
+        $routeCollection = $loader->load('import_multiple.yml');
+
+        $route = $routeCollection->get('bar_route');
+        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('baz_route');
+        $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
+    }
+
     public function testImportRouteWithNamePrefix()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));

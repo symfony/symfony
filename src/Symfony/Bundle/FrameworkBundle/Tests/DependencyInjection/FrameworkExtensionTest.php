@@ -352,6 +352,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(0, $container->getParameter('debug.error_handler.throw_at'));
     }
 
+    public function testPhpErrorsWithLogLevel()
+    {
+        $container = $this->createContainerFromFile('php_errors_log_level');
+
+        $this->assertEquals(8, $container->getDefinition('debug.debug_handlers_listener')->getArgument(3));
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');

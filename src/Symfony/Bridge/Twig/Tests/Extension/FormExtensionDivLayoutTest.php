@@ -178,7 +178,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->initRuntime($environment);
 
         $view = $this->factory
-            ->createNamed('name', 'money')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
             ->createView()
         ;
 

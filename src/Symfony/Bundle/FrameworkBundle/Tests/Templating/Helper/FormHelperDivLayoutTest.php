@@ -90,7 +90,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $this->engine->setCharset('ISO-8859-1');
 
         $view = $this->factory
-            ->createNamed('name', 'money')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
             ->createView()
         ;
 

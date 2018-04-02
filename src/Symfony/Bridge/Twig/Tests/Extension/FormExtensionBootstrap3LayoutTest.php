@@ -100,7 +100,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
         $this->extension->initRuntime($environment);
 
         $view = $this->factory
-            ->createNamed('name', 'money')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
             ->createView()
         ;
 

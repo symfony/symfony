@@ -656,7 +656,7 @@ class FrameworkExtension extends Extension
         }
 
         if (\is_int($config['log']) && $config['log']) {
-            $definition->replaceArgument(4, $config['log']);
+            $definition->replaceArgument(3, $config['log']);
         }
 
         if (!$config['throw']) {

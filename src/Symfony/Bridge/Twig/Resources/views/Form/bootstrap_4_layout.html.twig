@@ -9,13 +9,13 @@
         <div class="input-group{{ group_class|default('') }}">
             {%- if prepend -%}
                 <div class="input-group-prepend">
-                    <span class="input-group-text">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                    <span class="input-group-text">{{ money_pattern|form_encode_currency }}</span>
                 </div>
             {%- endif -%}
             {{- block('form_widget_simple') -}}
             {%- if append -%}
                 <div class="input-group-append">
-                    <span class="input-group-text">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                    <span class="input-group-text">{{ money_pattern|form_encode_currency }}</span>
                 </div>
             {%- endif -%}
         </div>

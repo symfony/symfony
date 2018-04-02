@@ -175,6 +175,13 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $environment->addExtension(new FormExtension());
         $environment->setCharset('ISO-8859-1');
 
+        $rendererEngine = new TwigRendererEngine(array(
+            'form_div_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->registerTwigRuntimeLoader($environment, $this->renderer);
+
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
             ->createView()

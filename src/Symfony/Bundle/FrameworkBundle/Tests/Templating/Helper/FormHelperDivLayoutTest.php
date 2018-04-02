@@ -85,6 +85,18 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
+    public function testMoneyWidgetInIso()
+    {
+        $this->engine->setCharset('ISO-8859-1');
+
+        $view = $this->factory
+            ->createNamed('name', 'money')
+            ->createView()
+        ;
+
+        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->form($view, $vars);

@@ -88,6 +88,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         return array(
             new TwigFilter('humanize', array($this, 'humanize')),
+            new TwigFilter('form_encode_currency', array($this, 'encodeCurrency'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
 
@@ -164,6 +165,22 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function isRootForm(FormView $formView)
     {
         return null === $formView->parent;
+    }
+
+    /**
+     * @internal
+     */
+    public function encodeCurrency(Environment $environment, $text, $widget = '')
+    {
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
+        }
+
+        return str_replace('{{ widget }}', $widget, $text);
     }
 
     /**

@@ -67,7 +67,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if ($this->stopwatch) {
             $this->stopwatch->start('dump');
         }
-        if ($this->isCollected) {
+        if ($this->isCollected && !$this->dumper) {
             $this->isCollected = false;
         }
 

@@ -27,7 +27,7 @@
         {% set prepend = '{{' == money_pattern[0:2] %}
         {% if not prepend %}
             <div class="small-3 large-2 columns">
-                <span class="prefix">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                <span class="prefix">{{ money_pattern|form_encode_currency }}</span>
             </div>
         {% endif %}
         <div class="small-9 large-10 columns">
@@ -35,7 +35,7 @@
         </div>
         {% if prepend %}
             <div class="small-3 large-2 columns">
-                <span class="postfix">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                <span class="postfix">{{ money_pattern|form_encode_currency }}</span>
             </div>
         {% endif %}
     </div>

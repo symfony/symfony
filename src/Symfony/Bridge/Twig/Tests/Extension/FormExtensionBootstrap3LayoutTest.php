@@ -82,10 +82,15 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
             __DIR__.'/Fixtures/templates/form',
         )), array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension($this->extension);
+        $environment->addExtension(new FormExtension());
         $environment->setCharset('ISO-8859-1');
 
-        $this->extension->initRuntime($environment);
+        $rendererEngine = new TwigRendererEngine(array(
+            'bootstrap_3_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')

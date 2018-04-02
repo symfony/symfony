@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by mlocati at 2018-03-20T15:03:30Z
+
+I have a doubt about this PR: `sapi_windows_vt100_support` is enabled by default (PHP sets it to true [at startup](https://github.com/php/php-src/blob/php-7.2.0/sapi/cli/php_cli.c#L1232-L1235)), so it may be false only if the PHP code explicitly sets it to false.
+So, an alternative to this PR would be:
+
+```php
+if (function_exists('stream_isatty') && !@stream_isatty($this->stream)) {
+    return false;
+}
+if (DIRECTORY_SEPARATOR === '\\') {
+    if (function_exists('sapi_windows_vt100_support')) {
+        return @sapi_windows_vt100_support($this->stream);
+    }
+    return
+        '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
+        || false !== getenv('ANSICON')
+        || 'ON' === getenv('ConEmuANSI')
+        || 'xterm' === getenv('TERM');
+}
+return function_exists('posix_isatty') && @posix_isatty($this->stream);
+```

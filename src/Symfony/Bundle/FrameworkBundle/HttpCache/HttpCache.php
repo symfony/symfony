@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class HttpCache extends BaseHttpCache
+class HttpCache extends BaseHttpCache
 {
     protected $cacheDir;
     protected $kernel;

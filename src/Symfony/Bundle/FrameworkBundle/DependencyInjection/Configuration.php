@@ -867,6 +867,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('The service name to use as provider when the specified adapter needs one.')
                                     ->end()
                                     ->scalarNode('clearer')->end()
+                                    ->scalarNode('namespace')->end()
                                 ->end()
                             ->end()
                             ->validate()

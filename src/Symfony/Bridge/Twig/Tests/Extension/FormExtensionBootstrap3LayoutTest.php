@@ -82,10 +82,8 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
             __DIR__.'/Fixtures/templates/form',
         )), array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension($this->extension);
+        $environment->addExtension(new FormExtension());
         $environment->setCharset('ISO-8859-1');
-
-        $this->extension->initRuntime($environment);
 
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')

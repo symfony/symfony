@@ -12,14 +12,14 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
@@ -127,6 +127,7 @@ EOF
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
+        $controllersPaths = array($kernel->getRootDir().'/Controller');
         $currentName = 'app folder';
 
         // Override with provided Bundle info
@@ -164,6 +165,14 @@ EOF
         $errorIo->comment('Parsing templates...');
         $this->extractor->setPrefix($input->getOption('prefix'));
         foreach ($viewsPaths as $path) {
+            if (is_dir($path)) {
+                $this->extractor->extract($path, $extractedCatalogue);
+            }
+        }
+
+        // load any messages from controllers
+        $errorIo->comment('Parsing controllers...');
+        foreach ($controllersPaths as $path) {
             if (is_dir($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }

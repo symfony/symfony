@@ -19,6 +19,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractBootstrap4LayoutTest;
+use Twig\Environment;
 
 /**
  * Class providing test cases for the Bootstrap 4 horizontal Twig form theme.
@@ -42,7 +43,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
 
@@ -76,6 +77,36 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
         $html = $this->renderStart($form->createView());
 
         $this->assertSame('<form name="form" method="get" action="0">', $html);
+    }
+
+    public function testMoneyWidgetInIso()
+    {
+        $environment = new Environment(new StubFilesystemLoader(array(
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        )), array('strict_variables' => true));
+        $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addExtension(new FormExtension());
+        $environment->setCharset('ISO-8859-1');
+
+        $rendererEngine = new TwigRendererEngine(array(
+            'bootstrap_4_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->registerTwigRuntimeLoader($environment, $this->renderer);
+
+        $view = $this->factory
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
+            ->createView()
+        ;
+
+        $this->assertSame(<<<'HTML'
+<div class="input-group"><div class="input-group-prepend">
+                    <span class="input-group-text">&euro; </span>
+                </div><input type="text" id="name" name="name" required="required" class="form-control" /></div>
+HTML
+        , trim($this->renderWidget($view)));
     }
 
     protected function renderForm(FormView $view, array $vars = array())

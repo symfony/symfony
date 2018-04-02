@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -25,6 +25,7 @@
         "arc": "aramejski",
         "arn": "mapuche",
         "arp": "arapaho",
+        "ars": "najdi arapski",
         "arw": "aravački",
         "as": "asamski",
         "asa": "asu",

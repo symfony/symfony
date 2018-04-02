@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.20",
     "Names": {
         "ADP": [
             "ADP",
@@ -619,6 +619,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya mauritanien (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya mauritanien"
         ],
         "MTL": [
@@ -847,6 +851,10 @@
         ],
         "STD": [
             "STD",
+            "dobra santoméen (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra santoméen"
         ],
         "SUR": [

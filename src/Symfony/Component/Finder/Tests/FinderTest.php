@@ -46,6 +46,20 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php', 'test.py', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testRemoveTrailingSlash()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot be run on Windows.');
+        }
+
+        $finder = $this->buildFinder();
+
+        $expected = $this->toAbsolute(array('foo/bar.tmp', 'test.php', 'test.py', 'foo bar'));
+        $in = '//'.realpath(self::$tmpDir).'//';
+
+        $this->assertIterator($expected, $finder->in($in)->files()->getIterator());
+    }
+
     public function testDepth()
     {
         $finder = $this->buildFinder();
@@ -514,8 +528,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->in($locations)->depth('< 10')->name('*.neon');
 
         $expected = array(
-            __DIR__.'/Fixtures/one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c.neon',
-            __DIR__.'/Fixtures/one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'d.neon',
+            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c.neon',
+            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'d.neon',
         );
 
         $this->assertIterator($expected, $finder);

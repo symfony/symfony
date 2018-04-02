@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "ADP": [
             "ADP",
@@ -615,6 +615,10 @@
         ],
         "MRO": [
             "MRO",
+            "mavretanska uguija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mavretanska uguija"
         ],
         "MTL": [
@@ -843,6 +847,10 @@
         ],
         "STD": [
             "STD",
+            "saotomejska dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "saotomejska dobra"
         ],
         "SUR": [

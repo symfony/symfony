@@ -207,13 +207,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
-        if (!$reflectionClass->isInstantiable()) {
-            return null;
-        }
-
         $constructor = $reflectionClass->getConstructor();
 
-        if (!$constructor) {
+        if (!$constructor || !$constructor->isPublic()) {
             return null;
         }
 

@@ -207,6 +207,13 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild3', $property, array()));
     }
 
+    public function testExtractPhp71WithPrivateConstructor()
+    {
+        $property = 'string';
+        $type = null;
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PrivateConstructor', $property, array()));
+    }
+
     /**
      * @dataProvider getReadableProperties
      */

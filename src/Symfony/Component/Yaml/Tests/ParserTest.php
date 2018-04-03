@@ -693,6 +693,41 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function getParseExceptionNotAffectedMultiLineStringLastResortParsing()
+    {
+        $tests = array();
+
+        $yaml = <<<'EOT'
+a
+    b:
+EOT;
+        $tests['parse error on first line'] = array($yaml);
+
+        $yaml = <<<'EOT'
+a
+
+b
+    c:
+EOT;
+        $tests['parse error due to inconsistent indentation'] = array($yaml);
+
+        $yaml = <<<'EOT'
+ &  *  !  |  >  '  "  %  @  ` #, { asd a;sdasd }-@^qw3
+EOT;
+        $tests['symfony/symfony/issues/22967#issuecomment-322067742'] = array($yaml);
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider getParseExceptionNotAffectedMultiLineStringLastResortParsing
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseExceptionNotAffectedByMultiLineStringLastResortParsing($yaml)
+    {
+        $this->parser->parse($yaml);
+    }
+
     public function testMultiLineStringLastResortParsing()
     {
         $yaml = <<<'EOT'
@@ -703,6 +738,17 @@ test:
 EOT;
         $expected = array(
             'test' => 'You can have things that don\'t look like strings here true yes you can',
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+
+        $yaml = <<<'EOT'
+a:
+    b
+       c
+EOT;
+        $expected = array(
+            'a' => 'b c',
         );
 
         $this->assertSame($expected, $this->parser->parse($yaml));

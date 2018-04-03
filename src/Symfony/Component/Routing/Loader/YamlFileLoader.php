@@ -216,6 +216,9 @@ class YamlFileLoader extends FileLoader
             if (null !== $methods) {
                 $subCollection->setMethods($methods);
             }
+            $subCollection->addDefaults($defaults);
+            $subCollection->addRequirements($requirements);
+            $subCollection->addOptions($options);
 
             if (isset($config['name_prefix'])) {
                 $subCollection->addNamePrefix($config['name_prefix']);

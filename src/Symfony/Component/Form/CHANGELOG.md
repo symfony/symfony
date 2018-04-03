@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `input=datetime_immutable` to DateType, TimeType, DateTimeType
+ * added `rounding_mode` option to MoneyType
 
 4.0.0
 -----

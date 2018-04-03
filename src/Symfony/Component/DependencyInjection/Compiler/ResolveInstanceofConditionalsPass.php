@@ -33,9 +33,6 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             if ($definition->getArguments()) {
                 throw new InvalidArgumentException(sprintf('Autoconfigured instanceof for type "%s" defines arguments but these are not supported and should be removed.', $interface));
             }
-            if ($definition->getMethodCalls()) {
-                throw new InvalidArgumentException(sprintf('Autoconfigured instanceof for type "%s" defines method calls but these are not supported and should be removed.', $interface));
-            }
         }
 
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -64,6 +61,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         $definition->setInstanceofConditionals(array());
         $parent = $shared = null;
         $instanceofTags = array();
+        $instanceofCalls = array();
 
         foreach ($conditionals as $interface => $instanceofDefs) {
             if ($interface !== $class && (!$container->getReflectionClass($class, false))) {
@@ -81,7 +79,9 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $parent = 'instanceof.'.$interface.'.'.$key.'.'.$id;
                 $container->setDefinition($parent, $instanceofDef);
                 $instanceofTags[] = $instanceofDef->getTags();
+                $instanceofCalls[] = $instanceofDef->getMethodCalls();
                 $instanceofDef->setTags(array());
+                $instanceofDef->setMethodCalls(array());
 
                 if (isset($instanceofDef->getChanges()['shared'])) {
                     $shared = $instanceofDef->isShared();
@@ -98,6 +98,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             $definition = serialize($definition);
             $definition = substr_replace($definition, '53', 2, 2);
             $definition = substr_replace($definition, 'Child', 44, 0);
+            /** @var ChildDefinition $definition */
             $definition = unserialize($definition);
             $definition->setParent($parent);
 
@@ -116,6 +117,10 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                     }
                 }
             }
+
+            $instanceofCalls = array_filter($instanceofCalls);
+            $instanceofCalls = array_map('current', $instanceofCalls);
+            $definition->setMethodCalls(array_merge($instanceofCalls, $definition->getMethodCalls()));
 
             // reset fields with "merge" behavior
             $abstract

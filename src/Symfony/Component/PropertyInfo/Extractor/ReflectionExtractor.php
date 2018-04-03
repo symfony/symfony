@@ -209,7 +209,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         $constructor = $reflectionClass->getConstructor();
 
-        if (!$constructor) {
+        if (!$constructor || !$constructor->isPublic()) {
             return null;
         }
 

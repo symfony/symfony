@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-04-02T23:10:05Z
+
+@lyrixx Thanks for the quick review! I did check every usage of `PHP_SAPI` and while there are a few others they already have either special support for `phpdbg`, similar check to that or are just about `cli-server` SAPI where `phpdbg` check is not applicable.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-04-02T23:11:30Z
+
+I've just unified the code style in all checks.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-04-02T23:13:50Z
+
+Important consideration is these would need to be re-checked in 2.8, 3.4, 4.0 etc.

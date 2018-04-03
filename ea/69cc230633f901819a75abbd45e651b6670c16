@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-03-03T19:14:44Z
+
+Seems it might be fixing https://github.com/symfony/symfony/issues/22967 and avoiding regression again as it was working in the previous releases
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-03-05T21:03:09Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-03-06T00:11:46Z
+
+Status: Needs Review
+
+@xabbuh I've tried another approach and only account for indentation inconsistency at offset 0. I added more test based on your comments and my findings
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-03-10T13:27:27Z
+
+@xabbuh is this good enough or is there missing test or a better/shorter solution ?
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-04-02T10:12:48Z
+
+updated and rebased @xabbuh
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-04-02T12:45:02Z
+
+failing test are not related
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-02T13:50:30Z
+
+Does this PR fix #22967? If yes, could you please  update the PR description accordingly?
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2018-04-02T14:57:33Z
+
+It does @nicolas-grekas, PR description edited as requested

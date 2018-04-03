@@ -16,6 +16,6 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

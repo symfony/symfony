@@ -16,6 +16,6 @@ namespace Symfony\Component\Messenger\Exception;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

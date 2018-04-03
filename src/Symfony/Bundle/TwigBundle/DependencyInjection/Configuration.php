@@ -76,6 +76,7 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
+                        ->normalizeKeys(false)
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {

@@ -41,4 +41,28 @@ class ConfigurationTest extends TestCase
 
         $this->assertFalse($config['strict_variables']);
     }
+
+    public function testGlobalsAreNotNormalized()
+    {
+        $input = array(
+            'globals' => array('some-global' => true),
+        );
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(), array($input));
+
+        $this->assertSame(array('some-global' => array('value' => true)), $config['globals']);
+    }
+
+    public function testArrayKeysInGlobalsAreNotNormalized()
+    {
+        $input = array(
+            'globals' => array('global' => array('some-key' => 'some-value')),
+        );
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(), array($input));
+
+        $this->assertSame(array('global' => array('value' => array('some-key' => 'some-value'))), $config['globals']);
+    }
 }

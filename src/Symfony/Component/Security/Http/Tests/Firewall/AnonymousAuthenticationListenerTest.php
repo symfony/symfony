@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\User\AnonymousUser;
 use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
 
 class AnonymousAuthenticationListenerTest extends TestCase
@@ -49,7 +50,7 @@ class AnonymousAuthenticationListenerTest extends TestCase
             ->will($this->returnValue(null))
         ;
 
-        $anonymousToken = new AnonymousToken('TheSecret', 'anon.', array());
+        $anonymousToken = new AnonymousToken('TheSecret', new AnonymousUser(), array());
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
         $authenticationManager

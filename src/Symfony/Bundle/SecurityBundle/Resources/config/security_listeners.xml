@@ -236,6 +236,7 @@
             <argument /> <!-- Simple Authenticator -->
             <argument /> <!-- User Provider -->
             <argument /> <!-- Provider-shared Key -->
+            <argument>null</argument> <!-- UserChecker -->
         </service>
 
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">

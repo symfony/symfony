@@ -60,6 +60,7 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -347,6 +348,8 @@ class FrameworkExtension extends Extension
             ->addTag('messenger.receiver');
         $container->registerForAutoconfiguration(SenderInterface::class)
             ->addTag('messenger.sender');
+        $container->registerForAutoconfiguration(MessageHandlerInterface::class)
+            ->addTag('messenger.message_handler');
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers

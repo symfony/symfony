@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-24T14:34:33Z
+
+The only remaining question is "Should this validation be enabled by default" (i.e. shouldn't we drop the `ValidatedMessageInterface`).
+
+To me, it sounds like we should enable it by default because:
+1. It's a common practice to validate messages before sending them to a bus
+2. There is no real "risk" as it would require the developers to add the `@Valid` annotation (or similar configuration) on the message's fields to have entities validated
+3. We can add an opt-in/opt-out configuration later if it's too much of a problem.
+
+What do you think? /cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-26T10:55:49Z
+
+I've squashed my commits and added validation by default. Validating a message without validation metadata will always pass.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T07:41:00Z
+
+Thank you for the review. I've updated accordingly. I've also rebased the PR on master.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T07:55:58Z
+
+I agree. But there will be plenty of merge conflicts.
+
+I will add "opt-out" config once #26647 is merged.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T11:03:48Z
+
+I've rebased my PR and added a way to opt-out from message validation
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-29T18:37:07Z
+
+Thank you for the reviews. I've updated the PR accordingly
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-04-03T09:40:02Z
+
+I've fixed the typo and added tests. I've also rebased on master. The Travis tests failure seams unrelated.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T12:23:55Z
+
+@fabpot as you disagreed with the Doctrine one... WDYT about this one? 🤔
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-03T12:26:31Z
+
+This one is fine as this is about integrating various Symfony components.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-03T18:07:42Z
+
+@sroze no need to rebase (as there are no merge commits) and no need to rebase (as there are no conflicts). Our gh tools does that automatically :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T18:16:17Z
+
+@fabpot that rebase request was meant so that we would have green ticks when I `gh merge` it :)
+But yeah, they aren't related to I guess I can... 💣.

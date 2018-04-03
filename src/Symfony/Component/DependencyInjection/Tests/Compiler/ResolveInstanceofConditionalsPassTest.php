@@ -200,16 +200,22 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Autoconfigured instanceof for type "PHPUnit\Framework\TestCase" defines method calls but these are not supported and should be removed.
+     * Test that autoconfigured calls are handled gracefully.
      */
-    public function testProcessThrowsExceptionForAutoconfiguredCalls()
+    public function testProcessForAutoconfiguredCalls()
     {
         $container = new ContainerBuilder();
-        $container->registerForAutoconfiguration(parent::class)
-            ->addMethodCall('setFoo');
+        $container->registerForAutoconfiguration(parent::class)->addMethodCall('setLogger');
+
+        $def = $container->register('foo', self::class)->setAutoconfigured(true);
+        $this->assertFalse($def->hasMethodCall('setLogger'), 'Definition shouldn\'t have method call yet.');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertTrue(
+            $container->findDefinition('foo')->hasMethodCall('setLogger'),
+            'Definition should have "setLogger" method call.'
+        );
     }
 
     /**

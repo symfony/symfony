@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel;
 
@@ -95,6 +95,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/Resources/views');
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
+        $this->fs->mkdir($this->translationDir.'/controllers');
     }
 
     protected function tearDown()
@@ -179,7 +180,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getContainer')
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
 
-        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates');
+        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', [$this->translationDir.'/controllers']);
 
         $application = new Application($kernel);
         $application->add($command);

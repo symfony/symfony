@@ -45,7 +45,7 @@ class TranslationUpdateCommand extends Command
     private $defaultViewsPath;
     private $defaultControllersPath;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, string $defaultControllersPath = null)
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $defaultControllersPath = [])
     {
         parent::__construct();
 
@@ -131,7 +131,7 @@ EOF
         }
         $controllersPaths = array($kernel->getRootDir().'/Controller');
         if ($this->defaultControllersPath) {
-            $controllersPaths[] = $this->defaultControllersPath;
+            $controllersPaths = array_merge($controllersPaths, $this->defaultControllersPath);
         }
         $currentName = 'app folder';
 

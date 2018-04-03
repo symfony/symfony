@@ -45,6 +45,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
@@ -530,6 +531,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('messenger.middleware.doctrine_transaction'));
         $def = $container->getDefinition('messenger.middleware.doctrine_transaction');
         $this->assertEquals('foobar', $def->getArgument(1));
+    }
+
+    public function testMessengerValidationDisabled()
+    {
+        if (!class_exists(Validation::class)) {
+            self::markTestSkipped('Skipping tests since Validator component is not installed');
+        }
+
+        $container = $this->createContainerFromFile('messenger_validation');
+        $this->assertFalse($container->hasDefinition('messenger.middleware.validator'));
     }
 
     public function testTranslator()

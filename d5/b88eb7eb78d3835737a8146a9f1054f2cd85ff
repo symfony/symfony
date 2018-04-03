@@ -1,0 +1,166 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-27T17:33:21Z
+
+Thanks @weaverryan. Updated based on your feedbacks 👍
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2018-03-28T08:08:22Z
+
+Do we really need this functionality. SRP anyone?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-28T08:18:58Z
+
+@mvrhov : ~~I'm not found of it either, but this can be useful for event buses.~~ -> I was more thinking about the priority, not really handling multiple messages types in one handler. Sorry.
+
+But for other types of buses, I'd personally prefer explicit psr-4 wiring rather than using a marker interface for auto configuration (and for which the `getHandledMessages` would basically be useless), like I'm already used to with tactician:
+
+```yaml
+    command_handlers:
+        namespace: App\Application\
+        resource: '%kernel.project_dir%/src/Application/**/Handler/*CommandHandler.php'
+        tags:
+            - { name: tactician.handler, typehints: true, bus: command }
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-28T08:28:59Z
+
+@ogizanagi which you can do already (except the multi-bus, for now) 🙃
+
+```yaml
+services:
+    App\Message\CommandHandler\:
+        resource: '../src/Message/CommandHandler/*'
+        tags: ['messenger.message_handler']
+```
+
+Source: https://github.com/Nyholm/message-component-demo/blob/master/config/services.yaml#L27-L29.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-28T08:33:24Z
+
+Of course! 😄
+Just saying I find this interface too much constraining if you want to use it for autoconfiguration without psr-4 wiring, as it requires implementing a method that wouldn't be useful for most buses (and even for event buses, handling multiple event types in the same handler does not looks so nice to me. I was more referring to the priority in my previous comment actually).
+Hence, I find the intent here not very clear.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-03-28T17:13:29Z
+
+Yea, the purpose of this is basically to support autoconfiguration. This particular interface (which is optional of course), is just the best way we could think of to make that happen :). We thought about doing a PSR-4 directory thing (like was suggested a few times, e.g. https://github.com/symfony/symfony/pull/26685#issuecomment-376804738), but it gets a bit trickier, as we can't guarantee a user will have this in their `services.yaml`, unless we add it there always in the FrameworkBundle recipe... which is kinda weird since the config isn't relevant unless you install the component.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2018-03-28T17:59:30Z
+
+My suggestion would be if we need the interface, then Create a blank one as a marker. Then for those who would like to also handle multiple messages in one handler add another interface which extends the marker one.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-29T06:20:04Z
+
+We now have a pending [PR for a Messenger recipe](https://github.com/symfony/recipes/pull/395). So the PSR-4 directory loading could be added here.
+
+Otherwise, I'd also recommend a blank marker interface.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-29T06:34:26Z
+
+Using psr4 directory loading is great. I’ve been using it for about 3 years with SimpleBus (not officially supported). However, I found it hard to explain and show for people consulting my project and for new developers. Having an alternative way of configure handlers that is very (!) similar to an existing pattern (EventSubsriberInterface) does make sense.
+
+Also, I’ve noticed that I many times found myself wanting to have multiple messages handled in the same handler.
+
+Say I have messages `UploadedCoverImage` and `UploadedProfileImage` should both be processed by the `CleanMetadataHandler`. Sure the “correct” way is to create a service and is used by `CleanProfileMetadataHandler` and `CleanCoverMetadataHandler`. But you know... using the same handler is more convenient and simple if the alternative is to create two empty handlers.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-29T14:59:20Z
+
+I'm not sure that there is any value of having an empty interface (well, except the fancyness of having it "autoconfigured", while PSR-4 discovery is doing the job).
+
+On the other hand, it's almost the only way to be able to listen to multiple messages from the same handler. A side effect is actually that now it is auto-configurable.
+
+I guess that taking this angle is much simpler to answer "is it necessary" and "should we do it this way".
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-03-31T22:28:16Z
+
+I don't see why we should introduce the possiblity to handle different messages in the same handler, if we know, like @Nyholm said, the better solution is to have two handlers that share the same logic, e.g. with a service or a trait.
+This also loses the possiblity to typehint the arguments of the `__invoke` method, which to me was the main reason why handlers are just callables instead of implementing an interface.
+
+So to solve autoconfiguration I would prefer an empty marker interface for now. And if we need multiple messages support, we can still introduce a new interface that extends from the marker interface later.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-01T12:45:44Z
+
+> “This also loses the possiblity to typehint the arguments of the __invoke method,
+which to me was the main reason why handlers are just callables instead of
+implementing an interface.”
+
+The idea is to be able to use both of them, not to replace it or even
+enforce the interface at all.
+
+On Sat, 31 Mar 2018 at 23:28, Tobias Schultze <notifications@github.com>
+wrote:
+
+> I don't see why we should introduce the possiblity to handle different
+> messages in the same handler, if we know, like @Nyholm
+> <https://github.com/Nyholm> said, the better solution is to have two
+> handlers that share the same logic, e.g. with a service or a trait.
+> This also loses the possiblity to typehint the arguments of the __invoke
+> method, which to me was the main reason why handlers are just callables
+> instead of implementing an interface.
+>
+> So to solve, autoconfiguration I would prefer an empty marker interface
+> for now. And if we need the multiple messages support, we can still
+> introduce a new interface that extends from the marker interface later.
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/26685#issuecomment-377727918>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEd65wk8S6LsJWiYHBFQgdJP5mpfrks5tkAMFgaJpZM4S9TOY>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-01T13:38:23Z
+
+I know but as I pointed out the additional thing is worse. So no point in adding something that is inferior.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-01T14:03:00Z
+
+I agree with @Tobion and @ogizanagi, 👍 for a marker only.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-04-01T14:30:22Z
+
+Reading all the feedback on this PR, I suggest two interfaces where the interface in this PR extends a “marker only” interface.
+
+(Of course the interfaces should be named differently but that is a later discussion)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T08:55:40Z
+
+Fair enough, I've split it into two interfaces 🙃
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T11:58:06Z
+
+@weaverryan could you update your review?

@@ -209,7 +209,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $expected = array(
             array('setFoo', array(
                 'plain_value',
-                '%some_parameter%'
+                '%some_parameter%',
             )),
             array('callBar', array()),
             array('isBaz', array()),

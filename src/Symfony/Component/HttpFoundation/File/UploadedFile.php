@@ -11,8 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\File;
 
+use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
+use Symfony\Component\HttpFoundation\File\Exception\ExtensionFileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\FormSizeFileException;
+use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoTmpDirFileException;
+use Symfony\Component\HttpFoundation\File\Exception\PartialFileException;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 /**
@@ -208,6 +215,23 @@ class UploadedFile extends File
             @chmod($target, 0666 & ~umask());
 
             return $target;
+        }
+
+        switch ($this->error) {
+            case UPLOAD_ERR_INI_SIZE:
+                throw new IniSizeFileException($this->getErrorMessage());
+            case UPLOAD_ERR_FORM_SIZE:
+                throw new FormSizeFileException($this->getErrorMessage());
+            case UPLOAD_ERR_PARTIAL:
+                throw new PartialFileException($this->getErrorMessage());
+            case UPLOAD_ERR_NO_FILE:
+                throw new NoFileException($this->getErrorMessage());
+            case UPLOAD_ERR_CANT_WRITE:
+                throw new CannotWriteFileException($this->getErrorMessage());
+            case UPLOAD_ERR_NO_TMP_DIR:
+                throw new NoTmpDirFileException($this->getErrorMessage());
+            case UPLOAD_ERR_EXTENSION:
+                throw new ExtensionFileException($this->getErrorMessage());
         }
 
         throw new FileException($this->getErrorMessage());

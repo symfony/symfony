@@ -43,8 +43,9 @@ class TranslationUpdateCommand extends Command
     private $defaultLocale;
     private $defaultTransPath;
     private $defaultViewsPath;
+    private $defaultControllersPath;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null)
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, string $defaultControllersPath = null)
     {
         parent::__construct();
 
@@ -54,6 +55,7 @@ class TranslationUpdateCommand extends Command
         $this->defaultLocale = $defaultLocale;
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
+        $this->defaultControllersPath = $defaultControllersPath;
     }
 
     /**
@@ -128,6 +130,9 @@ EOF
             $viewsPaths[] = $this->defaultViewsPath;
         }
         $controllersPaths = array($kernel->getRootDir().'/Controller');
+        if ($this->defaultControllersPath) {
+            $controllersPaths[] = $this->defaultControllersPath;
+        }
         $currentName = 'app folder';
 
         // Override with provided Bundle info

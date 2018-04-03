@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-29T08:30:36Z
+
+Legit but breaks BC, not sure it's worth it (`Symfony\Component\*\Exception\ExceptionInterface` should be updated if we do it for this one)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-29T08:33:36Z
+
+Not sure how it breaks BC?
+
+I can update rest as well.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-29T08:36:07Z
+
+It breaks for implementing classes that do not have the `\Throwable` api which exposes a bunch of methods
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-29T08:50:48Z
+
+Ah ok. Let's see if others see a way to move this forward. I'm for doing this in next minor version. Chance for BC break isn't high, this interface is meant to be used for exception classes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-29T13:11:15Z
+
+If we decide to do it, we should do it on all components, not only on one.
+But I'm not sure this is worth it.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-29T13:30:44Z
+
+Well benefit is not just theoretical safety of catching. This thing is going to be picked up by static analysis tools each time someone catches such exception, so user will need to suppress this for each of such case - pretty annoying.
+
+Will change in all components if this change is approved.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-03-29T18:01:30Z
+
+> This thing is going to be picked up by static analysis tools each time someone catches such exception
+
+Why? It's perfectly fine to catch non-throwable.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-30T16:28:51Z
+
+Two questions:
+
+1. Are this interfaces really meant to be implemented on userland too anyway?
+
+    I get the point of having it for catching all exceptions of a given component, can be useful sometimes. But I don't think users are implementing their own (perhaps some librairies/bundles extending component capabilities, though).
+1. Would it really be considered a BC break?
+
+    Anyway, even if it's only a marker interface, it's meant to be a marker interface for exceptions. So anyone implementing it on a non-exception class should be considered as misusing this interface and would not be considered a BC break, right?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-30T16:35:29Z
+
+I have thought about that same way as you do. Maybe it would make sense to mark these `@final` as well? Not sure if it makes sense for interfaces, but we basically need to tell users "you are free to catch this interface in user-space / use instanceof, but not inherit it in your own classes".
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-31T05:24:07Z
+
+To answers the 2 questions:
+
+ * No, this interface **must** not be implemented in userland
+ * Extending another interface would not be a BC break
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-04-01T07:21:19Z
+
+It make sense to me too.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-01T19:27:34Z
+
+I would agree on making this change in all components.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-02T12:09:03Z
+
+For the record, these interfaces did not extend anything as it was just a marker. All exception classes implementing this interface also extend a built-in PHP exception class (`class FooException extends \RuntimeException implements ComponentException`).

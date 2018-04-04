@@ -1,0 +1,1726 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="ja" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="update-timezone-translations.php" tool-name="CLDR time zone translation generator"/>
+    </header>
+    <body>
+      <trans-unit id="xKNxrNf" resname="Africa">
+        <source>Africa</source>
+        <target>アフリカ</target>
+      </trans-unit>
+      <trans-unit id="0g0EgFD" resname="Abidjan">
+        <source>Abidjan</source>
+        <target>アビジャン</target>
+      </trans-unit>
+      <trans-unit id="lmCf2PP" resname="Accra">
+        <source>Accra</source>
+        <target>アクラ</target>
+      </trans-unit>
+      <trans-unit id="oidDFqU" resname="Addis Ababa">
+        <source>Addis Ababa</source>
+        <target>アジスアベバ</target>
+      </trans-unit>
+      <trans-unit id="oHMIzqi" resname="Algiers">
+        <source>Algiers</source>
+        <target>アルジェ</target>
+      </trans-unit>
+      <trans-unit id="B2Zp9.8" resname="Asmara">
+        <source>Asmara</source>
+        <target>アスマラ</target>
+      </trans-unit>
+      <trans-unit id="V0PYNCM" resname="Bamako">
+        <source>Bamako</source>
+        <target>バマコ</target>
+      </trans-unit>
+      <trans-unit id="zhxT0Hv" resname="Bangui">
+        <source>Bangui</source>
+        <target>バンギ</target>
+      </trans-unit>
+      <trans-unit id="w7u4a3S" resname="Banjul">
+        <source>Banjul</source>
+        <target>バンジュール</target>
+      </trans-unit>
+      <trans-unit id="ZS_dLZh" resname="Bissau">
+        <source>Bissau</source>
+        <target>ビサウ</target>
+      </trans-unit>
+      <trans-unit id="hCFhmXJ" resname="Blantyre">
+        <source>Blantyre</source>
+        <target>ブランタイヤ</target>
+      </trans-unit>
+      <trans-unit id="aFC_wEX" resname="Brazzaville">
+        <source>Brazzaville</source>
+        <target>ブラザビル</target>
+      </trans-unit>
+      <trans-unit id="kTIF80t" resname="Bujumbura">
+        <source>Bujumbura</source>
+        <target>ブジュンブラ</target>
+      </trans-unit>
+      <trans-unit id="Yq9xP1g" resname="Cairo">
+        <source>Cairo</source>
+        <target>カイロ</target>
+      </trans-unit>
+      <trans-unit id="jOedqRt" resname="Casablanca">
+        <source>Casablanca</source>
+        <target>カサブランカ</target>
+      </trans-unit>
+      <trans-unit id="GUUHuJh" resname="Ceuta">
+        <source>Ceuta</source>
+        <target>セウタ</target>
+      </trans-unit>
+      <trans-unit id="vok0Mqa" resname="Conakry">
+        <source>Conakry</source>
+        <target>コナクリ</target>
+      </trans-unit>
+      <trans-unit id="kGwZhtk" resname="Dakar">
+        <source>Dakar</source>
+        <target>ダカール</target>
+      </trans-unit>
+      <trans-unit id="538.KCb" resname="Dar es Salaam">
+        <source>Dar es Salaam</source>
+        <target>ダルエスサラーム</target>
+      </trans-unit>
+      <trans-unit id="RnilezC" resname="Djibouti">
+        <source>Djibouti</source>
+        <target>ジブチ</target>
+      </trans-unit>
+      <trans-unit id="j7_QyMa" resname="Douala">
+        <source>Douala</source>
+        <target>ドゥアラ</target>
+      </trans-unit>
+      <trans-unit id="tzT2eBi" resname="El Aaiun">
+        <source>El Aaiun</source>
+        <target>アイウン</target>
+      </trans-unit>
+      <trans-unit id="nMvQH7X" resname="Freetown">
+        <source>Freetown</source>
+        <target>フリータウン</target>
+      </trans-unit>
+      <trans-unit id="B46MZPl" resname="Gaborone">
+        <source>Gaborone</source>
+        <target>ハボローネ</target>
+      </trans-unit>
+      <trans-unit id="hjwYbcc" resname="Harare">
+        <source>Harare</source>
+        <target>ハラレ</target>
+      </trans-unit>
+      <trans-unit id="D90dTxH" resname="Johannesburg">
+        <source>Johannesburg</source>
+        <target>ヨハネスブルグ</target>
+      </trans-unit>
+      <trans-unit id="Ikrkpmf" resname="Juba">
+        <source>Juba</source>
+        <target>ジュバ</target>
+      </trans-unit>
+      <trans-unit id="Yw22FGj" resname="Kampala">
+        <source>Kampala</source>
+        <target>カンパラ</target>
+      </trans-unit>
+      <trans-unit id="Ho7gjYQ" resname="Khartoum">
+        <source>Khartoum</source>
+        <target>ハルツーム</target>
+      </trans-unit>
+      <trans-unit id="M7V8GX0" resname="Kigali">
+        <source>Kigali</source>
+        <target>キガリ</target>
+      </trans-unit>
+      <trans-unit id="_jjz7l4" resname="Kinshasa">
+        <source>Kinshasa</source>
+        <target>キンシャサ</target>
+      </trans-unit>
+      <trans-unit id="s4SGP6H" resname="Lagos">
+        <source>Lagos</source>
+        <target>ラゴス</target>
+      </trans-unit>
+      <trans-unit id="NRXnN2E" resname="Libreville">
+        <source>Libreville</source>
+        <target>リーブルヴィル</target>
+      </trans-unit>
+      <trans-unit id="JAah.Lx" resname="Lome">
+        <source>Lome</source>
+        <target>ロメ</target>
+      </trans-unit>
+      <trans-unit id="YDkb_dV" resname="Luanda">
+        <source>Luanda</source>
+        <target>ルアンダ</target>
+      </trans-unit>
+      <trans-unit id="k5_O03o" resname="Lubumbashi">
+        <source>Lubumbashi</source>
+        <target>ルブンバシ</target>
+      </trans-unit>
+      <trans-unit id="ZzrU35k" resname="Lusaka">
+        <source>Lusaka</source>
+        <target>ルサカ</target>
+      </trans-unit>
+      <trans-unit id="lSAQIhp" resname="Malabo">
+        <source>Malabo</source>
+        <target>マラボ</target>
+      </trans-unit>
+      <trans-unit id="khsfEtY" resname="Maputo">
+        <source>Maputo</source>
+        <target>マプト</target>
+      </trans-unit>
+      <trans-unit id="E21IRpp" resname="Maseru">
+        <source>Maseru</source>
+        <target>マセル</target>
+      </trans-unit>
+      <trans-unit id="xqMYC.4" resname="Mbabane">
+        <source>Mbabane</source>
+        <target>ムババーネ</target>
+      </trans-unit>
+      <trans-unit id="9ARLMRI" resname="Mogadishu">
+        <source>Mogadishu</source>
+        <target>モガディシオ</target>
+      </trans-unit>
+      <trans-unit id="V.0qoJ7" resname="Monrovia">
+        <source>Monrovia</source>
+        <target>モンロビア</target>
+      </trans-unit>
+      <trans-unit id="W.wuVRO" resname="Nairobi">
+        <source>Nairobi</source>
+        <target>ナイロビ</target>
+      </trans-unit>
+      <trans-unit id="M1e1lNW" resname="Ndjamena">
+        <source>Ndjamena</source>
+        <target>ンジャメナ</target>
+      </trans-unit>
+      <trans-unit id="LAHlrPI" resname="Niamey">
+        <source>Niamey</source>
+        <target>ニアメ</target>
+      </trans-unit>
+      <trans-unit id="jKT183b" resname="Nouakchott">
+        <source>Nouakchott</source>
+        <target>ヌアクショット</target>
+      </trans-unit>
+      <trans-unit id="AP4mWCa" resname="Ouagadougou">
+        <source>Ouagadougou</source>
+        <target>ワガドゥグー</target>
+      </trans-unit>
+      <trans-unit id="DlWZQ2d" resname="Porto-Novo">
+        <source>Porto-Novo</source>
+        <target>ポルトノボ</target>
+      </trans-unit>
+      <trans-unit id="4InIzJR" resname="Sao Tome">
+        <source>Sao Tome</source>
+        <target>サントメ</target>
+      </trans-unit>
+      <trans-unit id="EdzJONm" resname="Tripoli">
+        <source>Tripoli</source>
+        <target>トリポリ</target>
+      </trans-unit>
+      <trans-unit id="YSdZkKx" resname="Tunis">
+        <source>Tunis</source>
+        <target>チュニス</target>
+      </trans-unit>
+      <trans-unit id="7G9gQkx" resname="Windhoek">
+        <source>Windhoek</source>
+        <target>ウィントフック</target>
+      </trans-unit>
+      <trans-unit id="mNfxE6o" resname="America">
+        <source>America</source>
+        <target>アメリカ大陸</target>
+      </trans-unit>
+      <trans-unit id="1FSpo8j" resname="Adak">
+        <source>Adak</source>
+        <target>アダック</target>
+      </trans-unit>
+      <trans-unit id="TWyBsy8" resname="Anchorage">
+        <source>Anchorage</source>
+        <target>アンカレッジ</target>
+      </trans-unit>
+      <trans-unit id="pKDH57d" resname="Anguilla">
+        <source>Anguilla</source>
+        <target>アンギラ</target>
+      </trans-unit>
+      <trans-unit id="JskUy5T" resname="Antigua">
+        <source>Antigua</source>
+        <target>アンティグア</target>
+      </trans-unit>
+      <trans-unit id="F1zDEIu" resname="Araguaina">
+        <source>Araguaina</source>
+        <target>アラグァイナ</target>
+      </trans-unit>
+      <trans-unit id="IyDHlt5" resname="Buenos Aires, Argentina">
+        <source>Buenos Aires, Argentina</source>
+        <target>ブエノスアイレス, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="pGBG_o7" resname="Catamarca, Argentina">
+        <source>Catamarca, Argentina</source>
+        <target>カタマルカ, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="qghyGbw" resname="Cordoba, Argentina">
+        <source>Cordoba, Argentina</source>
+        <target>コルドバ, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="yM3e.eb" resname="Jujuy, Argentina">
+        <source>Jujuy, Argentina</source>
+        <target>フフイ, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="ZmTIMlE" resname="La Rioja, Argentina">
+        <source>La Rioja, Argentina</source>
+        <target>ラリオハ, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="obdQ63b" resname="Mendoza, Argentina">
+        <source>Mendoza, Argentina</source>
+        <target>メンドーサ, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="7JatJO4" resname="Rio Gallegos, Argentina">
+        <source>Rio Gallegos, Argentina</source>
+        <target>リオガジェゴス, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="6Wd9fmL" resname="Salta, Argentina">
+        <source>Salta, Argentina</source>
+        <target>サルタ, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="SkyuE1U" resname="San Juan, Argentina">
+        <source>San Juan, Argentina</source>
+        <target>サンファン, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="OFq.viv" resname="San Luis, Argentina">
+        <source>San Luis, Argentina</source>
+        <target>サンルイス, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="euub6By" resname="Tucuman, Argentina">
+        <source>Tucuman, Argentina</source>
+        <target>トゥクマン, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="uxh00DZ" resname="Ushuaia, Argentina">
+        <source>Ushuaia, Argentina</source>
+        <target>ウシュアイア, アルゼンチン</target>
+      </trans-unit>
+      <trans-unit id="tWYlXrB" resname="Aruba">
+        <source>Aruba</source>
+        <target>アルバ</target>
+      </trans-unit>
+      <trans-unit id="yNqVj_u" resname="Asuncion">
+        <source>Asuncion</source>
+        <target>アスンシオン</target>
+      </trans-unit>
+      <trans-unit id="IkL9opV" resname="Atikokan">
+        <source>Atikokan</source>
+        <target>アティコカン</target>
+      </trans-unit>
+      <trans-unit id="X6jQeUC" resname="Bahia">
+        <source>Bahia</source>
+        <target>バイーア</target>
+      </trans-unit>
+      <trans-unit id="BONsvHk" resname="Bahia Banderas">
+        <source>Bahia Banderas</source>
+        <target>バイアバンデラ</target>
+      </trans-unit>
+      <trans-unit id="jo366bd" resname="Barbados">
+        <source>Barbados</source>
+        <target>バルバドス</target>
+      </trans-unit>
+      <trans-unit id="zQf6Nig" resname="Belem">
+        <source>Belem</source>
+        <target>ベレン</target>
+      </trans-unit>
+      <trans-unit id="cdyB8Tw" resname="Belize">
+        <source>Belize</source>
+        <target>ベリーズ</target>
+      </trans-unit>
+      <trans-unit id="M6x7Mzw" resname="Blanc-Sablon">
+        <source>Blanc-Sablon</source>
+        <target>ブラン・サブロン</target>
+      </trans-unit>
+      <trans-unit id="9lE.nDY" resname="Boa Vista">
+        <source>Boa Vista</source>
+        <target>ボアビスタ</target>
+      </trans-unit>
+      <trans-unit id="aqKMNK9" resname="Bogota">
+        <source>Bogota</source>
+        <target>ボゴタ</target>
+      </trans-unit>
+      <trans-unit id="r1egu3h" resname="Boise">
+        <source>Boise</source>
+        <target>ボイシ</target>
+      </trans-unit>
+      <trans-unit id="n5Zez70" resname="Cambridge Bay">
+        <source>Cambridge Bay</source>
+        <target>ケンブリッジベイ</target>
+      </trans-unit>
+      <trans-unit id="5AOIHrd" resname="Campo Grande">
+        <source>Campo Grande</source>
+        <target>カンポグランデ</target>
+      </trans-unit>
+      <trans-unit id="nmnqA5h" resname="Cancun">
+        <source>Cancun</source>
+        <target>カンクン</target>
+      </trans-unit>
+      <trans-unit id="exafBQI" resname="Caracas">
+        <source>Caracas</source>
+        <target>カラカス</target>
+      </trans-unit>
+      <trans-unit id="1J9vkzQ" resname="Cayenne">
+        <source>Cayenne</source>
+        <target>カイエンヌ</target>
+      </trans-unit>
+      <trans-unit id="DVSl7JQ" resname="Cayman">
+        <source>Cayman</source>
+        <target>ケイマン</target>
+      </trans-unit>
+      <trans-unit id="D12YPSA" resname="Chicago">
+        <source>Chicago</source>
+        <target>シカゴ</target>
+      </trans-unit>
+      <trans-unit id="xLhLkWZ" resname="Chihuahua">
+        <source>Chihuahua</source>
+        <target>チワワ</target>
+      </trans-unit>
+      <trans-unit id="4mdC183" resname="Costa Rica">
+        <source>Costa Rica</source>
+        <target>コスタリカ</target>
+      </trans-unit>
+      <trans-unit id="QrSuztJ" resname="Creston">
+        <source>Creston</source>
+        <target>クレストン</target>
+      </trans-unit>
+      <trans-unit id="vyhCJh_" resname="Cuiaba">
+        <source>Cuiaba</source>
+        <target>クイアバ</target>
+      </trans-unit>
+      <trans-unit id="P_YuKJN" resname="Curacao">
+        <source>Curacao</source>
+        <target>キュラソー</target>
+      </trans-unit>
+      <trans-unit id="ZIyyefR" resname="Danmarkshavn">
+        <source>Danmarkshavn</source>
+        <target>デンマークシャウン</target>
+      </trans-unit>
+      <trans-unit id="Dum7Fok" resname="Dawson">
+        <source>Dawson</source>
+        <target>ドーソン</target>
+      </trans-unit>
+      <trans-unit id="TIHrgiJ" resname="Dawson Creek">
+        <source>Dawson Creek</source>
+        <target>ドーソンクリーク</target>
+      </trans-unit>
+      <trans-unit id=".N64wH1" resname="Denver">
+        <source>Denver</source>
+        <target>デンバー</target>
+      </trans-unit>
+      <trans-unit id="CDgqQTz" resname="Detroit">
+        <source>Detroit</source>
+        <target>デトロイト</target>
+      </trans-unit>
+      <trans-unit id="vip.VoT" resname="Dominica">
+        <source>Dominica</source>
+        <target>ドミニカ</target>
+      </trans-unit>
+      <trans-unit id="pfDS0I6" resname="Edmonton">
+        <source>Edmonton</source>
+        <target>エドモントン</target>
+      </trans-unit>
+      <trans-unit id="CNOfmpa" resname="Eirunepe">
+        <source>Eirunepe</source>
+        <target>エイルネペ</target>
+      </trans-unit>
+      <trans-unit id="xAjSbB7" resname="El Salvador">
+        <source>El Salvador</source>
+        <target>エルサルバドル</target>
+      </trans-unit>
+      <trans-unit id="GEB.ZCH" resname="Fort Nelson">
+        <source>Fort Nelson</source>
+        <target>フォートネルソン</target>
+      </trans-unit>
+      <trans-unit id="ZR6G.Vt" resname="Fortaleza">
+        <source>Fortaleza</source>
+        <target>フォルタレザ</target>
+      </trans-unit>
+      <trans-unit id="ZQoXfec" resname="Glace Bay">
+        <source>Glace Bay</source>
+        <target>グレースベイ</target>
+      </trans-unit>
+      <trans-unit id="Sf093v0" resname="Godthab">
+        <source>Godthab</source>
+        <target>ヌーク</target>
+      </trans-unit>
+      <trans-unit id="3ZyD8_G" resname="Goose Bay">
+        <source>Goose Bay</source>
+        <target>グースベイ</target>
+      </trans-unit>
+      <trans-unit id="B7DDjHN" resname="Grand Turk">
+        <source>Grand Turk</source>
+        <target>グランドターク</target>
+      </trans-unit>
+      <trans-unit id="BZOqDI7" resname="Grenada">
+        <source>Grenada</source>
+        <target>グレナダ</target>
+      </trans-unit>
+      <trans-unit id="NcnePGO" resname="Guadeloupe">
+        <source>Guadeloupe</source>
+        <target>グアドループ</target>
+      </trans-unit>
+      <trans-unit id="RaFaJHD" resname="Guatemala">
+        <source>Guatemala</source>
+        <target>グアテマラ</target>
+      </trans-unit>
+      <trans-unit id="JLf346h" resname="Guayaquil">
+        <source>Guayaquil</source>
+        <target>グアヤキル</target>
+      </trans-unit>
+      <trans-unit id="6jv8Jvp" resname="Guyana">
+        <source>Guyana</source>
+        <target>ガイアナ</target>
+      </trans-unit>
+      <trans-unit id="t1cyqg_" resname="Halifax">
+        <source>Halifax</source>
+        <target>ハリファクス</target>
+      </trans-unit>
+      <trans-unit id="RI4Og0_" resname="Havana">
+        <source>Havana</source>
+        <target>ハバナ</target>
+      </trans-unit>
+      <trans-unit id="QL6k1Wd" resname="Hermosillo">
+        <source>Hermosillo</source>
+        <target>エルモシヨ</target>
+      </trans-unit>
+      <trans-unit id="MjN1J6x" resname="Indianapolis, Indiana">
+        <source>Indianapolis, Indiana</source>
+        <target>インディアナポリス</target>
+      </trans-unit>
+      <trans-unit id="XTN84un" resname="Knox, Indiana">
+        <source>Knox, Indiana</source>
+        <target>インディアナ州ノックス</target>
+      </trans-unit>
+      <trans-unit id="SgztjHV" resname="Marengo, Indiana">
+        <source>Marengo, Indiana</source>
+        <target>インディアナ州マレンゴ</target>
+      </trans-unit>
+      <trans-unit id="4Yrp5mG" resname="Petersburg, Indiana">
+        <source>Petersburg, Indiana</source>
+        <target>インディアナ州ピーターズバーグ</target>
+      </trans-unit>
+      <trans-unit id="vCQgfqF" resname="Tell City, Indiana">
+        <source>Tell City, Indiana</source>
+        <target>インディアナ州テルシティ</target>
+      </trans-unit>
+      <trans-unit id="9MZl.UK" resname="Vevay, Indiana">
+        <source>Vevay, Indiana</source>
+        <target>インディアナ州ビベー</target>
+      </trans-unit>
+      <trans-unit id="YxqUz1d" resname="Vincennes, Indiana">
+        <source>Vincennes, Indiana</source>
+        <target>インディアナ州ビンセンス</target>
+      </trans-unit>
+      <trans-unit id="11afSOT" resname="Winamac, Indiana">
+        <source>Winamac, Indiana</source>
+        <target>インディアナ州ウィナマック</target>
+      </trans-unit>
+      <trans-unit id="GWz_5cO" resname="Inuvik">
+        <source>Inuvik</source>
+        <target>イヌヴィク</target>
+      </trans-unit>
+      <trans-unit id="5YeR5oF" resname="Iqaluit">
+        <source>Iqaluit</source>
+        <target>イカルイット</target>
+      </trans-unit>
+      <trans-unit id="QsKYuhf" resname="Jamaica">
+        <source>Jamaica</source>
+        <target>ジャマイカ</target>
+      </trans-unit>
+      <trans-unit id="lQVrSKv" resname="Juneau">
+        <source>Juneau</source>
+        <target>ジュノー</target>
+      </trans-unit>
+      <trans-unit id="luf2X17" resname="Louisville, Kentucky">
+        <source>Louisville, Kentucky</source>
+        <target>ルイビル</target>
+      </trans-unit>
+      <trans-unit id="uO6XOMT" resname="Monticello, Kentucky">
+        <source>Monticello, Kentucky</source>
+        <target>ケンタッキー州モンティチェロ</target>
+      </trans-unit>
+      <trans-unit id="m1SN7RQ" resname="Kralendijk">
+        <source>Kralendijk</source>
+        <target>クラレンダイク</target>
+      </trans-unit>
+      <trans-unit id="y2oNgTH" resname="La Paz">
+        <source>La Paz</source>
+        <target>ラパス</target>
+      </trans-unit>
+      <trans-unit id="qvLQVNX" resname="Lima">
+        <source>Lima</source>
+        <target>リマ</target>
+      </trans-unit>
+      <trans-unit id="i24ElHI" resname="Los Angeles">
+        <source>Los Angeles</source>
+        <target>ロサンゼルス</target>
+      </trans-unit>
+      <trans-unit id="Q.99Lij" resname="Lower Princes">
+        <source>Lower Princes</source>
+        <target>ローワー・プリンセズ・クウォーター</target>
+      </trans-unit>
+      <trans-unit id="TTeU5da" resname="Maceio">
+        <source>Maceio</source>
+        <target>マセイオ</target>
+      </trans-unit>
+      <trans-unit id="U3k_Ffn" resname="Managua">
+        <source>Managua</source>
+        <target>マナグア</target>
+      </trans-unit>
+      <trans-unit id="1sLo_Hh" resname="Manaus">
+        <source>Manaus</source>
+        <target>マナウス</target>
+      </trans-unit>
+      <trans-unit id="hqpY6Mm" resname="Marigot">
+        <source>Marigot</source>
+        <target>マリゴ</target>
+      </trans-unit>
+      <trans-unit id="xlkG3Hz" resname="Martinique">
+        <source>Martinique</source>
+        <target>マルティニーク</target>
+      </trans-unit>
+      <trans-unit id="MKCd9dy" resname="Matamoros">
+        <source>Matamoros</source>
+        <target>マタモロス</target>
+      </trans-unit>
+      <trans-unit id="nnntZ5e" resname="Mazatlan">
+        <source>Mazatlan</source>
+        <target>マサトラン</target>
+      </trans-unit>
+      <trans-unit id="K0EJ7yY" resname="Menominee">
+        <source>Menominee</source>
+        <target>メノミニー</target>
+      </trans-unit>
+      <trans-unit id="NPRNhiv" resname="Merida">
+        <source>Merida</source>
+        <target>メリダ</target>
+      </trans-unit>
+      <trans-unit id="CNVyrpw" resname="Metlakatla">
+        <source>Metlakatla</source>
+        <target>メトラカトラ</target>
+      </trans-unit>
+      <trans-unit id="Wz.Z1I3" resname="Mexico City">
+        <source>Mexico City</source>
+        <target>メキシコシティー</target>
+      </trans-unit>
+      <trans-unit id="Zp5B5ZK" resname="Miquelon">
+        <source>Miquelon</source>
+        <target>ミクロン島</target>
+      </trans-unit>
+      <trans-unit id="Zd8i7Do" resname="Moncton">
+        <source>Moncton</source>
+        <target>モンクトン</target>
+      </trans-unit>
+      <trans-unit id="SefPSir" resname="Monterrey">
+        <source>Monterrey</source>
+        <target>モンテレイ</target>
+      </trans-unit>
+      <trans-unit id="jlDKz1Y" resname="Montevideo">
+        <source>Montevideo</source>
+        <target>モンテビデオ</target>
+      </trans-unit>
+      <trans-unit id="EnvP6XZ" resname="Montserrat">
+        <source>Montserrat</source>
+        <target>モントセラト</target>
+      </trans-unit>
+      <trans-unit id="ZCHLOEm" resname="Nassau">
+        <source>Nassau</source>
+        <target>ナッソー</target>
+      </trans-unit>
+      <trans-unit id="gV7Kl3x" resname="New York">
+        <source>New York</source>
+        <target>ニューヨーク</target>
+      </trans-unit>
+      <trans-unit id="LSbMLi0" resname="Nipigon">
+        <source>Nipigon</source>
+        <target>ニピゴン</target>
+      </trans-unit>
+      <trans-unit id="UIaQBjX" resname="Nome">
+        <source>Nome</source>
+        <target>ノーム</target>
+      </trans-unit>
+      <trans-unit id="uj8UaC6" resname="Noronha">
+        <source>Noronha</source>
+        <target>ノローニャ</target>
+      </trans-unit>
+      <trans-unit id="cv9nNcQ" resname="Beulah, North Dakota">
+        <source>Beulah, North Dakota</source>
+        <target>ノースダコタ州ビューラー</target>
+      </trans-unit>
+      <trans-unit id="29hWK6_" resname="Center, North Dakota">
+        <source>Center, North Dakota</source>
+        <target>ノースダコタ州センター</target>
+      </trans-unit>
+      <trans-unit id="gXwsTbx" resname="New Salem, North Dakota">
+        <source>New Salem, North Dakota</source>
+        <target>ノースダコタ州ニューセーラム</target>
+      </trans-unit>
+      <trans-unit id="hpbCSmI" resname="Ojinaga">
+        <source>Ojinaga</source>
+        <target>オヒナガ</target>
+      </trans-unit>
+      <trans-unit id="w2aPWBK" resname="Panama">
+        <source>Panama</source>
+        <target>パナマ</target>
+      </trans-unit>
+      <trans-unit id="AM2EuVw" resname="Pangnirtung">
+        <source>Pangnirtung</source>
+        <target>パンナータング</target>
+      </trans-unit>
+      <trans-unit id="rxwMy.X" resname="Paramaribo">
+        <source>Paramaribo</source>
+        <target>パラマリボ</target>
+      </trans-unit>
+      <trans-unit id="D0T.Dld" resname="Phoenix">
+        <source>Phoenix</source>
+        <target>フェニックス</target>
+      </trans-unit>
+      <trans-unit id="eOXeqk1" resname="Port-au-Prince">
+        <source>Port-au-Prince</source>
+        <target>ポルトープランス</target>
+      </trans-unit>
+      <trans-unit id="ZHPpS4R" resname="Port of Spain">
+        <source>Port of Spain</source>
+        <target>ポートオブスペイン</target>
+      </trans-unit>
+      <trans-unit id="fWKbOcJ" resname="Porto Velho">
+        <source>Porto Velho</source>
+        <target>ポルトベーリョ</target>
+      </trans-unit>
+      <trans-unit id="2apD6tX" resname="Puerto Rico">
+        <source>Puerto Rico</source>
+        <target>プエルトリコ</target>
+      </trans-unit>
+      <trans-unit id="6LdKcyp" resname="Punta Arenas">
+        <source>Punta Arenas</source>
+        <target>プンタアレナス</target>
+      </trans-unit>
+      <trans-unit id="34q4PSM" resname="Rainy River">
+        <source>Rainy River</source>
+        <target>レイニーリバー</target>
+      </trans-unit>
+      <trans-unit id="yRS0U3H" resname="Rankin Inlet">
+        <source>Rankin Inlet</source>
+        <target>ランキンインレット</target>
+      </trans-unit>
+      <trans-unit id="A4S.9z9" resname="Recife">
+        <source>Recife</source>
+        <target>レシフェ</target>
+      </trans-unit>
+      <trans-unit id="t4J7sMs" resname="Regina">
+        <source>Regina</source>
+        <target>レジャイナ</target>
+      </trans-unit>
+      <trans-unit id="2HFLXtt" resname="Resolute">
+        <source>Resolute</source>
+        <target>レゾリュート</target>
+      </trans-unit>
+      <trans-unit id="xVr.Beo" resname="Rio Branco">
+        <source>Rio Branco</source>
+        <target>リオブランコ</target>
+      </trans-unit>
+      <trans-unit id="R56MWnI" resname="Santarem">
+        <source>Santarem</source>
+        <target>サンタレム</target>
+      </trans-unit>
+      <trans-unit id="MDYjBgk" resname="Santiago">
+        <source>Santiago</source>
+        <target>サンチアゴ</target>
+      </trans-unit>
+      <trans-unit id="vvzRU_O" resname="Santo Domingo">
+        <source>Santo Domingo</source>
+        <target>サントドミンゴ</target>
+      </trans-unit>
+      <trans-unit id="JjQUPfM" resname="Sao Paulo">
+        <source>Sao Paulo</source>
+        <target>サンパウロ</target>
+      </trans-unit>
+      <trans-unit id="qpXZsYI" resname="Scoresbysund">
+        <source>Scoresbysund</source>
+        <target>イトコルトルミット</target>
+      </trans-unit>
+      <trans-unit id=".Fn1qPU" resname="Sitka">
+        <source>Sitka</source>
+        <target>シトカ</target>
+      </trans-unit>
+      <trans-unit id="3kdvZbP" resname="St Barthelemy">
+        <source>St Barthelemy</source>
+        <target>サン・バルテルミー</target>
+      </trans-unit>
+      <trans-unit id="qz5Yn16" resname="St Johns">
+        <source>St Johns</source>
+        <target>セントジョンズ</target>
+      </trans-unit>
+      <trans-unit id="thJlwRJ" resname="St Kitts">
+        <source>St Kitts</source>
+        <target>セントキッツ</target>
+      </trans-unit>
+      <trans-unit id="NnoL.fQ" resname="St Lucia">
+        <source>St Lucia</source>
+        <target>セントルシア</target>
+      </trans-unit>
+      <trans-unit id="jB4y5oW" resname="St Thomas">
+        <source>St Thomas</source>
+        <target>セントトーマス</target>
+      </trans-unit>
+      <trans-unit id="DPWEqao" resname="St Vincent">
+        <source>St Vincent</source>
+        <target>セントビンセント</target>
+      </trans-unit>
+      <trans-unit id="JfMTbrY" resname="Swift Current">
+        <source>Swift Current</source>
+        <target>スウィフトカレント</target>
+      </trans-unit>
+      <trans-unit id="cZUlI1j" resname="Tegucigalpa">
+        <source>Tegucigalpa</source>
+        <target>テグシガルパ</target>
+      </trans-unit>
+      <trans-unit id="nidlPvC" resname="Thule">
+        <source>Thule</source>
+        <target>チューレ</target>
+      </trans-unit>
+      <trans-unit id="BwDtRe6" resname="Thunder Bay">
+        <source>Thunder Bay</source>
+        <target>サンダーベイ</target>
+      </trans-unit>
+      <trans-unit id="O4bsZq4" resname="Tijuana">
+        <source>Tijuana</source>
+        <target>ティフアナ</target>
+      </trans-unit>
+      <trans-unit id="EhcwvWG" resname="Toronto">
+        <source>Toronto</source>
+        <target>トロント</target>
+      </trans-unit>
+      <trans-unit id="VnrMdHR" resname="Tortola">
+        <source>Tortola</source>
+        <target>トルトーラ</target>
+      </trans-unit>
+      <trans-unit id="iCXPlR2" resname="Vancouver">
+        <source>Vancouver</source>
+        <target>バンクーバー</target>
+      </trans-unit>
+      <trans-unit id="Jq35ADX" resname="Whitehorse">
+        <source>Whitehorse</source>
+        <target>ホワイトホース</target>
+      </trans-unit>
+      <trans-unit id="EcG9ls8" resname="Winnipeg">
+        <source>Winnipeg</source>
+        <target>ウィニペグ</target>
+      </trans-unit>
+      <trans-unit id="NaqW8Kh" resname="Yakutat">
+        <source>Yakutat</source>
+        <target>ヤクタット</target>
+      </trans-unit>
+      <trans-unit id="BA8zvNc" resname="Yellowknife">
+        <source>Yellowknife</source>
+        <target>イエローナイフ</target>
+      </trans-unit>
+      <trans-unit id="xD8z8Fe" resname="Antarctica">
+        <source>Antarctica</source>
+        <target>南極</target>
+      </trans-unit>
+      <trans-unit id="4muD1Lq" resname="Casey">
+        <source>Casey</source>
+        <target>ケーシー基地</target>
+      </trans-unit>
+      <trans-unit id="aDMT1pC" resname="Davis">
+        <source>Davis</source>
+        <target>デービス基地</target>
+      </trans-unit>
+      <trans-unit id="bJXiWoQ" resname="DumontDUrville">
+        <source>DumontDUrville</source>
+        <target>デュモン・デュルヴィル基地</target>
+      </trans-unit>
+      <trans-unit id="_3aFcDY" resname="Macquarie">
+        <source>Macquarie</source>
+        <target>マッコリー</target>
+      </trans-unit>
+      <trans-unit id="ls8LfGa" resname="Mawson">
+        <source>Mawson</source>
+        <target>モーソン基地</target>
+      </trans-unit>
+      <trans-unit id="5fZIzpY" resname="McMurdo">
+        <source>McMurdo</source>
+        <target>マクマード基地</target>
+      </trans-unit>
+      <trans-unit id="Z.9d5q2" resname="Palmer">
+        <source>Palmer</source>
+        <target>パーマー基地</target>
+      </trans-unit>
+      <trans-unit id="..73pv5" resname="Rothera">
+        <source>Rothera</source>
+        <target>ロゼラ基地</target>
+      </trans-unit>
+      <trans-unit id="q_yx4xN" resname="Syowa">
+        <source>Syowa</source>
+        <target>昭和基地</target>
+      </trans-unit>
+      <trans-unit id="m6wlaGx" resname="Troll">
+        <source>Troll</source>
+        <target>トロル基地</target>
+      </trans-unit>
+      <trans-unit id="ryIAlyL" resname="Vostok">
+        <source>Vostok</source>
+        <target>ボストーク基地</target>
+      </trans-unit>
+      <trans-unit id="Ya8bknb" resname="Longyearbyen">
+        <source>Longyearbyen</source>
+        <target>ロングイェールビーン</target>
+      </trans-unit>
+      <trans-unit id="esAuwch" resname="Asia">
+        <source>Asia</source>
+        <target>アジア</target>
+      </trans-unit>
+      <trans-unit id="O48z.Va" resname="Aden">
+        <source>Aden</source>
+        <target>アデン</target>
+      </trans-unit>
+      <trans-unit id="hptWGfd" resname="Almaty">
+        <source>Almaty</source>
+        <target>アルマトイ</target>
+      </trans-unit>
+      <trans-unit id="P8cyBz6" resname="Amman">
+        <source>Amman</source>
+        <target>アンマン</target>
+      </trans-unit>
+      <trans-unit id="__K2QEc" resname="Anadyr">
+        <source>Anadyr</source>
+        <target>アナディリ</target>
+      </trans-unit>
+      <trans-unit id="EF.rMgn" resname="Aqtau">
+        <source>Aqtau</source>
+        <target>アクタウ</target>
+      </trans-unit>
+      <trans-unit id="jo.G1cM" resname="Aqtobe">
+        <source>Aqtobe</source>
+        <target>アクトベ</target>
+      </trans-unit>
+      <trans-unit id="60tjgar" resname="Ashgabat">
+        <source>Ashgabat</source>
+        <target>アシガバード</target>
+      </trans-unit>
+      <trans-unit id="4k3uLMT" resname="Atyrau">
+        <source>Atyrau</source>
+        <target>アティラウ</target>
+      </trans-unit>
+      <trans-unit id="xr2aBpv" resname="Baghdad">
+        <source>Baghdad</source>
+        <target>バグダッド</target>
+      </trans-unit>
+      <trans-unit id="lLKFm5E" resname="Bahrain">
+        <source>Bahrain</source>
+        <target>バーレーン</target>
+      </trans-unit>
+      <trans-unit id="Ew7_ojL" resname="Baku">
+        <source>Baku</source>
+        <target>バクー</target>
+      </trans-unit>
+      <trans-unit id="_8IEcAV" resname="Bangkok">
+        <source>Bangkok</source>
+        <target>バンコク</target>
+      </trans-unit>
+      <trans-unit id="rSzhHaC" resname="Barnaul">
+        <source>Barnaul</source>
+        <target>バルナウル</target>
+      </trans-unit>
+      <trans-unit id="C2Y.1F." resname="Beirut">
+        <source>Beirut</source>
+        <target>ベイルート</target>
+      </trans-unit>
+      <trans-unit id="XMj9bPl" resname="Bishkek">
+        <source>Bishkek</source>
+        <target>ビシュケク</target>
+      </trans-unit>
+      <trans-unit id="mev32RI" resname="Brunei">
+        <source>Brunei</source>
+        <target>ブルネイ</target>
+      </trans-unit>
+      <trans-unit id="_h1g9TU" resname="Chita">
+        <source>Chita</source>
+        <target>チタ</target>
+      </trans-unit>
+      <trans-unit id="iGjxMtT" resname="Choibalsan">
+        <source>Choibalsan</source>
+        <target>チョイバルサン</target>
+      </trans-unit>
+      <trans-unit id="Rn8p1kh" resname="Colombo">
+        <source>Colombo</source>
+        <target>コロンボ</target>
+      </trans-unit>
+      <trans-unit id="ek_jIwD" resname="Damascus">
+        <source>Damascus</source>
+        <target>ダマスカス</target>
+      </trans-unit>
+      <trans-unit id="UP1THEL" resname="Dhaka">
+        <source>Dhaka</source>
+        <target>ダッカ</target>
+      </trans-unit>
+      <trans-unit id="XTIUnVc" resname="Dili">
+        <source>Dili</source>
+        <target>ディリ</target>
+      </trans-unit>
+      <trans-unit id="bEJQSKp" resname="Dubai">
+        <source>Dubai</source>
+        <target>ドバイ</target>
+      </trans-unit>
+      <trans-unit id="xoAxlUY" resname="Dushanbe">
+        <source>Dushanbe</source>
+        <target>ドゥシャンベ</target>
+      </trans-unit>
+      <trans-unit id="8mzhLVT" resname="Famagusta">
+        <source>Famagusta</source>
+        <target>ファマグスタ</target>
+      </trans-unit>
+      <trans-unit id="JHM_Bsw" resname="Gaza">
+        <source>Gaza</source>
+        <target>ガザ</target>
+      </trans-unit>
+      <trans-unit id="GTcKe3m" resname="Hebron">
+        <source>Hebron</source>
+        <target>ヘブロン</target>
+      </trans-unit>
+      <trans-unit id="HY2sRux" resname="Ho Chi Minh">
+        <source>Ho Chi Minh</source>
+        <target>ホーチミン</target>
+      </trans-unit>
+      <trans-unit id="HtjH5Wy" resname="Hong Kong">
+        <source>Hong Kong</source>
+        <target>香港</target>
+      </trans-unit>
+      <trans-unit id="VDcTmEd" resname="Hovd">
+        <source>Hovd</source>
+        <target>ホブド</target>
+      </trans-unit>
+      <trans-unit id="jGvljZY" resname="Irkutsk">
+        <source>Irkutsk</source>
+        <target>イルクーツク</target>
+      </trans-unit>
+      <trans-unit id="WS4n4nk" resname="Jakarta">
+        <source>Jakarta</source>
+        <target>ジャカルタ</target>
+      </trans-unit>
+      <trans-unit id=".5kPN6t" resname="Jayapura">
+        <source>Jayapura</source>
+        <target>ジャヤプラ</target>
+      </trans-unit>
+      <trans-unit id="RR674.d" resname="Jerusalem">
+        <source>Jerusalem</source>
+        <target>エルサレム</target>
+      </trans-unit>
+      <trans-unit id="jXnBBst" resname="Kabul">
+        <source>Kabul</source>
+        <target>カブール</target>
+      </trans-unit>
+      <trans-unit id="aiD00FH" resname="Kamchatka">
+        <source>Kamchatka</source>
+        <target>カムチャッカ</target>
+      </trans-unit>
+      <trans-unit id="We3MYa9" resname="Karachi">
+        <source>Karachi</source>
+        <target>カラチ</target>
+      </trans-unit>
+      <trans-unit id="f90LbYr" resname="Kathmandu">
+        <source>Kathmandu</source>
+        <target>カトマンズ</target>
+      </trans-unit>
+      <trans-unit id="SMTBxwG" resname="Khandyga">
+        <source>Khandyga</source>
+        <target>ハンドゥイガ</target>
+      </trans-unit>
+      <trans-unit id="zecnbnu" resname="Kolkata">
+        <source>Kolkata</source>
+        <target>コルカタ</target>
+      </trans-unit>
+      <trans-unit id="OIBItXG" resname="Krasnoyarsk">
+        <source>Krasnoyarsk</source>
+        <target>クラスノヤルスク</target>
+      </trans-unit>
+      <trans-unit id="EcMUa_u" resname="Kuala Lumpur">
+        <source>Kuala Lumpur</source>
+        <target>クアラルンプール</target>
+      </trans-unit>
+      <trans-unit id="p86AbZo" resname="Kuching">
+        <source>Kuching</source>
+        <target>クチン</target>
+      </trans-unit>
+      <trans-unit id="EMPC4u3" resname="Kuwait">
+        <source>Kuwait</source>
+        <target>クウェート</target>
+      </trans-unit>
+      <trans-unit id="peKNxVh" resname="Macau">
+        <source>Macau</source>
+        <target>マカオ</target>
+      </trans-unit>
+      <trans-unit id="4eClA47" resname="Magadan">
+        <source>Magadan</source>
+        <target>マガダン</target>
+      </trans-unit>
+      <trans-unit id="0RlxKLy" resname="Makassar">
+        <source>Makassar</source>
+        <target>マカッサル</target>
+      </trans-unit>
+      <trans-unit id="nC3ajvu" resname="Manila">
+        <source>Manila</source>
+        <target>マニラ</target>
+      </trans-unit>
+      <trans-unit id="Odp3nnr" resname="Muscat">
+        <source>Muscat</source>
+        <target>マスカット</target>
+      </trans-unit>
+      <trans-unit id="e_6Foti" resname="Nicosia">
+        <source>Nicosia</source>
+        <target>ニコシア</target>
+      </trans-unit>
+      <trans-unit id="JX_ADi." resname="Novokuznetsk">
+        <source>Novokuznetsk</source>
+        <target>ノヴォクズネツク</target>
+      </trans-unit>
+      <trans-unit id="2V0CYdI" resname="Novosibirsk">
+        <source>Novosibirsk</source>
+        <target>ノヴォシビルスク</target>
+      </trans-unit>
+      <trans-unit id=".UhgsGc" resname="Omsk">
+        <source>Omsk</source>
+        <target>オムスク</target>
+      </trans-unit>
+      <trans-unit id="p3oh.wz" resname="Oral">
+        <source>Oral</source>
+        <target>オラル</target>
+      </trans-unit>
+      <trans-unit id="jgWCcwD" resname="Phnom Penh">
+        <source>Phnom Penh</source>
+        <target>プノンペン</target>
+      </trans-unit>
+      <trans-unit id="S5ni2a_" resname="Pontianak">
+        <source>Pontianak</source>
+        <target>ポンティアナック</target>
+      </trans-unit>
+      <trans-unit id="Za8cbNU" resname="Pyongyang">
+        <source>Pyongyang</source>
+        <target>平壌</target>
+      </trans-unit>
+      <trans-unit id="VczFAU8" resname="Qatar">
+        <source>Qatar</source>
+        <target>カタール</target>
+      </trans-unit>
+      <trans-unit id="W.0WB1h" resname="Qyzylorda">
+        <source>Qyzylorda</source>
+        <target>クズロルダ</target>
+      </trans-unit>
+      <trans-unit id="t5s6QRw" resname="Riyadh">
+        <source>Riyadh</source>
+        <target>リヤド</target>
+      </trans-unit>
+      <trans-unit id="DQP9t1n" resname="Sakhalin">
+        <source>Sakhalin</source>
+        <target>サハリン</target>
+      </trans-unit>
+      <trans-unit id="TfcHOQV" resname="Samarkand">
+        <source>Samarkand</source>
+        <target>サマルカンド</target>
+      </trans-unit>
+      <trans-unit id="MrY0uIm" resname="Seoul">
+        <source>Seoul</source>
+        <target>ソウル</target>
+      </trans-unit>
+      <trans-unit id="MDsfqZP" resname="Shanghai">
+        <source>Shanghai</source>
+        <target>上海</target>
+      </trans-unit>
+      <trans-unit id="yW3YHbG" resname="Singapore">
+        <source>Singapore</source>
+        <target>シンガポール</target>
+      </trans-unit>
+      <trans-unit id="C2V9qYr" resname="Srednekolymsk">
+        <source>Srednekolymsk</source>
+        <target>スレドネコリムスク</target>
+      </trans-unit>
+      <trans-unit id="yAW7Gj4" resname="Taipei">
+        <source>Taipei</source>
+        <target>台北</target>
+      </trans-unit>
+      <trans-unit id="jeVupDa" resname="Tashkent">
+        <source>Tashkent</source>
+        <target>タシケント</target>
+      </trans-unit>
+      <trans-unit id="Sy14ppH" resname="Tbilisi">
+        <source>Tbilisi</source>
+        <target>トビリシ</target>
+      </trans-unit>
+      <trans-unit id="zAYUYHD" resname="Tehran">
+        <source>Tehran</source>
+        <target>テヘラン</target>
+      </trans-unit>
+      <trans-unit id="vlCJX3_" resname="Thimphu">
+        <source>Thimphu</source>
+        <target>ティンプー</target>
+      </trans-unit>
+      <trans-unit id="7C0ZFoA" resname="Tokyo">
+        <source>Tokyo</source>
+        <target>東京</target>
+      </trans-unit>
+      <trans-unit id="PByyd6r" resname="Tomsk">
+        <source>Tomsk</source>
+        <target>トムスク</target>
+      </trans-unit>
+      <trans-unit id="avfl4qu" resname="Ulaanbaatar">
+        <source>Ulaanbaatar</source>
+        <target>ウランバートル</target>
+      </trans-unit>
+      <trans-unit id="QL9wI0A" resname="Urumqi">
+        <source>Urumqi</source>
+        <target>ウルムチ</target>
+      </trans-unit>
+      <trans-unit id="QvKR2oE" resname="Ust-Nera">
+        <source>Ust-Nera</source>
+        <target>ウスチネラ</target>
+      </trans-unit>
+      <trans-unit id="IGHcdHr" resname="Vientiane">
+        <source>Vientiane</source>
+        <target>ビエンチャン</target>
+      </trans-unit>
+      <trans-unit id="cyDAMWR" resname="Vladivostok">
+        <source>Vladivostok</source>
+        <target>ウラジオストク</target>
+      </trans-unit>
+      <trans-unit id="AblKw05" resname="Yakutsk">
+        <source>Yakutsk</source>
+        <target>ヤクーツク</target>
+      </trans-unit>
+      <trans-unit id="s9zP7rf" resname="Yekaterinburg">
+        <source>Yekaterinburg</source>
+        <target>エカテリンブルグ</target>
+      </trans-unit>
+      <trans-unit id="XxCWvwJ" resname="Yerevan">
+        <source>Yerevan</source>
+        <target>エレバン</target>
+      </trans-unit>
+      <trans-unit id="_e4k_6e" resname="Azores">
+        <source>Azores</source>
+        <target>アゾレス</target>
+      </trans-unit>
+      <trans-unit id="ecif1Ff" resname="Bermuda">
+        <source>Bermuda</source>
+        <target>バミューダ</target>
+      </trans-unit>
+      <trans-unit id="vWYX8Ap" resname="Canary">
+        <source>Canary</source>
+        <target>カナリア</target>
+      </trans-unit>
+      <trans-unit id="n6by2qV" resname="Cape Verde">
+        <source>Cape Verde</source>
+        <target>カーボベルデ</target>
+      </trans-unit>
+      <trans-unit id="dEFu0DB" resname="Faroe">
+        <source>Faroe</source>
+        <target>フェロー</target>
+      </trans-unit>
+      <trans-unit id="LF0Poco" resname="Madeira">
+        <source>Madeira</source>
+        <target>マデイラ</target>
+      </trans-unit>
+      <trans-unit id="yL_cx0r" resname="Reykjavik">
+        <source>Reykjavik</source>
+        <target>レイキャビク</target>
+      </trans-unit>
+      <trans-unit id="XtI2lR5" resname="South Georgia">
+        <source>South Georgia</source>
+        <target>サウスジョージア</target>
+      </trans-unit>
+      <trans-unit id="xQCWdvc" resname="St Helena">
+        <source>St Helena</source>
+        <target>セントヘレナ</target>
+      </trans-unit>
+      <trans-unit id="9FN.Sdg" resname="Stanley">
+        <source>Stanley</source>
+        <target>スタンレー</target>
+      </trans-unit>
+      <trans-unit id="we9AzgS" resname="Australia">
+        <source>Australia</source>
+        <target>オーストララシア</target>
+      </trans-unit>
+      <trans-unit id="jnurSyO" resname="Adelaide">
+        <source>Adelaide</source>
+        <target>アデレード</target>
+      </trans-unit>
+      <trans-unit id="bicO.yc" resname="Brisbane">
+        <source>Brisbane</source>
+        <target>ブリスベン</target>
+      </trans-unit>
+      <trans-unit id="8TEif6G" resname="Broken Hill">
+        <source>Broken Hill</source>
+        <target>ブロークンヒル</target>
+      </trans-unit>
+      <trans-unit id="b2vCmNi" resname="Currie">
+        <source>Currie</source>
+        <target>カリー</target>
+      </trans-unit>
+      <trans-unit id="x745ioN" resname="Darwin">
+        <source>Darwin</source>
+        <target>ダーウィン</target>
+      </trans-unit>
+      <trans-unit id="os.wf07" resname="Eucla">
+        <source>Eucla</source>
+        <target>ユークラ</target>
+      </trans-unit>
+      <trans-unit id="CYFy.k2" resname="Hobart">
+        <source>Hobart</source>
+        <target>ホバート</target>
+      </trans-unit>
+      <trans-unit id="sfG1ORX" resname="Lindeman">
+        <source>Lindeman</source>
+        <target>リンデマン</target>
+      </trans-unit>
+      <trans-unit id="bg7gJJ3" resname="Lord Howe">
+        <source>Lord Howe</source>
+        <target>ロードハウ</target>
+      </trans-unit>
+      <trans-unit id="VIGIcBZ" resname="Melbourne">
+        <source>Melbourne</source>
+        <target>メルボルン</target>
+      </trans-unit>
+      <trans-unit id="wblx4ok" resname="Perth">
+        <source>Perth</source>
+        <target>パース</target>
+      </trans-unit>
+      <trans-unit id="bVgJq6n" resname="Sydney">
+        <source>Sydney</source>
+        <target>シドニー</target>
+      </trans-unit>
+      <trans-unit id="5ZX0Xcb" resname="Europe">
+        <source>Europe</source>
+        <target>ヨーロッパ</target>
+      </trans-unit>
+      <trans-unit id="ABPAH_D" resname="Amsterdam">
+        <source>Amsterdam</source>
+        <target>アムステルダム</target>
+      </trans-unit>
+      <trans-unit id="PjQL5N4" resname="Andorra">
+        <source>Andorra</source>
+        <target>アンドラ</target>
+      </trans-unit>
+      <trans-unit id="q7PR5ek" resname="Astrakhan">
+        <source>Astrakhan</source>
+        <target>アストラハン</target>
+      </trans-unit>
+      <trans-unit id="4okJBzI" resname="Athens">
+        <source>Athens</source>
+        <target>アテネ</target>
+      </trans-unit>
+      <trans-unit id="Z9p_4dt" resname="Belgrade">
+        <source>Belgrade</source>
+        <target>ベオグラード</target>
+      </trans-unit>
+      <trans-unit id="2tEUtu1" resname="Berlin">
+        <source>Berlin</source>
+        <target>ベルリン</target>
+      </trans-unit>
+      <trans-unit id="GVk855." resname="Bratislava">
+        <source>Bratislava</source>
+        <target>ブラチスラバ</target>
+      </trans-unit>
+      <trans-unit id="lBahoDH" resname="Brussels">
+        <source>Brussels</source>
+        <target>ブリュッセル</target>
+      </trans-unit>
+      <trans-unit id="9Sk4_8T" resname="Bucharest">
+        <source>Bucharest</source>
+        <target>ブカレスト</target>
+      </trans-unit>
+      <trans-unit id="FC9BKE5" resname="Budapest">
+        <source>Budapest</source>
+        <target>ブダペスト</target>
+      </trans-unit>
+      <trans-unit id="RiV0gLg" resname="Busingen">
+        <source>Busingen</source>
+        <target>ビュージンゲン</target>
+      </trans-unit>
+      <trans-unit id="PSfr_.F" resname="Chisinau">
+        <source>Chisinau</source>
+        <target>キシナウ</target>
+      </trans-unit>
+      <trans-unit id="FWa.YA7" resname="Copenhagen">
+        <source>Copenhagen</source>
+        <target>コペンハーゲン</target>
+      </trans-unit>
+      <trans-unit id="CorVH_o" resname="Dublin">
+        <source>Dublin</source>
+        <target>ダブリン</target>
+      </trans-unit>
+      <trans-unit id="CXztWC8" resname="Gibraltar">
+        <source>Gibraltar</source>
+        <target>ジブラルタル</target>
+      </trans-unit>
+      <trans-unit id="ucSMsf6" resname="Guernsey">
+        <source>Guernsey</source>
+        <target>ガーンジー</target>
+      </trans-unit>
+      <trans-unit id="DPTop6m" resname="Helsinki">
+        <source>Helsinki</source>
+        <target>ヘルシンキ</target>
+      </trans-unit>
+      <trans-unit id="NAlvlva" resname="Isle of Man">
+        <source>Isle of Man</source>
+        <target>マン島</target>
+      </trans-unit>
+      <trans-unit id="cK9lyQ1" resname="Istanbul">
+        <source>Istanbul</source>
+        <target>イスタンブール</target>
+      </trans-unit>
+      <trans-unit id="dkqMBK1" resname="Jersey">
+        <source>Jersey</source>
+        <target>ジャージー</target>
+      </trans-unit>
+      <trans-unit id="tHtJD1m" resname="Kaliningrad">
+        <source>Kaliningrad</source>
+        <target>カリーニングラード</target>
+      </trans-unit>
+      <trans-unit id="r4x.bF0" resname="Kiev">
+        <source>Kiev</source>
+        <target>キエフ</target>
+      </trans-unit>
+      <trans-unit id="hb19Ppd" resname="Kirov">
+        <source>Kirov</source>
+        <target>キーロフ</target>
+      </trans-unit>
+      <trans-unit id="kuXcJiv" resname="Lisbon">
+        <source>Lisbon</source>
+        <target>リスボン</target>
+      </trans-unit>
+      <trans-unit id="t.FH2LS" resname="Ljubljana">
+        <source>Ljubljana</source>
+        <target>リュブリャナ</target>
+      </trans-unit>
+      <trans-unit id="7MDn3Ah" resname="London">
+        <source>London</source>
+        <target>ロンドン</target>
+      </trans-unit>
+      <trans-unit id="7XbxkWI" resname="Luxembourg">
+        <source>Luxembourg</source>
+        <target>ルクセンブルク</target>
+      </trans-unit>
+      <trans-unit id="6cciy_." resname="Madrid">
+        <source>Madrid</source>
+        <target>マドリード</target>
+      </trans-unit>
+      <trans-unit id="cenrEHV" resname="Malta">
+        <source>Malta</source>
+        <target>マルタ</target>
+      </trans-unit>
+      <trans-unit id="fK9bGo8" resname="Mariehamn">
+        <source>Mariehamn</source>
+        <target>マリエハムン</target>
+      </trans-unit>
+      <trans-unit id="_xXlWfx" resname="Minsk">
+        <source>Minsk</source>
+        <target>ミンスク</target>
+      </trans-unit>
+      <trans-unit id="k1AYzEF" resname="Monaco">
+        <source>Monaco</source>
+        <target>モナコ</target>
+      </trans-unit>
+      <trans-unit id="RmG9W0s" resname="Moscow">
+        <source>Moscow</source>
+        <target>モスクワ</target>
+      </trans-unit>
+      <trans-unit id="QxUsyX9" resname="Oslo">
+        <source>Oslo</source>
+        <target>オスロ</target>
+      </trans-unit>
+      <trans-unit id="XdJytPM" resname="Paris">
+        <source>Paris</source>
+        <target>パリ</target>
+      </trans-unit>
+      <trans-unit id="geDjnJe" resname="Podgorica">
+        <source>Podgorica</source>
+        <target>ポドゴリツァ</target>
+      </trans-unit>
+      <trans-unit id="IjMcy4D" resname="Prague">
+        <source>Prague</source>
+        <target>プラハ</target>
+      </trans-unit>
+      <trans-unit id="0Rmd98a" resname="Riga">
+        <source>Riga</source>
+        <target>リガ</target>
+      </trans-unit>
+      <trans-unit id="0NIgGRh" resname="Rome">
+        <source>Rome</source>
+        <target>ローマ</target>
+      </trans-unit>
+      <trans-unit id="UcgraDz" resname="Samara">
+        <source>Samara</source>
+        <target>サマラ</target>
+      </trans-unit>
+      <trans-unit id="IwRQokm" resname="San Marino">
+        <source>San Marino</source>
+        <target>サンマリノ</target>
+      </trans-unit>
+      <trans-unit id="adxn0Ld" resname="Sarajevo">
+        <source>Sarajevo</source>
+        <target>サラエボ</target>
+      </trans-unit>
+      <trans-unit id="fGjx4qf" resname="Saratov">
+        <source>Saratov</source>
+        <target>サラトフ</target>
+      </trans-unit>
+      <trans-unit id=".EGRUwr" resname="Simferopol">
+        <source>Simferopol</source>
+        <target>シンフェロポリ</target>
+      </trans-unit>
+      <trans-unit id="5jlGbEy" resname="Skopje">
+        <source>Skopje</source>
+        <target>スコピエ</target>
+      </trans-unit>
+      <trans-unit id="u4ZpUqh" resname="Sofia">
+        <source>Sofia</source>
+        <target>ソフィア</target>
+      </trans-unit>
+      <trans-unit id="uYLX68o" resname="Stockholm">
+        <source>Stockholm</source>
+        <target>ストックホルム</target>
+      </trans-unit>
+      <trans-unit id="vbx.R1P" resname="Tallinn">
+        <source>Tallinn</source>
+        <target>タリン</target>
+      </trans-unit>
+      <trans-unit id="PQDcSFY" resname="Tirane">
+        <source>Tirane</source>
+        <target>ティラナ</target>
+      </trans-unit>
+      <trans-unit id="f0S0FnU" resname="Ulyanovsk">
+        <source>Ulyanovsk</source>
+        <target>ウリヤノフスク</target>
+      </trans-unit>
+      <trans-unit id="Vzj9tdg" resname="Uzhgorod">
+        <source>Uzhgorod</source>
+        <target>ウージュホロド</target>
+      </trans-unit>
+      <trans-unit id="OPqAaRL" resname="Vaduz">
+        <source>Vaduz</source>
+        <target>ファドゥーツ</target>
+      </trans-unit>
+      <trans-unit id="70KPonU" resname="Vatican">
+        <source>Vatican</source>
+        <target>バチカン</target>
+      </trans-unit>
+      <trans-unit id="237kE9Y" resname="Vienna">
+        <source>Vienna</source>
+        <target>ウィーン</target>
+      </trans-unit>
+      <trans-unit id="woPghpq" resname="Vilnius">
+        <source>Vilnius</source>
+        <target>ヴィリニュス</target>
+      </trans-unit>
+      <trans-unit id="P1r_xBk" resname="Volgograd">
+        <source>Volgograd</source>
+        <target>ボルゴグラード</target>
+      </trans-unit>
+      <trans-unit id="LVn43RO" resname="Warsaw">
+        <source>Warsaw</source>
+        <target>ワルシャワ</target>
+      </trans-unit>
+      <trans-unit id="7Az56Cx" resname="Zagreb">
+        <source>Zagreb</source>
+        <target>ザグレブ</target>
+      </trans-unit>
+      <trans-unit id="gTUfPNs" resname="Zaporozhye">
+        <source>Zaporozhye</source>
+        <target>ザポリージャ</target>
+      </trans-unit>
+      <trans-unit id="HnOxZHN" resname="Zurich">
+        <source>Zurich</source>
+        <target>チューリッヒ</target>
+      </trans-unit>
+      <trans-unit id="IqebxlM" resname="Antananarivo">
+        <source>Antananarivo</source>
+        <target>アンタナナリボ</target>
+      </trans-unit>
+      <trans-unit id="5m8rE0U" resname="Chagos">
+        <source>Chagos</source>
+        <target>チャゴス</target>
+      </trans-unit>
+      <trans-unit id="oJlI6PY" resname="Christmas">
+        <source>Christmas</source>
+        <target>クリスマス島</target>
+      </trans-unit>
+      <trans-unit id=".8NAbwx" resname="Cocos">
+        <source>Cocos</source>
+        <target>ココス諸島</target>
+      </trans-unit>
+      <trans-unit id="75LqDPu" resname="Comoro">
+        <source>Comoro</source>
+        <target>コモロ</target>
+      </trans-unit>
+      <trans-unit id="4Auz1to" resname="Kerguelen">
+        <source>Kerguelen</source>
+        <target>ケルゲレン諸島</target>
+      </trans-unit>
+      <trans-unit id="T5AuYmc" resname="Mahe">
+        <source>Mahe</source>
+        <target>マヘ</target>
+      </trans-unit>
+      <trans-unit id="j7VEcaS" resname="Maldives">
+        <source>Maldives</source>
+        <target>モルディブ</target>
+      </trans-unit>
+      <trans-unit id="qoBX7LQ" resname="Mauritius">
+        <source>Mauritius</source>
+        <target>モーリシャス</target>
+      </trans-unit>
+      <trans-unit id="0ItKDw3" resname="Mayotte">
+        <source>Mayotte</source>
+        <target>マヨット</target>
+      </trans-unit>
+      <trans-unit id="xP_0V3l" resname="Reunion">
+        <source>Reunion</source>
+        <target>レユニオン</target>
+      </trans-unit>
+      <trans-unit id="0pW2TJG" resname="Apia">
+        <source>Apia</source>
+        <target>アピア</target>
+      </trans-unit>
+      <trans-unit id="eJxcSf7" resname="Auckland">
+        <source>Auckland</source>
+        <target>オークランド</target>
+      </trans-unit>
+      <trans-unit id="lJm32gP" resname="Bougainville">
+        <source>Bougainville</source>
+        <target>ブーゲンビル</target>
+      </trans-unit>
+      <trans-unit id="afARQAP" resname="Chatham">
+        <source>Chatham</source>
+        <target>チャタム</target>
+      </trans-unit>
+      <trans-unit id="8ZU0hQP" resname="Chuuk">
+        <source>Chuuk</source>
+        <target>チューク</target>
+      </trans-unit>
+      <trans-unit id="Vid..Dr" resname="Easter">
+        <source>Easter</source>
+        <target>イースター島</target>
+      </trans-unit>
+      <trans-unit id="ZkUyoRp" resname="Efate">
+        <source>Efate</source>
+        <target>エフェテ島</target>
+      </trans-unit>
+      <trans-unit id="94t59EY" resname="Enderbury">
+        <source>Enderbury</source>
+        <target>エンダーベリー島</target>
+      </trans-unit>
+      <trans-unit id="WQRLSuI" resname="Fakaofo">
+        <source>Fakaofo</source>
+        <target>ファカオフォ</target>
+      </trans-unit>
+      <trans-unit id="Z5wC3NK" resname="Fiji">
+        <source>Fiji</source>
+        <target>フィジー</target>
+      </trans-unit>
+      <trans-unit id="bWxMBx6" resname="Funafuti">
+        <source>Funafuti</source>
+        <target>フナフティ</target>
+      </trans-unit>
+      <trans-unit id="2dBUyWw" resname="Galapagos">
+        <source>Galapagos</source>
+        <target>ガラパゴス</target>
+      </trans-unit>
+      <trans-unit id="0BZWZZU" resname="Gambier">
+        <source>Gambier</source>
+        <target>ガンビエ諸島</target>
+      </trans-unit>
+      <trans-unit id="0sGV4KO" resname="Guadalcanal">
+        <source>Guadalcanal</source>
+        <target>ガダルカナル</target>
+      </trans-unit>
+      <trans-unit id="XEsyHst" resname="Guam">
+        <source>Guam</source>
+        <target>グアム</target>
+      </trans-unit>
+      <trans-unit id="PtWklja" resname="Honolulu">
+        <source>Honolulu</source>
+        <target>ホノルル</target>
+      </trans-unit>
+      <trans-unit id="1zSFqbK" resname="Kiritimati">
+        <source>Kiritimati</source>
+        <target>キリスィマスィ島</target>
+      </trans-unit>
+      <trans-unit id="LGaPe06" resname="Kosrae">
+        <source>Kosrae</source>
+        <target>コスラエ</target>
+      </trans-unit>
+      <trans-unit id="KPk1z0o" resname="Kwajalein">
+        <source>Kwajalein</source>
+        <target>クェゼリン</target>
+      </trans-unit>
+      <trans-unit id="jXdwx4z" resname="Majuro">
+        <source>Majuro</source>
+        <target>マジュロ</target>
+      </trans-unit>
+      <trans-unit id="zW_Z5AQ" resname="Marquesas">
+        <source>Marquesas</source>
+        <target>マルキーズ</target>
+      </trans-unit>
+      <trans-unit id="uwVzTis" resname="Midway">
+        <source>Midway</source>
+        <target>ミッドウェー島</target>
+      </trans-unit>
+      <trans-unit id="V_kAiF1" resname="Nauru">
+        <source>Nauru</source>
+        <target>ナウル</target>
+      </trans-unit>
+      <trans-unit id="SVbCCQ." resname="Niue">
+        <source>Niue</source>
+        <target>ニウエ</target>
+      </trans-unit>
+      <trans-unit id="mzxtVNV" resname="Norfolk">
+        <source>Norfolk</source>
+        <target>ノーフォーク島</target>
+      </trans-unit>
+      <trans-unit id="Twucq18" resname="Noumea">
+        <source>Noumea</source>
+        <target>ヌメア</target>
+      </trans-unit>
+      <trans-unit id="vozamWp" resname="Pago Pago">
+        <source>Pago Pago</source>
+        <target>パゴパゴ</target>
+      </trans-unit>
+      <trans-unit id="f6ZHc9z" resname="Palau">
+        <source>Palau</source>
+        <target>パラオ</target>
+      </trans-unit>
+      <trans-unit id="D4oeaii" resname="Pitcairn">
+        <source>Pitcairn</source>
+        <target>ピトケアン諸島</target>
+      </trans-unit>
+      <trans-unit id="nusn_Ap" resname="Pohnpei">
+        <source>Pohnpei</source>
+        <target>ポンペイ島</target>
+      </trans-unit>
+      <trans-unit id="kwkV.ON" resname="Port Moresby">
+        <source>Port Moresby</source>
+        <target>ポートモレスビー</target>
+      </trans-unit>
+      <trans-unit id="5nqC5Hr" resname="Rarotonga">
+        <source>Rarotonga</source>
+        <target>ラロトンガ</target>
+      </trans-unit>
+      <trans-unit id="1yvO2ke" resname="Saipan">
+        <source>Saipan</source>
+        <target>サイパン</target>
+      </trans-unit>
+      <trans-unit id="zfij0Sj" resname="Tahiti">
+        <source>Tahiti</source>
+        <target>タヒチ</target>
+      </trans-unit>
+      <trans-unit id="VzTdApk" resname="Tarawa">
+        <source>Tarawa</source>
+        <target>タラワ</target>
+      </trans-unit>
+      <trans-unit id="HlYyI9F" resname="Tongatapu">
+        <source>Tongatapu</source>
+        <target>トンガタプ</target>
+      </trans-unit>
+      <trans-unit id="M6fpCDR" resname="Wake">
+        <source>Wake</source>
+        <target>ウェーク島</target>
+      </trans-unit>
+      <trans-unit id="dd_KRUq" resname="Wallis">
+        <source>Wallis</source>
+        <target>ウォリス諸島</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

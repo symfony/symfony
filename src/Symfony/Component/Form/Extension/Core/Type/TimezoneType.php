@@ -43,7 +43,7 @@ class TimezoneType extends AbstractType
                     return self::getTimezones($regions);
                 });
             },
-            'choice_translation_domain' => false,
+            'choice_translation_domain' => 'timezone',
             'input' => 'string',
             'regions' => \DateTimeZone::ALL,
         ));
@@ -71,8 +71,11 @@ class TimezoneType extends AbstractType
 
     /**
      * Returns a normalized array of timezone choices.
+     *
+     * This function is not part of the public API but should only be called
+     * from update-timezone-translations.php.
      */
-    private static function getTimezones(int $regions): array
+    public static function getTimezones(int $regions): array
     {
         $timezones = array();
 
@@ -81,7 +84,7 @@ class TimezoneType extends AbstractType
 
             if (count($parts) > 2) {
                 $region = $parts[0];
-                $name = $parts[1].' - '.$parts[2];
+                $name = $parts[2].', '.$parts[1];
             } elseif (count($parts) > 1) {
                 $region = $parts[0];
                 $name = $parts[1];

@@ -2211,8 +2211,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@name="name"]
     [not(@required)]
     [./optgroup
-        [@label="Europe"]
-        [./option[@value="Europe/Vienna"][@selected="selected"][.="Vienna"]]
+        [@label="[trans]Europe[/trans]"]
+        [./option[@value="Europe/Vienna"][@selected="selected"][.="[trans]Vienna[/trans]"]]
     ]
     [count(./optgroup)>10]
     [count(.//option)>200]

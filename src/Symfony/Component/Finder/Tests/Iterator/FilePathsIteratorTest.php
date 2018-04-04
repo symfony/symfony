@@ -34,7 +34,7 @@ class FilePathsIteratorTest extends RealIteratorTestCase
 
     public function getSubPathData()
     {
-        $tmpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfony_finder';
+        $tmpDir = sys_get_temp_dir().'/symfony_finder';
 
         return array(
             array(

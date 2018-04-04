@@ -25,8 +25,20 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
     private $exclusions;
     private $requestStack;
 
+    /**
+     * @param array $exclusions each exclusion must have a "code" and "urls" keys
+     */
     public function __construct(RequestStack $requestStack, array $exclusions, $actionLevel)
     {
+        foreach ($exclusions as $exclusion) {
+            if (!array_key_exists('code', $exclusion)) {
+                throw new \LogicException(sprintf('An exclusion must have a "code" key'));
+            }
+            if (!array_key_exists('urls', $exclusion)) {
+                throw new \LogicException(sprintf('An exclusion must have a "urls" key'));
+            }
+        }
+
         parent::__construct($actionLevel);
 
         $this->requestStack = $requestStack;
@@ -49,8 +61,8 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
                 }
 
                 $urlBlacklist = null;
-                if (count($exclusion['url'])) {
-                    return !preg_match('{('.implode('|', $exclusion['url']).')}i', $request->getPathInfo());
+                if (count($exclusion['urls'])) {
+                    return !preg_match('{('.implode('|', $exclusion['urls']).')}i', $request->getPathInfo());
                 }
 
                 return false;

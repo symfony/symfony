@@ -21,6 +21,22 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class HttpCodeActivationStrategyTest extends TestCase
 {
     /**
+     * @expectedException \LogicException
+     */
+    public function testExclusionsWithoutCode()
+    {
+        new HttpCodeActivationStrategy(new RequestStack(), array(array('urls' => array())), Logger::WARNING);
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testExclusionsWithoutUrls()
+    {
+        new HttpCodeActivationStrategy(new RequestStack(), array(array('code' => 404)), Logger::WARNING);
+    }
+
+    /**
      * @dataProvider isActivatedProvider
      */
     public function testIsActivated($url, $record, $expected)
@@ -31,10 +47,10 @@ class HttpCodeActivationStrategyTest extends TestCase
         $strategy = new HttpCodeActivationStrategy(
             $requestStack,
             array(
-                array('code' => 403, 'url' => array()),
-                array('code' => 404, 'url' => array()),
-                array('code' => 405, 'url' => array()),
-                array('code' => 400, 'url' => array('^/400/a', '^/400/b')),
+                array('code' => 403, 'urls' => array()),
+                array('code' => 404, 'urls' => array()),
+                array('code' => 405, 'urls' => array()),
+                array('code' => 400, 'urls' => array('^/400/a', '^/400/b')),
             ),
             Logger::WARNING
         );

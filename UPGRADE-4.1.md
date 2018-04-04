@@ -81,6 +81,7 @@ Security
    functionality, create a custom user-checker based on the
    `Symfony\Component\Security\Core\User\UserChecker`.
  * `AuthenticationUtils::getLastUsername()` now always returns a string.
+ * The `ExpressionVoter::addExpressionLanguageProvider()` method is deprecated. Register the provider directly on the injected ExpressionLanguage instance instead.
 
 SecurityBundle
 --------------

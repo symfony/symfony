@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -205,6 +208,66 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
         $this->addToAssertionCount(1);
+    }
+
+    public function testRegisterRequestMatchersWithAllowIfExpression()
+    {
+        $container = $this->getRawContainer();
+
+        $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array(),
+                ),
+            ),
+            'access_control' => array(
+                array('path' => '/', 'allow_if' => $rawExpression),
+            ),
+        ));
+
+        $container->compile();
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $this->assertCount(3, $args);
+        $expressionId = $args[1][0];
+        $this->assertTrue($container->hasDefinition($expressionId));
+        $expressionDef = $container->getDefinition($expressionId);
+        $this->assertSame(Expression::class, $expressionDef->getClass());
+        $this->assertSame($rawExpression, $expressionDef->getArgument(0));
+
+        $this->assertTrue($container->hasDefinition('security.cache_warmer.expression'));
+        $this->assertEquals(
+            new IteratorArgument(array(new Reference($expressionId))),
+            $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
+        );
+    }
+
+    public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array(),
+                ),
+            ),
+        ));
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
     }
 
     protected function getRawContainer()

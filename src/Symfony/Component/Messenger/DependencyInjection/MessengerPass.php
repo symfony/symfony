@@ -69,7 +69,7 @@ class MessengerPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $handles = $tag['handles'] ?? $this->guessHandledClasses($r = $container->getReflectionClass($container->getDefinition($serviceId)->getClass()), $serviceId);
+                $handles = isset($tag['handles']) ? array($tag['handles']) : $this->guessHandledClasses($r = $container->getReflectionClass($container->getDefinition($serviceId)->getClass()), $serviceId);
                 $priority = $tag['priority'] ?? 0;
 
                 foreach ($handles as $messageClass) {

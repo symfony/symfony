@@ -34,6 +34,10 @@ class MessengerPassTest extends TestCase
             ->addTag('messenger.message_handler')
         ;
         $container
+            ->register(MissingArgumentTypeHandler::class, MissingArgumentTypeHandler::class)
+            ->addTag('messenger.message_handler', array('handles' => SecondMessage::class))
+        ;
+        $container
             ->register(DummyReceiver::class, DummyReceiver::class)
             ->addTag('messenger.receiver')
         ;
@@ -43,7 +47,10 @@ class MessengerPassTest extends TestCase
         $handlerLocatorDefinition = $container->getDefinition($container->getDefinition('messenger.handler_resolver')->getArgument(0));
         $this->assertSame(ServiceLocator::class, $handlerLocatorDefinition->getClass());
         $this->assertEquals(
-            array('handler.'.DummyMessage::class => new ServiceClosureArgument(new Reference(DummyHandler::class))),
+            array(
+                'handler.'.DummyMessage::class => new ServiceClosureArgument(new Reference(DummyHandler::class)),
+                'handler.'.SecondMessage::class => new ServiceClosureArgument(new Reference(MissingArgumentTypeHandler::class)),
+            ),
             $handlerLocatorDefinition->getArgument(0)
         );
 

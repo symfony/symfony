@@ -19,7 +19,17 @@ use Symfony\Component\Finder\Finder;
  */
 class BsdFinderTest extends FinderTest
 {
-    protected function buildFinder()
+    public function testSymlinksNotResolved()
+    {
+        $this->markTestSkipped('not supported on BSD finder');
+    }
+
+    public function testBackPathNotNormalized()
+    {
+        $this->markTestSkipped('not supported on BSD finder');
+    }
+
+        protected function buildFinder()
     {
         $adapter = new BsdFindAdapter();
 

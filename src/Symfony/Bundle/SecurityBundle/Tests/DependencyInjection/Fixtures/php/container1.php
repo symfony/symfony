@@ -86,6 +86,11 @@ $container->loadFromExtension('security', array(
             'anonymous' => true,
             'http_basic' => true,
         ),
+        'simple_auth' => array(
+            'provider' => 'default',
+            'anonymous' => true,
+            'simple_form' => array('authenticator' => 'simple_authenticator'),
+        ),
     ),
 
     'access_control' => array(

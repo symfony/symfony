@@ -101,6 +101,13 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.listener.anonymous.with_user_checker',
                 'security.access_listener',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.2',
+                'security.authentication.listener.simple_form.simple_auth',
+                'security.authentication.listener.anonymous.simple_auth',
+                'security.access_listener',
+            ),
         ), $listeners);
     }
 

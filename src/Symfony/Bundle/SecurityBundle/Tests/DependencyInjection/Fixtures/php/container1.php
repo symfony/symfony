@@ -91,7 +91,6 @@ $container->loadFromExtension('security', array(
             'provider' => 'default',
             'anonymous' => true,
             'simple_form' => array('authenticator' => 'simple_authenticator'),
-            'logout_on_user_change' => true,
         ),
     ),
 

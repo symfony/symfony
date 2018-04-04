@@ -68,7 +68,7 @@
             <user-checker>app.user_checker</user-checker>
         </firewall>
 
-        <firewall name="simple_auth" logout-on-user-change="true" provider="default">
+        <firewall name="simple_auth" provider="default">
             <anonymous />
             <simple-form authenticator="simple_authenticator" />
         </firewall>

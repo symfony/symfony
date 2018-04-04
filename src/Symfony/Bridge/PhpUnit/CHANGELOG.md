@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Search for `SYMFONY_PHPUNIT_REMOVE` env var in `phpunit.xml` then
+   `phpunit.xml.dist`
+
 4.0.0
 -----
 

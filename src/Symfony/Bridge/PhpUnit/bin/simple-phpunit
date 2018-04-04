@@ -53,6 +53,21 @@ $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rt
 
 if (false === $SYMFONY_PHPUNIT_REMOVE = getenv('SYMFONY_PHPUNIT_REMOVE')) {
     $SYMFONY_PHPUNIT_REMOVE = 'phpspec/prophecy symfony/yaml';
+
+    $phpunitConfigFilename = null;
+    if (file_exists('phpunit.xml')) {
+        $phpunitConfigFilename = 'phpunit.xml';
+    } elseif (file_exists('phpunit.xml.dist')) {
+        $phpunitConfigFilename = 'phpunit.xml.dist';
+    }
+    if ($phpunitConfigFilename) {
+        $xml = new DomDocument();
+        $xml->load($phpunitConfigFilename);
+        $var = (new DOMXpath($xml))->query('//php/env[@name="SYMFONY_PHPUNIT_REMOVE"]')[0];
+        if ($var) {
+            $SYMFONY_PHPUNIT_REMOVE = $var->getAttribute('value');
+        }
+    }
 }
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {

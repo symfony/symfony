@@ -180,7 +180,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getContainer')
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
 
-        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', [$this->translationDir.'/controllers']);
+        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', array($this->translationDir.'/controllers'));
 
         $application = new Application($kernel);
         $application->add($command);

@@ -45,7 +45,7 @@ class TranslationUpdateCommand extends Command
     private $defaultViewsPath;
     private $defaultControllersPath;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $defaultControllersPath = [])
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $defaultControllersPath = array())
     {
         parent::__construct();
 

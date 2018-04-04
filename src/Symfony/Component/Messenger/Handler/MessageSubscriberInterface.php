@@ -19,7 +19,7 @@ namespace Symfony\Component\Messenger\Handler;
 interface MessageSubscriberInterface extends MessageHandlerInterface
 {
     /**
-     * Return a list of messages to be handled.
+     * Returns a list of messages to be handled.
      *
      * It returns a list of messages like in the following example:
      *

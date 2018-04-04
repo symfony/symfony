@@ -259,7 +259,7 @@ class ConfigurationTest extends TestCase
                         'entity_manager_name' => null,
                     ),
                     'validation' => array(
-                        'enabled' => false,
+                        'enabled' => !class_exists(FullStack::class),
                     ),
                 ),
             ),

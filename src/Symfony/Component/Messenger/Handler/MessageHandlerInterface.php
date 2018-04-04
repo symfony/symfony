@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Handler;
 
 /**
- * Handlers can implement this interface.
+ * Marker interface for message handlers.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */

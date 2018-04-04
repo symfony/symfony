@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T13:45:41Z
+
+Im not convinced. It feels like all middlewares should be registered at the same place. Especially if we do #26652.
+
+I do also imagine we could register middlewares like:
+
+```yaml
+framework:
+  messenger:
+    middlewares: ~ # default middlewares
+    bus_foo:
+      type: foo
+      routing:
+        'App\Bar': ['sender.bar', 'sender.biz']
+        'App\Foo': 'sender.foo'
+      middlewares:  # bus specific middlewares
+        - 'custom_service'
+        - validation: true
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-27T13:54:57Z
+
+@Nyholm There is a difference between being able to register all middleware services at the same place and hardcoding a specific middleware for Doctrine (third-party libraries won't be able to do that).
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-27T14:00:38Z
+
+For the records, a bit of the discussion is happening here as well: https://github.com/symfony/symfony/pull/26647#discussion_r177396484
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T14:04:43Z
+
+>  There is a difference between being able to register all middleware services at the same place and hardcoding a specific middleware for Doctrine (third-party libraries won't be able to do that).
+
+Yes. I know. I just wanted to share this idea with you (everybody). Maybe I should put it on #26652.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T08:36:01Z
+
+@fabpot at the end, WDYT about this one? Shall we close it or revert that on the FrameworkBundle (which will require a PR on the DoctrineBundle later)? 🤔
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-03T09:24:53Z
+
+I haven't changed my mind on this one.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T09:45:52Z
+
+Fair enough. It's waiting for votes to go ahead then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-04T12:12:08Z
+
+@sroze Can you rebase this one so that I can merge it? Thank you.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-04T12:53:47Z
+
+Rebased. @Nyholm could you send a PR on the DoctrineBundle to port this feature there?

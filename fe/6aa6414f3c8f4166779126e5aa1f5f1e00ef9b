@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-03T20:44:37Z
+
+would you mind adding some tests please?
+(and congrats and thank you for your first PR :) )
+
+---------------------------------------------------------------------------
+
+by syastrebov at 2018-04-04T11:31:49Z
+
+@nicolas-grekas You're welcome :) Added tests for the changes, please take a look.

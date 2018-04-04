@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by keradus at 2018-04-03T11:03:00Z
+
+original change was targetting 2.7, this branch is targetting master=4.1, please adjust target branch
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-04-03T11:08:25Z
+
+please add missing test that were not present in original PR, that caused integrated project to fail. (eg one with `/foo/../bar/baz` normalization and symlink
+
+---------------------------------------------------------------------------
+
+by helhum at 2018-04-03T11:14:16Z
+
+> original change was targetting 2.7, this branch is targetting master=4.1, please adjust target branch
+
+Does this mean, the PR should be based on 2.7 branch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-03T11:18:54Z
+
+> Does this mean, the PR should be based on 2.7 branch?
+
+correct
+
+---------------------------------------------------------------------------
+
+by helhum at 2018-04-03T11:38:35Z
+
+Working on tests for symlinked dirs now
+
+---------------------------------------------------------------------------
+
+by helhum at 2018-04-03T12:41:51Z
+
+Finder tests should pass now. Let me know if I can do anything else
+
+---------------------------------------------------------------------------
+
+by helhum at 2018-04-03T21:19:59Z
+
+This [comment](https://github.com/symfony/symfony/pull/26337#issuecomment-378400402) might give more explanation why I changed the code like that.

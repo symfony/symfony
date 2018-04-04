@@ -19,6 +19,16 @@ use Symfony\Component\Finder\Finder;
  */
 class GnuFinderTest extends FinderTest
 {
+    public function testSymlinksNotResolved()
+    {
+        $this->markTestSkipped('Symlinks are always resolved using the GnuFinderAdapter.');
+    }
+
+    public function testBackPathNotNormalized()
+    {
+        $this->markTestSkipped('Paths are always normalized using the GnuFinderAdapter.');
+    }
+
     protected function buildFinder()
     {
         $adapter = new GnuFindAdapter();

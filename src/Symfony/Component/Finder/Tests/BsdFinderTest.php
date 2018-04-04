@@ -21,15 +21,15 @@ class BsdFinderTest extends FinderTest
 {
     public function testSymlinksNotResolved()
     {
-        $this->markTestSkipped('not supported on BSD finder');
+        $this->markTestSkipped('Symlinks are always resolved using the BsdFinderAdapter.');
     }
 
     public function testBackPathNotNormalized()
     {
-        $this->markTestSkipped('not supported on BSD finder');
+        $this->markTestSkipped('Paths are always normalized using the BsdFinderAdapter.');
     }
 
-        protected function buildFinder()
+    protected function buildFinder()
     {
         $adapter = new BsdFindAdapter();
 

@@ -68,6 +68,11 @@
             <user-checker>app.user_checker</user-checker>
         </firewall>
 
+        <firewall name="simple_auth" logout-on-user-change="true" provider="default">
+            <anonymous />
+            <simple-form authenticator="simple_authenticator" />
+        </firewall>
+
         <role id="ROLE_ADMIN">ROLE_USER</role>
         <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
         <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>

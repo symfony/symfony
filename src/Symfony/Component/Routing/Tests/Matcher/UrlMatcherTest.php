@@ -45,6 +45,21 @@ class UrlMatcherTest extends TestCase
         }
     }
 
+    public function testMethodNotAllowedOnRoot()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/', array(), array(), array(), '', array(), array('GET')));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'POST'));
+
+        try {
+            $matcher->match('/');
+            $this->fail();
+        } catch (MethodNotAllowedException $e) {
+            $this->assertEquals(array('GET'), $e->getAllowedMethods());
+        }
+    }
+
     public function testHeadAllowedWhenRequirementContainsGet()
     {
         $coll = new RouteCollection();

@@ -194,7 +194,7 @@ EOF
         }
 
         // used to display the Welcome Page in apps that don't define a homepage
-        $code .= "        if ('/' === \$pathinfo) {\n";
+        $code .= "        if ('/' === \$pathinfo && !\$allow) {\n";
         $code .= "            throw new Symfony\Component\Routing\Exception\NoConfigurationException();\n";
         $code .= "        }\n";
 

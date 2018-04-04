@@ -118,7 +118,7 @@ class DeprecationErrorHandler
             }
 
             if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
-                if (isset($trace[$i]['class']) && in_array($trace[$i]['class'], array('Symfony\Bridge\PhpUnit\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'), true)) {
+                if (isset($trace[$i]['class']) && 0 === strpos($trace[$i]['class'], 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor')) {
                     $parsedMsg = unserialize($msg);
                     $msg = $parsedMsg['deprecation'];
                     $class = $parsedMsg['class'];
@@ -216,7 +216,7 @@ class DeprecationErrorHandler
 
                 $groups = array('unsilenced', 'remaining');
                 if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
-                        $groups[] = 'remaining vendor';
+                    $groups[] = 'remaining vendor';
                 }
                 array_push($groups, 'legacy', 'other');
 

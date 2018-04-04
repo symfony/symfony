@@ -50,6 +50,10 @@ class DateType extends AbstractType
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
+        if (null !== $pattern && !preg_match('/^(([yMd]+)[^yMd]*([yMd]+)[^yMd]*([yMd]+))|(^y{1}$|^M{1}$|^d{1}$)$/', $pattern)) {
+            throw new InvalidOptionsException(sprintf('The DateTime format "%s" is not supported in ICU. Please be aware that the data may not reflect the format.', $pattern));
+        }
+
         if ('single_text' === $options['widget']) {
             if (null !== $pattern && false === strpos($pattern, 'y') && false === strpos($pattern, 'M') && false === strpos($pattern, 'd')) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));

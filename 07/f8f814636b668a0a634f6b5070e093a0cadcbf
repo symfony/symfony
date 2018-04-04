@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-04T06:36:54Z
+
+This is a quick fix to make the test suite green again. However, as you can see the path normalization handling has always been dependent on the adapter that you used. I wonder if we shouldn't rather remove these new tests to not make any misleading promises about how the resulting path will be represented.
+
+---------------------------------------------------------------------------
+
+by helhum at 2018-04-04T09:09:52Z
+
+Hm, very good point (and sorry that I missed the test failures).
+
+Haven't looked into how these adapters are calling find, but from a naive approach on command line, `find` behaves exactly like the tests expect.
+
+`$ find ./../symfony -type d`
+
+Output:
+```
+...
+./../symfony/src
+...
+./../symfony/vendor
+...
+```
+
+Whether to remove the tests or not, depends on whether we agree Finder should fulfill their expectations.
+
+The introduced expectations do make sense, as I pointed out [here](https://github.com/symfony/symfony/pull/26337#issuecomment-378400402).
+
+But of course would be as well quite breaking for a bugfix version.
+
+Last but not least, I haven't checked yet if the implementation would be reasonably doable at all.
+
+I could help out in any direction, but obviously needs a decision from Symfony how to proceed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-04T09:15:21Z
+
+see https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Finder/Adapter/AbstractFindAdapter.php#L42 where `realpath()` is called
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-04T09:16:46Z
+
+Well, these adapters are deprecated though.
+
+But rather than using `realpath`, these adapters could normalize paths by resolving `../` parts in the path (removing the previous part of the path).
+
+---------------------------------------------------------------------------
+
+by helhum at 2018-04-04T10:03:01Z
+
+> see /src/Symfony/Component/Finder/Adapter/AbstractFindAdapter.php@2.7#L42 where `realpath()` is called
+
+Hm, ok. Don't know why this was added. Can't confirm that `find` won't work for paths with `../` in it.
+
+> Well, these adapters are deprecated though
+
+Ah OK, then I would just go with skipping these tests, as the adapters are gone in master anyway.

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-03T17:56:29Z
+
+A test case would be well deserved, adding a `simple` listener on a firewall in https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/Fixtures/yml/container1.yml and updating the expected result should be enough. I will add it tomorrow morning if you don't before.
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2018-04-04T07:51:55Z
+
+@chalasr I was looking into it. Not sure how I would actually do that. If you can point me to documentation on this part it would be much helpful. Otherwise, I must dig deep into test organization in order to figure out what to do.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-04T11:39:56Z
+
+@i3or1s Just pushed a test on your branch :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-04T12:27:52Z
+
+rebase done, travis failure unrelated (Finder).
+Note to merger: some SecurityBundle tests will need an update when merging in 3.4.

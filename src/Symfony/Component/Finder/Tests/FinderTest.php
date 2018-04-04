@@ -50,15 +50,40 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testRemoveTrailingSlash()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot be run on Windows.');
+        $finder = $this->buildFinder();
+
+        $expected = $this->toAbsolute(array('foo/bar.tmp', 'test.php', 'test.py', 'foo bar'));
+        $in = self::$tmpDir.'//';
+
+        $this->assertIterator($expected, $finder->in($in)->files()->getIterator());
+    }
+
+    public function testSymlinksNotResolved()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
         }
 
         $finder = $this->buildFinder();
 
-        $expected = $this->toAbsolute(array('foo/bar.tmp', 'test.php', 'test.py', 'foo bar'));
-        $in = '//'.realpath(self::$tmpDir).'//';
+        symlink($this->toAbsolute('foo'), $this->toAbsolute('baz'));
+        $expected = $this->toAbsolute(array('baz/bar.tmp'));
+        $in = self::$tmpDir.'/baz/';
+        try {
+            $this->assertIterator($expected, $finder->in($in)->files()->getIterator());
+            unlink($this->toAbsolute('baz'));
+        } catch (\Exception $e) {
+            unlink($this->toAbsolute('baz'));
+            throw $e;
+        }
+    }
 
+    public function testBackPathNotNormalized()
+    {
+        $finder = $this->buildFinder();
+
+        $expected = $this->toAbsolute(array('foo/../foo/bar.tmp'));
+        $in = self::$tmpDir.'/foo/../foo/';
         $this->assertIterator($expected, $finder->in($in)->files()->getIterator());
     }
 
@@ -279,7 +304,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testInWithGlob()
     {
         $finder = $this->buildFinder();
-        $finder->in(array(__DIR__.'/Fixtures/*/B/C', __DIR__.'/Fixtures/*/*/B/C'))->getIterator();
+        $finder->in(array(__DIR__.'/Fixtures/*/B/C/', __DIR__.'/Fixtures/*/*/B/C/'))->getIterator();
 
         $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
     }
@@ -518,8 +543,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->in($locations)->depth('< 10')->name('*.neon');
 
         $expected = array(
-            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c.neon',
-            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'d.neon',
+            __DIR__.'/Fixtures/one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c.neon',
+            __DIR__.'/Fixtures/one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'d.neon',
         );
 
         $this->assertIterator($expected, $finder);

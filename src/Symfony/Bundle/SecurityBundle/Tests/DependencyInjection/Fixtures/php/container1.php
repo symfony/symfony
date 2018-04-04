@@ -90,6 +90,12 @@ $container->loadFromExtension('security', array(
             'http_basic' => true,
             'logout_on_user_change' => true,
         ),
+        'simple_auth' => array(
+            'provider' => 'default',
+            'anonymous' => true,
+            'simple_form' => array('authenticator' => 'simple_authenticator'),
+            'logout_on_user_change' => true,
+        ),
     ),
 
     'access_control' => array(

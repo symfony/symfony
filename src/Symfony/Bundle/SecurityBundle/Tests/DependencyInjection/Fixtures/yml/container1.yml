@@ -73,6 +73,12 @@ security:
             user_checker: app.user_checker
             logout_on_user_change: true
 
+        simple_auth:
+            provider: default
+            anonymous: ~
+            simple_form: { authenticator: simple_authenticator }
+            logout_on_user_change: true
+
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]

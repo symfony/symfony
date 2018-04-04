@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
@@ -31,7 +32,7 @@ class MoneyType extends AbstractType
             ->addViewTransformer(new MoneyToLocalizedStringTransformer(
                 $options['scale'],
                 $options['grouping'],
-                null,
+                $options['rounding_mode'],
                 $options['divisor']
             ))
         ;
@@ -53,9 +54,20 @@ class MoneyType extends AbstractType
         $resolver->setDefaults(array(
             'scale' => 2,
             'grouping' => false,
+            'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
+        ));
+
+        $resolver->setAllowedValues('rounding_mode', array(
+            NumberToLocalizedStringTransformer::ROUND_FLOOR,
+            NumberToLocalizedStringTransformer::ROUND_DOWN,
+            NumberToLocalizedStringTransformer::ROUND_HALF_DOWN,
+            NumberToLocalizedStringTransformer::ROUND_HALF_EVEN,
+            NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+            NumberToLocalizedStringTransformer::ROUND_UP,
+            NumberToLocalizedStringTransformer::ROUND_CEILING,
         ));
 
         $resolver->setAllowedTypes('scale', 'int');

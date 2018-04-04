@@ -210,6 +210,7 @@
             <argument /> <!-- Simple Authenticator -->
             <argument /> <!-- User Provider -->
             <argument /> <!-- Provider-shared Key -->
+            <argument>null</argument> <!-- UserChecker -->
         </service>
 
         <service id="security.authentication.provider.pre_authenticated" class="Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider" abstract="true">

@@ -72,6 +72,32 @@ class SimpleAuthenticationProviderTest extends TestCase
         $provider->authenticate($token);
     }
 
+    /**
+     * Confirm an anonymous token is not checked by the user checker.
+     */
+    public function testAnonymousToken()
+    {
+        $user = 'anon.';
+
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token->expects($this->any())
+            ->method('getUser')
+            ->will($this->returnValue($user));
+
+        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $userChecker->expects($this->never())->method('checkPreAuth');
+        $userChecker->expects($this->never())->method('checkPostAuth');
+
+        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
+        $authenticator->expects($this->once())
+            ->method('authenticateToken')
+            ->will($this->returnValue($token));
+
+        $provider = $this->getProvider($authenticator, null, $userChecker);
+
+        $provider->authenticate($token);
+    }
+
     protected function getProvider($simpleAuthenticator = null, $userProvider = null, $userChecker = null, $key = 'test')
     {
         if (null === $userChecker) {

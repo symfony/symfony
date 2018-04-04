@@ -70,6 +70,11 @@ security:
             http_basic: ~
             user_checker: app.user_checker
 
+        simple_auth:
+            provider: default
+            anonymous: ~
+            simple_form: { authenticator: simple_authenticator }
+
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]

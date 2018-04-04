@@ -1,0 +1,147 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-04T09:48:09Z
+
+ping @csarrazi
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-03-05T10:31:54Z
+
+I think that we could improve this by introducing a new API for handling changes.
+
+Instead of using separate methods for different things, we should rather use a Command pattern, and provide a set of commands which could be implemented without breaking the interface each time we need to implement something.
+
+This way, we could have a runCommand() method in the EntryManager, with a list of operations:
+* UpdateEntry
+* AddAttributes
+* RemoveAttributes
+* RenameEntry
+
+This would support the current set, and we could deprecate the other methods afterwards.
+
+What do you think about this @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-03-05T10:33:30Z
+
+By the way, this means that the `add()`, `update()`, `remove()` and `rename()` methods should all be deprecated, in favor of the `runCommand()` (Or `executeCommand()`) method.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-17T20:01:50Z
+
+ping @jean-gui
+
+---------------------------------------------------------------------------
+
+by jean-gui at 2017-04-18T09:06:45Z
+
+I was actually waiting for your response to @csarrazi's ping. I'm not sure I have the necessary skills or time to implement this new API though. I'll try to, but am not making any promises.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-04-18T10:34:49Z
+
+@jean-gui want me to take over that one?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-04-18T10:35:34Z
+
+I won't have much time before next week, though.
+
+@symfony/deciders What do you think about the suggestion, btw?
+
+---------------------------------------------------------------------------
+
+by jean-gui at 2017-04-18T12:15:26Z
+
+@csarrazi If you can, sure!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-18T15:43:04Z
+
+Let's see how it goes for 3.4 :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:42:12Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T17:26:53Z
+
+@csarrazi Do you think you will have time to work on this one soon? If not, anybody else?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-10-02T09:12:37Z
+
+Hi @fabpot. Unfortunately I won't have time to work on this anytime soon. I can spend some time reviewing PRs, but unfortunately I have little time to do anything else.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T15:51:27Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-31T05:34:30Z
+
+Anyway willing to take over this one? If not, I'm going to close.
+
+---------------------------------------------------------------------------
+
+by jean-gui at 2018-04-03T09:31:02Z
+
+@fabpot If no one is willing to tackle the big refactoring suggested by @csarrazi, perhaps this PR could be considered for merging.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-04-04T09:06:30Z
+
+We can do that. Like I mentioned before, I no longer contribute to Symfony on a regular basis.
+
+One thing though. I would change the method name to removeAttributeValues / addAttributeValues.
+
+Second, this PR should be updated to take into account changes in coding standards for Symfony 4 (PHP > 7.1.3 is used, so scalar type hinting can be used now).
+
+By the way, `$values` should be type hinted as an `array`.
+
+---------------------------------------------------------------------------
+
+by jean-gui at 2018-04-04T09:44:33Z
+
+I'll try to do that today.
+
+---------------------------------------------------------------------------
+
+by jean-gui at 2018-04-04T17:15:36Z
+
+Done. Should I add those new methods to EntryManagerInterface? Would that be a BC break?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-04T17:16:14Z
+
+Adding them to the interface would be a BC break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-04T17:16:59Z
+
+One last thing before merging: can you add a note about these 2 new methods in the composer CHANGELOG file?
+
+---------------------------------------------------------------------------
+
+by jean-gui at 2018-04-04T17:29:48Z
+
+Done (if src/Symfony/Component/Ldap/CHANGELOG.md is the file you meant).
+
+I should probably submit a PR for the doc as well.

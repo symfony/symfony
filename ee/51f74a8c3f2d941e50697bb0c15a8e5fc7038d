@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-28T21:17:20Z
+
+New features should target the 3.4 branch.
+
+---------------------------------------------------------------------------
+
+by simshaun at 2017-07-28T21:21:29Z
+
+Sorry about that. Rebased to 3.4.
+
+How do I get AppVeyor to run again? It says "continuous-integration/appveyor/pr — AppVeyor was unable to build non-mergeable "
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-29T09:54:42Z
+
+Seems like you changed the PR target but not correctly rebased to the 3.4 branch.
+
+---------------------------------------------------------------------------
+
+by simshaun at 2017-07-29T17:59:00Z
+
+I think I fixed the rebase.
+
+The Travis failure seems to be unrelated:
+
+```
+There was 1 failure:
+1) Symfony\Component\Lock\Tests\Store\FlockStoreTest::testBlockingLocks
+The store saves a locked key.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Lock/Tests/Store/BlockingStoreTestTrait.php:57
+/home/travis/build/symfony/symfony/.phpunit/phpunit-6.0/phpunit:5
+/home/travis/build/symfony/symfony/vendor/symfony/phpunit-bridge/bin/simple-phpunit:192
+FAILURES!
+Tests: 99, Assertions: 261, Failures: 1.
+KO src/Symfony/Component/Lock
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T14:31:15Z
+
+Just wondering: couldn't/shouldn't this be submitted to monolog instead?
+
+---------------------------------------------------------------------------
+
+by simshaun at 2017-09-26T20:10:22Z
+
+Maybe. I did it here since the bridge contains the `NotFoundActivationStrategy` and this is similar.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T20:45:01Z
+
+OK my bad it's legit, Symfony namespace here :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T20:46:48Z
+
+So, ping @lsmith77 I guess, original report of the feature request.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T17:59:33Z
+
+Looks useful to me, but what about deprecating the `NotFoundActivationStrategy` in favor of this one, which is more generic (we should add support for the `blacklist` option though).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:26:12Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-02-01T12:46:14Z
+
+@nicolas-grekas What is the status of the PR?
+
+@simshaun are you sill handling it? If not, I may rework it.
+
+> Looks useful to me, but what about deprecating the `NotFoundActivationStrategy` in favor of this one, which is more generic (we should add support for the blacklist option though).
+
+@fabpot Makes sense to me. We could imagine something like that:
+
+```yaml
+excluded_http_erros:
+    403: ^/    # All 403 errors are excluded
+    404: ^/admin # All 404 errors are excluded for /admin/*
+    400: # Can be still multiple regex.
+        - ^/csrf/
+        - ^/foo/bar/
+```
+
+---------------------------------------------------------------------------
+
+by simshaun at 2018-02-01T19:02:34Z
+
+I'm working on adding the URL blacklist.  @fabpot, does the configuration format @Soullivaneuh showed above look good?
+
+One thing I'm thinking could be improved for user-friendliness: If you want a code to be excluded for all URLs, you just pass `true` instead of a `^/` regex.
+
+```yaml
+excluded_http_codes:
+    403: true           # All 403 errors are excluded
+    404: ^/admin        # All 404 errors are excluded for /admin/*
+    400:                # Can contain multiple regex
+        - ^/csrf/
+        - ^/foo/bar/
+```
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-02-02T15:17:18Z
+
+@simshaun I was thinking about the `true` option but didn't propose that to simplify the work. But if you think it can be implemented easily then :+1:. :-)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-09T15:08:23Z
+
+Just asking: do we really want to allow excluding HTTP status per URL? If we don't do that, this would be really simple:
+
+```yaml
+excluded_http_codes: [400, 403, 404]
+```
+
+If we really must support excluding per URL, do we really want to mix booleans and regexp strings? As proposed above, putting `403: ^/` would exclude `403` for all URLs, without the need to support, explain, learn and maintain forever the `true` value as an special option.
+
+-----
+
+And now a proposal that mixes both ideas. What if we add support for URLs, but make them optional? Like this:
+
+```yaml
+excluded_http_codes: [403, 404]
+
+excluded_http_codes: [{ 404: '^/some/section' }]
+
+excluded_http_codes: [403, 404, { 400: ['^/csrf', '^/foo/bar' ] }]
+```
+
+---------------------------------------------------------------------------
+
+by simshaun at 2018-02-09T15:26:50Z
+
+I'm good with that too.
+
+---------------------------------------------------------------------------
+
+by simshaun at 2018-02-18T10:48:44Z
+
+I've updated this PR to support URL blacklists using the YAML format suggested by @javiereguiluz. The other PRs referenced in the OP (MonologBundle and docs) have been updated as well.
+
+I really struggled with making the Configuration tree work with both YAML and XML. I ended up just normalizing the two into a common format that the new activation strategy understands.
+
+It now supports:
+
+**YAML:**
+```yaml
+excluded_http_codes: [403, 404, { 400: ['^/foo', '^/bar'] }]
+```
+
+**XML:**
+```xml
+<monolog:excluded-http-code code="403" />
+<monolog:excluded-http-code code="404" />
+<monolog:excluded-http-code code="400">
+  <monolog:url>^/foo</monolog:url>
+  <monolog:url>^/bar</monolog:url>
+</monolog:excluded-http-code>
+```
+
+---------------------------------------------------------------------------
+
+by simshaun at 2018-02-20T19:32:59Z
+
+Looks like the Travis failure is unrelated. Lots of problems with `FormExtensionBootstrap4HorizontalLayoutTest`

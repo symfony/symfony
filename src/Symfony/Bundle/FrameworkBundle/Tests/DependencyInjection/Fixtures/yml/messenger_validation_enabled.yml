@@ -1,0 +1,7 @@
+framework:
+    validation:
+        enabled: true
+    messenger:
+        middlewares:
+            validation:
+                enabled: true

@@ -4,8 +4,8 @@ CHANGELOG
 4.1.0
 -----
 
- * Search for `SYMFONY_PHPUNIT_REMOVE` env var in `phpunit.xml` then
-   `phpunit.xml.dist`
+ * Search for `SYMFONY_PHPUNIT_VERSION`, `SYMFONY_PHPUNIT_REMOVE`,
+   `SYMFONY_PHPUNIT_DIR` env var in `phpunit.xml` then in `phpunit.xml.dist`
 
 4.0.0
 -----

@@ -60,22 +60,17 @@ class ClientTest extends TestCase
         $m = $r->getMethod('filterResponse');
         $m->setAccessible(true);
 
-        $expected = array(
-            'foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; max-age='.(strtotime('Sun, 15-Feb-2009 20:00:00 GMT') - time()).'; path=/foo; domain=http://example.com; secure; httponly',
-            'foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; max-age='.(strtotime('Sun, 15-Feb-2009 20:00:00 GMT') - time()).'; path=/foo; domain=http://example.com; secure; httponly',
-        );
+        $response = new Response();
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $domResponse = $m->invoke($client, $response);
+        $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
-        $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
-
-        $response = new Response();
-        $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
-        $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
-        $domResponse = $m->invoke($client, $response);
-        $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
-        $this->assertEquals($expected, $domResponse->getHeader('Set-Cookie', false));
+        $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
+        $this->assertSame(array((string) $cookie1, (string) $cookie2), $domResponse->getHeader('Set-Cookie', false));
     }
 
     public function testFilterResponseSupportsStreamedResponses()

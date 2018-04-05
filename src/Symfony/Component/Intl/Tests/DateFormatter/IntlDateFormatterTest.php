@@ -219,7 +219,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
      */
     private function notImplemented(array $dataSets)
     {
-        return array_map(function ($row) {
+        return array_map(function (array $row) {
             return array($row[0], $row[1], 0);
         }, $dataSets);
     }

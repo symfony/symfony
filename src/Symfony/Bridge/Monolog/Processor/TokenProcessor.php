@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Processor;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * Adds the current security token to the log entry.
@@ -34,7 +35,7 @@ class TokenProcessor
             $records['extra']['token'] = array(
                 'username' => $token->getUsername(),
                 'authenticated' => $token->isAuthenticated(),
-                'roles' => array_map(function ($role) { return $role->getRole(); }, $token->getRoles()),
+                'roles' => array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles()),
             );
         }
 

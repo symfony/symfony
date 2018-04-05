@@ -605,6 +605,134 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
+    public function testCreateBuilderForPropertyPath()
+    {
+        $this->guesser1->expects($this->once())
+            ->method('guessType')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Component\Form\Extension\Core\Type\TextType',
+                array(),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('notTheFirstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('property_path' => 'firstName'))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty('Application\Author', 'notTheFirstName', null, array('property_path' => 'firstName'));
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testCreateBuilderForPropertyPathWithOneSubProperty()
+    {
+        $this->guesser1->expects($this->at(0))
+            ->method('guessType')
+            ->with('Application\Author', 'address')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Bridge\Doctrine\Form\Type\EntityType',
+                array('class' => 'Application\Address'),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $this->guesser1->expects($this->at(1))
+            ->method('guessType')
+            ->with('Application\Address', 'zipCode')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Component\Form\Extension\Core\Type\IntegerType',
+                array(),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('addressZipCode', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', null, array('property_path' => 'address.zipCode'))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty('Application\Author', 'addressZipCode', null, array('property_path' => 'address.zipCode'));
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testCreateBuilderForPropertyPathWithTwoSubProperties()
+    {
+        $this->guesser1->expects($this->at(0))
+            ->method('guessType')
+            ->with('Application\Author', 'address')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Bridge\Doctrine\Form\Type\EntityType',
+                array('class' => 'Application\Address'),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $this->guesser1->expects($this->at(1))
+            ->method('guessType')
+            ->with('Application\Address', 'zipCode')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Bridge\Doctrine\Form\Type\EntityType',
+                array('class' => 'Application\ZipCode'),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $this->guesser1->expects($this->at(2))
+            ->method('guessType')
+            ->with('Application\ZipCode', 'value')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Component\Form\Extension\Core\Type\IntegerType',
+                array(),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('addressZipCodeValue', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', null, array('property_path' => 'address.zipCode.value'))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty('Application\Author', 'addressZipCodeValue', null, array('property_path' => 'address.zipCode.value'));
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testCreateBuilderForPropertyPathWithOneSubPropertyAndOneIndex()
+    {
+        $this->guesser1->expects($this->at(0))
+            ->method('guessType')
+            ->with('Application\Author', 'addresses')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Bridge\Doctrine\Form\Type\EntityType',
+                array('class' => 'Application\Address'),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $this->guesser1->expects($this->at(1))
+            ->method('guessType')
+            ->with('Application\Address', 'zipCode')
+            ->will($this->returnValue(new TypeGuess(
+                'Symfony\Component\Form\Extension\Core\Type\IntegerType',
+                array(),
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstAddressZipCode', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', null, array('property_path' => 'addresses[0].zipCode'))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstAddressZipCode', null, array('property_path' => 'addresses[0].zipCode'));
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
     private function getMockFactory(array $methods = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')

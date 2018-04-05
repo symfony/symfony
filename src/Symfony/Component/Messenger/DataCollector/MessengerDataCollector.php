@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DataCollector;
+namespace Symfony\Component\Messenger\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\MiddlewareInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
 class MessengerDataCollector extends DataCollector implements MiddlewareInterface
 {
@@ -26,7 +28,7 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        return $this->data;
+        // noop
     }
 
     /**
@@ -61,25 +63,25 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
         try {
             $result = $next($message);
 
-            if (is_object($result)) {
+            if (\is_object($result)) {
                 $debugRepresentation['result'] = array(
-                    'type' => get_class($result),
+                    'type' => \get_class($result),
                     'object' => $this->cloneVar($result),
                 );
-            } elseif (is_array($result)) {
+            } elseif (\is_array($result)) {
                 $debugRepresentation['result'] = array(
                     'type' => 'array',
                     'object' => $this->cloneVar($result),
                 );
             } else {
                 $debugRepresentation['result'] = array(
-                    'type' => gettype($result),
+                    'type' => \gettype($result),
                     'value' => $result,
                 );
             }
         } catch (\Throwable $exception) {
             $debugRepresentation['exception'] = array(
-                'type' => get_class($exception),
+                'type' => \get_class($exception),
                 'message' => $exception->getMessage(),
             );
         }

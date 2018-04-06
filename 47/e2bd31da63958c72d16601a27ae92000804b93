@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-15T08:47:54Z
+
+I've remove the deprecation of the `create` method and rolled back the changes in TwigBundle and HttpKernel for now, as @nicolas-grekas suggested. PR is ready.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-15T09:17:18Z
+
+All right, the change set should be minimal now. Still, my goal would be to remove the `create` method with Symfony 5, because it's redundant now.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-16T10:14:57Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-16T12:15:09Z
+
+The failure on Travis looks unrelated.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-19T19:25:27Z
+
+Anything left to do here?

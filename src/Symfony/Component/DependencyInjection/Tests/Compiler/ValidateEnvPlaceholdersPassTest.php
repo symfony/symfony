@@ -196,6 +196,19 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    public function testEmptyEnvWithCannotBeEmptyForScalarNode(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
+            'scalar_node_not_empty' => '%env(SOME)%',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -213,6 +226,7 @@ class EnvConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('scalar_node')->end()
+                ->scalarNode('scalar_node_not_empty')->cannotBeEmpty()->end()
                 ->integerNode('int_node')->end()
                 ->floatNode('float_node')->end()
                 ->booleanNode('bool_node')->end()

@@ -477,6 +477,14 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Tests if a placeholder is being handled currently.
+     */
+    protected function isHandlingPlaceholder(): bool
+    {
+        return null !== $this->handlingPlaceholder;
+    }
+
+    /**
      * Gets allowed dynamic types for this node.
      */
     protected function getValidPlaceholderTypes(): array

@@ -36,8 +36,7 @@ $getEnvVar = function ($name, $default = false) {
     }
     if (false !== $phpunitConfig) {
         $var = new DOMXpath($phpunitConfig);
-        $var = $var->query('//php/env[@name="'.$name.'"]');
-        if ($var = $var[0]) {
+        foreach ($var->query('//php/env[@name="'.$name.'"]') as $var) {
             return $var->getAttribute('value');
         }
     }

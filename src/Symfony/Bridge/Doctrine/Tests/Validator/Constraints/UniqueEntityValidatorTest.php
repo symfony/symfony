@@ -517,4 +517,32 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($entity, $constraint);
     }
+
+    public function testValidateUniquenessOnNullResult()
+    {
+        $repository = $this->createRepositoryMock();
+        $repository
+             ->method('find')
+             ->will($this->returnValue(null))
+        ;
+
+        $this->em = $this->createEntityManagerMock($repository);
+        $this->registry = $this->createRegistryMock($this->em);
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+        ));
+
+        $entity = new SingleIntIdEntity(1, null);
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validator->validate($entity, $constraint);
+        $this->assertNoViolation();
+    }
 }

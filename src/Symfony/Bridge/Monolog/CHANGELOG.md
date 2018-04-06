@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * `WebProcessor` now implements `EventSubscriberInterface` in order to be easily autoconfigured
+
 4.0.0
 -----
 

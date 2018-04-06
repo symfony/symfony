@@ -7,6 +7,16 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.8 (2018-04-06)
+
+ * bug #26802 [Security] register custom providers on ExpressionLanguage directly (dmaicher)
+ * bug #26794 [PhpUnitBridge] Catch deprecation error handler (cvilleger)
+ * bug #26788 [Security] Load the user before pre/post auth checks when needed (chalasr)
+ * bug #26792 [Routing] Fix throwing NoConfigurationException instead of 405 (nicolas-grekas)
+ * bug #26774 [SecurityBundle] Add missing argument to security.authentication.provider.simple (i3or1s, chalasr)
+ * bug #26763 [Finder] Remove duplicate slashes in filenames (helhum)
+ * bug #26758 [WebProfilerBundle][HttpKernel] Make FileLinkFormatter URL format generation lazy (nicolas-grekas)
+
 * 4.0.7 (2018-04-03)
 
  * bug #26387 [Yaml] Fix regression when trying to parse multiline (antograssiot)

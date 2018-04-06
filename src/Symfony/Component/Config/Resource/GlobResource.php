@@ -93,7 +93,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
             return;
         }
 
-        if (false === strpos($this->pattern, '/**/') && (defined('GLOB_BRACE') || false === strpos($this->pattern, '{'))) {
+        if (0 !== strpos($this->prefix, 'phar://') && false === strpos($this->pattern, '/**/') && (defined('GLOB_BRACE') || false === strpos($this->pattern, '{'))) {
             foreach (glob($this->prefix.$this->pattern, defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $path) {
                 if ($this->recursive && is_dir($path)) {
                     $files = iterator_to_array(new \RecursiveIteratorIterator(

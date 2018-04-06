@@ -196,7 +196,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyEnvWithCannotBeEmptyForScalarNode(): void
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNode(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());

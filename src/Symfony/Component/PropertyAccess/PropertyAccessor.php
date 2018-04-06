@@ -82,6 +82,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string|PropertyPathInterface $propertyPath
      *
      * @return null|string
+     *
      * @throws \ReflectionException
      */
     public function getType(&$objectOrArray, $propertyPath): ? string
@@ -92,9 +93,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $propertyPath = $this->getPropertyPath($propertyPath);
 
-        $zval = [
+        $zval = array(
             self::VALUE => $objectOrArray,
-        ];
+        );
 
         for ($i = 0; $i < $propertyPath->getLength(); ++$i) {
             $property = $propertyPath->getElement($i);
@@ -106,7 +107,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
                 }
 
-                $access = $this->getWriteAccessInfo(get_class($zval[self::VALUE]), $property, []);
+                $access = $this->getWriteAccessInfo(get_class($zval[self::VALUE]), $property, array());
 
                 if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
                     $reflMethod = new \ReflectionMethod(get_class($zval[self::VALUE]), $access[self::ACCESS_NAME]);
@@ -115,6 +116,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         return $reflMethod->getParameters()[0]->getType()->getName();
                     }
                 }
+
                 return null;
             }
 

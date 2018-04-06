@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Ingen tilladselese at anvende kilden.</target>
+                <target>Ingen adgang til at forespørge ressourcen.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
-                <target>Ugyldigt CSRF token.</target>
+                <target>Ugyldig CSRF-token.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>Digest nonce has expired.</source>

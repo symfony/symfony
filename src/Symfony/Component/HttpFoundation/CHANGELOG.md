@@ -15,6 +15,7 @@ CHANGELOG
  * added `CannotWriteFileException`, `ExtensionFileException`, `FormSizeFileException`,
    `IniSizeFileException`, `NoFileException`, `NoTmpDirFileException`, `PartialFileException` to
    handle failed `UploadedFile`.
+ * added `MigratingSessionHandler` for migrating between two session handlers without losing sessions
 
 4.0.0
 -----

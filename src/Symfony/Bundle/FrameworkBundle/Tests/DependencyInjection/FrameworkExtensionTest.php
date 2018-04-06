@@ -520,13 +520,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('messenger.middleware.doctrine_transaction'));
     }
 
+    public function testMessengerValidationEnabled()
+    {
+        $container = $this->createContainerFromFile('messenger_validation_enabled');
+        $this->assertTrue($definition = $container->hasDefinition('messenger.middleware.validator'));
+    }
+
     public function testMessengerValidationDisabled()
     {
-        if (!class_exists(Validation::class)) {
-            self::markTestSkipped('Skipping tests since Validator component is not installed');
-        }
-
-        $container = $this->createContainerFromFile('messenger_validation');
+        $container = $this->createContainerFromFile('messenger_validation_disabled');
         $this->assertFalse($container->hasDefinition('messenger.middleware.validator'));
     }
 

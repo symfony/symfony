@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Command;
+namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -24,8 +24,10 @@ use Symfony\Component\Messenger\Worker;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
-class MessengerConsumeMessagesCommand extends Command
+class ConsumeMessagesCommand extends Command
 {
     protected static $defaultName = 'messenger:consume-messages';
 

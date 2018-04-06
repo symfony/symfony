@@ -58,7 +58,7 @@
             <tag name="monolog.logger" channel="messenger" />
         </service>
 
-        <service id="data_collector.messenger" class="Symfony\Bundle\FrameworkBundle\DataCollector\MessengerDataCollector">
+        <service id="data_collector.messenger" class="Symfony\Component\Messenger\DataCollector\MessengerDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/messenger.html.twig" id="messenger" priority="100" />
             <tag name="message_bus_middleware" />
         </service>

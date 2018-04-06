@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
@@ -1237,6 +1238,10 @@ class FrameworkExtension extends Extension
 
         // Enable services for CSRF protection (even without forms)
         $loader->load('security_csrf.xml');
+
+        if (!class_exists(CsrfExtension::class)) {
+            $container->removeDefinition('twig.extension.security_csrf');
+        }
     }
 
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)

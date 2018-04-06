@@ -7,6 +7,14 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.38 (2018-04-06)
+
+ * bug #26788 [Security] Load the user before pre/post auth checks when needed (chalasr)
+ * bug #26774 [SecurityBundle] Add missing argument to security.authentication.provider.simple (i3or1s, chalasr)
+ * bug #26763 [Finder] Remove duplicate slashes in filenames (helhum)
+ * bug #26749 Add PHPDbg support to HTTP components (hkdobrev)
+ * bug #26609 [Console] Fix check of color support on Windows (mlocati)
+
 * 2.8.37 (2018-04-02)
 
  * bug #26727 [HttpCache] Unlink tmp file on error (Chansig)

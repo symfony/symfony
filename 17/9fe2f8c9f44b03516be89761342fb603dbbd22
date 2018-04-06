@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-04-05T16:48:41Z
+
+Why is the Twig extension registered in FrameworkBundle rather than TwigBundle like all others ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-05T17:57:40Z
+
+It's registered based on the CSRF option provided by the FrameworkBundle to be consistent with the old extension.

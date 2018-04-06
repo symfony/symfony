@@ -16,6 +16,8 @@ Console
  * Deprecated the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
  * Deprecated the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
  * Deprecated the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
+ * Added support for `iterable` messages in `write` and `writeln` methods of `Symfony\Component\Console\Output\OutputInterface`.
+   If you have a custom implementation of the interface, you should make sure it works with iterable as well.
 
 DependencyInjection
 -------------------

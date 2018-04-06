@@ -137,7 +137,9 @@ abstract class Output implements OutputInterface
      */
     public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL)
     {
-        $messages = (array) $messages;
+        if (!is_iterable($messages)) {
+            $messages = array($messages);
+        }
 
         $types = self::OUTPUT_NORMAL | self::OUTPUT_RAW | self::OUTPUT_PLAIN;
         $type = $types & $options ?: self::OUTPUT_NORMAL;

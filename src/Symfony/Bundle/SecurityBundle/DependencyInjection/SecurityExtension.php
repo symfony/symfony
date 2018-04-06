@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
@@ -45,7 +44,6 @@ class SecurityExtension extends Extension
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
     private $factories = array();
     private $userProviderFactories = array();
-    private $expressionLanguage;
 
     public function __construct()
     {
@@ -136,10 +134,6 @@ class SecurityExtension extends Extension
 
     private function createAuthorization($config, ContainerBuilder $container)
     {
-        if (!$config['access_control']) {
-            return;
-        }
-
         foreach ($config['access_control'] as $access) {
             $matcher = $this->createRequestMatcher(
                 $container,
@@ -156,6 +150,14 @@ class SecurityExtension extends Extension
 
             $container->getDefinition('security.access_map')
                       ->addMethodCall('add', array($matcher, $attributes, $access['requires_channel']));
+        }
+
+        // allow cache warm-up for expressions
+        if (count($this->expressions)) {
+            $container->getDefinition('security.cache_warmer.expression')
+                ->replaceArgument(0, new IteratorArgument(array_values($this->expressions)));
+        } else {
+            $container->removeDefinition('security.cache_warmer.expression');
         }
     }
 
@@ -636,11 +638,14 @@ class SecurityExtension extends Extension
             return $this->expressions[$id];
         }
 
+        if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+        }
+
         $container
-            ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
+            ->register($id, 'Symfony\Component\ExpressionLanguage\Expression')
             ->setPublic(false)
             ->addArgument($expression)
-            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
         ;
 
         return $this->expressions[$id] = new Reference($id);
@@ -702,17 +707,5 @@ class SecurityExtension extends Extension
     {
         // first assemble the factories
         return new MainConfiguration($this->factories, $this->userProviderFactories);
-    }
-
-    private function getExpressionLanguage()
-    {
-        if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
-            }
-            $this->expressionLanguage = new ExpressionLanguage();
-        }
-
-        return $this->expressionLanguage;
     }
 }

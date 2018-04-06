@@ -80,7 +80,9 @@
 
         <service id="security.user_checker" class="Symfony\Component\Security\Core\User\UserChecker" />
 
-        <service id="security.expression_language" class="Symfony\Component\Security\Core\Authorization\ExpressionLanguage" />
+        <service id="security.expression_language" class="Symfony\Component\Security\Core\Authorization\ExpressionLanguage">
+            <argument type="service" id="cache.security_expression_language"></argument>
+        </service>
 
         <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" public="true">
             <argument type="service" id="request_stack" />
@@ -194,6 +196,18 @@
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />
+        </service>
+
+        <!-- Cache -->
+        <service id="cache.security_expression_language" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <!-- Cache Warmers -->
+        <service id="security.cache_warmer.expression" class="Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer">
+            <tag name="kernel.cache_warmer" />
+            <argument type="collection" /> <!-- expressions -->
+            <argument type="service" id="security.expression_language" />
         </service>
     </services>
 </container>

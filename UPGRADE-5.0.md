@@ -76,6 +76,7 @@ Security
 
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
  * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
+ * The `ExpressionVoter::addExpressionLanguageProvider()` method has been removed.
 
 SecurityBundle
 --------------

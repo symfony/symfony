@@ -368,7 +368,7 @@ Form
    ```php
    class MyTimezoneType extends TimezoneType
    {
-       public function loadChoices()
+       public function loadChoiceList()
        {
            // override the method
        }

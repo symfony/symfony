@@ -158,7 +158,7 @@ abstract class AbstractEventDispatcherTest extends TestCase
         // be executed
         // Manually set priority to enforce $this->listener to be called first
         $this->dispatcher->addListener('post.foo', array($this->listener, 'postFoo'), 10);
-        $this->dispatcher->addListener('post.foo', array($otherListener, 'preFoo'));
+        $this->dispatcher->addListener('post.foo', array($otherListener, 'postFoo'));
         $this->dispatcher->dispatch(self::postFoo);
         $this->assertTrue($this->listener->postFooInvoked);
         $this->assertFalse($otherListener->postFooInvoked);

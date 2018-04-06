@@ -247,7 +247,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $reflectionClass = new \ReflectionClass($class);
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes, $format);
-
+        $class = get_class($object);
+        
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute);

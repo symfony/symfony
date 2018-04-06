@@ -20,13 +20,20 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * @author Ross Motley <ross.motley@amara.com>
  * @author Oliver Radwell <oliver.radwell@amara.com>
  */
-class MigratingSessionHandler implements \SessionHandlerInterface
+class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $currentHandler;
     private $writeOnlyHandler;
 
     public function __construct(\SessionHandlerInterface $currentHandler, \SessionHandlerInterface $writeOnlyHandler)
     {
+        if (!$currentHandler instanceof \SessionUpdateTimestampHandlerInterface) {
+            $currentHandler = new StrictSessionHandler($currentHandler);
+        }
+        if (!$writeOnlyHandler instanceof \SessionUpdateTimestampHandlerInterface) {
+            $writeOnlyHandler = new StrictSessionHandler($writeOnlyHandler);
+        }
+
         $this->currentHandler = $currentHandler;
         $this->writeOnlyHandler = $writeOnlyHandler;
     }
@@ -67,10 +74,10 @@ class MigratingSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionId)
+    public function open($savePath, $sessionName)
     {
-        $result = $this->currentHandler->open($savePath, $sessionId);
-        $this->writeOnlyHandler->open($savePath, $sessionId);
+        $result = $this->currentHandler->open($savePath, $sessionName);
+        $this->writeOnlyHandler->open($savePath, $sessionName);
 
         return $result;
     }
@@ -91,6 +98,26 @@ class MigratingSessionHandler implements \SessionHandlerInterface
     {
         $result = $this->currentHandler->write($sessionId, $sessionData);
         $this->writeOnlyHandler->write($sessionId, $sessionData);
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateId($sessionId)
+    {
+        // No reading from new handler until switch-over
+        return $this->currentHandler->validateId($sessionId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateTimestamp($sessionId, $sessionData)
+    {
+        $result = $this->currentHandler->updateTimestamp($sessionId, $sessionData);
+        $this->writeOnlyHandler->updateTimestamp($sessionId, $sessionData);
 
         return $result;
     }

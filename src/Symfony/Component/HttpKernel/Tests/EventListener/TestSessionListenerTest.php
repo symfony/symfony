@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -46,6 +45,9 @@ class TestSessionListenerTest extends TestCase
     {
         $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
         $this->session = $this->getSession();
+        $this->listener->expects($this->any())
+             ->method('getSession')
+             ->will($this->returnValue($this->session));
     }
 
     public function testShouldSaveMasterRequestSession()
@@ -95,7 +97,7 @@ class TestSessionListenerTest extends TestCase
         $this->fixSessionId('456');
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $request = Request::create('/', 'GET', array(), array(new Cookie('MOCKSESSID', '123')));
+        $request = Request::create('/', 'GET', array(), array('MOCKSESSID' => '123'));
         $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
 

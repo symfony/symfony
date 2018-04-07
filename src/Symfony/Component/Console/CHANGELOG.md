@@ -6,6 +6,7 @@ CHANGELOG
 
  * added option to run suggested command if command is not found and only 1 alternative is available
  * added option to modify console output and print multiple modifiable sections
+ * added support for iterable messages in output `write` and `writeln` methods
 
 4.0.0
 -----

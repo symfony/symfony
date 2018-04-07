@@ -306,6 +306,9 @@ class SymfonyStyle extends OutputStyle
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
+        if ($messages instanceof \Traversable) {
+            $messages = iterator_to_array($messages, false);
+        }
         parent::writeln($messages, $type);
         $this->bufferedOutput->writeln($this->reduceBuffer($messages), $type);
     }
@@ -315,6 +318,9 @@ class SymfonyStyle extends OutputStyle
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {
+        if ($messages instanceof \Traversable) {
+            $messages = iterator_to_array($messages, false);
+        }
         parent::write($messages, $newline, $type);
         $this->bufferedOutput->write($this->reduceBuffer($messages), $newline, $type);
     }

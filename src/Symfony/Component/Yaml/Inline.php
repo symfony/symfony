@@ -324,6 +324,9 @@ class Inline
 
             if (null !== $delimiters) {
                 $tmp = ltrim(substr($scalar, $i), ' ');
+                if ('' === $tmp) {
+                    throw new ParseException(sprintf('Unexpected end of line, expected one of "%s".', implode($delimiters)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                }
                 if (!in_array($tmp[0], $delimiters)) {
                     throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                 }

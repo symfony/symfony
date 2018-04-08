@@ -7,6 +7,12 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.45 (2018-04-06)
+
+ * bug #26763 [Finder] Remove duplicate slashes in filenames (helhum)
+ * bug #26749 Add PHPDbg support to HTTP components (hkdobrev)
+ * bug #26609 [Console] Fix check of color support on Windows (mlocati)
+
 * 2.7.44 (2018-04-02)
 
  * bug #26727 [HttpCache] Unlink tmp file on error (Chansig)

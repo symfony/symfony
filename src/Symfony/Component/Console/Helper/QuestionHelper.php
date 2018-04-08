@@ -12,8 +12,6 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -176,114 +174,99 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output
      * @param Question        $question
      * @param resource        $inputStream
+     * @param array           $autocomplete
+     *
+     * @return string the response
      */
     private function autocomplete(OutputInterface $output, Question $question, $inputStream, array $autocomplete): string
     {
-        $ret = '';
+        $word = $this->readLineFromStream($inputStream);
 
-        $i = 0;
-        $ofs = -1;
-        $matches = $autocomplete;
-        $numMatches = count($matches);
+        /* if the typed word exits on autocomplete list will return it */
+        if (in_array($word, $autocomplete)) {
+            return $word;
+        }
 
-        $sttyMode = shell_exec('stty -g');
+        /* calculate the word matches from autocomplete */
+        $matches = $this->getWordMatchesSuggestion($word, $autocomplete);
 
-        // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
-        shell_exec('stty -icanon -echo');
+        if (count($matches) > 0) {
+            do {
+                $response = $this->suggestWordsList($output, $matches);
+            } while ($response && !in_array($response, $autocomplete));
 
-        // Add highlighted text style
-        $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
-
-        // Read a keypress
-        while (!feof($inputStream)) {
-            $c = fread($inputStream, 1);
-
-            // Backspace Character
-            if ("\177" === $c) {
-                if (0 === $numMatches && 0 !== $i) {
-                    --$i;
-                    // Move cursor backwards
-                    $output->write("\033[1D");
-                }
-
-                if (0 === $i) {
-                    $ofs = -1;
-                    $matches = $autocomplete;
-                    $numMatches = count($matches);
-                } else {
-                    $numMatches = 0;
-                }
-
-                // Pop the last character off the end of our string
-                $ret = substr($ret, 0, $i);
-            } elseif ("\033" === $c) {
-                // Did we read an escape sequence?
-                $c .= fread($inputStream, 2);
-
-                // A = Up Arrow. B = Down Arrow
-                if (isset($c[2]) && ('A' === $c[2] || 'B' === $c[2])) {
-                    if ('A' === $c[2] && -1 === $ofs) {
-                        $ofs = 0;
-                    }
-
-                    if (0 === $numMatches) {
-                        continue;
-                    }
-
-                    $ofs += ('A' === $c[2]) ? -1 : 1;
-                    $ofs = ($numMatches + $ofs) % $numMatches;
-                }
-            } elseif (ord($c) < 32) {
-                if ("\t" === $c || "\n" === $c) {
-                    if ($numMatches > 0 && -1 !== $ofs) {
-                        $ret = $matches[$ofs];
-                        // Echo out remaining chars for current match
-                        $output->write(substr($ret, $i));
-                        $i = strlen($ret);
-                    }
-
-                    if ("\n" === $c) {
-                        $output->write($c);
-                        break;
-                    }
-
-                    $numMatches = 0;
-                }
-
-                continue;
-            } else {
-                $output->write($c);
-                $ret .= $c;
-                ++$i;
-
-                $numMatches = 0;
-                $ofs = 0;
-
-                foreach ($autocomplete as $value) {
-                    // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (0 === strpos($value, $ret) && $i !== strlen($value)) {
-                        $matches[$numMatches++] = $value;
-                    }
-                }
-            }
-
-            // Erase characters from cursor to end of line
-            $output->write("\033[K");
-
-            if ($numMatches > 0 && -1 !== $ofs) {
-                // Save cursor position
-                $output->write("\0337");
-                // Write highlighted text
-                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $i)).'</hl>');
-                // Restore cursor position
-                $output->write("\0338");
+            /* replace the old word only if response is different than false and the old one */
+            if ($response && $word != $response) {
+                $word = $response;
             }
         }
 
-        // Reset stty so it behaves normally again
-        shell_exec(sprintf('stty %s', $sttyMode));
+        return $word;
+    }
 
-        return $ret;
+    /**
+     * Ask question with keywords list and return response.
+     *
+     * @param OutputInterface $output
+     * @param array           $suggestionList
+     * @param int             $returnedRows
+     *
+     * @return string|bool The typed word
+     */
+    private function suggestWordsList(OutputInterface $output, $suggestionList = array())
+    {
+        /* Suggest new words based on matches result */
+        $output->writeln(sprintf('Did you mean : %s ? type No if you want to keep your choice.', implode(', ', $suggestionList)));
+        $response = $this->readLineFromStream();
+
+        return ('no' == strtolower($response)) ? false : $response;
+    }
+
+    /**
+     * Return similar word list from suggestion list.
+     *
+     * @param OutputInterface $output
+     * @param array           $suggestionList
+     * @param int             $returnedRows
+     *
+     * @return string|array the matche(s) word(s) from suggestions
+     */
+    private function getWordMatchesSuggestion($word, array $suggestionList, int $returnedRows = 1)
+    {
+        $wordLength = strlen($word);
+        $minCharsToMatch = $wordLength / 2;
+
+        foreach ($suggestionList as $suggestion) {
+            /* calculate matches keys */
+            $matchesKeys = similar_text($word, $suggestion);
+            if ($matchesKeys > $minCharsToMatch) {
+                if (isset($matches[$matchesKeys])) {
+                    $matches[$matchesKeys] = array_merge((array) $matches[$matchesKeys], (array) $suggestion);
+                } else {
+                    $matches[$matchesKeys] = $suggestion;
+                }
+            }
+        }
+
+        /* sort the matches keywords */
+        krsort($matches);
+
+        return ($returnedRows > 1) ? array_slice($matches, 0, $returnedRows) : current($matches);
+    }
+
+    /**
+     * read line from console.
+     *
+     * @return string The typed word
+     */
+    private function readLineFromStream($inputStream): string
+    {
+        /* read until getting an empty word */
+        do {
+            $word = trim(fgets($inputStream));
+        } while (empty($word));
+
+        return $word;
     }
 
     /**

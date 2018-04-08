@@ -524,20 +524,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
-        $this->assertTrue($container->hasDefinition('message_bus'));
-        $this->assertFalse($container->hasDefinition('messenger.middleware.doctrine_transaction'));
-    }
-
-    public function testMessengerValidationEnabled()
-    {
-        $container = $this->createContainerFromFile('messenger_validation_enabled');
-        $this->assertTrue($definition = $container->hasDefinition('messenger.middleware.validator'));
-    }
-
-    public function testMessengerValidationDisabled()
-    {
-        $container = $this->createContainerFromFile('messenger_validation_disabled');
-        $this->assertFalse($container->hasDefinition('messenger.middleware.validator'));
+        $this->assertTrue($container->has('message_bus'));
     }
 
     public function testMessengerAdapter()
@@ -588,6 +575,24 @@ abstract class FrameworkExtensionTest extends TestCase
         $serializerTransportDefinition = $container->getDefinition('messenger.transport.serializer');
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
         $this->assertSame(array('enable_max_depth' => true), $serializerTransportDefinition->getArgument(2));
+    }
+
+    public function testMessengerWithMultipleBuses()
+    {
+        $container = $this->createContainerFromFile('messenger_multiple_buses');
+
+        $this->assertTrue($container->has('messenger.bus.commands'));
+        $this->assertSame(array(), $container->getDefinition('messenger.bus.commands')->getArgument(0));
+        $this->assertEquals(array('logging', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.commands.middlewares'));
+        $this->assertTrue($container->has('messenger.bus.events'));
+        $this->assertSame(array(), $container->getDefinition('messenger.bus.events')->getArgument(0));
+        $this->assertEquals(array('logging', 'tolerate_no_handler', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.events.middlewares'));
+        $this->assertTrue($container->has('messenger.bus.queries'));
+        $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
+        $this->assertEquals(array('route_messages', 'tolerate_no_handler', 'call_message_handler'), $container->getParameter('messenger.bus.queries.middlewares'));
+
+        $this->assertTrue($container->hasAlias('message_bus'));
+        $this->assertSame('messenger.bus.commands', (string) $container->getAlias('message_bus'));
     }
 
     public function testTranslator()

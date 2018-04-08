@@ -12,8 +12,12 @@
 namespace Symfony\Component\Messenger\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
@@ -28,13 +32,18 @@ class MessengerDataCollectorTest extends TestCase
      */
     public function testHandle($returnedValue, $expected)
     {
-        $collector = new MessengerDataCollector();
         $message = new DummyMessage('dummy message');
 
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->once())->method('__invoke')->with($message)->willReturn($returnedValue);
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->method('dispatch')->with($message)->willReturn($returnedValue);
+        $bus = new TraceableMessageBus($bus);
 
-        $this->assertSame($returnedValue, $collector->handle($message, $next));
+        $collector = new MessengerDataCollector();
+        $collector->registerBus('default', $bus);
+
+        $bus->dispatch($message);
+
+        $collector->collect(Request::create('/'), new Response());
 
         $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
@@ -45,6 +54,7 @@ class MessengerDataCollectorTest extends TestCase
     public function getHandleTestData()
     {
         $messageDump = <<<DUMP
+  "bus" => "default"
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "object" => Symfony\Component\VarDumper\Cloner\Data {%A
@@ -56,7 +66,7 @@ DUMP;
         yield 'no returned value' => array(
             null,
             <<<DUMP
-array:2 [
+array:3 [
 $messageDump
   "result" => array:2 [
     "type" => "NULL"
@@ -69,7 +79,7 @@ DUMP
         yield 'scalar returned value' => array(
             'returned value',
             <<<DUMP
-array:2 [
+array:3 [
 $messageDump
   "result" => array:2 [
     "type" => "string"
@@ -82,7 +92,7 @@ DUMP
         yield 'array returned value' => array(
             array('returned value'),
             <<<DUMP
-array:2 [
+array:3 [
 $messageDump
   "result" => array:2 [
     "type" => "array"
@@ -95,24 +105,29 @@ DUMP
 
     public function testHandleWithException()
     {
-        $collector = new MessengerDataCollector();
         $message = new DummyMessage('dummy message');
 
-        $expectedException = new \RuntimeException('foo');
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->once())->method('__invoke')->with($message)->willThrowException($expectedException);
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->method('dispatch')->with($message)->will($this->throwException(new \RuntimeException('foo')));
+        $bus = new TraceableMessageBus($bus);
+
+        $collector = new MessengerDataCollector();
+        $collector->registerBus('default', $bus);
 
         try {
-            $collector->handle($message, $next);
-        } catch (\Throwable $actualException) {
-            $this->assertSame($expectedException, $actualException);
+            $bus->dispatch($message);
+        } catch (\Throwable $e) {
+            // Ignore.
         }
+
+        $collector->collect(Request::create('/'), new Response());
 
         $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
         $this->assertDumpMatchesFormat(<<<DUMP
-array:2 [
+array:3 [
+  "bus" => "default"
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "object" => Symfony\Component\VarDumper\Cloner\Data {%A

@@ -254,11 +254,6 @@ class ConfigurationTest extends TestCase
             'messenger' => array(
                 'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
                 'routing' => array(),
-                'middlewares' => array(
-                    'validation' => array(
-                        'enabled' => !class_exists(FullStack::class),
-                    ),
-                ),
                 'adapters' => array(),
                 'serializer' => array(
                     'enabled' => true,
@@ -267,6 +262,8 @@ class ConfigurationTest extends TestCase
                 ),
                 'encoder' => 'messenger.transport.serializer',
                 'decoder' => 'messenger.transport.serializer',
+                'default_bus' => null,
+                'buses' => array('default' => array('default_middlewares' => true, 'middlewares' => array())),
             ),
         );
     }

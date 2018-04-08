@@ -61,6 +61,7 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
@@ -273,7 +274,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['messenger'])) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer']);
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
         }
@@ -1438,7 +1439,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig)
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig, array $validationConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed.');
@@ -1461,20 +1462,43 @@ class FrameworkExtension extends Extension
         $container->setAlias('messenger.transport.encoder', $config['encoder']);
         $container->setAlias('messenger.transport.decoder', $config['decoder']);
 
+        if (null === $config['default_bus']) {
+            if (count($config['buses']) > 1) {
+                throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
+            }
+
+            $config['default_bus'] = array_keys($config['buses'])[0];
+        }
+
+        $defaultMiddlewares = array('before' => array('logging'), 'after' => array('route_messages', 'call_message_handler'));
+        foreach ($config['buses'] as $name => $bus) {
+            $busId = 'messenger.bus.'.$name;
+
+            $middlewares = $bus['default_middlewares'] ? array_merge($defaultMiddlewares['before'], $bus['middlewares'], $defaultMiddlewares['after']) : $bus['middlewares'];
+
+            if (in_array('messenger.middleware.validation', $middlewares) && !$validationConfig['enabled']) {
+                throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
+            }
+
+            $container->setParameter($busId.'.middlewares', $middlewares);
+            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus', array('name' => $name)));
+
+            if ($name === $config['default_bus']) {
+                $container->setAlias('message_bus', $busId);
+                $container->setAlias(MessageBusInterface::class, $busId);
+            }
+        }
+
+        if (!$container->hasAlias('message_bus')) {
+            throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
+        }
+
         $messageToSenderIdsMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
             $messageToSenderIdsMapping[$message] = $messageConfiguration['senders'];
         }
 
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
-
-        if ($config['middlewares']['validation']['enabled']) {
-            if (!$container->has('validator')) {
-                throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
-            }
-        } else {
-            $container->removeDefinition('messenger.middleware.validator');
-        }
 
         foreach ($config['adapters'] as $name => $adapter) {
             $container->setDefinition('messenger.sender.'.$name, (new Definition(SenderInterface::class))->setFactory(array(

@@ -14,21 +14,34 @@ namespace Symfony\Component\Messenger\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\Messenger\MiddlewareInterface;
+use Symfony\Component\Messenger\TraceableMessageBus;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
  * @experimental in 4.1
  */
-class MessengerDataCollector extends DataCollector implements MiddlewareInterface
+class MessengerDataCollector extends DataCollector
 {
+    private $traceableBuses = array();
+
+    public function registerBus(string $name, TraceableMessageBus $bus)
+    {
+        $this->traceableBuses[$name] = $bus;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        // noop
+        $this->data = array('messages' => array());
+
+        foreach ($this->traceableBuses as $busName => $bus) {
+            foreach ($bus->getDispatchedMessages() as $message) {
+                $this->data['messages'][] = $this->collectMessage($busName, $message);
+            }
+        }
     }
 
     /**
@@ -47,21 +60,20 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
         $this->data = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle($message, callable $next)
+    private function collectMessage(string $busName, array $tracedMessage)
     {
+        $message = $tracedMessage['message'];
+
         $debugRepresentation = array(
+            'bus' => $busName,
             'message' => array(
                 'type' => \get_class($message),
                 'object' => $this->cloneVar($message),
             ),
         );
 
-        $exception = null;
-        try {
-            $result = $next($message);
+        if (array_key_exists('result', $tracedMessage)) {
+            $result = $tracedMessage['result'];
 
             if (\is_object($result)) {
                 $debugRepresentation['result'] = array(
@@ -79,20 +91,18 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
                     'value' => $result,
                 );
             }
-        } catch (\Throwable $exception) {
+        }
+
+        if (isset($tracedMessage['exception'])) {
+            $exception = $tracedMessage['exception'];
+
             $debugRepresentation['exception'] = array(
                 'type' => \get_class($exception),
                 'message' => $exception->getMessage(),
             );
         }
 
-        $this->data['messages'][] = $debugRepresentation;
-
-        if (null !== $exception) {
-            throw $exception;
-        }
-
-        return $result;
+        return $debugRepresentation;
     }
 
     public function getMessages(): array

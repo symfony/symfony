@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Debug;
+namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Debug\LoggingMiddleware;
+use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class LoggingMiddlewareTest extends TestCase

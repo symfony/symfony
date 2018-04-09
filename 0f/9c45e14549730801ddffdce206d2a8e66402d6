@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-04-05T21:06:14Z
+
+Symfony 3.1 is not maintained anymore :wink: I guess the lowest maintained affected branch is 3.4? Before that there is no PSR-6 Cache.
+
+But I think its fine to target even 2.7 for consistency? I would wait for a symfony member to confirm :wink:
+
+---------------------------------------------------------------------------
+
+by pmontoya at 2018-04-06T05:54:31Z
+
+@dmaicher : Sorry. Too worried to not forget a comment, to find the right way to create patchs and I forgot the most important : the bug... 😄
+Thanks for your comments

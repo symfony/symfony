@@ -1,13 +1,13 @@
 --TEST--
-Test DeprecationErrorHandler in weak mode
+Test DeprecationErrorHandler in forced color mode
 --FILE--
 <?php
 
-putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
+putenv('SYMFONY_DEPRECATIONS_HELPER');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
-putenv('ANSI');
+putenv('ANSI=1');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
@@ -17,9 +17,10 @@ define('PHPUNIT_COMPOSER_INSTALL', $vendor.'/vendor/autoload.php');
 require PHPUNIT_COMPOSER_INSTALL;
 require_once __DIR__.'/../../bootstrap.php';
 
-echo (int) set_error_handler('var_dump');
-echo (int) class_exists('Symfony\Bridge\PhpUnit\DeprecationErrorHandler', false);
+trigger_error('root deprecation', E_USER_DEPRECATED);
 
 ?>
---EXPECTF--
-00
+--EXPECTREGEX--
+.\[[0-9;]+mOther deprecation notices \(1\).\[0m
+
+  1x: root deprecation

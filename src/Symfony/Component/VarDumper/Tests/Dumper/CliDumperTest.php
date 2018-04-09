@@ -518,6 +518,62 @@ EOTXT
         );
     }
 
+    public function testSetColorFromEnv()
+    {
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar('test');
+
+        CliDumper::$defaultColors = null;
+        CliDumper::$defaultOutput = fopen('php://output', 'wb');
+
+        $dumper = new CliDumper(CliDumper::$defaultOutput);
+        $dumper->setColors(true);
+        ob_start();
+        $dumper->dump($data);
+        $expectedOutput = ob_get_clean();
+
+        try {
+            putenv('ANSI=1');
+
+            $dumper = new CliDumper(CliDumper::$defaultOutput);
+            ob_start();
+            $dumper->dump($data);
+            $out = ob_get_clean();
+        } finally {
+            putenv('ANSI');
+        }
+
+        $this->assertEquals($expectedOutput, $out);
+    }
+
+    public function testDisableColorFromEnv()
+    {
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar('test');
+
+        CliDumper::$defaultColors = null;
+        CliDumper::$defaultOutput = fopen('php://output', 'wb');
+
+        $dumper = new CliDumper(CliDumper::$defaultOutput);
+        $dumper->setColors(false);
+        ob_start();
+        $dumper->dump($data);
+        $expectedOutput = ob_get_clean();
+
+        try {
+            putenv('ANSI=0');
+
+            $dumper = new CliDumper(CliDumper::$defaultOutput);
+            ob_start();
+            $dumper->dump($data);
+            $out = ob_get_clean();
+        } finally {
+            putenv('ANSI');
+        }
+
+        $this->assertEquals($expectedOutput, $out);
+    }
+
     private function getSpecialVars()
     {
         foreach (array_keys($GLOBALS) as $var) {

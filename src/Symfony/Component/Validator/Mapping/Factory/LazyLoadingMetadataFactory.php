@@ -90,7 +90,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             return $this->loadedClasses[$class];
         }
 
-        if (!class_exists($class) && !interface_exists($class)) {
+        if (!class_exists($class) && !interface_exists($class, false)) {
             throw new NoSuchMetadataException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 

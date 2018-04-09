@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T11:20:47Z
+
+Should/Can we update `string|array` to `string|iterable` PHPdoc in StyleInterface etc?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-08T11:23:56Z
+
+These methods are not part of `StyleInterface`, but `OutputInterface` which is already up to date. The `StyleInterface` methods are unchanged.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-08T11:25:42Z
+
+(I'm not convinced enabling support for iterables in `StyleInterface` methods is worth it, appart maybe `listing` but there is already an `array` typehint).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T11:26:44Z
+
+`StyleInterface` could benefit the same upgrade (we could yield the lines from `createBlock()`).
+
+edit:
+
+> I'm not convinced enabling support for iterables in StyleInterface methods is worth it
+
+Well we did it for `write()` why not `success()` and such =/ I agree it's probably less common to use here :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-08T11:31:06Z
+
+I don't see many use cases for generators when displaying blocks, title, sections, etc... while `write/writeln` are important to update because the `SymfonyStyle` can be passed along to any method/class requiring an `OutputInterface` and that could really benefit from generators memory saving.

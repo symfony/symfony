@@ -655,12 +655,10 @@ class FrameworkExtension extends Extension
 
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
-        if (!$config['log']) {
+        if (false === $config['log']) {
             $definition->replaceArgument(1, null);
-        }
-
-        if (\is_int($config['log']) && $config['log']) {
-            $definition->replaceArgument(3, $config['log']);
+        } elseif (true !== $config['log']) {
+            $definition->replaceArgument(2, $config['log']);
         }
 
         if (!$config['throw']) {

@@ -340,7 +340,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_enabled');
 
-        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('debug.debug_handlers_listener')->getArgument(1));
+        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertNull($definition->getArgument(2));
         $this->assertSame(-1, $container->getParameter('debug.error_handler.throw_at'));
     }
 
@@ -348,7 +350,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_disabled');
 
-        $this->assertNull($container->getDefinition('debug.debug_handlers_listener')->getArgument(1));
+        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $this->assertNull($definition->getArgument(1));
+        $this->assertNull($definition->getArgument(2));
         $this->assertSame(0, $container->getParameter('debug.error_handler.throw_at'));
     }
 
@@ -356,7 +360,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('php_errors_log_level');
 
-        $this->assertEquals(8, $container->getDefinition('debug.debug_handlers_listener')->getArgument(3));
+        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $this->assertEquals(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertSame(8, $definition->getArgument(2));
     }
 
     public function testRouter()

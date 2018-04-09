@@ -9,7 +9,7 @@
 
         <!-- Bus -->
         <service id="message_bus" class="Symfony\Component\Messenger\MessageBus" public="true">
-            <argument type="tagged" tag="message_bus_middleware" /> <!-- Middlewares -->
+            <argument type="tagged" tag="messenger.bus_middleware" /> <!-- Middlewares -->
         </service>
 
         <service id="Symfony\Component\Messenger\MessageBusInterface" alias="message_bus" />
@@ -22,13 +22,13 @@
         <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware">
             <argument type="service" id="messenger.handler_resolver" />
 
-            <tag name="message_bus_middleware" priority="-10" />
+            <tag name="messenger.bus_middleware" priority="-10" />
         </service>
 
         <service id="messenger.middleware.validator" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
             <argument type="service" id="validator" />
 
-            <tag name="message_bus_middleware" priority="100" />
+            <tag name="messenger.bus_middleware" priority="100" />
         </service>
 
         <!-- Asynchronous -->
@@ -39,7 +39,7 @@
         <service id="messenger.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware">
             <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
 
-            <tag name="message_bus_middleware" priority="-5" />
+            <tag name="messenger.bus_middleware" priority="-5" />
         </service>
 
         <!-- Message encoding/decoding -->
@@ -54,13 +54,13 @@
         <service id="messenger.middleware.debug.logging" class="Symfony\Component\Messenger\Debug\LoggingMiddleware">
             <argument type="service" id="logger" />
 
-            <tag name="message_bus_middleware" priority="10" />
+            <tag name="messenger.bus_middleware" priority="10" />
             <tag name="monolog.logger" channel="messenger" />
         </service>
 
         <service id="data_collector.messenger" class="Symfony\Component\Messenger\DataCollector\MessengerDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/messenger.html.twig" id="messenger" priority="100" />
-            <tag name="message_bus_middleware" />
+            <tag name="messenger.bus_middleware" />
         </service>
 
         <!-- Discovery -->

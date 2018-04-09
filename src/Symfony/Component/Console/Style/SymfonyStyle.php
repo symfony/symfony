@@ -306,11 +306,14 @@ class SymfonyStyle extends OutputStyle
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
-        if ($messages instanceof \Traversable) {
-            $messages = iterator_to_array($messages, false);
+        if (!is_iterable($messages)) {
+            $messages = array($messages);
         }
-        parent::writeln($messages, $type);
-        $this->bufferedOutput->writeln($this->reduceBuffer($messages), $type);
+
+        foreach ($messages as $message) {
+            parent::writeln($message, $type);
+            $this->writeBuffer($message, true, $type);
+        }
     }
 
     /**
@@ -318,11 +321,14 @@ class SymfonyStyle extends OutputStyle
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {
-        if ($messages instanceof \Traversable) {
-            $messages = iterator_to_array($messages, false);
+        if (!is_iterable($messages)) {
+            $messages = array($messages);
         }
-        parent::write($messages, $newline, $type);
-        $this->bufferedOutput->write($this->reduceBuffer($messages), $newline, $type);
+
+        foreach ($messages as $message) {
+            parent::write($message, $newline, $type);
+            $this->writeBuffer($message, $newline, $type);
+        }
     }
 
     /**
@@ -375,13 +381,11 @@ class SymfonyStyle extends OutputStyle
         }
     }
 
-    private function reduceBuffer($messages): array
+    private function writeBuffer(string $message, bool $newLine, int $type): void
     {
         // We need to know if the two last chars are PHP_EOL
         // Preserve the last 4 chars inserted (PHP_EOL on windows is two chars) in the history buffer
-        return array_map(function ($value) {
-            return substr($value, -4);
-        }, array_merge(array($this->bufferedOutput->fetch()), (array) $messages));
+        $this->bufferedOutput->write(substr($message, -4), $newLine, $type);
     }
 
     private function createBlock(iterable $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false)

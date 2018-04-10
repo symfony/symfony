@@ -72,8 +72,7 @@ class TimezoneType extends AbstractType
     /**
      * Returns a normalized array of timezone choices.
      *
-     * This function is not part of the public API but should only be called
-     * from update-timezone-translations.php.
+     * @internal This should only be called from update-timezone-translations.php.
      */
     public static function getTimezones(int $regions): array
     {

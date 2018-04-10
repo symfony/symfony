@@ -74,4 +74,15 @@ class CacheItemTest extends TestCase
         $item = new CacheItem();
         $item->tag($tag);
     }
+
+    public function testCreateViaConstructor()
+    {
+        $item = new CacheItem('name', array('data'), $expiry = new \DateTime('+10 seconds'));
+
+        $this->assertEquals('name', $item->getKey());
+        $this->assertEquals(array('data'), $item->get());
+        call_user_func(\Closure::bind(function () use ($item, $expiry) {
+            $this->assertSame((int) $expiry->format('U'), $item->expiry);
+        }, $this, CacheItem::class));
+    }
 }

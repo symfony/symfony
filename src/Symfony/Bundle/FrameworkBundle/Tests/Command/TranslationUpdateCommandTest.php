@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class TranslationUpdateCommandTest extends TestCase
 {
@@ -180,7 +182,13 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getContainer')
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
 
-        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', array($this->translationDir.'/controllers'));
+        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
+        $router
+            ->expects($this->any())
+            ->method('getRouteCollection')
+            ->will($this->returnValue(new RouteCollection()));
+
+        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', $router, array($this->translationDir.'/controllers'));
 
         $application = new Application($kernel);
         $application->add($command);

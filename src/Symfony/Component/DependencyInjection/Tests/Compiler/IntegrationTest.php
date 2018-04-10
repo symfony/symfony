@@ -207,6 +207,16 @@ class IntegrationTest extends TestCase
             'child_service',
             'child_service_expected',
         );
+
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class)
+            ->addMethodCall('setSunshine', array('supernova'));
+        yield array(
+            'instanceof_and_calls',
+            'main_service',
+            'main_service_expected',
+            $container,
+        );
     }
 }
 

@@ -1,6 +1,6 @@
 
-[33mSymfony Container Public and Private Services Tagged with "tag1" Tag[39m
-[33m====================================================================[39m
+[33mSymfony Container Hidden Services Tagged with "tag1" Tag[39m
+[33m========================================================[39m
 
  -------------- ------- ------- ------- ----------------------- 
  [32m Service ID   [39m [32m attr1 [39m [32m attr2 [39m [32m attr3 [39m [32m Class name            [39m 

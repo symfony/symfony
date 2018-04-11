@@ -15,6 +15,7 @@ use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -230,27 +231,34 @@ abstract class Descriptor implements DescriptorInterface
             return $builder->getAlias($serviceId);
         }
 
+        if ('service_container' === $serviceId) {
+            return (new Definition(ContainerInterface::class))->setPublic(true)->setSynthetic(true);
+        }
+
         // the service has been injected in some special way, just return the service
         return $builder->get($serviceId);
     }
 
     /**
      * @param ContainerBuilder $builder
-     * @param bool             $showPrivate
+     * @param bool             $showHidden
      *
      * @return array
      */
-    protected function findDefinitionsByTag(ContainerBuilder $builder, $showPrivate)
+    protected function findDefinitionsByTag(ContainerBuilder $builder, $showHidden)
     {
         $definitions = array();
         $tags = $builder->findTags();
         asort($tags);
 
         foreach ($tags as $tag) {
+            if ('container.hidden' === $tag) {
+                continue;
+            }
             foreach ($builder->findTaggedServiceIds($tag) as $serviceId => $attributes) {
                 $definition = $this->resolveServiceDefinition($builder, $serviceId);
 
-                if (!$definition instanceof Definition || !$showPrivate && !$definition->isPublic()) {
+                if (!$definition instanceof Definition || ($showHidden xor $definition->hasTag('container.hidden'))) {
                     continue;
                 }
 

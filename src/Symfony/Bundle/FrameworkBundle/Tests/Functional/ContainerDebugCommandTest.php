@@ -55,12 +55,12 @@ class ContainerDebugCommandTest extends WebTestCase
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:container', '--show-private' => true));
-        $this->assertContains('public', $tester->getDisplay());
-        $this->assertContains('private_alias', $tester->getDisplay());
+        $tester->run(array('command' => 'debug:container', '--show-hidden' => true));
+        $this->assertNotContains('public', $tester->getDisplay());
+        $this->assertNotContains('private_alias', $tester->getDisplay());
 
         $tester->run(array('command' => 'debug:container'));
         $this->assertContains('public', $tester->getDisplay());
-        $this->assertNotContains('private_alias', $tester->getDisplay());
+        $this->assertContains('private_alias', $tester->getDisplay());
     }
 }

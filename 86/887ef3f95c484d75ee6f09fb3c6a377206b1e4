@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-12T15:22:21Z
+
+@sroze I've just taken out my autoconfiguration removal - so this PR is now dead-simple :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-12T15:39:21Z
+
+@weaverryan I've updated the tests within your PR as well.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-12T16:02:51Z
+
+Though, it breaks the tests with a service that has a dependency on the `logger` service. The service is removed via the `MessengerPass`. Maybe the best idea is to make the `logger` dependency lazy with `on-invalid="null"` on this given service?

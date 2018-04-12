@@ -60,6 +60,7 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $this->registerReceivers($container);
+        $this->registerSenders($container);
         $this->registerHandlers($container);
     }
 
@@ -156,10 +157,26 @@ class MessengerPass implements CompilerPassInterface
         $receiverMapping = array();
         foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
             foreach ($tags as $tag) {
-                $receiverMapping[$tag['id'] ?? $id] = new Reference($id);
+                $receiverMapping[$tag['name'] ?? $id] = new Reference($id);
             }
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
+    }
+
+    private function registerSenders(ContainerBuilder $container)
+    {
+        $senderLocatorMapping = array();
+        foreach ($container->findTaggedServiceIds('messenger.sender') as $id => $tags) {
+            foreach ($tags as $tag) {
+                $senderLocatorMapping[$id] = new Reference($id);
+
+                if ($tag['name']) {
+                    $senderLocatorMapping[$tag['name']] = new Reference($id);
+                }
+            }
+        }
+
+        $container->getDefinition('messenger.sender_locator')->replaceArgument(0, $senderLocatorMapping);
     }
 }

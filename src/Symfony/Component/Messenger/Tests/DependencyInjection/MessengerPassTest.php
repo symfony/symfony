@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpReceiver;
+use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\ContainerHandlerLocator;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Handler\ChainHandler;
@@ -86,6 +88,26 @@ class MessengerPassTest extends TestCase
 
         $this->assertSame(ChainHandler::class, $definition->getClass());
         $this->assertEquals(array(new Reference(PrioritizedHandler::class), new Reference(HandlerWithMultipleMessages::class)), $definition->getArgument(0));
+    }
+
+    public function testItRegistersReceivers()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('name' => 'amqp'));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertEquals(array('amqp' => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
+    }
+
+    public function testItRegistersSenders()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register(AmqpSender::class, AmqpSender::class)->addTag('messenger.sender', array('name' => 'amqp'));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertEquals(array('amqp' => new Reference(AmqpSender::class), AmqpSender::class => new Reference(AmqpSender::class)), $container->getDefinition('messenger.sender_locator')->getArgument(0));
     }
 
     /**
@@ -198,6 +220,11 @@ class MessengerPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
         $container->register('message_bus', ContainerHandlerLocator::class);
+
+        $container
+            ->register('messenger.sender_locator', ServiceLocator::class)
+            ->addArgument(new Reference('service_container'))
+        ;
 
         $container
             ->register('messenger.handler_resolver', ContainerHandlerLocator::class)

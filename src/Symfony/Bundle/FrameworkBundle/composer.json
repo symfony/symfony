@@ -27,7 +27,8 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/routing": "^4.1"
+        "symfony/routing": "^4.1",
+        "symfony/serializer": "^4.1"
     },
     "require-dev": {
         "doctrine/cache": "~1.0",
@@ -45,7 +46,6 @@
         "symfony/process": "~3.4|~4.0",
         "symfony/security-core": "~3.4|~4.0",
         "symfony/security-csrf": "~3.4|~4.0",
-        "symfony/serializer": "^4.1",
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",

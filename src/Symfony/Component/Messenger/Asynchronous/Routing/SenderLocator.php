@@ -32,7 +32,7 @@ class SenderLocator implements SenderLocatorInterface
      */
     public function getSendersForMessage($message): array
     {
-        $senderIds = $this->messageToSenderIdsMapping[get_class($message)] ?? $this->messageToSenderIdsMapping['*'] ?? array();
+        $senderIds = $this->messageToSenderIdsMapping[\get_class($message)] ?? $this->messageToSenderIdsMapping['*'] ?? array();
 
         $senders = array();
         foreach ($senderIds as $senderId) {

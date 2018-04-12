@@ -84,8 +84,7 @@ class Connection
         $exchangeOptions = $amqpOptions['exchange'];
         $queueOptions = $amqpOptions['queue'];
 
-        unset($amqpOptions['queue']);
-        unset($amqpOptions['exchange']);
+        unset($amqpOptions['queue'], $amqpOptions['exchange']);
 
         return new self($amqpOptions, $exchangeOptions, $queueOptions, $debug, $amqpFactory);
     }
@@ -93,7 +92,7 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = array())
+    public function publish(string $body, array $headers = array()): void
     {
         if ($this->debug) {
             $this->setup();
@@ -123,30 +122,30 @@ class Connection
                 $this->setup();
 
                 return $this->get();
-            } else {
-                throw $e;
             }
+
+            throw $e;
         }
 
         return null;
     }
 
-    public function ack(\AMQPEnvelope $message)
+    public function ack(\AMQPEnvelope $message): bool
     {
         return $this->queue()->ack($message->getDeliveryTag());
     }
 
-    public function reject(\AMQPEnvelope $message)
+    public function reject(\AMQPEnvelope $message): bool
     {
         return $this->queue()->reject($message->getDeliveryTag());
     }
 
-    public function nack(\AMQPEnvelope $message, int $flags = AMQP_NOPARAM)
+    public function nack(\AMQPEnvelope $message, int $flags = AMQP_NOPARAM): bool
     {
         return $this->queue()->nack($message->getDeliveryTag(), $flags);
     }
 
-    public function setup()
+    public function setup(): void
     {
         if (!$this->channel()->isConnected()) {
             $this->clear();
@@ -210,7 +209,7 @@ class Connection
         return $this->connectionCredentials;
     }
 
-    private function clear()
+    private function clear(): void
     {
         $this->amqpChannel = null;
         $this->amqpQueue = null;

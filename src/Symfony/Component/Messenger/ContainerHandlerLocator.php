@@ -29,7 +29,7 @@ class ContainerHandlerLocator implements HandlerLocatorInterface
 
     public function resolve($message): callable
     {
-        $messageClass = get_class($message);
+        $messageClass = \get_class($message);
         $handlerKey = 'handler.'.$messageClass;
 
         if (!$this->container->has($handlerKey)) {

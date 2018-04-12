@@ -54,7 +54,7 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
     {
         $debugRepresentation = array(
             'message' => array(
-                'type' => get_class($message),
+                'type' => \get_class($message),
                 'object' => $this->cloneVar($message),
             ),
         );

@@ -43,7 +43,7 @@ class AmqpReceiver implements ReceiverInterface
                 $handler(null);
 
                 usleep($this->connection->getConnectionCredentials()['loop_sleep'] ?? 200000);
-                if (function_exists('pcntl_signal_dispatch')) {
+                if (\function_exists('pcntl_signal_dispatch')) {
                     pcntl_signal_dispatch();
                 }
 
@@ -66,7 +66,7 @@ class AmqpReceiver implements ReceiverInterface
 
                 throw $e;
             } finally {
-                if (function_exists('pcntl_signal_dispatch')) {
+                if (\function_exists('pcntl_signal_dispatch')) {
                     pcntl_signal_dispatch();
                 }
             }

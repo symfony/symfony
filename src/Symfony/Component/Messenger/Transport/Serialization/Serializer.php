@@ -21,8 +21,12 @@ class Serializer implements DecoderInterface, EncoderInterface
     private $serializer;
     private $format;
 
-    public function __construct(SerializerInterface $serializer, string $format = 'json')
+    public function __construct(SerializerInterface $serializer = null, string $format = 'json')
     {
+        if (null === $serializer) {
+            throw new \InvalidArgumentException('A Serializer is required to use this Messenger transport. Try running "composer req serializer".');
+        }
+
         $this->serializer = $serializer;
         $this->format = $format;
     }

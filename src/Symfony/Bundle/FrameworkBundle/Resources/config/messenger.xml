@@ -44,7 +44,7 @@
 
         <!-- Message encoding/decoding -->
         <service id="messenger.transport.serialize_message_with_type_in_headers" class="Symfony\Component\Messenger\Transport\Serialization\Serializer">
-            <argument type="service" id="serializer" />
+            <argument type="service" id="serializer" on-invalid="null" />
         </service>
 
         <service id="messenger.transport.default_encoder" alias="messenger.transport.serialize_message_with_type_in_headers" public="true" />

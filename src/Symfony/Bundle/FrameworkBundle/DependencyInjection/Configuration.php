@@ -970,7 +970,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('messenger')
                     ->info('Messenger configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{!class_exists(FullStack::class) && interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->fixXmlConfig('adapter')
                     ->children()
                         ->arrayNode('routing')

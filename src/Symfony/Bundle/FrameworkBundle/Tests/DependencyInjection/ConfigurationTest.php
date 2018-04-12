@@ -251,7 +251,7 @@ class ConfigurationTest extends TestCase
                 ),
             ),
             'messenger' => array(
-                'enabled' => !class_exists(FullStack::class) && class_exists(MessageBusInterface::class),
+                'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
                 'routing' => array(),
                 'middlewares' => array(
                     'validation' => array(

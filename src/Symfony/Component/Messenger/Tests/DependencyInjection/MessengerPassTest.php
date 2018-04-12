@@ -221,11 +221,15 @@ class DummyHandler
 
 class DummyReceiver implements ReceiverInterface
 {
-    public function receive(): iterable
+    public function receive(callable $handler): void
     {
         for ($i = 0; $i < 3; ++$i) {
-            yield new DummyMessage("Dummy $i");
+            $handler(new DummyMessage("Dummy $i"));
         }
+    }
+
+    public function stop(): void
+    {
     }
 }
 

@@ -72,5 +72,18 @@
             <tag name="container.service_locator" />
             <argument type="collection" />
         </service>
+
+        <!-- Adapters -->
+        <service id="messenger.adapter_factory" class="Symfony\Component\Messenger\Adapter\Factory\ChainAdapterFactory">
+            <argument type="tagged" tag="messenger.adapter_factory" />
+        </service>
+
+        <service id="messenger.adapter.amqp.factory" class="Symfony\Component\Messenger\Adapter\AmqpExt\AmqpAdapterFactory">
+            <argument type="service" id="messenger.transport.default_encoder" />
+            <argument type="service" id="messenger.transport.default_decoder" />
+            <argument>%kernel.debug%</argument>
+
+            <tag name="messenger.adapter_factory" />
+        </service>
     </services>
 </container>

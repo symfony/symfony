@@ -971,12 +971,17 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('messenger')
                     ->info('Messenger configuration')
                     ->{!class_exists(FullStack::class) && class_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->fixXmlConfig('adapter')
                     ->children()
                         ->arrayNode('routing')
                             ->useAttributeAsKey('message_class')
                             ->beforeNormalization()
                                 ->always()
                                 ->then(function ($config) {
+                                    if (!is_array($config)) {
+                                        return array();
+                                    }
+
                                     $newConfig = array();
                                     foreach ($config as $k => $v) {
                                         if (!is_int($k)) {
@@ -1008,6 +1013,28 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->arrayNode('validation')
                                     ->{!class_exists(FullStack::class) && class_exists(Validation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('adapters')
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                                ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(function (string $dsn) {
+                                        return array('dsn' => $dsn);
+                                    })
+                                ->end()
+                                ->fixXmlConfig('option')
+                                ->children()
+                                    ->scalarNode('dsn')->end()
+                                    ->arrayNode('options')
+                                        ->normalizeKeys(false)
+                                            ->useAttributeAsKey('name')
+                                            ->defaultValue(array())
+                                            ->prototype('variable')
+                                        ->end()
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()

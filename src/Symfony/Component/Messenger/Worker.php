@@ -35,22 +35,22 @@ class Worker
      */
     public function run()
     {
-        $iterator = $this->receiver->receive();
+        if (function_exists('pcntl_signal')) {
+            pcntl_signal(SIGTERM, function () {
+                $this->receiver->stop();
+            });
+        }
 
-        foreach ($iterator as $message) {
+        $this->receiver->receive(function($message) {
+            if (null === $message) {
+                return;
+            }
+
             if (!$message instanceof ReceivedMessage) {
                 $message = new ReceivedMessage($message);
             }
 
-            try {
-                $this->bus->dispatch($message);
-            } catch (\Throwable $e) {
-                if (!$iterator instanceof \Generator) {
-                    throw $e;
-                }
-
-                $iterator->throw($e);
-            }
-        }
+            $this->bus->dispatch($message);
+        });
     }
 }

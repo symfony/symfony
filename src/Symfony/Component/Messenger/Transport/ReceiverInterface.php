@@ -18,5 +18,16 @@ namespace Symfony\Component\Messenger\Transport;
  */
 interface ReceiverInterface
 {
-    public function receive(): iterable;
+    /**
+     * Receive some messages to the given handler.
+     *
+     * The handler will have, as argument, the received message. Note that this message
+     * can be `null` if the timeout to receive something has expired.
+     */
+    public function receive(callable $handler) : void;
+
+    /**
+     * Stop receiving some messages.
+     */
+    public function stop(): void;
 }

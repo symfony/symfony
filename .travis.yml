@@ -12,11 +12,13 @@ addons:
         - language-pack-fr-base
         - ldap-utils
         - slapd
+        - librabbitmq-dev
 
 env:
     global:
         - MIN_PHP=7.1.3
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
+        - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
 
 matrix:
     include:
@@ -38,6 +40,7 @@ services:
     - memcached
     - mongodb
     - redis-server
+    - rabbitmq
 
 before_install:
     - |
@@ -134,6 +137,11 @@ before_install:
     - |
       # Install extra PHP extensions
       if [[ ! $skip ]]; then
+          # Install librabbitmq
+          wget http://ftp.debian.org/debian/pool/main/libr/librabbitmq/librabbitmq-dev_0.5.2-2_amd64.deb
+          wget http://ftp.debian.org/debian/pool/main/libr/librabbitmq/librabbitmq1_0.5.2-2_amd64.deb
+          sudo dpkg -i librabbitmq1_0.5.2-2_amd64.deb librabbitmq-dev_0.5.2-2_amd64.deb
+
           # install libsodium
           sudo add-apt-repository ppa:ondrej/php -y
           sudo apt-get update -q
@@ -142,6 +150,7 @@ before_install:
           tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
           tfold ext.libsodium tpecl libsodium sodium.so $INI
           tfold ext.mongodb tpecl mongodb-1.4.0RC1 mongodb.so $INI
+          tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
       fi
 
     - |

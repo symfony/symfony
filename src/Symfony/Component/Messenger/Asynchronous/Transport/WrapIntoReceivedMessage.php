@@ -25,20 +25,19 @@ class WrapIntoReceivedMessage implements ReceiverInterface
         $this->decoratedReceiver = $decoratedConsumer;
     }
 
-    public function receive(): iterable
+    public function receive(callable $handler): void
     {
-        $iterator = $this->decoratedReceiver->receive();
-
-        foreach ($iterator as $message) {
-            try {
-                yield new ReceivedMessage($message);
-            } catch (\Throwable $e) {
-                if (!$iterator instanceof \Generator) {
-                    throw $e;
-                }
-
-                $iterator->throw($e);
+        $this->decoratedReceiver->receive(function ($message) use ($handler) {
+            if (null !== $message) {
+                $message = new ReceivedMessage($message);
             }
-        }
+
+            $handler($message);
+        });
+    }
+
+    public function stop(): void
+    {
+        $this->decoratedReceiver->stop();
     }
 }

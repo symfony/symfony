@@ -258,6 +258,7 @@ class ConfigurationTest extends TestCase
                         'enabled' => !class_exists(FullStack::class),
                     ),
                 ),
+                'adapters' => array(),
             ),
         );
     }

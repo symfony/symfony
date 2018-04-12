@@ -30,7 +30,7 @@ class HandlerLocator implements HandlerLocatorInterface
 
     public function resolve($message): callable
     {
-        $messageKey = get_class($message);
+        $messageKey = \get_class($message);
 
         if (!isset($this->messageToHandlerMapping[$messageKey])) {
             throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $messageKey));

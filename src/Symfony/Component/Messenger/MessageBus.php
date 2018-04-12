@@ -37,13 +37,13 @@ class MessageBus implements MessageBusInterface
      */
     public function dispatch($message)
     {
-        return call_user_func($this->callableForNextMiddleware(0), $message);
+        return \call_user_func($this->callableForNextMiddleware(0), $message);
     }
 
     private function callableForNextMiddleware(int $index): callable
     {
         if (null === $this->indexedMiddlewares) {
-            $this->indexedMiddlewares = is_array($this->middlewares) ? array_values($this->middlewares) : iterator_to_array($this->middlewares, false);
+            $this->indexedMiddlewares = \is_array($this->middlewares) ? array_values($this->middlewares) : iterator_to_array($this->middlewares, false);
         }
 
         if (!isset($this->indexedMiddlewares[$index])) {

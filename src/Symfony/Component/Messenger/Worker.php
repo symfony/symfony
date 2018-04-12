@@ -35,13 +35,13 @@ class Worker
      */
     public function run()
     {
-        if (function_exists('pcntl_signal')) {
+        if (\function_exists('pcntl_signal')) {
             pcntl_signal(SIGTERM, function () {
                 $this->receiver->stop();
             });
         }
 
-        $this->receiver->receive(function($message) {
+        $this->receiver->receive(function ($message) {
             if (null === $message) {
                 return;
             }

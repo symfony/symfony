@@ -55,7 +55,7 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send($secondMessage = new DummyMessage('Second'));
 
         $receivedMessages = 0;
-        $generator = $receiver->receive(function ($message) use ($receiver, &$receivedMessages, $firstMessage, $secondMessage) {
+        $receiver->receive(function ($message) use ($receiver, &$receivedMessages, $firstMessage, $secondMessage) {
             $this->assertEquals(0 == $receivedMessages ? $firstMessage : $secondMessage, $message);
 
             if (2 == ++$receivedMessages) {

@@ -73,7 +73,7 @@ class MessengerPass implements CompilerPassInterface
                 $priority = $tag['priority'] ?? 0;
 
                 foreach ($handles as $messageClass) {
-                    if (is_array($messageClass)) {
+                    if (\is_array($messageClass)) {
                         $messagePriority = $messageClass[1];
                         $messageClass = $messageClass[0];
                     } else {
@@ -93,12 +93,12 @@ class MessengerPass implements CompilerPassInterface
 
         foreach ($handlersByMessage as $message => $handlers) {
             krsort($handlersByMessage[$message]);
-            $handlersByMessage[$message] = call_user_func_array('array_merge', $handlersByMessage[$message]);
+            $handlersByMessage[$message] = \call_user_func_array('array_merge', $handlersByMessage[$message]);
         }
 
         $definitions = array();
         foreach ($handlersByMessage as $message => $handlers) {
-            if (1 === count($handlers)) {
+            if (1 === \count($handlers)) {
                 $handlersByMessage[$message] = current($handlers);
             } else {
                 $d = new Definition(ChainHandler::class, array($handlers));
@@ -136,7 +136,7 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $parameters = $method->getParameters();
-        if (1 !== count($parameters)) {
+        if (1 !== \count($parameters)) {
             throw new RuntimeException(sprintf('Invalid handler service "%s": method "%s::__invoke()" must have exactly one argument corresponding to the message it handles.', $serviceId, $handlerClass->getName()));
         }
 

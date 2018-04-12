@@ -433,6 +433,7 @@ class XmlFileLoader extends FileLoader
         uksort($definitions, 'strnatcmp');
         foreach (array_reverse($definitions) as $id => list($domElement, $file)) {
             if (null !== $definition = $this->parseDefinition($domElement, $file, array())) {
+                $definition->addTag('container.hidden');
                 $this->setDefinition($id, $definition);
             }
         }

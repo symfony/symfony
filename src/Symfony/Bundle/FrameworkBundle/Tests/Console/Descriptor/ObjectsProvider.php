@@ -129,6 +129,7 @@ class ObjectsProvider
                 ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
                 ->addTag('tag1', array('attr3' => 'val3'))
                 ->addTag('tag2')
+                ->addTag('container.hidden')
                 ->addMethodCall('setMailer', array(new Reference('mailer')))
                 ->setFactory(array(new Reference('factory.service'), 'get')),
         );

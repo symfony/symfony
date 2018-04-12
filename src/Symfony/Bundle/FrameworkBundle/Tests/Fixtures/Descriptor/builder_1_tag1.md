@@ -1,5 +1,5 @@
-Public and private services with tag `tag1`
-===========================================
+Hidden services with tag `tag1`
+===============================
 
 Definitions
 -----------
@@ -24,3 +24,4 @@ Definitions
 - Tag: `tag1`
     - Attr3: val3
 - Tag: `tag2`
+- Tag: `container.hidden`

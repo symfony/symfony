@@ -10,7 +10,8 @@
   Class             Full\Qualified\Class2            
 [39;49m  Tags              tag1 ([39;49m[32mattr1[39m[39;49m: val1, [39;49m[32mattr2[39m[39;49m: val2)[39;49m[39;49m  [39;49m
 [39;49m                    [39;49m[39;49mtag1 ([39;49m[32mattr3[39m[39;49m: val3)[39;49m[39;49m               [39;49m
-[39;49m                    [39;49mtag2                             
+[39;49m                    [39;49m[39;49mtag2[39;49m[39;49m                             [39;49m
+[39;49m                    [39;49mcontainer.hidden                 
   Calls             setMailer                        
   Public            no                               
   Synthetic         yes                              

@@ -35,6 +35,10 @@
             {
                 "name": "tag2",
                 "parameters": []
+            },
+            {
+                "name": "container.hidden",
+                "parameters": []
             }
         ]
     }

@@ -24,7 +24,7 @@ class Serializer implements DecoderInterface, EncoderInterface
     public function __construct(SerializerInterface $serializer = null, string $format = 'json')
     {
         if (null === $serializer) {
-            throw new \InvalidArgumentException('A Serializer is required to use this Messenger transport. Try running "composer req serializer".');
+            throw new \InvalidArgumentException('A Serializer is required to use this Messenger transport. Try running "composer require symfony/serializer".');
         }
 
         $this->serializer = $serializer;

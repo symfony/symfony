@@ -1,0 +1,328 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T09:54:42Z
+
+Shouldn't this be *inside* the Messenger component?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T10:12:07Z
+
+> Shouldn't this be inside the Messenger component?
+
+That's a good question. I took the outside approach but it's debatable as the "inside" approach is basically the Cache component's approach.
+
+Cons of having them inside are:
+1. You don't want to download an AMQP client when you get the component to use it as a message bus, or when you use another adapter.
+2. It will be harder to draw the line of what's "inside" or "outside" regarding the adapters created by the community.
+
+The pros of having them inside:
+1. As I foresee many other adapters (for example an "HTTP" adapter - ApiPlatform or not - in order to send/receive messages via HTTP), if we decide that this one should be outside the component, it means more maintenance "cost" for us to add more "official" ones (i.e. creating packages, recipes, bundles, etc...)
+
+With years of having many adapters within the Cache component, what is your PoV? Was that a good choice?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T10:14:59Z
+
+> You don't want to download an AMQP client
+
+We shouldn't care for extra files. We're talking about 500 lines here, LICENSE included.
+We just need to make ext-amqp a suggestion instead.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T10:25:18Z
+
+@nicolas-grekas you are just quoting a small part of my answer here. I understand your answer to my question about Cache Component's choice is "yes, definitely".
+
+Therefore, let's say we go with the adapter bundled inside, how would you have a similar DX than this one that we can have with another bundle?
+1. `composer req amqp`
+2. Change `AMQP_DSN` environment variable (if needed)
+3. Configure the routing of your message in `config/packages/framework.yaml`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T10:27:20Z
+
+@sroze we'll just ship with a default config based on e.g. PDO. Or no default config if none are available.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T11:02:36Z
+
+> we'll just ship with a default config based on e.g. PDO
+
+What do you mean? Where would you see this configuration to be tweaked by the developer? Could you give me a bullet-list example compared to what I described above as I don't get how it could be simple for the developer?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T11:06:28Z
+
+> Where would you see this configuration to be tweaked by the developer
+
+in a recipe
+
+---------------------------------------------------------------------------
+
+by theofidry at 2018-03-22T11:20:49Z
+
+@nicolas-grekas but if you do `composer req amqp` and you don't have the extension installed it won't be able to pick it up if those things are handled by the recipe whereas if it's outside you can put the extension as a requirement upfront.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-22T11:34:02Z
+
+@theofidry There can be a pack that also defines the dependeny on the amqp extension and we can then provide a recipe for the pack.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2018-03-22T11:44:04Z
+
+But shouldn’t that bridge be also usable from outside of Symfony?
+
+On Thu 22 Mar 2018 at 11:34, Christian Flothmann <notifications@github.com>
+wrote:
+
+> @theofidry <https://github.com/theofidry> There can be a pack that also
+> defines the dependeny on the amqp extension and we can then provide a
+> recipe for the pack.
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/26632#issuecomment-375273016>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AE76gfvSvIYfsAOSfGbI2pQ5FTx2wcKXks5tg4w6gaJpZM4S2sxP>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T11:46:47Z
+
+> But shouldn’t that bridge be also usable from outside of Symfony?
+
+Well, there is no point of this adapter/bridge without the Messenger component anyway, isn't it? 😉
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-22T11:48:38Z
+
+> Shouldn't this be inside the Messenger component?
+
+I would say no.
+
+If it is inside the Messanger component, then why shouldn't we also add a [php-amqplib/php-amqplib](https://github.com/php-amqplib/php-amqplib) adapter? And a php-enqueue adapter? And an adapter for Kafka, Redis etc etc etc. Where do you draw the line?
+
+One could argue that we should just have the **one**, but I think that the AMQP adapter is just a implementation detail (not a core thing) of the component.
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-03-22T11:51:50Z
+
+There are three AMQP implementations out there php-amqplib, bunny, amqp-ext and amqp-interop that provides a set of interop interfaces. It would be better to use amqp interop and do not hard code dependency to the extension. Let developers to choose what they want to use
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T11:57:14Z
+
+This needs to be in the Messenger component IMHO. We don't ship components that require third-party code, because then we cannot enforce our policies for BC/FC, deprecations, etc.
+
+> Where do you draw the line?
+
+Exactly where our policies need to be enforced so that we can provide the Symfony guarantees.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-22T12:00:25Z
+
+> We don't ship components that require third-party code
+
+That is the thing. The messanger component does not **need** any AMQP library/extension. That is just an extra feature.
+
+---
+
+@makasim 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T12:02:02Z
+
+@Nyholm ??? yes it *needs* a store, as soon as you need async.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T12:07:42Z
+
+> Where do you draw the line?
+
+@Nyholm That question is valid regardless of having adapters inside or outside the component: which ones becomes a `symfony/` package and which ones are living somewhere else... I agree with @nicolas-grekas here, it's a must-have in terms of DX for most of the users. And does not cost anything (except few KBs) for others :)
+
+> Let developers to choose what they want to use
+
+@makasim that's exactly what we are doing by exposing all these extension points (i.e. the Sender/Receiver and Encoder/Decoder interfaces). That's exactly why I've built [the Enqueue adapter](https://github.com/sroze/enqueue-bridge). The point here is what should be shipped directly within Symfony Core.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-22T12:11:30Z
+
+> yes it needs a store, as soon as you need async.
+
+Yes, but it is not obvious that you need async.
+
+I would still like to see that the adapters is not part of the component package. But if we really feel we want to ship some: lets do php-enqueue and ext-amqp as our "adapters shipped with the component"
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-22T12:34:57Z
+
+I'm for storing adapters directly in the component.
+It's easier to discover for the end user, and it's consistent with what is done for Cache and PropertyInfo (we provide an adapter for phpDocumentator's ReflectionDocBlock, and it's inside the component directly).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-22T12:42:17Z
+
+But what about all external dependencies that different adapters use? We would still need ask the user to download third party code.
+
+```php
+throw new \Exception('To use the XXX adapter you need to download XXX/library');
+```
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2018-03-22T12:53:55Z
+
+The main problem with the approach of storing adapter in the component is for versioning purpose, let's imagine there is a new version of the amqp extension with a different API. When you update this adapter it will become a problem, sure you can add a conflict version, but you may have other libs depending on the old extension (and not updated).
+
+Also people would not be able to profit for new features / bug fix unless they update their extension (although it's an implementation detail)
+
+However having an adapter outside this component you would just need to create a new one with the new API and maintain the old one in parallelel (or create some deprecation policy to allow people upgrading to the new one)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-22T15:47:40Z
+
+Versionning isn’t an issue. We can create bridges for both versions of the dep (we did that for Reflection DocBlock in Prophecy for instance).
+
+Regarding extra packages, we’ll add adapters dependencies in the suggest section. And we can always create metapackages such as message-amp for DX of suggesting isn’t enough.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T19:43:25Z
+
+I agree that the best option is actually to package the AMQP adapter within the Messenger component. This will simplify the maintenance and ease the discoverability of the adapter. In order to integrate it properly with Symfony it, therefore, requires works on the `messenger` section of the FrameworkBundle, like the following:
+```yaml
+framework:
+    messenger:
+        adapters:
+            default: "amqp://guest:guest@localhost:5672/%2f/messages"
+```
+
+@fabpot to prevent conflicts, it seems like the best idea is to wait for the Messenger PR to be merged within `master` :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-24T12:59:00Z
+
+Updated to have the adapter within the component. It also exposes another extension point (`messenger.adapter_factory` tag) that allows other adapter factories to be plugged-in very easily and allow users to simply use a DSN-based configuration.
+
+And updated the description with the usage example.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-24T13:14:22Z
+
+@nicolas-grekas @dunglas @javiereguiluz @docteurklein @theofidry ready for another round of review on the structure :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-26T17:19:24Z
+
+@dunglas @chalasr can you have another look please?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-27T13:55:40Z
+
+Rebased and updated based on comments. Ready 👍
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-03-29T18:13:04Z
+
+There are BC breaks coming with [2.0 version](https://github.com/pdezwart/php-amqp/issues/257) of the extension. You'd have to break it too.
+
+This wouldn't be the case if you adopt [AMQP Interop](https://github.com/queue-interop/queue-interop#amqp-interop). As it, just interfaces\contract and any compatible adapter could be plugged in.
+
+I confident in it and can release stable release anytime If it something that stop you from using it.
+
+The interop layer footprint is [small](https://blog.forma-pro.com/php-amqp-clients-benchmark-them-all-8a4e6adb1a6b)
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-03-29T18:16:02Z
+
+Make sure to require the ext version that contains this fix https://github.com/pdezwart/php-amqp/issues/281. If I remember it is correctly it is 1.9.3
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-30T09:41:05Z
+
+Thanks again for your review @makasim. To ensure the version of the php-amqp extension, we can use an `amqp` meta-package, but this adds a bit of complexity. Is there any way to detect its version number at runtime? I can't see any constant defined 🤔
+
+No doubt we will promote the enqueue adapter (which we agreed will be in the enqueue organisation 🎉), though (so far) we'd like to have a very minimalist AMQP adapter within the Core.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-30T10:56:58Z
+
+@sroze can't we add a conflict rule for `ext-amqp:<1.9.3`?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-30T12:35:24Z
+
+Yep, very good idea. I guess `<1.9.3,>=2.0.0` will prevent us from the BCs of the extension 2.0 as well.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-01T15:58:37Z
+
+Could you give an example how to set options for AMQP like `x-dead-letter-exchange` and `x-message-ttl`? Those are often needed. So there should be an easy way to set those.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-02T21:43:39Z
+
+@chalasr added the conflict.
+@Tobion good point. Added it in https://github.com/symfony/symfony/pull/26632/commits/587c741c892f056d9ab7e7fe6caa83408382421b 👍
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T08:31:01Z
+
+Thank you very much @lyrixx for the review. I've updated a few things and added comments to the rest. Can you check them out? :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-03T09:21:46Z
+
+@sroze Nice iteration. Thanks.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-03T20:14:36Z
+
+@lyrixx @soyuka @makasim thank you so much for your tests and reviews that pushes that adapter and the transport's design to their limits. This (hopefully last) change should resolve the last blockers.
+
+Following the discovery of [this `yield`/`try`/`catch` weirdness](https://gist.github.com/sroze/2ed22483b5fd35081b4fa31f02fd1a24) (which [isn't a bug](https://bugs.php.net/bug.php?id=76181)) I decided to question this choice that I loved of using an `iterable` as a result of the `ReceiverInterface`. The only way to manage errors is via sending the exceptions back to the generator (via `$generator->throw($exception)`): this adds a lot of complexity (i.e. `if instanceof Generator` checks in the `catch` of `ReceiverInterface` decorators) and allows an easy way to break this error management by forgetting to forward the error down or by simply not using generators anymore. Therefore, I changed the interface to take a message handler instead of returning that generator. It looks good (`$receiver->receive($handler)` is literally correct) and prevents a weird management of exceptions.
+
+Last but not least, in order to prevent the issues mentioned by Max and tackle in Greg's PR, I moved from using the `consume` method to the `get` method. We now have to manually handle the signals but first, we can be sure it's properly handled (see [the test](https://github.com/symfony/symfony/pull/26632/files#diff-31d54404cd29fcd612f175ed67b18216R67)) and it removes this very specific constraint on the AMQP library version.
+
+---------------------------------------------------------------------------
+
+by davidbarratt at 2018-04-08T03:36:16Z
+
+Any chance on this getting merged soon? Thanks! :)

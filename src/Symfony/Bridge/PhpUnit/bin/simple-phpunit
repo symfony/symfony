@@ -22,6 +22,7 @@ $getEnvVar = function ($name, $default = false) {
 
     static $phpunitConfig = null;
     if (null === $phpunitConfig) {
+        $phpunitConfigFilename = null;
         if (file_exists('phpunit.xml')) {
             $phpunitConfigFilename = 'phpunit.xml';
         } elseif (file_exists('phpunit.xml.dist')) {

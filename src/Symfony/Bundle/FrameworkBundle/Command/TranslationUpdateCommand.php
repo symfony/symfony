@@ -44,6 +44,13 @@ class TranslationUpdateCommand extends Command
     private $defaultTransPath;
     private $defaultViewsPath;
 
+    /**
+     * Extractor of validation messages.
+     *
+     * @var ExtractorInterface
+     */
+    private $validationExtractor = null;
+
     public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null)
     {
         parent::__construct();
@@ -54,6 +61,20 @@ class TranslationUpdateCommand extends Command
         $this->defaultLocale = $defaultLocale;
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
+    }
+
+    /**
+     * Set extractor of validation messages.
+     *
+     * @param ExtractorInterface $validationExtractor
+     *
+     * @return $this
+     */
+    public function setValidationExtractor(ExtractorInterface $validationExtractor)
+    {
+        $this->validationExtractor = $validationExtractor;
+
+        return $this;
     }
 
     /**
@@ -72,6 +93,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
+                new InputOption('extract-validation-messages', null, InputOption::VALUE_NONE, 'Extract validation messages'),
             ))
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
@@ -167,6 +189,13 @@ EOF
             if (is_dir($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
+        }
+
+        // load any validation messages
+        if ($this->validationExtractor && $input->getOption('extract-validation-messages')) {
+            $extractValidationMessagesDir = realpath($kernel->getRootDir() . '/../src');
+            $this->validationExtractor->setPrefix($input->getOption('prefix'));
+            $this->validationExtractor->extract($extractValidationMessagesDir, $extractedCatalogue);
         }
 
         // load any existing messages from the translation files

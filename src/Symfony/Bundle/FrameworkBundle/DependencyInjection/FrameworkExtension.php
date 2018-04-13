@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -86,6 +87,10 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintComma
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
+use Symfony\Component\Validator\Translation\Extractor\ChainExtractor;
+use Symfony\Component\Validator\Translation\Extractor\PhpValidationExtractor;
+use Symfony\Component\Validator\Translation\Extractor\XmlValidationExtractor;
+use Symfony\Component\Validator\Translation\Extractor\YamlValidationExtractor;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
@@ -243,7 +248,7 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 
-        $this->registerValidationConfiguration($config['validation'], $container, $loader);
+        $this->registerValidationConfiguration($config['validation'], $container, $loader, $this->isConfigEnabled($container, $config['translator']));
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
@@ -1032,7 +1037,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, bool $translatorEnabled = false)
     {
         if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
             return;
@@ -1048,6 +1053,36 @@ class FrameworkExtension extends Extension
 
         $loader->load('validator.xml');
 
+        if ($translatorEnabled) {
+            $phpValidationExtractor = new Definition(
+                PhpValidationExtractor::class,
+                array($config['enable_annotations'], $config['static_method'], $config['translation_domain'])
+            );
+            $phpValidationExtractor->addTag('translation.extractor.validation');
+            $container->setDefinition(PhpValidationExtractor::class, $phpValidationExtractor);
+
+            $yamlValidationExtractor = new Definition(YamlValidationExtractor::class, array($config['translation_domain']));
+            $yamlValidationExtractor->addTag('translation.extractor.validation');
+            $container->setDefinition(YamlValidationExtractor::class, $yamlValidationExtractor);
+
+            $xmlValidationExtractor = new Definition(XmlValidationExtractor::class, array($config['translation_domain']));
+            $xmlValidationExtractor->addTag('translation.extractor.validation');
+            $container->setDefinition(XmlValidationExtractor::class, $xmlValidationExtractor);
+
+            $validationExtractor = new Definition(ChainExtractor::class);
+            $container->setDefinition('translation.extractor.validation', $validationExtractor);
+
+            foreach ($container->findTaggedServiceIds('translation.extractor.validation') as $id => $tags) {
+                $validationExtractor->addMethodCall('addExtractor', array(new Reference($id)));
+            }
+
+            $container->getDefinition('console.command.translation_update')
+                ->addMethodCall('setValidationExtractor', array(new Reference('translation.extractor.validation')));
+
+            $container->getDefinition('console.command.translation_debug')
+                ->addMethodCall('setValidationExtractor', array(new Reference('translation.extractor.validation')));
+        }
+
         $validatorBuilder = $container->getDefinition('validator.builder');
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
@@ -1057,10 +1092,18 @@ class FrameworkExtension extends Extension
 
         if (!empty($files['xml'])) {
             $validatorBuilder->addMethodCall('addXmlMappings', array($files['xml']));
+
+            try {
+                $container->getDefinition(XmlValidationExtractor::class)->addMethodCall('setFiles', array($files['xml']));
+            } catch (ServiceNotFoundException $e) { }
         }
 
         if (!empty($files['yml'])) {
             $validatorBuilder->addMethodCall('addYamlMappings', array($files['yml']));
+
+            try {
+                $container->getDefinition(YamlValidationExtractor::class)->addMethodCall('setFiles', array($files['yml']));
+            } catch (ServiceNotFoundException $e) { }
         }
 
         $definition = $container->findDefinition('validator.email');

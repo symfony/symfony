@@ -49,6 +49,13 @@ class TranslationDebugCommand extends Command
     private $defaultTransPath;
     private $defaultViewsPath;
 
+    /**
+     * Extractor of validation messages.
+     *
+     * @var ExtractorInterface
+     */
+    private $validationExtractor = null;
+
     public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null)
     {
         parent::__construct();
@@ -58,6 +65,20 @@ class TranslationDebugCommand extends Command
         $this->extractor = $extractor;
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
+    }
+
+    /**
+     * Set extractor of validation messages.
+     *
+     * @param ExtractorInterface $validationExtractor
+     *
+     * @return $this
+     */
+    public function setValidationExtractor(ExtractorInterface $validationExtractor)
+    {
+        $this->validationExtractor = $validationExtractor;
+
+        return $this;
     }
 
     /**
@@ -73,6 +94,7 @@ class TranslationDebugCommand extends Command
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
+                new InputOption('extract-validation-messages', null, InputOption::VALUE_NONE, 'Extract validation messages'),
             ))
             ->setDescription('Displays translation messages information')
             ->setHelp(<<<'EOF'
@@ -104,6 +126,9 @@ You can display information about translations in all registered bundles in a sp
 
   <info>php %command.full_name% --all en</info>
 
+You can extract messages from validation constrains:  
+
+  <info>php %command.full_name% --extract-validation-messages</info>
 EOF
             )
         ;
@@ -169,8 +194,16 @@ EOF
             }
         }
 
+        $extractedCatalogue = new MessageCatalogue($locale);
+
         // Extract used messages
-        $extractedCatalogue = $this->extractMessages($locale, $viewsPaths);
+        $this->extractMessages($extractedCatalogue, $viewsPaths);
+
+        // Extract used validation messages
+        if ($input->getOption('extract-validation-messages')) {
+            $extractValidationMessagesDir = realpath($kernel->getRootDir() . '/../src');
+            $this->validationExtractor->extract($extractValidationMessagesDir, $extractedCatalogue);
+        };
 
         // Load defined messages
         $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths);
@@ -290,16 +323,13 @@ EOF
         return $string;
     }
 
-    private function extractMessages(string $locale, array $transPaths): MessageCatalogue
+    private function extractMessages(MessageCatalogue $extractedCatalogue, array $transPaths)
     {
-        $extractedCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
             if (is_dir($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
         }
-
-        return $extractedCatalogue;
     }
 
     private function loadCurrentMessages(string $locale, array $transPaths): MessageCatalogue

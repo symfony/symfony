@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * add a `workflow_metadata` function
+ * add bundle name suggestion on wrongly overrided templates paths
 
 3.4.0
 -----

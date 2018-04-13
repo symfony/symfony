@@ -31,13 +31,15 @@ class DebugCommand extends Command
 
     private $twig;
     private $projectDir;
+    private $bundlesMetadata;
 
-    public function __construct(Environment $twig, string $projectDir = null)
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = array())
     {
         parent::__construct();
 
         $this->twig = $twig;
         $this->projectDir = $projectDir;
+        $this->bundlesMetadata = $bundlesMetadata;
     }
 
     protected function configure()
@@ -83,6 +85,7 @@ EOF
             $data['tests'] = array_keys($data['tests']);
             $data['loader_paths'] = $this->getLoaderPaths();
             $io->writeln(json_encode($data));
+            $this->displayAlternatives($this->findWrongBundleOverrides($data['loader_paths']), $io);
 
             return 0;
         }
@@ -108,7 +111,8 @@ EOF
         }
 
         $rows = array();
-        foreach ($this->getLoaderPaths() as $namespace => $paths) {
+        $loaderPaths = $this->getLoaderPaths();
+        foreach ($loaderPaths as $namespace => $paths) {
             if (count($paths) > 1) {
                 $rows[] = array('', '');
             }
@@ -123,6 +127,7 @@ EOF
         array_pop($rows);
         $io->section('Loader Paths');
         $io->table(array('Namespace', 'Paths'), $rows);
+        $this->displayAlternatives($this->findWrongBundleOverrides($loaderPaths), $io);
 
         return 0;
     }
@@ -240,6 +245,65 @@ EOF
 
         if ('filters' === $type) {
             return $meta ? '('.implode(', ', $meta).')' : '';
+        }
+    }
+
+    private function findWrongBundleOverrides($loaderPaths)
+    {
+        $alternatives = array();
+        $paths = array_unique($loaderPaths['(None)']);
+        $bundleNames = array();
+        foreach ($paths as $path) {
+            $relativePath = $path.'/bundles/';
+            if (file_exists($dir = $this->projectDir.'/'.$relativePath)) {
+                $folders = glob($dir.'*', GLOB_ONLYDIR);
+                $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
+                    if (null !== $this->projectDir && 0 === strpos($absolutePath, $this->projectDir)) {
+                        $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                        $name = ltrim(substr($path, \strlen($relativePath)), DIRECTORY_SEPARATOR);
+                        $carry[$name] = $path;
+                    }
+
+                    return $carry;
+                }, $bundleNames);
+            }
+        }
+
+        if (\count($bundleNames)) {
+            $loadedBundles = $this->bundlesMetadata;
+            $notFoundBundles = array_diff_key($bundleNames, $loadedBundles);
+            if (\count($notFoundBundles)) {
+                $alternatives = array();
+                foreach ($notFoundBundles as $notFoundBundle => $path) {
+                    $alternatives[$path] = array();
+                    foreach ($loadedBundles as $name => $bundle) {
+                        $lev = levenshtein($notFoundBundle, $name);
+                        if ($lev <= \strlen($notFoundBundle) / 3 || false !== strpos($name, $notFoundBundle)) {
+                            $alternatives[$path][] = $name;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $alternatives;
+    }
+
+    private function displayAlternatives(array $wrongBundles, SymfonyStyle $io)
+    {
+        foreach ($wrongBundles as $path => $alternatives) {
+            $message = sprintf('Path "%s" not matching any bundle found', $path);
+            if ($alternatives) {
+                if (1 === \count($alternatives)) {
+                    $message .= sprintf(", did you mean \"%s\"?\n", $alternatives[0]);
+                } else {
+                    $message .= ", did you mean one of these:\n";
+                    foreach ($alternatives as $bundle) {
+                        $message .= sprintf("  - %s\n", $bundle);
+                    }
+                }
+            }
+            $io->warning(trim($message));
         }
     }
 }

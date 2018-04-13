@@ -82,10 +82,10 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $this->write("Container tags\n==============");
 
-        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
             $this->write("\n\n".$tag."\n".str_repeat('-', strlen($tag)));
             foreach ($definitions as $serviceId => $definition) {
                 $this->write("\n\n");
@@ -119,9 +119,9 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
-        $title = $showPrivate ? 'Public and private services' : 'Public services';
+        $title = $showHidden ? 'Hidden services' : 'Services';
         if (isset($options['tag'])) {
             $title .= ' with tag `'.$options['tag'].'`';
         }
@@ -138,14 +138,14 @@ class MarkdownDescriptor extends Descriptor
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
+            if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
+                continue;
+            }
+
             if ($service instanceof Alias) {
-                if ($showPrivate || ($service->isPublic() && !$service->isPrivate())) {
-                    $services['aliases'][$serviceId] = $service;
-                }
+                $services['aliases'][$serviceId] = $service;
             } elseif ($service instanceof Definition) {
-                if (($showPrivate || ($service->isPublic() && !$service->isPrivate()))) {
-                    $services['definitions'][$serviceId] = $service;
-                }
+                $services['definitions'][$serviceId] = $service;
             } else {
                 $services['services'][$serviceId] = $service;
             }

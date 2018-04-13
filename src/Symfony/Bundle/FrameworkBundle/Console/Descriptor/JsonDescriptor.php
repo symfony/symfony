@@ -63,10 +63,10 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $data = array();
 
-        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
             $data[$tag] = array();
             foreach ($definitions as $definition) {
                 $data[$tag][] = $this->getContainerDefinitionData($definition, true);
@@ -100,7 +100,7 @@ class JsonDescriptor extends Descriptor
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $data = array('definitions' => array(), 'aliases' => array(), 'services' => array());
@@ -112,14 +112,14 @@ class JsonDescriptor extends Descriptor
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
+            if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
+                continue;
+            }
+
             if ($service instanceof Alias) {
-                if ($showPrivate || ($service->isPublic() && !$service->isPrivate())) {
-                    $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
-                }
+                $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
             } elseif ($service instanceof Definition) {
-                if (($showPrivate || ($service->isPublic() && !$service->isPrivate()))) {
-                    $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments);
-                }
+                $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments);
             } else {
                 $data['services'][$serviceId] = get_class($service);
             }

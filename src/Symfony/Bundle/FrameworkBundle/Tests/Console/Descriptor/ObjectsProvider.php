@@ -107,20 +107,20 @@ class ObjectsProvider
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
-                ->addArgument(new Reference('definition2'))
+                ->addArgument(new Reference('.definition_2'))
                 ->addArgument('%parameter%')
                 ->addArgument(new Definition('inline_service', array('arg1', 'arg2')))
                 ->addArgument(array(
                     'foo',
-                    new Reference('definition2'),
+                    new Reference('.definition_2'),
                     new Definition('inline_service'),
                 ))
                 ->addArgument(new IteratorArgument(array(
                     new Reference('definition_1'),
-                    new Reference('definition_2'),
+                    new Reference('.definition_2'),
                 )))
                 ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
-            'definition_2' => $definition2
+            '.definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')
@@ -138,7 +138,7 @@ class ObjectsProvider
     {
         return array(
             'alias_1' => new Alias('service_1', true),
-            'alias_2' => new Alias('service_2', false),
+            '.alias_2' => new Alias('.service_2', false),
         );
     }
 

@@ -48,8 +48,9 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
+                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services (deprecated)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
+                new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Used to show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
@@ -72,11 +73,6 @@ To see available types that can be used for autowiring, use the <info>--types</i
 
   <info>php %command.full_name% --types</info>
 
-By default, private services are hidden. You can display all services by
-using the <info>--show-private</info> flag:
-
-  <info>php %command.full_name% --show-private</info>
-
 Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
 
   <info>php %command.full_name% --tags</info>
@@ -93,6 +89,11 @@ Display a specific parameter by specifying its name with the <info>--parameter</
 
   <info>php %command.full_name% --parameter=kernel.debug</info>
 
+By default, internal services are hidden. You can display them
+using the <info>--show-hidden</info> flag:
+
+  <info>php %command.full_name% --show-hidden</info>
+
 EOF
             )
         ;
@@ -103,6 +104,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($input->getOption('show-private')) {
+            @trigger_error('The "--show-private" option no longer has any effect and is deprecated since Symfony 4.1.', E_USER_DEPRECATED);
+        }
+
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
@@ -110,7 +115,7 @@ EOF
         $object = $this->getContainerBuilder();
 
         if ($input->getOption('types')) {
-            $options = array('show_private' => true);
+            $options = array();
             $options['filter'] = array($this, 'filterToServiceTypes');
         } elseif ($input->getOption('parameters')) {
             $parameters = array();
@@ -122,19 +127,20 @@ EOF
         } elseif ($parameter = $input->getOption('parameter')) {
             $options = array('parameter' => $parameter);
         } elseif ($input->getOption('tags')) {
-            $options = array('group_by' => 'tags', 'show_private' => $input->getOption('show-private'));
+            $options = array('group_by' => 'tags');
         } elseif ($tag = $input->getOption('tag')) {
-            $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
+            $options = array('tag' => $tag);
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $errorIo, $object, $name);
             $options = array('id' => $name);
         } else {
-            $options = array('show_private' => $input->getOption('show-private'));
+            $options = array();
         }
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['show_arguments'] = $input->getOption('show-arguments');
+        $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
         $helper->describe($io, $object, $options);

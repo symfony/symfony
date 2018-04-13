@@ -25,7 +25,8 @@
         "symfony/property-access": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/property-access": "~3.4|~4.0",
-        "symfony/process": "~4.0"
+        "symfony/process": "~4.0",
+        "symfony/validator": "~4.0"
     },
     "suggest": {
         "sroze/enqueue-bridge": "For using the php-enqueue library as an adapter."

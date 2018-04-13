@@ -44,6 +44,8 @@ class MessengerPassTest extends TestCase
 
         (new MessengerPass())->process($container);
 
+        $this->assertFalse($container->hasDefinition('messenger.middleware.debug.logging'));
+
         $handlerLocatorDefinition = $container->getDefinition($container->getDefinition('messenger.handler_resolver')->getArgument(0));
         $this->assertSame(ServiceLocator::class, $handlerLocatorDefinition->getClass());
         $this->assertEquals(

@@ -3,13 +3,6 @@ Inflector Component
 
 Inflector converts words between their singular and plural forms (English only).
 
-Disclaimer
-----------
-
-This component is currently marked as internal. Do not use it in your own code.
-Breaking changes may be introduced in the next minor version of Symfony, or the
-component itself might even be removed completely.
-
 Resources
 ---------
 

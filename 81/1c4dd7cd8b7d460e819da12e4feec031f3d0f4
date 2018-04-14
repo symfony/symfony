@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-04-04T18:13:49Z
+
+another solution could be to perform this trimming during the cache warmup of the router (we already have some logic there to resolve the bundle notation to class names there to optimize things). This way, we would have the controller class without leading backslash in the `_controller` key
+
+---------------------------------------------------------------------------
+
+by mathieutu at 2018-04-04T20:03:11Z
+
+Yeah could be a good idea, maybe a bit more consistent, and need less operations.
+As you want guys, let me know and I'll try to do it on router!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-04T20:57:15Z
+
+Worth a try for sure!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-07T20:09:59Z
+
+> another solution could be to perform this trimming during the cache warmup of the router (we already have some logic there to resolve the bundle notation to class names there to optimize things).
+
+Since the bundle notation is deprecated, this part might not survive long. So I would either do it in the Route class itself, so it it always set in a normalized way for all consumers. Or do it like proposed here.

@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by chapterjason at 2018-04-11T08:48:11Z
+
+Is there any reason why a `span` is used to display the alerts? When I look at the docs of bootstrap, I can clearly see that the `div` tag are used for that.
+
+https://getbootstrap.com/docs/4.0/components/alerts/
+
+Using `d-block` is for me really odd.
+
+---------------------------------------------------------------------------
+
+by normisg at 2018-04-11T09:01:44Z
+
+Yes, it was changed in https://github.com/symfony/symfony/commit/5dcaaadb5e8c01148b67d009c95a5118849f9a55 to "Make sure form errors is valid HTML".
+Seems unnecessary to me too.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-04-11T22:26:33Z
+
+The reason for this is that now error blocks might appear inside `<label>` tags. You cannot have `<div>` inside a label.

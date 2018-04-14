@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\ChoiceList;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\StringUtil;
 
 /**
  * A list of choices with arbitrary data types.
@@ -209,8 +210,9 @@ class ArrayChoiceList implements ChoiceListInterface
             }
 
             $choiceValue = (string) call_user_func($value, $choice);
-            $choicesByValues[$choiceValue] = $choice;
-            $keysByValues[$choiceValue] = $key;
+            $trimmedKey = StringUtil::trim($choiceValue);
+            $choicesByValues[$trimmedKey] = $choice;
+            $keysByValues[$trimmedKey] = $key;
             $structuredValues[$key] = $choiceValue;
         }
     }

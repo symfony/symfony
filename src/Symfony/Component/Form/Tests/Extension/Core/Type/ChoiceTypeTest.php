@@ -2567,4 +2567,19 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('_09name', $view->vars['name']);
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
+
+    public function testSubmitSingleWhitspacedValue()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => false,
+            'choices_as_values' => true,
+            'choices' => array(
+                'foobar ' => 'foobar ',
+            ),
+        ));
+
+        $form->submit('foobar ');
+
+        $this->assertEquals('foobar ', $form->getData());
+    }
 }

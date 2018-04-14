@@ -22,3 +22,16 @@ if (!function_exists('dump')) {
         }
     }
 }
+
+if (!function_exists('dd')) {
+    /**
+     * @author Giorgio Grasso <me@grag.io>
+     */
+    function dd()
+    {
+        foreach (func_get_args() as $obj) {
+            VarDumper::dump($obj);
+        }
+        die;
+    }
+}

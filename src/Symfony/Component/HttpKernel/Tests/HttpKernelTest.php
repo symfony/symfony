@@ -159,15 +159,15 @@ class HttpKernelTest extends TestCase
         $this->assertEquals('hello', $kernel->handle(new Request())->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testHandleWhenNoControllerIsFound()
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getHttpKernel($dispatcher, false);
 
-        $kernel->handle(new Request());
+        $response = $kernel->handle(new Request());
+
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertSame('404 Not Found', $response->getContent());
     }
 
     public function testHandleWhenTheControllerIsAClosure()

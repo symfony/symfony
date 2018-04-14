@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-13T14:57:17Z
+
+What does it fix ? Because now, you will execute many time `file_exists` with no real value.
+Did I miss something ?
+
+---------------------------------------------------------------------------
+
+by romain-pierre at 2018-04-13T15:03:51Z
+
+You're too fast for me lol, just the time to see the error by myself and re-push ;-)

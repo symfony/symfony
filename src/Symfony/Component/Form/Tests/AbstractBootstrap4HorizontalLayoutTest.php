@@ -32,7 +32,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     [
         ./label[@for="name"]
         [
-            ./span[@class="alert alert-danger"]
+            ./span[@class="alert alert-danger d-block"]
                 [./span[@class="mb-0 d-block"]
                     [./span[.="[trans]Error[/trans]"]]
                     [./span[.="[trans]Error![/trans]"]]

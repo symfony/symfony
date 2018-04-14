@@ -32,7 +32,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     [
         ./label[@for="name"]
         [
-            ./span[@class="alert alert-danger"]
+            ./span[@class="alert alert-danger d-block"]
                 [./span[@class="mb-0 d-block"]
                     [./span[.="[trans]Error[/trans]"]]
                     [./span[.="[trans]Error![/trans]"]]
@@ -161,7 +161,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
         $this->assertMatchesXpath($html,
 '/span
-    [@class="alert alert-danger"]
+    [@class="alert alert-danger d-block"]
     [
         ./span[@class="mb-0 d-block"]
             [./span[.="[trans]Error[/trans]"]]

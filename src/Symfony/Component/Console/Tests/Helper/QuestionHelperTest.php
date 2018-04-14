@@ -157,6 +157,29 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
+    public function testAskWithAutocompleteWithExactMatch()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        $inputStream = $this->getInputStream("b\n");
+
+        $possibleChoices = array(
+            'a' => 'berlin',
+            'b' => 'copenhagen',
+            'c' => 'amsterdam',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setHelperSet(new HelperSet(array(new FormatterHelper())));
+
+        $question = new ChoiceQuestion('Please select a city', $possibleChoices);
+        $question->setMaxAttempts(1);
+
+        $this->assertSame('b', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
     public function testAutocompleteWithTrailingBackslash()
     {
         if (!$this->hasSttyAvailable()) {

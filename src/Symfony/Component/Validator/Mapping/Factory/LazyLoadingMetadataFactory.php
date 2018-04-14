@@ -88,15 +88,15 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             return $this->loadedClasses[$class];
         }
 
+        if (!class_exists($class) && !interface_exists($class, false)) {
+            throw new NoSuchMetadataException(sprintf('The class or interface "%s" does not exist.', $class));
+        }
+
         if (null !== $this->cache && false !== ($metadata = $this->cache->read($class))) {
             // Include constraints from the parent class
             $this->mergeConstraints($metadata);
 
             return $this->loadedClasses[$class] = $metadata;
-        }
-
-        if (!class_exists($class) && !interface_exists($class)) {
-            throw new NoSuchMetadataException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
         $metadata = new ClassMetadata($class);

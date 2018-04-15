@@ -16,16 +16,19 @@ use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\TaggableCacheInterface;
+use Symfony\Component\Cache\Traits\GetTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, ResettableInterface
+class TagAwareAdapter implements TagAwareAdapterInterface, TaggableCacheInterface, PruneableInterface, ResettableInterface
 {
     const TAGS_PREFIX = "\0tags\0";
 
     use ProxyTrait;
+    use GetTrait;
 
     private $deferred = array();
     private $createCacheItem;
@@ -58,6 +61,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
         );
         $this->setCacheItemTags = \Closure::bind(
             function (CacheItem $item, $key, array &$itemTags) {
+                $item->isTaggable = true;
                 if (!$item->isHit) {
                     return $item;
                 }

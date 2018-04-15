@@ -13,10 +13,12 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\GetTrait;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
 
 /**
@@ -26,9 +28,10 @@ use Symfony\Component\Cache\Traits\PhpArrayTrait;
  * @author Titouan Galopin <galopintitouan@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class PhpArrayAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
+class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     use PhpArrayTrait;
+    use GetTrait;
 
     private $createCacheItem;
 
@@ -75,6 +78,31 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
         }
 
         return $fallbackPool;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback)
+    {
+        if (null === $this->values) {
+            $this->initialize();
+        }
+        if (null === $value = $this->values[$key] ?? null) {
+            if ($this->pool instanceof CacheInterface) {
+                return $this->pool->get($key, $callback);
+            }
+
+            return $this->doGet($this->pool, $key, $callback);
+        }
+        if ('N;' === $value) {
+            return null;
+        }
+        if (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
+            return unserialize($value);
+        }
+
+        return $value;
     }
 
     /**

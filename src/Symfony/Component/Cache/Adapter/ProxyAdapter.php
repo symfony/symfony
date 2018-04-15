@@ -13,17 +13,20 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\GetTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
+class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     use ProxyTrait;
+    use GetTrait;
 
     private $namespace;
     private $namespaceLen;
@@ -52,6 +55,20 @@ class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableIn
             null,
             CacheItem::class
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback)
+    {
+        if (!$this->pool instanceof CacheInterface) {
+            return $this->doGet($this->pool, $key, $callback);
+        }
+
+        return $this->pool->get($this->getId($key), function ($innerItem) use ($key, $callback) {
+            return $callback(($this->createCacheItem)($key, $innerItem));
+        });
     }
 
     /**

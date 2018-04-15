@@ -13,10 +13,12 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\GetTrait;
 
 /**
  * Chains several adapters together.
@@ -26,8 +28,10 @@ use Symfony\Component\Cache\ResettableInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
+class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
+    use GetTrait;
+
     private $adapters = array();
     private $adapterCount;
     private $syncItem;
@@ -61,6 +65,8 @@ class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableIn
                 $item->expiry = $sourceItem->expiry;
                 $item->isHit = $sourceItem->isHit;
 
+                $sourceItem->isTaggable = false;
+
                 if (0 < $sourceItem->defaultLifetime && $sourceItem->defaultLifetime < $defaultLifetime) {
                     $defaultLifetime = $sourceItem->defaultLifetime;
                 }
@@ -73,6 +79,33 @@ class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableIn
             null,
             CacheItem::class
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback)
+    {
+        $lastItem = null;
+        $i = 0;
+        $wrap = function (CacheItem $item = null) use ($key, $callback, &$wrap, &$i, &$lastItem) {
+            $adapter = $this->adapters[$i];
+            if (isset($this->adapters[++$i])) {
+                $callback = $wrap;
+            }
+            if ($adapter instanceof CacheInterface) {
+                $value = $adapter->get($key, $callback);
+            } else {
+                $value = $this->doGet($adapter, $key, $callback);
+            }
+            if (null !== $item) {
+                ($this->syncItem)($lastItem = $lastItem ?? $item, $item);
+            }
+
+            return $value;
+        };
+
+        return $wrap();
     }
 
     /**

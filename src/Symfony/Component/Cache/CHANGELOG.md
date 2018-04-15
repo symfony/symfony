@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `CacheInterface` and `TaggableCacheInterface`
+ * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
+
 3.4.0
 -----
 

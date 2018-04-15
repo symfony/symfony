@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
@@ -24,6 +25,26 @@ abstract class AdapterTestCase extends CachePoolTest
         if (!array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
+    }
+
+    public function testGet()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool();
+
+        $value = mt_rand();
+
+        $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use ($value) {
+            $this->assertSame('foo', $item->getKey());
+
+            return $value;
+        }));
+
+        $item = $cache->getItem('foo');
+        $this->assertSame($value, $item->get());
     }
 
     public function testDefaultLifeTime()

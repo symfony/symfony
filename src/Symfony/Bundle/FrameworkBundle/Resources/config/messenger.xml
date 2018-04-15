@@ -52,7 +52,7 @@
 
         <!-- Logging & Debug -->
         <service id="messenger.middleware.debug.logging" class="Symfony\Component\Messenger\Debug\LoggingMiddleware">
-            <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="logger" />
 
             <tag name="messenger.bus_middleware" priority="10" />
             <tag name="monolog.logger" channel="messenger" />

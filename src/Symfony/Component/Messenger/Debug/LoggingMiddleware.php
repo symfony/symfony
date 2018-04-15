@@ -21,7 +21,7 @@ class LoggingMiddleware implements MiddlewareInterface
 {
     private $logger;
 
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
@@ -31,10 +31,6 @@ class LoggingMiddleware implements MiddlewareInterface
      */
     public function handle($message, callable $next)
     {
-        if (null === $this->logger) {
-            return $next($message);
-        }
-
         $this->logger->debug('Starting handling message {class}', array(
             'message' => $message,
             'class' => \get_class($message),

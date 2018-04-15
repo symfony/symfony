@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -1089,6 +1090,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainer(array('kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret'));
         $container->registerExtension(new FrameworkExtension());
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses(array(new LoggerPass()));
         $this->loadFromFile($container, 'default_config');
         $container
             ->register('foo', \stdClass::class)
@@ -1180,6 +1182,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $container->getCompilerPassConfig()->setOptimizationPasses(array());
             $container->getCompilerPassConfig()->setRemovingPasses(array());
         }
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses(array(new LoggerPass()));
         $container->getCompilerPassConfig()->setBeforeRemovingPasses(array(new AddConstraintValidatorsPass(), new TranslatorPass('translator.default', 'translation.reader')));
         $container->getCompilerPassConfig()->setAfterRemovingPasses(array(new AddAnnotationsCachedReaderPass()));
 

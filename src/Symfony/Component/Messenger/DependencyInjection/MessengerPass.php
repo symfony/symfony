@@ -49,7 +49,7 @@ class MessengerPass implements CompilerPassInterface
             return;
         }
 
-        if (!$container->getParameter('kernel.debug') || !$container->has('logger')) {
+        if (!$container->getParameter('kernel.debug') || !$container->hasAlias('logger')) {
             $container->removeDefinition('messenger.middleware.debug.logging');
         }
 

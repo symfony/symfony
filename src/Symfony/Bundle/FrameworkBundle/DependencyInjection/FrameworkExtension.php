@@ -22,6 +22,7 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -1556,12 +1557,31 @@ class FrameworkExtension extends Extension
             $config['pools']['cache.'.$name] = array(
                 'adapter' => $config[$name],
                 'public' => true,
+                'tags' => false,
             );
         }
         foreach ($config['pools'] as $name => $pool) {
+            if ($config['pools'][$pool['adapter']]['tags'] ?? false) {
+                $pool['adapter'] = '.'.$pool['adapter'].'.inner';
+            }
             $definition = new ChildDefinition($pool['adapter']);
+
+            if ($pool['tags']) {
+                if ($config['pools'][$pool['tags']]['tags'] ?? false) {
+                    $pool['tags'] = '.'.$pool['tags'].'.inner';
+                }
+                $container->register($name, TagAwareAdapter::class)
+                    ->addArgument(new Reference('.'.$name.'.inner'))
+                    ->addArgument(true !== $pool['tags'] ? new Reference($pool['tags']) : null)
+                    ->setPublic($pool['public'])
+                ;
+
+                $pool['name'] = $name;
+                $pool['public'] = false;
+                $name = '.'.$name.'.inner';
+            }
             $definition->setPublic($pool['public']);
-            unset($pool['adapter'], $pool['public']);
+            unset($pool['adapter'], $pool['public'], $pool['tags']);
 
             $definition->addTag('cache.pool', $pool);
             $container->setDefinition($name, $definition);

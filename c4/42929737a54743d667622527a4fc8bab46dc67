@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-04-13T14:28:37Z
+
+@ogizanagi the [tests fail](https://travis-ci.org/symfony/symfony/jobs/366133655#L2687) again, I guess `LoggerPass` is processed after `MessengerPass`? or not?
+https://github.com/symfony/symfony/blob/6bbb5bcc5294fdd540bec35541f77b87e212fc5f/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php#L90
+
+Any suggestions?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-13T16:05:27Z
+
+@yceruto : IIUC, the FrameworkExtensionTest does not build the FrameworkBundle, so compiler passes like the `LoggerPass` registered in the fwb are never processed.
+
+Anyway, you moved it back to the MessengerPass, so this check is kind of required here as you can theoretically use the pass shipped within the component out of the Fwb usage, just with DI. So, let's keep this check.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-04-14T17:53:36Z
+
+Done! (failures are unrelated)
+
+Status: Needs Review

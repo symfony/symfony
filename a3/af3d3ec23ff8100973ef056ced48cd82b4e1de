@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-04-15T08:00:55Z
+
+Change documented here https://github.com/symfony/symfony-docs/pull/9598.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-15T12:06:56Z
+
+Just to reduce the BC breaking potential: what about trying the trimmed value when the non trimmed one doesn't match?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-04-15T19:38:01Z
+
+I've added a test that covers submitting a value with a white space.
+
+I don't think we should have a double check that add some overhead in two different transformers, it would mean we may should care of deprecating that behavior in master, adding even more overhead.
+
+You convinced me that this was a bug fix :), then I'm not in favor of having an ambiguous behavior about a match that should not be expected. It is not even possible to try to submit invalid values using a Form API from Browser Kit when playing in tests.
+
+What about not caring about this :), but taking care of fixing the docs should be enough, WDYT?

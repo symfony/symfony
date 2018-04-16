@@ -9,7 +9,11 @@
         <framework:messenger>
             <framework:adapter name="default" dsn="amqp://localhost/%2f/messages" />
             <framework:adapter name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name">
-                <framework:option name="queue_name" value="Queue" />
+                <framework:options>
+                    <framework:queue>
+                        <framework:name>Queue</framework:name>
+                    </framework:queue>
+                </framework:options>
             </framework:adapter>
         </framework:messenger>
     </framework:config>

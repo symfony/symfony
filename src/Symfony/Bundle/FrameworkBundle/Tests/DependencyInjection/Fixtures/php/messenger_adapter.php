@@ -6,7 +6,7 @@ $container->loadFromExtension('framework', array(
             'default' => 'amqp://localhost/%2f/messages',
             'customised' => array(
                 'dsn' => 'amqp://localhost/%2f/messages?exchange_name=exchange_name',
-                'options' => array('queue_name' => 'Queue'),
+                'options' => array('queue' => array('name' => 'Queue')),
             ),
         ),
     ),

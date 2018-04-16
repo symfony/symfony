@@ -94,7 +94,7 @@ class Connection
      */
     public function publish(string $body, array $headers = array()): void
     {
-        if ($this->debug) {
+        if ($this->debug && $this->shouldSetup()) {
             $this->setup();
         }
 
@@ -108,7 +108,7 @@ class Connection
      */
     public function get(): ?\AMQPEnvelope
     {
-        if ($this->debug) {
+        if ($this->debug && $this->shouldSetup()) {
             $this->setup();
         }
 
@@ -117,7 +117,7 @@ class Connection
                 return $message;
             }
         } catch (\AMQPQueueException $e) {
-            if (404 === $e->getCode()) {
+            if (404 === $e->getCode() && $this->shouldSetup()) {
                 // If we get a 404 for the queue, it means we need to setup the exchange & queue.
                 $this->setup();
 
@@ -214,5 +214,10 @@ class Connection
         $this->amqpChannel = null;
         $this->amqpQueue = null;
         $this->amqpExchange = null;
+    }
+
+    private function shouldSetup(): bool
+    {
+        return !array_key_exists('auto-setup', $this->connectionCredentials) || 'false' !== $this->connectionCredentials['auto-setup'];
     }
 }

@@ -539,7 +539,7 @@ abstract class BaseNode implements NodeInterface
         $knownTypes = array_keys(self::$placeholders[$this->handlingPlaceholder]);
         $validTypes = $this->getValidPlaceholderTypes();
 
-        if (array_diff($knownTypes, $validTypes)) {
+        if ($validTypes && array_diff($knownTypes, $validTypes)) {
             $e = new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected %s, but got %s.',
                 $this->getPath(),

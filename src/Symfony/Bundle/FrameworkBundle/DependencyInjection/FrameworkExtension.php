@@ -1446,19 +1446,11 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.xml');
 
-        $senderLocatorMapping = array();
         $messageToSenderIdsMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
-            foreach ($messageConfiguration['senders'] as $sender) {
-                if (null !== $sender) {
-                    $senderLocatorMapping[$sender] = new Reference($sender);
-                }
-            }
-
             $messageToSenderIdsMapping[$message] = $messageConfiguration['senders'];
         }
 
-        $container->getDefinition('messenger.sender_locator')->replaceArgument(0, $senderLocatorMapping);
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
 
         if ($config['middlewares']['validation']['enabled']) {
@@ -1476,7 +1468,7 @@ class FrameworkExtension extends Extension
             ))->setArguments(array(
                 $adapter['dsn'],
                 $adapter['options'],
-            ))->addTag('messenger.sender'));
+            ))->addTag('messenger.sender', array('name' => $name)));
 
             $container->setDefinition('messenger.receiver.'.$name, (new Definition(ReceiverInterface::class))->setFactory(array(
                 new Reference('messenger.adapter_factory'),
@@ -1484,7 +1476,7 @@ class FrameworkExtension extends Extension
             ))->setArguments(array(
                 $adapter['dsn'],
                 $adapter['options'],
-            ))->addTag('messenger.receiver'));
+            ))->addTag('messenger.receiver', array('name' => $name)));
         }
     }
 

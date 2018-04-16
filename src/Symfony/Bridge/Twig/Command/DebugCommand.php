@@ -32,14 +32,18 @@ class DebugCommand extends Command
     private $twig;
     private $projectDir;
     private $bundlesMetadata;
+    private $twigDefaultPath;
+    private $rootDir;
 
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = array())
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = array(), string $twigDefaultPath = null, string $rootDir = null)
     {
         parent::__construct();
 
         $this->twig = $twig;
         $this->projectDir = $projectDir;
         $this->bundlesMetadata = $bundlesMetadata;
+        $this->twigDefaultPath = $twigDefaultPath;
+        $this->rootDir = $rootDir;
     }
 
     protected function configure()
@@ -85,7 +89,7 @@ EOF
             $data['tests'] = array_keys($data['tests']);
             $data['loader_paths'] = $this->getLoaderPaths();
             $io->writeln(json_encode($data));
-            $this->displayAlternatives($this->findWrongBundleOverrides($data['loader_paths']), $io);
+            $this->displayAlternatives($this->findWrongBundleOverrides(), $io);
 
             return 0;
         }
@@ -111,8 +115,7 @@ EOF
         }
 
         $rows = array();
-        $loaderPaths = $this->getLoaderPaths();
-        foreach ($loaderPaths as $namespace => $paths) {
+        foreach ($this->getLoaderPaths() as $namespace => $paths) {
             if (count($paths) > 1) {
                 $rows[] = array('', '');
             }
@@ -127,7 +130,7 @@ EOF
         array_pop($rows);
         $io->section('Loader Paths');
         $io->table(array('Namespace', 'Paths'), $rows);
-        $this->displayAlternatives($this->findWrongBundleOverrides($loaderPaths), $io);
+        $this->displayAlternatives($this->findWrongBundleOverrides(), $io);
 
         return 0;
     }
@@ -248,16 +251,35 @@ EOF
         }
     }
 
-    private function findWrongBundleOverrides($loaderPaths)
+    private function findWrongBundleOverrides(): array
     {
         $alternatives = array();
-        $paths = array_unique($loaderPaths['(None)']);
         $bundleNames = array();
-        foreach ($paths as $path) {
-            $relativePath = $path.'/bundles/';
-            if (file_exists($dir = $this->projectDir.'/'.$relativePath)) {
-                $folders = glob($dir.'*', GLOB_ONLYDIR);
-                $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
+
+        if ($this->rootDir) {
+            $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
+            $relativePath = ltrim(substr($this->rootDir.'/Resources/', \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+            $bundleNames = array_reduce(
+                $folders,
+                function ($carry, $absolutePath) use ($relativePath) {
+                    if (null !== $this->projectDir && 0 === strpos($absolutePath, $this->projectDir)) {
+                        $name = basename(\dirname($absolutePath));
+                        $path = $relativePath.$name;
+                        $carry[$name] = $path;
+                    }
+
+                    return $carry;
+                },
+                $bundleNames
+            );
+        }
+
+        if ($this->twigDefaultPath) {
+            $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
+            $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles', \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+            $bundleNames = array_reduce(
+                $folders,
+                function ($carry, $absolutePath) use ($relativePath) {
                     if (null !== $this->projectDir && 0 === strpos($absolutePath, $this->projectDir)) {
                         $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
                         $name = ltrim(substr($path, \strlen($relativePath)), DIRECTORY_SEPARATOR);
@@ -265,8 +287,9 @@ EOF
                     }
 
                     return $carry;
-                }, $bundleNames);
-            }
+                },
+                $bundleNames
+            );
         }
 
         if (\count($bundleNames)) {
@@ -289,7 +312,7 @@ EOF
         return $alternatives;
     }
 
-    private function displayAlternatives(array $wrongBundles, SymfonyStyle $io)
+    private function displayAlternatives(array $wrongBundles, SymfonyStyle $io): void
     {
         foreach ($wrongBundles as $path => $alternatives) {
             $message = sprintf('Path "%s" not matching any bundle found', $path);

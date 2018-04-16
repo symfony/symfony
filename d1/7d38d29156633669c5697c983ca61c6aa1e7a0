@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2018-03-22T21:08:58Z
+
+Ping @aschempp – you wrapped your head around the `ResponseCacheStrategy` lately, so you might want to comment.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-03-23T11:49:33Z
+
+The fix looks somewhat correct to me, according to the PR title.
+
+However, the correct solution would be to make the final response private (and not non-cacheable). But I guess you're aware of that and this PR is to disable caching in favor of incorrect caching.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-04-11T20:47:58Z
+
+@nicolas-grekas The appveyor test failed at
+
+```
+1) Symfony\Component\Console\Tests\Helper\ProcessHelperTest::testVariousProcessRuns with data set #2 ('  RUN  php -r "echo 42;"\n  OU...fully\n', 'php -r "echo 42;"', 4, null)
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+ '  RUN  php -r "echo 42;"
+-  OUT  42
+   RES  Command ran successfully
+ '
+C:\projects\symfony\src\Symfony\Component\Console\Tests\Helper\ProcessHelperTest.php:33
+FAILURES!
+```
+Is that a known spurious test?

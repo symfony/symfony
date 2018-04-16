@@ -15,6 +15,10 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Gathers and configures the argument value resolvers.
@@ -40,9 +44,20 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
             return;
         }
 
+        $resolvers = $this->findAndSortTaggedServices($this->argumentValueResolverTag, $container);
+
+        if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
+            foreach ($resolvers as $resolverReference) {
+                $id = (string) $resolverReference;
+                $container->register("debug.$id", TraceableValueResolver::class)
+                    ->setDecoratedService($id)
+                    ->setArguments(array(new Reference("debug.$id.inner"), new Reference('debug.stopwatch', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
+            }
+        }
+
         $container
             ->getDefinition($this->argumentResolverService)
-            ->replaceArgument(1, new IteratorArgument($this->findAndSortTaggedServices($this->argumentValueResolverTag, $container)))
+            ->replaceArgument(1, new IteratorArgument($resolvers))
         ;
     }
 }

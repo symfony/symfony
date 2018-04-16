@@ -569,6 +569,27 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('queue_name' => 'Queue'), $receiverArguments[1]);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".
+     */
+    public function testMessengerTransportConfigurationWithoutSerializer()
+    {
+        $this->createContainerFromFile('messenger_transport_no_serializer');
+    }
+
+    public function testMessengerTransportConfiguration()
+    {
+        $container = $this->createContainerFromFile('messenger_transport');
+
+        $this->assertSame('messenger.transport.serializer', (string) $container->getAlias('messenger.transport.encoder'));
+        $this->assertSame('messenger.transport.serializer', (string) $container->getAlias('messenger.transport.decoder'));
+
+        $serializerTransportDefinition = $container->getDefinition('messenger.transport.serializer');
+        $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
+        $this->assertSame(array('enable_max_depth' => true), $serializerTransportDefinition->getArgument(2));
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');

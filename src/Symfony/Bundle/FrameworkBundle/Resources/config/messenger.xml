@@ -43,12 +43,11 @@
         </service>
 
         <!-- Message encoding/decoding -->
-        <service id="messenger.transport.serialize_message_with_type_in_headers" class="Symfony\Component\Messenger\Transport\Serialization\Serializer">
+        <service id="messenger.transport.serializer" class="Symfony\Component\Messenger\Transport\Serialization\Serializer">
             <argument type="service" id="serializer" />
+            <argument /> <!-- Format -->
+            <argument type="collection" /> <!-- Context -->
         </service>
-
-        <service id="messenger.transport.default_encoder" alias="messenger.transport.serialize_message_with_type_in_headers" public="true" />
-        <service id="messenger.transport.default_decoder" alias="messenger.transport.serialize_message_with_type_in_headers" public="true" />
 
         <!-- Logging & Debug -->
         <service id="messenger.middleware.debug.logging" class="Symfony\Component\Messenger\Debug\LoggingMiddleware">
@@ -79,8 +78,8 @@
         </service>
 
         <service id="messenger.adapter.amqp.factory" class="Symfony\Component\Messenger\Adapter\AmqpExt\AmqpAdapterFactory">
-            <argument type="service" id="messenger.transport.default_encoder" />
-            <argument type="service" id="messenger.transport.default_decoder" />
+            <argument type="service" id="messenger.transport.encoder" />
+            <argument type="service" id="messenger.transport.decoder" />
             <argument>%kernel.debug%</argument>
 
             <tag name="messenger.adapter_factory" />

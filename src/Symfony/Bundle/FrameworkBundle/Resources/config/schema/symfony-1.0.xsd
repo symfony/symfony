@@ -371,15 +371,10 @@
 
     <xsd:complexType name="messenger_adapter">
         <xsd:sequence>
-            <xsd:element name="option" type="messenger_adapter_option" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="options" type="metadata" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
-    </xsd:complexType>
-
-    <xsd:complexType name="messenger_adapter_option">
-        <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="value" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_middleware">

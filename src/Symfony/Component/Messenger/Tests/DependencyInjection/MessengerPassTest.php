@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator;
@@ -324,7 +325,7 @@ class DummyReceiver implements ReceiverInterface
     public function receive(callable $handler): void
     {
         for ($i = 0; $i < 3; ++$i) {
-            $handler(new DummyMessage("Dummy $i"));
+            $handler(Envelope::wrap(new DummyMessage("Dummy $i")));
         }
     }
 

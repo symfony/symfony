@@ -55,6 +55,12 @@ class MessageBus implements MessageBusInterface
         $middleware = $this->indexedMiddlewares[$index];
 
         return function ($message) use ($middleware, $index) {
+            $message = Envelope::wrap($message);
+            if (!$middleware instanceof EnvelopeAwareInterface) {
+                // Do not provide the envelope if the middleware cannot read it:
+                $message = $message->getMessage();
+            }
+
             return $middleware->handle($message, $this->callableForNextMiddleware($index + 1));
         };
     }

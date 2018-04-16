@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
-use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -51,10 +50,6 @@ class LoggingMiddleware implements MiddlewareInterface
 
     private function createContext($message): array
     {
-        if ($message instanceof ReceivedMessage) {
-            $message = $message->getMessage();
-        }
-
         return array(
             'message' => $message,
             'class' => \get_class($message),

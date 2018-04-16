@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Enhancers;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
@@ -34,10 +35,10 @@ class StopWhenMessageCountIsExceededReceiver implements ReceiverInterface
     {
         $receivedMessages = 0;
 
-        $this->decoratedReceiver->receive(function ($message) use ($handler, &$receivedMessages) {
-            $handler($message);
+        $this->decoratedReceiver->receive(function (?Envelope $envelope) use ($handler, &$receivedMessages) {
+            $handler($envelope);
 
-            if (null !== $message && ++$receivedMessages >= $this->maximumNumberOfMessages) {
+            if (null !== $envelope && ++$receivedMessages >= $this->maximumNumberOfMessages) {
                 $this->stop();
                 if (null !== $this->logger) {
                     $this->logger->info('Receiver stopped due to maximum count of {count} exceeded', array('count' => $this->maximumNumberOfMessages));

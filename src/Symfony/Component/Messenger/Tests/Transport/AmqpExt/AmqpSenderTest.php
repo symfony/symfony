@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -24,16 +25,16 @@ class AmqpSenderTest extends TestCase
 {
     public function testItSendsTheEncodedMessage()
     {
-        $message = new DummyMessage('Oy');
+        $envelope = Envelope::wrap(new DummyMessage('Oy'));
         $encoded = array('body' => '...', 'headers' => array('type' => DummyMessage::class));
 
         $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
-        $encoder->method('encode')->with($message)->willReturnOnConsecutiveCalls($encoded);
+        $encoder->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers']);
 
         $sender = new AmqpSender($encoder, $connection);
-        $sender->send($message);
+        $sender->send($envelope);
     }
 }

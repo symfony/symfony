@@ -13,12 +13,14 @@ namespace Symfony\Component\Messenger\Asynchronous\Middleware;
 
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class SendMessageMiddleware implements MiddlewareInterface
+class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
 {
     private $senderLocator;
 
@@ -32,17 +34,19 @@ class SendMessageMiddleware implements MiddlewareInterface
      */
     public function handle($message, callable $next)
     {
-        if ($message instanceof ReceivedMessage) {
-            return $next($message->getMessage());
+        $envelope = Envelope::wrap($message);
+        if ($envelope->get(ReceivedMessage::class)) {
+            // It's a received message. Do not send it back:
+            return $next($message);
         }
 
-        if (!empty($senders = $this->senderLocator->getSendersForMessage($message))) {
+        if (!empty($senders = $this->senderLocator->getSendersForMessage($envelope->getMessage()))) {
             foreach ($senders as $sender) {
                 if (null === $sender) {
                     continue;
                 }
 
-                $sender->send($message);
+                $sender->send($envelope);
             }
 
             if (!\in_array(null, $senders, true)) {

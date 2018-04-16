@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DebugBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -24,15 +25,22 @@ use Symfony\Component\VarDumper\Server\DumpServer;
  *
  * @internal
  */
-class ServerDumpPlaceholderCommand extends ServerDumpCommand
+class ServerDumpPlaceholderCommand extends Command
 {
+    private $replacedCommand;
+
     public function __construct(DumpServer $server = null, array $descriptors = array())
     {
-        parent::__construct(new class() extends DumpServer {
-            public function __construct()
-            {
-            }
-        }, $descriptors);
+        $this->replacedCommand = new ServerDumpCommand((new \ReflectionClass(DumpServer::class))->newInstanceWithoutConstructor(), $descriptors);
+
+        parent::__construct();
+    }
+
+    protected function configure()
+    {
+        $this->setDefinition($this->replacedCommand->getDefinition());
+        $this->setHelp($this->replacedCommand->getHelp());
+        $this->setDescription($this->replacedCommand->getDescription());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

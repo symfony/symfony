@@ -209,6 +209,19 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    public function testEnvWithVariableNode(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
+            'variable_node' => '%env(SOME)%',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -247,6 +260,7 @@ class EnvConfiguration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('simple_array_node')->end()
                 ->enumNode('enum_node')->values(array('a', 'b'))->end()
+                ->variableNode('variable_node')->end()
             ->end();
 
         return $treeBuilder;

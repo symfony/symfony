@@ -15,8 +15,7 @@ if (!function_exists('dump')) {
     /**
      * @author Nicolas Grekas <p@tchwork.com>
      */
-    function dump($var, ...$moreVars)
-    {
+    function dump($var, ...$moreVars) {
         VarDumper::dump($var);
 
         foreach ($moreVars as $var) {
@@ -28,5 +27,15 @@ if (!function_exists('dump')) {
         }
 
         return $var;
+    }
+}
+
+if (!function_exists('dump_die')) {
+    /**
+     * @author Joubert RedRat <me+symfony@redrat.com.br>
+     */
+    function dump_die($var, ...$moreVars) {
+        dump($var, $moreVars);
+        die;
     }
 }

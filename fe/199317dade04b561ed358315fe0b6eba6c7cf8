@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-16T12:50:55Z
+
+@ogizanagi changed the PR based on your feedbacks. Looks better 👌
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-17T06:52:05Z
+
+Though, if we rename "adapters" to "transports" this would clash 🤔. WDYT about removing this `.transport` configuration layer and just having `framework.messenger.encoder`, `framework.messenger.decoder` & `framework.messenger.serializer` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-17T07:05:43Z
+
+Yes for less nesting levels

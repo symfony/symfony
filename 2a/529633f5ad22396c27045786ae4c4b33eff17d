@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-17T09:00:24Z
+
+Tests need to be updated https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Tests/EventListener/ErrorListenerTest.php
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2018-04-17T09:32:58Z
+
+Updated the test

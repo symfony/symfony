@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-04-12T14:51:52Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-13T12:12:37Z
+
+> Yes, it's possible to have a NUL character
+
+But your example doesn't use `command -v`, so I'm not sure it applies, does it?
+
+About the proposal I made, I did it because I found it harder to review when ob_* closing functions are called in two different code paths. I made the proposal to make Symfony better, not to bother you.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-04-13T16:54:58Z
+
+> But your example doesn't use command -v, so I'm not sure it applies, does it?
+
+Rather not assume that `command -v` will return what we expect it to return. It doesn't complicate the regex much anyway...
+
+> About the proposal I made, I did it because I found it harder to review when ob_* closing functions are called in two different code paths. I made the proposal to make Symfony better, not to bother you.
+
+Got it. I will make the change.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-04-13T17:10:09Z
+
+Removed the `preg_match` as it's just unnecessary (and what if `file` is a shell built-in lol)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-04-17T09:16:44Z
+
+Status: Needs Review

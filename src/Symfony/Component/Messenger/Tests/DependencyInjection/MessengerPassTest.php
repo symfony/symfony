@@ -99,7 +99,17 @@ class MessengerPassTest extends TestCase
 
         (new MessengerPass())->process($container);
 
-        $this->assertEquals(array('amqp' => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
+        $this->assertEquals(array('amqp' => new Reference(AmqpReceiver::class), AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
+    }
+
+    public function testItRegistersReceiversWithoutTagName()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver');
+
+        (new MessengerPass())->process($container);
+
+        $this->assertEquals(array(AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
     }
 
     public function testItRegistersSenders()
@@ -110,6 +120,16 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertEquals(array('amqp' => new Reference(AmqpSender::class), AmqpSender::class => new Reference(AmqpSender::class)), $container->getDefinition('messenger.sender_locator')->getArgument(0));
+    }
+
+    public function testItRegistersSenderWithoutTagName()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register(AmqpSender::class, AmqpSender::class)->addTag('messenger.sender');
+
+        (new MessengerPass())->process($container);
+
+        $this->assertEquals(array(AmqpSender::class => new Reference(AmqpSender::class)), $container->getDefinition('messenger.sender_locator')->getArgument(0));
     }
 
     /**

@@ -157,7 +157,11 @@ class MessengerPass implements CompilerPassInterface
         $receiverMapping = array();
         foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
             foreach ($tags as $tag) {
-                $receiverMapping[$tag['name'] ?? $id] = new Reference($id);
+                $receiverMapping[$id] = new Reference($id);
+
+                if (isset($tag['name'])) {
+                    $receiverMapping[$tag['name']] = $receiverMapping[$id];
+                }
             }
         }
 
@@ -171,8 +175,8 @@ class MessengerPass implements CompilerPassInterface
             foreach ($tags as $tag) {
                 $senderLocatorMapping[$id] = new Reference($id);
 
-                if ($tag['name']) {
-                    $senderLocatorMapping[$tag['name']] = new Reference($id);
+                if (isset($tag['name'])) {
+                    $senderLocatorMapping[$tag['name']] = $senderLocatorMapping[$id];
                 }
             }
         }

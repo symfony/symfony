@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by davidbarratt at 2018-04-17T15:31:55Z
+
+What happens if you attempt to publish to a non-existent exchange? I assume it will throw an exception? That makes sense to me since that's the same behavior that happens if you attempt to publish to a non-existent vhost.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-17T16:01:14Z
+
+When you publish to a non-existent exchange, RabbitMq would not tell you anything, unfortunately. It would not throw an exception, so that's why we actually setup when `debug`. On the other hand, it does throw an exception when consuming a message, that's why [we handle this specific case](https://github.com/sroze/symfony/blob/b99b0696f1e3a40ca8773201f9a78af8e35dd943/src/Symfony/Component/Messenger/Adapter/AmqpExt/Connection.php#L120-L125) and do the setup automatically :)
+
+---------------------------------------------------------------------------
+
+by davidbarratt at 2018-04-17T16:17:54Z
+
+Could we have an option to setup the exchange, but not the queue?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-17T16:21:07Z
+
+I wouldn't go in this direction. If we do, we also need to be able to select if we bind the queue or not for example. I'd argue that either you use the automated configuration or you go ahead with your own.
+
+---------------------------------------------------------------------------
+
+by davidbarratt at 2018-04-17T16:31:59Z
+
+hmm, I guess it's fine. If there aren't any applications listening.. then it doesn't matter if the message falls out of the tubes.

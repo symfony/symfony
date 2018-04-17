@@ -1,0 +1,6 @@
+framework:
+    messenger:
+        serializer:
+            format: csv
+            context:
+                enable_max_depth: true

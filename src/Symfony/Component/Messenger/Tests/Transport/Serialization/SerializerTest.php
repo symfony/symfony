@@ -44,4 +44,21 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('type', $encoded['headers']);
         $this->assertEquals(DummyMessage::class, $encoded['headers']['type']);
     }
+
+    public function testUsesTheCustomFormatAndContext()
+    {
+        $message = new DummyMessage('Foo');
+
+        $serializer = $this->getMockBuilder(SerializerComponent\SerializerInterface::class)->getMock();
+        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', array('foo' => 'bar'))->willReturn('Yay');
+        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', array('foo' => 'bar'))->willReturn($message);
+
+        $encoder = new Serializer($serializer, 'csv', array('foo' => 'bar'));
+
+        $encoded = $encoder->encode($message);
+        $decoded = $encoder->decode($encoded);
+
+        $this->assertSame('Yay', $encoded['body']);
+        $this->assertSame($message, $decoded);
+    }
 }

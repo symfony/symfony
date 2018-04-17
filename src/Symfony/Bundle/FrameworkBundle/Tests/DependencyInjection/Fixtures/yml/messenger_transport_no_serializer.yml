@@ -1,0 +1,8 @@
+framework:
+    serializer:
+        enabled: false
+    messenger:
+        serializer:
+            enabled: true
+        adapters:
+            default: 'amqp://localhost/%2f/messages'

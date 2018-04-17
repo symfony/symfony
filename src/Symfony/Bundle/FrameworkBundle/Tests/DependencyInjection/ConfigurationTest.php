@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Serializer\Serializer;
 
 class ConfigurationTest extends TestCase
 {
@@ -259,6 +260,13 @@ class ConfigurationTest extends TestCase
                     ),
                 ),
                 'adapters' => array(),
+                'serializer' => array(
+                    'enabled' => true,
+                    'format' => 'json',
+                    'context' => array(),
+                ),
+                'encoder' => 'messenger.transport.serializer',
+                'decoder' => 'messenger.transport.serializer',
             ),
         );
     }

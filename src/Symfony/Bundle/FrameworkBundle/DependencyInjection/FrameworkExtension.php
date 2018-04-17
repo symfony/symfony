@@ -273,7 +273,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['messenger'])) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader);
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
         }
@@ -1438,13 +1438,28 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed.');
         }
 
         $loader->load('messenger.xml');
+
+        if ($this->isConfigEnabled($container, $config['serializer'])) {
+            if (count($config['adapters']) > 0 && !$this->isConfigEnabled($container, $serializerConfig)) {
+                throw new LogicException('Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".');
+            }
+
+            $container->getDefinition('messenger.transport.serializer')
+                ->replaceArgument(1, $config['serializer']['format'])
+                ->replaceArgument(2, $config['serializer']['context']);
+        } else {
+            $container->removeDefinition('messenger.transport.serializer');
+        }
+
+        $container->setAlias('messenger.transport.encoder', $config['encoder']);
+        $container->setAlias('messenger.transport.decoder', $config['decoder']);
 
         $messageToSenderIdsMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {

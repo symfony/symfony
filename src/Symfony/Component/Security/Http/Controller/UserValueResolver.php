@@ -57,6 +57,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
 
     /**
      * @param string $type
+     *
      * @return bool
      */
     private function implementsCorrectInterface($type)

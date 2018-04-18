@@ -72,6 +72,21 @@ class SecurityUserValueResolverTest extends TestCase
         $this->assertSame(array($user), iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
     }
 
+    public function testResolveUserInterfaceImplementation()
+    {
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token->expects($this->any())->method('getUser')->willReturn($user);
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $resolver = new SecurityUserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', DummySubUser::class, false, false, null);
+
+        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
+        $this->assertSame(array($user), iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+    }
+
     public function testIntegration()
     {
         $user = $this->getMockBuilder(UserInterface::class)->getMock();

@@ -66,6 +66,6 @@ final class SecurityUserValueResolver implements ArgumentValueResolverInterface
      */
     private function implementsCorrectInterface($type)
     {
-        return $type === UserInterface::class || array_key_exists(UserInterface::class, class_implements($type));
+        return UserInterface::class === $type || array_key_exists(UserInterface::class, class_implements($type));
     }
 }

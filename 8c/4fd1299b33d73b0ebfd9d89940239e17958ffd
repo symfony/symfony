@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-06T09:43:00Z
+
+@chalasr @stof  do you think this can cause issues?
+
+Also I don't know how to provide a proper error message in case a provider is needed but none is configured.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-06T09:57:38Z
+
+Very complex topic, looks like you like them :) (#24805)
+
+@weaverryan and me have this in mind for a while, the issue is that actually pretty much all security listeners are requiring a user provider for user loading/refreshment.
+This misses new test case(s) (authentication with no configured provider), adding them will better answer your question.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-06T10:28:03Z
+
+Yes the way we'll authenticate our users makes me discover some edge cases!
+
+> the issue is that actually pretty much all security listeners are requiring a user provider for user loading/refreshment.
+
+I don't understand how this is an issue?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-06T14:55:15Z
+
+I created a dummy user provider whose sole purpose is to throw an exception, WDYT?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-09T02:28:27Z
+
+Huh, a dummy provider is a really clever idea - it makes this very feasible (and sure, we could try to rip out the guts of the user provider system later... but that will be super hard and will probably never happen).
+
+I like this!
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-09T10:16:21Z
+
+Do we need a functional test where authentication is done without user provider?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-12T09:23:40Z
+
+@MatTheCat The config test added here should be enough
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-13T07:26:53Z
+
+Are we good to go then or are some things missing?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-17T09:40:13Z
+
+Is it alright to let `BadMethodCallException`s empty?

@@ -16,6 +16,8 @@ use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
 trait ProxyTrait
 {

@@ -78,6 +78,7 @@ Security
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
  * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
  * The `ExpressionVoter::addExpressionLanguageProvider()` method has been removed.
+ * The `AuthenticationTrustResolver` constructor arguments have been removed.
 
 SecurityBundle
 --------------
@@ -85,6 +86,8 @@ SecurityBundle
  * The `logout_on_user_change` firewall option has been removed.
  * The `switch_user.stateless` firewall option has been removed.
  * The `SecurityUserValueResolver` class has been removed.
+ * The `security.authentication.trust_resolver.anonymous_class` parameter has been removed. 
+ * The `security.authentication.trust_resolver.rememberme_class` parameter has been removed. 
 
 Translation
 -----------

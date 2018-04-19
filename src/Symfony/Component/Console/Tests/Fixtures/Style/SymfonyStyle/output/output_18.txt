@@ -1,0 +1,4 @@
+
+[39;49m // [39;49mLoading the configuration file                                                                                                
+[39;49m // [39;49m"[33m/var/www/deploy/current/test/production/219099923320/feature-test-config/config/packages/alice.yml[39m".                         
+

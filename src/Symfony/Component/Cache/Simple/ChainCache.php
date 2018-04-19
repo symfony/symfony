@@ -58,7 +58,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
      */
     public function get($key, $default = null)
     {
-        $miss = null !== $default && is_object($default) ? $default : $this->miss;
+        $miss = null !== $default && \is_object($default) ? $default : $this->miss;
 
         foreach ($this->caches as $i => $cache) {
             $value = $cache->get($key, $miss);
@@ -80,7 +80,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
      */
     public function getMultiple($keys, $default = null)
     {
-        $miss = null !== $default && is_object($default) ? $default : $this->miss;
+        $miss = null !== $default && \is_object($default) ? $default : $this->miss;
 
         return $this->generateItems($this->caches[0]->getMultiple($keys, $miss), 0, $miss, $default);
     }

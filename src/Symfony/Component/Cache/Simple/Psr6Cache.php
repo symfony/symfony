@@ -38,7 +38,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
         if ($pool instanceof AbstractAdapter) {
             $this->createCacheItem = \Closure::bind(
                 function ($key, $value, $allowInt = false) {
-                    if ($allowInt && is_int($key)) {
+                    if ($allowInt && \is_int($key)) {
                         $key = (string) $key;
                     } else {
                         CacheItem::validateKey($key);
@@ -121,7 +121,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
+        } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
 
@@ -146,7 +146,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
      */
     public function setMultiple($values, $ttl = null)
     {
-        $valuesIsArray = is_array($values);
+        $valuesIsArray = \is_array($values);
         if (!$valuesIsArray && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', is_object($values) ? get_class($values) : gettype($values)));
         }
@@ -166,7 +166,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
                 $items = $this->pool->getItems($items);
             } else {
                 foreach ($values as $key => $value) {
-                    if (is_int($key)) {
+                    if (\is_int($key)) {
                         $key = (string) $key;
                     }
                     $items[$key] = $this->pool->getItem($key)->set($value);
@@ -199,7 +199,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
+        } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
 

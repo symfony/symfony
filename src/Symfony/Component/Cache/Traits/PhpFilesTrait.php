@@ -96,7 +96,7 @@ trait PhpFilesTrait
         foreach ($values as $id => $value) {
             if ('N;' === $value) {
                 $values[$id] = null;
-            } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
+            } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
                 $values[$id] = parent::unserialize($value);
             }
         }
@@ -122,21 +122,21 @@ trait PhpFilesTrait
         $allowCompile = 'cli' !== PHP_SAPI || ini_get('opcache.enable_cli');
 
         foreach ($values as $key => $value) {
-            if (null === $value || is_object($value)) {
+            if (null === $value || \is_object($value)) {
                 $value = serialize($value);
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 $serialized = serialize($value);
                 $unserialized = parent::unserialize($serialized);
                 // Store arrays serialized if they contain any objects or references
                 if ($unserialized !== $value || (false !== strpos($serialized, ';R:') && preg_match('/;R:[1-9]/', $serialized))) {
                     $value = $serialized;
                 }
-            } elseif (is_string($value)) {
+            } elseif (\is_string($value)) {
                 // Serialize strings if they could be confused with serialized objects or arrays
                 if ('N;' === $value || (isset($value[2]) && ':' === $value[1])) {
                     $value = serialize($value);
                 }
-            } elseif (!is_scalar($value)) {
+            } elseif (!\is_scalar($value)) {
                 throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, gettype($value)));
             }
 

@@ -63,7 +63,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      */
     public function get($key, $default = null)
     {
-        if (!is_string($key)) {
+        if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
         }
         if (null === $this->values) {
@@ -77,7 +77,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
 
         if ('N;' === $value) {
             $value = null;
-        } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
+        } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
             try {
                 $e = null;
                 $value = unserialize($value);
@@ -99,11 +99,11 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
+        } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
         foreach ($keys as $key) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
             }
         }
@@ -119,7 +119,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      */
     public function has($key)
     {
-        if (!is_string($key)) {
+        if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
         }
         if (null === $this->values) {
@@ -134,7 +134,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      */
     public function delete($key)
     {
-        if (!is_string($key)) {
+        if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
         }
         if (null === $this->values) {
@@ -149,7 +149,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      */
     public function deleteMultiple($keys)
     {
-        if (!is_array($keys) && !$keys instanceof \Traversable) {
+        if (!\is_array($keys) && !$keys instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
 
@@ -157,7 +157,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         $fallbackKeys = array();
 
         foreach ($keys as $key) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
             }
 
@@ -183,7 +183,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      */
     public function set($key, $value, $ttl = null)
     {
-        if (!is_string($key)) {
+        if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
         }
         if (null === $this->values) {
@@ -198,7 +198,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      */
     public function setMultiple($values, $ttl = null)
     {
-        if (!is_array($values) && !$values instanceof \Traversable) {
+        if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', is_object($values) ? get_class($values) : gettype($values)));
         }
 
@@ -206,7 +206,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         $fallbackValues = array();
 
         foreach ($values as $key => $value) {
-            if (!is_string($key) && !is_int($key)) {
+            if (!\is_string($key) && !\is_int($key)) {
                 throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', is_object($key) ? get_class($key) : gettype($key)));
             }
 
@@ -234,7 +234,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
 
                 if ('N;' === $value) {
                     yield $key => null;
-                } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
+                } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
                     try {
                         yield $key => unserialize($value);
                     } catch (\Error $e) {

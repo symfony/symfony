@@ -240,7 +240,7 @@ trait RedisTrait
             $cursor = null;
             do {
                 $keys = $host instanceof \Predis\Client ? $host->scan($cursor, 'MATCH', $namespace.'*', 'COUNT', 1000) : $host->scan($cursor, $namespace.'*', 1000);
-                if (isset($keys[1]) && is_array($keys[1])) {
+                if (isset($keys[1]) && \is_array($keys[1])) {
                     $cursor = $keys[0];
                     $keys = $keys[1];
                 }

@@ -422,6 +422,9 @@ class SecurityExtension extends Extension
                         $userProvider = null;
                     } elseif ($defaultProvider) {
                         $userProvider = $defaultProvider;
+                    } elseif (empty($providerIds)) {
+                        $userProvider = sprintf('security.user.provider.missing.%s', $key);
+                        $container->setDefinition($userProvider, (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id));
                     } else {
                         throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $key, $id));
                     }

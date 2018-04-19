@@ -31,6 +31,8 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
      */
     private $choiceList;
 
+    private $locale;
+
     /**
      * {@inheritdoc}
      */
@@ -44,9 +46,12 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
                     return null;
                 }
 
+                $this->locale = $options['locale'];
+
                 return $this;
             },
             'choice_translation_domain' => false,
+            'locale' => \Locale::getDefault(),
         ));
     }
 
@@ -75,7 +80,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getRegionBundle()->getCountryNames()), $value);
+        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getRegionBundle()->getCountryNames($this->locale)), $value);
     }
 
     /**

@@ -31,6 +31,8 @@ class LanguageType extends AbstractType implements ChoiceLoaderInterface
      */
     private $choiceList;
 
+    private $locale;
+
     /**
      * {@inheritdoc}
      */
@@ -44,9 +46,12 @@ class LanguageType extends AbstractType implements ChoiceLoaderInterface
                     return null;
                 }
 
+                $this->locale = $options['locale'];
+
                 return $this;
             },
             'choice_translation_domain' => false,
+            'locale' => \Locale::getDefault(),
         ));
     }
 
@@ -75,7 +80,7 @@ class LanguageType extends AbstractType implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getLanguageBundle()->getLanguageNames()), $value);
+        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getLanguageBundle()->getLanguageNames($this->locale)), $value);
     }
 
     /**

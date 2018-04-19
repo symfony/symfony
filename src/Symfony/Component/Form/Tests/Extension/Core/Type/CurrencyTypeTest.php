@@ -35,6 +35,16 @@ class CurrencyTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices, '', false, false);
     }
 
+    public function testCustomLocale()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('locale' => 'ru'))
+            ->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('EUR', 'EUR', 'Евро'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('USD', 'USD', 'Доллар США'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('SIT', 'SIT', 'Словенский толар'), $choices, '', false, false);
+    }
+
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');

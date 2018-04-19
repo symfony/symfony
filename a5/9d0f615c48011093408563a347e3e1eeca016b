@@ -1,0 +1,273 @@
+---------------------------------------------------------------------------
+
+by onEXHovia at 2018-04-18T09:21:38Z
+
+I think there will be a similar number of pros and cons.
+Should we add `TwigFunction` by analogy with [dump](https://github.com/symfony/symfony/blob/2fb303bb4fa8bc6ccb336a282417d056964b257b/src/Symfony/Bridge/Twig/Extension/DumpExtension.php#L41) 🤔
+
+---------------------------------------------------------------------------
+
+by pamil at 2018-04-18T09:30:51Z
+
+Seeing `dd()` anywhere in the code for the first time would cause nothing else but confusion. If one wants to save keystrokes, why not create a macro in IDE (or use a debugger)?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T09:32:39Z
+
+- It doesn't add complexity
+- It's optional
+- It's faster than hooking up the debugger
+- Not everyone has experience with a debugger
+- It doesn't replace a debugger and you're not forced to use this
+
+I see no downsides and maintenance isn't an issue :+1:
+
+---------------------------------------------------------------------------
+
+by kunicmarko20 at 2018-04-18T09:34:16Z
+
+@iltar But you have `dump()`, as @pamil said you can create IDE macro. If this gets accepted won't it start an avalanche of people wanting shortcuts for something?
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2018-04-18T09:46:02Z
+
+Creating a macro in the IDE is part of the doc, not the framework, and not asked as much as `dd()`. I'm totally approving this feature as it's almost like "everyone's asking for it", where debugger usage, even though better, can be cumbersome for lots of devs.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T10:01:49Z
+
+@kunicmarko20 Not everyone is always developing with an IDE, don't forget the notepad(++), Vim, atom etc developers. Also important to note down, is that the var-dumper can be used as stand-alone. Meaning if devs like the symfony `dump()`, they can use this package. This reaches far beyond experienced developers with debuggers, as you'll probably be reaching hobby devs, wordpress/joomla/drupal devs etc.
+
+When you're comparing the full feature set of the var-dumper component vs other dumpers, then a dump and die functionality is quite common and desired. It takes a few lines to add the function, but adds a big feeling of completion for the developers that would otherwise have used a `dd()`-similar function from another framework.
+
+I think it's quite nice to have a "full" solution coming from Symfony, making it even better :+1:
+
+---------------------------------------------------------------------------
+
+by pamil at 2018-04-18T10:25:18Z
+
+After reading the reasoning behind introducing this function I think it's a good idea in fact and with almost no potential for harm. 👍
+
+---------------------------------------------------------------------------
+
+by deflock at 2018-04-18T10:30:32Z
+
+The feature itself is must have, but not sure about name, confuses a bit.
+
+@iltar Can you explain "It's optional"? What if I want `dump()` but not `dd()` in global scope?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T10:33:41Z
+
+@deflock why would you not want it in the global scope? It's optional because you don't _have_ to use it.
+
+I don't really care about the name myself, I'll just roll with it.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2018-04-18T12:35:13Z
+
+Why not! I'm not sure if it's super useful but at least it's cheap to implement and maintain.
+
+---------------------------------------------------------------------------
+
+by pimolo at 2018-04-18T12:46:43Z
+
+IMHO it's a good thing for beginners :+1:
+But we should put in the doc that it is just an helper, and that we highly suggest installing a true debugging tool, like XDebug.
+`dd()`is nothing compared to that, even if it can be enough sometimes.
+
+I would be disappointed if as a consequence, we had some people thinking : "Oh look, Symfony is recommanding `dump();exit;`/`dd()` thing for debugging".
+
+---------------------------------------------------------------------------
+
+by houssemGeek at 2018-04-18T13:15:03Z
+
+Very good idea, in fact I galley every time with the **dump() + exit(0) / die()**. **dd()** is very useful ^^
+
+---------------------------------------------------------------------------
+
+by ecataranciuc at 2018-04-18T13:24:41Z
+
+The name could be more descriptive.
+
+---------------------------------------------------------------------------
+
+by sailingdeveloper at 2018-04-18T13:30:17Z
+
+Assuming that this is inspired by Laravel, it's [implementation](https://github.com/laravel/framework/blob/5.6/src/Illuminate/Support/helpers.php#L547) includes sending a 500 response code:
+```php
+http_response_code(500);
+```
+
+Maybe that's worth considering?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-18T13:33:52Z
+
+> sending a 500 response code
+
+Actually, I wondered the same but did not include the call because I feel like a debugging tool should change as little as possible the current context. If you happen to need to debug the status code, doing so would prevent it.
+
+---------------------------------------------------------------------------
+
+by sailingdeveloper at 2018-04-18T13:46:35Z
+
+> change as little as possible the current context
+
+Fair point, although you could move the call below the actual dump statement. It's just that when a developer leaves a `dd()` statment, this always results in an invalid response.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-18T14:11:21Z
+
+@stof good catch, fixed. I actually preferred to *not* alter `SourceContextProvider` and call `VarDumper::dump()` directly instead.
+
+---------------------------------------------------------------------------
+
+by teresko at 2018-04-18T14:19:36Z
+
+So, what you are saying is that Symfony will begin polluting the global php namespace with various "utility functions"? Looks like you are determined to turn this framework in the next version of CodeIgnorant, just because sheep from Laravel have been bleating.
+
+This is a terrible idea.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T14:23:19Z
+
+> So, what you are saying is that Symfony will begin polluting the global php namespace with various "utility functions"?
+
+Only in dev mode and only if you actually require the component, it's opt-in, not opt-out, unless you're still using `symfony/symfony`.
+
+> Looks like you are determined to turn this framework in the next version of CodeIgnorant, just because sheep from Laravel have been bleating.
+
+I get it, you disagree with it. However, you can also point that out in a civilized way.
+
+> This is a terrible idea.
+
+Can you elaborate why you think this is a terrible idea?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-18T14:28:49Z
+
+> good catch, fixed. I actually preferred to not alter SourceContextProvider and call VarDumper::dump() directly instead.
+
+that won't help. It will still report the `dd` function, as it will still be the latest non-whitelisted call
+
+---------------------------------------------------------------------------
+
+by DojoGeekRA at 2018-04-18T14:33:13Z
+
+@sailingdeveloper and @nicolas-grekas
+
+Laravel sends a 500 response to workaround an issue in Chrome where the network preview tab does not render correctly the content. [This is the related PR](https://github.com/laravel/framework/pull/22581).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-04-18T14:37:12Z
+
+@teresko your concerns about this are completely valid --> *"polluting the global php namespace with various utility functions"*. But that won't be the case here because we won't add lots of utilities. In fact, we'll probably won't add any other utility function in a long time.
+
+The same happened to us in the past with the base controller. People who disliked it told us ... "but you'll end up adding hundreds of shortcuts!!!". However, as years have passed, we have barely added any new shortcut. The number of utility methods in the base controller is very stable and limited, as it should be.
+
+A final comment: you said *"CodeIgnorant"* and *"sheep from Laravel"* ... and I find those comments VERY INSULTING to those communities. We like and respect all the people from CodeIgniter, Laravel, and any other open source project. Please, reword your previous message and never again disrespect any person or project in this repository. Thank you!
+
+---------------------------------------------------------------------------
+
+by tomasfejfar at 2018-04-18T15:19:46Z
+
+I'd argue that it would make sense to add d() as well.
+
+I'm very happy that I'll be able to retire https://github.com/tomasfejfar/enhanced-dump altogether.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-18T15:24:33Z
+
+@stof actually it works: the logic doesn't care about the name of the caller (dump or dd), it just checks the callee (VarDumper::dump)
+
+@DojoGeekRA thanks for the hint! I tried on Chrome 65, no issue on my side, a 500 is not needed to display the preview:
+
+![image](https://user-images.githubusercontent.com/243674/38941671-5afe1ba4-432d-11e8-81d9-bd3d9675e040.png)
+
+---------------------------------------------------------------------------
+
+by taylorotwell at 2018-04-18T15:32:46Z
+
+![Yes](https://media.giphy.com/media/2pjspMQCi70k/giphy.gif)
+
+---------------------------------------------------------------------------
+
+by Meroje at 2018-04-18T16:07:19Z
+
+@nicolas-grekas @DojoGeekRA chrome 65 removed the need for an error code to render the preview that was introduced with 62 https://bugs.chromium.org/p/chromium/issues/detail?id=785050
+
+---------------------------------------------------------------------------
+
+by haydenk at 2018-04-18T16:26:11Z
+
+Why not add an optional argument to `dump()` to exit when it's done instead of creating a whole new function?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-18T16:26:30Z
+
+> Why not add an optional argument to dump() to exit when it's done instead of creating a whole new function?
+
+because dump is variadic
+
+---------------------------------------------------------------------------
+
+by haydenk at 2018-04-18T16:29:12Z
+
+@lyrixx Ah, good point.
+
+---------------------------------------------------------------------------
+
+by joubertredrat at 2018-04-18T16:36:00Z
+
+Oh, a enem..., erm, a friend @taylorotwell here? Hey, let's drink coffee?
+
+About function, I think that is best to be more verbosity, how `dump_die`, `dump_exit` or `dump_output` as example, what you think guys?
+
+> Why not add an optional argument to dump() to exit when it's done instead of creating a whole new function?
+
+Because `dump` today support multiple arguments.
+
+---------------------------------------------------------------------------
+
+by kunicmarko20 at 2018-04-18T16:42:11Z
+
+If people think we need a shortcut then it should be small, `dd` is the best choice for this. If it is longer then I can write `dump();die();` myself.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2018-04-18T18:24:23Z
+
+What a mess of a conversation just for a DX initiative that has been demanded for a long time, and still lots of arguments against.
+
+I think this is part of the small changes that can really conciliate lots of dev communities and improve "classic" debug experience as well for people not using complex xdebug setups or full-stack IDEs. I mean, when one debugs using VIM, a simple `dd()` is really straightforward.
+
+---------------------------------------------------------------------------
+
+by akalongman at 2018-04-18T20:39:11Z
+
++1 for `dump_die()`
+
+---------------------------------------------------------------------------
+
+by Majkl578 at 2018-04-18T20:58:47Z
+
+Maybe rename `Symfony\Component\VarDumper\VarDumper::dump()` to `D::d()` instead?
+
+---------------------------------------------------------------------------
+
+by antoniocambados at 2018-04-18T23:20:40Z
+
+I don't miss a `dd()` shortcut but I can barely think of any serious objection. The proposed name is convenient and matches other frameworks, so I'd stick with it.

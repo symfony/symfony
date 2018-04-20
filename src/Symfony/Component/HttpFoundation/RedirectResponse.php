@@ -88,8 +88,21 @@ class RedirectResponse extends Response
 
         $this->targetUrl = $url;
 
-        $this->setContent(
-            sprintf('<!DOCTYPE html>
+        $this->setContent(sprintf($this->getHtmlRedirect(), htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
+
+        $this->headers->set('Location', $url);
+
+        return $this;
+    }
+
+    /**
+     * Return redirect html.
+     *
+     * @return string
+     */
+    protected function getHtmlRedirect() : string
+    {
+        return '<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" />
@@ -100,10 +113,6 @@ class RedirectResponse extends Response
     <body>
         Redirecting to <a href="%1$s">%1$s</a>.
     </body>
-</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
-
-        $this->headers->set('Location', $url);
-
-        return $this;
+</html>';
     }
 }

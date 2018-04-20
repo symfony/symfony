@@ -50,7 +50,7 @@ class MarkdownDescriptor extends Descriptor
         $this->write(
             '**'.$option->getName().':**'."\n\n"
             .'* Name: `--'.$option->getName().'`'."\n"
-            .'* Shortcut: '.($option->getShortcut() ? '`-'.implode('|-', explode('|', $option->getShortcut())).'`' : '<none>')."\n"
+            .'* Shortcut: '.($option->getShortcut() ? '`-'.str_replace('|', '|-', $option->getShortcut()).'`' : '<none>')."\n"
             .'* Accept value: '.($option->acceptValue() ? 'yes' : 'no')."\n"
             .'* Is value required: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'* Is multiple: '.($option->isArray() ? 'yes' : 'no')."\n"

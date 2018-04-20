@@ -195,7 +195,7 @@ class InputOption
      *
      * @return bool
      */
-    public function equals(InputOption $option)
+    public function equals(self $option)
     {
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()

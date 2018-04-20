@@ -204,7 +204,7 @@ class DoctrineExtensionTest extends TestCase
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
         $defCalls = $definition->getMethodCalls();
         $expectedCalls[] = 'setNamespace';
-        $actualCalls = array_map(function ($call) {
+        $actualCalls = array_map(function (array $call) {
             return $call[0];
         }, $defCalls);
 

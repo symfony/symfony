@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -117,7 +118,7 @@ class ControllerNameParser
      */
     private function findAlternative(string $nonExistentBundleName): ?string
     {
-        $bundleNames = array_map(function ($b) {
+        $bundleNames = array_map(function (BundleInterface $b) {
             return $b->getName();
         }, $this->kernel->getBundles());
 

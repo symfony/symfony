@@ -2567,4 +2567,59 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('_09name', $view->vars['name']);
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
+
+        /**
+     * @dataProvider provideTrimCases
+     */
+    public function testTrimIsDisabled($multiple, $expanded)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'choices' => array(
+                'a' => '1',
+            ),
+            'choices_as_values' => true,
+        ));
+
+        $submittedData = ' 1';
+
+        $form->submit($multiple ? (array) $submittedData : $submittedData);
+
+        // When the choice does not exist the transformation fails
+        $this->assertFalse($form->isSynchronized());
+        $this->assertNull($form->getData());
+    }
+
+    /**
+     * @dataProvider provideTrimCases
+     */
+    public function testSubmitValueWithWhiteSpace($multiple, $expanded)
+    {
+        $valueWhitWhiteSpace = '1 ';
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'choices' => array(
+                'a' => $valueWhitWhiteSpace,
+            ),
+            'choices_as_values' => true,
+        ));
+
+        $form->submit($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace, $form->getData());
+    }
+
+    public function provideTrimCases()
+    {
+        return array(
+            'Simple' => array(false, false),
+            'Multiple' => array(true, false),
+            'Simple expanded' => array(false, true),
+            'Multiple expanded' => array(true, true),
+        );
+    }
 }

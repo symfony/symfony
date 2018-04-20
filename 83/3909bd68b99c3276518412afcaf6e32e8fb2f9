@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T08:09:21Z
+
+ping @symfony/deciders this would be great in 4.1, the current state is clumsy.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-20T09:35:30Z
+
+I like the idea.
+
+But Why did you choose a dot? I think it would be better to choose an underscore even if the meaning of a name starting with a dot in the unix FS is to hide it.
+
+The underscore is already used in the framework (or other lib) to mean "it's internal / private". I'm thinking to `_locale`, `_format`, `_controller` in the routing Component, `_fragment` in the HttpKernel, `_profiler` in the DebugBundle, `_default` in the DIC, and many more,
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T09:40:48Z
+
+Good question :)
+The reason is that an underscored service name cannot be loaded by the YamlFileLoader as they are forbidden. But we have tests that dump + reload configuration to ensure this is allowed. Dumping works, but not loading, for this reason.
+So then, if underscore is not allowed, it must be a dot :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-20T09:48:56Z
+
+I really like the idea as well. And tbh, hiding things that started with `.` is not a new idea so it's a nice choice.
+
+The result of the `debug:container` command is going to be different though, as it will now include the private services. Do we consider this as a BC-break? 🙊
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T09:53:59Z
+
+> Do we consider this as a BC-break?
+
+If we were to answer yes to this question, we couldn't do any improvement to any command we publish. The answer must be no.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-20T10:06:30Z
+
+> So then, if underscore is not allowed, it must be a dot :)
+
+okay, go for it ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T12:25:21Z
+
+> Won't we skip non hidden service now if $showHidden is true?
+
+That's correct: by default, you get non-hidden services, and if you add `--show-hidden`, you get only non-hidden ones. Much more useful IMHO.

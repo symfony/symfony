@@ -70,7 +70,7 @@ class MarkdownDescriptor extends Descriptor
     {
         $name = '--'.$option->getName();
         if ($option->getShortcut()) {
-            $name .= '|-'.implode('|-', explode('|', $option->getShortcut())).'';
+            $name .= '|-'.str_replace('|', '|-', $option->getShortcut()).'';
         }
 
         $this->write(

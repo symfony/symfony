@@ -157,7 +157,7 @@ class CodeHelper extends Helper
             $file = trim($file);
             $fileStr = $file;
             if (0 === strpos($fileStr, $this->rootDir)) {
-                $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
+                $fileStr = str_replace(array('\\', $this->rootDir), array('/', ''), $fileStr);
                 $fileStr = htmlspecialchars($fileStr, $flags, $this->charset);
                 $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', htmlspecialchars($this->rootDir, $flags, $this->charset), $fileStr);
             }

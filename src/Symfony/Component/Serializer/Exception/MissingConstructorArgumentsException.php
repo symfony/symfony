@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * IncompleteInputDataException.
- *
  * @author Maxime VEBER <maxime.veber@nekland.fr>
  */
 class MissingConstructorArgumentsException extends RuntimeException

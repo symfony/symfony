@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-06T05:35:50Z
+
+@DQNEO Can you check if there are other anonymous functions that could use some type hints as well?
+
+---------------------------------------------------------------------------
+
+by DQNEO at 2018-04-06T07:53:07Z
+
+For this component,  that's all.
+For the entire repository. There are more and you can see all here https://github.com/DQNEO/symfony/pull/1
+
+> Can you check if there are other anonymous functions that could use some type hints as well?
+
+Sure, I'll do.
+Should I make one PR which contains all the similar modifications or  make separated PRs per component?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-06T08:08:40Z
+
+One PR for all components please.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-06T08:11:20Z
+
+There is a risk factor here to break BC. This can suddendly forbid duck typing.
+For this reason, I'm not sure we should do this.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-06T10:07:57Z
+
+In this case, we control the array of parameters (as it comes from `$refl->getParameters()`). So the only risk would be if PHP starts returning something else in this API (in which case, knowing early that the code is broken is good, as it would break anyway)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-06T10:49:29Z
+
+> In this case, we control the array of parameters
+
+yes: this must be thought case by case, with a risk of mistake if we're not extra careful, that's what I meant
+
+---------------------------------------------------------------------------
+
+by DQNEO at 2018-04-06T17:42:55Z
+
+I've done for most of  anonymous functions in which I thought we could declare types.

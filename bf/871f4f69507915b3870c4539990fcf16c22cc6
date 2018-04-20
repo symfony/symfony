@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-04-19T16:01:49Z
+
+shouldn't we have tests covering these edge case behaviors to avoid recreating them ?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-19T16:02:11Z
+
+Also, what are these edge cases ?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-19T16:03:40Z
+
+@iltar the import won't work fine, as 3.4 still supports PHP 5.6, while these require 7.1.
+
+And as our CS are about using a backslash for classes in the global namespace, it makes sense to use the same rule for global functions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-19T16:33:10Z
+
+> There are still several count, gettype, is_array, is_object calls that could benefit from the global namespace
+
+the remaining ones would actually not benefit from inlining because they are not on the hot path, so inlining or not would make no difference.
+
+> what are these edge cases
+
+Before this PR, the item object fetched from the lowest adapter is directly saved in upper ones.
+With this change, each item fetched from each adapter is mutated to match the properties of the item from the lowest adapter. This better respects the semantic of items.

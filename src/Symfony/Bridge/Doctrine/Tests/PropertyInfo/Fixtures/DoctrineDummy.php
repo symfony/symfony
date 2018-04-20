@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 
@@ -44,6 +45,11 @@ class DoctrineDummy
      * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid")
      */
     protected $indexedBar;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="foo", indexBy="foo")
+     */
+    protected $indexedFoo;
 
     /**
      * @Column(type="guid")

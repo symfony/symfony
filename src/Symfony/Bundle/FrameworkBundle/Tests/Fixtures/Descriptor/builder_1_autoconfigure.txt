@@ -1,0 +1,7 @@
+[33mSymfony Container Autoconfiguring Tags[39m
+[33m======================================[39m
+
+[33m"autoconfiguring_interface_tag" tag[39m
+[33m-----------------------------------[39m
+
+ * Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\AutoconfiguringInterface

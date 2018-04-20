@@ -97,6 +97,24 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerAutoconfiguringTags(ContainerBuilder $builder, array $options = array())
+    {
+        $this->write("Container autoconfiguring Tags\n==============================");
+
+        $autoconfiguredInstanceofByTag = $this->getAutoconfiguredInstanceofByTag($builder);
+
+        foreach ($autoconfiguredInstanceofByTag as $tag => $autoconfiguredInstanceofList) {
+            $this->write("\n\n".$tag."\n".str_repeat('-', strlen($tag)));
+            foreach ($autoconfiguredInstanceofList as $autoconfiguredInstanceof) {
+                $this->write("\n\n");
+                $this->write(sprintf('- %s', $autoconfiguredInstanceof));
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {

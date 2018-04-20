@@ -1,0 +1,7 @@
+Container autoconfiguring Tags
+==============================
+
+autoconfiguring_interface_tag
+-----------------------------
+
+- Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\AutoconfiguringInterface

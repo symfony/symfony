@@ -92,6 +92,7 @@ class ObjectsProvider
         $builder1 = new ContainerBuilder();
         $builder1->setDefinitions(self::getContainerDefinitions());
         $builder1->setAliases(self::getContainerAliases());
+        $builder1->registerForAutoconfiguration(AutoconfiguringInterface::class)->addTag('autoconfiguring_interface_tag');
 
         return array('builder_1' => $builder1);
     }
@@ -195,4 +196,8 @@ class RouteStub extends Route
     {
         return new CompiledRoute('', '#PATH_REGEX#', array(), array(), '#HOST_REGEX#');
     }
+}
+
+interface AutoconfiguringInterface
+{
 }

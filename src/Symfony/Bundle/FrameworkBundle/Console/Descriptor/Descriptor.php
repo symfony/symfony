@@ -50,6 +50,9 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ParameterBag:
                 $this->describeContainerParameters($object, $options);
                 break;
+            case $object instanceof ContainerBuilder && isset($options['autoconfigure']) && true === $options['autoconfigure']:
+                $this->describeContainerAutoconfiguringTags($object, $options);
+                break;
             case $object instanceof ContainerBuilder && isset($options['group_by']) && 'tags' === $options['group_by']:
                 $this->describeContainerTags($object, $options);
                 break;
@@ -119,6 +122,11 @@ abstract class Descriptor implements DescriptorInterface
      * Describes container tags.
      */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array());
+
+    /**
+     * Describes container autoconfiguring tags.
+     */
+    abstract protected function describeContainerAutoconfiguringTags(ContainerBuilder $builder, array $options = array());
 
     /**
      * Describes a container service by its name.
@@ -263,6 +271,28 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return $definitions;
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     *
+     * @return array
+     */
+    protected function getAutoconfiguredInstanceofByTag(ContainerBuilder $builder)
+    {
+        $autoconfiguredInstanceofByTag = array();
+
+        foreach ($builder->getAutoconfiguredInstanceof() as $key => $autoconfiguredInstanceof) {
+            foreach (array_keys($autoconfiguredInstanceof->getTags()) as $tag) {
+                if (!isset($autoconfiguredInstanceofByTag[$tag])) {
+                    $autoconfiguredInstanceofByTag[$tag] = array($key);
+                } else {
+                    $autoconfiguredInstanceofByTag[$tag][] = $key;
+                }
+            }
+        }
+
+        return $autoconfiguredInstanceofByTag;
     }
 
     protected function sortParameters(ParameterBag $parameters)

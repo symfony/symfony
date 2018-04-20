@@ -79,6 +79,22 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerAutoconfiguringTags(ContainerBuilder $builder, array $options = array())
+    {
+        $data = array();
+
+        $autoconfiguredInstanceofByTag = $this->getAutoconfiguredInstanceofByTag($builder);
+
+        foreach ($autoconfiguredInstanceofByTag as $tag => $autoconfiguredInstanceofList) {
+            $data[$tag] = $autoconfiguredInstanceofByTag[$tag];
+        }
+
+        $this->writeData($data, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {

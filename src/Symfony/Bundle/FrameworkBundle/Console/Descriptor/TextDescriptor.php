@@ -122,15 +122,15 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
-        if ($showPrivate) {
-            $options['output']->title('Symfony Container Public and Private Tags');
+        if ($showHidden) {
+            $options['output']->title('Symfony Container Hidden Tags');
         } else {
-            $options['output']->title('Symfony Container Public Tags');
+            $options['output']->title('Symfony Container Tags');
         }
 
-        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
             $options['output']->section(sprintf('"%s" tag', $tag));
             $options['output']->listing(array_keys($definitions));
         }
@@ -165,13 +165,13 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $showTag = isset($options['tag']) ? $options['tag'] : null;
 
-        if ($showPrivate) {
-            $title = 'Symfony Container Public and Private Services';
+        if ($showHidden) {
+            $title = 'Symfony Container Hidden Services';
         } else {
-            $title = 'Symfony Container Public Services';
+            $title = 'Symfony Container Services';
         }
 
         if ($showTag) {
@@ -189,12 +189,14 @@ class TextDescriptor extends Descriptor
 
         foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
+
+            // filter out hidden services unless shown explicitly
+            if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
+                unset($serviceIds[$key]);
+                continue;
+            }
+
             if ($definition instanceof Definition) {
-                // filter out private services unless shown explicitly
-                if (!$showPrivate && (!$definition->isPublic() || $definition->isPrivate())) {
-                    unset($serviceIds[$key]);
-                    continue;
-                }
                 if ($showTag) {
                     $tags = $definition->getTag($showTag);
                     foreach ($tags as $tag) {
@@ -207,11 +209,6 @@ class TextDescriptor extends Descriptor
                             }
                         }
                     }
-                }
-            } elseif ($definition instanceof Alias) {
-                if (!$showPrivate && (!$definition->isPublic() || $definition->isPrivate())) {
-                    unset($serviceIds[$key]);
-                    continue;
                 }
             }
         }

@@ -29,7 +29,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
-        $parent = 'instanceof.'.parent::class.'.0.foo';
+        $parent = '.instanceof.'.parent::class.'.0.foo';
         $def = $container->getDefinition('foo');
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertInstanceOf(ChildDefinition::class, $def);
@@ -260,7 +260,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
-        $abstract = $container->getDefinition('abstract.instanceof.bar');
+        $abstract = $container->getDefinition('.abstract.instanceof.bar');
 
         $this->assertEmpty($abstract->getArguments());
         $this->assertEmpty($abstract->getMethodCalls());

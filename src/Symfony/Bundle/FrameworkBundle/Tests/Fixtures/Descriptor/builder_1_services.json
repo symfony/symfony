@@ -1,20 +1,6 @@
 {
     "definitions": {
-        "definition_1": {
-            "class": "Full\\Qualified\\Class1",
-            "public": true,
-            "synthetic": false,
-            "lazy": true,
-            "shared": true,
-            "abstract": true,
-            "autowire": false,
-            "autoconfigure": false,
-            "file": null,
-            "factory_class": "Full\\Qualified\\FactoryClass",
-            "factory_method": "get",
-            "tags": []
-        },
-        "definition_2": {
+        ".definition_2": {
             "class": "Full\\Qualified\\Class2",
             "public": false,
             "synthetic": true,
@@ -51,16 +37,10 @@
         }
     },
     "aliases": {
-        "alias_1": {
-            "service": "service_1",
-            "public": true
-        },
-        "alias_2": {
-            "service": "service_2",
+        ".alias_2": {
+            "service": ".service_2",
             "public": false
         }
     },
-    "services": {
-        "service_container": "Symfony\\Component\\DependencyInjection\\ContainerBuilder"
-    }
+    "services": []
 }

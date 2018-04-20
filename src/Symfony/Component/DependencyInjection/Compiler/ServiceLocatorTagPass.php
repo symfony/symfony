@@ -54,7 +54,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
         $value->setArguments($arguments);
 
-        $id = 'service_locator.'.ContainerBuilder::hash($value);
+        $id = '.service_locator.'.ContainerBuilder::hash($value);
 
         if ($isRoot) {
             if ($id !== $this->currentId) {
@@ -91,7 +91,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             ->setPublic(false)
             ->addTag('container.service_locator');
 
-        if (!$container->has($id = 'service_locator.'.ContainerBuilder::hash($locator))) {
+        if (!$container->has($id = '.service_locator.'.ContainerBuilder::hash($locator))) {
             $container->setDefinition($id, $locator);
         }
 

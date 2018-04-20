@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -44,7 +45,7 @@ class ContainerConfigurator extends AbstractConfigurator
     final public function extension($namespace, array $config)
     {
         if (!$this->container->hasExtension($namespace)) {
-            $extensions = array_filter(array_map(function ($ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
+            $extensions = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
             throw new InvalidArgumentException(sprintf(
                 'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
                 $namespace,

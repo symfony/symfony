@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-20T09:53:34Z
+
+I think we should actually remove such phpdocs. They don't bring any value.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-20T09:55:45Z
+
+I agree with @sroze

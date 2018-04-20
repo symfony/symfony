@@ -1880,4 +1880,196 @@ class ChoiceTypeTest extends BaseTypeTest
             'multiple, expanded' => array(true, true, array(array())),
         );
     }
+
+    public function testInheritTranslationDomainFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+                'translation_domain' => 'domain',
+            ))
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+    }
+
+    public function testPassTranslationDomainToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+            'translation_domain' => 'domain',
+        ))
+            ->createView();
+
+        $this->assertSame('domain', $view->vars['translation_domain']);
+    }
+
+    public function testPreferOwnTranslationDomain()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+                'translation_domain' => 'parent_domain',
+            ))
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+                'translation_domain' => 'domain',
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+    }
+
+    public function testDefaultTranslationDomain()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertNull($view['child']->vars['translation_domain']);
+    }
+
+    public function testPassMultipartFalseToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertFalse($view->vars['multipart']);
+    }
+
+    public function testPassLabelToView()
+    {
+        $view = $this->factory->createNamed('__test___field', static::TESTED_TYPE, null, array(
+            'label' => 'My label',
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertSame('My label', $view->vars['label']);
+    }
+
+    public function testPassIdAndNameToViewWithGrandParent()
+    {
+        $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', FormTypeTest::TESTED_TYPE);
+        $builder->get('child')->add('grand_child', static::TESTED_TYPE, array(
+            'choices_as_values' => true,
+        ));
+        $view = $builder->getForm()->createView();
+
+        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
+        $this->assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
+        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
+    }
+
+    public function testPassIdAndNameToViewWithParent()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('parent_child', $view['child']->vars['id']);
+        $this->assertEquals('child', $view['child']->vars['name']);
+        $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
+    }
+
+    public function testPassDisabledAsOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'disabled' => true,
+            'choices_as_values' => true,
+        ));
+
+        $this->assertTrue($form->isDisabled());
+    }
+
+    public function testPassIdAndNameToView()
+    {
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('name', $view->vars['name']);
+        $this->assertEquals('name', $view->vars['full_name']);
+    }
+
+    public function testStripLeadingUnderscoresAndDigitsFromId()
+    {
+        $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('_09name', $view->vars['name']);
+        $this->assertEquals('_09name', $view->vars['full_name']);
+    }
+
+        /**
+     * @dataProvider provideTrimCases
+     */
+    public function testTrimIsDisabled($multiple, $expanded)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'choices' => array(
+                'a' => '1',
+            ),
+            'choices_as_values' => true,
+        ));
+
+        $submittedData = ' 1';
+
+        $form->submit($multiple ? (array) $submittedData : $submittedData);
+
+        // When the choice does not exist the transformation fails
+        $this->assertFalse($form->isSynchronized());
+        $this->assertNull($form->getData());
+    }
+
+    /**
+     * @dataProvider provideTrimCases
+     */
+    public function testSubmitValueWithWhiteSpace($multiple, $expanded)
+    {
+        $valueWhitWhiteSpace = '1 ';
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'choices' => array(
+                'a' => $valueWhitWhiteSpace,
+            ),
+            'choices_as_values' => true,
+        ));
+
+        $form->submit($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace, $form->getData());
+    }
+
+    public function provideTrimCases()
+    {
+        return array(
+            'Simple' => array(false, false),
+            'Multiple' => array(true, false),
+            'Simple expanded' => array(false, true),
+            'Multiple expanded' => array(true, true),
+        );
+    }
 }

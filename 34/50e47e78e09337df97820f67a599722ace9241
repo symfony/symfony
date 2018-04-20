@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-04-03T17:08:42Z
+
+this is indeed a BC break technically, in case some people use dashes in their global names (although that would be weird, as they are not allowed in Twig identifiers)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-03T17:09:34Z
+
+This PR breaks BC for no benefit IMO, as leaving dashes untouched will not help at all (they are forbidden)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-03T17:40:41Z
+
+@stof : The issue here actually isn't that the global var name is transformed (it's already configured with `->normalizeKeys(false)`), but that an array registered as a global will see its keys transformed while those are perfectly fine. I.e:
+
+```yaml
+twig:
+    globals:
+        some-global: { 'some-key': 'some-value' }
+```
+
+will expose:
+
+```php
+"some-global" => array: [
+    "some_key" => "some-value"
+]
+```
+
+hence, a global variable named `some-global` (you'll get some troubles accessing it indeed, but still doable using `_context['some-global']` despite clearly not recommended) but with transformed array keys. Dashes in array keys aren't forbidden.
+
+(using `some-global` as name for the global var in the test case is misleading regarding this)
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-04-03T21:31:01Z
+
+@stof what @ogizanagi is saying
+
+@ogizanagi choice of name for the global itself is there to verify that the current behavior (which enables dashes in global names already) stays as is.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-04T12:09:14Z
+
+I haven't checked, but this should be on 2.7 or master.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-04-04T12:25:55Z
+
+@fabpot rebased against 2.7
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-04T14:49:45Z
+
+should be on master to me as well, consistent with the decision made in https://github.com/symfony/symfony/pull/21718
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-04T15:07:41Z
+
+Lets' go for master on my side also.
+@lstrojny while rebasing, could you please add a note in the UPGRADING file about it?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-04T15:53:16Z
+
+hmm, the key normalization is indeed done before the `beforeNormalization` callbacks, so the value is not yet in the `value` key of the array node (and so gets normalized)
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-04-04T22:11:11Z
+
+@nicolas-grekas @chalasr I disagree it should go to master only, as it’s clearly a bugfix. The referenced decision in #21718 looks quite different for me. While it’s technically the same issue ("normalization where normalization shouldn't happen") the context matters a lot and the context is very different. Prioritizing BC at all costs in the context of authentications makes a lot of sense to me and I feel it was the right call. In the context of template globals though, correctness should be prioritized over complete backwards compatibility.
+
+Adding it to the UPGRADING file makes a lot of sense.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-05T06:16:45Z
+
+@lstrojny The problem is that we cannot afford to break some code out there in a patch release. Unfortunately, we've had several such cases in the past (and quite recently with the latest releases). The story is always the same: we find something that we want to fix in 2.7, which is a bug that also changes the current behavior in subtle ways, but we think that it's ok as nobody can rely on this bad behavior, and of course, some people are relying on the buggy behavior, they are upset, we are reverting, and I need to do another quick release (2.7, 2.8, 3.4, and 4.0 right now). Lot of time and frustration. So, I would advise to target master on this one.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-04-19T20:20:03Z
+
+Split the test and rebased against master. Ready to be merged from my POV

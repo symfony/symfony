@@ -42,8 +42,50 @@ class ControllerArgumentValueResolverPassTest extends TestCase
             $container->register($id)->addTag('controller.argument_value_resolver', $tag);
         }
 
+        $container->setParameter('kernel.debug', false);
+
         (new ControllerArgumentValueResolverPass())->process($container);
         $this->assertEquals($expected, $definition->getArgument(1)->getValues());
+
+        $this->assertFalse($container->hasDefinition('n1.traceable'));
+        $this->assertFalse($container->hasDefinition('n2.traceable'));
+        $this->assertFalse($container->hasDefinition('n3.traceable'));
+    }
+
+    public function testInDebug()
+    {
+        $services = array(
+            'n3' => array(array()),
+            'n1' => array(array('priority' => 200)),
+            'n2' => array(array('priority' => 100)),
+        );
+
+        $expected = array(
+            new Reference('n1'),
+            new Reference('n2'),
+            new Reference('n3'),
+        );
+
+        $definition = new Definition(ArgumentResolver::class, array(null, array()));
+        $container = new ContainerBuilder();
+        $container->setDefinition('argument_resolver', $definition);
+
+        foreach ($services as $id => list($tag)) {
+            $container->register($id)->addTag('controller.argument_value_resolver', $tag);
+        }
+
+        $container->setParameter('kernel.debug', true);
+
+        (new ControllerArgumentValueResolverPass())->process($container);
+        $this->assertEquals($expected, $definition->getArgument(1)->getValues());
+
+        $this->assertTrue($container->hasDefinition('debug.n1'));
+        $this->assertTrue($container->hasDefinition('debug.n2'));
+        $this->assertTrue($container->hasDefinition('debug.n3'));
+
+        $this->assertTrue($container->hasDefinition('n1'));
+        $this->assertTrue($container->hasDefinition('n2'));
+        $this->assertTrue($container->hasDefinition('n3'));
     }
 
     public function testReturningEmptyArrayWhenNoService()
@@ -51,6 +93,8 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $definition = new Definition(ArgumentResolver::class, array(null, array()));
         $container = new ContainerBuilder();
         $container->setDefinition('argument_resolver', $definition);
+
+        $container->setParameter('kernel.debug', false);
 
         (new ControllerArgumentValueResolverPass())->process($container);
         $this->assertEquals(array(), $definition->getArgument(1)->getValues());

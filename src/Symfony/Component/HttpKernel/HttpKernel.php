@@ -221,13 +221,16 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         // a listener might have replaced the exception
         $e = $event->getException();
 
-        if (!$event->hasResponse()) {
+        if ($event->hasResponse()) {
+            $response = $event->getResponse();
+        } elseif ($e instanceof HttpExceptionInterface) {
+            $code = $e->getStatusCode();
+            $response = new Response(isset(Response::$statusTexts[$code]) ? $code.' '.Response::$statusTexts[$code] : $code);
+        } else {
             $this->finishRequest($request, $type);
 
             throw $e;
         }
-
-        $response = $event->getResponse();
 
         // the developer asked for a specific status code
         if (!$event->isAllowingCustomResponseCode() && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {

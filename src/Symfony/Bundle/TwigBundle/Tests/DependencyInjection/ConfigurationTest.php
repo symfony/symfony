@@ -45,6 +45,7 @@ class ConfigurationTest extends TestCase
     public function testGlobalsAreNotNormalized()
     {
         $input = array(
+            'strict_variables' => false, // to be removed in 5.0 relying on default
             'globals' => array('some-global' => true),
         );
 
@@ -57,6 +58,7 @@ class ConfigurationTest extends TestCase
     public function testArrayKeysInGlobalsAreNotNormalized()
     {
         $input = array(
+            'strict_variables' => false, // to be removed in 5.0 relying on default
             'globals' => array('global' => array('some-key' => 'some-value')),
         );
 

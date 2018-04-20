@@ -201,6 +201,9 @@ class CookieTest extends TestCase
 
         $cookie = Cookie::fromString('foo=bar', true);
         $this->assertEquals(new Cookie('foo', 'bar', 0, '/', null, false, false), $cookie);
+
+        $cookie = Cookie::fromString('foo', true);
+        $this->assertEquals(new Cookie('foo', null, 0, '/', null, false, false), $cookie);
     }
 
     public function testFromStringWithHttpOnly()

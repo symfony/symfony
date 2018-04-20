@@ -1887,9 +1887,7 @@ class ChoiceTypeTest extends BaseTypeTest
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
                 'translation_domain' => 'domain',
             ))
-            ->add('child', static::TESTED_TYPE, array(
-                'choices_as_values' => true,
-            ))
+            ->add('child', static::TESTED_TYPE)
             ->getForm()
             ->createView();
 
@@ -1899,7 +1897,6 @@ class ChoiceTypeTest extends BaseTypeTest
     public function testPassTranslationDomainToView()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
-            'choices_as_values' => true,
             'translation_domain' => 'domain',
         ))
             ->createView();
@@ -1914,7 +1911,6 @@ class ChoiceTypeTest extends BaseTypeTest
                 'translation_domain' => 'parent_domain',
             ))
             ->add('child', static::TESTED_TYPE, array(
-                'choices_as_values' => true,
                 'translation_domain' => 'domain',
             ))
             ->getForm()
@@ -1926,9 +1922,7 @@ class ChoiceTypeTest extends BaseTypeTest
     public function testDefaultTranslationDomain()
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
-            ->add('child', static::TESTED_TYPE, array(
-                'choices_as_values' => true,
-            ))
+            ->add('child', static::TESTED_TYPE)
             ->getForm()
             ->createView();
 
@@ -1937,9 +1931,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testPassMultipartFalseToView()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
-            'choices_as_values' => true,
-        ))
+        $view = $this->factory->create(static::TESTED_TYPE, null)
             ->createView();
 
         $this->assertFalse($view->vars['multipart']);
@@ -1949,7 +1941,6 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $view = $this->factory->createNamed('__test___field', static::TESTED_TYPE, null, array(
             'label' => 'My label',
-            'choices_as_values' => true,
         ))
             ->createView();
 
@@ -1960,9 +1951,7 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', FormTypeTest::TESTED_TYPE);
-        $builder->get('child')->add('grand_child', static::TESTED_TYPE, array(
-            'choices_as_values' => true,
-        ));
+        $builder->get('child')->add('grand_child', static::TESTED_TYPE);
         $view = $builder->getForm()->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
@@ -1973,9 +1962,7 @@ class ChoiceTypeTest extends BaseTypeTest
     public function testPassIdAndNameToViewWithParent()
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
-            ->add('child', static::TESTED_TYPE, array(
-                'choices_as_values' => true,
-            ))
+            ->add('child', static::TESTED_TYPE)
             ->getForm()
             ->createView();
 
@@ -1988,7 +1975,6 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'disabled' => true,
-            'choices_as_values' => true,
         ));
 
         $this->assertTrue($form->isDisabled());
@@ -1996,9 +1982,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testPassIdAndNameToView()
     {
-        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'choices_as_values' => true,
-        ))
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null)
             ->createView();
 
         $this->assertEquals('name', $view->vars['id']);
@@ -2008,9 +1992,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
     {
-        $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null, array(
-            'choices_as_values' => true,
-        ))
+        $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null)
             ->createView();
 
         $this->assertEquals('name', $view->vars['id']);
@@ -2029,7 +2011,6 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => array(
                 'a' => '1',
             ),
-            'choices_as_values' => true,
         ));
 
         $submittedData = ' 1';
@@ -2054,7 +2035,6 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => array(
                 'a' => $valueWhitWhiteSpace,
             ),
-            'choices_as_values' => true,
         ));
 
         $form->submit($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace);

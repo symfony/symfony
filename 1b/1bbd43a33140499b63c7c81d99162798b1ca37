@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-06T12:45:47Z
+
+4.1 is still open for small additions.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-06T14:21:45Z
+
+I've updated the changelogs to be for 4.1
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T07:19:13Z
+
+Service definitions should be fixed now, tests are passing :+1:  My PC only froze for 10 minutes after which I rebooted via the on/off button, due to a minor recursion issue I created during the process.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T08:28:47Z
+
+@chalasr I removed the line where I mentioned adding it based on feedback earlier. I can put something back in there if desired. What were you thinking of?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-18T08:41:41Z
+
+@iltar I mean only the CHANGELOG file, not upgrade ones :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-18T08:56:42Z
+
+Something in the form of: `Added the ability to profile individual argument value resolvers via the  Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-18T09:06:26Z
+
+👌 for me

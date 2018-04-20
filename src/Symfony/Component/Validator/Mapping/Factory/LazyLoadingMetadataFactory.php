@@ -162,10 +162,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 
         $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
 
-        if (class_exists($class) || interface_exists($class)) {
-            return true;
-        }
-
-        return false;
+        return class_exists($class) || interface_exists($class, false);
     }
 }

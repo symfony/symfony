@@ -30,6 +30,16 @@ final class CacheItem implements CacheItemInterface
     protected $innerItem;
     protected $poolHash;
 
+    public function __construct(string $key = null, $value = null, \DateTimeInterface $expiryDate = null)
+    {
+        $this->key = $key;
+        $this->value = $value;
+
+        if (null != $expiryDate) {
+            $this->expiresAt($expiryDate);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */

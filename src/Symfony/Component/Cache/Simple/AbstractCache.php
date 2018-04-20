@@ -79,7 +79,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
+        } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
         $ids = array();
@@ -103,13 +103,13 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
      */
     public function setMultiple($values, $ttl = null)
     {
-        if (!is_array($values) && !$values instanceof \Traversable) {
+        if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', is_object($values) ? get_class($values) : gettype($values)));
         }
         $valuesById = array();
 
         foreach ($values as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 $key = (string) $key;
             }
             $valuesById[$this->getId($key)] = $value;
@@ -126,7 +126,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
             return true;
         }
         $keys = array();
-        foreach (is_array($e) ? $e : array_keys($valuesById) as $id) {
+        foreach (\is_array($e) ? $e : array_keys($valuesById) as $id) {
             $keys[] = substr($id, strlen($this->namespace));
         }
         CacheItem::log($this->logger, 'Failed to save values', array('keys' => $keys, 'exception' => $e instanceof \Exception ? $e : null));
@@ -141,7 +141,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
+        } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
 
@@ -156,7 +156,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
         if ($ttl instanceof \DateInterval) {
             $ttl = (int) \DateTime::createFromFormat('U', 0)->add($ttl)->format('U');
         }
-        if (is_int($ttl)) {
+        if (\is_int($ttl)) {
             return 0 < $ttl ? $ttl : false;
         }
 

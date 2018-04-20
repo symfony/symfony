@@ -89,7 +89,7 @@ final class CacheItem implements CacheItemInterface
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
             $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
-        } elseif (is_int($time)) {
+        } elseif (\is_int($time)) {
             $this->expiry = $time + time();
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
@@ -109,17 +109,17 @@ final class CacheItem implements CacheItemInterface
      */
     public function tag($tags)
     {
-        if (!is_array($tags)) {
+        if (!\is_array($tags)) {
             $tags = array($tags);
         }
         foreach ($tags as $tag) {
-            if (!is_string($tag)) {
+            if (!\is_string($tag)) {
                 throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given', is_object($tag) ? get_class($tag) : gettype($tag)));
             }
             if (isset($this->tags[$tag])) {
                 continue;
             }
-            if (!isset($tag[0])) {
+            if ('' === $tag) {
                 throw new InvalidArgumentException('Cache tag length must be greater than zero');
             }
             if (false !== strpbrk($tag, '{}()/\@:')) {
@@ -152,10 +152,10 @@ final class CacheItem implements CacheItemInterface
      */
     public static function validateKey($key)
     {
-        if (!is_string($key)) {
+        if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', is_object($key) ? get_class($key) : gettype($key)));
         }
-        if (!isset($key[0])) {
+        if ('' === $key) {
             throw new InvalidArgumentException('Cache key length must be greater than zero');
         }
         if (false !== strpbrk($key, '{}()/\@:')) {

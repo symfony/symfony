@@ -57,7 +57,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
+        } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
         foreach ($keys as $key) {
@@ -72,7 +72,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function deleteMultiple($keys)
     {
-        if (!is_array($keys) && !$keys instanceof \Traversable) {
+        if (!\is_array($keys) && !$keys instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
         }
         foreach ($keys as $key) {
@@ -97,13 +97,13 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function setMultiple($values, $ttl = null)
     {
-        if (!is_array($values) && !$values instanceof \Traversable) {
+        if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', is_object($values) ? get_class($values) : gettype($values)));
         }
         $valuesArray = array();
 
         foreach ($values as $key => $value) {
-            is_int($key) || CacheItem::validateKey($key);
+            \is_int($key) || CacheItem::validateKey($key);
             $valuesArray[$key] = $value;
         }
         if (false === $ttl = $this->normalizeTtl($ttl)) {
@@ -139,7 +139,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         if ($ttl instanceof \DateInterval) {
             $ttl = (int) \DateTime::createFromFormat('U', 0)->add($ttl)->format('U');
         }
-        if (is_int($ttl)) {
+        if (\is_int($ttl)) {
             return 0 < $ttl ? $ttl : false;
         }
 

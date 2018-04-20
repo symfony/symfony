@@ -21,7 +21,8 @@
                 "compound",
                 "data_class",
                 "empty_data",
-                "error_bubbling"
+                "error_bubbling",
+                "trim"
             ]
         },
         "parent": {
@@ -43,7 +44,6 @@
                 "property_path",
                 "required",
                 "translation_domain",
-                "trim",
                 "upload_max_size_message"
             ]
         },

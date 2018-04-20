@@ -233,7 +233,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             if (true === $e || array() === $e) {
                 continue;
             }
-            if (is_array($e) || 1 === count($values)) {
+            if (\is_array($e) || 1 === \count($values)) {
                 foreach (is_array($e) ? $e : array_keys($values) as $id) {
                     $ok = false;
                     $v = $values[$id];

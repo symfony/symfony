@@ -34,7 +34,7 @@ class MaximumCountReceiver implements ReceiverInterface
         $this->decoratedReceiver->receive(function ($message) use ($handler, &$receivedMessages) {
             $handler($message);
 
-            if (++$receivedMessages >= $this->maximumNumberOfMessages) {
+            if (null !== $message && ++$receivedMessages >= $this->maximumNumberOfMessages) {
                 $this->stop();
             }
         });

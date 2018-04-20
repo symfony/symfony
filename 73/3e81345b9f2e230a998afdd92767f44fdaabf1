@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-21T15:23:23Z
+
+@insekticid would you mind adding a test case please?
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-07T05:45:18Z
+
+@insekticid Can you work on adding a test case for your bug fix? That's something we need to avoid future regression. Or do you need help?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-11T14:59:12Z
+
+Status: needs work
+(missing test case)
+
+---------------------------------------------------------------------------
+
+by insekticid at 2018-02-20T11:01:56Z
+
+I need some time to go back to this issue and write some tests
+
+---------------------------------------------------------------------------
+
+by insekticid at 2018-03-31T10:51:17Z
+
+added tests
+
+@dunglas ping
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-04-09T12:54:19Z
+
+Travis failure is unrelated.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-16T14:04:10Z
+
+Isn't it something that also needs to be fixed in 2.8?

@@ -107,7 +107,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
     public function invalidateTags(array $tags)
     {
         foreach ($tags as $k => $tag) {
-            if ('' !== $tag && is_string($tag)) {
+            if ('' !== $tag && \is_string($tag)) {
                 $tags[$k] = $tag.static::TAGS_PREFIX;
             }
         }
@@ -161,7 +161,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
         $tagKeys = array();
 
         foreach ($keys as $key) {
-            if ('' !== $key && is_string($key)) {
+            if ('' !== $key && \is_string($key)) {
                 $key = static::TAGS_PREFIX.$key;
                 $tagKeys[$key] = $key;
             }
@@ -202,7 +202,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
     public function deleteItems(array $keys)
     {
         foreach ($keys as $key) {
-            if ('' !== $key && is_string($key)) {
+            if ('' !== $key && \is_string($key)) {
                 $keys[] = static::TAGS_PREFIX.$key;
             }
         }

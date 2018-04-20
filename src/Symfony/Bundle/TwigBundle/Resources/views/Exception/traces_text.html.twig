@@ -17,7 +17,13 @@
     <tbody id="trace-text-{{ index }}">
         <tr>
             <td>
-                {{ include('@Twig/Exception/traces.txt.twig', { exception: exception }, with_context = false) }}
+                {% if exception.trace|length %}
+                <pre class="stacktrace">
+                {%- filter escape('html') -%}
+                    {{- include('@Twig/Exception/traces.txt.twig', { exception: exception, format: 'html' }, with_context = false) }}
+                {% endfilter %}
+                </pre>
+                {% endif %}
             </td>
         </tr>
     </tbody>

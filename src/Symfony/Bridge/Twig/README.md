@@ -1,7 +1,7 @@
 Twig Bridge
 ===========
 
-Provides integration for [Twig](http://twig.sensiolabs.org/) with various
+Provides integration for [Twig](https://twig.symfony.com/) with various
 Symfony components.
 
 Resources

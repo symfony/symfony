@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Annotation\Route as RouteAnnotation;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassController;
@@ -35,7 +35,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionLo
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RouteWithPrefixController;
 
-class AnnotationClassLoaderTest extends TestCase
+class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
     /**
      * @var AnnotationClassLoader
@@ -164,6 +164,51 @@ class AnnotationClassLoaderTest extends TestCase
         $this->assertCount(2, $routes);
         $this->assertEquals('/nl/actie', $routes->get('action.nl')->getPath());
         $this->assertEquals('/en/action', $routes->get('action.en')->getPath());
+    }
+
+    public function testInvokableClassMultipleRouteLoad()
+    {
+        $classRouteData1 = array(
+            'name' => 'route1',
+            'path' => '/1',
+            'schemes' => array('https'),
+            'methods' => array('GET'),
+        );
+
+        $classRouteData2 = array(
+            'name' => 'route2',
+            'path' => '/2',
+            'schemes' => array('https'),
+            'methods' => array('GET'),
+        );
+
+        $reader = $this->getReader();
+        $reader
+            ->expects($this->exactly(1))
+            ->method('getClassAnnotations')
+            ->will($this->returnValue(array(new RouteAnnotation($classRouteData1), new RouteAnnotation($classRouteData2))))
+        ;
+        $reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue(array()))
+        ;
+        $loader = new class($reader) extends AnnotationClassLoader {
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot) {}
+        };
+
+        $routeCollection = $loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BazClass');
+        $route = $routeCollection->get($classRouteData1['name']);
+
+        $this->assertSame($classRouteData1['path'], $route->getPath(), '->load preserves class route path');
+        $this->assertEquals($classRouteData1['schemes'], $route->getSchemes(), '->load preserves class route schemes');
+        $this->assertEquals($classRouteData1['methods'], $route->getMethods(), '->load preserves class route methods');
+
+        $route = $routeCollection->get($classRouteData2['name']);
+
+        $this->assertSame($classRouteData2['path'], $route->getPath(), '->load preserves class route path');
+        $this->assertEquals($classRouteData2['schemes'], $route->getSchemes(), '->load preserves class route schemes');
+        $this->assertEquals($classRouteData2['methods'], $route->getMethods(), '->load preserves class route methods');
     }
 
     public function testMissingPrefixLocale()

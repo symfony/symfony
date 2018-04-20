@@ -66,15 +66,15 @@ return array(
 EOF;
 
         foreach ($values as $key => $value) {
-            CacheItem::validateKey(is_int($key) ? (string) $key : $key);
+            CacheItem::validateKey(\is_int($key) ? (string) $key : $key);
 
-            if (null === $value || is_object($value)) {
+            if (null === $value || \is_object($value)) {
                 try {
                     $value = serialize($value);
                 } catch (\Exception $e) {
                     throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, get_class($value)), 0, $e);
                 }
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 try {
                     $serialized = serialize($value);
                     $unserialized = unserialize($serialized);
@@ -85,12 +85,12 @@ EOF;
                 if ($unserialized !== $value || (false !== strpos($serialized, ';R:') && preg_match('/;R:[1-9]/', $serialized))) {
                     $value = $serialized;
                 }
-            } elseif (is_string($value)) {
+            } elseif (\is_string($value)) {
                 // Serialize strings if they could be confused with serialized objects or arrays
                 if ('N;' === $value || (isset($value[2]) && ':' === $value[1])) {
                     $value = serialize($value);
                 }
-            } elseif (!is_scalar($value)) {
+            } elseif (!\is_scalar($value)) {
                 throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, gettype($value)));
             }
 

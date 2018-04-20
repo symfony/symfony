@@ -37,7 +37,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
      */
     public function get($key, $default = null)
     {
-        $miss = null !== $default && is_object($default) ? $default : $this->miss;
+        $miss = null !== $default && \is_object($default) ? $default : $this->miss;
         $event = $this->start(__FUNCTION__);
         try {
             $value = $this->pool->get($key, $miss);
@@ -109,7 +109,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
                 }
             };
             $values = $values();
-        } elseif (is_array($values)) {
+        } elseif (\is_array($values)) {
             $event->result['keys'] = array_keys($values);
         }
 
@@ -125,7 +125,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
      */
     public function getMultiple($keys, $default = null)
     {
-        $miss = null !== $default && is_object($default) ? $default : $this->miss;
+        $miss = null !== $default && \is_object($default) ? $default : $this->miss;
         $event = $this->start(__FUNCTION__);
         try {
             $result = $this->pool->getMultiple($keys, $miss);

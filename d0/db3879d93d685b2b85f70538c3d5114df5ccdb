@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-25T12:26:16Z
+
+Should the profile for the master request get all logs? At least yes when `framework.profiler.only_master_requests` is set.
+Thinking about the toolbar/panel, having the total count for logs of all sub requests looks desirable to me also. On the implementation side, a simple implementation would require cloning values from collector twice. A better implem would looks for profiles of all subrequests and aggregate them for the master request.
+
+---------------------------------------------------------------------------
+
+by vtsykun at 2017-07-26T09:07:02Z
+
+I guess that profile should for the master request get all logs
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T07:18:05Z
+
+> I guess that profile should for the master request get all logs
+
+@vtsykun same to me. OK to finish this PR then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T14:34:45Z
+
+ping @vtsykun
+
+---------------------------------------------------------------------------
+
+by vtsykun at 2017-08-31T19:57:18Z
+
+Hi @nicolas-grekas, this done, please review
+Yes, I updated PR and squashed commit on Jul 29. So in this implementation I show all logs for master request.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-21T17:43:22Z
+
+From #24275; do events have this same issue?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-09T21:36:02Z
+
+@vtsykun thank you for this PR, and sorry I didn't manage to review it earlier. I just rebased it on top of the latest version of branch 3.4, with a few minor changes. The code looks to good to me. It sill misses a few unit tests. Would you be up for adding them? If yes, don't forget to fetch+rebase --hard on your remote `patch-splitting-logs` branch. If not, I'm sure someone else can take over. Please advise.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-17T11:17:33Z
+
+> Looks like something for 4.1/master instead
+
+It could go on 4.1 for sure. The only thing that made me keep it for 3.4 is that the reported behavior affects 3.4 (sub-requests heavy pages suffer from a significant penalty because of log duplication.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T09:45:36Z
+
+Rebased on master, ready for 4.1.

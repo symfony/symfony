@@ -671,6 +671,7 @@ class FrameworkExtension extends Extension
         if ($debug && class_exists(DebugProcessor::class)) {
             $definition = new Definition(DebugProcessor::class);
             $definition->setPublic(false);
+            $definition->addArgument(new Reference('request_stack'));
             $container->setDefinition('debug.log_processor', $definition);
         }
     }

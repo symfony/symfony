@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2018-04-06T09:01:52Z
+
+@nicolas-grekas I can't reproduce the error in Framework Bundle (Travis pipeline), tests are OK when I run them. Any idea ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-09T18:24:27Z
+
+LGTM.
+Can you just add a test with the same method being defined manually AND via instanceof?
+(it should be called twice: first by the instanceof, 2nd by the manual definition, isn't it?)
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2018-04-10T09:26:42Z
+
+Added in `1d811cb`

@@ -119,10 +119,15 @@ abstract class AnnotationClassLoader implements LoaderInterface
             }
         }
 
-        if (0 === $collection->count() && $class->hasMethod('__invoke') && $annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            $globals['path'] = '';
-            $globals['name'] = '';
-            $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
+        if (0 === $collection->count() && $class->hasMethod('__invoke')) {
+            foreach ($this->reader->getClassAnnotations($class) as $annot) {
+                if ($annot instanceof $this->routeAnnotationClass) {
+                    $globals['path'] = '';
+                    $globals['name'] = '';
+
+                    $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
+                }
+            }
         }
 
         return $collection;

@@ -11,7 +11,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_name                 data_class           attr                      csrf_message           
   choice_translation_domain   empty_data           auto_initialize           csrf_protection        
   choice_value                error_bubbling       block_name                csrf_token_id          
-  choices                                          by_reference              csrf_token_manager     
+  choices                     trim                 by_reference              csrf_token_manager     
   choices_as_values                                data                                             
   expanded                                         disabled                                         
   group_by                                         inherit_data                                     
@@ -24,7 +24,6 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    property_path                                    
                                                    required                                         
                                                    translation_domain                               
-                                                   trim                                             
                                                    upload_max_size_message                          
  --------------------------- -------------------- ------------------------- ----------------------- 
 

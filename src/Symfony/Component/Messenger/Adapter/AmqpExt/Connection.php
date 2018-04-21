@@ -218,6 +218,6 @@ class Connection
 
     private function shouldSetup(): bool
     {
-        return !array_key_exists('auto-setup', $this->connectionCredentials) || 'false' !== $this->connectionCredentials['auto-setup'];
+        return !array_key_exists('auto-setup', $this->connectionCredentials) || !in_array($this->connectionCredentials['auto-setup'], array(false, 'false'), true);
     }
 }

@@ -20,7 +20,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @final
  */
-class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
+class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
 {
     private $propertyInfoExtractor;
     private $cacheItemPool;
@@ -78,6 +78,14 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
     public function getTypes($class, $property, array $context = array())
     {
         return $this->extract('getTypes', array($class, $property, $context));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    {
+        return $this->extract('isInitializable', array($class, $property, $context));
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -24,7 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
 {
     /**
      * @internal
@@ -144,6 +145,34 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         list($reflectionMethod) = $this->getMutatorMethod($class, $property);
 
         return null !== $reflectionMethod;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    {
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+
+        if (!$reflectionClass->isInstantiable()) {
+            return false;
+        }
+
+        if ($constructor = $reflectionClass->getConstructor()) {
+            foreach ($constructor->getParameters() as $parameter) {
+                if ($property === $parameter->name) {
+                    return true;
+                }
+            }
+        } elseif ($parentClass = $reflectionClass->getParentClass()) {
+            return $this->isInitializable($parentClass->getName(), $property);
+        }
+
+        return false;
     }
 
     /**

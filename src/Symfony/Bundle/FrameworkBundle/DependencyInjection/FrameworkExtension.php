@@ -76,6 +76,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
@@ -347,6 +348,8 @@ class FrameworkExtension extends Extension
             ->addTag('property_info.description_extractor');
         $container->registerForAutoconfiguration(PropertyAccessExtractorInterface::class)
             ->addTag('property_info.access_extractor');
+        $container->registerForAutoconfiguration(PropertyInitializableExtractorInterface::class)
+            ->addTag('property_info.initializable_extractor');
         $container->registerForAutoconfiguration(EncoderInterface::class)
             ->addTag('serializer.encoder');
         $container->registerForAutoconfiguration(DecoderInterface::class)

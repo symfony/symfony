@@ -9,11 +9,11 @@
         <framework:messenger>
             <framework:routing message-class="Symfony\Component\Messenger\Tests\Fixtures\DummyMessage">
                 <framework:sender service="amqp" />
+                <framework:sender service="audit" />
             </framework:routing>
-            <framework:routing message-class="Symfony\Component\Messenger\Tests\Fixtures\SecondMessage">
+            <framework:routing message-class="Symfony\Component\Messenger\Tests\Fixtures\SecondMessage" send-and-handle="true">
                 <framework:sender service="amqp" />
                 <framework:sender service="audit" />
-                <framework:sender service="null" />
             </framework:routing>
             <framework:routing message-class="*">
                 <framework:sender service="amqp" />

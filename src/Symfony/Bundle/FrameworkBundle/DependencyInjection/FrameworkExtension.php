@@ -63,6 +63,7 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\ChainSender;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -1494,16 +1495,28 @@ class FrameworkExtension extends Extension
             throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
         }
 
-        $messageToSenderIdsMapping = array();
+        $messageToSenderIdMapping = array();
+        $messageToSendAndHandleMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
             }
 
-            $messageToSenderIdsMapping[$message] = $messageConfiguration['senders'];
+            if (1 < \count($messageConfiguration['senders'])) {
+                $senders = array_map(function ($sender) { return new Reference($sender); }, $messageConfiguration['senders']);
+                $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
+                $chainSenderId = '.messenger.chain_sender.'.$message;
+                $container->setDefinition($chainSenderId, $chainSenderDefinition);
+                $messageToSenderIdMapping[$message] = $chainSenderId;
+            } else {
+                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
+            }
+
+            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
         }
 
-        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
+        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
+        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
 
         foreach ($config['transports'] as $name => $transport) {
             if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {

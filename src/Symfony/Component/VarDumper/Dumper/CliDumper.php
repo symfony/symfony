@@ -513,7 +513,7 @@ class CliDumper extends AbstractDumper
      */
     private function isWindowsTrueColor()
     {
-        $result = strval(getenv('ANSICON_VER')) >= '183'
+        $result = 183 <= getenv('ANSICON_VER')
             || 'ON' === getenv('ConEmuANSI')
             || 'xterm' === getenv('TERM');
 

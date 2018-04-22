@@ -111,7 +111,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             $nullable = false !== $nullKey;
 
             // Remove the null type from the type if other types are defined
-            if ($nullable && count($varTypes) > 1) {
+            if ($nullable && \count($varTypes) > 1) {
                 unset($varTypes[$nullKey]);
             }
 
@@ -127,7 +127,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return;
         }
 
-        if (!in_array($prefix, ReflectionExtractor::$arrayMutatorPrefixes)) {
+        if (!\in_array($prefix, ReflectionExtractor::$arrayMutatorPrefixes)) {
             return $types;
         }
 
@@ -386,7 +386,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private function getPhpTypeAndClass($docType)
     {
-        if (in_array($docType, Type::$builtinTypes)) {
+        if (\in_array($docType, Type::$builtinTypes)) {
             return array($docType, null);
         }
 

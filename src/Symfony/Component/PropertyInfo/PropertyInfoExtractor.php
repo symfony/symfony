@@ -112,7 +112,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
     private function extract(array $extractors, $method, array $arguments)
     {
         foreach ($extractors as $extractor) {
-            $value = call_user_func_array(array($extractor, $method), $arguments);
+            $value = \call_user_func_array(array($extractor, $method), $arguments);
             if (null !== $value) {
                 return $value;
             }

@@ -16,7 +16,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
  *
  * @internal
  */
-class Command extends \PHPUnit_TextUI_Command
+class CommandForV5 extends \PHPUnit_TextUI_Command
 {
     /**
      * {@inheritdoc}

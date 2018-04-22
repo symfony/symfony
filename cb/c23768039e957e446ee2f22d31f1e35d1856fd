@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-28T16:19:51Z
+
+This is the kind of change that should be really fine, but is risky until proven right. I'm not sure this can be merged in 3.4 as this is a new feature, even if it fixes edge cases.
+About these edge-cases, are they solvable, testable, important to fix now?
+
+---------------------------------------------------------------------------
+
+by c960657 at 2017-10-28T23:08:24Z
+
+At least some of the edge cases are easy to fix, e.g. those dealing with missing case-insensitivity.
+
+I don't think these problems are particularly important to fix in 3.x. They hardly occur in practice. So I wouldn't mind postponing this to 4.x.
+
+---------------------------------------------------------------------------
+
+by c960657 at 2017-11-18T14:24:53Z
+
+Rebased to master.
+
+---------------------------------------------------------------------------
+
+by c960657 at 2018-03-06T18:02:58Z
+
+Rebased to master.
+
+---------------------------------------------------------------------------
+
+by c960657 at 2018-04-20T05:37:35Z
+
+@ro0NL I have addresses your comments. Thanks!

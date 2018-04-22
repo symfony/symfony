@@ -327,7 +327,7 @@ class Response
         }
 
         // headers
-        foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
+        foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {
                 header($name.': '.$value, false, $this->statusCode);
             }
@@ -335,15 +335,6 @@ class Response
 
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText), true, $this->statusCode);
-
-        // cookies
-        foreach ($this->headers->getCookies() as $cookie) {
-            if ($cookie->isRaw()) {
-                setrawcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-            } else {
-                setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-            }
-        }
 
         return $this;
     }

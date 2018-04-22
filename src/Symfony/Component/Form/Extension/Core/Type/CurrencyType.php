@@ -30,7 +30,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
      *
      * @var ArrayChoiceList
      *
-     * @deprecated since Symfony 4.2
+     * @deprecated since Symfony 4.1
      */
     private $choiceList;
 
@@ -73,11 +73,11 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated since Symfony 4.2
+     * @deprecated since Symfony 4.1
      */
     public function loadChoiceList($value = null)
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 4.2, use "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 4.1, use "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
 
         if (null !== $this->choiceList) {
             return $this->choiceList;
@@ -89,11 +89,11 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated since Symfony 4.2
+     * @deprecated since Symfony 4.1
      */
     public function loadChoicesForValues(array $values, $value = null)
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 4.2, use "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 4.1, use "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
 
         // Optimize
         $values = array_filter($values);
@@ -112,11 +112,11 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated since Symfony 4.2
+     * @deprecated since Symfony 4.1
      */
     public function loadValuesForChoices(array $choices, $value = null)
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 4.2, use "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 4.1, use "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
 
         // Optimize
         $choices = array_filter($choices);

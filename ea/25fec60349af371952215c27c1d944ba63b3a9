@@ -1,0 +1,276 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T22:43:07Z
+
+When trying to run simple-phpunit, I now get autoloading issues that I also get with phpunit 6:
+
+```
+SYMFONY_PHPUNIT_VERSION=7.0 php vendor/bin/simple-phpunit --bootstrap vendor/autoload.php src/Symfony/Component/Asset/Tests/PackageTest.php
+PHPUnit 7.0.3 by Sebastian Bergmann and contributors.
+
+Testing Symfony\Component\Asset\Tests\PackageTest
+EEEEEEEEEEEE                                                      12 / 12 (100%)
+
+Time: 19 ms, Memory: 4.00MB
+
+There were 12 errors:
+
+1) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #0 ('v1', '', 'http://example.com/foo', 'http://example.com/foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+2) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #1 ('v1', '', 'https://example.com/foo', 'https://example.com/foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+3) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #2 ('v1', '', '//example.com/foo', '//example.com/foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+4) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #3 ('v1', '', '/foo', '/foo?v1')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+5) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #4 ('v1', '', 'foo', 'foo?v1')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+6) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #5 (null, '', '/foo', '/foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+7) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #6 (null, '', 'foo', 'foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+8) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #7 ('v1', 'version-%2$s/%1$s', '/foo', '/version-v1/foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+9) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #8 ('v1', 'version-%2$s/%1$s', 'foo', 'version-v1/foo')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+10) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #9 ('v1', 'version-%2$s/%1$s', 'foo/', 'version-v1/foo/')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+11) Symfony\Component\Asset\Tests\PackageTest::testGetUrl with data set #10 ('v1', 'version-%2$s/%1$s', '/foo/', '/version-v1/foo/')
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:26
+
+12) Symfony\Component\Asset\Tests\PackageTest::testGetVersion
+Error: Class 'Symfony\Component\Asset\Package' not found
+
+/home/greg/dev/symfony/src/Symfony/Component/Asset/Tests/PackageTest.php:52
+```
+
+Not quite sure why this happens but I think I might have fixed the bug :P
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T22:57:42Z
+
+Other, bigger issue: "The PHPUnit\Framework\BaseTestListener class has been removed (deprecated in PHPUnit 6.4)"
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:07:53Z
+
+Ah nevermind that has been handled already it seems.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:10:21Z
+
+@juliendufresne @geoff-maddock can you please test this patch on whatever project you were having this issue, and review this PR?
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-20T23:23:50Z
+
+I did exactly what you did before posting the issue and ran with another more complex issue.
+Something like `class A does not have the method B`.
+
+I'll try again to get the right output.
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-20T23:32:59Z
+
+```
+PHP Fatal error:  Uncaught Error: Call to undefined method PHPUnit\Util\Configuration::getExtensionConfiguration() in /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:908
+Stack trace:
+#0 /app/vendor/symfony/phpunit-bridge/TextUI/TestRunner.php(34): PHPUnit\TextUI\TestRunner->handleConfiguration(Array)
+#1 /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(151): Symfony\Bridge\PhpUnit\TextUI\TestRunner->handleConfiguration(Array)
+#2 /app/vendor/bin/.phpunit/phpunit-7.0/src/TextUI/Command.php(205): PHPUnit\TextUI\TestRunner->doRun(Object(PHPUnit\Framework\TestSuite), Array, true)
+#3 /app/vendor/bin/.phpunit/phpunit-7.0/src/TextUI/Command.php(153): PHPUnit\TextUI\Command->run(Array, true)
+#4 /app/vendor/bin/.phpunit/phpunit-7.0/phpunit(17): PHPUnit\TextUI\Command::main()
+#5 /app/vendor/symfony/phpunit-bridge/bin/simple-phpunit(251): include('/app/vendor/bin...')
+#6 {main}
+  thrown in /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php on line 908
+
+Fatal error: Uncaught Error: Call to undefined method PHPUnit\Util\Configuration::getExtensionConfiguration() in /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:908
+Stack trace:
+#0 /app/vendor/symfony/phpunit-bridge/TextUI/TestRunner.php(34): PHPUnit\TextUI\TestRunner->handleConfiguration(Array)
+#1 /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(151): Symfony\Bridge\PhpUnit\TextUI\TestRunner->handleConfiguration(Array)
+#2 /app/vendor/bin/.phpunit/phpunit-7.0/src/TextUI/Command.php(205): PHPUnit\TextUI\TestRunner->doRun(Object(PHPUnit\Framework\TestSuite), Array, true)
+#3 /app/vendor/bin/.phpunit/phpunit-7.0/src/TextUI/Command.php(153): PHPUnit\TextUI\Command->run(Array, true)
+#4 /app/vendor/bin/.phpunit/phpunit-7.0/phpunit(17): PHPUnit\TextUI\Command::main()
+#5 /app/vendor/symfony/phpunit-bridge/bin/simple-phpunit(251): include('/app/vendor/bin...')
+#6 {main}
+  thrown in /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php on line 908
+
+```
+
+EDIT: this is the output of one call meaning that I have two times the same error.
+
+EDIT2: ok I'm guessing it's not getting the right phpunit project because this one is located in `vendor/phpunit/phpunit` instead of `vendor/bin/.phpunit/phpunit-7.0`
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:37:36Z
+
+Looks like you have phpunit installed on your project: `/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php`. Try removing it, it probably interferes in a weird way.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:38:53Z
+
+Here is the commit that introduces this method: https://github.com/sebastianbergmann/phpunit/commit/41c75847e0a7e7df2e0eba6b6edf4d1b99da3103
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-20T23:38:56Z
+
+Just saw this at the same time :)
+It's because of another dependency (phpstan-phpunit) :/
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:39:38Z
+
+Yeah that's why we should stop using phpstan as a vendor like this :P
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:42:54Z
+
+Argh, as you said it's `phpstan-phpunit` not sure you can run that in isolation from the project :/
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-20T23:42:55Z
+
+Removing the dependency that introduced phpunit works. Using phpstan standalone (outside of the project) is another debate :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-20T23:43:35Z
+
+> Argh, as you said it's phpstan-phpunit not sure you can run that in isolation from the project :/
+
+Ah nevermind, it's totally doable: https://hub.docker.com/r/phpstan/phpstan/
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-20T23:49:15Z
+
+It's so sick I've not found that it uses the wrong phpunit earlier because I could have done the exact same PR months ago ^^
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-21T01:23:05Z
+
+I still don't understand why it loaded the class `PHPUnit\TextUI\TestRunner` from the wrong directory (`/app/vendor/phpunit` instead of `/app/vendor/bin/.phpunit/phpunit-7.0/src/TextUI/TestRunner.php`)
+
+It should use its own autoloading located in `/app/vendor/bin/.phpunit/phpunit-7.0/vendor/autoload.php`
+
+What I found so far is that if I force the autoloading from the `vendor/bin/.phpunit/phpunit-7.0/phpunit` using this code:
+```php
+$reflector = new ReflectionClass('PHPUnit\TextUI\TestRunner');
+```
+It works. (you need to put this code in the simple-phunit file on line 123 so it will regenerate the phpunit file.)
+
+---------------------------------------------------------------------------
+
+by juliendufresne at 2018-04-21T09:15:36Z
+
+I figured it out.
+`simple-phpunit` uses the composer autoload file located in `vendor/bin/.phpunit/phpunit-7.0/vendor/autoload.php`
+But when phpunit tries to load a class in the project (in the tests folder), it uses the file specified in the `phpunit.xml.dist`: `bootstrap="vendor/autoload.php"`.
+The later overrides the former and every unknown files will then uses the `<project-root-dir>vendor/autolad.php` file.
+
+That's why we can not have both phpunit-bridge and phpunit as a dependency in the project.
+Sadly, I don't think there is any trick to remove phpunit from the classmap of `<project-root-dir>/vendor/composer/autoload_classmap.php` at runtime.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-21T09:16:13Z
+
+Actually, the bridge should still be compatible with PHP 5.3, so we might have to use the same approach as we have for SymfonyTestsListener.php...
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-21T09:18:06Z
+
+Ah right, I didn't check the right composer.json, and assumed the constraints would be the same
+
+https://github.com/symfony/symfony/blob/833909bd68b99c3276518412afcaf6e32e8fb2f9/src/Symfony/Bridge/PhpUnit/composer.json#L19-L21
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-22T05:49:34Z
+
+Why is it for 4.0 and not 2.7?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-22T07:34:42Z
+
+The bug was reported for 4.0, let's see if it applies to lower versions.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-22T07:42:45Z
+
+The 2.7 code looks a lot different: there is no `TestRunner` class or `Command::handleConfiguration`, there are no class aliases.
+
+I can make a separate PR just for this method signature:
+
+https://github.com/symfony/symfony/blob/923417122abcf5eb4b8d0df84cc0730bdf4123b9/src/Symfony/Bridge/PhpUnit/TextUI/Command.php#L22
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-22T07:51:13Z
+
+The `Legacy` directory appears on the 3.3 branch, but 3.3 is not supported, so I think the right target for this bugfix is 3.4. I can write other PR 2.7 and 2.8 if you deem it necessary, but I guess that if `Legacy` is missing from those branches, it means that you didn't think supporting phpunit 6 was necessary (might also mean that 2.7 and 2.8 were unaffected by the phpunit 6 bc-breaks, I don't know). Please tell me what you think, but in the meantime, I am going to rebase on 3.4.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-22T07:53:37Z
+
+Apparently, support for phpunit 7 is a feature and [was therefore added on 3.4](https://github.com/symfony/symfony/pull/26089)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-22T08:28:38Z
+
+The Appveyor and Travis build failures seem unrelated.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-22T09:23:54Z
+
+The adopted naming convention is to use the lowest supported version for naming. Since we are not 100% about phpunit 4 support, we use V5, and if it works for phpunit 4, that's great but we don't really care.

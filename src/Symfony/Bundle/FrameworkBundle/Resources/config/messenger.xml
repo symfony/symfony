@@ -64,6 +64,7 @@
             <argument type="service" id="messenger.transport.encoder" />
             <argument type="service" id="messenger.transport.decoder" />
             <argument>%kernel.debug%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
 
             <tag name="messenger.transport_factory" />
         </service>

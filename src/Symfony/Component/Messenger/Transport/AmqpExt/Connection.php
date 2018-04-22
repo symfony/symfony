@@ -18,7 +18,10 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
  */
 class Connection
 {
-    private $connectionCredentials;
+    private const DEFAULT_MESSAGE_TTL_IN_MILLI_SECONDS = 10000;
+    private const DEFAULT_MAX_ATTEMPTS = 3;
+
+    private $connectionConfiguration;
     private $exchangeConfiguration;
     private $queueConfiguration;
     private $debug;
@@ -39,9 +42,50 @@ class Connection
      */
     private $amqpQueue;
 
-    public function __construct(array $connectionCredentials, array $exchangeConfiguration, array $queueConfiguration, bool $debug = false, AmqpFactory $amqpFactory = null)
+    /**
+     * @var \AMQPExchange|null
+     */
+    private $amqpRetryExchange;
+
+    /**
+     * Available options:
+     *
+     *   * host: Hostname of the AMQP service
+     *   * port: Port of the AMQP service
+     *   * vhost: Virtual Host to use with the AMQP service
+     *   * user: Username to use to connect the the AMQP service
+     *   * password: Username to use the connect to the AMQP service
+     *   * queue:
+     *     * name: Name of the queue
+     *     * routing_key: The routing key (if any) to use to push the messages to
+     *     * flags: Queue flags (Default: AMQP_DURABLE)
+     *     * arguments: Extra arguments
+     *   * exchange:
+     *     * name: Name of the exchange
+     *     * type: Type of exchange (Default: fanout)
+     *     * flags: Exchange flags (Default: AMQP_DURABLE)
+     *     * arguments: Extra arguments
+     *   * retry:
+     *     * attempts: Number of times it will try to retry
+     *     * routing_key_pattern: The pattern of the routing key (Default: "attempt_%attempt%")
+     *     * dead_queue: Name of the queue in which messages that retry more than attempts time are pushed to
+     *     * dead_routing_key: Routing key name for the dead queue (Default: "dead")
+     *     * queue_name_pattern: Pattern to use to create the queues (Default: "retry_queue_%attempt%")
+     *     * exchange_name: Name of the exchange to be used for the retried messages (Default: "retry")
+     *     * ttl: Key-value pairs of attempt number -> seconds to wait. If not configured, 10 seconds will be waited each attempt.
+     *   * auto-setup: Enable or not the auto-setup of queues and exchanges (Default: true)
+     *   * loop_sleep: Amount of micro-seconds to wait if no message are available (Default: 200000)
+     */
+    public function __construct(array $connectionConfiguration, array $exchangeConfiguration, array $queueConfiguration, bool $debug = false, AmqpFactory $amqpFactory = null)
     {
-        $this->connectionCredentials = $connectionCredentials;
+        $this->connectionConfiguration = array_replace_recursive(array(
+            'retry' => array(
+                'routing_key_pattern' => 'attempt_%attempt%',
+                'dead_routing_key' => 'dead',
+                'exchange_name' => 'retry',
+                'queue_name_pattern' => 'retry_queue_%attempt%',
+            ),
+        ), $connectionConfiguration);
         $this->debug = $debug;
         $this->exchangeConfiguration = $exchangeConfiguration;
         $this->queueConfiguration = $queueConfiguration;
@@ -99,6 +143,108 @@ class Connection
         }
 
         $this->exchange()->publish($body, null, AMQP_NOPARAM, array('headers' => $headers));
+    }
+
+    /**
+     * @throws \AMQPException
+     */
+    public function publishForRetry(\AMQPEnvelope $message): bool
+    {
+        if (!isset($this->connectionConfiguration['retry'])) {
+            return false;
+        }
+
+        $retryConfiguration = $this->connectionConfiguration['retry'];
+        $attemptNumber = ((int) $message->getHeader('symfony-messenger-attempts') ?: 0) + 1;
+
+        if ($this->shouldSetup()) {
+            $this->setupRetry($retryConfiguration, $attemptNumber);
+        }
+
+        $maximumAttempts = $retryConfiguration['attempts'] ?? self::DEFAULT_MAX_ATTEMPTS;
+        $routingKey = str_replace('%attempt%', $attemptNumber, $retryConfiguration['routing_key_pattern']);
+
+        if ($attemptNumber > $maximumAttempts) {
+            if (!isset($retryConfiguration['dead_queue'])) {
+                return false;
+            }
+
+            $routingKey = $retryConfiguration['dead_routing_key'];
+        }
+
+        $retriedMessageAttributes = array(
+            'headers' => array_merge($message->getHeaders(), array('symfony-messenger-attempts' => (string) $attemptNumber)),
+        );
+
+        if ($deliveryMode = $message->getDeliveryMode()) {
+            $retriedMessageAttributes['delivery_mode'] = $deliveryMode;
+        }
+        if ($userId = $message->getUserId()) {
+            $retriedMessageAttributes['user_id'] = $userId;
+        }
+        if (null !== $priority = $message->getPriority()) {
+            $retriedMessageAttributes['priority'] = $priority;
+        }
+        if ($replyTo = $message->getReplyTo()) {
+            $retriedMessageAttributes['reply_to'] = $replyTo;
+        }
+
+        $this->retryExchange($retryConfiguration)->publish(
+            $message->getBody(),
+            $routingKey,
+            AMQP_NOPARAM,
+            $retriedMessageAttributes
+        );
+
+        return true;
+    }
+
+    private function setupRetry(array $retryConfiguration, int $attemptNumber)
+    {
+        if (!$this->channel()->isConnected()) {
+            $this->clear();
+        }
+
+        $exchange = $this->retryExchange($retryConfiguration);
+        $exchange->declareExchange();
+
+        $queue = $this->retryQueue($retryConfiguration, $attemptNumber);
+        $queue->declareQueue();
+        $queue->bind($exchange->getName(), str_replace('%attempt%', $attemptNumber, $retryConfiguration['routing_key_pattern']));
+
+        if (isset($retryConfiguration['dead_queue'])) {
+            $queue = $this->amqpFactory->createQueue($this->channel());
+            $queue->setName($retryConfiguration['dead_queue']);
+            $queue->declareQueue();
+            $queue->bind($exchange->getName(), $retryConfiguration['dead_routing_key']);
+        }
+    }
+
+    private function retryExchange(array $retryConfiguration): \AMQPExchange
+    {
+        if (null === $this->amqpRetryExchange) {
+            $this->amqpRetryExchange = $this->amqpFactory->createExchange($this->channel());
+            $this->amqpRetryExchange->setName($retryConfiguration['exchange_name']);
+            $this->amqpRetryExchange->setType(AMQP_EX_TYPE_DIRECT);
+        }
+
+        return $this->amqpRetryExchange;
+    }
+
+    private function retryQueue(array $retryConfiguration, int $attemptNumber)
+    {
+        $queue = $this->amqpFactory->createQueue($this->channel());
+        $queue->setName(str_replace('%attempt%', $attemptNumber, $retryConfiguration['queue_name_pattern']));
+        $queue->setArguments(array(
+            'x-message-ttl' => $retryConfiguration['ttl'][$attemptNumber - 1] ?? self::DEFAULT_MESSAGE_TTL_IN_MILLI_SECONDS,
+            'x-dead-letter-exchange' => $this->exchange()->getName(),
+        ));
+
+        if (isset($this->queueConfiguration['routing_key'])) {
+            $queue->setArgument('x-dead-letter-routing-key', $this->queueConfiguration['routing_key']);
+        }
+
+        return $queue;
     }
 
     /**
@@ -160,8 +306,8 @@ class Connection
     public function channel(): \AMQPChannel
     {
         if (null === $this->amqpChannel) {
-            $connection = $this->amqpFactory->createConnection($this->connectionCredentials);
-            $connectMethod = 'true' === ($this->connectionCredentials['persistent'] ?? 'false') ? 'pconnect' : 'connect';
+            $connection = $this->amqpFactory->createConnection($this->connectionConfiguration);
+            $connectMethod = 'true' === ($this->connectionConfiguration['persistent'] ?? 'false') ? 'pconnect' : 'connect';
 
             if (false === $connection->{$connectMethod}()) {
                 throw new \AMQPException('Could not connect to the AMQP server. Please verify the provided DSN.');
@@ -204,9 +350,9 @@ class Connection
         return $this->amqpExchange;
     }
 
-    public function getConnectionCredentials(): array
+    public function getConnectionConfiguration(): array
     {
-        return $this->connectionCredentials;
+        return $this->connectionConfiguration;
     }
 
     private function clear(): void
@@ -218,6 +364,6 @@ class Connection
 
     private function shouldSetup(): bool
     {
-        return !array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], array(false, 'false'), true);
+        return !array_key_exists('auto-setup', $this->connectionConfiguration) || !\in_array($this->connectionConfiguration['auto-setup'], array(false, 'false'), true);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
@@ -26,12 +27,14 @@ class AmqpTransport implements TransportInterface
     private $connection;
     private $receiver;
     private $sender;
+    private $logger;
 
-    public function __construct(EncoderInterface $encoder, DecoderInterface $decoder, Connection $connection)
+    public function __construct(EncoderInterface $encoder, DecoderInterface $decoder, Connection $connection, LoggerInterface $logger = null)
     {
         $this->encoder = $encoder;
         $this->decoder = $decoder;
         $this->connection = $connection;
+        $this->logger = $logger;
     }
 
     /**
@@ -60,7 +63,7 @@ class AmqpTransport implements TransportInterface
 
     private function getReceiver()
     {
-        return $this->receiver = new AmqpReceiver($this->decoder, $this->connection);
+        return $this->receiver = new AmqpReceiver($this->decoder, $this->connection, $this->logger);
     }
 
     private function getSender()

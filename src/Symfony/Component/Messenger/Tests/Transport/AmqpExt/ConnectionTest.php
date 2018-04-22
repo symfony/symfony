@@ -189,6 +189,98 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', array(), true, $factory);
         $connection->publish('body');
     }
+
+    public function testItRetriesTheMessage()
+    {
+        $amqpConnection = $this->getMockBuilder(\AMQPConnection::class)->disableOriginalConstructor()->getMock();
+        $amqpChannel = $this->getMockBuilder(\AMQPChannel::class)->disableOriginalConstructor()->getMock();
+        $retryQueue = $this->getMockBuilder(\AMQPQueue::class)->disableOriginalConstructor()->getMock();
+
+        $factory = $this->getMockBuilder(AmqpFactory::class)->getMock();
+        $factory->method('createConnection')->willReturn($amqpConnection);
+        $factory->method('createChannel')->willReturn($amqpChannel);
+        $factory->method('createQueue')->willReturn($retryQueue);
+        $factory->method('createExchange')->will($this->onConsecutiveCalls(
+            $retryExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock(),
+            $amqpExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock()
+        ));
+
+        $amqpExchange->expects($this->once())->method('setName')->with('messages');
+        $amqpExchange->method('getName')->willReturn('messages');
+
+        $retryExchange->expects($this->once())->method('setName')->with('retry');
+        $retryExchange->expects($this->once())->method('declareExchange');
+        $retryExchange->method('getName')->willReturn('retry');
+
+        $retryQueue->expects($this->once())->method('setName')->with('retry_queue_1');
+        $retryQueue->expects($this->once())->method('setArguments')->with(array(
+            'x-message-ttl' => 10000,
+            'x-dead-letter-exchange' => 'messages',
+        ));
+
+        $retryQueue->expects($this->once())->method('declareQueue');
+        $retryQueue->expects($this->once())->method('bind')->with('retry', 'attempt_1');
+
+        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope->method('getHeader')->with('symfony-messenger-attempts')->willReturn(false);
+        $envelope->method('getHeaders')->willReturn(array('x-some-headers' => 'foo'));
+        $envelope->method('getBody')->willReturn('{}');
+
+        $retryExchange->expects($this->once())->method('publish')->with('{}', 'attempt_1', AMQP_NOPARAM, array('headers' => array('x-some-headers' => 'foo', 'symfony-messenger-attempts' => 1)));
+
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', array('retry' => array('attempts' => 3)), false, $factory);
+        $connection->publishForRetry($envelope);
+    }
+
+    public function testItRetriesTheMessageWithADifferentRoutingKeyAndTTLs()
+    {
+        $amqpConnection = $this->getMockBuilder(\AMQPConnection::class)->disableOriginalConstructor()->getMock();
+        $amqpChannel = $this->getMockBuilder(\AMQPChannel::class)->disableOriginalConstructor()->getMock();
+        $retryQueue = $this->getMockBuilder(\AMQPQueue::class)->disableOriginalConstructor()->getMock();
+
+        $factory = $this->getMockBuilder(AmqpFactory::class)->getMock();
+        $factory->method('createConnection')->willReturn($amqpConnection);
+        $factory->method('createChannel')->willReturn($amqpChannel);
+        $factory->method('createQueue')->willReturn($retryQueue);
+        $factory->method('createExchange')->will($this->onConsecutiveCalls(
+            $retryExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock(),
+            $amqpExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock()
+        ));
+
+        $amqpExchange->expects($this->once())->method('setName')->with('messages');
+        $amqpExchange->method('getName')->willReturn('messages');
+
+        $retryExchange->expects($this->once())->method('setName')->with('retry');
+        $retryExchange->expects($this->once())->method('declareExchange');
+        $retryExchange->method('getName')->willReturn('retry');
+
+        $connectionOptions = array(
+            'retry' => array(
+                'attempts' => 3,
+                'dead_routing_key' => 'my_dead_routing_key',
+                'ttl' => array(30000, 60000, 120000),
+            ),
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', $connectionOptions, false, $factory);
+
+        $messageRetriedTwice = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $messageRetriedTwice->method('getHeader')->with('symfony-messenger-attempts')->willReturn('2');
+        $messageRetriedTwice->method('getHeaders')->willReturn(array('symfony-messenger-attempts' => '2'));
+        $messageRetriedTwice->method('getBody')->willReturn('{}');
+
+        $retryQueue->expects($this->once())->method('setName')->with('retry_queue_3');
+        $retryQueue->expects($this->once())->method('setArguments')->with(array(
+            'x-message-ttl' => 120000,
+            'x-dead-letter-exchange' => 'messages',
+        ));
+
+        $retryQueue->expects($this->once())->method('declareQueue');
+        $retryQueue->expects($this->once())->method('bind')->with('retry', 'attempt_3');
+
+        $retryExchange->expects($this->once())->method('publish')->with('{}', 'attempt_3', AMQP_NOPARAM, array('headers' => array('symfony-messenger-attempts' => 3)));
+        $connection->publishForRetry($messageRetriedTwice);
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

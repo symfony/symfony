@@ -69,7 +69,7 @@ class AmqpReceiverTest extends TestCase
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);
 
-        $connection->expects($this->once())->method('nack')->with($envelope);
+        $connection->expects($this->once())->method('nack')->with($envelope, AMQP_REQUEUE);
 
         $receiver = new AmqpReceiver($serializer, $connection);
         $receiver->receive(function () {
@@ -99,6 +99,60 @@ class AmqpReceiverTest extends TestCase
         $receiver = new AmqpReceiver($serializer, $connection);
         $receiver->receive(function () {
             throw new WillNeverWorkException('Well...');
+        });
+    }
+
+    public function testItPublishesTheMessageForRetryIfSuchConfiguration()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+        );
+
+        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn(array(
+            'type' => DummyMessage::class,
+        ));
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('get')->willReturn($envelope);
+        $connection->method('getConnectionConfiguration')->willReturn(array('retry' => array('attempts' => 3)));
+        $connection->method('publishForRetry')->with($envelope)->willReturn(true);
+
+        $connection->expects($this->once())->method('ack')->with($envelope);
+
+        $receiver = new AmqpReceiver($serializer, $connection);
+        $receiver->receive(function (Envelope $envelope) use ($receiver) {
+            $this->assertEquals(new DummyMessage('Hi'), $envelope->getMessage());
+            $receiver->stop();
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Messenger\Tests\Transport\AmqpExt\InterruptException
+     */
+    public function testItThrowsTheExceptionIfTheRetryPublishDidNotWork()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+        );
+
+        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn(array(
+            'type' => DummyMessage::class,
+        ));
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('get')->willReturn($envelope);
+        $connection->method('getConnectionConfiguration')->willReturn(array('retry' => array('attempts' => 3)));
+        $connection->method('publishForRetry')->with($envelope)->willReturn(false);
+
+        $connection->expects($this->never())->method('ack')->with($envelope);
+
+        $receiver = new AmqpReceiver($serializer, $connection);
+        $receiver->receive(function () {
+            throw new InterruptException('Well...');
         });
     }
 }

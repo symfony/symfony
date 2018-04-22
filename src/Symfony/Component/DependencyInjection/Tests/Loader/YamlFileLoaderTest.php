@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -719,7 +720,7 @@ class YamlFileLoaderTest extends TestCase
             '$foo' => array(null),
             '$quz' => 'quz',
             '$factory' => 'factory',
-        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+        ), array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
         $this->assertEquals(array(
             'quz',
             null,
@@ -736,6 +737,6 @@ class YamlFileLoaderTest extends TestCase
             'NonExistent' => null,
             '$quz' => 'quz',
             '$factory' => 'factory',
-        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+        ), array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
     }
 }

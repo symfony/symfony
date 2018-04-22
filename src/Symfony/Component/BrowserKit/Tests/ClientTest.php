@@ -367,6 +367,20 @@ class ClientTest extends TestCase
         $this->assertEquals('bar', $server['PHP_AUTH_PW']);
     }
 
+    public function testSubmitPassthrewHeaders()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+        $headers = array('Accept-Language' => 'de');
+
+        $client->submit($crawler->filter('input')->form(), array(), $headers);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('Accept-Language', $server);
+        $this->assertEquals('de', $server['Accept-Language']);
+    }
+
     public function testFollowRedirect()
     {
         $client = new TestClient();

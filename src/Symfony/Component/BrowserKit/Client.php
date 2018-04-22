@@ -289,11 +289,11 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = array())
+    public function submit(Form $form, array $values = array(), $serverParameters = array())
     {
         $form->setValues($values);
 
-        return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles());
+        return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $serverParameters);
     }
 
     /**

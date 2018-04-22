@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by johnstevenson at 2018-04-14T18:40:31Z
+
+Sure. But I could do with some info regarding CliDumper:
+
+The constructor checks for Windows color support (so it can set a restricted style set), but only uses environment variables and not the output.
+
+1. I guess it is safe to use `$this->outputStream` here?
+2. Or would it be better to set the styles within the `supportsColors` method later?
+
+The `supportsColors` method does one type of check if `$this->outputStream` is not the default (`is_resource` && `posix_isatty`, which doesn't include windows) and a different, more stringent one if it is. An explanation why would be really useful. Likewise why if it is not the default, the method returns before checking for color options in `argv`.
+
+I was wondering if the output needs to be differentiated, and if so, then what are the criteria for each type.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-14T19:45:46Z
+
+Which color set does new versions of Windows support? If it doesn't need the reduced set, then the current logic in the CliDumper constructor should be fine, so that only supportsColors should be updated.
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2018-04-14T20:30:47Z
+
+Windows 10 has supported 24-bit color for over a year now, but you can obviously still run PHP7.2 on earlier versions.
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2018-04-16T20:07:58Z
+
+I've synced DeprecationErrorHandler.php, but without any info about CliDumper.php I have no idea if my changes are correct.
+
+I've kept the current logic in the CliDumper constructor, which is not ideal since it won't show 24-bit color output in cmd.exe on Windows 10. Incidentally, the Windows tests pass for me locally, but not on Appveyor for some reason:
+
+```
+There were 3 failures:
+1) Symfony\Component\HttpKernel\Tests\DataCollector\DumpDataCollectorTest::testCollectDefault
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-DumpDataCollectorTest.php on line 65:
+-123
++DumpDataCollectorTest.php on line 65:
++123
+
+C:\projects\symfony\src\Symfony\Component\HttpKernel\Tests\DataCollector\DumpDataCollectorTest.php:73
+
+2) Symfony\Component\HttpKernel\Tests\DataCollector\DumpDataCollectorTest::testFlush
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-DumpDataCollectorTest.php on line 123:
+-456
++DumpDataCollectorTest.php on line 123:
++456
+
+C:\projects\symfony\src\Symfony\Component\HttpKernel\Tests\DataCollector\DumpDataCollectorTest.php:129
+
+3) Symfony\Component\HttpKernel\Tests\DataCollector\DumpDataCollectorTest::testFlushNothingWhenDataDumperIsProvided
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-DumpDataCollectorTest.php on line 142:
+-456
++DumpDataCollectorTest.php on line 142:
++456
+
+C:\projects\symfony\src\Symfony\Component\HttpKernel\Tests\DataCollector
+```
+I've also added references to the source of the code, but I'll remove them if not considered desirable.
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2018-04-16T20:43:58Z
+
+> Do you think we can improve the logic and somehow detect when the native Windows terminal supports 24b colors?
+
+Probably, but I need you to answer my original question:
+
+The constructor checks for Windows color support (so it can set a restricted style set), but only uses environment variables and not the output.
+
+   1. I guess it is safe to use $this->outputStream here?
+   2. Or would it be better to set the styles within the supportsColors method later?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-16T20:45:59Z
+
+It is not safe to use `$this->outputStream`. The check should be done against a global stream, `STDOUT` basically.

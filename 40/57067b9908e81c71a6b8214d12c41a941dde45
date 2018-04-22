@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T10:22:35Z
+
+ping @weaverryan
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-10T21:59:07Z
+
+I agree with @xabbuh https://github.com/symfony/symfony/issues/25992#issuecomment-363032260 that the current behavior is *not* the correct behavior. I even checked Amazon further: I can (A) login, (B) go back to the login page and enter an incorrect password and (C) go back to my account area and even update my password. So, let's fix this :).
+
+So now the question: is this change a BC break? Because this deals with security... and specifically it's something that *relaxes* security, I think it *is* a BC break. That sucks, but... I think it's correct.
+
+The fix, then, means adding a BC layer. I can only think of one way: adding a new option to *opt into* this behavior. I was thinking an option under `security`, but a container parameter - e.g. `security.logout_on_auth_failure: false`, would be a bit easier for the deprecation layer.
+
+If not set (or set to anything *except* false), we would keep the current behavior but trigger a deprecation warning. If the parameter *is* set to false, we could call a new internal `setLogoutOnAuthFailure()` method on `GuardAuthenticationHandler`, and change the behavior based on this. I think we should fix it as a "feature" on 4.1, versus trying to backport it to 2.8.
+
+This change would also need to be made to:
+* `AbstractAuthenticationListener`
+* `AbstractPreAuthenticatedListener`
+* `BasicAuthenticationListener`
+* `SimplePreAuthenticationListener`
+* `UsernamePasswordJsonAuthenticationListener`
+
+Really, the change is not *that* huge, so I think we should do it. @iltar are you up for it? I'm in support of this.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-02-11T10:15:46Z
+
+As it's currently an issue, I'm not sure if I can wait till the release of 4.1, but I can always fix it for 4.1 and "backport" it via file autoloading in composer for my local project.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-11T11:49:01Z
+
+In theory, you could fix on 2.7 if you’d like :). It shouldn’t make a huge difference, except that I’m not sure how our deprecation policy works. As I understand it, you would not include the deprecation warnings for the parameter NOT being set in 2.7. Those would be added in 4.1 (but I’m not 100% sure here - I don’t know if a time it’s come up)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-19T08:24:34Z
+
+My opinion on the matter:
+
+ * if guard is the only part of the security component behaving like this, it would qualify as a bug IMHO
+
+ * I would not deprecate the behavior as there is no security issue impact with the change. I would just consider this as either a bug fix or a behavior change (I also don't think this should be configurable).
+
+ * if we fix it as a bug fix, it should be on 2.7, not 2.8
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-02-19T09:04:30Z
+
+If we fix it as a bug in guard (because the Simple* variant didn't show this behavior for me), it should be on 2.8 as this is where guard was introduced.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T21:08:08Z
+
+so, is this ready?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-16T13:34:25Z
+
+In theory this can be merged, there just needs to be a consensus on whether it _should_ be merged :sweat_smile:

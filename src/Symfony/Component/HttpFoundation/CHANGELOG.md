@@ -16,6 +16,7 @@ CHANGELOG
    `IniSizeFileException`, `NoFileException`, `NoTmpDirFileException`, `PartialFileException` to
    handle failed `UploadedFile`.
  * added `MigratingSessionHandler` for migrating between two session handlers without losing sessions
+ * added `HeaderUtils`.
 
 4.0.0
 -----

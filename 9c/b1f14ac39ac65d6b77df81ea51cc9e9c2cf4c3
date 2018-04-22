@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by cfjulien at 2018-04-05T10:29:59Z
+
+Is there something i can to about the failed test AppVeyor?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-06T05:37:09Z
+
+As this is a new feature, this pull request should be rebased on master.
+
+---------------------------------------------------------------------------
+
+by cfjulien at 2018-04-06T10:59:09Z
+
+We rebased but the master test is still failing.

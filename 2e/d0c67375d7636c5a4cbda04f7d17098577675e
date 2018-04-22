@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T15:39:23Z
+
+These failures perfectly illustrate what I was anticipating in #26821. We must be very careful when doing such changes. In fact, should revert the added Role type hint from #26821?
+
+---------------------------------------------------------------------------
+
+by DQNEO at 2018-04-20T17:57:47Z
+
+OK I'll revert the RoleInterface addition.
+~And also make a PR to remove Role from  #26821.~
+Oh, what is wrong with #26821 ? Role type is not deprecated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-21T09:31:14Z
+
+>  Oh, what is wrong with #26821 ? Role type is not deprecated.
+
+Right, but there is nothing enforcing that a Role object is actually provided here. People could play duck typing, isn't it?
+
+---------------------------------------------------------------------------
+
+by DQNEO at 2018-04-21T11:24:39Z
+
+well, that depends on how strict people think `@return` (like `@return Role[] `  in RoleHierarchyInterface) is.
+I regarded `@return` as equivalent to the "return type declaration".
+But as you say, some users may ignore it and could do duck typing.
+So I'll eliminate the `Role` declaration.
+
+Sorry for bothering you all and thank you for the feedback!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-22T06:27:10Z
+
+Should be merged in master, not 3.4.
+
+---------------------------------------------------------------------------
+
+by DQNEO at 2018-04-22T06:31:55Z
+
+Sure. I've changed the target branch to master.

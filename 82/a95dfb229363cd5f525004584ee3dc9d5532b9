@@ -1,0 +1,200 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-06T20:36:37Z
+
+Nop, the Cookie now understands how to stringify itself differently based
+the raw or not raw. Therefore, we don't need PHP's `set*cookie`
+On Wed, 6 Dec 2017 at 18:13, Thom Hurks <notifications@github.com> wrote:
+
+> *@ThomHurks* commented on this pull request.
+> ------------------------------
+>
+> In src/Symfony/Component/HttpFoundation/Response.php
+> <https://github.com/symfony/symfony/pull/25348#discussion_r155316254>:
+>
+> > @@ -337,7 +337,7 @@ public function sendHeaders()
+>          }
+>
+>          // headers
+> -        foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
+> +        foreach ($this->headers->allPreserveCase() as $name => $values) {
+>
+> The current cookie code distinguishes between urlencoding the cookie value
+> and not doing that (raw), the setcookie() function also performs some
+> filtering and escaping as I understand it. As far as I can see in the code,
+> the allPreserveCase() function doesn't do that but just casts the Cookie
+> object to string and as such isn't a 1-to-1 substitute for setcookie()
+> and setrawcookie(), right?
+>
+> —
+> You are receiving this because you are subscribed to this thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25348#pullrequestreview-81616344>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHETp-qltXfQNc_xmHHXVlwKnmRftaks5s9tkdgaJpZM4Q3nK_>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ThomHurks at 2017-12-06T20:42:55Z
+
+@sroze Yes, I realized that after examining the code more closely and so I edited my comment. Still, cross-referencing the code with PHP's implementation may be a good thing to do to prevent regression in behaviour. I'm not sure how new the Cookie code is, and the code that is currently there is not actually used to generate the final cookie at the moment, so it may be incomplete/untested?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-06T21:13:35Z
+
+@ThomHurks here is the native implem:
+https://github.com/php/php-src/blob/master/ext/standard/head.c#L84
+
+everything looks fine to me.
+
+---------------------------------------------------------------------------
+
+by ThomHurks at 2017-12-07T09:02:52Z
+
+@nicolas-grekas Not the case, there are some differences that I can spot:
+- Symfony does not check the value of ```value``` against the characters ```=,; \t\r\n\013\014``` whereas PHP does. Symfony only checks it against ```name``` and PHP checks it agains ```name``` and ```value```.
+- When a cookie needs to be deleted, Symfony sets the ```max-age``` to ```31536001``` and the ```expiry``` to ```now - max-age``` but PHP just passes in ```expiry = 1``` and ```max-age = 0```.
+- PHP checks if the expiry date has a year greater than 9999.
+- Symfony also ```urlencode```'s ```name```, I don't see PHP do that.
+- Symfony uses ```urlencode``` for the ```name``` vs ```rawurlencode``` for the ```value```, not sure why that difference is there.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-07T09:07:10Z
+
+I understand your concerns, and agree a bit. We will add integration
+testing to this PR very soon. Highlighting the important scenarios that you
+believe needs to be tested would be a very nice input from you! Could you
+do so?
+On Thu, 7 Dec 2017 at 09:02, Thom Hurks <notifications@github.com> wrote:
+
+> @nicolas-grekas <https://github.com/nicolas-grekas> Not the case, there
+> are some differences that I can spot:
+>
+>    - Symfony does not check the value of value against the characters =,;
+>    \t\r\n\013\014 whereas PHP does. Symfony only checks it against name
+>    and PHP checks it agains name and value.
+>    - When a cookie needs to be deleted, Symfony sets the max-age to
+>    31536001 and the expiry to now - max-age but PHP just passes in expiry
+>    = 1 and max-age = 0.
+>    - PHP checks if the expiry date has a year greater than 9999.
+>    - Symfony also urlencode's name, I don't see PHP do that.
+>    - Symfony uses urlencode for the name vs rawurlencode for the value,
+>    not sure why that difference is there.
+>
+> —
+> You are receiving this because you were mentioned.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25348#issuecomment-349905192>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEcCjAYcpYVxNkRxVfnFdeovGgsknks5s96nCgaJpZM4Q3nK_>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-07T19:51:45Z
+
+I'd like to propose a plan:
+- @sroze would you like to submit a testing infra for this? Could be heavily inspired by `AbstractSessionHandlerTest` on 3.4
+- @ThomHurks would you like to submit a separate PR on 3.3 to align the behavior with native PHP?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-07T20:13:46Z
+
+I like this plan 👍
+On Thu, 7 Dec 2017 at 19:51, Nicolas Grekas <notifications@github.com>
+wrote:
+
+> I'd like to propose a plan:
+>
+>    - @sroze <https://github.com/sroze> would you like to submit a testing
+>    infra for this? Could be heavily inspired by AbstractSessionHandlerTest
+>    on 3.4
+>    - @ThomHurks <https://github.com/thomhurks> would you like to submit a
+>    separate PR on 3.3 to align the behavior with native PHP?
+>
+> —
+> You are receiving this because you were mentioned.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25348#issuecomment-350075636>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEbIHdt80LKCThXK49tqP3kTEwUoKks5s-EHXgaJpZM4Q3nK_>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ThomHurks at 2017-12-07T22:02:57Z
+
+@nicolas-grekas I will likely have time tomorrow to create a PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T21:33:12Z
+
+@sroze @ThomHurks any progress?
+
+---------------------------------------------------------------------------
+
+by halaei at 2018-01-12T14:27:41Z
+
+Regarding [spectre attack](https://meltdownattack.com/) and [suggested mitigations](https://www.chromium.org/Home/chromium-security/ssca) should this be considered as a critical security fix?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-12T14:48:15Z
+
+I don't think it has anything to do with the attacks you've mentioned. I did not get time to get ahead with this so if anybody would like until I get back to it, you're welcome 😉
+
+---------------------------------------------------------------------------
+
+by halaei at 2018-01-12T15:08:12Z
+
+@sroze I quote the part from https://www.chromium.org/Home/chromium-security/ssca that seems to imply this is actually relevant:
+
+> Where possible, prevent cookies from entering the renderer process' memory by using the SameSite and HTTPOnly cookie attributes, and by avoiding reading from document.cookie.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-29T15:24:03Z
+
+moving to the 3.4 milestone as the last bugfix release for 3.3 was published today
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T20:00:48Z
+
+Back on here, this PR now contains a second commit provided by @cvilleger, thank to him for working on it.
+
+The Response + Cookie classes are now functionnally tested, and their behavior is a bit more aligned to PHP native one:
+
+> Symfony does not check the value of value against the characters =,; \t\r\n\013\014 whereas PHP does. Symfony only checks it against name and PHP checks it agains name and value.
+
+It does for the name, but doesn't care for the value. HTTP allows anything so no reason to restrict like PHP.
+
+> When a cookie needs to be deleted, Symfony sets the max-age to 31536001 and the expiry to now - max-age but PHP just passes in expiry = 1 and max-age = 0.
+
+Aligned
+
+> PHP checks if the expiry date has a year greater than 9999.
+
+I don't see any reason, kept as is (and tested).
+
+> Symfony also urlencode's name, I don't see PHP do that.
+
+PHP should encode. Symfony does, that's OK.
+
+> Symfony uses urlencode for the name vs rawurlencode for the value, not sure why that difference is there.
+
+Unrelated to the PHP vs Symfony delta, kept as is.
+
+Status: needs review

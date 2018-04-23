@@ -1,6 +1,11 @@
 UPGRADE FROM 4.x to 5.0
 =======================
 
+Cache
+-----
+
+ * Removed `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
+
 Config
 ------
 

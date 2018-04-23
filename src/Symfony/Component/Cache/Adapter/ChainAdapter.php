@@ -64,8 +64,10 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $item->value = $sourceItem->value;
                 $item->expiry = $sourceItem->expiry;
                 $item->isHit = $sourceItem->isHit;
+                $item->metadata = $sourceItem->metadata;
 
                 $sourceItem->isTaggable = false;
+                unset($sourceItem->metadata[CacheItem::METADATA_TAGS]);
 
                 if (0 < $sourceItem->defaultLifetime && $sourceItem->defaultLifetime < $defaultLifetime) {
                     $defaultLifetime = $sourceItem->defaultLifetime;
@@ -84,19 +86,20 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback)
+    public function get(string $key, callable $callback, float $beta = null)
     {
         $lastItem = null;
         $i = 0;
-        $wrap = function (CacheItem $item = null) use ($key, $callback, &$wrap, &$i, &$lastItem) {
+        $wrap = function (CacheItem $item = null) use ($key, $callback, $beta, &$wrap, &$i, &$lastItem) {
             $adapter = $this->adapters[$i];
             if (isset($this->adapters[++$i])) {
                 $callback = $wrap;
+                $beta = INF === $beta ? INF : 0;
             }
             if ($adapter instanceof CacheInterface) {
-                $value = $adapter->get($key, $callback);
+                $value = $adapter->get($key, $callback, $beta);
             } else {
-                $value = $this->doGet($adapter, $key, $callback);
+                $value = $this->doGet($adapter, $key, $callback, $beta ?? 1.0);
             }
             if (null !== $item) {
                 ($this->syncItem)($lastItem = $lastItem ?? $item, $item);

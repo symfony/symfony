@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 class ArrayAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = array(
+        'testGetMetadata' => 'ArrayAdapter does not keep metadata.',
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
     );

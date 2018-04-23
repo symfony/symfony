@@ -67,7 +67,7 @@ class TagAwareAdapter implements CacheInterface, TagAwareAdapterInterface, Prune
                 }
                 if (isset($itemTags[$key])) {
                     foreach ($itemTags[$key] as $tag => $version) {
-                        $item->prevTags[$tag] = $tag;
+                        $item->metadata[CacheItem::METADATA_TAGS][$tag] = $tag;
                     }
                     unset($itemTags[$key]);
                 } else {
@@ -84,7 +84,7 @@ class TagAwareAdapter implements CacheInterface, TagAwareAdapterInterface, Prune
             function ($deferred) {
                 $tagsByKey = array();
                 foreach ($deferred as $key => $item) {
-                    $tagsByKey[$key] = $item->tags;
+                    $tagsByKey[$key] = $item->newMetadata[CacheItem::METADATA_TAGS] ?? array();
                 }
 
                 return $tagsByKey;

@@ -63,7 +63,7 @@ class CacheItemTest extends TestCase
         $this->assertSame($item, $item->tag(array('bar', 'baz')));
 
         call_user_func(\Closure::bind(function () use ($item) {
-            $this->assertSame(array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'), $item->tags);
+            $this->assertSame(array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'), $item->newMetadata[CacheItem::METADATA_TAGS]);
         }, $this, CacheItem::class));
     }
 

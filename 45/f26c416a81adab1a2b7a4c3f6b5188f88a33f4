@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-23T08:02:04Z
+
+Should be merged in the lowest branch where this exception exists.
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-04-23T09:27:33Z
+
+Changed base to 2.7.

@@ -97,11 +97,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
             if ($maxDepthReached) {
-                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue);
+                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue, $object, $attribute, $format, $context);
             }
 
             if (isset($this->callbacks[$attribute])) {
-                $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
+                $attributeValue = \call_user_func($this->callbacks[$attribute], $attributeValue, $object, $attribute, $format, $context);
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {

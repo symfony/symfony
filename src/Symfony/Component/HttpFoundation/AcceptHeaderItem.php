@@ -43,7 +43,7 @@ class AcceptHeaderItem
         $parts = HeaderUtils::split($itemValue, ';=');
 
         $part = array_shift($parts);
-        $attributes = HeaderUtils::combineParts($parts, 1);
+        $attributes = HeaderUtils::combineParts($parts);
 
         return new self($part[0], $attributes);
     }

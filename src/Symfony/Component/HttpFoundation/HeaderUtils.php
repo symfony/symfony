@@ -31,7 +31,7 @@ class HeaderUtils
      * Example:
      *
      *     HeaderUtils::split("da, en-gb;q=0.8", ",;")
-     *     // => array(array("da"), array("en-gb"), array("q", "0.8"))
+     *     // => array(array('da'), array('en-gb', 'q=0.8'))
      *
      * @param string $header     HTTP header value
      * @param string $separators List of characters to split on, ordered by
@@ -42,7 +42,7 @@ class HeaderUtils
      */
     public static function split(string $header, string $separators): array
     {
-        $quotedSeparators = preg_quote($separators);
+        $quotedSeparators = preg_quote($separators, '/');
 
         preg_match_all('
             /
@@ -71,7 +71,7 @@ class HeaderUtils
      * Each of the nested arrays should have one or two elements. The first
      * value will be used as the keys in the associative array, and the second
      * will be used as the values, or true if the nested array only contains one
-     * element.
+     * element. Array keys are lowercased.
      *
      * Example:
      *
@@ -94,13 +94,13 @@ class HeaderUtils
      * Joins an associative array into a string for use in an HTTP header.
      *
      * The key and value of each entry are joined with "=", and all entries
-     * is joined with the specified separator and an additional space (for
+     * are joined with the specified separator and an additional space (for
      * readability). Values are quoted if necessary.
      *
      * Example:
      *
      *     HeaderUtils::joinAssoc(array("foo" => "abc", "bar" => true, "baz" => "a b c"), ",")
-     *     // => 'foo=bar, baz, baz="a b c"'
+     *     // => 'foo=abc, bar, baz="a b c"'
      */
     public static function joinAssoc(array $assoc, string $separator): string
     {

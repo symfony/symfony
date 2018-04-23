@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-09T13:24:12Z
+
+Actually, I don't need to add a new class to preserve the BC, right ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-23T09:17:41Z
+
+I have update the PR:
+
+* I removed the new class
+* `WebProcessor` now implements `EventSubscriberInterface` in order to be easily autoconfigured
+
+Before:
+
+```yaml
+    Symfony\Bridge\Monolog\Processor\WebProcessor:
+        tags:
+            - { name: monolog.processor }
+            - { name: kernel.event_listener, event: kernel.request, priority: 4096 }
+```
+
+After:
+```yaml
+    Symfony\Bridge\Monolog\Processor\WebProcessor:
+        tags: [ monolog.processor ]
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-23T09:55:54Z
+
+> minor CS comment
+
+@fabpot I don't see your comments :/

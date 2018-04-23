@@ -12,19 +12,19 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
+use Symfony\Component\Translation\Catalogue\MergeOperation;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * A command that parses templates to extract translation messages and adds them
@@ -67,22 +67,19 @@ class TranslationUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(
-                array(
-                    new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                    new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
-                    new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
-                    new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
-                    new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
-                    new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
-                    new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
-                    new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
-                    new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
-                )
-            )
+            ->setDefinition(array(
+                new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
+                new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
+                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
+                new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
+                new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
+                new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
+                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
+            ))
             ->setDescription('Updates the translation file')
-            ->setHelp(
-                <<<'EOF'
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
 of a given bundle or the app folder. It can display them or merge the new ones into the translation files.
 
@@ -97,7 +94,8 @@ Example running against app messages (app/Resources folder)
   <info>php %command.full_name% --dump-messages en</info>
   <info>php %command.full_name% --force --prefix="new_" fr</info>
 EOF
-            );
+            )
+        ;
     }
 
     /**
@@ -118,12 +116,7 @@ EOF
         // check format
         $supportedFormats = $this->writer->getFormats();
         if (!in_array($input->getOption('output-format'), $supportedFormats)) {
-            $errorIo->error(
-                array(
-                    'Wrong output format',
-                    'Supported formats are: '.implode(', ', $supportedFormats).'.',
-                )
-            );
+            $errorIo->error(array('Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.'));
 
             return 1;
         }
@@ -241,16 +234,12 @@ EOF
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(
-                        function ($id) {
-                            return sprintf('<fg=green>%s</>', $id);
-                        }, $newKeys
-                    ),
-                    array_map(
-                        function ($id) {
-                            return sprintf('<fg=red>%s</>', $id);
-                        }, array_keys($operation->getObsoleteMessages($domain))
-                    )
+                    array_map(function ($id) {
+                        return sprintf('<fg=green>%s</>', $id);
+                    }, $newKeys),
+                    array_map(function ($id) {
+                        return sprintf('<fg=red>%s</>', $id);
+                    }, array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = count($list);
@@ -287,12 +276,7 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write(
-                $operation->getResult(), $input->getOption('output-format'), array(
-                'path' => $bundleTransPath,
-                'default_locale' => $this->defaultLocale,
-            )
-            );
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

@@ -35,6 +35,7 @@ class TagAwareAdapter implements CacheInterface, TagAwareAdapterInterface, Prune
     private $setCacheItemTags;
     private $getTagsByKey;
     private $invalidateTags;
+    private $getId;
     private $tags;
     private $knownTagVersions = array();
     private $knownTagVersionsTtl;
@@ -105,6 +106,13 @@ class TagAwareAdapter implements CacheInterface, TagAwareAdapterInterface, Prune
             null,
             CacheItem::class
         );
+        $this->getId = \Closure::bind(
+            function (AbstractAdapter $pool, $key) {
+                return $pool->getId($key);
+            },
+            null,
+            AbstractAdapter::class
+        );
     }
 
     /**
@@ -148,6 +156,22 @@ class TagAwareAdapter implements CacheInterface, TagAwareAdapterInterface, Prune
         }
 
         return $ok;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback, float $beta = null)
+    {
+        if ($this->pool instanceof AbstractAdapter) {
+            $id = ($this->getId)($this->pool, $key);
+        } elseif ($this->pool instanceof ProxyAdapter) {
+            $id = ((array) $this->pool)["\0Symfony\\Component\\Cache\\Adapter\\ProxyAdapter\0namespace"].$key;
+        } else {
+            $id = null;
+        }
+
+        return $this->doGet($this, $key, $callback, $beta ?? 1.0, $id !== $key ? $id : null);
     }
 
     /**

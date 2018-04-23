@@ -160,6 +160,14 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
     /**
      * {@inheritdoc}
      */
+    public function get(string $key, callable $callback, float $beta = null)
+    {
+        return $this->doGet($this, $key, $callback, $beta ?? 1.0, '' !== $this->namespace ? $this->getId($key) : null);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getItem($key)
     {
         if ($this->deferred) {

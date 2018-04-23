@@ -34,7 +34,7 @@ trait GetTrait
         return $this->doGet($this, $key, $callback, $beta ?? 1.0);
     }
 
-    private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, float $beta)
+    private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, float $beta, string $lockId = null)
     {
         $t = 0;
         $item = $pool->getItem($key);
@@ -64,6 +64,7 @@ trait GetTrait
         }
 
         static $save = null;
+        static $useApcu = null;
 
         if (null === $save) {
             $save = \Closure::bind(
@@ -81,6 +82,26 @@ trait GetTrait
             );
         }
 
-        return $save($pool, $item, $callback($item), $t);
+        if (null === $lockId || !$useApcu = $useApcu ?? \function_exists('apcu_entry') && ini_get('apc.enabled') && ('cli' !== \PHP_SAPI || ini_get('apc.enable_cli'))) {
+            return $save($pool, $item, $callback($item), $t);
+        }
+
+        $t = $t ?: microtime(true);
+        $lockId = ':'.$lockId;
+        $isHit = true;
+        $value = apcu_entry($lockId, function () use ($callback, $item, &$isHit) {
+            $isHit = false;
+
+            return $callback($item);
+        }, 2);
+
+        if (!$isHit) {
+            $save($pool, $item, $value, $t);
+            // give some time to concurrent processes to get the value from APCu
+            usleep(min(300000, (microtime(true) - $t) * 150000));
+            apcu_delete($lockId);
+        }
+
+        return $value;
     }
 }

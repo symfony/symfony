@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `CacheInterface`, which provides stampede protection via probabilistic early expiration and should become the preferred way to use a cache
+ * added warmup-time stampede protection using `apcu_entry()` for locking when available
  * added sub-second expiry accuracy for backends that support it
  * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
  * deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead

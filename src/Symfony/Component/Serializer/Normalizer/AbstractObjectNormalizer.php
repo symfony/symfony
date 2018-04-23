@@ -108,7 +108,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $stack[$attribute] = $attributeValue;
             }
 
-            $data = $this->updateData($data, $attribute, $attributeValue);
+            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $context);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
@@ -116,7 +116,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
             }
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute)));
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute)), $class, $format, $context);
         }
 
         return $data;
@@ -246,7 +246,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
+                $attribute = $this->nameConverter->denormalize($attribute, $class, $format, $context);
             }
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
@@ -400,10 +400,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param mixed $attributeValue
      */
-    private function updateData(array $data, string $attribute, $attributeValue): array
+    private function updateData(array $data, string $attribute, $attributeValue, string $class, ?string $format, array $context): array
     {
         if ($this->nameConverter) {
-            $attribute = $this->nameConverter->normalize($attribute);
+            $attribute = $this->nameConverter->normalize($attribute, $class, $format, $context);
         }
 
         $data[$attribute] = $attributeValue;

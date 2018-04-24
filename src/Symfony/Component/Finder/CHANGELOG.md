@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added $useNaturalSort option to Finder::sortByName() method
+
 4.0.0
 -----
 

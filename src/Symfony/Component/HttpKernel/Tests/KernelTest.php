@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -897,5 +898,45 @@ class TestKernel implements HttpKernelInterface
 
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+    }
+}
+
+class CustomProjectDirKernel extends Kernel
+{
+    private $buildContainer;
+    private $httpKernel;
+
+    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $name = 'custom')
+    {
+        parent::__construct($name, true);
+
+        $this->buildContainer = $buildContainer;
+        $this->httpKernel = $httpKernel;
+    }
+
+    public function registerBundles()
+    {
+        return array();
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+
+    public function getRootDir()
+    {
+        return __DIR__.'/Fixtures';
+    }
+
+    protected function build(ContainerBuilder $container)
+    {
+        if ($build = $this->buildContainer) {
+            $build($container);
+        }
+    }
+
+    protected function getHttpKernel()
+    {
+        return $this->httpKernel;
     }
 }

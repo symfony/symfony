@@ -19,18 +19,18 @@ namespace Symfony\Component\Validator\Translation\Extractor;
 class FQCNExtractor
 {
     /**
-     * Absolute path to source file
+     * Absolute path to source file.
      *
      * @var string
      */
     private $source;
 
     /**
-     * Found FQCN
+     * Found FQCN.
      *
      * @var array
      */
-    private $classes = [];
+    private $classes = array();
 
     /**
      * @var string
@@ -38,28 +38,28 @@ class FQCNExtractor
     private $currentNamespace = '';
 
     /**
-     * Whether last token is T_NAMESPACE
+     * Whether last token is T_NAMESPACE.
      *
      * @var bool
      */
     private $tNamespaceLastToken = false;
 
     /**
-     * Whether last token is T_CLASS
+     * Whether last token is T_CLASS.
      *
      * @var bool
      */
     private $tClassLastToken = false;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $source
      */
     public function __construct(string $source)
     {
         if (!is_file($source)) {
-            throw new \InvalidArgumentException($source . ' is not a PHP source file.');
+            throw new \InvalidArgumentException($source.' is not a PHP source file.');
         }
 
         $this->source = $source;
@@ -90,7 +90,7 @@ class FQCNExtractor
     }
 
     /**
-     * Treat next token
+     * Treat next token.
      *
      * @param int    $tokenCode
      * @param string $tokenValue
@@ -132,7 +132,7 @@ class FQCNExtractor
         if ($this->tClassLastToken) {
             if (T_STRING === $tokenCode) {
                 // new class found
-                $this->classes[] = $this->currentNamespace . '\\' . $tokenValue;
+                $this->classes[] = $this->currentNamespace.'\\'.$tokenValue;
             }
 
             $this->tClassLastToken = false;

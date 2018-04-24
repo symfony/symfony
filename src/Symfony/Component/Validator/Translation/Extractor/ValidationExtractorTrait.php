@@ -39,7 +39,7 @@ trait ValidationExtractorTrait
     private $defaultDomain = 'validators';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setPrefix($prefix)
     {
@@ -50,7 +50,7 @@ trait ValidationExtractorTrait
      * Fill catalogue with validation messages from metadata.
      *
      * @param MessageCatalogue $catalogue
-     * @param ClassMetadata $metadata
+     * @param ClassMetadata    $metadata
      *
      * @throws \ReflectionException
      */
@@ -64,7 +64,7 @@ trait ValidationExtractorTrait
                     $messages = $this->getMessagesFromConstraint($constraint);
                     $this->addMessagesToCatalog($catalogue, $messages);
                 }
-            };
+            }
         }
 
         // extract messages from callback constraints
@@ -80,15 +80,14 @@ trait ValidationExtractorTrait
      * Add messages to catalog.
      *
      * @param MessageCatalogueInterface $catalogue
-     * @param string[] $messages
+     * @param string[]                  $messages
      */
     private function addMessagesToCatalog(MessageCatalogueInterface $catalogue, $messages)
     {
         foreach ($messages as $message) {
-            $catalogue->set(trim($message), $this->prefix . trim($message), $this->defaultDomain);
+            $catalogue->set(trim($message), $this->prefix.trim($message), $this->defaultDomain);
         }
     }
-
 
     /**
      * Get all validation messages from given constraint.
@@ -101,7 +100,7 @@ trait ValidationExtractorTrait
      */
     private function getMessagesFromConstraint(Constraint $constraint)
     {
-        $messages = [];
+        $messages = array();
 
         $refl = new \ReflectionClass($constraint);
 

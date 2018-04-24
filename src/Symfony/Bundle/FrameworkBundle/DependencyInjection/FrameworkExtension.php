@@ -1095,7 +1095,8 @@ class FrameworkExtension extends Extension
 
             try {
                 $container->getDefinition(XmlValidationExtractor::class)->addMethodCall('setFiles', array($files['xml']));
-            } catch (ServiceNotFoundException $e) { }
+            } catch (ServiceNotFoundException $e) {
+            }
         }
 
         if (!empty($files['yml'])) {
@@ -1103,7 +1104,8 @@ class FrameworkExtension extends Extension
 
             try {
                 $container->getDefinition(YamlValidationExtractor::class)->addMethodCall('setFiles', array($files['yml']));
-            } catch (ServiceNotFoundException $e) { }
+            } catch (ServiceNotFoundException $e) {
+            }
         }
 
         $definition = $container->findDefinition('validator.email');

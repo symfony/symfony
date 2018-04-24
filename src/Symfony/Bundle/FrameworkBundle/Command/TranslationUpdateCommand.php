@@ -193,7 +193,7 @@ EOF
 
         // load any validation messages
         if ($this->validationExtractor && $input->getOption('extract-validation-messages')) {
-            $extractValidationMessagesDir = realpath($kernel->getRootDir() . '/../src');
+            $extractValidationMessagesDir = realpath($kernel->getRootDir().'/../src');
             $this->validationExtractor->setPrefix($input->getOption('prefix'));
             $this->validationExtractor->extract($extractValidationMessagesDir, $extractedCatalogue);
         }

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 class YamlValidationExtractor extends AbstractFileValidationExtractor
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createLoader(string $file)
     {

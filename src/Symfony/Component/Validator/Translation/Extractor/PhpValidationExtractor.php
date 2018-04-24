@@ -33,7 +33,7 @@ class PhpValidationExtractor extends AbstractFileExtractor implements ExtractorI
     use ValidationExtractorTrait;
 
     /**
-     * Whether annotations should be enabled
+     * Whether annotations should be enabled.
      *
      * @var bool
      */
@@ -50,13 +50,13 @@ class PhpValidationExtractor extends AbstractFileExtractor implements ExtractorI
     private $staticMethod;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param bool   $annotationsEnabled Annotations are enabled by default when validation and translation are enabled
      * @param array  $staticMethod       Name of static methods which load validation metadata
      * @param string $defaultDomain      Default translation messages domain
      */
-    public function __construct($annotationsEnabled = false, $staticMethod = ['loadValidatorMetadata'], $defaultDomain = 'validators')
+    public function __construct($annotationsEnabled = false, $staticMethod = array('loadValidatorMetadata'), $defaultDomain = 'validators')
     {
         $this->annotationsEnabled = $annotationsEnabled;
         if ($annotationsEnabled) {
@@ -95,7 +95,8 @@ class PhpValidationExtractor extends AbstractFileExtractor implements ExtractorI
 
                     // fill catalogue with validation messages from metadata
                     $this->extractMessagesFromMetadata($catalogue, $metadata);
-                } catch (\Exception $e) { };
+                } catch (\Exception $e) {
+                }
             }
         }
 
@@ -103,7 +104,7 @@ class PhpValidationExtractor extends AbstractFileExtractor implements ExtractorI
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function canBeExtracted($file)
     {
@@ -111,7 +112,7 @@ class PhpValidationExtractor extends AbstractFileExtractor implements ExtractorI
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function extractFromDirectory($directory)
     {
@@ -124,7 +125,7 @@ class PhpValidationExtractor extends AbstractFileExtractor implements ExtractorI
             \RecursiveRegexIterator::GET_MATCH
         );
 
-        $files = [];
+        $files = array();
 
         foreach ($iterator as $file) {
             $files[] = $file[0];

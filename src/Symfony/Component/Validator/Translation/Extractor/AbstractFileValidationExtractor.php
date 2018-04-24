@@ -29,12 +29,12 @@ abstract class AbstractFileValidationExtractor implements ExtractorInterface
      *
      * @var string[]
      */
-    private $files = [];
+    private $files = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $defaultDomain      Default translation messages domain
+     * @param string $defaultDomain Default translation messages domain
      */
     public function __construct($defaultDomain = 'validators')
     {
@@ -42,7 +42,7 @@ abstract class AbstractFileValidationExtractor implements ExtractorInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function extract($resource, MessageCatalogue $catalogue)
     {
@@ -74,5 +74,5 @@ abstract class AbstractFileValidationExtractor implements ExtractorInterface
      *
      * @return XmlFileLoader|YamlFileLoader
      */
-    protected abstract function createLoader(string $file);
+    abstract protected function createLoader(string $file);
 }

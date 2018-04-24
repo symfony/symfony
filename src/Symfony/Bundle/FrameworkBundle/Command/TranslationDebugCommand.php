@@ -201,9 +201,9 @@ EOF
 
         // Extract used validation messages
         if ($input->getOption('extract-validation-messages')) {
-            $extractValidationMessagesDir = realpath($kernel->getRootDir() . '/../src');
+            $extractValidationMessagesDir = realpath($kernel->getRootDir().'/../src');
             $this->validationExtractor->extract($extractValidationMessagesDir, $extractedCatalogue);
-        };
+        }
 
         // Load defined messages
         $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths);

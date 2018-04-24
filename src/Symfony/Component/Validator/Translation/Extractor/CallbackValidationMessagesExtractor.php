@@ -44,100 +44,101 @@ namespace Symfony\Component\Validator\Translation\Extractor;
 class CallbackValidationMessagesExtractor
 {
     /**
-     * The method to attach violation to validation context
+     * The method to attach violation to validation context.
      */
     const BUILD_VIOLATION_METHOD_NAME = 'buildViolation';
 
     /**
-     * Absolute path of source file
+     * Absolute path of source file.
      *
      * @var string
      */
     private $path;
 
     /**
-     * Short class name
+     * Short class name.
      *
      * @var string
      */
     private $className;
 
     /**
-     * Name of callback method usually annotated with `@Assert\Callback`
+     * Name of callback method usually annotated with `@Assert\Callback`.
      *
      * @var string
      */
     private $callbackName;
 
     /**
-     * Previous token is T_ClASS
+     * Previous token is T_ClASS.
      *
      * @var bool
      */
     private $isTClassLastToken = false;
 
     /**
-     * Searched class is started
+     * Searched class is started.
      *
      * @var bool
      */
     private $classStarted = false;
 
     /**
-     * Depth of opened parenthesis within a searched class
+     * Depth of opened parenthesis within a searched class.
      *
      * @var int
      */
     private $classParenthesisDepth = 0;
 
     /**
-     * Previous token is T_FUNCTION
+     * Previous token is T_FUNCTION.
      *
      * @var bool
      */
     private $isTFunctionLastToken = false;
 
     /**
-     * Searched callback is started
+     * Searched callback is started.
      *
      * @var bool
      */
     private $callbackStarted = false;
 
     /**
-     * Depth of opened parenthesis within a searched callback
+     * Depth of opened parenthesis within a searched callback.
      *
      * @var int
      */
     private $callbackParenthesisDepth = 0;
 
     /**
-     * Previous token is =>
+     * Previous token is =>.
      *
      * @var bool
      */
     private $isTObjectOperatorLastToken = false;
 
     /**
-     * Previous token is searched build violation method call
+     * Previous token is searched build violation method call.
      *
      * @var bool
      */
     private $isTBuildViolationMethodLastToken = false;
 
     /**
-     * Found messages
+     * Found messages.
      *
      * @var array
      */
-    private $messages = [];
+    private $messages = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param $path
      * @param $className
      * @param $callbackName
+     *
      * @throws \ReflectionException
      */
     public function __construct($path, $className, $callbackName)
@@ -148,7 +149,7 @@ class CallbackValidationMessagesExtractor
     }
 
     /**
-     * Extract messages from static validation callback
+     * Extract messages from static validation callback.
      *
      * @return array
      */
@@ -258,33 +259,33 @@ class CallbackValidationMessagesExtractor
     }
 
     /**
-     * Open parenthesis encountered
+     * Open parenthesis encountered.
      */
     private function openParenthesis()
     {
         if ($this->classStarted) {
-            $this->classParenthesisDepth++;
+            ++$this->classParenthesisDepth;
         }
 
         if ($this->callbackStarted) {
-            $this->callbackParenthesisDepth++;
+            ++$this->callbackParenthesisDepth;
         }
     }
 
     /**
-     * Close parenthesis encountered
+     * Close parenthesis encountered.
      */
     private function closeParenthesis()
     {
         if ($this->classStarted) {
-            if (--$this->classParenthesisDepth == 0) {
+            if (0 == --$this->classParenthesisDepth) {
                 // class finished
                 $this->classStarted = false;
-            };
+            }
         }
 
         if ($this->callbackStarted) {
-            if (--$this->callbackParenthesisDepth == 0) {
+            if (0 == --$this->callbackParenthesisDepth) {
                 // callback finished
                 $this->callbackStarted = false;
             }

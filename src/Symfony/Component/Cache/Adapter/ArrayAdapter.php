@@ -87,7 +87,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             CacheItem::validateKey($key);
         }
 
-        return $this->generateItems($keys, time(), $this->createCacheItem);
+        return $this->generateItems($keys, microtime(true), $this->createCacheItem);
     }
 
     /**
@@ -115,7 +115,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         $value = $item["\0*\0value"];
         $expiry = $item["\0*\0expiry"];
 
-        if (null !== $expiry && $expiry <= time()) {
+        if (null !== $expiry && $expiry <= microtime(true)) {
             $this->deleteItem($key);
 
             return true;
@@ -131,7 +131,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             }
         }
         if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
-            $expiry = time() + $item["\0*\0defaultLifetime"];
+            $expiry = microtime(true) + $item["\0*\0defaultLifetime"];
         }
 
         $this->values[$key] = $value;

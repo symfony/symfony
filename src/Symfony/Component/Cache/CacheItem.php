@@ -89,9 +89,9 @@ final class CacheItem implements CacheItemInterface
     public function expiresAt($expiration)
     {
         if (null === $expiration) {
-            $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
+            $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
         } elseif ($expiration instanceof \DateTimeInterface) {
-            $this->expiry = (int) $expiration->format('U');
+            $this->expiry = (float) $expiration->format('U.u');
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', is_object($expiration) ? get_class($expiration) : gettype($expiration)));
         }
@@ -105,11 +105,11 @@ final class CacheItem implements CacheItemInterface
     public function expiresAfter($time)
     {
         if (null === $time) {
-            $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
+            $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
-            $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
+            $this->expiry = microtime(true) + \DateTime::createFromFormat('U', 0)->add($time)->format('U.u');
         } elseif (\is_int($time)) {
-            $this->expiry = $time + time();
+            $this->expiry = $time + microtime(true);
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
         }

@@ -906,6 +906,23 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame('BarMissingClass', (string) end($resources));
     }
 
+    public function testGetReflectionClassOnInternalTypes()
+    {
+        $container = new ContainerBuilder();
+
+        $this->assertNull($container->getReflectionClass('int'));
+        $this->assertNull($container->getReflectionClass('float'));
+        $this->assertNull($container->getReflectionClass('string'));
+        $this->assertNull($container->getReflectionClass('bool'));
+        $this->assertNull($container->getReflectionClass('resource'));
+        $this->assertNull($container->getReflectionClass('object'));
+        $this->assertNull($container->getReflectionClass('array'));
+        $this->assertNull($container->getReflectionClass('null'));
+        $this->assertNull($container->getReflectionClass('callable'));
+        $this->assertNull($container->getReflectionClass('iterable'));
+        $this->assertNull($container->getReflectionClass('mixed'));
+    }
+
     public function testCompilesClassDefinitionsOfLazyServices()
     {
         $container = new ContainerBuilder();

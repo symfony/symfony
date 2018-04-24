@@ -74,14 +74,27 @@ class MessengerPass implements CompilerPassInterface
 
     private function registerHandlers(ContainerBuilder $container)
     {
+        $definitions = array();
         $handlersByMessage = array();
 
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $handles = isset($tag['handles']) ? array($tag['handles']) : $this->guessHandledClasses($r = $container->getReflectionClass($container->getDefinition($serviceId)->getClass()), $serviceId);
+                $r = $container->getReflectionClass($container->getDefinition($serviceId)->getClass());
+
+                if (isset($tag['handles'])) {
+                    $handles = isset($tag['method']) ? array($tag['handles'] => $tag['method']) : array($tag['handles']);
+                } else {
+                    $handles = $this->guessHandledClasses($r, $serviceId);
+                }
+
                 $priority = $tag['priority'] ?? 0;
 
-                foreach ($handles as $messageClass) {
+                foreach ($handles as $messageClass => $method) {
+                    if (\is_int($messageClass)) {
+                        $messageClass = $method;
+                        $method = '__invoke';
+                    }
+
                     if (\is_array($messageClass)) {
                         $messagePriority = $messageClass[1];
                         $messageClass = $messageClass[0];
@@ -89,10 +102,25 @@ class MessengerPass implements CompilerPassInterface
                         $messagePriority = $priority;
                     }
 
-                    if (!class_exists($messageClass)) {
-                        $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf($r->implementsInterface(MessageHandlerInterface::class) ? 'returned by method "%s::getHandledMessages()"' : 'used as argument type in method "%s::__invoke()"', $r->getName());
+                    if (\is_array($method)) {
+                        $messagePriority = $method[1];
+                        $method = $method[0];
+                    }
+
+                    if (!\class_exists($messageClass)) {
+                        $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : $r->implementsInterface(MessageHandlerInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
 
                         throw new RuntimeException(sprintf('Invalid handler service "%s": message class "%s" %s does not exist.', $serviceId, $messageClass, $messageClassLocation));
+                    }
+
+                    if (!$r->hasMethod($method)) {
+                        throw new RuntimeException(sprintf('Invalid handler service "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
+                    }
+
+                    if ('__invoke' !== $method) {
+                        $wrapperDefinition = (new Definition('callable'))->addArgument(array(new Reference($serviceId), $method))->setFactory('Closure::fromCallable');
+
+                        $definitions[$serviceId = '.messenger.method_on_object_wrapper.'.ContainerBuilder::hash($messageClass.':'.$messagePriority.':'.$serviceId.':'.$method)] = $wrapperDefinition;
                     }
 
                     $handlersByMessage[$messageClass][$messagePriority][] = new Reference($serviceId);
@@ -105,7 +133,6 @@ class MessengerPass implements CompilerPassInterface
             $handlersByMessage[$message] = array_merge(...$handlersByMessage[$message]);
         }
 
-        $definitions = array();
         $handlersLocatorMapping = array();
         foreach ($handlersByMessage as $message => $handlers) {
             if (1 === \count($handlers)) {

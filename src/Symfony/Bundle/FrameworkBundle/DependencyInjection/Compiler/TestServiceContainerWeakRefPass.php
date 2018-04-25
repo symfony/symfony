@@ -31,7 +31,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isPublic() && !$definition->getErrors() && !$definition->isAbstract()) {
+            if ((!$definition->isPublic() || $definition->isPrivate()) && !$definition->getErrors() && !$definition->isAbstract()) {
                 $privateServices[$id] = new ServiceClosureArgument(new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE));
             }
         }
@@ -39,7 +39,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $aliases = $container->getAliases();
 
         foreach ($aliases as $id => $alias) {
-            if (!$alias->isPublic()) {
+            if (!$alias->isPublic() || $alias->isPrivate()) {
                 while (isset($aliases[$target = (string) $alias])) {
                     $alias = $aliases[$target];
                 }

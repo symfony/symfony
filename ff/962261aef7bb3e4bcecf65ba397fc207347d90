@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-23T12:41:10Z
+
+I can confirm that this fix is working
+
+---------------------------------------------------------------------------
+
+by biomedia-thomas at 2018-04-23T13:30:32Z
+
+I've added the key to the exception and also added some tests.

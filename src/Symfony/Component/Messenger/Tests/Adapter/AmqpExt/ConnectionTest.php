@@ -182,6 +182,12 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', array('auto-setup' => 'false'), true, $factory);
         $connection->publish('body');
+
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', array('auto-setup' => false), true, $factory);
+        $connection->publish('body');
+
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', array(), true, $factory);
+        $connection->publish('body');
     }
 }
 

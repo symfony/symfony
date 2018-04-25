@@ -23,6 +23,6 @@ class CommandForV5 extends \PHPUnit_TextUI_Command
      */
     protected function createRunner()
     {
-        return new TestRunner($this->arguments['loader']);
+        return new TestRunnerForV5($this->arguments['loader']);
     }
 }

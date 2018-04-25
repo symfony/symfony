@@ -9,6 +9,7 @@ CHANGELOG
  * added support for service's decorators autowiring
  * deprecated the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods
  * environment variables are validated when used in extension configuration
+ * deprecated support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
 
 4.0.0
 -----

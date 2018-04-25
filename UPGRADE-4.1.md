@@ -23,6 +23,7 @@ DependencyInjection
 -------------------
 
  * Deprecated the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods.
+ * Deprecated support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`.
 
 EventDispatcher
 ---------------

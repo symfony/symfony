@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\ContainerHandlerLocator;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
+use Symfony\Component\Messenger\DecoratedMessageBus;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
@@ -260,6 +261,17 @@ class MessengerPassTest extends TestCase
         $this->assertEquals(array(array('registerBus', array('foo', new Reference($debuggedFooBusId))), array('registerBus', array('messenger.bus.bar', new Reference($debuggedBarBusId)))), $container->getDefinition('messenger.data_collector')->getMethodCalls());
     }
 
+    public function testRegistersBusDecoratedClass()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register($fooBusId = 'messenger.bus.foo', MessageBusInterface::class)->addTag('messenger.bus', array('decorator_class' => MyTypeHintedBus::class));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertTrue($container->hasDefinition(MyTypeHintedBus::class));
+        $this->assertSame(array($fooBusId, null, 0), $container->getDefinition(MyTypeHintedBus::class)->getDecoratedService());
+    }
+
     public function testRegistersMiddlewaresFromServices()
     {
         $container = $this->getContainerBuilder();
@@ -412,4 +424,8 @@ class UselessMiddleware implements MiddlewareInterface
     {
         return $next($message);
     }
+}
+
+final class MyTypeHintedBus extends DecoratedMessageBus
+{
 }

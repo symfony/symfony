@@ -144,7 +144,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return;
         }
 
-        if (!in_array($prefix, $this->arrayMutatorPrefixes)) {
+        if (!\in_array($prefix, $this->arrayMutatorPrefixes)) {
             return $types;
         }
 

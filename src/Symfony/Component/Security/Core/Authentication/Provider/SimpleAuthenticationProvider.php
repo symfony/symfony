@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
@@ -45,6 +46,11 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         $user = $authToken->getUser();
+
+        if (!$user instanceof UserInterface) {
+            return $authToken;
+        }
+
         $this->userChecker->checkPreAuth($user);
         $this->userChecker->checkPostAuth($user);
 

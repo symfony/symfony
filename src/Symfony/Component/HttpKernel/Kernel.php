@@ -480,7 +480,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function getContainerClass()
     {
-        return $this->name.ucfirst(preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $this->environment)).($this->debug ? 'Debug' : '').'ProjectContainer';
+        return $this->name.ucfirst(preg_replace('/[^a-zA-Z0-9_]/', '', $this->environment)).($this->debug ? 'Debug' : '').'ProjectContainer';
     }
 
     /**

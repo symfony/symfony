@@ -1,0 +1,394 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-08T15:01:33Z
+
+IMHO, the `framework.messenger.buses.[bus_name].middlewares` node should be kept simple, with no priority handling (only the order matters). Otherwise, even if we'll have the debug command to help, it just brings confusion between services registered through the config and the ones through DI tags. It's far easier to read the list of middlewares applied on a bus on a single place.
+
+I wonder if we shouldn't even remove the DI tag or just keep it for the default bus if `framework.messenger.buses.[default_bus_name].middlewares` is not set.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T15:23:36Z
+
+I tend to prefer DI config over semantic middleware config, thus keep the tag.
+
+Concerning attributes i'd say `bus: string|null` which either applies to the given or default bus. No big fan of the current explode trick compared to multiple tags.
+
+Last but not least, i think 1 (default) bus should be configured minimum.
+
+Alternatively it could wire pre-defined middlewares on a per-case basis, e.g.
+
+```yaml
+framework:
+    messenger:
+        buses:
+            events:
+                tolerate_no_handler: true
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-08T15:30:30Z
+
+> IMHO, the framework.messenger.buses.[bus_name].middlewares node should be kept simple, with no priority handling (only the order matters).
+
+That's how I started it. The problem with this approach is how to place a middleware between/before/after the ones that are configured with the tags (and need priorities). I don't see any harm in being able to configure the priority, especially that when you don't, the configuration syntax is super easy. (i.e. by default, it's all middlewares priority 0, in the order in which you've put them in the configuration).
+
+> Concerning attributes i'd say `bus: string|null` which either applies to the given or default bus. No big fan of the current explode trick compared to multiple tags.
+
+It's actually convenient to do so within the code base to simplify the handling of either a middleware is only applied to a given set of buses or all of them, hence me doing this way here. I don't mind changing it but I don't have a strong argument in doing so tbh.
+
+> Last but not least, i think st least 1 (default) bus should be configured.
+
+That's the case if you don't configure your owns. If you do, then I'd argue it's now up to you :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T15:36:07Z
+
+> That's the case if you don't configure your owns.
+
+Right, my bad. I missed the default bus entry in config :)
+
+> I don't have a strong argument in doing so tbh
+
+IMHO it's more pure :) but no strong opinion either.
+
+About `framework.messenger.buses.[bus_name].middlewares`
+
+You have to configure a service anyway, having to specify it here again is double bookkeeping, also this is not the place to infer new service definitions or so. IMHO :)
+
+Having a single way of doing things is nice, and given you need to define the service i'd say tag it as a middleware as well, if needed.
+
+SO we should either favor the tag or `[bus_name].middlewares: [list of service ids]`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-08T15:42:59Z
+
+> The problem with this approach is how to place a middleware between/before/after the ones that are configured with the tags (and need priorities).
+
+That's why I'd suggest removing the tag 😄
+The harm is not about having to handle a priority attribute in the config, but about allowing to configure things from 2 different places. I wouldn't allow both DI and semantic config for configuring middlewares.
+I don't see much benefits to the DI tag for middlewares, while the semantic config is expressive and already allows to handle the stack order. That's how work the tactician-bundle. Never had to complain about it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T15:45:01Z
+
+A tag seems more flexible though :) considering third parties who want to register a middleware. Or put different what about the default middlewares currently?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-08T15:47:40Z
+
+> considering third parties who want to register a middleware.
+
+That's the point to me: it's only a userland config. No third party implied. A third party could just help registering a default service to use, or provide a factory.
+
+> Or put different what about the default middlewares currently?
+
+They can just be configured as default values for the middlewares node.
+If the user want to add a middleware before or after, they'll have to be explicit about it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T15:50:29Z
+
+Well.. i was considering exactly that, register/tag a [middleware](https://github.com/msgphp/msgphp/blob/fc310bf18a2289d633cb5412b2ce36552f3f641f/src/Domain/Infra/Messenger/ConsoleMessageSubscriberMiddleware.php#L25)  to capture any message dispatched and pass it to a [service](https://github.com/msgphp/msgphp/blob/fc310bf18a2289d633cb5412b2ce36552f3f641f/src/Domain/Infra/Console/Event/MessageSubscriber.php#L13).
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-08T18:49:40Z
+
+I think that your conversation is a good example of why we need to keep both configurations.
+
+@ogizanagi As far as I understand, your concern is that it can introduce some complexity about knowing where/how the middlewares are configuration: I appreciate that but I don't believe this will be the case as it is basically a question of how you, as a developer, use these configuration mechanisms. Though, if we see a large proportion of issues coming that are related to that, we can later decide which one to deprecate I guess.
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2018-04-09T07:37:00Z
+
+Hello all,
+I would also be in favor of removing the tag. The duplicated config will be hard to trace, and can lead to side effect.
+Imagine I have an application 2 buses. Now I install a bundle that provides a middleware, as a tagged service, which I want to add to only one of the bus. How to deal with such situation? How to easily unregister the middleware from one bus?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-09T07:47:42Z
+
+At this point im :+1: for keeping both configs (DI+semantic).
+
+Please dont remove tagging middlewares, it makes it real hard to hook in and basically defeats the feature as decorating the bus at this point is probably easier :joy:
+
+> Now I install a bundle that provides a middleware, as a tagged service, which I want to add to only one of the bus. How to deal with such situation? How to easily unregister the middleware from one bus?
+
+It's probably the bundle's intend to enable the middleware on all buses. Otherwise it should allow you to configure the bus service to use. I.e. _How to easily unregister the middleware from one bus?_ seems highly hypothetical.
+
+Also we never had this debate with bundles tagging e.g. `kernel.event_listener` etc. You would simply remove the definition if it doesnt fit then too.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-09T08:23:57Z
+
+I've rebased the pull-request so it contains the new middleware tag.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-09T14:46:02Z
+
+@ogizanagi What if you could enable/disable tags from the `framework.messenger.tags` or something? 🤔
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-09T14:54:14Z
+
+If we drop tags, "bundles" could use the prependConfiguration to have some sort of automated configuration.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-09T15:32:03Z
+
+Im really curious what others think about @ogizanagi's statement:
+
+> it's only a userland config. No third party implied
+
+I tend to disagree with that. Why is a bus middleware "userland-config" and a kernel event listener not?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-09T17:25:13Z
+
+So, we've talked a bit on Slack with @sroze today. Here's mostly what I shared with him about my point of view:
+
+Here is how I see a typical configuration would look like with semantic config only and removing the DI tag:
+
+```yaml
+framework:
+  messenger:
+    buses:
+      commands:
+        middlewares:
+          - logging # fwb alias
+          - validation # fwb alias
+          # DoctrineBundle transaction middleware.
+          # This demonstrates support of factories we could provide, i.e the doctrine_transaction_middleware
+          # is an abstract service the FrameworkBundle would decline with following arguments
+          # (here "default" being the manager name to use. Only simple scalar arguments, i.e no services references)
+          - doctrine_transaction_middleware: [default]
+          # Third-parties would just have to provide a service id (or factories for most custom needs) and document usage.
+          # No automatic middleware registering, the user opt-in explicitly for each bus.
+          - msg_php.console_message_subscriber_middleware
+          # userland middleware service id
+          - app.messenger.my_custom_middleware
+          - message_handler # alias
+      events:
+        middlewares:
+          - logging
+          - tolerate_no_handler # fwb alias
+          - message_handler
+```
+
+where `logging`, `validation`, `tolerate_no_handler` & `message_handler` are aliases handled by the FrameworkBundle for convenience, which also removes by the same occasion the need for the `messenger.bus.middlewares.validation` key from https://github.com/symfony/symfony/pull/26648.
+
+Everything is configured in one place and explicit. Nothing behind the scene. No need for priority. No need for third-parties to register middlewares themselves (just to provide and document middleware services ids/factories).
+
+Supporting both config & DI tag means decentralizing the middleware stack, struggling with priorities (even if the debug command would help) and allowing third-parties to register middleware automagically (which I really don't think is useful).
+A parallel (limited though) could be made with Monolog's handlers stack: no DI tag is provided AFAIK to register handlers (And thank goodness, that's fortunate. That'll only bring more confusion :smile:).
+
+Even the one legit use-case I see within the framework can be solved differently: the `MessengerDataCollector` has to be registered automatically on debug mode. The solution without tag is simple: just decorate the `HandleMessageMiddleware` just like we do with validator & event dispatcher collectors for instance.
+
+Finally, I used Tactician for more than 2 years. [This is how the middlewares are registered by the bundle](https://github.com/thephpleague/tactician-bundle#configuring-middleware) (but simpler, no factory support). Never had to complain and I'm not aware of
+any issue asking for a DI tag. So, what about starting with this?
+
+Anyway, if a majority still prefers keeping the DI tag, then I'd be in favor of no semantic config at all. Supporting both just seems confusing and pointless to me. :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-09T18:20:44Z
+
+> allowing third-parties to register middleware automagically (which I really don't think is useful).
+
+ok, more thinking about it and decorating instead sounds reasonable, if not better :) in my case it's also about capturing dispatch messages like data collector does.
+
+Config looks good :+1: perhaps denote built-in aliases (non service ids i guess) with `:logging`, etc. Or put different who wins / what happens if a `logging` service is defined.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-09T20:17:04Z
+
+To me, fwb known aliases would always win and are unlikely to collide with actual middlewares' ids, but yes, I guess a way to denote built-in aliases would be nice :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-12T16:05:29Z
+
+@ogizanagi @chalasr I've updated the PR. I agree with you, it's actually a better DX to have only one place for the configuration.
+
+With the way the PR is right now, if you define you own middlewares, you override the default "logging", "call_message_handler" and "route_messages" handlers, so you **need** to define them. It feels like it could be a source of troubles for the users... What's your point of view on what we could/should do arround that?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-12T21:18:25Z
+
+> you override the default "logging", "call_message_handler" and "route_messages" handlers, so you need to define them.
+
+I don't think it's an issue. The only thing we should _maybe_ do is hint the user if the `call_message_handler` is not part of the list. Or automatically adding it but that would be a bit strange to treat it differently from other middlewares.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-13T08:55:51Z
+
+> The only thing we should maybe do is hint the user if the call_message_handler is not part of
+
+I think we should even throw an exception. Worst case, they really don't want a handler to be called, they use a middleware like the one proposed in #26901
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-15T21:37:36Z
+
+Rebased. Ready for more reviews @symfony/deciders.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-16T18:54:04Z
+
+@ro0NL @ogizanagi thank you for your reviews. I've updated the PR the following way:
+1. We create middlewares for each bus, based on a `parent` service.
+2. The collector is registered some "traceable" bus, same as we do for the cache & events
+3. Removed the `buses` parameters to only rely on the `messenger.bus` tag
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-17T17:03:30Z
+
+And rebased 👍
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-04-20T07:24:30Z
+
+I've just started to test this PR on a project. It works well. It is not easy to configure but it is flexible. With "easy" I mean: It would be nice to have:
+
+```
+  busses:
+      acme:
+          type: command_bus
+```
+
+Im not sure that is a realistic because whatever a "command_bus" is for me it might not be the same for you. So Im +1 with the config.
+
+---------------------
+
+I get an error though:
+
+```
+    messenger:
+        default_bus: events
+        buses:
+            events:
+                middlewares:
+                    - route_messages
+                    - 'Symfony\Component\Messenger\Middleware\TolerateNoHandler'
+                    - call_message_handler
+```
+
+```
+In ResolveChildDefinitionsPass.php line 71:
+
+  Service "messenger.bus.events.middleware.Symfony\Component\Messenger\Middleware\TolerateNoHandler": Parent definition
+  "Symfony\Component\Messenger\Middleware\TolerateNoHandler" does not exist.
+
+```
+
+If I change my config to the following, it will work:
+
+```
+    messenger:
+        default_bus: events
+        buses:
+            events:
+                middlewares:
+                    - route_messages
+                    - 'messenger.middleware.tolerate_no_handler'
+                    - call_message_handler
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-20T07:48:30Z
+
+You are right, my example in the original pull-request description wasn't accurate anymore (updated now). The reason you had this exception is because it tried to create an instance of the middleware for this bus based on the parent definition that you define.
+
+In the example you mentioned, you could even:
+```patch
+- 'messenger.middleware.tolerate_no_handler'
++ tolerate_no_handler
+```
+
+Regarding the `buses.[name].type` configuration, I like the idea but is obviously trickier to settle on what should be in which. Therefore I'd argue this shouldn't be in this PR at least 🙃 (could be a good 3rd party bundle as well).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-21T01:02:41Z
+
+Hey guys!
+
+Sorry to come late after so much work.
+
+> With the way the PR is right now, if you define you own middlewares, you override the default "logging", "call_message_handler" and "route_messages" handlers, so you need to define them. It feels like it could be a source of troubles for the users... What's your point of view on what we could/should do around that?
+
+I actually think this is a *huge* problem. Imagine a user wants to add a new middleware: they setup their config, set middleware to `[my_new_middleware]` and suddenly things that worked before don't - my message isn't being handled or routed.
+
+I'm not sure of the best solution - I think the argument around tags is valid, and the fact that experience with TacticianBundle has validated their approach a bit. Actually, one solution would be to be *more* like TacticianBundle: have *zero* default middleware out-of-the-box. Then, in the recipe, include the 3 middleware in `messenger.yaml` with comments. When a user creates a second bus, they'll copy and paste.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-21T14:39:08Z
+
+> Actually, one solution would be to be more like TacticianBundle: have zero default middleware out-of-the-box.
+
+This means we can't auto-activate the messenger when we know it's installed (i.e. the `MessageBus` class exists) and we would only rely on the YAML configuration. It's pretty good to be able to do this (i.e. doing some configuration via the recipe) but it's more boilerplate (and much harder to maintain, once the recipe is installed, you're done...)
+
+What about having the following`middlewares` per bus:
+- `logging`
+- `validation`
+- _all the middlewares in the `buses.[name].middlewares` configuration_
+- `route_messages`
+- `call_message_handler`
+
+As a developer, you can disable the "default middlewares" with:
+```yaml
+buses:
+    [name]:
+        default_middlewares: false
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-21T15:53:51Z
+
+I've pushed 3 commits:
+1. [`0d78a0e`](https://github.com/symfony/symfony/pull/26864/commits/0d78a0e7683280ccb9e82429e641915cb5836794) that allows middlewares to be services (no requirement for them to be abstract)
+2. [` d39604e`](https://github.com/symfony/symfony/pull/26864/commits/d39604e634bd4f3f08103422a0a4b75c068f9daa) forces to have a matching `default_bus` only when using more than one bus. Otherwise, well, it take the name of that only bus.
+3. [`8d16cda`](https://github.com/symfony/symfony/pull/26864/commits/8d16cdabc8e3790a6c9ab306db39f9a4488f3114) my favourite alternative to replace all the configured middlewares: we have a set of hard-coded default middlewares and you can squeeze yours in between. If you really need to (I believe this will be rare) you can disable the default middlewares with `default_middlewares: false`.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-22T00:15:38Z
+
+Ping @symfony/deciders!
+
+I'm 👍 for this approach, and it's a big PR, so we need to get it merged in soon. The most important aspect is how middleware are added. The final decision about that is explained very well here: https://github.com/symfony/symfony/pull/26864#issuecomment-383301982
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-25T12:53:00Z
+
+Repushed the last commit to make AppVeyor green again 💚
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-25T16:25:07Z
+
+Let's merge! Thank you all for your feedback 🎉

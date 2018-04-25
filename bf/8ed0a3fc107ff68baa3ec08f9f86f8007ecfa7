@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-04-06T13:07:46Z
+
+Well, if your method returns `object|null` rather than returning `object[]`, the following code is broken as well, in case the current object is found.
+
+The UniqueEntityValidator expects a results corresponding to `getResults`, i.e. an array.
+
+---------------------------------------------------------------------------
+
+by gpenverne at 2018-04-06T13:23:39Z
+
+@stof  indeed. Another way to fix is to ensure item is an array. What do you think about?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-09T13:15:24Z
+
+I think we should throw an exception then.
+
+---------------------------------------------------------------------------
+
+by gpenverne at 2018-04-09T14:57:16Z
+
+@xabbuh With php7.1, no trouble with this. Throw an exception will be a breaking change.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-09T15:52:02Z
+
+What result would you expect here if you do not return a countable collection?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T09:18:54Z
+
+Actually, even the "instanceof Iterator" case is broken, because not all iterators are countable.
+
+Here is an alternative proposal that should do it:
+```diff
+--- a/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
++++ b/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php
+@@ -132,16 +132,26 @@ class UniqueEntityValidator extends ConstraintValidator
+          * iterator implementation.
+          */
+         if ($result instanceof \Iterator) {
+             $result->rewind();
++            $result = $result instanceof \Countable && 1 < count($result) ? array($result->current(), $result->current()) : (array) $result->current();
+         } elseif (is_array($result)) {
+             reset($result);
++        } else {
++            $result = (array) $result;
+         }
+
+         /* If no entity matched the query criteria or a single entity matched,
+          * which is the same as the entity being validated, the criteria is
+          * unique.
+          */
+-        if (0 === count($result) || (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result)))) {
++        if (!$result || (1 === \count($result) && current($result) === $entity)) {
+             return;
+         }
+```

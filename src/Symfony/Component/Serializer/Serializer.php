@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Normalizer\NormalizerWithCacheableSupportResultInterface;
 
 /**
  * Serializer serializes and deserializes data.
@@ -53,6 +54,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @var Encoder\ChainDecoder
      */
     protected $decoder;
+
+    private $normalizerCache = array();
 
     /**
      * @var array
@@ -202,10 +205,33 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     private function getNormalizer($data, $format, array $context)
     {
+        $type = \is_object($data) ? 'c-'.\get_class($data) : \gettype($data);
+        if (
+            isset($this->normalizerCache[$type][$format]) ||
+            (isset($this->normalizerCache[$type]) && \array_key_exists($format, $this->normalizerCache[$type]))
+        ) {
+            return $this->normalizerCache[$type][$format];
+        }
+
+        $cacheable = true;
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format, $context)) {
+            if (!$normalizer instanceof NormalizerInterface) {
+                continue;
+            }
+
+            $cacheable = $cacheable && $normalizer instanceof NormalizerWithCacheableSupportResultInterface;
+            if ($normalizer->supportsNormalization($data, $format, $context)) {
+                if ($cacheable) {
+                    $this->normalizerCache[$type][$format] = $normalizer;
+                }
+
                 return $normalizer;
             }
+        }
+
+        if ($cacheable) {
+            // allow to cache primitive types
+            $this->normalizerCache[$type][$format] = null;
         }
     }
 

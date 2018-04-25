@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractObjectNormalizer extends AbstractNormalizer
+abstract class AbstractObjectNormalizer extends AbstractNormalizer implements NormalizerWithCacheableSupportResultInterface
 {
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';

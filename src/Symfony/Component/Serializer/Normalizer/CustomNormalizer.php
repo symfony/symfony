@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, NormalizerWithCacheableSupportResultInterface
 {
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;

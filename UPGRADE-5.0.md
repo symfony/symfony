@@ -20,6 +20,7 @@ DependencyInjection
 -------------------
 
  * Removed the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods.
+ * Removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`.
 
 EventDispatcher
 ---------------

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by davidbarratt at 2018-04-21T17:22:19Z
+
+I don't understand the failure...
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-21T17:50:29Z
+
+> Note that we need to keep the false string option was it's the only way we can have the XML working I reckon.
+
+I don't why that should be the case? Isn't the xml loader also type casting certain values like "false"?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-22T05:41:37Z
+
+@Tobion is right, `false` should be auto-converted automatically for the XML format.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T09:19:32Z
+
+Even without `xsd:boolean`? That’s interesting... 🤔Keep in mind that this comes from [this very non-strict `options`](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Resources/config/schema/symfony-1.0.xsd#L385).
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T10:12:31Z
+
+Anyway, this value also comes via the DSN so we need to handle the `false` string (I'm not sure there is any point to do some processing of `false`/`true` strings on the parsed DSN for now as it's our only use-case here).
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T10:14:59Z
+
+@davidbarratt the Travis failure is unrelated. I've restarted the job, this should be back to green.

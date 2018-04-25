@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-22T09:33:23Z
+
+The BC break potential for in_array-related changes in non-zero, not sure we should do it...
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-22T11:30:05Z
+
+I can revert them, but how can it be a bc break? We explicitly manipulate strings everywhere (PHPDoc).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-22T11:50:41Z
+
+Even explicit native string types do cast.

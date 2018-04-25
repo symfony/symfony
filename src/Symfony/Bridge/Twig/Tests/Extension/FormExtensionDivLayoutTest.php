@@ -190,6 +190,26 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
     }
 
+    public function testHelpAttr()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'Help text test!',
+            'help_attr' => array(
+                'class' => 'class-test',
+            ),
+        ));
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="class-test help-text"]
+    [.="[trans]Help text test![/trans]"]
+'
+        );
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);

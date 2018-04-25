@@ -35,6 +35,7 @@
                 "data",
                 "disabled",
                 "help",
+                "help_attr",
                 "inherit_data",
                 "label",
                 "label_attr",

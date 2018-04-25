@@ -35,6 +35,7 @@
         <table>
             <thead>
             <tr>
+                <th>Bus</th>
                 <th>Message</th>
                 <th>Result</th>
             </tr>
@@ -42,6 +43,7 @@
             <tbody>
             {% for message in collector.messages %}
                 <tr>
+                    <td>{{ message.bus }}</td>
                     <td>
                         {% if message.result.object is defined %}
                             {{ profiler_dump(message.message.object, maxDepth=2) }}

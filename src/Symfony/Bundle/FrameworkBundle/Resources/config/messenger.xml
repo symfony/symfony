@@ -7,28 +7,9 @@
     <services>
         <defaults public="false" />
 
-        <!-- Bus -->
-        <service id="message_bus" class="Symfony\Component\Messenger\MessageBus" public="true">
-            <argument type="tagged" tag="messenger.bus_middleware" /> <!-- Middlewares -->
-        </service>
-
-        <service id="Symfony\Component\Messenger\MessageBusInterface" alias="message_bus" />
-
         <!-- Handlers -->
         <service id="messenger.handler_resolver" class="Symfony\Component\Messenger\ContainerHandlerLocator">
             <argument type="service" id="service_container"/>
-        </service>
-
-        <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware">
-            <argument type="service" id="messenger.handler_resolver" />
-
-            <tag name="messenger.bus_middleware" priority="-10" />
-        </service>
-
-        <service id="messenger.middleware.validator" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
-            <argument type="service" id="validator" />
-
-            <tag name="messenger.bus_middleware" priority="100" />
         </service>
 
         <!-- Asynchronous -->
@@ -36,10 +17,8 @@
             <argument type="service" id="messenger.sender_locator" />
             <argument /> <!-- Message to sender ID mapping -->
         </service>
-        <service id="messenger.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware">
+        <service id="messenger.middleware.route_messages" class="Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware">
             <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
-
-            <tag name="messenger.bus_middleware" priority="-5" />
         </service>
 
         <!-- Message encoding/decoding -->
@@ -49,17 +28,25 @@
             <argument type="collection" /> <!-- Context -->
         </service>
 
+        <!-- Middlewares -->
+        <service id="messenger.middleware.tolerate_no_handler" class="Symfony\Component\Messenger\Middleware\TolerateNoHandler" abstract="true" />
+        <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
+            <argument type="service" id="messenger.handler_resolver" />
+        </service>
+
+        <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware" abstract="true">
+            <argument type="service" id="validator" />
+        </service>
+
         <!-- Logging & Debug -->
-        <service id="messenger.middleware.debug.logging" class="Symfony\Component\Messenger\Debug\LoggingMiddleware">
+        <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware" abstract="true">
             <argument type="service" id="logger" />
 
-            <tag name="messenger.bus_middleware" priority="10" />
             <tag name="monolog.logger" channel="messenger" />
         </service>
 
-        <service id="data_collector.messenger" class="Symfony\Component\Messenger\DataCollector\MessengerDataCollector">
+        <service id="messenger.data_collector" class="Symfony\Component\Messenger\DataCollector\MessengerDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/messenger.html.twig" id="messenger" priority="100" />
-            <tag name="messenger.bus_middleware" />
         </service>
 
         <!-- Discovery -->

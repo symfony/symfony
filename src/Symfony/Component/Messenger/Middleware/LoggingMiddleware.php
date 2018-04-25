@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Debug;
+namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\MiddlewareInterface;
 use Psr\Log\LoggerInterface;

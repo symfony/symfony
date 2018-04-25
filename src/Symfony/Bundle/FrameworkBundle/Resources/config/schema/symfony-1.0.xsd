@@ -356,9 +356,10 @@
             <xsd:element name="encoder" type="xsd:string" minOccurs="0" />
             <xsd:element name="decoder" type="xsd:string" minOccurs="0" />
             <xsd:element name="routing" type="messenger_routing" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="middlewares" type="messenger_middleware" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="adapter" type="messenger_adapter" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="bus" type="messenger_bus" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
+        <xsd:attribute name="default-bus" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">
@@ -388,13 +389,16 @@
         <xsd:attribute name="dsn" type="xsd:string" />
     </xsd:complexType>
 
-    <xsd:complexType name="messenger_middleware">
-        <xsd:sequence>
-            <xsd:element name="validation" type="messenger_validation" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+    <xsd:complexType name="messenger_adapter_option">
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="value" type="xsd:string" />
     </xsd:complexType>
 
-    <xsd:complexType name="messenger_validation">
-        <xsd:attribute name="enabled" type="xsd:boolean" />
+    <xsd:complexType name="messenger_bus">
+        <xsd:sequence>
+            <xsd:element name="middleware" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="default-middlewares" type="xsd:boolean"/>
     </xsd:complexType>
 </xsd:schema>

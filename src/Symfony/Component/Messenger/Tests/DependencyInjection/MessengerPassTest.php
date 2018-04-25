@@ -19,9 +19,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\ContainerHandlerLocator;
+use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\TolerateNoHandler;
+use Symfony\Component\Messenger\MiddlewareInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
@@ -237,11 +241,58 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    public function testRegistersTraceableBusesToCollector()
+    {
+        $dataCollector = $this->getMockBuilder(MessengerDataCollector::class)->getMock();
+
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.data_collector', $dataCollector);
+        $container->register($fooBusId = 'messenger.bus.foo', MessageBusInterface::class)->addTag('messenger.bus', array('name' => 'foo'));
+        $container->register($barBusId = 'messenger.bus.bar', MessageBusInterface::class)->addTag('messenger.bus');
+        $container->setParameter('kernel.debug', true);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertTrue($container->hasDefinition($debuggedFooBusId = 'debug.traced.'.$fooBusId));
+        $this->assertSame(array($fooBusId, null, 0), $container->getDefinition($debuggedFooBusId)->getDecoratedService());
+        $this->assertTrue($container->hasDefinition($debuggedBarBusId = 'debug.traced.'.$barBusId));
+        $this->assertSame(array($barBusId, null, 0), $container->getDefinition($debuggedBarBusId)->getDecoratedService());
+        $this->assertEquals(array(array('registerBus', array('foo', new Reference($debuggedFooBusId))), array('registerBus', array('messenger.bus.bar', new Reference($debuggedBarBusId)))), $container->getDefinition('messenger.data_collector')->getMethodCalls());
+    }
+
+    public function testRegistersMiddlewaresFromServices()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register($fooBusId = 'messenger.bus.foo', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus', array('name' => 'foo'));
+        $container->register('messenger.middleware.tolerate_no_handler', TolerateNoHandler::class)->setAbstract(true);
+        $container->register(UselessMiddleware::class, UselessMiddleware::class);
+
+        $container->setParameter($middlewaresParameter = $fooBusId.'.middlewares', array(UselessMiddleware::class, 'tolerate_no_handler'));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertTrue($container->hasDefinition($childMiddlewareId = $fooBusId.'.middleware.tolerate_no_handler'));
+        $this->assertEquals(array(new Reference(UselessMiddleware::class), new Reference($childMiddlewareId)), $container->getDefinition($fooBusId)->getArgument(0));
+        $this->assertFalse($container->hasParameter($middlewaresParameter));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid middleware "not_defined_middleware": define such service to be able to use it.
+     */
+    public function testCannotRegistersAnUndefinedMiddleware()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register($fooBusId = 'messenger.bus.foo', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus', array('name' => 'foo'));
+        $container->setParameter($middlewaresParameter = $fooBusId.'.middlewares', array('not_defined_middleware'));
+
+        (new MessengerPass())->process($container);
+    }
+
     private function getContainerBuilder(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
-        $container->register('message_bus', ContainerHandlerLocator::class);
 
         $container
             ->register('messenger.sender_locator', ServiceLocator::class)
@@ -352,5 +403,13 @@ class HandleNoMessageHandler implements MessageSubscriberInterface
     public static function getHandledMessages(): array
     {
         return array();
+    }
+}
+
+class UselessMiddleware implements MiddlewareInterface
+{
+    public function handle($message, callable $next)
+    {
+        return $next($message);
     }
 }

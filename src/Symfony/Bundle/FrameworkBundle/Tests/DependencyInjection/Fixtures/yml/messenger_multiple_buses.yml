@@ -1,0 +1,14 @@
+framework:
+    messenger:
+        default_bus: commands
+        buses:
+            commands: ~
+            events:
+                middlewares:
+                    - "tolerate_no_handler"
+            queries:
+                default_middlewares: false
+                middlewares:
+                    - "route_messages"
+                    - "tolerate_no_handler"
+                    - "call_message_handler"

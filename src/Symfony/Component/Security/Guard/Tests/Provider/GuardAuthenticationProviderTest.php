@@ -156,7 +156,7 @@ class GuardAuthenticationProviderTest extends TestCase
     {
         $providerKey = 'my_uncool_firewall';
 
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
 
         // make sure the authenticator is used
         $this->preAuthenticationToken->expects($this->any())
@@ -201,8 +201,8 @@ class GuardAuthenticationProviderTest extends TestCase
 
     public function testSupportsChecksGuardAuthenticatorsTokenOrigin()
     {
-        $authenticatorA = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
-        $authenticatorB = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $authenticatorB = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticators = array($authenticatorA, $authenticatorB);
 
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
@@ -223,7 +223,7 @@ class GuardAuthenticationProviderTest extends TestCase
      */
     public function testAuthenticateFailsOnNonOriginatingToken()
     {
-        $authenticatorA = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticators = array($authenticatorA);
 
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();

@@ -1482,7 +1482,11 @@ class FrameworkExtension extends Extension
             }
 
             $container->setParameter($busId.'.middlewares', $middlewares);
-            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus', array('name' => $name)));
+            $container->setDefinition($busId, (new Definition($bus['class'] ?? MessageBus::class, array(array())))->addTag('messenger.bus', array('name' => $name)));
+
+            if (isset($bus['class'])) {
+                $container->setAlias($bus['class'], $busId);
+            }
 
             if ($name === $config['default_bus']) {
                 $container->setAlias('message_bus', $busId);

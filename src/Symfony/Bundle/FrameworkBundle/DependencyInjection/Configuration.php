@@ -1054,6 +1054,7 @@ class Configuration implements ConfigurationInterface
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->booleanNode('default_middlewares')->defaultTrue()->end()
+                                    ->scalarNode('class')->end()
                                     ->arrayNode('middlewares')
                                         ->defaultValue(array())
                                         ->prototype('scalar')->end()

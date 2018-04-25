@@ -67,7 +67,7 @@ class DumpDataCollectorTest extends TestCase
 
         ob_start();
         $collector->collect(new Request(), new Response());
-        $output = ob_get_clean();
+        $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
 
         if (\PHP_VERSION_ID >= 50400) {
             $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
@@ -125,10 +125,11 @@ EOTXT;
 
         ob_start();
         $collector->__destruct();
+        $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
         if (\PHP_VERSION_ID >= 50400) {
-            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", $output);
         } else {
-            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", ob_get_clean());
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", $output);
         }
     }
 
@@ -141,10 +142,11 @@ EOTXT;
         ob_start();
         $collector->dump($data);
         $line = __LINE__ - 1;
+        $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
         if (\PHP_VERSION_ID >= 50400) {
-            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", $output);
         } else {
-            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", ob_get_clean());
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", $output);
         }
 
         ob_start();

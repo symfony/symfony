@@ -54,7 +54,7 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
                 $user = $this->userProvider->loadUserByUsername($user);
 
                 if (!$user instanceof UserInterface) {
-                    throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
+                    return $authToken;
                 }
             } catch (UsernameNotFoundException $e) {
                 $e->setUsername($user);

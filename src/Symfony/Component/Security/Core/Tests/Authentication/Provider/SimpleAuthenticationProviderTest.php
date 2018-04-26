@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\SimpleAuthenticationProvider;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserChecker;
 
 class SimpleAuthenticationProviderTest extends TestCase
@@ -72,54 +71,6 @@ class SimpleAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider($authenticator, null, $userChecker);
 
         $provider->authenticate($token);
-    }
-
-    public function testAuthenticateFromString()
-    {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-        $token->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue('foo'));
-
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
-        $authenticator->expects($this->once())
-            ->method('authenticateToken')
-            ->will($this->returnValue($token));
-
-        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
-        $userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock());
-        $provider = $this->getProvider($authenticator, $userProvider);
-
-        $this->assertSame($token, $provider->authenticate($token));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
-    public function testUsernameNotFound()
-    {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-        $token->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue('foo'));
-
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
-        $authenticator->expects($this->once())
-            ->method('authenticateToken')
-            ->will($this->returnValue($token));
-
-        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
-        $userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->willThrowException(new UsernameNotFoundException());
-
-        $this->getProvider($authenticator, $userProvider)->authenticate($token);
     }
 
     public function testAuthenticateSkipsUserChecksForNonUserInterfaceObjects()

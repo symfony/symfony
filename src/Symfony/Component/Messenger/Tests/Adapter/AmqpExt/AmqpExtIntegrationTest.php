@@ -16,7 +16,6 @@ use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Adapter\AmqpExt\Connection;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Transport\Enhancers\MaximumCountReceiver;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Process\PhpProcess;
 use Symfony\Component\Process\Process;
@@ -58,7 +57,7 @@ class AmqpExtIntegrationTest extends TestCase
         $receiver->receive(function ($message) use ($receiver, &$receivedMessages, $firstMessage, $secondMessage) {
             $this->assertEquals(0 == $receivedMessages ? $firstMessage : $secondMessage, $message);
 
-            if (2 == ++$receivedMessages) {
+            if (2 === ++$receivedMessages) {
                 $receiver->stop();
             }
         });
@@ -116,9 +115,15 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->queue()->purge();
 
         $sender = new AmqpSender($serializer, $connection);
-        $receiver = new MaximumCountReceiver(new AmqpReceiver($serializer, $connection), 2);
-        $receiver->receive(function ($message) {
+        $receiver = new AmqpReceiver($serializer, $connection);
+
+        $receivedMessages = 0;
+        $receiver->receive(function ($message) use ($receiver, &$receivedMessages) {
             $this->assertNull($message);
+
+            if (2 === ++$receivedMessages) {
+                $receiver->stop();
+            }
         });
     }
 

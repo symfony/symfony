@@ -11,20 +11,23 @@
 
 namespace Symfony\Component\Messenger\Transport\Enhancers;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class MaximumCountReceiver implements ReceiverInterface
+class StopWhenMessageCountIsExceededReceiver implements ReceiverInterface
 {
     private $decoratedReceiver;
     private $maximumNumberOfMessages;
+    private $logger;
 
-    public function __construct(ReceiverInterface $decoratedReceiver, int $maximumNumberOfMessages)
+    public function __construct(ReceiverInterface $decoratedReceiver, int $maximumNumberOfMessages, LoggerInterface $logger = null)
     {
         $this->decoratedReceiver = $decoratedReceiver;
         $this->maximumNumberOfMessages = $maximumNumberOfMessages;
+        $this->logger = $logger;
     }
 
     public function receive(callable $handler): void
@@ -34,8 +37,11 @@ class MaximumCountReceiver implements ReceiverInterface
         $this->decoratedReceiver->receive(function ($message) use ($handler, &$receivedMessages) {
             $handler($message);
 
-            if (++$receivedMessages >= $this->maximumNumberOfMessages) {
+            if (null !== $message && ++$receivedMessages >= $this->maximumNumberOfMessages) {
                 $this->stop();
+                if (null !== $this->logger) {
+                    $this->logger->info('Receiver stopped due to maximum count of {count} exceeded', array('count' => $this->maximumNumberOfMessages));
+                }
             }
         });
     }

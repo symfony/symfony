@@ -115,23 +115,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      */
     protected function injectToolbar(Response $response, Request $request, array $nonces)
     {
-        $content = $response->getContent();
-        $pos = strripos($content, '</body>');
+        $toolbar = $this->twig->render('@WebProfiler/Profiler/toolbar_js.html.twig', array(
+                'excluded_ajax_paths' => $this->excludedAjaxPaths,
+                'token' => $response->headers->get('X-Debug-Token'),
+                'request' => $request,
+                'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
+                'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
+        ));
 
-        if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
-                '@WebProfiler/Profiler/toolbar_js.html.twig',
-                array(
-                    'excluded_ajax_paths' => $this->excludedAjaxPaths,
-                    'token' => $response->headers->get('X-Debug-Token'),
-                    'request' => $request,
-                    'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
-                    'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
-                )
-            ))."\n";
-            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
-            $response->setContent($content);
-        }
+        $response->setContent($response->getContent()."\n".$toolbar);
     }
 
     public static function getSubscribedEvents()

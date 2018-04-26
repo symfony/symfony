@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-18T15:01:19Z
+
+Same as for the other PR, could you have some tests? :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-20T14:47:23Z
+
+The tests are failing. Looks like some infinite loop because the tests for the component just never ends. Can you look at it? Also, I believe we should use inject the `logger` within the decorators now that it's possible: inject it to the command and to the receivers.
+
+---------------------------------------------------------------------------
+
+by sdelicata at 2018-04-20T17:50:34Z
+
+I've reproduced it. I'll try to fix soon
+
+---------------------------------------------------------------------------
+
+by sdelicata at 2018-04-20T19:27:02Z
+
+Test fixed.
+MaximumCounterReceiver doesn't increase its internal counter anymore when receiving null message, so it will never stop :p
+
+---------------------------------------------------------------------------
+
+by sdelicata at 2018-04-20T19:36:01Z
+
+> Also, I believe we should use inject the logger within the decorators now that it's possible: inject it to the command and to the receivers
+@sroze That's exactly what I planed ;)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T10:24:46Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-04-22T11:11:24Z
+
+I don't like naming of these. IMO it should signify what's being done when limit is exceeded. Otherwise, there will be confusion when somebody implements receiver with same trigger but another action. Also, I had no idea what it does until I looked into code. I thought it will just wait until memory is freed up or it will try to release some memory.
+
+MaximumCountReceiver -> AbortWhenMaximumCountIsExceededReceiver
+MemoryLimitReceiver -> AbortWhenMaximumMemoryIsExceededReceiver
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T11:45:35Z
+
+That's a fair point you have here @ostrolucky. Though, no need to "maximum" if we already have "exceeded". Also, the receivers have this notion of "stop", so I'd suggest:
+- `MaximumCountReceiver` -> `StopWhenMessageCountIsExceededReceiver`
+- `MemoryLimitReceiver` -> `StopWhenMemoryUsageIsExceededReceiver`
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-25T16:26:38Z
+
+@fabpot could you update your review please?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-25T21:16:00Z
+
+@sdelicata please squash your commits into a single commit. some commit seems to be authored with a different email, so we cannot squash them.
+
+---------------------------------------------------------------------------
+
+by sdelicata at 2018-04-26T08:32:44Z
+
+@Tobion Squash done

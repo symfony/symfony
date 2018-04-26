@@ -1,10 +1,13 @@
 <?php
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
+
 $container->loadFromExtension('framework', array(
     'messenger' => array(
         'routing' => array(
-            'App\Bar' => array('sender.bar', 'sender.biz'),
-            'App\Foo' => 'sender.foo',
+            FooMessage::class => array('sender.bar', 'sender.biz'),
+            BarMessage::class => 'sender.foo',
         ),
     ),
 ));

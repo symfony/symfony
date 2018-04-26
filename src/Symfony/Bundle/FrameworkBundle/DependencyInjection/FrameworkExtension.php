@@ -1496,6 +1496,10 @@ class FrameworkExtension extends Extension
 
         $messageToSenderIdsMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
+            if (!class_exists($message) && !interface_exists($message, false)) {
+                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
+            }
+
             $messageToSenderIdsMapping[$message] = $messageConfiguration['senders'];
         }
 

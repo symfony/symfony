@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
@@ -62,7 +63,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      */
     public function authenticate(TokenInterface $token)
     {
-        if (!$this->supports($token)) {
+        if (!$token instanceof GuardTokenInterface) {
             throw new \InvalidArgumentException('GuardAuthenticationProvider only supports GuardTokenInterface.');
         }
 
@@ -86,19 +87,13 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
             throw new AuthenticationExpiredException();
         }
 
-        // find the *one* GuardAuthenticator that this token originated from
-        foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
-            // get a key that's unique to *this* guard authenticator
-            // this MUST be the same as GuardAuthenticationListener
-            $uniqueGuardKey = $this->providerKey.'_'.$key;
+        $guardAuthenticator = $this->findOriginatingAuthenticator($token);
 
-            if ($uniqueGuardKey == $token->getGuardProviderKey()) {
-                return $this->authenticateViaGuard($guardAuthenticator, $token);
-            }
+        if (null === $guardAuthenticator) {
+            throw new AuthenticationException(sprintf('Token with provider key "%s" did not originate from any of the guard authenticators of provider "%s".', $token->getGuardProviderKey(), $this->providerKey));
         }
 
-        // no matching authenticator found - but there will be multiple GuardAuthenticationProvider
-        // instances that will be checked if you have multiple firewalls.
+        return $this->authenticateViaGuard($guardAuthenticator, $token);
     }
 
     private function authenticateViaGuard($guardAuthenticator, PreAuthenticationGuardToken $token)
@@ -107,18 +102,11 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf(
-                'Null returned from %s::getUser()',
-                get_class($guardAuthenticator)
-            ));
+            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser()', get_class($guardAuthenticator)));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \UnexpectedValueException(sprintf(
-                'The %s::getUser() method must return a UserInterface. You returned %s.',
-                get_class($guardAuthenticator),
-                is_object($user) ? get_class($user) : gettype($user)
-            ));
+            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', get_class($guardAuthenticator), is_object($user) ? get_class($user) : gettype($user)));
         }
 
         $this->userChecker->checkPreAuth($user);
@@ -130,18 +118,37 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         // turn the UserInterface into a TokenInterface
         $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
-            throw new \UnexpectedValueException(sprintf(
-                'The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.',
-                get_class($guardAuthenticator),
-                is_object($authenticatedToken) ? get_class($authenticatedToken) : gettype($authenticatedToken)
-            ));
+            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', get_class($guardAuthenticator), is_object($authenticatedToken) ? get_class($authenticatedToken) : gettype($authenticatedToken)));
         }
 
         return $authenticatedToken;
     }
 
+    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token)
+    {
+        // find the *one* GuardAuthenticator that this token originated from
+        foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
+            // get a key that's unique to *this* guard authenticator
+            // this MUST be the same as GuardAuthenticationListener
+            $uniqueGuardKey = $this->providerKey.'_'.$key;
+
+            if ($uniqueGuardKey === $token->getGuardProviderKey()) {
+                return $guardAuthenticator;
+            }
+        }
+
+        // no matching authenticator found - but there will be multiple GuardAuthenticationProvider
+        // instances that will be checked if you have multiple firewalls.
+
+        return null;
+    }
+
     public function supports(TokenInterface $token)
     {
+        if ($token instanceof PreAuthenticationGuardToken) {
+            return null !== $this->findOriginatingAuthenticator($token);
+        }
+
         return $token instanceof GuardTokenInterface;
     }
 }

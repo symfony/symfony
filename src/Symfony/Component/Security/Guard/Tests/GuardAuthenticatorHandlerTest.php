@@ -82,7 +82,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     /**
      * @dataProvider getTokenClearingTests
      */
-    public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey, $shouldTokenBeCleared)
+    public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey)
     {
         $token = $this->getMockBuilder($tokenClass)
             ->disableOriginalConstructor()
@@ -91,12 +91,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->method('getProviderKey')
             ->will($this->returnValue($tokenProviderKey));
 
-        // make the $token be the current token
-        $this->tokenStorage->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $this->tokenStorage->expects($shouldTokenBeCleared ? $this->once() : $this->never())
+        $this->tokenStorage->expects($this->never())
             ->method('setToken')
             ->with(null);
         $authException = new AuthenticationException('Bad password!');
@@ -116,9 +111,9 @@ class GuardAuthenticatorHandlerTest extends TestCase
     {
         $tests = array();
         // correct token class and matching firewall => clear the token
-        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'the_firewall_key', true);
-        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'different_key', false);
-        $tests[] = array('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', 'the_firewall_key', 'the_firewall_key', false);
+        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'the_firewall_key');
+        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'different_key');
+        $tests[] = array('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', 'the_firewall_key', 'the_firewall_key');
 
         return $tests;
     }

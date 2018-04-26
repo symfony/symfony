@@ -16,13 +16,13 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
  *
  * @internal
  */
-class Command extends \PHPUnit_TextUI_Command
+class CommandForV5 extends \PHPUnit_TextUI_Command
 {
     /**
      * {@inheritdoc}
      */
     protected function createRunner()
     {
-        return new TestRunner($this->arguments['loader']);
+        return new TestRunnerForV5($this->arguments['loader']);
     }
 }

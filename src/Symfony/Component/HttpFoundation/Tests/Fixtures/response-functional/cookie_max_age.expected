@@ -1,0 +1,11 @@
+
+Warning: Expiry date cannot have a year greater than 9999 in %scookie_max_age.php on line 10
+
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: no-cache, private
+    [2] => Date: Sat, 12 Nov 1955 20:04:00 GMT
+    [3] => Set-Cookie: foo=bar; expires=Sat, 01-Jan-10000 02:46:40 GMT; Max-Age=%d; path=/
+)
+shutdown

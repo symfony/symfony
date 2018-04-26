@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-24T18:22:14Z
+
+@ogizanagi yeah I've been trying to push the tests changes for ages but the connection in the train is so flacky 😅
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-24T18:25:09Z
+
+> would be good to keep one test with failure expected though
+
+I don't think it's worth it: it would means another set of yml/xml/php tests, just for these `_exists` checks :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-24T18:27:24Z
+
+> the connection in the train is so flacky
+
+You should try taking the bus instead to send your messages more efficiently.
+
+Alright, I'm out... -> []
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-24T18:34:23Z
+
+London -> Paris in bus is a nightmare (at takes ages haha).
+
+On Tue, Apr 24, 2018 at 7:27 PM Maxime Steinhausser <
+notifications@github.com> wrote:
+
+> the connection in the train is so flacky
+>
+> You should try taking the bus instead to send your messages more
+> efficiently.
+>
+> Alright, I'm out... -> []
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/27032#issuecomment-384033503>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEeJ2aJ-Lr_pKJF0R6U42eIoUmK1qks5tr26TgaJpZM4Th6hw>
+> .
+>

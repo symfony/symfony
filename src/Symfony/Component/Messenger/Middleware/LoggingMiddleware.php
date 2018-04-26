@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -31,28 +32,33 @@ class LoggingMiddleware implements MiddlewareInterface
      */
     public function handle($message, callable $next)
     {
-        $this->logger->debug('Starting handling message {class}', array(
-            'message' => $message,
-            'class' => \get_class($message),
-        ));
+        $this->logger->debug('Starting handling message {class}', $this->createContext($message));
 
         try {
             $result = $next($message);
         } catch (\Throwable $e) {
-            $this->logger->warning('An exception occurred while handling message {class}', array(
-                'message' => $message,
-                'exception' => $e,
-                'class' => \get_class($message),
+            $this->logger->warning('An exception occurred while handling message {class}', array_merge(
+                $this->createContext($message),
+                array('exception' => $e)
             ));
 
             throw $e;
         }
 
-        $this->logger->debug('Finished handling message {class}', array(
-            'message' => $message,
-            'class' => \get_class($message),
-        ));
+        $this->logger->debug('Finished handling message {class}', $this->createContext($message));
 
         return $result;
+    }
+
+    private function createContext($message): array
+    {
+        if ($message instanceof ReceivedMessage) {
+            $message = $message->getMessage();
+        }
+
+        return array(
+            'message' => $message,
+            'class' => \get_class($message),
+        );
     }
 }

@@ -16,7 +16,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
  *
  * @internal
  */
-class TestRunner extends \PHPUnit_TextUI_TestRunner
+class TestRunnerForV5 extends \PHPUnit_TextUI_TestRunner
 {
     /**
      * {@inheritdoc}

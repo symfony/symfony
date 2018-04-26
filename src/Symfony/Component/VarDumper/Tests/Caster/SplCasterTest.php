@@ -144,4 +144,23 @@ EOTXT;
             array(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_LIFO | IT_MODE_DELETE'),
         );
     }
+
+    public function testCastObjectStorageIsntModified()
+    {
+        $var = new \SplObjectStorage();
+        $var->attach(new \stdClass());
+        $var->rewind();
+        $current = $var->current();
+
+        $this->assertDumpMatchesFormat('%A', $var);
+        $this->assertSame($current, $var->current());
+    }
+
+    public function testCastObjectStorageDumpsInfo()
+    {
+        $var = new \SplObjectStorage();
+        $var->attach(new \stdClass(), new \DateTime());
+
+        $this->assertDumpMatchesFormat('%ADateTime%A', $var);
+    }
 }

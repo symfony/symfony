@@ -1,0 +1,14 @@
+# LDAP
+/src/Symfony/Component/Ldap/* @csarrazi
+# Lock
+/src/Symfony/Component/Lock/* @jderusse
+# Messenger
+/src/Symfony/Bridge/Doctrine/Messenger/* @sroze
+/src/Symfony/Component/Messenger/* @sroze
+# Workflow
+/src/Symfony/Bridge/Twig/Extension/WorkflowExtension.php @lyrixx
+/src/Symfony/Bridge/Twig/Tests/Extension/WorkflowExtensionTest.php @lyrixx
+/src/Symfony/Bundle/FrameworkBundle/Command/WorkflowDumpCommand.php @lyrixx
+/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/ValidateWorkflowsPass.php @lyrixx
+/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/WorkflowGuardListenerPass.php @lyrixx
+/src/Symfony/Component/Workflow/* @lyrixx

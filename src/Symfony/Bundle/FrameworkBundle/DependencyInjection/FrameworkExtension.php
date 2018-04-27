@@ -1481,13 +1481,8 @@ class FrameworkExtension extends Extension
                 throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
             }
 
-            $tagAttributes = array('name' => $name);
-            if (isset($bus['decorator_class'])) {
-                $tagAttributes['decorator_class'] = $bus['decorator_class'];
-            }
-
             $container->setParameter($busId.'.middlewares', $middlewares);
-            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus', $tagAttributes));
+            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus', array('name' => $name)));
 
             if ($name === $config['default_bus']) {
                 $container->setAlias('message_bus', $busId);

@@ -63,12 +63,6 @@ class MessengerPass implements CompilerPassInterface
             if ($container->hasDefinition('messenger.data_collector')) {
                 $this->registerBusToCollector($container, $busId, $tags[0]);
             }
-
-            if (isset($tags[0]['decorator_class'])) {
-                $container->register($tags[0]['decorator_class'], $tags[0]['decorator_class'])
-                    ->setDecoratedService($busId)
-                    ->setArguments(array(new Reference($tags[0]['decorator_class'].'.inner')));
-            }
         }
 
         $this->registerReceivers($container);

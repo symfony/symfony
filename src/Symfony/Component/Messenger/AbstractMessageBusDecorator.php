@@ -14,12 +14,12 @@ namespace Symfony\Component\Messenger;
 /**
  * A decorated message bus.
  *
- * Use this abstract class to created your message bus decorator to specialise your
- * bus instances and type-hint them.
+ * Use this abstract class to create your message bus decorator to specialise your
+ * bus instances and type-hint against them.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-abstract class DecoratedMessageBus implements MessageBusInterface
+abstract class AbstractMessageBusDecorator implements MessageBusInterface
 {
     private $decoratedBus;
 

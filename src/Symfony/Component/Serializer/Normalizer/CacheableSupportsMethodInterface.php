@@ -12,10 +12,14 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 /**
- * "supportsNormalization()" methods of normalizers implementing this interface have a cacheable return.
+ * Marker interface for normalizers and denormalizers that use
+ * only the type and the format in their supports*() methods.
+ *
+ * By implementing this interface, the return value of the
+ * supports*() methods will be cached by type and format.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface NormalizerWithCacheableSupportResultInterface
+interface CacheableSupportsMethodInterface
 {
 }

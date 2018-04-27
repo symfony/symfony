@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-04-24T07:44:19Z
+
+In the PHPdoc of `joinAssoc()` there are some minor issue that should be fixed too:
+
+* `... is joined ...`  -> `... are joined ...`
+* The result of the example (`'foo=bar, baz, baz="a b c"'`) should be `'foo=abc, bar, baz="a b c"'`
+
+Thanks!

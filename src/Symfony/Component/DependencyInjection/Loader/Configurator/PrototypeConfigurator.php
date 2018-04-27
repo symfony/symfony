@@ -39,7 +39,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
 
     private $loader;
     private $resource;
-    private $exclude;
+    private $excludes;
     private $allowParent;
 
     public function __construct(ServicesConfigurator $parent, PhpFileLoader $loader, Definition $defaults, string $namespace, string $resource, bool $allowParent)
@@ -63,19 +63,21 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         parent::__destruct();
 
         if ($this->loader) {
-            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->exclude);
+            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes);
         }
         $this->loader = null;
     }
 
     /**
-     * Excludes files from registration using a glob pattern.
+     * Excludes files from registration using glob patterns.
+     *
+     * @param string[]|string $excludes
      *
      * @return $this
      */
-    final public function exclude(string $exclude)
+    final public function exclude($excludes)
     {
-        $this->exclude = $exclude;
+        $this->excludes = (array) $excludes;
 
         return $this;
     }

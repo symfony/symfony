@@ -34,7 +34,7 @@ interface MessageSubscriberInterface extends MessageHandlerInterface
      *
      * The `__invoke` method of the handler will be called as usual with the message to handle.
      *
-     * @return array
+     * @return iterable
      */
-    public static function getHandledMessages(): array;
+    public static function getHandledMessages(): iterable;
 }

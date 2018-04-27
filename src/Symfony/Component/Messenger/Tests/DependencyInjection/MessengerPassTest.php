@@ -342,7 +342,7 @@ class UndefinedMessageHandler
 
 class UndefinedMessageHandlerViaInterface implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array(UndefinedMessage::class);
     }
@@ -379,7 +379,7 @@ class BuiltinArgumentTypeHandler
 
 class HandlerWithMultipleMessages implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array(
             DummyMessage::class,
@@ -390,7 +390,7 @@ class HandlerWithMultipleMessages implements MessageSubscriberInterface
 
 class PrioritizedHandler implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array(
             array(SecondMessage::class, 10),
@@ -400,7 +400,7 @@ class PrioritizedHandler implements MessageSubscriberInterface
 
 class HandleNoMessageHandler implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array();
     }

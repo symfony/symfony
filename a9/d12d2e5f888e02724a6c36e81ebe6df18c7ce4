@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-26T12:55:22Z
+
+Thanks :)
+Would you mind adding a test case please?
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2018-04-26T12:57:04Z
+
+For which case? When tried to supply array callback? Because when array would be passed nothing will happen so I don't know what to test against.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-26T12:59:19Z
+
+For the case when you pass an invokable object.
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2018-04-26T13:00:59Z
+
+Oh right forgot about this simple case 😊
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2018-04-26T13:26:17Z
+
+@nicolas-grekas I don't know about Routing test I did not want to introduce copied test case so I just extended existing test case there.

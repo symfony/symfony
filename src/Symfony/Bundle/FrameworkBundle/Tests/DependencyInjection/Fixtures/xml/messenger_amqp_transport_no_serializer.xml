@@ -8,13 +8,7 @@
     <framework:config>
         <framework:messenger>
             <framework:serializer enabled="false" />
-            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage">
-                <framework:sender service="sender.bar" />
-                <framework:sender service="sender.biz" />
-            </framework:routing>
-            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage">
-                <framework:sender service="sender.foo" />
-            </framework:routing>
+            <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
         </framework:messenger>
     </framework:config>
 </container>

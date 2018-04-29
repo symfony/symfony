@@ -296,7 +296,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         ksort($this->cacheControl);
 
-        return HeaderUtils::joinAssoc($this->cacheControl, ',');
+        return HeaderUtils::toString($this->cacheControl, ',');
     }
 
     /**
@@ -310,6 +310,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $parts = HeaderUtils::split($header, ',=');
 
-        return HeaderUtils::combineParts($parts);
+        return HeaderUtils::combine($parts);
     }
 }

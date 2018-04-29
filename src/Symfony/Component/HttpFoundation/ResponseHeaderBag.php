@@ -295,7 +295,7 @@ class ResponseHeaderBag extends HeaderBag
             $params['filename*'] = "utf-8''".rawurlencode($filename);
         }
 
-        return $disposition.'; '.HeaderUtils::joinAssoc($params, ';');
+        return $disposition.'; '.HeaderUtils::toString($params, ';');
     }
 
     /**

@@ -1949,7 +1949,7 @@ class Request
             $forwardedValues = array();
             $param = self::$forwardedParams[$type];
             foreach ($parts as $subParts) {
-                $assoc = HeaderUtils::combineParts($subParts);
+                $assoc = HeaderUtils::combine($subParts);
                 if (isset($assoc[$param])) {
                     $forwardedValues[] = $assoc[$param];
                 }

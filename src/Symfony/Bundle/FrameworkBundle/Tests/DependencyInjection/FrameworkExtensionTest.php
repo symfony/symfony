@@ -34,6 +34,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -554,6 +556,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(2, $receiverArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $receiverArguments[0]);
         $this->assertSame(array('queue' => array('name' => 'Queue')), $receiverArguments[1]);
+    }
+
+    public function testMessengerRouting()
+    {
+        $container = $this->createContainerFromFile('messenger_routing');
+        $senderLocatorDefinition = $container->getDefinition('messenger.asynchronous.routing.sender_locator');
+
+        $messageToSenderIdsMapping = array(
+            DummyMessage::class => array('amqp'),
+            SecondMessage::class => array('amqp', 'audit', null),
+            '*' => array('amqp'),
+        );
+
+        $this->assertSame($messageToSenderIdsMapping, $senderLocatorDefinition->getArgument(1));
     }
 
     /**

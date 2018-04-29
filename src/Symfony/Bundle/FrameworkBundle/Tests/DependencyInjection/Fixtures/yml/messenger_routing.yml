@@ -1,0 +1,6 @@
+framework:
+    messenger:
+        routing:
+            'Symfony\Component\Messenger\Tests\Fixtures\DummyMessage': amqp
+            'Symfony\Component\Messenger\Tests\Fixtures\SecondMessage': [amqp, audit, ~]
+            '*': amqp

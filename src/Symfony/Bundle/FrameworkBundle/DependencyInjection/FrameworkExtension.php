@@ -1449,7 +1449,7 @@ class FrameworkExtension extends Extension
         $loader->load('messenger.xml');
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
-            if (count($config['adapters']) > 0 && !$this->isConfigEnabled($container, $serializerConfig)) {
+            if (\count($config['adapters']) > 0 && !$this->isConfigEnabled($container, $serializerConfig)) {
                 throw new LogicException('Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".');
             }
 
@@ -1464,7 +1464,7 @@ class FrameworkExtension extends Extension
         $container->setAlias('messenger.transport.decoder', $config['decoder']);
 
         if (null === $config['default_bus']) {
-            if (count($config['buses']) > 1) {
+            if (\count($config['buses']) > 1) {
                 throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
             }
 
@@ -1477,7 +1477,7 @@ class FrameworkExtension extends Extension
 
             $middlewares = $bus['default_middlewares'] ? array_merge($defaultMiddlewares['before'], $bus['middlewares'], $defaultMiddlewares['after']) : $bus['middlewares'];
 
-            if (in_array('messenger.middleware.validation', $middlewares) && !$validationConfig['enabled']) {
+            if (!$validationConfig['enabled'] && \in_array('messenger.middleware.validation', $middlewares, true)) {
                 throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
             }
 
@@ -1496,7 +1496,7 @@ class FrameworkExtension extends Extension
 
         $messageToSenderIdsMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
-            if (!class_exists($message) && !interface_exists($message, false)) {
+            if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
             }
 
@@ -1506,21 +1506,19 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
 
         foreach ($config['adapters'] as $name => $adapter) {
-            $container->setDefinition('messenger.sender.'.$name, (new Definition(SenderInterface::class))->setFactory(array(
-                new Reference('messenger.adapter_factory'),
-                'createSender',
-            ))->setArguments(array(
-                $adapter['dsn'],
-                $adapter['options'],
-            ))->addTag('messenger.sender', array('name' => $name)));
+            $senderDefinition = (new Definition(SenderInterface::class))
+                ->setFactory(array(new Reference('messenger.adapter_factory'), 'createSender'))
+                ->setArguments(array($adapter['dsn'], $adapter['options']))
+                ->addTag('messenger.sender', array('name' => $name))
+            ;
+            $container->setDefinition('messenger.sender.'.$name, $senderDefinition);
 
-            $container->setDefinition('messenger.receiver.'.$name, (new Definition(ReceiverInterface::class))->setFactory(array(
-                new Reference('messenger.adapter_factory'),
-                'createReceiver',
-            ))->setArguments(array(
-                $adapter['dsn'],
-                $adapter['options'],
-            ))->addTag('messenger.receiver', array('name' => $name)));
+            $receiverDefinition = (new Definition(ReceiverInterface::class))
+                ->setFactory(array(new Reference('messenger.adapter_factory'), 'createReceiver'))
+                ->setArguments(array($adapter['dsn'], $adapter['options']))
+                ->addTag('messenger.receiver', array('name' => $name))
+            ;
+            $container->setDefinition('messenger.receiver.'.$name, $receiverDefinition);
         }
     }
 

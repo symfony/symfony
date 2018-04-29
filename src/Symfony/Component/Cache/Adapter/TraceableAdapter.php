@@ -16,6 +16,7 @@ use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Contract\Service\ResetInterface;
 
 /**
  * An adapter that collects data about all cache calls.
@@ -225,7 +226,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      */
     public function reset()
     {
-        if (!$this->pool instanceof ResettableInterface) {
+        if (!$this->pool instanceof ResetInterface) {
             return;
         }
         $event = $this->start(__FUNCTION__);

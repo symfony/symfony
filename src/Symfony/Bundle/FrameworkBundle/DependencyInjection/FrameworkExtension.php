@@ -25,7 +25,6 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
-use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -95,6 +94,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contract\Service\ResetInterface;
 
 /**
  * FrameworkExtension.
@@ -324,7 +324,7 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
-        $container->registerForAutoconfiguration(ResettableInterface::class)
+        $container->registerForAutoconfiguration(ResetInterface::class)
             ->addTag('kernel.reset', array('method' => 'reset'));
         $container->registerForAutoconfiguration(ProcessorInterface::class)
             ->addTag('monolog.processor');

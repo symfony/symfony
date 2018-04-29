@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contract\Service\ResetInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -39,7 +40,7 @@ class DoctrineProvider extends CacheProvider implements PruneableInterface, Rese
      */
     public function reset()
     {
-        if ($this->pool instanceof ResettableInterface) {
+        if ($this->pool instanceof ResetInterface) {
             $this->pool->reset();
         }
         $this->setNamespace($this->getNamespace());

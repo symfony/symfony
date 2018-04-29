@@ -1,0 +1,145 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-25T16:16:16Z
+
+> this will dramatically improve the performance of the Serializer component
+
+Do you have some nice Blackfire profile to show us the difference? 😃
+
+---------------------------------------------------------------------------
+
+by bendavies at 2018-04-25T16:31:43Z
+
+For me this only gave a 9% speed up, as `getNormalizer` will evaluate every normalizer for scalar/nulls and then return `null`, which is the majority of my `getNormalizer` calls.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-25T17:13:48Z
+
+@bendavies I added support for primitive types and excluded denormalizers. Can you try again?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-25T20:43:27Z
+
+Here is a Blackfire comparison: https://blackfire.io/profiles/compare/ca1d8a07-335f-4a37-8ea7-369f3983d044...0563674b-fc0e-4ab4-9e6d-1b9a089651ad/graph?settings%5Bdimension%5D=wt&settings%5Bdisplay%5D=landscape&settings%5BtabPane%5D=nodes&selected=&callname=main()
+
+Improvement of 9.27%.
+
+I used an adapted version of @egeloen's [benchmark](https://github.com/egeloen/ivory-serializer-benchmark). The gain will probably be bigger on real projects (especially API Platform ones) where a lot of normalizers are registered.
+
+Here is the adaptation:
+
+```patch
+        $this->serializer = new Serializer(
+            [
++                new DataUriNormalizer(),
++                new DateTimeNormalizer(),
++                new DateIntervalNormalizer(),
++                new ConstraintViolationListNormalizer(),
++                new JsonSerializableNormalizer(),
+                new GetSetMethodNormalizer($classMetadataFactory)
+            ],
+            [new JsonEncoder()]
+        );
+    }
+```
+
+And the command used: blackfire run bin/benchmark -i100 -sSymfonyGetSetNormalizer --iteration 100 --vertical-complexity 4 --horizontal-complexity 4
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-25T20:50:44Z
+
+Here is a profile from of a real project: https://blackfire.io/profiles/compare/a5c802f8-5c45-4d06-ae6f-ed63b4f23b8a/graph (provided by @bendavies)
+
+36% for the whole app!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-26T21:05:04Z
+
+Some additional thought:
+the current interface slows down the non-cacheable normalizers, because of the extra checks in the loop, esp. the array_diff check. But given the actually used vary-by is only "type" here, can't we specialize on this and use a labelling interface instead? eg `ContextFreeNormalizerInterface`?
+Once a normalizer implements this, it could be cached by type+format?
+For more safety and in order to enforce the contract, I'd pass `null` as `$data` when this interface is implemented (or maybe a string hinting the situation when dumped, for DX?), so that devs cannot mess up with $data once they opted-in.
+Ideally also, this PR should allow reverting #24228, by moving from local caches to external caches. Is that possible?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-04-26T23:58:39Z
+
+@nicolas-grekas I like your idea but instead of the marker interface I would use interface with a `supportNormalizationForType(string $type)` method that is called instead of the `supportNormalization` so we don't have to pass something with a special meaning as `$data`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-27T04:41:21Z
+
+> supportNormalizationForType
+
+*AndFormat - But not sure about that because the (de)normalizer interfaces ask about supportsNormalization. It'd be strange to require implementing two similar methods, especially when the new one would basically just call the current on with a dummy$data as there is no other possible implementation.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-27T07:34:42Z
+
+The implementation does not seem to care about the varying though. It always varies the cache by both type and format.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-27T10:00:00Z
+
+New implementation proposal:
+
+* Interface renamed to `NormalizerWithCacheableSupportResultInterface` (still not really fan of it...)
+* No method to implement
+* `array_diff` call removed
+
+The gain is higher now, 16% instead of 9%: https://blackfire.io/profiles/compare/ca1d8a07-335f-4a37-8ea7-369f3983d044...b6a8383e-e4e9-4d9c-b514-2e31a47fbff1/graph?settings%5Bdimension%5D=wt&settings%5Bdisplay%5D=landscape&settings%5BtabPane%5D=nodes&selected=&callname=main()
+Can you try it on your project @bendavies?
+
+We should also update the documentation to encourage to always use this new interface when possible (= almost always).
+
+@nicolas-grekas the local cache still has a benefit if (and only if) at least 1 normalizer in the chain doesn't implement this new interface (in some case, there is a real use case: the `supports` method depends of the context). I would keep it for now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-27T10:18:42Z
+
+> For more safety and in order to enforce the contract, I'd pass null as $data when this interface is implemented (or maybe a string hinting the situation when dumped, for DX?), so that devs cannot mess up with $data once they opted-in.
+
+It's not possible, most normalizers use `$data` at least to guess its type.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-27T12:31:56Z
+
+@dunglas I just push-forced on your fork: the first commit is exactly yours (squashed from previous ones), the 2nd is mine: it adds caching to denormalizers and implements additional logic allowing to revert #24228.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-27T13:10:56Z
+
+Nice improvements @nicolas-grekas 👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-27T13:11:18Z
+
+@bendavies can you try the last version before we merge it?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2018-04-27T13:13:06Z
+
+Yes. Will later today.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2018-04-27T14:55:31Z
+
+Real world ApiPlatform app comparison (tldr: 36% improvement):
+https://blackfire.io/profiles/compare/dc9c0964-fa3a-44dc-845c-b7ee4a2608f9/graph
+
+98% improvement on `getNormalizer`:
+![image](https://user-images.githubusercontent.com/625392/39369211-96319cc0-4a33-11e8-82fa-6eb8d19d9a31.png)

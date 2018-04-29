@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-27T19:46:17Z
+
+As proven by this regression... we need to test it. Can you add a test
+please? :)
+
+On Fri, 27 Apr 2018 at 21:27, Yonel Ceruto <notifications@github.com> wrote:
+
+> Q A
+> Branch? master
+> Bug fix? no
+> New feature? no
+> BC breaks? no
+> Deprecations? no
+> Tests pass? yes
+> Fixed tickets #27081 <https://github.com/symfony/symfony/issues/27081>
+> License MIT
+> Doc PR -
+>
+> Also fixing some CS warnings and code readability.
+> ------------------------------
+> You can view, comment on, or merge this pull request online at:
+>
+>   https://github.com/symfony/symfony/pull/27083
+> Commit Summary
+>
+>    - Restore wildcard support in routing
+>
+> File Changes
+>
+>    - *M*
+>    src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
+>    <https://github.com/symfony/symfony/pull/27083/files#diff-0> (36)
+>
+> Patch Links:
+>
+>    - https://github.com/symfony/symfony/pull/27083.patch
+>    - https://github.com/symfony/symfony/pull/27083.diff
+>
+> —
+> You are receiving this because you are subscribed to this thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/27083>, or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEf4k4QS2DMm28tkCMXbt4J5gJ-0qks5ts3ExgaJpZM4Tq5YN>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-04-27T20:01:43Z
+
+You caught me! :smile: ... Alright, I'm adding the tests.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-04-27T21:25:47Z
+
+Tests added.

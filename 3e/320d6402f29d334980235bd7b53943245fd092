@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-09T18:32:03Z
+
+Just wondering: how will this behave when the controller is not a string? Eg a closure?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-09T18:58:25Z
+
+Hmm, good catch, that'll be an issue (it won't even be serialized). This needs to be fixed in the `RequestContextProvider`. An option could be cloning and dumping it. But not sure it is worth it.
+
+Status: Needs work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-09T19:24:04Z
+
+It should be wrapped using `ClassStub::wrapCallable()` I suppose (see the profiler, it is doing so AFAIK).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-10T17:32:06Z
+
+Thanks for the hint, but I'm not sure how to leverage it directly? Anyway, what would you think of this?
+
+### HTML
+
+|Collapsed by default|Expanded|
+|--|--|
+|![screenshot 2018-04-10 a 19 18 11](https://user-images.githubusercontent.com/2211145/38573045-2d114c4a-3cf5-11e8-9e0c-1e0ba1c06416.PNG)|![screenshot 2018-04-10 a 19 29 55](https://user-images.githubusercontent.com/2211145/38573213-9f161eba-3cf5-11e8-829c-1211a9f24906.PNG)|
+
+### CLI
+
+<img width="1067" alt="screenshot 2018-04-10 a 19 19 01" src="https://user-images.githubusercontent.com/2211145/38573048-2d4a0bc0-3cf5-11e8-86f8-4e749212dde5.PNG">
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-22T06:24:08Z
+
+/cc @nicolas-grekas

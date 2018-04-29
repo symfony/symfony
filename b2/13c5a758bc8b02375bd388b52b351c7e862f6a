@@ -1,0 +1,177 @@
+---------------------------------------------------------------------------
+
+by cilefen at 2018-02-26T19:30:15Z
+
+I don't understand enough about SF tests to know why tests are failing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-14T16:05:05Z
+
+I'd like to propose an alternative, see #26928.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-16T15:50:59Z
+
+#26928 is simpler.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-23T08:35:51Z
+
+Reopening as discussed in #26928
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-23T08:51:10Z
+
+@cilefen up to finish this one? Otherwise no pb, please advise and we'll take over.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-23T10:49:05Z
+
+I will look look at it today.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-23T18:46:51Z
+
+@dmaicher I'm wondering: the approach with the global exception handler I proposed in the front controller is also able to deal with fatal errors.
+What does the approach in this PR has that's making it better?
+That's an honest question :)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-04-23T19:02:20Z
+
+@nicolas-grekas sure let's discuss it :blush:
+
+> What does the approach in this PR has that's making it better?
+
+- In my opinion the front controller should be a really lightweight "wrapper" around the kernel and just send the response to the client that has been returned by the kernel
+- if using `WebTestCase` on some API project (no custom exception listeners, no TwigBundle) you want to assert 404 responses for example: How to do it when that logic is in the front-controller?
+- people have to update their front controllers to benefit from this feature? :smiley:
+
+> is also able to deal with fatal errors.
+
+Currently I'm using `Symfony\Component\Debug\ErrorHandler::register();` for that in my front controllers so that they are turned into exceptions :yum:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-23T19:25:35Z
+
+> Currently I'm using `ErrorHandler::register();` for that in my front controllers so that they are turned into exceptions
+
+but `FrameworkBundle::boot()` already does the same, isn't it? So fatals are already turned into exceptions on prod also and you could remove the line you added in your front controller, isn't it?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-04-24T08:21:36Z
+
+> but FrameworkBundle::boot() already does the same, isn't it? So fatals are already turned into exceptions on prod also and you could remove the line you added in your front controller, isn't it?
+
+true! I just double checked it and you are right :wink: This particular project was started with Symfony 2.3 ages ago and I remember back then there was some reason for this. But now it works fine :+1:  :smiley:
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-24T13:25:53Z
+
+I just pushed a commit (will squash later), but I'm too busy even to test it at the moment.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-24T14:01:51Z
+
+I will like to know if I am even close on the headers. As for whether this actually works...it does not. When in dev mode you get this new response rather than the debug component response.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-24T14:51:11Z
+
+In this branch as of right now, when in the dev environment, both this and the debug response are returned to the browser.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-24T14:52:04Z
+
+We may need to adjust the weight of this listener.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-04-24T18:17:09Z
+
+I just tested it a bit on one of my Symfony 3.4.8 apps and in general it works fine :+1:
+
+In my project I use templating so I just disabled `Symfony\Component\HttpKernel\EventListener\ExceptionListener` for my tests. If I leave it enabled your listener does not do nothing. See first remark below.
+
+- I think we don't need this check: https://github.com/symfony/symfony/pull/26138/files#diff-7bd9abf60ae49670c578b9ec03fb6facR46, because once a response is set the propagation is stopped and all following listeners are not called anyway: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Event/GetResponseEvent.php#L46
+- currently the html returned in the response body is a bit broken. It basically only contains the inner html body, but the outer markup is missing. Also there are no styles. I'm still not sure if we should really use the content of `ExceptionHandler` here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-24T18:28:54Z
+
+I also checked out the PR to test, the behavior is good. I'll propose an updated implementation in a few hours (AFK right now)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-24T20:22:38Z
+
+Here is an updated proposal. Instead of creating a new listener, I propose to register the existing one, while making it a bit more capable:
+https://github.com/symfony/symfony/compare/3.4...nicolas-grekas:http-x-fallback
+
+@cilefen if you don't mind, could you please add some test cases?
+
+> when in the dev environment, both this and the debug response are returned to the browser
+
+are you still experiencing this? If yes, can you please tell me how we could reproduce it? I don't for now.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-25T12:31:49Z
+
+@nicolas-grekas The steps I am using are on #25844. With this branch currently, the dev environment 404 does not look correct.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-25T14:17:21Z
+
+I don't have the double display on my side. I'm not testing with Apache but with `php -S`, but it should make a difference. Can you try again from a fresh install? If my linked patch above is OK to you, would you borrow it and update the PR accordingly?
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-25T14:36:26Z
+
+@nicolas-grekas Your diff works for me, and seems simpler. The only question I have in fact is whether it intended that a production environment 404 should look like this:
+
+<img width="1078" alt="screen shot 2018-04-25 at 10 34 34 am" src="https://user-images.githubusercontent.com/1977311/39252782-683b0394-4874-11e8-825a-4afa089456c7.png">
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-25T14:42:54Z
+
+> whether it intended that a production environment 404 should look like this
+
+yes it is IMHO: we need to provide some default page, we have one in Debug. If this doesn't fit, then we should update Debug (ie fix #22964)
+And ppl are still free to register their own listener if the default doesn't fit.
+But this PR is not the place to work on the display.
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-25T14:57:03Z
+
+@nicolas-grekas I see. I've just now switched to your diff. I haven't rebased or squashed yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-25T15:28:09Z
+
+Thanks. It'd be awesome if you could squash and add a test case if possible... :)
+
+---------------------------------------------------------------------------
+
+by cilefen at 2018-04-25T15:54:48Z
+
+@nicolas-grekas It is rebased and squashed. I stole the test addition you made in #26928.

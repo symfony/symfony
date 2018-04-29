@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by gharlan at 2018-03-25T11:33:41Z
+
+@jeffreymb tested it again and found a problem. When the ajax page triggers immediately another ajax call (without the `-Replace` header), the ajax block in toolbar doesn't stop blinking.
+
+It is reproducible for me with these controllers:
+
+```php
+    /**
+     * @Route("/")
+     */
+    public function indexAction(): Response
+    {
+        return new Response(<<<'HTML'
+<html>
+<head>
+</head>
+<body>
+    <a href="/foo">Load /foo</a>
+    <main></main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $('a').click(function (event) {
+            event.preventDefault();
+            $('main').load('/foo');
+        });
+    </script>
+</body>
+</html>
+HTML
+);
+    }
+
+    /**
+     * @Route("/foo")
+     */
+    public function fooAction(): Response
+    {
+        $response = new Response('
+            foo
+            <script>$.get("/bar");</script>
+        ');
+        $response->headers->set('Symfony-Debug-Toolbar-Replace', 1);
+
+        return $response;
+    }
+
+    /**
+     * @Route("/bar")
+     */
+    public function barAction(): Response
+    {
+        return new Response('', 204);
+    }
+```
+
+Load index page and click on "Load /foo". After that the ajax block is blinking all the time here.
+
+---------------------------------------------------------------------------
+
+by jeffreymb at 2018-03-25T14:28:05Z
+
+@gharlan This PR doesn't (at this point) touch the code that is relevant to the issue you've discovered. Is this for sure in scope for this PR?
+
+---------------------------------------------------------------------------
+
+by gharlan at 2018-03-25T14:40:53Z
+
+Without this PR I don't have this issue.
+
+---------------------------------------------------------------------------
+
+by jeffreymb at 2018-03-27T02:18:55Z
+
+@gharlan fixed
+
+---------------------------------------------------------------------------
+
+by gharlan at 2018-03-27T09:14:45Z
+
+Thanks, it works great! ❤️
+
+In `base_js.html.twig` I found this comment:
+
+> This file is partially duplicated in TwigBundle/Resources/views/base_js.html.twig. If you
+   make any change in this file, verify the same change is needed in the other file.
+
+So maybe you have to copy your changes to this file? I'm not sure.
+
+---------------------------------------------------------------------------
+
+by jeffreymb at 2018-03-27T14:58:00Z
+
+I've double checked that none of the changes in this PR are relevant to `TwigBundle/Resources/views/base_js.html.twig`.
+
+---------------------------------------------------------------------------
+
+by jeffreymb at 2018-04-16T09:31:47Z
+
+Any chance this can make 4.1? I'm not sure what the policy is, but this PR was created before the feature freeze, and actually most of the work done before the 4.0 feature freeze!
+
+---------------------------------------------------------------------------
+
+by jeffreymb at 2018-04-16T10:47:43Z
+
+There is a docs issue: https://github.com/symfony/symfony-docs/issues/8409
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T12:30:18Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by jeffreymb at 2018-04-27T10:25:11Z
+
+I created a doc PR earlier today.

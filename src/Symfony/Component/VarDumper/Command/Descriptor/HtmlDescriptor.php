@@ -44,6 +44,7 @@ class HtmlDescriptor implements DumpDescriptorInterface
         $title = '-';
         if (isset($context['request'])) {
             $request = $context['request'];
+            $controller = "<span class='dumped-tag'>{$this->dumper->dump($request['controller'], true, array('maxDepth' => 0))}</span>";
             $title = sprintf('<code>%s</code> <a href="%s">%s</a>', $request['method'], $uri = $request['uri'], $uri);
             $dedupIdentifier = $request['identifier'];
         } elseif (isset($context['cli'])) {
@@ -53,31 +54,36 @@ class HtmlDescriptor implements DumpDescriptorInterface
             $dedupIdentifier = uniqid('', true);
         }
 
-        $contextText = array();
+        $sourceDescription = '';
         if (isset($context['source'])) {
             $source = $context['source'];
+            $projectDir = $source['project_dir'];
             $sourceDescription = sprintf('%s on line %d', $source['name'], $source['line']);
             if (isset($source['file_link'])) {
                 $sourceDescription = sprintf('<a href="%s">%s</a>', $source['file_link'], $sourceDescription);
             }
-
-            $contextText[] = $sourceDescription;
         }
 
-        $contextText = implode('<br />', $contextText);
         $isoDate = $this->extractDate($context, 'c');
+        $tags = array_filter(array(
+            'controller' => $controller ?? null,
+            'project dir' => $projectDir ?? null,
+        ));
 
         $output->writeln(<<<HTML
 <article data-dedup-id="$dedupIdentifier">
     <header>
-        <h2>$title</h2>
-        <time class="text-small" title="$isoDate" datetime="$isoDate">
-            {$this->extractDate($context)}
-        </time>
+        <div class="row">
+            <h2 class="col">$title</h2>
+            <time class="col text-small" title="$isoDate" datetime="$isoDate">
+                {$this->extractDate($context)}
+            </time>
+        </div>
+        {$this->renderTags($tags)}
     </header>
     <section class="body">
         <p class="text-small">
-            $contextText
+            $sourceDescription
         </p>
         {$this->dumper->dump($data, true)}
     </section>
@@ -89,5 +95,25 @@ HTML
     private function extractDate(array $context, string $format = 'r'): string
     {
         return date($format, $context['timestamp']);
+    }
+
+    private function renderTags(array $tags): string
+    {
+        if (!$tags) {
+            return '';
+        }
+
+        $renderedTags = '';
+        foreach ($tags as $key => $value) {
+            $renderedTags .= sprintf('<li><span class="badge">%s</span>%s</li>', $key, $value);
+        }
+
+        return <<<HTML
+<div class="row">
+    <ul class="tags">
+        $renderedTags
+    </ul>
+</div>
+HTML;
     }
 }

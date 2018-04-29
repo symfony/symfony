@@ -37,6 +37,7 @@ class CliDescriptor implements DumpDescriptorInterface
     public function describe(OutputInterface $output, Data $data, array $context, int $clientId): void
     {
         $io = $output instanceof SymfonyStyle ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
+        $this->dumper->setColors($output->isDecorated());
 
         $rows = array(array('date', date('r', $context['timestamp'])));
         $lastIdentifier = $this->lastIdentifier;
@@ -48,7 +49,7 @@ class CliDescriptor implements DumpDescriptorInterface
             $this->lastIdentifier = $request['identifier'];
             $section = sprintf('%s %s', $request['method'], $request['uri']);
             if ($controller = $request['controller']) {
-                $rows[] = array('controller', $controller);
+                $rows[] = array('controller', rtrim($this->dumper->dump($controller, true), "\n"));
             }
         } elseif (isset($context['cli'])) {
             $this->lastIdentifier = $context['cli']['identifier'];

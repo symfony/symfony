@@ -34,7 +34,7 @@ class FlockStore implements StoreInterface
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
      *
-     * @throws LockStorageException If the lock directory could not be created or is not writable
+     * @throws LockStorageException If the lock directory doesn’t exist or is not writable
      */
     public function __construct($lockPath = null)
     {

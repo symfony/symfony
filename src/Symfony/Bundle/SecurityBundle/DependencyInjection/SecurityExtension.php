@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 /**
@@ -179,6 +180,10 @@ class SecurityExtension extends Extension
         }
         $arguments[1] = new IteratorArgument($userProviders);
         $contextListenerDefinition->setArguments($arguments);
+
+        if (1 === \count($providerIds)) {
+            $container->setAlias(UserProviderInterface::class, current($providerIds));
+        }
 
         $customUserChecker = false;
 

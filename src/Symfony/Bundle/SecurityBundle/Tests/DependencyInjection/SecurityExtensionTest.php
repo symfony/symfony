@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -268,6 +269,51 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
+    }
+
+    public function testRegisterTheUserProviderAlias()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertTrue($container->hasAlias(UserProviderInterface::class));
+    }
+
+    public function testDoNotRegisterTheUserProviderAliasWithMultipleProviders()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'first' => array('id' => 'foo'),
+                'second' => array('id' => 'bar'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array('provider' => 'second'),
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertFalse($container->has(UserProviderInterface::class));
     }
 
     protected function getRawContainer()

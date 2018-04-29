@@ -17,12 +17,10 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
-
-    private $cache = array();
 
     /**
      * {@inheritdoc}
@@ -67,14 +65,6 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (isset($this->cache[$type])) {
-            return $this->cache[$type];
-        }
-
-        if (!class_exists($type)) {
-            return $this->cache[$type] = false;
-        }
-
-        return $this->cache[$type] = is_subclass_of($type, 'Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
+        return \is_subclass_of($type, DenormalizableInterface::class);
     }
 }

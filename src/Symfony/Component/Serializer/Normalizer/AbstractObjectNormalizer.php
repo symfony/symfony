@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractObjectNormalizer extends AbstractNormalizer
+abstract class AbstractObjectNormalizer extends AbstractNormalizer implements CacheableSupportsMethodInterface
 {
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
@@ -38,7 +38,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     private $propertyTypeExtractor;
     private $attributesCache = array();
-    private $cache = array();
 
     /**
      * @var callable|null
@@ -225,11 +224,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (!isset($this->cache[$type])) {
-            $this->cache[$type] = class_exists($type) || (interface_exists($type) && null !== $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
-        }
-
-        return $this->cache[$type];
+        return \class_exists($type) || (\interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
     /**

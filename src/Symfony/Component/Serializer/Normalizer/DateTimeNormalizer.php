@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
+class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';

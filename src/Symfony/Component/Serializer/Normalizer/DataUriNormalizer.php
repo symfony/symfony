@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
+class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     private static $supportedTypes = array(
         \SplFileInfo::class => true,

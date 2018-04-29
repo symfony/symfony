@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
  *
  * @author Fred Cox <mcfedr@gmail.com>
  */
-class JsonSerializableNormalizer extends AbstractNormalizer
+class JsonSerializableNormalizer extends AbstractNormalizer implements CacheableSupportsMethodInterface
 {
     /**
      * {@inheritdoc}

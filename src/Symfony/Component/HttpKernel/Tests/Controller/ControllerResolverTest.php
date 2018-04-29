@@ -148,7 +148,7 @@ class ControllerResolverTest extends TestCase
         return array(
             array(AbstractController::class.'::staticAction', 'foo'),
             array(array(AbstractController::class, 'staticAction'), 'foo'),
-            array(array(PrivateConstructorController::class, 'staticAction'), 'bar'),
+            array(PrivateConstructorController::class.'::staticAction', 'bar'),
             array(array(PrivateConstructorController::class, 'staticAction'), 'bar'),
         );
     }

@@ -307,13 +307,13 @@ class DeprecationErrorHandler
      */
     private static function hasColorSupport()
     {
-        if (!defined('STDOUT')) {
-            return false;
-        }
-
         $colorEnv = getenv('ANSI');
         if (in_array($colorEnv, array('0', '1'))) {
             return '1' === $colorEnv;
+        }
+
+        if (!defined('STDOUT')) {
+            return false;
         }
 
         if (DIRECTORY_SEPARATOR === '\\') {

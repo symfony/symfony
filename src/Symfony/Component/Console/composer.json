@@ -28,7 +28,7 @@
     "suggest": {
         "symfony/event-dispatcher": "",
         "symfony/process": "",
-        "psr/log": "For using the console logger"
+        "psr/log-implementation": "For using the console logger"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\Messenger\TraceableMessageBus;
  *
  * @experimental in 4.1
  */
-class MessengerDataCollector extends DataCollector
+class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $traceableBuses = array();
 
@@ -34,6 +35,14 @@ class MessengerDataCollector extends DataCollector
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
+    {
+        // Noop. Everything is collected live by the traceable buses & cloned as late as possible.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function lateCollect()
     {
         $this->data = array('messages' => array());
 

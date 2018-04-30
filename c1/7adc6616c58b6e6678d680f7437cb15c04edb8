@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-28T16:21:09Z
+
+The workflow component does not exist in the 2.7 branch. So do we really want to merge it in 2.7?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T05:31:08Z
+
+I suggested @lyrixx to submit on 2.7 so that we don't have to deal with any merge conflicts on this file. Sensible?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T06:37:48Z
+
+@csarrazi can we add you to Ldap?
+@jderusse to Lock?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-04-29T06:42:25Z
+
+Totally :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-30T06:40:59Z
+
+If we were to do that, I suggest that we do it for everybody in this PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-30T08:54:49Z
+
+> If we were to do that, I suggest that we do it for everybody in this PR.
+
+I'm not sure everyone deal with notifications in the same way. I prefer to let people decide.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-04-30T10:44:26Z
+
+@nicolas-grekas isn't there a requirement to be able to have write access to the repository for that feature?
+
+In any case, sure, but as mentioned numerous times, I can not provide any sort of SLA on response time for tickets or notifications. In the medium term, if someone feels comfortable with this, I would be glad if anyone wished to take over the LDAP component.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-30T12:50:46Z
+
+PR Updated
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-30T16:19:16Z
+
+I'm definitely happy to be in the Messenger one :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-04-30T16:22:50Z
+
+@sroze Done ;)

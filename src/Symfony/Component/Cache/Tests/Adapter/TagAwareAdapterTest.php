@@ -71,6 +71,22 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertTrue($pool->getItem('foo')->isHit());
     }
 
+    public function testInvalidateCommits()
+    {
+        $pool1 = $this->createCachePool();
+
+        $foo = $pool1->getItem('foo');
+        $foo->tag('tag');
+
+        $pool1->saveDeferred($foo->set('foo'));
+        $pool1->invalidateTags(array('tag'));
+
+        $pool2 = $this->createCachePool();
+        $foo = $pool2->getItem('foo');
+
+        $this->assertTrue($foo->isHit());
+    }
+
     public function testTagsAreCleanedOnSave()
     {
         $pool = $this->createCachePool();

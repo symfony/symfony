@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Reference;
@@ -88,8 +89,14 @@ class ResolveBindingsPass extends AbstractRecursivePass
 
         $calls = $value->getMethodCalls();
 
-        if ($constructor = $this->getConstructor($value, false)) {
-            $calls[] = array($constructor, $value->getArguments());
+        try {
+            if ($constructor = $this->getConstructor($value, false)) {
+                $calls[] = array($constructor, $value->getArguments());
+            }
+        } catch (RuntimeException $e) {
+            $this->container->getDefinition($this->currentId)->addError($e->getMessage());
+
+            return parent::processValue($value, $isRoot);
         }
 
         foreach ($calls as $i => $call) {

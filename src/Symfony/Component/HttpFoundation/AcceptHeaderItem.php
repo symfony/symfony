@@ -43,7 +43,7 @@ class AcceptHeaderItem
         $parts = HeaderUtils::split($itemValue, ';=');
 
         $part = array_shift($parts);
-        $attributes = HeaderUtils::combineParts($parts);
+        $attributes = HeaderUtils::combine($parts);
 
         return new self($part[0], $attributes);
     }
@@ -57,7 +57,7 @@ class AcceptHeaderItem
     {
         $string = $this->value.($this->quality < 1 ? ';q='.$this->quality : '');
         if (count($this->attributes) > 0) {
-            $string .= '; '.HeaderUtils::joinAssoc($this->attributes, ';');
+            $string .= '; '.HeaderUtils::toString($this->attributes, ';');
         }
 
         return $string;

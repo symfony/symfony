@@ -56,7 +56,7 @@ class AcceptHeader
 
         return new self(array_map(function ($subParts) use (&$index) {
             $part = array_shift($subParts);
-            $attributes = HeaderUtils::combineParts($subParts);
+            $attributes = HeaderUtils::combine($subParts);
 
             $item = new AcceptHeaderItem($part[0], $attributes);
             $item->setIndex($index++);

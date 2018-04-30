@@ -57,7 +57,7 @@ class Cookie
         $name = $decode ? urldecode($part[0]) : $part[0];
         $value = isset($part[1]) ? ($decode ? urldecode($part[1]) : $part[1]) : null;
 
-        $data = HeaderUtils::combineParts($parts) + $data;
+        $data = HeaderUtils::combine($parts) + $data;
 
         if (isset($data['max-age'])) {
             $data['expires'] = time() + (int) $data['max-age'];

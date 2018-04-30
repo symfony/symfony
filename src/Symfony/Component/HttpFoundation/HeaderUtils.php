@@ -75,10 +75,10 @@ class HeaderUtils
      *
      * Example:
      *
-     *     HeaderUtils::combineParts(array(array("foo", "abc"), array("bar")))
+     *     HeaderUtils::combine(array(array("foo", "abc"), array("bar")))
      *     // => array("foo" => "abc", "bar" => true)
      */
-    public static function combineParts(array $parts): array
+    public static function combine(array $parts): array
     {
         $assoc = array();
         foreach ($parts as $part) {
@@ -99,10 +99,10 @@ class HeaderUtils
      *
      * Example:
      *
-     *     HeaderUtils::joinAssoc(array("foo" => "abc", "bar" => true, "baz" => "a b c"), ",")
+     *     HeaderUtils::toString(array("foo" => "abc", "bar" => true, "baz" => "a b c"), ",")
      *     // => 'foo=abc, bar, baz="a b c"'
      */
-    public static function joinAssoc(array $assoc, string $separator): string
+    public static function toString(array $assoc, string $separator): string
     {
         $parts = array();
         foreach ($assoc as $name => $value) {

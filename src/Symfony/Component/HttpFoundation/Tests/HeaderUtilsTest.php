@@ -45,21 +45,21 @@ class HeaderUtilsTest extends TestCase
         $this->assertSame(array('foo', 'bar, baz\\'), HeaderUtils::split('foo, "bar, baz\\\\', ','));
     }
 
-    public function testCombineAssoc()
+    public function testCombine()
     {
-        $this->assertSame(array('foo' => '123'), HeaderUtils::combineParts(array(array('foo', '123'))));
-        $this->assertSame(array('foo' => true), HeaderUtils::combineParts(array(array('foo'))));
-        $this->assertSame(array('foo' => true), HeaderUtils::combineParts(array(array('Foo'))));
-        $this->assertSame(array('foo' => '123', 'bar' => true), HeaderUtils::combineParts(array(array('foo', '123'), array('bar'))));
+        $this->assertSame(array('foo' => '123'), HeaderUtils::combine(array(array('foo', '123'))));
+        $this->assertSame(array('foo' => true), HeaderUtils::combine(array(array('foo'))));
+        $this->assertSame(array('foo' => true), HeaderUtils::combine(array(array('Foo'))));
+        $this->assertSame(array('foo' => '123', 'bar' => true), HeaderUtils::combine(array(array('foo', '123'), array('bar'))));
     }
 
-    public function testJoinAssoc()
+    public function testToString()
     {
-        $this->assertSame('foo', HeaderUtils::joinAssoc(array('foo' => true), ','));
-        $this->assertSame('foo; bar', HeaderUtils::joinAssoc(array('foo' => true, 'bar' => true), ';'));
-        $this->assertSame('foo=123', HeaderUtils::joinAssoc(array('foo' => '123'), ','));
-        $this->assertSame('foo="1 2 3"', HeaderUtils::joinAssoc(array('foo' => '1 2 3'), ','));
-        $this->assertSame('foo="1 2 3", bar', HeaderUtils::joinAssoc(array('foo' => '1 2 3', 'bar' => true), ','));
+        $this->assertSame('foo', HeaderUtils::toString(array('foo' => true), ','));
+        $this->assertSame('foo; bar', HeaderUtils::toString(array('foo' => true, 'bar' => true), ';'));
+        $this->assertSame('foo=123', HeaderUtils::toString(array('foo' => '123'), ','));
+        $this->assertSame('foo="1 2 3"', HeaderUtils::toString(array('foo' => '1 2 3'), ','));
+        $this->assertSame('foo="1 2 3", bar', HeaderUtils::toString(array('foo' => '1 2 3', 'bar' => true), ','));
     }
 
     public function testQuote()

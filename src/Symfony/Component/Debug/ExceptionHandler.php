@@ -40,7 +40,7 @@ class ExceptionHandler
     {
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->fileLinkFormat = $fileLinkFormat;
     }
 
     /**
@@ -355,13 +355,29 @@ EOF;
     private function formatPath($path, $line)
     {
         $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
-        $fmt = $this->fileLinkFormat;
+        $fmt = $this->fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
 
-        if ($fmt && $link = is_string($fmt) ? strtr($fmt, array('%f' => $path, '%l' => $line)) : $fmt->format($path, $line)) {
-            return sprintf('<span class="block trace-file-path">in <a href="%s" title="Go to source">%s (line %d)</a></span>', $this->escapeHtml($link), $file, $line);
+        if (!$fmt) {
+            return sprintf('<span class="block trace-file-path">in <a title="%s%3$s"><strong>%s</strong>%s</a></span>', $this->escapeHtml($path), $file, 0 < $line ? ' line '.$line : '');
         }
 
-        return sprintf('<span class="block trace-file-path">in <a title="%s line %3$d"><strong>%s</strong> (line %d)</a></span>', $this->escapeHtml($path), $file, $line);
+        if (\is_string($fmt)) {
+            $i = strpos($f = $fmt, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
+            $fmt = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            for ($i = 1; isset($fmt[$i]); ++$i) {
+                if (0 === strpos($path, $k = $fmt[$i++])) {
+                    $path = substr_replace($path, $fmt[$i], 0, strlen($k));
+                    break;
+                }
+            }
+
+            $link = strtr($fmt[0], array('%f' => $path, '%l' => $line));
+        } else {
+            $link = $fmt->format($path, $line);
+        }
+
+        return sprintf('<span class="block trace-file-path">in <a href="%s" title="Go to source"><strong>%s</string>%s</a></span>', $this->escapeHtml($link), $file, 0 < $line ? ' line '.$line : '');
     }
 
     /**

@@ -7,6 +7,19 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.46 (2018-04-27)
+
+ * bug #26831 [Bridge/Doctrine] count(): Parameter must be an array or an object that implements Countable (gpenverne)
+ * bug #27044 [Security] Skip user checks if not implementing UserInterface (chalasr)
+ * bug #26910 Use new PHP7.2 functions in hasColorSupport (johnstevenson)
+ * bug #26999 [VarDumper] Fix dumping of SplObjectStorage (corphi)
+ * bug #26886 Don't assume that file binary exists on *nix OS (teohhanhui)
+ * bug #26643 Fix that ESI/SSI processing can turn a "private" response "public" (mpdude)
+ * bug #26932 [Form] Fixed trimming choice values (HeahDude)
+ * bug #26875 [Console] Don't go past exact matches when autocompleting (nicolas-grekas)
+ * bug #26823 [Validator] Fix LazyLoadingMetadataFactory with PSR6Cache for non classname if tested values isn't existing class (Pascal Montoya, pmontoya)
+ * bug #26834 [Yaml] Throw parse error on unfinished inline map (nicolas-grekas)
+
 * 2.7.45 (2018-04-06)
 
  * bug #26763 [Finder] Remove duplicate slashes in filenames (helhum)

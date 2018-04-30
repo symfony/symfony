@@ -37,7 +37,7 @@ final class TransitionBlockerList implements \IteratorAggregate, \Countable
         $this->blockers[] = $blocker;
     }
 
-    public function reset(): void
+    public function clear(): void
     {
         $this->blockers = array();
     }

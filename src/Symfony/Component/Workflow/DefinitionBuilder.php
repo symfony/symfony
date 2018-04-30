@@ -47,7 +47,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function reset()
+    public function clear()
     {
         $this->places = array();
         $this->transitions = array();
@@ -120,5 +120,17 @@ class DefinitionBuilder
         $this->transitions[] = $transition;
 
         return $this;
+    }
+
+    /**
+     * @deprecated since Symfony 4.1, use the clear() method instead.
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.1, use the "clear()" method instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->clear();
     }
 }

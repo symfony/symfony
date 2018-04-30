@@ -107,6 +107,7 @@ Validator
 Workflow
 --------
 
+ * The `DefinitionBuilder::reset()` method has been removed, use the `clear()` one instead.
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.

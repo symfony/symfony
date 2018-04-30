@@ -12,8 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -43,7 +41,7 @@ class MessengerDataCollectorTest extends TestCase
 
         $bus->dispatch($message);
 
-        $collector->collect(Request::create('/'), new Response());
+        $collector->lateCollect();
 
         $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
@@ -120,7 +118,7 @@ DUMP
             // Ignore.
         }
 
-        $collector->collect(Request::create('/'), new Response());
+        $collector->lateCollect();
 
         $messages = $collector->getMessages();
         $this->assertCount(1, $messages);

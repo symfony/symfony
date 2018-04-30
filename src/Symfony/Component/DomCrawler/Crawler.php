@@ -744,7 +744,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Selects a heading (h1 to h6) by the heading text
+     * Selects a heading (h1 to h6) by the heading text.
      *
      * @param string $value The heading text
      *
@@ -752,7 +752,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function selectHeading($value)
     {
-        $xpath = sprintf("descendant-or-self::*[h1|h2|h3|h4|h5|h6][contains(concat(' ', normalize-space(string(.)), ' '), %s)]", Crawler::xpathLiteral(' '.$value.' '));
+        $xpath = sprintf("descendant-or-self::*[h1|h2|h3|h4|h5|h6][contains(concat(' ', normalize-space(string(.)), ' '), %s)]", self::xpathLiteral(' '.$value.' '));
 
         return $this->filterXPath($xpath);
     }

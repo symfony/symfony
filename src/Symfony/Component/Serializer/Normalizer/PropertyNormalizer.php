@@ -47,6 +47,14 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
+
+    /**
      * Checks if the given class has any non-static property.
      */
     private function supports(string $class): bool

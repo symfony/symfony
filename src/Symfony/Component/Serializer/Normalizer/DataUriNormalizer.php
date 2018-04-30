@@ -120,6 +120,14 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
+
+    /**
      * Gets the mime type of the object. Defaults to application/octet-stream.
      *
      * @param \SplFileInfo $object

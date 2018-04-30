@@ -117,6 +117,14 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
+
+    /**
      * Formats datetime errors.
      *
      * @return string[]

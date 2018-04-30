@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
  *
  * @author Fred Cox <mcfedr@gmail.com>
  */
-class JsonSerializableNormalizer extends AbstractNormalizer implements CacheableSupportsMethodInterface
+class JsonSerializableNormalizer extends AbstractNormalizer
 {
     /**
      * {@inheritdoc}
@@ -63,5 +63,13 @@ class JsonSerializableNormalizer extends AbstractNormalizer implements Cacheable
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         throw new LogicException(sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
     }
 }

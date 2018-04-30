@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @final
  */
-class ArrayDenormalizer implements ContextAwareDenormalizerInterface, SerializerAwareInterface
+class ArrayDenormalizer implements ContextAwareDenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
     /**
      * @var SerializerInterface|DenormalizerInterface
@@ -82,5 +82,13 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
         }
 
         $this->serializer = $serializer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod();
     }
 }

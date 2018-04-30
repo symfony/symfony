@@ -56,4 +56,12 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     {
         return $data instanceof ConstraintViolationListInterface;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
 }

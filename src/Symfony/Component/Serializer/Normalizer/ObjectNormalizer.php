@@ -43,6 +43,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function extractAttributes($object, $format = null, array $context = array())
     {
         // If not using groups, detect manually

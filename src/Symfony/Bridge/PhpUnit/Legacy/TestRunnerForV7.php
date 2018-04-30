@@ -19,12 +19,12 @@ use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
  *
  * @internal
  */
-class TestRunnerForV6 extends BaseRunner
+class TestRunnerForV7 extends BaseRunner
 {
     /**
      * {@inheritdoc}
      */
-    protected function handleConfiguration(array &$arguments)
+    protected function handleConfiguration(array &$arguments): void
     {
         $listener = new SymfonyTestsListener();
 

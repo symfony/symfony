@@ -182,6 +182,23 @@ class NativeSessionStorageTest extends TestCase
         $this->assertEquals($options, $gco);
     }
 
+    public function testSessionOptions()
+    {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM is not handled in this test case.');
+        }
+
+        $options = array(
+            'url_rewriter.tags' => 'a=href',
+            'cache_expire' => '200',
+        );
+
+        $this->getStorage($options);
+
+        $this->assertSame('a=href', ini_get('url_rewriter.tags'));
+        $this->assertSame('200', ini_get('session.cache_expire'));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

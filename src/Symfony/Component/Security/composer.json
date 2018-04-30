@@ -41,7 +41,7 @@
         "psr/log": "~1.0"
     },
     "suggest": {
-        "psr/container": "To instantiate the Security class",
+        "psr/container-implementation": "To instantiate the Security class",
         "symfony/form": "",
         "symfony/validator": "For using the user password constraint",
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs",

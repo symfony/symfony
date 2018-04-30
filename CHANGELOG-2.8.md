@@ -7,6 +7,23 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.39 (2018-04-30)
+
+ * bug #27067 [HttpFoundation] Fix setting session-related ini settings (e-moe)
+ * bug #27016 [Security][Guard] GuardAuthenticationProvider::authenticate cannot return null (biomedia-thomas)
+ * bug #26831 [Bridge/Doctrine] count(): Parameter must be an array or an object that implements Countable (gpenverne)
+ * bug #27044 [Security] Skip user checks if not implementing UserInterface (chalasr)
+ * bug #26014 [Security] Fixed being logged out on failed attempt in guard (iltar)
+ * bug #26910 Use new PHP7.2 functions in hasColorSupport (johnstevenson)
+ * bug #26999 [VarDumper] Fix dumping of SplObjectStorage (corphi)
+ * bug #25841 [DoctrineBridge] Fix bug when indexBy is meta key in PropertyInfo\DoctrineExtractor (insekticid)
+ * bug #26886 Don't assume that file binary exists on *nix OS (teohhanhui)
+ * bug #26643 Fix that ESI/SSI processing can turn a "private" response "public" (mpdude)
+ * bug #26932 [Form] Fixed trimming choice values (HeahDude)
+ * bug #26875 [Console] Don't go past exact matches when autocompleting (nicolas-grekas)
+ * bug #26823 [Validator] Fix LazyLoadingMetadataFactory with PSR6Cache for non classname if tested values isn't existing class (Pascal Montoya, pmontoya)
+ * bug #26834 [Yaml] Throw parse error on unfinished inline map (nicolas-grekas)
+
 * 2.8.38 (2018-04-06)
 
  * bug #26788 [Security] Load the user before pre/post auth checks when needed (chalasr)

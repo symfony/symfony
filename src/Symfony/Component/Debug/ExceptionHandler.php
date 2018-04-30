@@ -357,11 +357,30 @@ EOF;
         $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
         $fmt = $this->fileLinkFormat;
 
-        if ($fmt && $link = is_string($fmt) ? strtr($fmt, array('%f' => $path, '%l' => $line)) : $fmt->format($path, $line)) {
-            return sprintf('<span class="block trace-file-path">in <a href="%s" title="Go to source">%s (line %d)</a></span>', $this->escapeHtml($link), $file, $line);
+        if (!$fmt) {
+            return sprintf('<span class="block trace-file-path">in <a title="%s line %3$d"><strong>%s</strong> (line %d)</a></span>', $this->escapeHtml($path), $file, $line);
         }
 
-        return sprintf('<span class="block trace-file-path">in <a title="%s line %3$d"><strong>%s</strong> (line %d)</a></span>', $this->escapeHtml($path), $file, $line);
+        if (\is_string($fmt)) {
+            static $fmtParsed = null;
+            if (null === $fmtParsed) {
+                $i = strpos($f = $fmt, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
+                $fmtParsed = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
+            }
+
+            for ($i = 1; isset($fmtParsed[$i]); ++$i) {
+                if (0 === strpos($path, $k = $fmtParsed[$i++])) {
+                    $path = substr_replace($path, $fmtParsed[$i], 0, strlen($k));
+                    break;
+                }
+            }
+
+            $link = strtr($fmtParsed[0], array('%f' => $path, '%l' => $line));
+        } else {
+            $link = $fmt->format($path, $line);
+        }
+
+        return sprintf('<span class="block trace-file-path">in <a href="%s" title="Go to source">%s (line %d)</a></span>', $this->escapeHtml($link), $file, $line);
     }
 
     /**

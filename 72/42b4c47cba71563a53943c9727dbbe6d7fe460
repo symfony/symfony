@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-29T08:13:04Z
+
+@juliendufresne @nicolas-grekas please review
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-04-29T08:19:17Z
+
+Should fix https://travis-ci.org/symfony/symfony/jobs/372615942

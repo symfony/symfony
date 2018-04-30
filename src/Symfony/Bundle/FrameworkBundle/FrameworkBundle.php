@@ -61,6 +61,9 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
+        if (!ini_get('xdebug.file_link_format') && !get_cfg_var('xdebug.file_link_format')) {
+            ini_set('xdebug.file_link_format', $this->container->getParameter('debug.file_link_format'));
+        }
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
 
         if ($this->container->getParameter('kernel.http_method_override')) {

@@ -30,7 +30,7 @@
     "suggest": {
         "symfony/config": "",
         "symfony/yaml": "",
-        "psr/log": "To use logging capability in translator"
+        "psr/log-implementation": "To use logging capability in translator"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\": "" },

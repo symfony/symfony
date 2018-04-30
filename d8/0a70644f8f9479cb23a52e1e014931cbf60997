@@ -1,0 +1,158 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-10T09:22:09Z
+
+I think this has to be discussed with the core team.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-10T15:04:39Z
+
+Indeed, that's something that mush be discussed by the core team first. Good news is that we have planned to start a discussion about similar topics during SymfonyCon next week. Closing in the meantime.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-11-18T09:26:55Z
+
+@egircys awesome initiative!
+
+As part of launching the diversity initiative at SymfonyCon I am looking exactly for people like you motivated to take action!
+
+I am currently educating myself on the topic. One of my first findings on the topic is that we should decouple the code of conduct oversight from any single entity. This of course requires motivated people commited to educating themselves on relevant topics and working to build trust within the community.
+
+Can you contact me at smith@pooteeweet.org?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-11-21T07:09:04Z
+
+Instead of pointing to a sensio email address imho we should have a dedicated mailinglist and a named list of people with access to this mailinglist (in case someone f.e. wants to report but are not comfortable with all the people on the list, they have the option of contacting an individual from the list) who are not tied to just one entity. ideally the group should have people with a diverse background and some interest in the topic of diversity.
+
+I guess it makes sense to put the CoC here but we should then also put it in the documentation.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-11-21T07:09:44Z
+
+BTW for anyone interested in the topic of CoC’s and this one in particular you might find this post useful https://philsturgeon.uk/2016/09/15/codes-of-conduct-maybe-theyre-not-so-bad/
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-11-21T07:10:20Z
+
+Another helpful overview https://www.ashedryden.com/blog/codes-of-conduct-101-faq
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-21T09:54:23Z
+
+I forgot to mention that we should very clearly explain what is the Symfony community to which these rules would apply. For example:
+
+* Doctrine community, Doctrine repos and Doctrine managers are not part of the Symfony project, even lots of people think that they are.
+* Third-party bundles shouldn't belong to this CoC either (unless they voluntarily apply). So, if some person contribute to core Symfony repos and have their own personal repos with Symfony bundles ... these rules only apply to their work on the core Symfony repos.
+* Same for Twig, SwiftMailer, etc. do they belong to Symfony or not?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-11-21T18:51:16Z
+
+@javiereguiluz the scope is a very good question .. Doctrine, Twig, SwiftMailer etc are at this point very much part of the eco-system and as such leaving them out would likely not solve the problem we are trying to solve. So yes it would be maybe a good idea to include them .. but it would require some coordination. I guess with Twig/Swiftmailer it would be easier than with Doctrine.
+
+Of course the next topics then might be other projects like Guzzle, PHPCR/Jackalope etc.
+
+Generally maybe we should specifically allow other projects within the eco-system to 1) also adopt the CoC and if they want opt in to our reporting "infrastructure".
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-11-25T16:00:44Z
+
+@egircys
+
+In general as stated above, I think it would be best to not fork the source version beyond adjusting the email for reporting. As such I would prefer to also keep their formatting so that we can more easily pull in upstream changes by simply copy & paste.
+
+So is there a specific reason why you removed the 80 char limit from the original version?
+ie. from https://www.contributor-covenant.org/version/1/4/code-of-conduct.md
+
+---------------------------------------------------------------------------
+
+by egircys at 2017-11-25T17:15:38Z
+
+I've reverted the changes and adjusted the email for reporting. I've added also the char limitation as it is in the original version. Initially the text was adopted from the GitHub CoC template, there is no char limitation.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2017-12-08T11:03:17Z
+
+@lsmith77 : thanks for taking this on. It's much appreciated. Also thanks for not reinventing the wheel!
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2018-01-08T16:53:12Z
+
+👎 why introducing any kind of politics? is there any ticket out there that would be *Fixed* by this PR?
+There are tons of articles why CoC's can be a bad idea. Do you really want symfony to become a platform to discuss something like https://github.com/opal/opal/issues/941 ?
+
+if you really think we would need something like this i would suggest a code of conflict
+https://www.kernel.org/doc/html/v4.12/process/code-of-conflict.html
+
+or something like this: https://github.com/WebEngDUS/WebEngDUS/blob/master/CODE_OF_CONDUCT.md#2-principles
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-01-08T19:50:52Z
+
+For the opal incident I would refer to the following post to give a bit more context:
+https://medium.com/@coralineada/on-opalgate-2efd0fc1e0fd
+
+But yes, the proposed CoC would apply to a twitter account that mentions Symfony in th bio or is used frequently to discuss topics around Symfony.
+
+As for the Kernel code of conduct and the other one proposed, I think there is a balance between being vauge and being explicit. As might evident by the discussions above with https://github.com/javiereguiluz he prefers being very explict. Those CoCs are however highly unspecific. More importantly the wording of the Kernel one along with the behavior permitted to Linus Torvald I would say its a prime example of a CoC that is so vague that its enforced can be achieved by apparently allowing any behavior to remain unchecked. I would very much say that if any core developers of Symfony would behave even half was bad as Linus, they should be removed.
+
+In conclusion, I do think it makes sense to discuss how vague and how explict we should be, imho the two options you proposed are too vague.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2018-01-09T12:23:37Z
+
+> imho the two options you proposed are too vague.
+
+*Vague* can be very powerful. If there are any kind of problem in the community we should take care, spend a lot of time to resolve it and teach how to contribute in a nice way.
+But i don't think we should try to spend time on writing laws - it's error prone and can split a community.
+
+> I would very much say that if any core developers of Symfony would behave even half was bad as Linus, they should be removed.
+
+Would we reject a PR because it's from [Linus](https://www.ted.com/talks/linus_torvalds_the_mind_behind_linux)? Should we reject Linux support at?
+
+I can't imagine any incident that we couldn't solve such an CoC:
+
+```
+Code of Conduct
+
+Be friendly to everyone.
+Let us ([E-MAIL]) know if you've any kind of problem.
+```
+
+I believe that the community wouldn't have that much incidents that the jury must be scaled with laws. It would allow us to evaluate each case individually - which would be the fairest possible.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-01-09T12:39:02Z
+
+I very much agree that we shouldn’t end up writing a detailed rule book. We should not duplicate the complexity of the legal system with police, lawyers etc. Obviously for absolute extreme forms of abuse/harassement, we should rely on the existing structures to deal with them.
+
+As for rejecting PRs, I thimk if a developer continues with verbal abuse of community members even after a CoC being put into place that makes it clear this is not acceptable and having been reminded of this, then yes we should no longer allow this person to be part of this community, including rejecting PRs. While that individual might produce stellar code, the cost will still be higher when people leave or contribute less because of this verbal abuse, ie. the cost of a toxis genius are never worth it.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2018-01-10T18:10:27Z
+
+@timglabisch even though a CoC may not be a bullet-proof tool, it's not a legal document and you don't need a CoC to bring up politics neither do you need a CoC to deal with a jerk so in that sense a CoC is useless. It however shows an intent to not tolerate abusive behaviour and apparently it does work to a certain degree and make some people feel safer.
+
+So don't be afraid of a CoC to "bring up politics", it will be political if one want to regardless of the CoC.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-20T13:07:01Z
+
+Blocked by the PRs pending in the docs repository.
+Also, @egircys can you change the branch target to 2.7 instead of master (as the CoC applies to all versions of Symfony)?

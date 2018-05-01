@@ -67,6 +67,9 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     public function reset()
     {
         $this->data = array();
+        foreach ($this->traceableBuses as $traceableBus) {
+            $traceableBus->reset();
+        }
     }
 
     private function collectMessage(string $busName, array $tracedMessage)

@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/translation": "~2.4"
+        "symfony/translation": "~2.4",
+        "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
         "doctrine/common": "~2.3",

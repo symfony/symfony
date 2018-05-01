@@ -21,6 +21,7 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/http-kernel": "~3.3|~4.0",
+        "symfony/polyfill-ctype": "~1.8",
         "symfony/process": "~3.3.14|^3.4.2|^4.0.2"
     },
     "autoload": {

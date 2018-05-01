@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-01T18:39:45Z
+
+Should be added to the root composer.json also.
+
+---------------------------------------------------------------------------
+
+by BackEndTea at 2018-05-01T18:54:14Z
+
+I have used `~1.8` as the constraint for now, is that correct, or should i use `^1.8`?  I see both  being used.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-01T19:08:54Z
+
+Bear in mind that since Symfony 3.3, there is only single place in Serializer left which uses ctype_ function  https://github.com/symfony/symfony/blob/f6760d38996f5fbd3904285f345b22a74748b279/src/Symfony/Component/Serializer/Encoder/XmlEncoder.php#L371
+
+I have removed second use in https://github.com/symfony/symfony/pull/21676
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-01T21:06:35Z
+
+@BackEndTea could you please make all changes in one single PR (this one as it has an important comment from @ostrolucky)? This would ease our work and would prevent almsot duplicate lines in the changelog. Thanks.
+
+---------------------------------------------------------------------------
+
+by BackEndTea at 2018-05-01T21:07:54Z
+
+Will do, wasn't sure what the best course of action was.
+
+I'll close the other PR's and update this one
+
+---------------------------------------------------------------------------
+
+by BackEndTea at 2018-05-01T21:29:59Z
+
+In 3.4 the `Inflector` component and the  `WebServerBundle` use `cytpe` functions, while the `PropertyAccess` component no longer uses `ctype. This stays the same for 4.0 & master.

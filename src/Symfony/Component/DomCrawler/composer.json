@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
         "symfony/css-selector": "~2.3"

@@ -30,7 +30,7 @@ class FormRegistry implements FormRegistryInterface
     private $extensions = array();
 
     /**
-     * @var FormTypeInterface[]
+     * @var ResolvedFormTypeInterface[]
      */
     private $types = array();
 

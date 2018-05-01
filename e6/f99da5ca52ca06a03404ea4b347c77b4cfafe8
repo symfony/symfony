@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-17T04:34:23Z
+
+To answer your question, I would drop it.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-04-18T13:59:51Z
+
+I like the intend (could apply to many places in core) but not sure it's worth the hassle.
+👍 for dropping now and maybe open a discussion regarding all similar cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T07:00:42Z
+
+@ogizanagi lets drop then :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-29T14:01:34Z
+
+When introducing the server dumper feature, I was pretty much +0 about this due to the uncommon way to achieve it, the first of its kind in the core AFAIK.
+However as there is no more dedicated option for enabling the feature but relies on a special value for the `debug.destination` instead for the command to be available, it's really not easily discoverable. So I've changed my mind about it. I think it fulfills its purpose.
+
+If the intent is approved and you think it could apply to some other places, I don't see any reason to remove it right now. It's internal anyway and pure DX, no hassle. I'd say let's give it a chance and remove it later if things start being more complicated. We'll see if the approach is worth it or not and if it can be applied to some other places (but right now I can't think about any similar case).

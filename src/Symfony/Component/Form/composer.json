@@ -20,6 +20,7 @@
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/intl": "~3.4|~4.0",
         "symfony/options-resolver": "~3.4|~4.0",
+        "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/property-access": "~3.4|~4.0"
     },

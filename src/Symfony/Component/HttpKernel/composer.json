@@ -20,6 +20,7 @@
         "symfony/event-dispatcher": "~4.1",
         "symfony/http-foundation": "~4.1",
         "symfony/debug": "~3.4|~4.0",
+        "symfony/polyfill-ctype": "~1.8",
         "psr/log": "~1.0"
     },
     "require-dev": {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2018-05-01T22:41:20Z
+
+See https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php where the object initializers are used.

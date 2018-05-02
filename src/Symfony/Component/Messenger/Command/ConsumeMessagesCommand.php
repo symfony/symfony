@@ -19,8 +19,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMessageCountIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMemoryUsageIsExceededReceiver;
+use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMessageCountIsExceededReceiver;
+use Symfony\Component\Messenger\Transport\Enhancers\StopWhenTimeLimitIsReachedReceiver;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 
@@ -56,6 +57,7 @@ class ConsumeMessagesCommand extends Command
                 new InputArgument('receiver', InputArgument::REQUIRED, 'Name of the receiver'),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
+                new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
             ))
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -70,6 +72,10 @@ Use the --limit option to limit the number of messages received:
 Use the --memory-limit option to stop the worker if it exceeds a given memory usage limit. You can use shorthand byte values [K, M or G]:
 
     <info>php %command.full_name% <receiver-name> --memory-limit=128M</info>
+
+Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached:
+
+    <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
 EOF
             )
         ;
@@ -94,6 +100,10 @@ EOF
 
         if ($memoryLimit = $input->getOption('memory-limit')) {
             $receiver = new StopWhenMemoryUsageIsExceededReceiver($receiver, $this->convertToBytes($memoryLimit), $this->logger);
+        }
+
+        if ($timeLimit = $input->getOption('time-limit')) {
+            $receiver = new StopWhenTimeLimitIsReachedReceiver($receiver, $timeLimit, $this->logger);
         }
 
         $worker = new Worker($receiver, $this->bus);

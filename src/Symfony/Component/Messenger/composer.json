@@ -29,7 +29,7 @@
         "symfony/var-dumper": "~3.4|~4.0"
     },
     "suggest": {
-        "sroze/enqueue-bridge": "For using the php-enqueue library as an adapter."
+        "sroze/enqueue-bridge": "For using the php-enqueue library as a transport."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },

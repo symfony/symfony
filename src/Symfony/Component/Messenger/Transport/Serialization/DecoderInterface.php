@@ -22,7 +22,7 @@ interface DecoderInterface
      * Decodes the message from an encoded-form.
      *
      * The `$encodedMessage` parameter is a key-value array that
-     * describes the message, that will be used by the different adapters.
+     * describes the message, that will be used by the different transports.
      *
      * The most common keys are:
      * - `body` (string) - the message body

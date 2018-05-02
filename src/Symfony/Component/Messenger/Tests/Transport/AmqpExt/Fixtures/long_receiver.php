@@ -12,9 +12,9 @@ if (!file_exists($autoload)) {
 
 require_once $autoload;
 
-use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpReceiver;
-use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpSender;
-use Symfony\Component\Messenger\Adapter\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
+use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Worker;

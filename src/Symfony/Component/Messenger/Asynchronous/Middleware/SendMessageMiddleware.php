@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Asynchronous\Middleware;
 
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
-use Symfony\Component\Messenger\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

@@ -19,7 +19,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 interface EncoderInterface
 {
     /**
-     * Encodes a message to a common format understandable by adapters. The encoded array should only
+     * Encodes a message to a common format understandable by transports. The encoded array should only
      * contain scalar and arrays.
      *
      * The most common keys of the encoded array are:

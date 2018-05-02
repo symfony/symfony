@@ -254,7 +254,7 @@ class ConfigurationTest extends TestCase
             'messenger' => array(
                 'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
                 'routing' => array(),
-                'adapters' => array(),
+                'transports' => array(),
                 'serializer' => array(
                     'enabled' => true,
                     'format' => 'json',

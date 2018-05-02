@@ -8,14 +8,14 @@
     <framework:config>
         <framework:serializer enabled="true" />
         <framework:messenger>
-            <framework:adapter name="default" dsn="amqp://localhost/%2f/messages" />
-            <framework:adapter name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name">
+            <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
+            <framework:transport name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name">
                 <framework:options>
                     <framework:queue>
                         <framework:name>Queue</framework:name>
                     </framework:queue>
                 </framework:options>
-            </framework:adapter>
+            </framework:transport>
         </framework:messenger>
     </framework:config>
 </container>

@@ -529,9 +529,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('message_bus'));
     }
 
-    public function testMessengerAdapter()
+    public function testMessengerTransports()
     {
-        $container = $this->createContainerFromFile('messenger_adapter');
+        $container = $this->createContainerFromFile('messenger_transports');
         $this->assertTrue($container->hasDefinition('messenger.sender.default'));
         $this->assertTrue($container->getDefinition('messenger.sender.default')->hasTag('messenger.sender'));
         $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.sender.default')->getTag('messenger.sender'));
@@ -543,7 +543,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $senderFactory = $container->getDefinition('messenger.sender.customised')->getFactory();
         $senderArguments = $container->getDefinition('messenger.sender.customised')->getArguments();
 
-        $this->assertEquals(array(new Reference('messenger.adapter_factory'), 'createSender'), $senderFactory);
+        $this->assertEquals(array(new Reference('messenger.transport_factory'), 'createSender'), $senderFactory);
         $this->assertCount(2, $senderArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $senderArguments[0]);
         $this->assertSame(array('queue' => array('name' => 'Queue')), $senderArguments[1]);
@@ -552,7 +552,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $receiverFactory = $container->getDefinition('messenger.receiver.customised')->getFactory();
         $receiverArguments = $container->getDefinition('messenger.receiver.customised')->getArguments();
 
-        $this->assertEquals(array(new Reference('messenger.adapter_factory'), 'createReceiver'), $receiverFactory);
+        $this->assertEquals(array(new Reference('messenger.transport_factory'), 'createReceiver'), $receiverFactory);
         $this->assertCount(2, $receiverArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $receiverArguments[0]);
         $this->assertSame(array('queue' => array('name' => 'Queue')), $receiverArguments[1]);

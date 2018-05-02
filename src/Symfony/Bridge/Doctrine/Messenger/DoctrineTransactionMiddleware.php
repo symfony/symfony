@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * Wraps all handlers in a single doctrine transaction.

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Adapter\AmqpExt;
+namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpSender;
-use Symfony\Component\Messenger\Adapter\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
+use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;

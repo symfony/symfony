@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Adapter\Factory;
+namespace Symfony\Component\Messenger\Transport\Factory;
 
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
@@ -17,12 +17,12 @@ use Symfony\Component\Messenger\Transport\SenderInterface;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class ChainAdapterFactory implements AdapterFactoryInterface
+class ChainTransportFactory implements TransportFactoryInterface
 {
     private $factories;
 
     /**
-     * @param iterable|AdapterFactoryInterface[] $factories
+     * @param iterable|TransportFactoryInterface[] $factories
      */
     public function __construct(iterable $factories)
     {
@@ -37,7 +37,7 @@ class ChainAdapterFactory implements AdapterFactoryInterface
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('No adapter supports the given DSN "%s".', $dsn));
+        throw new \InvalidArgumentException(sprintf('No transport supports the given DSN "%s".', $dsn));
     }
 
     public function createSender(string $dsn, array $options): SenderInterface
@@ -48,7 +48,7 @@ class ChainAdapterFactory implements AdapterFactoryInterface
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('No adapter supports the given DSN "%s".', $dsn));
+        throw new \InvalidArgumentException(sprintf('No transport supports the given DSN "%s".', $dsn));
     }
 
     public function supports(string $dsn, array $options): bool

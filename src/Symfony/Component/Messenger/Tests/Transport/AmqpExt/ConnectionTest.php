@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Adapter\AmqpExt;
+namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpFactory;
-use Symfony\Component\Messenger\Adapter\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory;
+use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 
 /**
  * @requires extension amqp

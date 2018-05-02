@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Adapter\Factory;
+namespace Symfony\Component\Messenger\Transport\Factory;
 
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 
 /**
- * Creates a Messenger adapter.
+ * Creates a Messenger transport.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-interface AdapterFactoryInterface
+interface TransportFactoryInterface
 {
     public function createReceiver(string $dsn, array $options): ReceiverInterface;
 

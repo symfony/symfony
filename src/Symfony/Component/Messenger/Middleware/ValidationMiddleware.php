@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
-use Symfony\Component\Messenger\MiddlewareInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**

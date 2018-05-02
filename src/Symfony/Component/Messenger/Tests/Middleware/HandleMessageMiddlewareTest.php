@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\HandlerLocator;
+use Symfony\Component\Messenger\Handler\Locator\HandlerLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 

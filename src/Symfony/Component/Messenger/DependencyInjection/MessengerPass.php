@@ -100,7 +100,7 @@ class MessengerPass implements CompilerPassInterface
 
         foreach ($handlersByMessage as $message => $handlers) {
             krsort($handlersByMessage[$message]);
-            $handlersByMessage[$message] = \call_user_func_array('array_merge', $handlersByMessage[$message]);
+            $handlersByMessage[$message] = array_merge(...$handlersByMessage[$message]);
         }
 
         $definitions = array();

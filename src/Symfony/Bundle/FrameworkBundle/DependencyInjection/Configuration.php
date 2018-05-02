@@ -1061,7 +1061,36 @@ class Configuration implements ConfigurationInterface
                                             })
                                         ->end()
                                         ->defaultValue(array())
-                                        ->prototype('scalar')->end()
+                                        ->prototype('array')
+                                            ->beforeNormalization()
+                                                ->always()
+                                                ->then(function ($middleware): array {
+                                                    if (!\is_array($middleware)) {
+                                                        return array('id' => $middleware);
+                                                    }
+                                                    if (isset($middleware['id'])) {
+                                                        return $middleware;
+                                                    }
+                                                    if (\count($middleware) > 1) {
+                                                        throw new \InvalidArgumentException(sprintf('There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "%s".', json_encode($middleware)));
+                                                    }
+
+                                                    return array(
+                                                        'id' => key($middleware),
+                                                        'arguments' => current($middleware),
+                                                    );
+                                                })
+                                            ->end()
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('id')->isRequired()->cannotBeEmpty()->end()
+                                                ->arrayNode('arguments')
+                                                    ->normalizeKeys(false)
+                                                    ->defaultValue(array())
+                                                    ->prototype('variable')
+                                                ->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()

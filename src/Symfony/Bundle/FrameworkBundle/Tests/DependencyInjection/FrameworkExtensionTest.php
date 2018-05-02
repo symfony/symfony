@@ -604,16 +604,39 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->has('messenger.bus.commands'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.commands')->getArgument(0));
-        $this->assertEquals(array('logging', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.commands.middleware'));
+        $this->assertEquals(array(
+            array('id' => 'logging'),
+            array('id' => 'route_messages'),
+            array('id' => 'call_message_handler'),
+        ), $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.events')->getArgument(0));
-        $this->assertEquals(array('logging', 'allow_no_handler', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.events.middleware'));
+        $this->assertEquals(array(
+            array('id' => 'logging'),
+            array('id' => 'with_factory', 'arguments' => array('foo', true, array('bar' => 'baz'))),
+            array('id' => 'allow_no_handler', 'arguments' => array()),
+            array('id' => 'route_messages'),
+            array('id' => 'call_message_handler'),
+        ), $container->getParameter('messenger.bus.events.middleware'));
         $this->assertTrue($container->has('messenger.bus.queries'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
-        $this->assertEquals(array('route_messages', 'allow_no_handler', 'call_message_handler'), $container->getParameter('messenger.bus.queries.middleware'));
+        $this->assertEquals(array(
+            array('id' => 'route_messages', 'arguments' => array()),
+            array('id' => 'allow_no_handler', 'arguments' => array()),
+            array('id' => 'call_message_handler', 'arguments' => array()),
+        ), $container->getParameter('messenger.bus.queries.middleware'));
 
         $this->assertTrue($container->hasAlias('message_bus'));
         $this->assertSame('messenger.bus.commands', (string) $container->getAlias('message_bus'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "{"foo":["qux"],"bar":["baz"]}"
+     */
+    public function testMessengerMiddlewareFactoryErroneousFormat()
+    {
+        $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
     public function testTranslator()

@@ -57,6 +57,11 @@ class PercentType extends AbstractType
             'symbol' => '%',
             'type' => 'fractional',
             'compound' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please enter a percentage value.';
+            },
         ]);
 
         $resolver->setAllowedValues('type', [

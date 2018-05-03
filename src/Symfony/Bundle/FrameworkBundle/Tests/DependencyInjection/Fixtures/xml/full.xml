@@ -8,7 +8,7 @@
 
     <framework:config secret="s3cr3t" ide="file%%link%%format" default-locale="fr" http-method-override="false">
         <framework:csrf-protection />
-        <framework:form>
+        <framework:form legacy-error-messages="false">
             <framework:csrf-protection field-name="_csrf"/>
         </framework:form>
         <framework:esi enabled="true" />

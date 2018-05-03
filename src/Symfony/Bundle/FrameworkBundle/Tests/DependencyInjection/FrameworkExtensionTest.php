@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
@@ -57,6 +58,8 @@ use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private static $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
@@ -1013,6 +1016,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('form_no_csrf');
 
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testFormsWithoutImprovedValidationMessages()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.2: Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.');
+
+        $this->createContainerFromFile('form_legacy_messages');
     }
 
     public function testStopwatchEnabledWithDebugModeEnabled()

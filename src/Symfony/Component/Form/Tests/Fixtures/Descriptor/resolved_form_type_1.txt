@@ -11,8 +11,8 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_loader               data_class           allow_file_upload              csrf_message           
   choice_name                 empty_data           attr                           csrf_protection        
   choice_translation_domain   error_bubbling       attr_translation_parameters    csrf_token_id          
-  choice_value                trim                 auto_initialize                csrf_token_manager     
-  choices                                          block_name                                            
+  choice_value                invalid_message      auto_initialize                csrf_token_manager     
+  choices                     trim                 block_name                                            
   expanded                                         block_prefix                                          
   group_by                                         by_reference                                          
   multiple                                         data                                                  
@@ -22,6 +22,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    help_html                                             
                                                    help_translation_parameters                           
                                                    inherit_data                                          
+                                                   invalid_message_parameters                            
                                                    is_empty_callback                                     
                                                    label                                                 
                                                    label_attr                                            

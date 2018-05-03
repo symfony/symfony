@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransfo
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
@@ -60,6 +61,11 @@ class CheckboxType extends AbstractType
             'empty_data' => $emptyData,
             'compound' => false,
             'false_values' => [null],
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'The checkbox has an invalid value.';
+            },
             'is_empty_callback' => static function ($modelData): bool {
                 return false === $modelData;
             },

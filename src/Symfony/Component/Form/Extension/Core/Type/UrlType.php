@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UrlType extends AbstractType
@@ -46,7 +47,14 @@ class UrlType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('default_protocol', 'http');
+        $resolver->setDefaults([
+            'default_protocol' => 'http',
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please enter a valid URL.';
+            },
+        ]);
 
         $resolver->setAllowedTypes('default_protocol', ['null', 'string']);
     }

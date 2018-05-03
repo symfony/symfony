@@ -22,6 +22,8 @@
             "help_html",
             "help_translation_parameters",
             "inherit_data",
+            "invalid_message",
+            "invalid_message_parameters",
             "is_empty_callback",
             "label",
             "label_attr",

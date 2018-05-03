@@ -11,22 +11,22 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers event listeners and subscribers to the available doctrine connections.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
+ * @author David Maicher <mail@dmaicher.de>
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
     private $connections;
-    private $container;
     private $eventManagers;
     private $managerTemplate;
     private $tagPrefix;
@@ -53,97 +53,97 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             return;
         }
 
-        $taggedSubscribers = $container->findTaggedServiceIds($this->tagPrefix.'.event_subscriber', true);
-        $taggedListeners = $container->findTaggedServiceIds($this->tagPrefix.'.event_listener', true);
-
-        if (empty($taggedSubscribers) && empty($taggedListeners)) {
-            return;
-        }
-
-        $this->container = $container;
         $this->connections = $container->getParameter($this->connections);
-        $sortFunc = function ($a, $b) {
-            $a = isset($a['priority']) ? $a['priority'] : 0;
-            $b = isset($b['priority']) ? $b['priority'] : 0;
+        $this->addTaggedSubscribers($container);
+        $this->addTaggedListeners($container);
+    }
 
-            return $a > $b ? -1 : 1;
-        };
+    private function addTaggedSubscribers(ContainerBuilder $container)
+    {
+        $subscriberTag = $this->tagPrefix.'.event_subscriber';
+        $taggedSubscribers = $this->findAndSortTags($subscriberTag, $container);
 
-        if (!empty($taggedSubscribers)) {
-            $subscribersPerCon = $this->groupByConnection($taggedSubscribers);
-            foreach ($subscribersPerCon as $con => $subscribers) {
-                $em = $this->getEventManager($con);
-
-                uasort($subscribers, $sortFunc);
-                foreach ($subscribers as $id => $instance) {
-                    $em->addMethodCall('addEventSubscriber', array(new Reference($id)));
+        foreach ($taggedSubscribers as $taggedSubscriber) {
+            list($id, $tag) = $taggedSubscriber;
+            $connections = isset($tag['connection']) ? array($tag['connection']) : array_keys($this->connections);
+            foreach ($connections as $con) {
+                if (!isset($this->connections[$con])) {
+                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $taggedSubscriber, implode(', ', array_keys($this->connections))));
                 }
-            }
-        }
 
-        if (!empty($taggedListeners)) {
-            $listenersPerCon = $this->groupByConnection($taggedListeners, true);
-            foreach ($listenersPerCon as $con => $listeners) {
-                $em = $this->getEventManager($con);
-
-                uasort($listeners, $sortFunc);
-                foreach ($listeners as $id => $instance) {
-                    $em->addMethodCall('addEventListener', array(
-                        array_unique($instance['event']),
-                        isset($instance['lazy']) && $instance['lazy'] ? $id : new Reference($id),
-                    ));
-                }
+                $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', array(new Reference($id)));
             }
         }
     }
 
-    private function groupByConnection(array $services, $isListener = false)
+    private function addTaggedListeners(ContainerBuilder $container)
     {
-        $grouped = array();
-        foreach ($allCons = array_keys($this->connections) as $con) {
-            $grouped[$con] = array();
-        }
+        $listenerTag = $this->tagPrefix.'.event_listener';
+        $taggedListeners = $this->findAndSortTags($listenerTag, $container);
 
-        foreach ($services as $id => $instances) {
-            foreach ($instances as $instance) {
-                if ($isListener) {
-                    if (!isset($instance['event'])) {
-                        throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
-                    }
-                    $instance['event'] = array($instance['event']);
+        foreach ($taggedListeners as $taggedListener) {
+            list($id, $tag) = $taggedListener;
+            $taggedListenerDef = $container->getDefinition($id);
+            if (!isset($tag['event'])) {
+                throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
+            }
 
-                    if (!empty($instance['lazy'])) {
-                        $this->container->getDefinition($id)->setPublic(true);
-                    }
+            $connections = isset($tag['connection']) ? array($tag['connection']) : array_keys($this->connections);
+            foreach ($connections as $con) {
+                if (!isset($this->connections[$con])) {
+                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
                 }
 
-                $cons = isset($instance['connection']) ? array($instance['connection']) : $allCons;
-                foreach ($cons as $con) {
-                    if (!isset($grouped[$con])) {
-                        throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
-                    }
-
-                    if ($isListener && isset($grouped[$con][$id])) {
-                        $grouped[$con][$id]['event'] = array_merge($grouped[$con][$id]['event'], $instance['event']);
-                    } else {
-                        $grouped[$con][$id] = $instance;
-                    }
+                if ($lazy = !empty($tag['lazy'])) {
+                    $taggedListenerDef->setPublic(true);
                 }
+
+                // we add one call per event per service so we have the correct order
+                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', array(array($tag['event']), $lazy ? $id : new Reference($id)));
             }
         }
-
-        return $grouped;
     }
 
-    private function getEventManager($name)
+    private function getEventManagerDef(ContainerBuilder $container, $name)
     {
-        if (null === $this->eventManagers) {
-            $this->eventManagers = array();
-            foreach ($this->connections as $n => $id) {
-                $this->eventManagers[$n] = $this->container->getDefinition(sprintf($this->managerTemplate, $n));
-            }
+        if (!isset($this->eventManagers[$name])) {
+            $this->eventManagers[$name] = $container->getDefinition(sprintf($this->managerTemplate, $name));
         }
 
         return $this->eventManagers[$name];
+    }
+
+    /**
+     * Finds and orders all service tags with the given name by their priority.
+     *
+     * The order of additions must be respected for services having the same priority,
+     * and knowing that the \SplPriorityQueue class does not respect the FIFO method,
+     * we should not use this class.
+     *
+     * @see https://bugs.php.net/bug.php?id=53710
+     * @see https://bugs.php.net/bug.php?id=60926
+     *
+     * @param string           $tagName
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     */
+    private function findAndSortTags($tagName, ContainerBuilder $container)
+    {
+        $sortedTags = array();
+
+        foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
+            foreach ($tags as $attributes) {
+                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
+                $sortedTags[$priority][] = array($serviceId, $attributes);
+            }
+        }
+
+        if ($sortedTags) {
+            krsort($sortedTags);
+            $sortedTags = call_user_func_array('array_merge', $sortedTags);
+        }
+
+        return $sortedTags;
     }
 }

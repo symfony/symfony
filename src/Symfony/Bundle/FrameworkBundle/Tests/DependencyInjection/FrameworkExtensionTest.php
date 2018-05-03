@@ -1029,6 +1029,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Setting the "framework.form.legacy_error_messages" to 'true' is deprecated and the option will have no effect as of Symfony 5.0.
+     */
+    public function testFormsWithoutImprovedValidationMessages()
+    {
+        $this->createContainerFromFile('form_legacy_messages');
+    }
+
     public function testStopwatchEnabledWithDebugModeEnabled()
     {
         $container = $this->createContainerFromFile('default_config', [

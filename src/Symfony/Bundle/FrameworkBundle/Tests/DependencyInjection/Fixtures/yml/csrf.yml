@@ -1,5 +1,6 @@
 framework:
     secret: s3cr3t
     csrf_protection: ~
-    form: ~
+    form:
+        legacy_error_messages: false
     session: ~

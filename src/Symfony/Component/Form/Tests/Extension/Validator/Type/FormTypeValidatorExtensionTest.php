@@ -35,6 +35,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             null,
             [
                 'validation_groups' => 'group',
+                'legacy_error_messages' => false,
             ]
         );
         $builder->add('firstName', FormTypeTest::TESTED_TYPE);
@@ -60,14 +61,14 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 
-        $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
+        $formTypeValidatorExtension = new FormTypeValidatorExtension($validator, false);
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
     }
 
     public function testGroupSequenceWithConstraintsOption()
     {
         $form = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
             ->getFormFactory()
             ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
             ->add('field', TextTypeTest::TESTED_TYPE, [
@@ -86,5 +87,14 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     protected function createForm(array $options = [])
     {
         return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Setting the option 'legacy_error_messages' to 'true' is deprecated and will be disabled by default in Symfony 5.0
+     */
+    public function testDeprecatedMessage()
+    {
+        $this->factory->create(FormTypeTest::TESTED_TYPE, null, array('legacy_error_messages' => true));
     }
 }

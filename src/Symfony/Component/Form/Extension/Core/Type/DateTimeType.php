@@ -251,6 +251,11 @@ class DateTimeType extends AbstractType
             'empty_data' => function (Options $options) {
                 return $options['compound'] ? [] : '';
             },
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The date and time are invalid.' :
+                    $previousValue;
+            },
         ]);
 
         // Don't add some defaults in order to preserve the defaults

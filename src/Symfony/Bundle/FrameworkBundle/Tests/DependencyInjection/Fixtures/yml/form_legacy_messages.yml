@@ -2,4 +2,4 @@ framework:
     form:
         csrf_protection:
             enabled: false
-        legacy_error_messages: false
+        legacy_error_messages: true

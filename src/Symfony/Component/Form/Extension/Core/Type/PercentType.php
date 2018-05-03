@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentType extends AbstractType
@@ -35,6 +36,11 @@ class PercentType extends AbstractType
             'scale' => 0,
             'type' => 'fractional',
             'compound' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The percentage is invalid.' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setAllowedValues('type', [

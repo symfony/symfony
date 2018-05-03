@@ -46,6 +46,11 @@ class TimezoneType extends AbstractType
             'choice_translation_domain' => false,
             'input' => 'string',
             'regions' => \DateTimeZone::ALL,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The time zone is invalid' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setAllowedValues('input', ['string', 'datetimezone']);

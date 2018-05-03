@@ -1,4 +1,3 @@
-
 Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
 ==============================================================================
 
@@ -11,8 +10,8 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_name                 data_class           allow_file_upload         csrf_message           
   choice_translation_domain   empty_data           attr                      csrf_protection        
   choice_value                error_bubbling       auto_initialize           csrf_token_id          
-  choices                     trim                 block_name                csrf_token_manager     
-  expanded                                         block_prefix                                     
+  choices                     invalid_message      block_name                csrf_token_manager     
+  expanded                    trim                 block_prefix                                     
   group_by                                         by_reference                                     
   multiple                                         data                                             
   placeholder                                      disabled                                         
@@ -41,4 +40,3 @@ Type extensions
 ---------------
 
  * Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
-

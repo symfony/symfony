@@ -12,9 +12,24 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 
 class EmailType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The email address is invalid.' :
+                    $previousValue;
+            },
+        ));
+    }
+
     /**
      * {@inheritdoc}
      */

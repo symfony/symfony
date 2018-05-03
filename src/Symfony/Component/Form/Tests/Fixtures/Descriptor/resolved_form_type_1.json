@@ -22,6 +22,7 @@
                 "data_class",
                 "empty_data",
                 "error_bubbling",
+                "invalid_message",
                 "trim"
             ]
         },

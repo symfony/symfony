@@ -185,6 +185,11 @@ class FormType extends BaseType
             'help' => null,
             'help_attr' => [],
             'help_html' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The form is invalid.' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');

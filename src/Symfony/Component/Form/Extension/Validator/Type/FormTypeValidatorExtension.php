@@ -26,11 +26,13 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 {
     private $validator;
     private $violationMapper;
+    private $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true)
     {
         $this->validator = $validator;
         $this->violationMapper = new ViolationMapper();
+        $this->legacyErrorMessages = $legacyErrorMessages;
     }
 
     /**
@@ -58,9 +60,18 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'constraints' => [],
             'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => [],
+            'legacy_error_messages' => $this->legacyErrorMessages,
             'allow_extra_fields' => false,
             'extra_fields_message' => 'This form should not contain extra fields.',
         ]);
+        $resolver->setAllowedTypes('legacy_error_messages', 'bool');
+        $resolver->setDeprecated('legacy_error_messages', function (OptionsResolver $resolver, $value) {
+            if ($value === true) {
+                return 'Setting the option \'legacy_error_messages\' to \'true\' is deprecated and will be disabled by default in Symfony 5.0';
+            }
+
+            return '';
+        });
 
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }

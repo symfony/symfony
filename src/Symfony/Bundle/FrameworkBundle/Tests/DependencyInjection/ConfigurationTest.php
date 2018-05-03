@@ -172,9 +172,10 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
+                'legacy_error_messages' => true,
             ],
-            'esi' => ['enabled' => false],
-            'ssi' => ['enabled' => false],
+            'esi' => array('enabled' => false),
+            'ssi' => array('enabled' => false),
             'fragments' => [
                 'enabled' => false,
                 'path' => '/_fragment',

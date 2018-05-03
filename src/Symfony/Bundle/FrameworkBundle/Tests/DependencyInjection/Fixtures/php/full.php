@@ -8,6 +8,7 @@ $container->loadFromExtension('framework', [
         'csrf_protection' => [
             'field_name' => '_csrf',
         ],
+        'legacy_error_messages' => false,
     ],
     'http_method_override' => false,
     'esi' => [

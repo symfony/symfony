@@ -317,6 +317,11 @@ class ChoiceType extends AbstractType
             'data_class' => null,
             'choice_translation_domain' => true,
             'trim' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The selected choice is invalid.' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

@@ -3,7 +3,9 @@ framework:
     router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml" }
     validation:    { enabled: true, enable_annotations: true }
     csrf_protection: true
-    form: true
+    form:
+        enabled: true
+        legacy_error_messages: false
     test: true
     default_locale: en
     session:

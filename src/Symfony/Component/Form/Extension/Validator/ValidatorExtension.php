@@ -25,9 +25,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ValidatorExtension extends AbstractExtension
 {
     private $validator;
+    private $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true)
     {
+        $this->legacyErrorMessages = $legacyErrorMessages;
+
         $metadata = $validator->getMetadataFor('Symfony\Component\Form\Form');
 
         // Register the form constraints in the validator programmatically.
@@ -50,7 +53,7 @@ class ValidatorExtension extends AbstractExtension
     protected function loadTypeExtensions()
     {
         return [
-            new Type\FormTypeValidatorExtension($this->validator),
+            new Type\FormTypeValidatorExtension($this->validator, $this->legacyErrorMessages),
             new Type\RepeatedTypeValidatorExtension(),
             new Type\SubmitTypeValidatorExtension(),
         ];

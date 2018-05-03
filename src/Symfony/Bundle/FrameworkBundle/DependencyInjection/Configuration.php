@@ -148,6 +148,8 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()
+                        // This node can be set to false by default from Symfony 5.0
+                        ->booleanNode('legacy_error_messages')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()

@@ -40,7 +40,7 @@ class ValidatorExtensionTest extends TestCase
             ->method('addPropertyConstraint')
             ->with('children', $this->isInstanceOf('Symfony\Component\Validator\Constraints\Valid'));
 
-        $extension = new ValidatorExtension($validator);
+        $extension = new ValidatorExtension($validator, true);
         $guesser = $extension->loadTypeGuesser();
 
         $this->assertInstanceOf('Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser', $guesser);

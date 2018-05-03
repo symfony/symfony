@@ -20,6 +20,7 @@
             "help_attr",
             "help_html",
             "inherit_data",
+            "invalid_message",
             "label",
             "label_attr",
             "label_format",

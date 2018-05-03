@@ -403,6 +403,11 @@ class FrameworkExtension extends Extension
     {
         $loader->load('form.xml');
 
+        if (true === $config['form']['legacy_error_messages']) {
+            @trigger_error('Setting the "framework.form.legacy_error_messages" to \'true\' is deprecated and the option will have no effect as of Symfony 5.0.', E_USER_DEPRECATED);
+        }
+        $container->getDefinition('form.type_extension.form.validator')->replaceArgument(1, $config['form']['legacy_error_messages']);
+
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }

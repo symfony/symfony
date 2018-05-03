@@ -49,6 +49,11 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The locale is invalid.' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);

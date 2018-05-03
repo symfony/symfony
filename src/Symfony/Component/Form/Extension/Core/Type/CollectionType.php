@@ -97,6 +97,11 @@ class CollectionType extends AbstractType
             'entry_type' => __NAMESPACE__.'\TextType',
             'entry_options' => [],
             'delete_empty' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The collection is invalid.' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);

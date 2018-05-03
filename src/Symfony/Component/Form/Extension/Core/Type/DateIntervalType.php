@@ -235,6 +235,11 @@ class DateIntervalType extends AbstractType
                 'compound' => $compound,
                 'empty_data' => $emptyData,
                 'labels' => [],
+                'invalid_message' => function (Options $options, $previousValue) {
+                    return ($options['legacy_error_messages'] ?? true) ?
+                        'The date interval is invalid.' :
+                        $previousValue;
+                },
             ]
         );
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

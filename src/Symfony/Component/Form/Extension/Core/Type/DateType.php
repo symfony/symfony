@@ -283,6 +283,11 @@ class DateType extends AbstractType
                 return $options['compound'] ? [] : '';
             },
             'choice_translation_domain' => false,
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true) ?
+                    'The date is invalid.' :
+                    $previousValue;
+            },
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

@@ -129,7 +129,7 @@ class DefinitionBuilder
      */
     public function reset()
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.1, use the "clear()" method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "clear()" method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->clear();
     }

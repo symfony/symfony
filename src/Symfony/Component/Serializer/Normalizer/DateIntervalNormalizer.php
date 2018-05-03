@@ -57,6 +57,14 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 
     /**
      * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException

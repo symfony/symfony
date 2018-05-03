@@ -22,4 +22,5 @@ namespace Symfony\Component\Serializer\Normalizer;
  */
 interface CacheableSupportsMethodInterface
 {
+    public function hasCacheableSupportsMethod(): bool;
 }

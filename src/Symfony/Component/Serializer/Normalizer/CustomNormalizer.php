@@ -67,4 +67,12 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     {
         return \is_subclass_of($type, DenormalizableInterface::class);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
 }

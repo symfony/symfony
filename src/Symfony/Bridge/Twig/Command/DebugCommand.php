@@ -88,8 +88,20 @@ EOF
             }
             $data['tests'] = array_keys($data['tests']);
             $data['loader_paths'] = $this->getLoaderPaths();
+            if ($wrongBundles = $this->findWrongBundleOverrides()) {
+                $messages = $this->buildWarningMessages($wrongBundles);
+                $data['warnings'] = array_reduce(
+                    $messages,
+                    function ($carry, $message) {
+                        $carry[] = $message;
+
+                        return $carry;
+                    },
+                    array()
+                );
+            }
+
             $io->writeln(json_encode($data));
-            $this->displayAlternatives($this->findWrongBundleOverrides(), $io);
 
             return 0;
         }
@@ -130,7 +142,13 @@ EOF
         array_pop($rows);
         $io->section('Loader Paths');
         $io->table(array('Namespace', 'Paths'), $rows);
-        $this->displayAlternatives($this->findWrongBundleOverrides(), $io);
+        $messages = $this->buildWarningMessages($this->findWrongBundleOverrides());
+        array_walk(
+            $messages,
+            function ($message) use ($io) {
+                $io->warning(trim($message));
+            }
+         );
 
         return 0;
     }
@@ -293,13 +311,12 @@ EOF
         }
 
         if (\count($bundleNames)) {
-            $loadedBundles = $this->bundlesMetadata;
-            $notFoundBundles = array_diff_key($bundleNames, $loadedBundles);
+            $notFoundBundles = array_diff_key($bundleNames, $this->bundlesMetadata);
             if (\count($notFoundBundles)) {
                 $alternatives = array();
                 foreach ($notFoundBundles as $notFoundBundle => $path) {
                     $alternatives[$path] = array();
-                    foreach ($loadedBundles as $name => $bundle) {
+                    foreach ($this->bundlesMetadata as $name => $bundle) {
                         $lev = levenshtein($notFoundBundle, $name);
                         if ($lev <= \strlen($notFoundBundle) / 3 || false !== strpos($name, $notFoundBundle)) {
                             $alternatives[$path][] = $name;
@@ -312,8 +329,9 @@ EOF
         return $alternatives;
     }
 
-    private function displayAlternatives(array $wrongBundles, SymfonyStyle $io): void
+    private function buildWarningMessages(array $wrongBundles): array
     {
+        $messages = array();
         foreach ($wrongBundles as $path => $alternatives) {
             $message = sprintf('Path "%s" not matching any bundle found', $path);
             if ($alternatives) {
@@ -326,7 +344,9 @@ EOF
                     }
                 }
             }
-            $io->warning(trim($message));
+            $messages[] = $message;
         }
+
+        return $messages;
     }
 }

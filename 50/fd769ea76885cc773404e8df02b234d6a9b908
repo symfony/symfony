@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-04-30T22:23:36Z
+
+It's really weird for an interface called `CacheableSupportsMethodInterface` to be implemented by normalizers that don't have cacheable `supports` method. That's so counter-intuitive that it's confusing. Could it be a separate interface instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-30T22:27:06Z
+
+@teohhanhui why not a new name indeed. Do you have a suggestion? Naming is hard :) About a separate interface, I don't understand what you're suggesting. One interface is enough, isn't it?
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-04-30T22:28:01Z
+
+@nicolas-grekas Apart from the typo (`CacheableSupportsMethodInteface` -> `CacheableSupportsMethodInterface`), this still doesn't work unfortunately (ref https://github.com/symfony/symfony/pull/27049#issuecomment-385523294). If it means anything, my normalizers do not extend `AbstractNormalizer` and only implement `NormalizerInterface` directly.
+
+What is your aim here? Should I implement this interface in my normalizers and return `false`, because it doesn't work with that too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-30T22:55:13Z
+
+What does "doesn't work" mean? My aim it at making the cacheable mechanism BC, by making it opt-in.
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-04-30T22:59:47Z
+
+It means, my normalizers are still not used and serialization falls back to `ObjectNormalizer`, as per my previous comment on #27049
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-01T00:31:40Z
+
+@emodric I fail to understand why. Can you debug the situation after applying this PR please?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-05-01T02:45:37Z
+
+Can’t we mark `supportsNormalization` methods `@final` instead to avoid the BC break? It means that someone wanting to create a “dynamic” method would have to use decoration instead of inheritance (a good practice anyway).
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-05-01T07:00:04Z
+
+I'll try. Give me a couple of days.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-05-01T07:07:56Z
+
+I think there's a much simpler and BC-safe way of doing this. Have subclasses of the built-in normalizers that implement the new interface. Then it's truly opt-in and has no potential of any BC breaks.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-05-01T07:08:37Z
+
+And we could of course use them by default in the declared services.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-05-01T08:09:53Z
+
+@teohhanhui we had this idea, but it only fixes the problem when using the component directly. `FrameworkBundle` registers the existing classes as services, and replacing them by the subclasses would be another BC break...
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-05-01T08:11:44Z
+
+@emodric can you provide the code of your custom normalizer (even privately, using a private Gist for instance, or PM on Slack)? Does it extend a builtin normalizer, or the `abstract` class directly?
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-05-01T08:18:23Z
+
+I'm not near a computer today, but as soon as I'm back, I'll do it. I'll try to create a test app to provoke the issue, too.
+
+In the meantime, my normalizers implement `NormalizerInterface` directly, without using `AbstractNormalizer` or extending any other normalizer. They are tagged with `serializer.normalizer` with default priority.
+
+`supportsNormalization` dynamically checks for supported data by checking instance of provided data as well as a property in the provided object.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-05-01T08:24:55Z
+
+@dunglas:
+> FrameworkBundle register the existing classes as services, and replacing them by the subclasses would be another BC break...
+
+How so? Liskov Substitution Principle means we can substitute them with any subclasses any time, no?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-01T13:43:38Z
+
+> Then it's truly opt-in and has no potential of any BC breaks.
+
+@teohhanhui what is not truly opt-in in the current PR? Also, where is the potential BC break? Please advise I don't understand. Also, how would you handle the ArrayNormalizer case (see attached patch for the way this PR does it?) Would you mind opening a PR embedding your proposal? It might be easier to understand each other this way. Thanks.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-05-01T14:30:45Z
+
+> Liskov Substitution Principle means we can substitute them with any subclasses any time, no?
+
+Unfortunately we cannot rely on it to replace Symfony native services. If the user uses `get_class($service) === 'Foo\Bar'` in his code (instead of using `instanceof`), it will break... And it's very frequent.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-05-01T18:00:12Z
+
+@dunglas:
+>  If the user use get_class($service) === 'Foo\Bar' in his code (instead of using instanceof), it will break... And it's very frequent.
+
+That really is the fault of the client code, or does the Symfony BC promise even cover that? :x
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-05-01T20:03:21Z
+
+@dunglas Here's a Symfony Standard app (it was easier to setup this way, rather than using Flex) with @nicolas-grekas `ser-cache` branch configured, with a sample normalizer which shows the bug: https://github.com/emodric/symfony-serializer-bug
+
+Run the app with the built in server with `php bin/console server:run -d web` and access the homepage.
+
+The output is `{"fooBar": "foo", "fooBaz": "bar"}`, while I'd expect it to be ``{"foo_bar": "foo", "foo_baz": "bar"}`` showing that sample normalizer is not being used, instead the fallback to `ObjectNormalizer` is being done. Moreover, `supportsNormalization` method of my sample serializer is not even called.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-01T21:54:42Z
+
+@emodric thanks for the reproducer, it definitely helped, this is now fixed!
+
+---------------------------------------------------------------------------
+
+by emodric at 2018-05-02T06:56:33Z
+
+Thanks @nicolas-grekas ! Tested it with my test suite and now it works :+1:
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-05-02T08:42:25Z
+
+What about:
+
+VarySupportsNormalizerInterface
+- varySupportsNormalization
+- varySupportsDenormalization
+
+(So that there's more granular control and we can cache separately for normalization / denormalization?)
+
+VarySupportsSerializerInterface
+- varySupports
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-05-02T15:54:58Z
+
+Actually, we need to add different interfaces for Normalizers and Denormalizers.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T18:09:30Z
+
+Talking on Slack with @dunglas, here is the plan we have in mind:
+- we keep one interface for both normalizers and denormalizers, because it makes DX simpler (only one method to implement), and also because it doesn't prevent anything: the uncommon case of having a cacheable supportsNormalization and non-cacheable one for denormalization is achievable by creating two separate classes for normalization and denormalization. Yes, it adds boilerplate. But the uncommon case should not force more boilerplate to the common case.
+- we introduce TypeNormalizerInterface and TypeDenormalizerInterface in 4.2, with supportsTypeNormalization/supportsTypeDenormalization methods that take only `$type, $format = null` as arguments.
+
+This way, we have the best flexibility for all cases.
+
+About the name here, despite the proposal (thanks for it), I'd still keep this PR as is.
+
+PR ready on my side.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-05-02T18:33:41Z
+
+The name `CacheableSupportsMethodInterface` is misleading if it can be either cacheable or not cacheable. (When the name says "cacheable", it better mean just that.)

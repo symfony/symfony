@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-05-02T17:06:08Z
+
+@fabpot understood, target blank removed
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-05-02T17:07:31Z
+
+The target branch is not good. It should be either 2.7 (bug fix) or master (new feature).
+I don't know what is it though
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-05-02T18:09:42Z
+
+This code does not exists on 2.x
+And as 3.4 is an lts and it is code on dev only, i think it should be discussed/acceptes
+What do you think?

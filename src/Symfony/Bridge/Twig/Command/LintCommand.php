@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -119,7 +121,7 @@ EOF
 
         if (0 === count($filenames)) {
             if (0 !== ftell(STDIN)) {
-                throw new \RuntimeException('Please provide a filename or pipe template content to STDIN.');
+                throw new RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
 
             $template = '';
@@ -155,7 +157,7 @@ EOF
             return Finder::create()->files()->in($filename)->name('*.twig');
         }
 
-        throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
+        throw new RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
     private function validate($template, $file)
@@ -184,7 +186,7 @@ EOF
             case 'json':
                 return $this->displayJson($output, $files);
             default:
-                throw new \InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
+                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
         }
     }
 

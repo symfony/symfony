@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -73,7 +74,7 @@ EOF
                 } elseif ('port' === $filter) {
                     $output->write($port);
                 } else {
-                    throw new \InvalidArgumentException(sprintf('"%s" is not a valid filter.', $filter));
+                    throw new InvalidArgumentException(sprintf('"%s" is not a valid filter.', $filter));
                 }
             } else {
                 return 1;

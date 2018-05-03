@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -115,7 +116,7 @@ EOT
                 if (is_dir(dirname($targetArg).'/web')) {
                     $targetArg = dirname($targetArg).'/web';
                 } else {
-                    throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                    throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
                 }
             }
         }

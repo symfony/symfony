@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -167,9 +168,9 @@ EOF
 
         $name = $input->getArgument('name');
         if ((null !== $name) && ($optionsCount > 0)) {
-            throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
+            throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
         } elseif ((null === $name) && $optionsCount > 1) {
-            throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
+            throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
         }
     }
 
@@ -208,7 +209,7 @@ EOF
 
         $matchingServices = $this->findServiceIdsContaining($builder, $name);
         if (empty($matchingServices)) {
-            throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
+            throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
         $default = 1 === count($matchingServices) ? $matchingServices[0] : null;

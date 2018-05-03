@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -116,7 +117,7 @@ EOF
 
         if ($name) {
             if (!$route = $routes->get($name)) {
-                throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
+                throw new InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
 
             $callable = $this->extractCallable($route);

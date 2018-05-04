@@ -181,7 +181,18 @@ abstract class AbstractDoctrineExtension extends Extension
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'))) {
             $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'));
         } else {
-            $chainDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.driver_chain.class%'));
+            if ($container->hasParameter($this->getObjectManagerElementName('metadata.driver_chain.class'))) {
+                $chainDriverDefinitionClass = '%' . $this->getObjectManagerElementName('metadata.driver_chain.class%');
+                @trigger_error(
+                    'Usage of class parameter to carry FQCN through the application is deprecated since version 4.2. Use and implement "getChainDriverClass" instead.',
+                    E_USER_DEPRECATED
+                );
+            } elseif (method_exists($this, 'getChainDriverClass')) {
+                $chainDriverDefinitionClass = $this->getChainDriverClass();
+            } else {
+                $chainDriverDefinitionClass = $objectManager['meta_driver_chain_class'];
+            }
+            $chainDriverDef = new Definition($chainDriverDefinitionClass);
             $chainDriverDef->setPublic(false);
         }
 
@@ -197,14 +208,33 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
                 $mappingDriverDef->setArguments($args);
             } elseif ('annotation' == $driverType) {
-                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
+                if ($container->hasParameter($this->getObjectManagerElementName('metadata.' . $driverType . '.class'))) {
+                    $annotationDriverClass = '%' . $this->getObjectManagerElementName('metadata.' . $driverType . '.class%');
+                    @trigger_error(
+                        'Usage of class parameter to carry FQCN through the application is deprecated since Symfony 4.2. Use and implement "getAnnotationDriverClass" instead.',
+                        E_USER_DEPRECATED
+                    );
+                } else {
+                    $annotationDriverClass = $objectManager['annotation_driver_class'];
+                }
+
+                $mappingDriverDef = new Definition(
+                    $annotationDriverClass, [
                     new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths),
-                ));
+                ]
+                );
             } else {
-                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
-                    array_values($driverPaths),
-                ));
+                if ($container->hasParameter($this->getObjectManagerElementName('metadata.' . $driverType . '.class'))) {
+                    @trigger_error(
+                        'Usage of class parameter to carry FQCN through the application is deprecated since Symfony 4.2. Use and implement "getMetaDriverClass" instead.',
+                        E_USER_DEPRECATED
+                    );
+                    $metaDriverClass = '%' . $this->getObjectManagerElementName('metadata.' . $driverType . '.class%');
+                } else {
+                    $metaDriverClass = $objectManager['mapping_driver_class'];
+                }
+                $mappingDriverDef = new Definition($metaDriverClass, [array_values($driverPaths)]);
             }
             $mappingDriverDef->setPublic(false);
             if (false !== strpos($mappingDriverDef->getClass(), 'yml') || false !== strpos($mappingDriverDef->getClass(), 'xml')) {
@@ -319,10 +349,24 @@ abstract class AbstractDoctrineExtension extends Extension
 
                 return $cacheDriverServiceId;
             case 'memcached':
-                $memcachedClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.memcached.class').'%';
-                $memcachedInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcached_instance.class').'%';
-                $memcachedHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcached_host').'%';
-                $memcachedPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcached_port').'%';
+                if ($container->hasParameter($this->getObjectManagerElementName('cache.memcached.class'))) {
+                    @trigger_error(
+                        'Usage of class parameter for memcache class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                    );
+                }
+                if ($container->hasParameter($this->getObjectManagerElementName('cache.memcached_instance.class'))) {
+                    @trigger_error(
+                        'Usage of class parameter for memcached_instance class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                    );
+                }
+                $memcachedClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%' . $this->getObjectManagerElementName('cache.memcached.class') . '%';
+                $memcachedInstanceClass = !empty($cacheDriver['instance_class'])
+                    ? $cacheDriver['instance_class']
+                    : '%' . $this->getObjectManagerElementName(
+                        'cache.memcached_instance.class'
+                    ) . '%';
+                $memcachedHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%' . $this->getObjectManagerElementName('cache.memcached_host') . '%';
+                $memcachedPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%' . $this->getObjectManagerElementName('cache.memcached_port') . '%';
                 $cacheDef = new Definition($memcachedClass);
                 $memcachedInstance = new Definition($memcachedInstanceClass);
                 $memcachedInstance->setPrivate(true);
@@ -332,11 +376,26 @@ abstract class AbstractDoctrineExtension extends Extension
                 $container->setDefinition($this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManagerName)), $memcachedInstance);
                 $cacheDef->addMethodCall('setMemcached', array(new Reference($this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManagerName)))));
                 break;
-             case 'redis':
-                $redisClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.redis.class').'%';
-                $redisInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.redis_instance.class').'%';
-                $redisHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.redis_host').'%';
-                $redisPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.redis_port').'%';
+            case 'redis':
+                if ($container->hasParameter($this->getObjectManagerElementName('cache.redis.class'))) {
+                    @trigger_error(
+                        'Usage of class parameter for redis class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                    );
+                }
+
+                if ($container->hasParameter($this->getObjectManagerElementName('cache.redis_instance.class'))) {
+                    @trigger_error(
+                        'Usage of class parameter for redis_instance class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                    );
+                }
+                $redisClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%' . $this->getObjectManagerElementName('cache.redis.class') . '%';
+                $redisInstanceClass = !empty($cacheDriver['instance_class'])
+                    ? $cacheDriver['instance_class']
+                    : '%' . $this->getObjectManagerElementName(
+                        'cache.redis_instance.class'
+                    ) . '%';
+                $redisHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%' . $this->getObjectManagerElementName('cache.redis_host') . '%';
+                $redisPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%' . $this->getObjectManagerElementName('cache.redis_port') . '%';
                 $cacheDef = new Definition($redisClass);
                 $redisInstance = new Definition($redisInstanceClass);
                 $redisInstance->setPrivate(true);
@@ -352,7 +411,13 @@ abstract class AbstractDoctrineExtension extends Extension
             case 'xcache':
             case 'wincache':
             case 'zenddata':
-                $cacheDef = new Definition('%'.$this->getObjectManagerElementName(sprintf('cache.%s.class', $cacheDriver['type'])).'%');
+                if ($container->hasParameter($this->getObjectManagerElementName(sprintf('cache.%s.class', $cacheDriver['type'])))) {
+                    @trigger_error(
+                        'Usage of class parameter for '.$cacheDriver['type'].' class is deprecated since version 4.2 and
+                            ill be removed in 5.0. Use configuration values instead.'
+                    );
+                }
+                $cacheDef = new Definition('%' . $this->getObjectManagerElementName(sprintf('cache.%s.class', $cacheDriver['type'])) . '%');
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('"%s" is an unrecognized Doctrine cache driver.', $cacheDriver['type']));

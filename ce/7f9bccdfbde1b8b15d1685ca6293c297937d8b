@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-05-02T15:00:12Z
+
+Added a commit that fix the conflict rule for the HttpKernel component (the `SourceContextProvider` is used in the `DumpDataCollector`).

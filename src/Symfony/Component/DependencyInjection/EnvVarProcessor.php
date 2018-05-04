@@ -41,6 +41,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'float' => 'float',
             'int' => 'int',
             'json' => 'array',
+            'key' => 'bool|int|float|string|array',
             'resolve' => 'string',
             'string' => 'string',
         );
@@ -52,6 +53,25 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     public function getEnv($prefix, $name, \Closure $getEnv)
     {
         $i = strpos($name, ':');
+
+        if ('key' === $prefix) {
+            if (false === $i) {
+                throw new RuntimeException(sprintf('Invalid configuration: env var "key:%s" does not contain a key specifier.', $name));
+            }
+
+            $next = substr($name, $i + 1);
+            $key = substr($name, 0, $i);
+            $array = $getEnv($next);
+
+            if (!is_array($array)) {
+                throw new RuntimeException(sprintf('Resolved value of "%s" did not result in an array value.', $next));
+            }
+            if (!array_key_exists($key, $array)) {
+                throw new RuntimeException(sprintf('Key "%s" not found in "%s" (resolved from "%s")', $key, json_encode($array), $next));
+            }
+
+            return $array[$key];
+        }
 
         if ('file' === $prefix) {
             if (!is_scalar($file = $getEnv($name))) {

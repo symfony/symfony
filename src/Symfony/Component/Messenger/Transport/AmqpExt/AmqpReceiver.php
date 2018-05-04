@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Adapter\AmqpExt;
+namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Adapter\AmqpExt\Exception\RejectMessageExceptionInterface;
+use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
 

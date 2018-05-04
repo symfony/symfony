@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Adapter\AmqpExt\Exception;
+namespace Symfony\Component\Messenger\Transport\AmqpExt\Exception;
 
 /**
  * If something goes wrong while consuming and handling a message from the AMQP broker, there are two choices: rejecting

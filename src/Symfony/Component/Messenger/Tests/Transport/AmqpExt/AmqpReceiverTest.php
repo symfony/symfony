@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Adapter\AmqpExt;
+namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Adapter\AmqpExt\AmqpReceiver;
-use Symfony\Component\Messenger\Adapter\AmqpExt\Connection;
-use Symfony\Component\Messenger\Adapter\AmqpExt\Exception\RejectMessageExceptionInterface;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
+use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -51,7 +51,7 @@ class AmqpReceiverTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Messenger\Tests\Adapter\AmqpExt\InterruptException
+     * @expectedException \Symfony\Component\Messenger\Tests\Transport\AmqpExt\InterruptException
      */
     public function testItNonAcknowledgeTheMessageIfAnExceptionHappened()
     {
@@ -77,7 +77,7 @@ class AmqpReceiverTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Messenger\Tests\Adapter\AmqpExt\WillNeverWorkException
+     * @expectedException \Symfony\Component\Messenger\Tests\Transport\AmqpExt\WillNeverWorkException
      */
     public function testItRejectsTheMessageIfTheExceptionIsARejectMessageExceptionInterface()
     {

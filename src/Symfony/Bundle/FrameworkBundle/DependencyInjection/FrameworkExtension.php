@@ -1449,7 +1449,7 @@ class FrameworkExtension extends Extension
         $loader->load('messenger.xml');
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
-            if (\count($config['adapters']) > 0 && !$this->isConfigEnabled($container, $serializerConfig)) {
+            if (\count($config['transports']) > 0 && !$this->isConfigEnabled($container, $serializerConfig)) {
                 throw new LogicException('Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".');
             }
 
@@ -1505,17 +1505,17 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
 
-        foreach ($config['adapters'] as $name => $adapter) {
+        foreach ($config['transports'] as $name => $transport) {
             $senderDefinition = (new Definition(SenderInterface::class))
-                ->setFactory(array(new Reference('messenger.adapter_factory'), 'createSender'))
-                ->setArguments(array($adapter['dsn'], $adapter['options']))
+                ->setFactory(array(new Reference('messenger.transport_factory'), 'createSender'))
+                ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.sender', array('name' => $name))
             ;
             $container->setDefinition('messenger.sender.'.$name, $senderDefinition);
 
             $receiverDefinition = (new Definition(ReceiverInterface::class))
-                ->setFactory(array(new Reference('messenger.adapter_factory'), 'createReceiver'))
-                ->setArguments(array($adapter['dsn'], $adapter['options']))
+                ->setFactory(array(new Reference('messenger.transport_factory'), 'createReceiver'))
+                ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.receiver', array('name' => $name))
             ;
             $container->setDefinition('messenger.receiver.'.$name, $receiverDefinition);

@@ -9,19 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger;
+namespace Symfony\Component\Messenger\Handler\Locator;
+
+use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
  * @experimental in 4.1
  */
-interface MiddlewareInterface
+interface HandlerLocatorInterface
 {
     /**
+     * Returns the handler for the given message.
+     *
      * @param object $message
      *
-     * @return mixed
+     * @throws NoHandlerForMessageException
+     *
+     * @return callable
      */
-    public function handle($message, callable $next);
+    public function resolve($message): callable;
 }

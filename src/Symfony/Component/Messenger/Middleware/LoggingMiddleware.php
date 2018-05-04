@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
-use Symfony\Component\Messenger\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
 
 /**

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger;
+namespace Symfony\Component\Messenger\Handler\Locator;
 
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 

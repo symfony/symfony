@@ -8,7 +8,7 @@
         <defaults public="false" />
 
         <!-- Handlers -->
-        <service id="messenger.handler_resolver" class="Symfony\Component\Messenger\ContainerHandlerLocator">
+        <service id="messenger.handler_resolver" class="Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator">
             <argument type="service" id="service_container"/>
         </service>
 
@@ -60,16 +60,16 @@
         </service>
 
         <!-- Adapters -->
-        <service id="messenger.adapter_factory" class="Symfony\Component\Messenger\Adapter\Factory\ChainAdapterFactory">
-            <argument type="tagged" tag="messenger.adapter_factory" />
+        <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\Factory\ChainTransportFactory">
+            <argument type="tagged" tag="messenger.transport_factory" />
         </service>
 
-        <service id="messenger.adapter.amqp.factory" class="Symfony\Component\Messenger\Adapter\AmqpExt\AmqpAdapterFactory">
+        <service id="messenger.adapter.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
             <argument type="service" id="messenger.transport.encoder" />
             <argument type="service" id="messenger.transport.decoder" />
             <argument>%kernel.debug%</argument>
 
-            <tag name="messenger.adapter_factory" />
+            <tag name="messenger.transport_factory" />
         </service>
     </services>
 </container>

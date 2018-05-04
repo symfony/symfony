@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Adapter\AmqpExt;
+namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Adapter\Factory\AdapterFactoryInterface;
+use Symfony\Component\Messenger\Transport\Factory\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class AmqpAdapterFactory implements AdapterFactoryInterface
+class AmqpTransportFactory implements TransportFactoryInterface
 {
     private $encoder;
     private $decoder;

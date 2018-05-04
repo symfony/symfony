@@ -356,7 +356,7 @@
             <xsd:element name="encoder" type="xsd:string" minOccurs="0" />
             <xsd:element name="decoder" type="xsd:string" minOccurs="0" />
             <xsd:element name="routing" type="messenger_routing" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="adapter" type="messenger_adapter" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="transport" type="messenger_transport" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="bus" type="messenger_bus" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="default-bus" type="xsd:string" />
@@ -381,17 +381,12 @@
         <xsd:attribute name="service" type="xsd:string" use="required"/>
     </xsd:complexType>
 
-    <xsd:complexType name="messenger_adapter">
+    <xsd:complexType name="messenger_transport">
         <xsd:sequence>
             <xsd:element name="options" type="metadata" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
-    </xsd:complexType>
-
-    <xsd:complexType name="messenger_adapter_option">
-        <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="value" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_bus">

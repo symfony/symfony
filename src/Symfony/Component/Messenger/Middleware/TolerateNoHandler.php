@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
-use Symfony\Component\Messenger\MiddlewareInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

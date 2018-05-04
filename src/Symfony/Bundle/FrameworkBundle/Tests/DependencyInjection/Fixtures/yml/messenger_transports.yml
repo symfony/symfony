@@ -1,7 +1,7 @@
 framework:
     serializer: true
     messenger:
-        adapters:
+        transports:
             default: 'amqp://localhost/%2f/messages'
             customised:
                 dsn: 'amqp://localhost/%2f/messages?exchange_name=exchange_name'

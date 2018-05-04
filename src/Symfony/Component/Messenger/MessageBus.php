@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Matthias Noback <matthiasnoback@gmail.com>

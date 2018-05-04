@@ -8,7 +8,7 @@ $container->loadFromExtension('framework', array(
         'serializer' => array(
             'enabled' => true,
         ),
-        'adapters' => array(
+        'transports' => array(
             'default' => 'amqp://localhost/%2f/messages',
         ),
     ),

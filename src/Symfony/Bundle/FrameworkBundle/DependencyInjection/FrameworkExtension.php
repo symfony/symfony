@@ -1383,7 +1383,7 @@ class FrameworkExtension extends Extension
                         $storeDefinition = new Reference('lock.store.semaphore');
                         break;
                     case $usedEnvs || preg_match('#^[a-z]++://#', $storeDsn):
-                        if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
+                        if (!$container->hasDefinition($connectionDefinitionId = '.lock_connection.'.$container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
                             $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
@@ -1396,7 +1396,7 @@ class FrameworkExtension extends Extension
                         $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
                         $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
 
-                        $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
+                        $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 
                         $storeDefinition = new Reference($storeDefinitionId);
                         break;

@@ -59,12 +59,12 @@
             <argument type="collection" />
         </service>
 
-        <!-- Adapters -->
+        <!-- transports -->
         <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\Factory\ChainTransportFactory">
             <argument type="tagged" tag="messenger.transport_factory" />
         </service>
 
-        <service id="messenger.adapter.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
+        <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
             <argument type="service" id="messenger.transport.encoder" />
             <argument type="service" id="messenger.transport.decoder" />
             <argument>%kernel.debug%</argument>

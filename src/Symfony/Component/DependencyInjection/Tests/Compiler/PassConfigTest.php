@@ -35,4 +35,20 @@ class PassConfigTest extends TestCase
         $this->assertSame($pass2, $passes[0]);
         $this->assertSame($pass1, $passes[1]);
     }
+
+    public function testPassOrderingWithoutPasses()
+    {
+        $config = new PassConfig();
+        $config->setBeforeOptimizationPasses(array());
+        $config->setAfterRemovingPasses(array());
+        $config->setBeforeRemovingPasses(array());
+        $config->setOptimizationPasses(array());
+        $config->setRemovingPasses(array());
+
+        $this->assertEmpty($config->getBeforeOptimizationPasses());
+        $this->assertEmpty($config->getAfterRemovingPasses());
+        $this->assertEmpty($config->getBeforeRemovingPasses());
+        $this->assertEmpty($config->getOptimizationPasses());
+        $this->assertEmpty($config->getRemovingPasses());
+    }
 }

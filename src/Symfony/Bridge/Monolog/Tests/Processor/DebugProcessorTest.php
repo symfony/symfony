@@ -29,6 +29,14 @@ class DebugProcessorTest extends TestCase
         $this->assertSame(1, $processor->countErrors());
     }
 
+    public function testDebugProcessorWithoutLogs()
+    {
+        $processor = new DebugProcessor();
+
+        $this->assertCount(0, $processor->getLogs());
+        $this->assertSame(0, $processor->countErrors());
+    }
+
     public function testWithRequestStack()
     {
         $stack = new RequestStack();

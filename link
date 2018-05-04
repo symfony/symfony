@@ -38,7 +38,7 @@ $sfPackages = array('symfony/symfony' => __DIR__);
 
 $filesystem = new Filesystem();
 $braces = array('Bundle', 'Bridge', 'Component', 'Component/Security');
-$directories = call_user_func_array('array_merge', array_values(array_map(function ($part) {
+$directories = array_merge(...array_values(array_map(function ($part) {
     return glob(__DIR__.'/src/Symfony/'.$part.'/*', GLOB_ONLYDIR | GLOB_NOSORT);
 }, $braces)));
 

@@ -20,6 +20,8 @@ use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+// by design this class encourages creating a separate connection per DSN
+// can't we do without, ie drop it and rely on the DI extension in fwb to do the work instead? See comment there.
 class AmqpTransportFactory implements TransportFactoryInterface
 {
     private $encoder;

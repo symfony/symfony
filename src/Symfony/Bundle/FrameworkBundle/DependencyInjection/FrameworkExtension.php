@@ -1473,6 +1473,9 @@ class FrameworkExtension extends Extension
 
         $defaultMiddlewares = array('before' => array('logging'), 'after' => array('route_messages', 'call_message_handler'));
         foreach ($config['buses'] as $name => $bus) {
+            // derivating a service id from a name is a convention that makes it harder to know what id to @reference when wiring things
+            // the cache pool configuration forces full ids here instead
+            // I think we might want to do the same here
             $busId = 'messenger.bus.'.$name;
 
             $middlewares = $bus['default_middlewares'] ? array_merge($defaultMiddlewares['before'], $bus['middlewares'], $defaultMiddlewares['after']) : $bus['middlewares'];
@@ -1508,16 +1511,21 @@ class FrameworkExtension extends Extension
         foreach ($config['transports'] as $name => $transport) {
             $senderDefinition = (new Definition(SenderInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createSender'))
+                // this forces creating a separate connection per DSN
+                // see above how we avoid this for the lock component (similar for Cache pools)
                 ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.sender', array('name' => $name))
             ;
+            // same as above: this is convention-based. Don't we prefer being explicit?
             $container->setDefinition('messenger.sender.'.$name, $senderDefinition);
 
             $receiverDefinition = (new Definition(ReceiverInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createReceiver'))
+                // this forces creating a separate connection per DSN
                 ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.receiver', array('name' => $name))
             ;
+            // same as above: this is convention-based. Don't we prefer being explicit?
             $container->setDefinition('messenger.receiver.'.$name, $receiverDefinition);
         }
     }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-02T21:44:01Z
+
+What I also found is that namespaces of interfaces and implementations are not consistent.
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/MiddlewareInterface.php is in the messener root. But the implementations are in a sub-namespace https://github.com/symfony/symfony/tree/master/src/Symfony/Component/Messenger/Middleware
+But the implemtations of https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/HandlerLocatorInterface.php are also in the root.
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Handler/MessageHandlerInterface.php is not in the root and the implementation neither.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-02T21:46:41Z
+
+So I'd propose
+1. move the bus stuff to Symfony\Component\Messenger\Bus\
+2. move handler locators to Symfony\Component\Messenger\Handler\Locator\
+3. move Symfony\Component\Messenger\MiddlewareInterface to Symfony\Component\Messenger\Middleware\MiddlewareInterface
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-03T06:27:56Z
+
+I agree with @Tobion . But I'd keep `MessageBus` and `MessageBusInterface` root as the main component entry point. It seems consistent with what we did with other components.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T07:52:46Z
+
+Good catch @Tobion, it was the right time to move them. I've moved the handler and middleware ones, kept the Bus one at the root like we do on other bundles like the Serializer.

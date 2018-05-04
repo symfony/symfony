@@ -1468,13 +1468,11 @@ class FrameworkExtension extends Extension
                 throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
             }
 
-            $config['default_bus'] = array_keys($config['buses'])[0];
+            $config['default_bus'] = key($config['buses']);
         }
 
         $defaultMiddlewares = array('before' => array('logging'), 'after' => array('route_messages', 'call_message_handler'));
-        foreach ($config['buses'] as $name => $bus) {
-            $busId = 'messenger.bus.'.$name;
-
+        foreach ($config['buses'] as $busId => $bus) {
             $middlewares = $bus['default_middlewares'] ? array_merge($defaultMiddlewares['before'], $bus['middlewares'], $defaultMiddlewares['after']) : $bus['middlewares'];
 
             if (!$validationConfig['enabled'] && \in_array('messenger.middleware.validation', $middlewares, true)) {
@@ -1482,9 +1480,9 @@ class FrameworkExtension extends Extension
             }
 
             $container->setParameter($busId.'.middlewares', $middlewares);
-            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus', array('name' => $name)));
+            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus'));
 
-            if ($name === $config['default_bus']) {
+            if ($busId === $config['default_bus']) {
                 $container->setAlias('message_bus', $busId);
                 $container->setAlias(MessageBusInterface::class, $busId);
             }

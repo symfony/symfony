@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-02T11:25:32Z
+
+I've added a test to verify it's still working with an empty array as it was missing: https://3v4l.org/hFQpJ
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T13:45:18Z
+
+I'm sure there are more in the code base. Please revert the ?? as its unrelated (and breaks merges, while not providing much I believe.)
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-02T13:52:49Z
+
+Ternary is reverted. You are correct that there are more cases in the code base that can benefit from this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T23:17:20Z
+
+@iltar would you mind updating the other cases also please?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-03T06:22:08Z
+
+@nicolas-grekas do you prefer it in this PR or a new one?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-03T06:44:32Z
+
+I've updated all callbacks that I could find regarding `array_merge`. Some have gotten `array_values` due to having non-numerical keys, which cannot be unpacked. There's 1 check coming up, but I don't think it's a problem.
+
+![image](https://user-images.githubusercontent.com/1754678/39562810-e27dd1e2-4ead-11e8-93eb-00c5c542707a.png)

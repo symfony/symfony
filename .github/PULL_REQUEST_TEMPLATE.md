@@ -5,7 +5,6 @@
 | New feature?  | yes/no <!-- don't forget to update src/**/CHANGELOG.md files -->
 | BC breaks?    | no     <!-- see https://symfony.com/bc -->
 | Deprecations? | yes/no <!-- don't forget to update UPGRADE-*.md and src/**/CHANGELOG.md files -->
-| Tests pass?   | yes    <!-- please add some, will be required by reviewers -->
 | Fixed tickets | #...   <!-- #-prefixed issue number(s), if any -->
 | License       | MIT
 | Doc PR        | symfony/symfony-docs#... <!-- required for new features -->
@@ -17,4 +16,5 @@ Additionally:
  - Bug fixes must be submitted against the lowest branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too).
  - Features and deprecations must be submitted against the master branch.
+ - Please add some tests. It'll usually be required by reviewers -->
 -->

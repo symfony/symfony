@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Middleware\TolerateNoHandler;
+use Symfony\Component\Messenger\Middleware\AllowNoHandlerMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -264,14 +264,14 @@ class MessengerPassTest extends TestCase
     {
         $container = $this->getContainerBuilder();
         $container->register($fooBusId = 'messenger.bus.foo', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus', array('name' => 'foo'));
-        $container->register('messenger.middleware.tolerate_no_handler', TolerateNoHandler::class)->setAbstract(true);
+        $container->register('messenger.middleware.allow_no_handler', AllowNoHandlerMiddleware::class)->setAbstract(true);
         $container->register(UselessMiddleware::class, UselessMiddleware::class);
 
-        $container->setParameter($middlewaresParameter = $fooBusId.'.middlewares', array(UselessMiddleware::class, 'tolerate_no_handler'));
+        $container->setParameter($middlewaresParameter = $fooBusId.'.middlewares', array(UselessMiddleware::class, 'allow_no_handler'));
 
         (new MessengerPass())->process($container);
 
-        $this->assertTrue($container->hasDefinition($childMiddlewareId = $fooBusId.'.middleware.tolerate_no_handler'));
+        $this->assertTrue($container->hasDefinition($childMiddlewareId = $fooBusId.'.middleware.allow_no_handler'));
         $this->assertEquals(array(new Reference(UselessMiddleware::class), new Reference($childMiddlewareId)), $container->getDefinition($fooBusId)->getArgument(0));
         $this->assertFalse($container->hasParameter($middlewaresParameter));
     }

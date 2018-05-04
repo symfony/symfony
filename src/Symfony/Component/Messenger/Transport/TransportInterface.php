@@ -12,16 +12,10 @@
 namespace Symfony\Component\Messenger\Transport;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  *
  * @experimental in 4.1
  */
-interface SenderInterface
+interface TransportInterface extends ReceiverInterface, SenderInterface
 {
-    /**
-     * Sends the given message.
-     *
-     * @param object $message
-     */
-    public function send($message): void;
 }

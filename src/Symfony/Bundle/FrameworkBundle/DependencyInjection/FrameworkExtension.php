@@ -65,6 +65,7 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -1506,19 +1507,13 @@ class FrameworkExtension extends Extension
                 throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
             }
 
-            $senderDefinition = (new Definition(SenderInterface::class))
-                ->setFactory(array(new Reference('messenger.transport_factory'), 'createSender'))
-                ->setArguments(array($transport['dsn'], $transport['options']))
-                ->addTag('messenger.sender', array('name' => $name))
-            ;
-            $container->setDefinition('messenger.sender.'.$name, $senderDefinition);
-
-            $receiverDefinition = (new Definition(ReceiverInterface::class))
-                ->setFactory(array(new Reference('messenger.transport_factory'), 'createReceiver'))
+            $transportDefinition = (new Definition(TransportInterface::class))
+                ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
                 ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.receiver', array('name' => $name))
+                ->addTag('messenger.sender', array('name' => $name))
             ;
-            $container->setDefinition('messenger.receiver.'.$name, $receiverDefinition);
+            $container->setDefinition('messenger.transport.'.$name, $transportDefinition);
         }
     }
 

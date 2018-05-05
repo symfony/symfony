@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  *
  * @experimental in 4.1
  */
-final class ValidationConfiguration implements EnvelopeItemInterface
+final class ValidationConfiguration implements EnvelopeItemInterface, \Serializable
 {
     private $groups;
 
@@ -34,6 +34,14 @@ final class ValidationConfiguration implements EnvelopeItemInterface
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isTransportable(): bool
+    {
+        return true;
     }
 
     public function serialize()

@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
  *
  * @experimental in 4.1
  */
-final class SerializerConfiguration implements EnvelopeItemInterface
+final class SerializerConfiguration implements EnvelopeItemInterface, \Serializable
 {
     private $context;
 
@@ -30,6 +30,14 @@ final class SerializerConfiguration implements EnvelopeItemInterface
     public function getContext(): array
     {
         return $this->context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isTransportable(): bool
+    {
+        return true;
     }
 
     public function serialize()

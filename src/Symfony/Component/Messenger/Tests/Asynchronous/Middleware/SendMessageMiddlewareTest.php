@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 
@@ -35,6 +36,27 @@ class SendMessageMiddlewareTest extends TestCase
         $next->expects($this->never())->method($this->anything());
 
         $middleware->handle($message, $next);
+    }
+
+    public function testItSendsEnvelopeWithTransportableItemsOnly()
+    {
+        $envelope = Envelope::wrap(new DummyMessage('Hey'))
+            ->with(new TransportableItem())
+            ->with(new NonTransportableItem())
+        ;
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+
+        $middleware = new SendMessageMiddleware(new InMemorySenderLocator(array(
+            $sender,
+        )));
+
+        $sender->expects($this->once())->method('send')->with(Envelope::wrap(new DummyMessage('Hey'))
+            ->with(new TransportableItem())
+        );
+        $next->expects($this->never())->method($this->anything());
+
+        $middleware->handle($envelope, $next);
     }
 
     public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
@@ -112,5 +134,21 @@ class InMemorySenderLocator implements SenderLocatorInterface
     public function getSendersForMessage($message): array
     {
         return $this->senders;
+    }
+}
+
+class TransportableItem implements EnvelopeItemInterface
+{
+    public function isTransportable(): bool
+    {
+        return true;
+    }
+}
+
+class NonTransportableItem implements EnvelopeItemInterface
+{
+    public function isTransportable(): bool
+    {
+        return false;
     }
 }

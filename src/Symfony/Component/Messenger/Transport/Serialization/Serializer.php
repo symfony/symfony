@@ -68,8 +68,8 @@ class Serializer implements DecoderInterface, EncoderInterface
         }
 
         $headers = array('type' => \get_class($envelope->getMessage()));
-        if ($configurations = $envelope->all()) {
-            $headers['X-Message-Envelope-Items'] = serialize($configurations);
+        if ($items = $envelope->all()) {
+            $headers['X-Message-Envelope-Items'] = serialize($items);
         }
 
         return array(

@@ -25,13 +25,11 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
  */
 final class ReceivedMessage implements EnvelopeItemInterface
 {
-    public function serialize()
+    /**
+     * {@inheritdoc}
+     */
+    public function isTransportable(): bool
     {
-        return '';
-    }
-
-    public function unserialize($serialized)
-    {
-        // noop
+        return false;
     }
 }

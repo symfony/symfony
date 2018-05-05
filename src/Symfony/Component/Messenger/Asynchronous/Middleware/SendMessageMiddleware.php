@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EnvelopeAwareInterface;
+use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
@@ -39,6 +40,10 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
             // It's a received message. Do not send it back:
             return $next($message);
         }
+
+        $envelope = new Envelope($envelope->getMessage(), array_filter($envelope->all(), function (EnvelopeItemInterface $item): bool {
+            return $item->isTransportable();
+        }));
 
         if (!empty($senders = $this->senderLocator->getSendersForMessage($envelope->getMessage()))) {
             foreach ($senders as $sender) {

@@ -95,4 +95,28 @@ class ResolveBindingsPassTest extends TestCase
 
         $this->assertEquals(array(array('setDefaultLocale', array('fr'))), $definition->getMethodCalls());
     }
+
+    public function testTupleBinding()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = array(
+            '$c' => new BoundArgument(new Reference('bar')),
+            CaseSensitiveClass::class.'$c' => new BoundArgument(new Reference('foo')),
+        );
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->addMethodCall('setSensitiveClass');
+        $definition->addMethodCall('setAnotherC');
+        $definition->setBindings($bindings);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $expected = array(
+            array('setSensitiveClass', array(new Reference('foo'))),
+            array('setAnotherC', array(new Reference('bar'))),
+        );
+        $this->assertEquals($expected, $definition->getMethodCalls());
+    }
 }

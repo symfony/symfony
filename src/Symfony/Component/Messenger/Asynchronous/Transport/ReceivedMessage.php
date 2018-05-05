@@ -25,11 +25,4 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
  */
 final class ReceivedMessage implements EnvelopeItemInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isTransportable(): bool
-    {
-        return false;
-    }
 }

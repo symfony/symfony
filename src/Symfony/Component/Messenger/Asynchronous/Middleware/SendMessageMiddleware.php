@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\TransportableEnvelopeItemInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -41,9 +42,10 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
             return $next($message);
         }
 
-        $envelope = new Envelope($envelope->getMessage(), array_filter($envelope->all(), function (EnvelopeItemInterface $item): bool {
-            return $item->isTransportable();
-        }));
+        $transportableItems = array_filter($envelope->all(), function (EnvelopeItemInterface $item): bool {
+            return $item instanceof TransportableEnvelopeItemInterface;
+        });
+        $envelope = new Envelope($envelope->getMessage(), $transportableItems);
 
         if (!empty($senders = $this->senderLocator->getSendersForMessage($envelope->getMessage()))) {
             foreach ($senders as $sender) {

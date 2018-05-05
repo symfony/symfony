@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
-use Symfony\Component\Messenger\EnvelopeItemInterface;
+use Symfony\Component\Messenger\TransportableEnvelopeItemInterface;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
  * @experimental in 4.1
  */
-final class SerializerConfiguration implements EnvelopeItemInterface, \Serializable
+final class SerializerConfiguration implements TransportableEnvelopeItemInterface
 {
     private $context;
 
@@ -30,14 +30,6 @@ final class SerializerConfiguration implements EnvelopeItemInterface, \Serializa
     public function getContext(): array
     {
         return $this->context;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isTransportable(): bool
-    {
-        return true;
     }
 
     public function serialize()

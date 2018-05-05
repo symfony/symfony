@@ -15,8 +15,4 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
 
 class AnEnvelopeItem implements EnvelopeItemInterface
 {
-    public function isTransportable(): bool
-    {
-        return false;
-    }
 }

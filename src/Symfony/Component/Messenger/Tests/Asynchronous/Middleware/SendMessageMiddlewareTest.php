@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\TransportableEnvelopeItemInterface;
 
 class SendMessageMiddlewareTest extends TestCase
 {
@@ -137,18 +138,19 @@ class InMemorySenderLocator implements SenderLocatorInterface
     }
 }
 
-class TransportableItem implements EnvelopeItemInterface
+class TransportableItem implements TransportableEnvelopeItemInterface
 {
-    public function isTransportable(): bool
+    public function serialize()
     {
-        return true;
+        // no op
+    }
+
+    public function unserialize($serialized)
+    {
+        // no op
     }
 }
 
 class NonTransportableItem implements EnvelopeItemInterface
 {
-    public function isTransportable(): bool
-    {
-        return false;
-    }
 }

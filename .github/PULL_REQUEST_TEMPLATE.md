@@ -9,6 +9,8 @@
 | License       | MIT
 | Doc PR        | symfony/symfony-docs#... <!-- required for new features -->
 
+- [x] _Tests were added or updated when relevant and CI checks are green_
+
 <!--
 Write a short README entry for your feature/bugfix here (replace this comment block.)
 This will help people understand your PR and can be used as a start of the Doc PR.

@@ -27,8 +27,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Used inside metadata driver method to simplify aggregation of data.
      */
-    protected $aliasMap = array();
-
+    protected $aliasMap = [];
     /**
      * Used inside metadata driver method to simplify aggregation of data.
      */
@@ -141,7 +140,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
     {
-        $bundleDir = \dirname($bundle->getFileName());
+        $bundleDir = dirname($bundle->getFileName());
 
         if (!$bundleConfig['type']) {
             $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir, $container);
@@ -178,8 +177,8 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
         // configure metadata driver for each bundle based on the type of mapping files found
-        if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'))) {
-            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'));
+        if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
+            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'));
         } else {
             if ($container->hasParameter($this->getObjectManagerElementName('metadata.driver_chain.class'))) {
                 $chainDriverDefinitionClass = '%' . $this->getObjectManagerElementName('metadata.driver_chain.class%');

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-05T17:58:01Z
+
+`AllowNoHandlerMiddleware` looks a bit weird to me too (although less weird than `TolerateNoHandler`). Some alternatives in case you want to consider other names: `HandlerlessMiddleware`, `OptionalHandlerMiddleware`, `NoHandlerMiddleware`.

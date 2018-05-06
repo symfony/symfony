@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-04T10:06:18Z
+
+Simpler solution: use `{}` as delimiters. These have a special meaning inside the regex already, so don't require extra quoting just because of being the delimiter. This is the strategy used in Composer.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-05-06T17:18:51Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-05-06T17:19:18Z
+
+I have switched to using curly braces as suggested by @stof.

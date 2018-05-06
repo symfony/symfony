@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * extended `@param` semantic to hint autowiring of services and parameters
+
 4.1.0
 -----
 

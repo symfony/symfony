@@ -379,3 +379,16 @@ class NonAutowirableDecorator implements DecoratorInterface
     {
     }
 }
+
+class AnnotatedParamsFoo
+{
+    /**
+     * @param $a %a%
+     * @param $b %b%
+     * @param $c @c
+     * @param $d @d
+     */
+    public function __construct($a, $b, $c, $d)
+    {
+    }
+}

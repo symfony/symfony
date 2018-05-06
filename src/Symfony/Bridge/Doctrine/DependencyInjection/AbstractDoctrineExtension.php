@@ -412,8 +412,7 @@ abstract class AbstractDoctrineExtension extends Extension
             case 'zenddata':
                 if ($container->hasParameter($this->getObjectManagerElementName(sprintf('cache.%s.class', $cacheDriver['type'])))) {
                     @trigger_error(
-                        'Usage of class parameter for '.$cacheDriver['type'].' class is deprecated since version 4.2 and
-                            ill be removed in 5.0. Use configuration values instead.'
+                        'Usage of class parameter for '.$cacheDriver['type'].' class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
                     );
                 }
                 $cacheDef = new Definition('%' . $this->getObjectManagerElementName(sprintf('cache.%s.class', $cacheDriver['type'])) . '%');

@@ -394,6 +394,6 @@
             <xsd:element name="middleware" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="default-middlewares" type="xsd:boolean"/>
+        <xsd:attribute name="default-middleware" type="xsd:boolean"/>
     </xsd:complexType>
 </xsd:schema>

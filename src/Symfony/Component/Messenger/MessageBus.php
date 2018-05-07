@@ -19,19 +19,19 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
  */
 class MessageBus implements MessageBusInterface
 {
-    private $middlewares;
+    private $middlewareHandlers;
 
     /**
      * @var MiddlewareInterface[]|null
      */
-    private $indexedMiddlewares;
+    private $indexedMiddlewareHandlers;
 
     /**
-     * @param MiddlewareInterface[]|iterable $middlewares
+     * @param MiddlewareInterface[]|iterable $middlewareHandlers
      */
-    public function __construct(iterable $middlewares = array())
+    public function __construct(iterable $middlewareHandlers = array())
     {
-        $this->middlewares = $middlewares;
+        $this->middlewareHandlers = $middlewareHandlers;
     }
 
     /**
@@ -44,15 +44,15 @@ class MessageBus implements MessageBusInterface
 
     private function callableForNextMiddleware(int $index): callable
     {
-        if (null === $this->indexedMiddlewares) {
-            $this->indexedMiddlewares = \is_array($this->middlewares) ? array_values($this->middlewares) : iterator_to_array($this->middlewares, false);
+        if (null === $this->indexedMiddlewareHandlers) {
+            $this->indexedMiddlewareHandlers = \is_array($this->middlewareHandlers) ? array_values($this->middlewareHandlers) : iterator_to_array($this->middlewareHandlers, false);
         }
 
-        if (!isset($this->indexedMiddlewares[$index])) {
+        if (!isset($this->indexedMiddlewareHandlers[$index])) {
             return function () {};
         }
 
-        $middleware = $this->indexedMiddlewares[$index];
+        $middleware = $this->indexedMiddlewareHandlers[$index];
 
         return function ($message) use ($middleware, $index) {
             return $middleware->handle($message, $this->callableForNextMiddleware($index + 1));

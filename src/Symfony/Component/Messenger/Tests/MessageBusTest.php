@@ -26,7 +26,7 @@ class MessageBusTest extends TestCase
         $this->assertInstanceOf(MessageBusInterface::class, $bus);
     }
 
-    public function testItCallsTheMiddlewaresAndChainTheReturnValue()
+    public function testItCallsMiddlewareAndChainTheReturnValue()
     {
         $message = new DummyMessage('Hello');
         $responseFromDepthMiddleware = 1234;

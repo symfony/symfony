@@ -6,13 +6,13 @@ $container->loadFromExtension('framework', array(
         'buses' => array(
             'messenger.bus.commands' => null,
             'messenger.bus.events' => array(
-                'middlewares' => array(
+                'middleware' => array(
                     'allow_no_handler',
                 ),
             ),
             'messenger.bus.queries' => array(
-                'default_middlewares' => false,
-                'middlewares' => array(
+                'default_middleware' => false,
+                'middleware' => array(
                     'route_messages',
                     'allow_no_handler',
                     'call_message_handler',

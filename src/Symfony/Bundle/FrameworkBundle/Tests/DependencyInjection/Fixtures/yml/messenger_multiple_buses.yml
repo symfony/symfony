@@ -4,11 +4,11 @@ framework:
         buses:
             messenger.bus.commands: ~
             messenger.bus.events:
-                middlewares:
+                middleware:
                     - "allow_no_handler"
             messenger.bus.queries:
-                default_middlewares: false
-                middlewares:
+                default_middleware: false
+                middleware:
                     - "route_messages"
                     - "allow_no_handler"
                     - "call_message_handler"

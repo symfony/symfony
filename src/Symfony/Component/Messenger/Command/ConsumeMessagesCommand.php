@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,7 +23,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMemoryUsageIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMessageCountIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenTimeLimitIsReachedReceiver;
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 
 /**
@@ -89,12 +89,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         if (!$this->receiverLocator->has($receiverName = $input->getArgument('receiver'))) {
-            throw new \RuntimeException(sprintf('Receiver "%s" does not exist.', $receiverName));
+            throw new RuntimeException(sprintf('Receiver "%s" does not exist.', $receiverName));
         }
 
-        if (!($receiver = $this->receiverLocator->get($receiverName)) instanceof ReceiverInterface) {
-            throw new \RuntimeException(sprintf('Receiver "%s" is not a valid message consumer. It must implement the "%s" interface.', $receiverName, ReceiverInterface::class));
-        }
+        $receiver = $this->receiverLocator->get($receiverName);
 
         if ($limit = $input->getOption('limit')) {
             $receiver = new StopWhenMessageCountIsExceededReceiver($receiver, $limit, $this->logger);
@@ -117,9 +115,9 @@ EOF
         $memoryLimit = strtolower($memoryLimit);
         $max = strtolower(ltrim($memoryLimit, '+'));
         if (0 === strpos($max, '0x')) {
-            $max = intval($max, 16);
+            $max = \intval($max, 16);
         } elseif (0 === strpos($max, '0')) {
-            $max = intval($max, 8);
+            $max = \intval($max, 8);
         } else {
             $max = (int) $max;
         }

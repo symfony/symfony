@@ -174,6 +174,19 @@ class MessengerPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid sender "app.messenger.sender": class "Symfony\Component\Messenger\Tests\DependencyInjection\InvalidSender" must implement interface "Symfony\Component\Messenger\Transport\SenderInterface".
+     */
+    public function testItDoesNotRegisterInvalidSender()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('app.messenger.sender', InvalidSender::class)
+            ->addTag('messenger.sender');
+
+        (new MessengerPass())->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler": message class "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler::__invoke()" does not exist.
      */
     public function testUndefinedMessageClassForHandler()
@@ -364,6 +377,14 @@ class DummyReceiver implements ReceiverInterface
     public function stop(): void
     {
     }
+}
+
+class InvalidReceiver
+{
+}
+
+class InvalidSender
+{
 }
 
 class UndefinedMessageHandler

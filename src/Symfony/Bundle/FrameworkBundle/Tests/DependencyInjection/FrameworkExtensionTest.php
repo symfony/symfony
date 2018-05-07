@@ -614,10 +614,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('logging', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.commands.middlewares'));
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.events')->getArgument(0));
-        $this->assertEquals(array('logging', 'tolerate_no_handler', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.events.middlewares'));
+        $this->assertEquals(array('logging', 'allow_no_handler', 'route_messages', 'call_message_handler'), $container->getParameter('messenger.bus.events.middlewares'));
         $this->assertTrue($container->has('messenger.bus.queries'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
-        $this->assertEquals(array('route_messages', 'tolerate_no_handler', 'call_message_handler'), $container->getParameter('messenger.bus.queries.middlewares'));
+        $this->assertEquals(array('route_messages', 'allow_no_handler', 'call_message_handler'), $container->getParameter('messenger.bus.queries.middlewares'));
 
         $this->assertTrue($container->hasAlias('message_bus'));
         $this->assertSame('messenger.bus.commands', (string) $container->getAlias('message_bus'));

@@ -5,10 +5,10 @@ framework:
             messenger.bus.commands: ~
             messenger.bus.events:
                 middlewares:
-                    - "tolerate_no_handler"
+                    - "allow_no_handler"
             messenger.bus.queries:
                 default_middlewares: false
                 middlewares:
                     - "route_messages"
-                    - "tolerate_no_handler"
+                    - "allow_no_handler"
                     - "call_message_handler"

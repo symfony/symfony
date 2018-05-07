@@ -29,7 +29,7 @@
         </service>
 
         <!-- Middlewares -->
-        <service id="messenger.middleware.tolerate_no_handler" class="Symfony\Component\Messenger\Middleware\TolerateNoHandler" abstract="true" />
+        <service id="messenger.middleware.allow_no_handler" class="Symfony\Component\Messenger\Middleware\AllowNoHandlerMiddleware" abstract="true" />
         <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
             <argument type="service" id="messenger.handler_resolver" />
         </service>

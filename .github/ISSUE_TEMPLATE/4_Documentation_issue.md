@@ -1,6 +1,6 @@
 ---
-name: Documentation Issue
-about: Anything related to Symfony Documentation
+name: ⛔ Documentation Issue
+about: See https://github.com/symfony/symfony-docs/issues for documentation issues
 
 ---
 

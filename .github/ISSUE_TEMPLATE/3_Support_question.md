@@ -1,6 +1,6 @@
 ---
-name: Support Question
-about: Questions about using Symfony and its components
+name: ⛔ Support Question
+about: See https://symfony.com/support for questions about using Symfony and its components
 
 ---
 

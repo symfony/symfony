@@ -1,8 +1,10 @@
 ---
-name: Security Issue
-about: Report security-related errors
+name: ⛔ Security Issue
+about: See https://symfony.com/security to report security-related issues
 
 ---
+
+⚠ PLEASE DON'T DISCLOSE SECURITY-RELATED ISSUES PUBLICLY, SEE BELOW.
 
 <!--
     The Symfony Code of Conduct applies to all the activity on this repository.

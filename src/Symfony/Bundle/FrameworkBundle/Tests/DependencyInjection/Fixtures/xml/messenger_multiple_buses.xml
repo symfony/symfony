@@ -9,11 +9,11 @@
         <framework:messenger default-bus="messenger.bus.commands">
             <framework:bus name="messenger.bus.commands" />
             <framework:bus name="messenger.bus.events">
-                <framework:middleware>tolerate_no_handler</framework:middleware>
+                <framework:middleware>allow_no_handler</framework:middleware>
             </framework:bus>
             <framework:bus name="messenger.bus.queries" default-middlewares="false">
                 <framework:middleware>route_messages</framework:middleware>
-                <framework:middleware>tolerate_no_handler</framework:middleware>
+                <framework:middleware>allow_no_handler</framework:middleware>
                 <framework:middleware>call_message_handler</framework:middleware>
             </framework:bus>
         </framework:messenger>

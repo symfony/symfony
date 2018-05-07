@@ -111,6 +111,10 @@ class LogoutUrlGenerator
 
             $request = $this->requestStack->getCurrentRequest();
 
+            if (!$request) {
+                throw new \LogicException('Unable to generate the logout URL without a request.');
+            }
+
             $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBaseUrl().$logoutPath;
 
             if (!empty($parameters)) {

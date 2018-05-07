@@ -112,4 +112,22 @@ class LogoutUrlGeneratorTest extends TestCase
 
         $this->generator->getLogoutPath();
     }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Unable to generate the logout URL without a request.
+     */
+    public function testWithoutCurrentRequest()
+    {
+        // build a requestStack without a current request
+        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
+        $request = $this->getMockBuilder(Request::class)->getMock();
+        $requestStack->method('getCurrentRequest')->willReturn(null);
+
+        $generator = new LogoutUrlGenerator($requestStack, null, $this->tokenStorage);
+
+        $generator->registerListener('secured_area', '/logout', null, null);
+        $generator->setCurrentFirewall('secured_area');
+        $generator->getLogoutPath();
+    }
 }

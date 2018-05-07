@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Transport\SenderInterface;
  * Creates a Messenger transport.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
 interface TransportFactoryInterface
 {

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-06T01:20:34Z
+
+Btw what is the purpose of the annoted class cache?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-06T01:59:05Z
+
+The purpose is being able to warmup the annotations' cached reader. Without that, annotations are parsed at runtime the first time

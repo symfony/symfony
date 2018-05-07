@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
@@ -44,8 +45,8 @@ class AmqpReceiverTest extends TestCase
         $connection->expects($this->once())->method('ack')->with($envelope);
 
         $receiver = new AmqpReceiver($serializer, $connection);
-        $receiver->receive(function ($message) use ($receiver) {
-            $this->assertEquals(new DummyMessage('Hi'), $message);
+        $receiver->receive(function (?Envelope $envelope) use ($receiver) {
+            $this->assertEquals(new DummyMessage('Hi'), $envelope->getMessage());
             $receiver->stop();
         });
     }

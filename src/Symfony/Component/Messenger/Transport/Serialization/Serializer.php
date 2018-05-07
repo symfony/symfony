@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -32,27 +33,48 @@ class Serializer implements DecoderInterface, EncoderInterface
     /**
      * {@inheritdoc}
      */
-    public function decode(array $encodedMessage)
+    public function decode(array $encodedEnvelope): Envelope
     {
-        if (empty($encodedMessage['body']) || empty($encodedMessage['headers'])) {
-            throw new \InvalidArgumentException('Encoded message should have at least a `body` and some `headers`.');
+        if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
+            throw new \InvalidArgumentException('Encoded envelope should have at least a `body` and some `headers`.');
         }
 
-        if (empty($encodedMessage['headers']['type'])) {
-            throw new \InvalidArgumentException('Encoded message does not have a `type` header.');
+        if (empty($encodedEnvelope['headers']['type'])) {
+            throw new \InvalidArgumentException('Encoded envelope does not have a `type` header.');
         }
 
-        return $this->serializer->deserialize($encodedMessage['body'], $encodedMessage['headers']['type'], $this->format, $this->context);
+        $envelopeItems = isset($encodedEnvelope['headers']['X-Message-Envelope-Items']) ? unserialize($encodedEnvelope['headers']['X-Message-Envelope-Items']) : array();
+
+        $context = $this->context;
+        /** @var SerializerConfiguration|null $serializerConfig */
+        if ($serializerConfig = $envelopeItems[SerializerConfiguration::class] ?? null) {
+            $context = $serializerConfig->getContext() + $context;
+        }
+
+        $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
+
+        return new Envelope($message, $envelopeItems);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encode($message): array
+    public function encode(Envelope $envelope): array
     {
+        $context = $this->context;
+        /** @var SerializerConfiguration|null $serializerConfig */
+        if ($serializerConfig = $envelope->get(SerializerConfiguration::class)) {
+            $context = $serializerConfig->getContext() + $context;
+        }
+
+        $headers = array('type' => \get_class($envelope->getMessage()));
+        if ($configurations = $envelope->all()) {
+            $headers['X-Message-Envelope-Items'] = serialize($configurations);
+        }
+
         return array(
-            'body' => $this->serializer->serialize($message, $this->format, $this->context),
-            'headers' => array('type' => \get_class($message)),
+            'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+            'headers' => $headers,
         );
     }
 }

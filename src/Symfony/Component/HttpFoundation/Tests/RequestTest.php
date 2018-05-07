@@ -23,6 +23,7 @@ class RequestTest extends TestCase
     {
         // reset
         Request::setTrustedProxies(array(), -1);
+        Request::setTrustedHosts(array());
     }
 
     public function testInitialize()
@@ -1924,9 +1925,15 @@ class RequestTest extends TestCase
 
         $request->headers->set('host', 'subdomain.trusted.com');
         $this->assertEquals('subdomain.trusted.com', $request->getHost());
+    }
 
-        // reset request for following tests
-        Request::setTrustedHosts(array());
+    public function testSetTrustedHostsDoesNotBreakOnSpecialCharacters()
+    {
+        Request::setTrustedHosts(array('localhost(\.local){0,1}#,example.com', 'localhost'));
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'localhost');
+        $this->assertSame('localhost', $request->getHost());
     }
 
     public function testFactory()

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -94,7 +95,17 @@ EOT
             $targetArg = $kernel->getContainer()->getParameter('kernel.project_dir').'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
+<<<<<<< HEAD
                 throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+=======
+                // deprecated, logic to be removed in 4.0
+                // this allows the commands to work out of the box with web/ and public/
+                if (is_dir(dirname($targetArg).'/web')) {
+                    $targetArg = dirname($targetArg).'/web';
+                } else {
+                    throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                }
+>>>>>>> 3.4
             }
         }
 

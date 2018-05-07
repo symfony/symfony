@@ -12,8 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -41,30 +39,6 @@ class ValidationMiddlewareTest extends TestCase
         ;
 
         $result = (new ValidationMiddleware($validator))->handle($message, $next);
-
-        $this->assertSame('Hello', $result);
-    }
-
-    public function testValidateWithConfigurationAndNextMiddleware()
-    {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
-
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator
-            ->expects($this->once())
-            ->method('validate')
-            ->with($message, null, $groups)
-            ->willReturn($this->createMock(ConstraintViolationListInterface::class))
-        ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($envelope)
-            ->willReturn('Hello')
-        ;
-
-        $result = (new ValidationMiddleware($validator))->handle($envelope, $next);
 
         $this->assertSame('Hello', $result);
     }

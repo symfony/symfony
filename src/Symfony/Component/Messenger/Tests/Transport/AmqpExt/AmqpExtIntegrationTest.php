@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
@@ -51,12 +50,12 @@ class AmqpExtIntegrationTest extends TestCase
         $sender = new AmqpSender($serializer, $connection);
         $receiver = new AmqpReceiver($serializer, $connection);
 
-        $sender->send($first = Envelope::wrap(new DummyMessage('First')));
-        $sender->send($second = Envelope::wrap(new DummyMessage('Second')));
+        $sender->send($firstMessage = new DummyMessage('First'));
+        $sender->send($secondMessage = new DummyMessage('Second'));
 
         $receivedMessages = 0;
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages, $first, $second) {
-            $this->assertEquals(0 == $receivedMessages ? $first : $second, $envelope);
+        $receiver->receive(function ($message) use ($receiver, &$receivedMessages, $firstMessage, $secondMessage) {
+            $this->assertEquals(0 == $receivedMessages ? $firstMessage : $secondMessage, $message);
 
             if (2 === ++$receivedMessages) {
                 $receiver->stop();
@@ -75,7 +74,7 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->queue()->purge();
 
         $sender = new AmqpSender($serializer, $connection);
-        $sender->send(Envelope::wrap(new DummyMessage('Hello')));
+        $sender->send(new DummyMessage('Hello'));
 
         $amqpReadTimeout = 30;
         $dsn = getenv('MESSENGER_AMQP_DSN').'?read_timeout='.$amqpReadTimeout;
@@ -99,15 +98,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         $this->assertFalse($process->isRunning());
         $this->assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
-        $this->assertSame($expectedOutput.<<<'TXT'
-Get envelope with message: Symfony\Component\Messenger\Tests\Fixtures\DummyMessage
-with items: [
-    "Symfony\\Component\\Messenger\\Asynchronous\\Transport\\ReceivedMessage"
-]
-Done.
-
-TXT
-            , $process->getOutput());
+        $this->assertEquals($expectedOutput."Get message: Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage\nDone.\n", $process->getOutput());
     }
 
     /**
@@ -123,11 +114,12 @@ TXT
         $connection->setup();
         $connection->queue()->purge();
 
+        $sender = new AmqpSender($serializer, $connection);
         $receiver = new AmqpReceiver($serializer, $connection);
 
         $receivedMessages = 0;
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages) {
-            $this->assertNull($envelope);
+        $receiver->receive(function ($message) use ($receiver, &$receivedMessages) {
+            $this->assertNull($message);
 
             if (2 === ++$receivedMessages) {
                 $receiver->stop();

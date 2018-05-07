@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Transport\Enhancers;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
@@ -37,8 +36,8 @@ class StopWhenMemoryUsageIsExceededReceiver implements ReceiverInterface
 
     public function receive(callable $handler): void
     {
-        $this->decoratedReceiver->receive(function (?Envelope $envelope) use ($handler) {
-            $handler($envelope);
+        $this->decoratedReceiver->receive(function ($message) use ($handler) {
+            $handler($message);
 
             $memoryResolver = $this->memoryResolver;
             if ($memoryResolver() > $this->memoryLimit) {

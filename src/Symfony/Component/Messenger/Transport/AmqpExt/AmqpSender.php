@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
 
@@ -22,21 +21,21 @@ use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
  */
 class AmqpSender implements SenderInterface
 {
-    private $encoder;
+    private $messageEncoder;
     private $connection;
 
-    public function __construct(EncoderInterface $encoder, Connection $connection)
+    public function __construct(EncoderInterface $messageEncoder, Connection $connection)
     {
-        $this->encoder = $encoder;
+        $this->messageEncoder = $messageEncoder;
         $this->connection = $connection;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function send(Envelope $envelope)
+    public function send($message)
     {
-        $encodedMessage = $this->encoder->encode($envelope);
+        $encodedMessage = $this->messageEncoder->encode($message);
 
         $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
     }

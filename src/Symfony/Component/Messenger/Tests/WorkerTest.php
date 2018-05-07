@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\CallbackReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -23,33 +22,29 @@ class WorkerTest extends TestCase
 {
     public function testWorkerDispatchTheReceivedMessage()
     {
-        $apiMessage = new DummyMessage('API');
-        $ipaMessage = new DummyMessage('IPA');
-
-        $receiver = new CallbackReceiver(function ($handler) use ($apiMessage, $ipaMessage) {
-            $handler(Envelope::wrap($apiMessage));
-            $handler(Envelope::wrap($ipaMessage));
+        $receiver = new CallbackReceiver(function ($handler) {
+            $handler(new DummyMessage('API'));
+            $handler(new DummyMessage('IPA'));
         });
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with(Envelope::wrap($apiMessage)->with(new ReceivedMessage()));
-        $bus->expects($this->at(1))->method('dispatch')->with(Envelope::wrap($ipaMessage)->with(new ReceivedMessage()));
+        $bus->expects($this->at(0))->method('dispatch')->with(new ReceivedMessage(new DummyMessage('API')));
+        $bus->expects($this->at(1))->method('dispatch')->with(new ReceivedMessage(new DummyMessage('IPA')));
 
         $worker = new Worker($receiver, $bus);
         $worker->run();
     }
 
-    public function testWorkerDoesNotWrapMessagesAlreadyWrappedWithReceivedMessage()
+    public function testWorkerDoesNotWrapMessagesAlreadyWrappedInReceivedMessages()
     {
-        $envelop = Envelope::wrap(new DummyMessage('API'))->with(new ReceivedMessage());
-        $receiver = new CallbackReceiver(function ($handler) use ($envelop) {
-            $handler($envelop);
+        $receiver = new CallbackReceiver(function ($handler) {
+            $handler(new ReceivedMessage(new DummyMessage('API')));
         });
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with($envelop);
+        $bus->expects($this->at(0))->method('dispatch')->with(new ReceivedMessage(new DummyMessage('API')));
 
         $worker = new Worker($receiver, $bus);
         $worker->run();
@@ -59,7 +54,7 @@ class WorkerTest extends TestCase
     {
         $receiver = new CallbackReceiver(function ($handler) {
             try {
-                $handler(Envelope::wrap(new DummyMessage('Hello')));
+                $handler(new DummyMessage('Hello'));
 
                 $this->assertTrue(false, 'This should not be called because the exception is sent back to the generator.');
             } catch (\InvalidArgumentException $e) {

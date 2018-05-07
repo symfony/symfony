@@ -1050,11 +1050,16 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('default' => array('default_middleware' => true, 'middleware' => array())))
                             ->useAttributeAsKey('name')
                             ->prototype('array')
-                                ->fixXmlConfig('middleware')
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->booleanNode('default_middleware')->defaultTrue()->end()
                                     ->arrayNode('middleware')
+                                        ->beforeNormalization()
+                                            ->ifString()
+                                            ->then(function (string $middleware) {
+                                                return array($middleware);
+                                            })
+                                        ->end()
                                         ->defaultValue(array())
                                         ->prototype('scalar')->end()
                                     ->end()

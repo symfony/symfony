@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
@@ -27,6 +28,18 @@ class TraceableMessageBusTest extends TestCase
 
         $traceableBus = new TraceableMessageBus($bus);
         $this->assertSame($result, $traceableBus->dispatch($message));
+        $this->assertSame(array(array('message' => $message, 'result' => $result)), $traceableBus->getDispatchedMessages());
+    }
+
+    public function testItTracesResultWithEnvelope()
+    {
+        $envelope = Envelope::wrap($message = new DummyMessage('Hello'));
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($result = array('foo' => 'bar'));
+
+        $traceableBus = new TraceableMessageBus($bus);
+        $this->assertSame($result, $traceableBus->dispatch($envelope));
         $this->assertSame(array(array('message' => $message, 'result' => $result)), $traceableBus->getDispatchedMessages());
     }
 

@@ -57,6 +57,15 @@ final class Envelope
         return $cloned;
     }
 
+    public function withMessage($message): self
+    {
+        $cloned = clone $this;
+
+        $cloned->message = $message;
+
+        return $cloned;
+    }
+
     public function get(string $itemFqcn): ?EnvelopeItemInterface
     {
         return $this->items[$itemFqcn] ?? null;

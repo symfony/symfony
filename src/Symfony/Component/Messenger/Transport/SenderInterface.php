@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
-use Symfony\Component\Messenger\Envelope;
-
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
@@ -21,9 +19,9 @@ use Symfony\Component\Messenger\Envelope;
 interface SenderInterface
 {
     /**
-     * Sends the given envelope.
+     * Sends the given message.
      *
-     * @param Envelope $envelope
+     * @param object $message
      */
-    public function send(Envelope $envelope);
+    public function send($message);
 }

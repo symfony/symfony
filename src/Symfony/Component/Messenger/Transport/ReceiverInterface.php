@@ -21,10 +21,10 @@ interface ReceiverInterface
     /**
      * Receive some messages to the given handler.
      *
-     * The handler will have, as argument, the received {@link \Symfony\Component\Messenger\Envelope} containing the message.
-     * Note that this envelope can be `null` if the timeout to receive something has expired.
+     * The handler will have, as argument, the received message. Note that this message
+     * can be `null` if the timeout to receive something has expired.
      */
-    public function receive(callable $handler): void;
+    public function receive(callable $handler) : void;
 
     /**
      * Stop receiving some messages.

@@ -23,7 +23,7 @@ interface MessageBusInterface
      *
      * The bus can return a value coming from handlers, but is not required to do so.
      *
-     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     * @param object $message
      *
      * @return mixed
      */

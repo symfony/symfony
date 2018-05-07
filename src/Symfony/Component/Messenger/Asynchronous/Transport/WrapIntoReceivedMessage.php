@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Asynchronous\Transport;
 
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
@@ -28,12 +27,12 @@ class WrapIntoReceivedMessage implements ReceiverInterface
 
     public function receive(callable $handler): void
     {
-        $this->decoratedReceiver->receive(function (?Envelope $envelope) use ($handler) {
-            if (null !== $envelope) {
-                $envelope = $envelope->with(new ReceivedMessage());
+        $this->decoratedReceiver->receive(function ($message) use ($handler) {
+            if (null !== $message) {
+                $message = new ReceivedMessage($message);
             }
 
-            $handler($envelope);
+            $handler($message);
         });
     }
 

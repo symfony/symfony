@@ -1444,8 +1444,8 @@ class FrameworkExtension extends Extension
         $loader->load('messenger.xml');
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
-            if (\count($config['transports']) > 0 && !$this->isConfigEnabled($container, $serializerConfig)) {
-                throw new LogicException('Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".');
+            if (!$this->isConfigEnabled($container, $serializerConfig)) {
+                throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
             }
 
             $container->getDefinition('messenger.transport.serializer')
@@ -1453,6 +1453,9 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, $config['serializer']['context']);
         } else {
             $container->removeDefinition('messenger.transport.serializer');
+            if ('messenger.transport.serializer' === $config['encoder'] || 'messenger.transport.serializer' === $config['decoder']) {
+                $container->removeDefinition('messenger.transport.amqp.factory');
+            }
         }
 
         $container->setAlias('messenger.transport.encoder', $config['encoder']);
@@ -1501,6 +1504,10 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
 
         foreach ($config['transports'] as $name => $transport) {
+            if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
+                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
+            }
+
             $senderDefinition = (new Definition(SenderInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createSender'))
                 ->setArguments(array($transport['dsn'], $transport['options']))

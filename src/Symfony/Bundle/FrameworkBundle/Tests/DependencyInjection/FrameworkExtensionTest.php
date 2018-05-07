@@ -526,7 +526,8 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
-        $this->assertTrue($container->has('message_bus'));
+        $this->assertTrue($container->hasAlias('message_bus'));
+        $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
     }
 
     public function testMessengerTransports()
@@ -556,6 +557,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(2, $receiverArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $receiverArguments[0]);
         $this->assertSame(array('queue' => array('name' => 'Queue')), $receiverArguments[1]);
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
     }
 
     public function testMessengerRouting()
@@ -574,11 +577,20 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".
+     * @expectedExceptionMessage The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".
      */
     public function testMessengerTransportConfigurationWithoutSerializer()
     {
         $this->createContainerFromFile('messenger_transport_no_serializer');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".
+     */
+    public function testMessengerAMQPTransportConfigurationWithoutSerializer()
+    {
+        $this->createContainerFromFile('messenger_amqp_transport_no_serializer');
     }
 
     public function testMessengerTransportConfiguration()

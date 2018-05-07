@@ -256,7 +256,7 @@ class ConfigurationTest extends TestCase
                 'routing' => array(),
                 'transports' => array(),
                 'serializer' => array(
-                    'enabled' => true,
+                    'enabled' => !class_exists(FullStack::class),
                     'format' => 'json',
                     'context' => array(),
                 ),

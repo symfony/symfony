@@ -1010,7 +1010,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('serializer')
-                            ->canBeDisabled()
+                            ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('format')->defaultValue('json')->end()

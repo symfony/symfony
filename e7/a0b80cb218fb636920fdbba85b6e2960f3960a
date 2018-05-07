@@ -1,0 +1,452 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-16T13:14:00Z
+
+That's a very interesting idea. So if I understand it correctly, it would allow users to configure things when they dispatch the messages to the bus. For example, in order to configure the serialization groups used when serializing the message or enabling the validation, this would look like this:
+
+```php
+$bus->dispatch(new SerializerContextAwareMessage(
+    new MessageToValidate(
+        new MyMessage(/* ... */)
+    ),
+    ['groups' => [...]]
+));
+```
+
+1. **Serialization survival.** I believe that such "feature" needs to survive serialization/deserialization. Right now, the "transport" works because we use the message class as a reference when de-serializing. How would you approach this in such scenario?
+
+2. **Implemented interface?** It definitely exposes some "logic" when dispatching the message. If you dispatch it multiple times from multiple places, it means you need to "copy" this logic. Expect the ability to have different "rules" for the same message (which I don't believe is a good idea) what would be the advantage over a message implementing a certain interface? I guess "decoupling" is an answer but here, the "coupling" is still around IMHO.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-16T13:48:28Z
+
+> 1. [...] How would you approach this in such scenario?
+
+I'd expect some opinions first before deciding if we want to support it or even if it's is a concept only acting before sending the message :) But we could find a solution for sure.
+
+> 2. [...] Except the ability to have different "rules" for the same message (which I don't believe is a good idea) [...] I guess "decoupling" is an answer but here, the "coupling" is still around IMHO.
+
+That's the point to me indeed. Don't mix infrastructural requirements with my messages. This is also the most flexible approach as implementing such interfaces would be cumbersome, inheriting multiple base classes won't be possible appart from using traits, and I want to keep my messages simple wrappers around the data they exist for, no more. Composing through these wrappers solves this and is only the responsibility of the dispatcher (I don't mind the infrastructural stuff knowing about my messages, so "coupling" in this way is not an issue). As you mentioned it, this also allows having "different rules" for the same message, according to the place it was dispatched. Can still be relevant for the metrics middleware example aforementioned for instance.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-18T08:23:14Z
+
+Alright, I definitely like the idea. The problem that we are trying to solve here will happen both ways (before/after sending/receiving the message), so we need this "configuration" to survive encoding/decoding or otherwise, it won't be a valid solution for lots of use cases.
+
+Do you have an idea to tackle this serialization problem? Nesting the message within multiple wrappers sound like a source of troubles when doing the de-serialization. It also poses the problem of communication with 3rd party systems. Let's get the example of an application communicating with another one via RabbitMq. If they want to configure the retry mechanism (an example that would use such configuration) then the serialized message within the queue would be too different (the message is now within another one) for the one before and... it wouldn't work anymore.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-18T08:33:13Z
+
+An alternative to your idea is a more flat option.
+
+```php
+$message = new ConfiguredMessage($message);
+$message = $message->with(new RetryStrategyConfiguration(/* ... */));
+$message = $message->with(new SerializationConfiguration(/* ... */));
+
+$bus->dispatch($message);
+```
+
+1. The `ConfiguredMessage` would be `final` and non-serializable. It would contain the same sort of helper (the `unwrap` you propose) but could be called `get(string $configurationFqcn)` or similar
+2. Same very nice mechanism that you propose on the additional interface on middlewares
+3. The encoder/decoder would serialize all the "configurations" one by one in different headers (so we don't "break" the message)
+
+WDYT? 🤔
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-18T10:08:10Z
+
+That looks nice to me, I should give it a try :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-18T10:58:40Z
+
+~`RetryStrategyConfiguration` and cie could all implements a `Configuration` interface so we  might be able to use the serializer's discriminator map~. It would require more configuration and might not be very extensible.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-04-21T19:43:42Z
+
+I see some red flags when you have classes with feature interfaces (like our messages) and you try to wrap (decorate) them in other classes. We had the similar situation with `php-cache/cache-bundle` and we decided to [create PHP classes on the fly](https://github.com/php-cache/cache-bundle/blob/1.1.0/src/DataCollector/ProxyFactory.php) to support the wrapped functionality and the feature interfaces. Not a super solid solution..
+
+-------
+
+Im not sure I understand why this is needed. Or I mean, why we need this abstraction to solve the problems mentioned. We mention validation groups, but from a CQRS perspective, messages are for one purpose only. Ie you would never need to validate the same message in two different ways.
+
+About the issue when you only want to retry some messages: See [here what HTTPlug is doing](https://github.com/php-http/client-common/blob/master/src/Plugin/RetryPlugin.php#L48). Sure, HTTP is simpler here. If you got something super complex, them maybe you should implement your own RetryPlugin. For the vast majority of the users I assume they want to retry all messages until they pass.
+
+At the moment Im 👎 for this PR.
+
+If one still believe that this is a really good feature, I see to problem implementing this in a third party library. The Messenger component is so awesome and flexible so one could easily create a `nyholm/wrapped-messeges-bundle`.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T14:58:22Z
+
+> I see some red flags when you have classes with feature interfaces (like our messages) and you try to wrap (decorate) them in other classes.
+
+@Nyholm can you elaborate on these ones? You actually did not mention any of these "red flags" 😉 Also, what do you mean by "classes with feature interfaces"? Last but not least, do you acknowledge that you saw that in the implementation, the middleware or handler won't receive the wrapped message, right? It's only if you implement a specific interface that you do so I don't see understand the issue.
+
+> About the issue when you only want to retry some messages: See here what HTTPlug is doing.
+
+Right now, without such feature proposed here, we simply can't (or I don't see how at least 😃) have a generic retry feature, unfortunately. In order to have such a feature (broader than just the AmqpExt adapter), we need to pass some metadata down to the adapters in some way (an interface on the message or via wrapping it).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-04-23T08:35:00Z
+
+Of course. In PHP cache we have cache adapters for different types of storages. Some storage/adapter may support tagging, some support hierarchy cache. That is why we have "feature interfaces" like `TaggingAdapter` or `HierarchyAdapter`. So a consuming library my check for that interface before they try to use tags. This is fine and it works. I think this is similar to what been discussed with messages in the MessengerComponent. We are discussing `DelayedMessageInterface` etc.
+
+When we later wanted to decorate our adapters with a `TraceableAdapter` to be used with Symfony's WebProfiler `DataCollector` we will run into issues because the decorated service will no longer implement the feature interface. I fear (the "red flags") that we move the Messenger component in the same direction. With wrapped messages nobody would see our `DelayedMessageInterface`.
+
+I do recognize that `FooCacheAdapter` is a service and our messages are value objects.
+
+------
+
+>  Last but not least, do you acknowledge that you saw that in the implementation, the middleware or handler won't receive the wrapped message, right?
+
+No, I did not see that. So it only the bus that handle the WrappedMessage?
+
+---------
+
+> Right now, without such feature proposed here, we simply can't (or I don't see how at least 😃) have a generic retry feature, unfortunately.
+
+I think the logic of "how a message should be retired" should not belong to the message. The message itself should not care at all. It is the RetryMiddleware that should handle that. Of the top of my head, here is an example:
+
+```php
+
+class RetryMiddleware {
+    private $decider; // A service that decides if a message should be retried or not
+    private $publisher; // A service that pushes the message to a new(?) bus or different(?) queue
+
+    // ...
+
+    public function handle($message, callable $next)
+    {
+        try {
+            $result = $next($message);
+        } catch (\Throwable $e) {
+            if($this->decider->decide($message, $e)) {
+                $this->publisher->publish($message, $e);
+            }
+            throw $e;
+        }
+
+        return $result;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-29T14:51:31Z
+
+> >Last but not least, do you acknowledge that you saw that in the implementation, the middleware or handler won't receive the wrapped message, right?
+>
+> No, I did not see that. So it only the bus that handle the WrappedMessage?
+
+Sorry if the description was unclear/minimalistic. I did open this RFC through a PR in order to give examples through code rather than a big description so we can discuss all its aspects right now through (partial) implementation.
+
+The idea is to make wrapper transparent in most cases when directly consuming a message like in middlewares. If a middleware needs to access the wrappers and not only the original message, it has to implement a specific marker interface, used by the bus to send either the message and its wrappers around, or just the message otherwise. That's what the `WrappedMessageAwareMiddlewareInterface` is about in the current version of this PR.
+
+So, right now, I think the red flags you mentioned actually won't be an issue for middlewares.
+
+> the decorated service will no longer implement the feature interface. I fear (the "red flags") that we move the Messenger component in the same direction. With wrapped messages nobody would see our DelayedMessageInterface.
+
+You can still implement feature interface on your messages. But that's precisely what I'd want to avoid actually, because I don't want my messages to be anything else than VO around the data they exist for. Starting implementing feature interfaces related to infrastructural concerns is not the responsibility of these objects, but rather on the callers's side.
+
+> Im not sure I understand why this is needed. Or I mean, why we need this abstraction to solve the problems mentioned. We mention validation groups, but from a CQRS perspective, messages are for one purpose only. Ie you would never need to validate the same message in two different ways.
+
+We introduced [`ChainHandler`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Handler/ChainHandler.php) allowing to return multiple results from a single dispatched message and [MessageSubscriberInterface](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Handler/MessageSubscriberInterface.php) to have the ability to easily have a single handler handling multiple messages types. These are not very common to me neither, but still can be useful in some cases. I think we shouldn't assume too much there would never be a need for more flexibility here. As I said myself, the example with validation groups is uncommon but still useful in most advanced cases where the data inside the message is complex but still considered a single unit to handle.
+
+> If one still believe that this is a really good feature, I see to problem implementing this in a third party library. The Messenger component is so awesome and flexible so one could easily create a nyholm/wrapped-messeges-bundle.
+
+Even if as I said it should be transparent for middlewares, this requires the bus to be aware of such a feature to choose to provide either the wrapped or unwrapped message to each middlewares in the stack. Third-parties middlewares decorators would also need to be aware of such a feature and implement `WrappedMessageAwareMiddlewareInterface` or it might be incompatible otherwise. So this is an important decision to take in the core itself to me or we might have some troubles implementing it later.
+
+We should also consider that, currently, there is already a wrapper in the wild ([ReceivedMessage](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Asynchronous/Transport/ReceivedMessage.php)) and it already requires a special treatment: https://github.com/symfony/symfony/pull/27066. Either the concept should be generalized, or either we might think about another way to handle it.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-30T16:56:03Z
+
+Thank you for such a detailed answer @ogizanagi. I think that this is a needed feature as well and I'm 👍 to add it (the flat version though, for the reasons I've mentioned).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-05-02T13:36:23Z
+
+Hey guys!
+
+As I have very little Message Bus experience, take my opinion as a bit of an outsider/noob :). I don't really have a good impression as to if this is or isn't a good idea, or the possible pitfalls.
+
+However, this note makes  a lot of sense to me:
+
+> We should also consider that, currently, there is already a wrapper in the wild (ReceivedMessage) and it already requires a special treatment: #27066. Either the concept should be generalized, or either we might think about another way to handle it.
+
+And, in general, even if it’s an edge case, the fact that there is currently *no* way to “attach” middleware configuration to a message (e.g. validation groups) seems not ideal, at the very least.
+
+I'd also prefer the [flat](https://github.com/symfony/symfony/pull/26945#issuecomment-382308804) approach. But, more for the reason that messages inside of messages make my head spin a little bit. And, I think there's no disadvantage to the flat version?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-05-02T15:41:02Z
+
+> the fact that there is currently no way to “attach” middleware configuration to a message (e.g. validation groups) seems not ideal
+
+IMO this should stay like this, the configuration should depend of the bus and message class but the caller shouldn't be able to override this configuration. In the example of the validation group this would allow anyone to pass invalid messages by setting the validation group to one with no constraints.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-02T17:41:18Z
+
+I've pushed the new flat version. To answer @weaverryan, there isn't any disadvantage to it in comparison with the wrappers approach.
+But, whereas it doesn't seem that bad for middlewares, the configured messages also have to go through other layers, like the transport, which feels like the implementation isn't much satisfying. i expected that, now we have some code under our eyes to consider. So let's see if this is going somewhere or not.
+
+For the serialization of flatten configurations, I'd expect each configuration to be `\Serializable`. PHP serialization (under control) seemed like a good fit for this, as anyway you need to use the same stack on both sender & receiver sides to benefit from configured messages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-04T00:37:43Z
+
+Rebase needed after #27129
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-04T11:51:02Z
+
+Rebased and added/completed some tests
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2018-05-04T12:44:15Z
+
+I think a better name for what you are trying to model is `Envelope` instead if `ConfiguredMessage`. It could be implemented as a VO or designed as an interface.
+Also for reference:
+    http://www.enterpriseintegrationpatterns.com/patterns/messaging/EnvelopeWrapper.html
+
+Something like:
+
+```php
+final class Envelope
+{
+    public static function wrap(object $message): Envelope
+    {
+        return new self($message);
+    }
+
+    public function open(): object
+    {
+        return $this->message;
+    }
+
+    public function stamp(EnvelopeLabel $label): Envelope
+    {
+        $modified = clone $this;
+		$modified->labels[$label->name()] = $label;
+
+		return $modified;
+    }
+
+    public function check(string $labelName): ?EnvelopeLabel
+    {
+        return $this->labels[$labelName] ?? null;
+    }
+
+    private function __construct(object $message)
+    {
+        $this->message = $message;
+    }
+
+    /** @var EnvelopeLabel[] */
+    private $labels = [];
+    /** @var object */
+    private $message;
+}
+
+interface EnvelopeLabel
+{
+    public function name(): string;
+
+    public function read(string $field): string;
+}
+
+final class ValidationLabel implements EnvelopeLabel
+{
+    public function name(): string
+    {
+        return self::class;
+    }
+
+    public function read(string $field): string
+    {
+        ...
+    }
+}
+```
+
+usage:
+```php
+$message = new MyMessage();
+$envelope = Envelope::wrap($message)->stamp(new ValidationLabel());
+
+$messageBus->dispatch($envelope);
+```
+
+or having specialized envelope implementations:
+
+```php
+interface Envelope
+{
+    /** @return object Message or Envelope */
+    public function open(): object;
+}
+
+final class ValidationEnvelope implements Envelope
+{
+    ...
+}
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-04T12:55:33Z
+
+`Envelope` is a much better name than `ConfiguredMessage` ❤️. I'm not sure about the `stamp` idea though. I'd prefer the `envelope` to `wrap` a `message`, `with` some additional `configuration` I think.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2018-05-04T13:45:37Z
+
+Yeah, The stamp is just my preference. But the general idea is to have an envelope wrap a message/content/payload/body and enrich with some label/metadata/context/header. You can find this design with HTTP, AMQP, SOAP, etc.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-04T14:20:54Z
+
+❤️ 👍 for `Envelope`. Thanks @andersonamuller , great idea.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-04T15:56:44Z
+
+Alright. Sometimes naming things properly changes everything :)
+
+What if the `Envelope` was actually a mandatory part of the system, removing the need for the `EnvelopeReaderInterface` marker interface and those still weird `Envelope::openFor()` & `Envelope::wrap()` method calls & manipulations?
+I.e, senders, encoders/decoders, receivers & middlewares would always get an `Envelope`. Only handlers would directly get the message inside. The `MessageBus` itself would still allow dispatching either a message or an envelope, but would internally wrap it anyway for middlewares.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-04T16:00:15Z
+
+> I.e, senders, encoders/decoders, receivers & middlewares would always get an Envelope.
+
+YES! 👍 for senders, receivers, encoders and decoders.
+
+Let's keep the "EnvelopeAware" interface for the middleware though, please, there are many cases where we don't care about the envelope in them.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-04T16:06:42Z
+
+> there are many cases where we don't care about the envelope in them.
+
+Right, but is this really an issue? I won't mind the extra call to `Envelope::open()` to get the message in a middleware personally and I think it'll homogenize a bit things internally.
+
+(Anyway, I can start without to give a try)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-04T16:07:55Z
+
+Middlewares & handlers are the things to be used by the developers (the rest is mainly behind the scene), so it would be more coherent and consistent to have this same marker-based mechanism to get the message or the message with its envelope IMHO.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-04T18:23:09Z
+
+I've removed the RFC label.
+Comments are still very very welcomed but I think there was enough discussion & code changed a lot recently. Time to take a decision and polish it :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-05T13:03:07Z
+
+One more thing: should every item go through transport? We could just ignore non-serializable items when ~encoding~ sending. Also `ReceivedMessage` just is a marker used on receiver's side so no point being serializable.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-05T13:46:19Z
+
+But wouldn’t making it optionally serialisable be a source of potential
+confusion and “tricky bugs”? (i.e. the middleware X doesn’t “work” anymore
+because I forgot to add the Serializable on my EnvelopeItem)
+On Sat, 5 May 2018 at 15:03, Maxime Steinhausser <notifications@github.com>
+wrote:
+
+> One more thing: should every items go through transport? We could just
+> ignore non-serializable items when encoding. Also ReceivedMessage just is
+> a marker used on receiver's side so no point being serializable.
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/26945#issuecomment-386804255>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHESfpeFACi4cJmu-4pw_b6S86axmPks5tvaMQgaJpZM4TWWEB>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-05T13:53:15Z
+
+Yes, that's a fair point. So I hesitated proposing a `EnvelopItemInterface::isTransportable(): bool` method (or whatever). But simply mentioning this on the interface and the docs might be enough. Your call :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-05-05T21:29:25Z
+
+I've opened PR in @ogizanagi's repository that solve this problem: https://github.com/ogizanagi/symfony/pull/1 , Mark transportable items and ensure that they can be properly serialized. You can cherry pick my commit if this kind of sollution is acceptable.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-06T07:54:32Z
+
+Thank you @Koc ! Unfortunately, I chose not doing so on purpose because I believe it has the same drawbacks expressed in https://github.com/symfony/symfony/pull/26945#issuecomment-386806825.
+But as I said, perhaps mentioning this requirement on the docs and the interface might be enough.
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-05-06T08:56:37Z
+
+You cann't forget implement `serialize`/`deserialize` when implementing `TransportableEnvelopeItemInterface` because got PHP error (`TransportableEnvelopeItemInterface` extends `Serializable`). And you shouldn't implement `isTransportable` all the time.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-06T09:01:10Z
+
+The point was you can forget implementing `TransportableEnvelopeItemInterface` with the proposed code (thus, the item is dropped without warning).
+Which is the same as you can forget to implement `\Serializable` before https://github.com/symfony/symfony/pull/26945/commits/c17ea71 (hence, the item is dropped without warning).
+
+So that's not changing anything to what is expressed in https://github.com/symfony/symfony/pull/26945#issuecomment-386806825. Your suggestion is basically just using a dedicated Messenger interface rather than just `\Serializable` (which is not a bad idea, but not really required here).
+`EnvelopeItemInterface::isTransportable(): bool` makes things clear by requiring to answer the transportable question.
+
+The question is: is it either a DX or documentation issue to solve.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-07T12:56:11Z
+
+Let's go ahead with this one in 4.1 beta, it's definitely needed.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-07T13:18:36Z
+
+@sroze: https://github.com/symfony/symfony/pull/26945/commits/c17ea71f49fccaafbbbd9d654361ea16167c59fb removed from this PR for now. To be reconsidered for next beta, in another PR.

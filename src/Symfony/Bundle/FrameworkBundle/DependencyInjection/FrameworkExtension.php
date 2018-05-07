@@ -1469,15 +1469,15 @@ class FrameworkExtension extends Extension
             $config['default_bus'] = key($config['buses']);
         }
 
-        $defaultMiddlewares = array('before' => array('logging'), 'after' => array('route_messages', 'call_message_handler'));
+        $defaultMiddleware = array('before' => array('logging'), 'after' => array('route_messages', 'call_message_handler'));
         foreach ($config['buses'] as $busId => $bus) {
-            $middlewares = $bus['default_middlewares'] ? array_merge($defaultMiddlewares['before'], $bus['middlewares'], $defaultMiddlewares['after']) : $bus['middlewares'];
+            $middleware = $bus['default_middleware'] ? array_merge($defaultMiddleware['before'], $bus['middleware'], $defaultMiddleware['after']) : $bus['middleware'];
 
-            if (!$validationConfig['enabled'] && \in_array('messenger.middleware.validation', $middlewares, true)) {
+            if (!$validationConfig['enabled'] && \in_array('messenger.middleware.validation', $middleware, true)) {
                 throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
             }
 
-            $container->setParameter($busId.'.middlewares', $middlewares);
+            $container->setParameter($busId.'.middleware', $middleware);
             $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus'));
 
             if ($busId === $config['default_bus']) {

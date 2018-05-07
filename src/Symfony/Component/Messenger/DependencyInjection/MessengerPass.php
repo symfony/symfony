@@ -54,10 +54,10 @@ class MessengerPass implements CompilerPassInterface
         }
 
         foreach ($container->findTaggedServiceIds($this->busTag) as $busId => $tags) {
-            if ($container->hasParameter($busMiddlewaresParameter = $busId.'.middlewares')) {
-                $this->registerBusMiddlewares($container, $busId, $container->getParameter($busMiddlewaresParameter));
+            if ($container->hasParameter($busMiddlewareParameter = $busId.'.middleware')) {
+                $this->registerBusMiddleware($container, $busId, $container->getParameter($busMiddlewareParameter));
 
-                $container->getParameterBag()->remove($busMiddlewaresParameter);
+                $container->getParameterBag()->remove($busMiddlewareParameter);
             }
 
             if ($container->hasDefinition('messenger.data_collector')) {
@@ -200,7 +200,7 @@ class MessengerPass implements CompilerPassInterface
         $container->getDefinition('messenger.data_collector')->addMethodCall('registerBus', array($busId, new Reference($tracedBusId)));
     }
 
-    private function registerBusMiddlewares(ContainerBuilder $container, string $busId, array $middlewares)
+    private function registerBusMiddleware(ContainerBuilder $container, string $busId, array $middleware)
     {
         $container->getDefinition($busId)->replaceArgument(0, array_map(function (string $name) use ($container, $busId) {
             if (!$container->has($messengerMiddlewareId = 'messenger.middleware.'.$name)) {
@@ -218,6 +218,6 @@ class MessengerPass implements CompilerPassInterface
             }
 
             return new Reference($messengerMiddlewareId);
-        }, $middlewares));
+        }, $middleware));
     }
 }

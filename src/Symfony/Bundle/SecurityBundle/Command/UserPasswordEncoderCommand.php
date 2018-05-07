@@ -192,16 +192,7 @@ EOF
         }
 
         if (empty($this->userClasses)) {
-<<<<<<< HEAD
-            throw new \RuntimeException('There are no configured encoders for the "security" extension.');
-=======
-            if (null === $this->encoderFactory) {
-                // BC to be removed and simply keep the exception whenever there is no configured user classes in 4.0
-                return User::class;
-            }
-
             throw new RuntimeException('There are no configured encoders for the "security" extension.');
->>>>>>> 3.4
         }
 
         if (!$input->isInteractive() || 1 === count($this->userClasses)) {

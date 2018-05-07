@@ -345,6 +345,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
         foreach ($tagVersions as $tag => $version) {
             $tags[$tag.static::TAGS_PREFIX] = $tag;
             if ($fetchTagVersions || !isset($this->knownTagVersions[$tag])) {
+                $fetchTagVersions = true;
                 continue;
             }
             $version -= $this->knownTagVersions[$tag][1];

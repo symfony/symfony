@@ -109,11 +109,6 @@ class FrameworkExtension extends Extension
     private $validatorConfigEnabled = false;
 
     /**
-     * @var string|null
-     */
-    private $kernelRootHash;
-
-    /**
      * Responds to the app.config configuration parameter.
      *
      * @throws LogicException
@@ -1570,20 +1565,6 @@ class FrameworkExtension extends Extension
                 $propertyAccessDefinition->setArguments(array(0, false));
             }
         }
-    }
-
-    /**
-     * Gets a hash of the kernel root directory.
-     *
-     * @return string
-     */
-    private function getKernelRootHash(ContainerBuilder $container)
-    {
-        if (!$this->kernelRootHash) {
-            $this->kernelRootHash = hash('sha256', $container->getParameter('kernel.root_dir'));
-        }
-
-        return $this->kernelRootHash;
     }
 
     /**

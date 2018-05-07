@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -84,7 +85,7 @@ EOF
         $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+            throw new RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));

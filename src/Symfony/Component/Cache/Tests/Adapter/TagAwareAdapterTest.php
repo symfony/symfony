@@ -69,6 +69,12 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($pool->getItem('i1')->isHit());
         $this->assertFalse($pool->getItem('i3')->isHit());
         $this->assertTrue($pool->getItem('foo')->isHit());
+
+        $anotherPoolInstance = $this->createCachePool();
+
+        $this->assertFalse($anotherPoolInstance->getItem('i1')->isHit());
+        $this->assertFalse($anotherPoolInstance->getItem('i3')->isHit());
+        $this->assertTrue($anotherPoolInstance->getItem('foo')->isHit());
     }
 
     public function testInvalidateCommits()

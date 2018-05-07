@@ -392,6 +392,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     }
 
     /**
+     * Gets the patterns defining the classes to parse and cache for annotations.
+     */
+    public function getAnnotatedClassesToCompile(): array
+    {
+        return array();
+    }
+
+    /**
      * Initializes bundles.
      *
      * @throws \LogicException if two bundles share a common name

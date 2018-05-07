@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Messenger\Transport\Serialization;
+use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -19,14 +20,14 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 interface EncoderInterface
 {
     /**
-     * Encodes a message to a common format understandable by transports. The encoded array should only
-     * contain scalar and arrays.
+     * Encodes an envelope content (message & items) to a common format understandable by transports.
+     * The encoded array should only contain scalar and arrays.
      *
      * The most common keys of the encoded array are:
      * - `body` (string) - the message body
      * - `headers` (string<string>) - a key/value pair of headers
      *
-     * @param object $message The object that is put on the MessageBus by the user
+     * @param Envelope $envelope The envelop containing the message put on the MessageBus by the user
      */
-    public function encode($message): array;
+    public function encode(Envelope $envelope): array;
 }

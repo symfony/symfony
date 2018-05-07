@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-05-04T13:26:48Z
+
+@javiereguiluz It should be open against 2.7, isn't ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-04T13:27:58Z
+
+In the blog post GitHub says that they only look into `master`. If you decide to merge on 2.7 too, the branch can be easily changed while merging. There shouldn't be any conflict.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-05-04T13:30:10Z
+
+What about adding label automatically ?
+https://help.github.com/articles/about-automation-for-issues-and-pull-requests-with-query-parameters/
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-04T13:32:41Z
+
+@lyrixx that's only available when using the URL to select the template, but not when using template files, right? Also:
+
+> For example, you must have permission to add a label to an issue to use the labels query parameter.
+
+None of our users have permission to add labels, so this wouldn't work either.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-04T15:40:06Z
+
+Should be merged on 2.7 as keeping the old files there would be confusing.
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2018-05-04T16:36:05Z
+
+Btw, the comment inside the template - what to fill in - is realy cool.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2018-05-06T11:17:02Z
+
+We probably have to update Carson as well, as it is currently based on the info table for issues/PRs.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-06T17:28:55Z
+
+I've done all the changes asked by Wouter and Maxime (thanks for your comments!) Let's merge this soon so we can test it with real people and that way we can iterate/improve these templates. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-07T18:17:06Z
+
+What about using emoticons like in https://pbs.twimg.com/media/DcTfEcFVwAAHkXX.jpg:large ?
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2018-05-07T18:24:42Z
+
+Ohh noo, even if my opinion does not matter, but i hate emoticons. It is like a flash back in msn/icq time. :-)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-07T18:40:46Z
+
+@nicolas-grekas to avoid long discussions, what if we merge this as-is? If we see that the templates are too dull, let's add emoticons ... if we add emoticons and we don't like them, let's remove them later. But let's move fast, please 🙏. This new gitHub feature is too amazing to not use it right away :) Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-07T18:43:09Z
+
+@ElectricMaxxx your opinion, and the opinions of the entire community, is taken into account. The only special thing are the +1/-1 votes when a decision must be made. Then, only the Core Team member votes are counted. But we read all your opinions and comments ... and lots of times you changed our minds!
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2018-05-07T18:47:22Z
+
+@javiereguiluz no worries, just learning the internal stuff. and btw. the culture i learned in symfony comunity, brought me to the point i am. Thanks a lot.
+
+so lets merge that, and i will adopt it in CMF and other packages i maintan :-)

@@ -15,6 +15,8 @@ namespace Symfony\Component\Messenger\Handler;
  * Marker interface for message handlers.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
 interface MessageHandlerInterface
 {

@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-01T18:45:30Z
+
+With these changes, if I am a developer that just get started with Messenger and uses the AMQP examples, here is what I'll have, as an exception labelled as coming from `ChainAdapterFactory` line 51:
+
+>  No adapter supports the given DSN "amqp://guest:guest@localhost:5672/%2f/messages
+
+My reaction would be "WTF?!". I would definitely favour having a DX that almost forces you to install Symfony's Serializer than having to Google things out 🙃
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-01T20:08:06Z
+
+@sroze we've the same point, that's the goal of this PR: improving DX with or *without* AMQP requirements as AMQP is optional, right?
+
+> No adapter supports the given DSN "amqp://guest:guest@localhost:5672/%2f/messages
+
+It's a good example of what I'm trying to improve here. In that case the Serializer component is not enabled or installed so the AMQP adapter was removed. Are you suggesting check by `0 === strpos($dsn, 'amqp://')` somewhere to show a better exception message?
+
+> My reaction would be "WTF?!". I would definitely favour having a DX that almost forces you to install Symfony's Serializer than having to Google things out
+
+Probably I can react the same if I'm a developer who just started with Messenger and I *don't* use the AMQP :P Is there any opinion against what I try to solve? or how has it been solved?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-01T20:31:39Z
+
+> a DX that almost forces you to install Symfony's Serializer...
+
+That was precisely my inspiration to create this PR :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-01T20:58:14Z
+
+I definitely get you on that one :). I guess the key is to answer “how can
+we make it more explicit than we need the serializer to be installed when
+using the AMQP adapter?” then. I tried earlier this month to move the check
+at runtime but it ended up having the “composer req serializer message”
+within the Messenger component wamespace which didn’t make sense either.
+On Tue, 1 May 2018 at 21:31, Yonel Ceruto <notifications@github.com> wrote:
+
+> a DX that almost forces you to install Symfony's Serializer...
+>
+> That was precisely my inspiration to create this PR :)
+>
+> —
+> You are receiving this because you were mentioned.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/27084#issuecomment-385781002>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEdt-mM8bcMiM7XtqpwH0UeFAXbOQks5tuMYxgaJpZM4TrQz_>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-02T00:34:29Z
+
+> How can we make it more explicit than we need the serializer to be installed when using the AMQP adapter?
+
+Well, I'm proposing one option here: disabling the AMQP adapter feature if there is no all dependencies to make it work, then we could add a note about `composer require symfony/serializer` into Messenger documentation to enable it if you want to use the built-in AMQP adapter.
+
+Actually there is many places and features inside Symfony that are enabled/disabled according to req installation, such as `doctrine/annotations` for [serializer](http://symfony.com/doc/current/serializer.html#using-serialization-groups-annotations) and [routing](http://symfony.com/doc/current/routing.html#creating-routes) components, [`symfony/security-csrf`](http://symfony.com/doc/current/components/form.html#csrf-protection), [`symfony/twig-bridge`](http://symfony.com/doc/current/components/form.html#twig-templating), [`symfony/translation`](http://symfony.com/doc/current/components/form.html#translation), [`symfony/validator`](http://symfony.com/doc/current/components/form.html#validation) for form component and [`ocramius/proxy-manager` for lazy services](http://symfony.com/doc/current/service_container/lazy_services.html#installation) in DI component for just to mention some.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-02T19:41:09Z
+
+> Well, I'm proposing one option here: disabling the AMQP adapter feature if there is no all dependencies to make it work, then we could add a note about composer require symfony/serializer into Messenger documentation to enable it if you want to use the built-in AMQP adapter.
+
+I'm happy with disabling it by default **but** we need a clearer message than this one:
+
+> No adapter supports the given DSN "amqp://guest:guest@localhost:5672/%2f/messages
+
+The trick is to be able to provide one, I'm not sure what's the best approach as I've tried multiple times without great success (see #26908 and #26941)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-03T13:35:08Z
+
+@sroze displayed a better exception message when you're trying to use AMQP and the default AMQP adapter is not available (either Serializer component is not installed or it isn't enabled).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-04T00:37:10Z
+
+Rebase needed after #27129
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-04T19:48:28Z
+
+Rebased again after #27150
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-05T11:55:53Z
+
+Shall we go ahead with this one?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-06T14:58:27Z
+
+Status: Needs Review

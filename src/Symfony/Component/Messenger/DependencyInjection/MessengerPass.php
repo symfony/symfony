@@ -161,14 +161,20 @@ class MessengerPass implements CompilerPassInterface
     private function registerReceivers(ContainerBuilder $container)
     {
         $receiverMapping = array();
-        foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
-            foreach ($tags as $tag) {
-                $receiverMapping[$id] = new Reference($id);
+        $taggedReceivers = $container->findTaggedServiceIds($this->receiverTag);
 
+        foreach ($taggedReceivers as $id => $tags) {
+            $receiverMapping[$id] = new Reference($id);
+
+            foreach ($tags as $tag) {
                 if (isset($tag['name'])) {
                     $receiverMapping[$tag['name']] = $receiverMapping[$id];
                 }
             }
+        }
+
+        if (1 === \count($taggedReceivers) && $container->hasDefinition('console.command.messenger_consume_messages')) {
+            $container->getDefinition('console.command.messenger_consume_messages')->replaceArgument(3, (string) current($receiverMapping));
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
@@ -178,9 +184,9 @@ class MessengerPass implements CompilerPassInterface
     {
         $senderLocatorMapping = array();
         foreach ($container->findTaggedServiceIds($this->senderTag) as $id => $tags) {
-            foreach ($tags as $tag) {
-                $senderLocatorMapping[$id] = new Reference($id);
+            $senderLocatorMapping[$id] = new Reference($id);
 
+            foreach ($tags as $tag) {
                 if (isset($tag['name'])) {
                     $senderLocatorMapping[$tag['name']] = $senderLocatorMapping[$id];
                 }

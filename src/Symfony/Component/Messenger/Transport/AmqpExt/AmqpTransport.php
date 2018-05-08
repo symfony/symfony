@@ -43,7 +43,7 @@ class AmqpTransport implements TransportInterface
      */
     public function receive(callable $handler): void
     {
-        ($this->receiver ?? $this->getReceiver())->receive($hander);
+        ($this->receiver ?? $this->getReceiver())->receive($handler);
     }
 
     /**
@@ -74,6 +74,6 @@ class AmqpTransport implements TransportInterface
 
     private function getConnection()
     {
-        return $this->connection = new Connection($this->dsn, $this->options, $this->debug);
+        return $this->connection = Connection::fromDsn($this->dsn, $this->options, $this->debug);
     }
 }

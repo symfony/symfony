@@ -22,20 +22,15 @@ class AmqpTransport implements TransportInterface
 {
     private $encoder;
     private $decoder;
-    private $dsn;
-    private $options;
-    private $debug;
     private $connection;
     private $receiver;
     private $sender;
 
-    public function __construct(EncoderInterface $encoder, DecoderInterface $decoder, string $dsn, array $options, bool $debug)
+    public function __construct(EncoderInterface $encoder, DecoderInterface $decoder, Connection $connection)
     {
         $this->encoder = $encoder;
         $this->decoder = $decoder;
-        $this->dsn = $dsn;
-        $this->options = $options;
-        $this->debug = $debug;
+        $this->connection = $connection;
     }
 
     /**
@@ -64,16 +59,11 @@ class AmqpTransport implements TransportInterface
 
     private function getReceiver()
     {
-        return $this->receiver = new AmqpReceiver($this->decoder, $this->connection ?? $this->getConnection());
+        return $this->receiver = new AmqpReceiver($this->decoder, $this->connection);
     }
 
     private function getSender()
     {
-        return $this->sender = new AmqpSender($this->encoder, $this->connection ?? $this->getConnection());
-    }
-
-    private function getConnection()
-    {
-        return $this->connection = Connection::fromDsn($this->dsn, $this->options, $this->debug);
+        return $this->sender = new AmqpSender($this->encoder, $this->connection);
     }
 }

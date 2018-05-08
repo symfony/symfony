@@ -33,7 +33,7 @@ class AmqpSender implements SenderInterface
     /**
      * {@inheritdoc}
      */
-    public function send($message)
+    public function send($message): void
     {
         $encodedMessage = $this->messageEncoder->encode($message);
 

@@ -9,15 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Transport\Factory;
-
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\SenderInterface;
+namespace Symfony\Component\Messenger\Transport;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class ChainTransportFactory implements TransportFactoryInterface
+class TransportFactory implements TransportFactoryInterface
 {
     private $factories;
 
@@ -29,22 +26,11 @@ class ChainTransportFactory implements TransportFactoryInterface
         $this->factories = $factories;
     }
 
-    public function createReceiver(string $dsn, array $options): ReceiverInterface
+    public function createTransport(string $dsn, array $options): TransportInterface
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($dsn, $options)) {
-                return $factory->createReceiver($dsn, $options);
-            }
-        }
-
-        throw new \InvalidArgumentException(sprintf('No transport supports the given DSN "%s".', $dsn));
-    }
-
-    public function createSender(string $dsn, array $options): SenderInterface
-    {
-        foreach ($this->factories as $factory) {
-            if ($factory->supports($dsn, $options)) {
-                return $factory->createSender($dsn, $options);
+                return $factory->createTransport($dsn, $options);
             }
         }
 

@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
+use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -44,13 +46,25 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
      */
     public function lateCollect()
     {
-        $this->data = array('messages' => array());
+        $this->data = array('messages' => array(), 'buses' => array_keys($this->traceableBuses));
 
+        $messages = array();
         foreach ($this->traceableBuses as $busName => $bus) {
             foreach ($bus->getDispatchedMessages() as $message) {
-                $this->data['messages'][] = $this->collectMessage($busName, $message);
+                $debugRepresentation = $this->cloneVar($this->collectMessage($busName, $message));
+                $messages[] = array($debugRepresentation, $message['callTime']);
             }
         }
+
+        // Order by call time
+        usort($messages, function (array $a, array $b): int {
+            return $a[1] > $b[1] ? 1 : -1;
+        });
+
+        // Keep the messages clones only
+        $this->data['messages'] = array_map(function (array $item): Data {
+            return $item[0];
+        }, $messages);
     }
 
     /**
@@ -78,31 +92,19 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
 
         $debugRepresentation = array(
             'bus' => $busName,
+            'envelopeItems' => $tracedMessage['envelopeItems'] ?? null,
             'message' => array(
-                'type' => \get_class($message),
-                'object' => $this->cloneVar($message),
+                'type' => new ClassStub(\get_class($message)),
+                'value' => $message,
             ),
         );
 
         if (array_key_exists('result', $tracedMessage)) {
             $result = $tracedMessage['result'];
-
-            if (\is_object($result)) {
-                $debugRepresentation['result'] = array(
-                    'type' => \get_class($result),
-                    'object' => $this->cloneVar($result),
-                );
-            } elseif (\is_array($result)) {
-                $debugRepresentation['result'] = array(
-                    'type' => 'array',
-                    'object' => $this->cloneVar($result),
-                );
-            } else {
-                $debugRepresentation['result'] = array(
-                    'type' => \gettype($result),
-                    'value' => $result,
-                );
-            }
+            $debugRepresentation['result'] = array(
+                'type' => \is_object($result) ? \get_class($result) : gettype($result),
+                'value' => $result,
+            );
         }
 
         if (isset($tracedMessage['exception'])) {
@@ -110,15 +112,31 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
 
             $debugRepresentation['exception'] = array(
                 'type' => \get_class($exception),
-                'message' => $exception->getMessage(),
+                'value' => $exception,
             );
         }
 
         return $debugRepresentation;
     }
 
-    public function getMessages(): array
+    public function getExceptionsCount(string $bus = null): int
     {
-        return $this->data['messages'] ?? array();
+        return array_reduce($this->getMessages($bus), function (int $carry, Data $message) {
+            return $carry += isset($message['exception']) ? 1 : 0;
+        }, 0);
+    }
+
+    public function getMessages(string $bus = null): array
+    {
+        $messages = $this->data['messages'] ?? array();
+
+        return $bus ? array_filter($messages, function (Data $message) use ($bus): bool {
+            return $bus === $message['bus'];
+        }) : $messages;
+    }
+
+    public function getBuses(): array
+    {
+        return $this->data['buses'];
     }
 }

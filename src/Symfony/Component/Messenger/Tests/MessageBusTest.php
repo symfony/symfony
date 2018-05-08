@@ -15,10 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EnvelopeAwareInterface;
-use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeItem;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class MessageBusTest extends TestCase
@@ -158,24 +158,5 @@ class MessageBusTest extends TestCase
         ));
 
         $bus->dispatch($envelope);
-    }
-}
-
-class AnEnvelopeItem implements EnvelopeItemInterface
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        return new self();
     }
 }

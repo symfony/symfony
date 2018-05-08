@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-08T15:13:05Z
+
+Also other here https://github.com/symfony/symfony/pull/27196
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-08T15:18:59Z
+
+Let's add more of an integration test, we should have caught that. Will do in a following PR...

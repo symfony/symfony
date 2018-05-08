@@ -34,7 +34,7 @@ class AmqpTransportFactory implements TransportFactoryInterface
 
     public function createTransport(string $dsn, array $options): TransportInterface
     {
-        return new AmqpTransport($this->encoder, $this->decoder, $dsn, $options, $thid->debug);
+        return new AmqpTransport($this->encoder, $this->decoder, $dsn, $options, $this->debug);
     }
 
     public function supports(string $dsn, array $options): bool

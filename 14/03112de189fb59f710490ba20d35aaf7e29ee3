@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-09T10:19:38Z
+
+this is broken, because the min support version of the workflow component is still 3.4 currently.
+
+There is 2 solutions here:
+
+- bump the min version (and add a conflict rule ensuring that as it is an optional dependency)
+- put a `method_exists` check to detect the presence of the new method
+
+I would go for the first solution. Requiring people to upgrade to workflow 4.1+ when they upgrade FrameworkBundle to 4.1 is fine.
+
+---------------------------------------------------------------------------
+
+by xkobal at 2018-05-09T11:04:13Z
+
+It's done. Tell me if my changes on composer.json are ok. Thanks.

@@ -273,6 +273,7 @@ class FrameworkExtension extends Extension
             $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
+            $container->removeDefinition('console.command.messenger_debug');
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {

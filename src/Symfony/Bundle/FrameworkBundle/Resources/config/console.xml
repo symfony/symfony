@@ -77,6 +77,11 @@
             <tag name="console.command" command="messenger:consume-messages" />
         </service>
 
+        <service id="console.command.messenger_debug" class="Symfony\Component\Messenger\Command\DebugCommand">
+            <argument type="collection" /> <!-- Message to handlers mapping -->
+            <tag name="console.command" command="debug:messenger" />
+        </service>
+
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
             <tag name="console.command" command="debug:router" />

@@ -104,26 +104,29 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $definitions = array();
+        $handlersLocatorMapping = array();
         foreach ($handlersByMessage as $message => $handlers) {
             if (1 === \count($handlers)) {
-                $handlersByMessage[$message] = current($handlers);
+                $handlersLocatorMapping['handler.'.$message] = current($handlers);
             } else {
                 $d = new Definition(ChainHandler::class, array($handlers));
                 $d->setPrivate(true);
                 $serviceId = hash('sha1', $message);
                 $definitions[$serviceId] = $d;
-                $handlersByMessage[$message] = new Reference($serviceId);
+                $handlersLocatorMapping['handler.'.$message] = new Reference($serviceId);
             }
         }
         $container->addDefinitions($definitions);
 
-        $handlersLocatorMapping = array();
-        foreach ($handlersByMessage as $message => $handler) {
-            $handlersLocatorMapping['handler.'.$message] = $handler;
-        }
-
         $handlerResolver = $container->getDefinition('messenger.handler_resolver');
         $handlerResolver->replaceArgument(0, ServiceLocatorTagPass::register($container, $handlersLocatorMapping));
+
+        if ($container->hasDefinition('console.command.messenger_debug')) {
+            $container->getDefinition('console.command.messenger_debug')
+                ->replaceArgument(0, array_map(function (array $handlers): array {
+                    return array_map('strval', $handlers);
+                }, $handlersByMessage));
+        }
     }
 
     private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId): array

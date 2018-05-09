@@ -573,10 +573,10 @@ class FrameworkExtension extends Extension
                 foreach ($workflow['supports'] as $supportedClassName) {
                     $strategyDefinition = new Definition(Workflow\SupportStrategy\InstanceOfSupportStrategy::class, array($supportedClassName));
                     $strategyDefinition->setPublic(false);
-                    $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $strategyDefinition));
+                    $registryDefinition->addMethodCall('addWorkflow', array(new Reference($workflowId), $strategyDefinition));
                 }
             } elseif (isset($workflow['support_strategy'])) {
-                $registryDefinition->addMethodCall('add', array(new Reference($workflowId), new Reference($workflow['support_strategy'])));
+                $registryDefinition->addMethodCall('addWorkflow', array(new Reference($workflowId), new Reference($workflow['support_strategy'])));
             }
 
             // Enable the AuditTrail

@@ -23,6 +23,8 @@ use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
+use Symfony\Component\Messenger\Transport\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\SenderInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -167,6 +169,11 @@ class MessengerPass implements CompilerPassInterface
         $taggedReceivers = $container->findTaggedServiceIds($this->receiverTag);
 
         foreach ($taggedReceivers as $id => $tags) {
+            $receiverClass = $container->findDefinition($id)->getClass();
+            if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
+                throw new RuntimeException(sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));
+            }
+
             $receiverMapping[$id] = new Reference($id);
 
             foreach ($tags as $tag) {
@@ -187,6 +194,11 @@ class MessengerPass implements CompilerPassInterface
     {
         $senderLocatorMapping = array();
         foreach ($container->findTaggedServiceIds($this->senderTag) as $id => $tags) {
+            $senderClass = $container->findDefinition($id)->getClass();
+            if (!is_subclass_of($senderClass, SenderInterface::class)) {
+                throw new RuntimeException(sprintf('Invalid sender "%s": class "%s" must implement interface "%s".', $id, $senderClass, SenderInterface::class));
+            }
+
             $senderLocatorMapping[$id] = new Reference($id);
 
             foreach ($tags as $tag) {

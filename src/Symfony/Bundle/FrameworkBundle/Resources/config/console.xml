@@ -73,6 +73,7 @@
             <argument type="service" id="message_bus" />
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>null</argument> <!-- Default receiver name -->
 
             <tag name="console.command" command="messenger:consume-messages" />
         </service>

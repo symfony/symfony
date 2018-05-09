@@ -51,7 +51,7 @@
         "symfony/templating": "~3.4|~4.0",
         "symfony/validator": "^4.1",
         "symfony/var-dumper": "~3.4|~4.0",
-        "symfony/workflow": "~3.4|~4.0",
+        "symfony/workflow": "^4.1",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/lock": "~3.4|~4.0",
@@ -72,7 +72,7 @@
         "symfony/stopwatch": "<3.4",
         "symfony/translation": "<3.4",
         "symfony/validator": "<4.1",
-        "symfony/workflow": "<3.4"
+        "symfony/workflow": "<4.1"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

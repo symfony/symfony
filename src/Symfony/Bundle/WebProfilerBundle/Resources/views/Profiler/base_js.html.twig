@@ -421,7 +421,7 @@
                         /* Evaluate in global scope scripts embedded inside the toolbar */
                         eval.call({}, ([].slice.call(el.querySelectorAll('script')).map(function (script) {
                           return script.firstChild.nodeValue;
-                        }).join('\n')));
+                        }).join(';\n')));
 
                         el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
 

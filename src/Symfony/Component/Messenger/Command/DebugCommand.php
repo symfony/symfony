@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @experimental in 4.1
  */
-class MessengerDebugCommand extends Command
+class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:messenger';
 

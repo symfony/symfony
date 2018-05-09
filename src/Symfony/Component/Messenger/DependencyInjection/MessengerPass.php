@@ -104,26 +104,29 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $definitions = array();
+        $handlersLocatorMapping = array();
         foreach ($handlersByMessage as $message => $handlers) {
             if (1 === \count($handlers)) {
-                $handlersByMessage[$message] = current($handlers);
+                $handlersLocatorMapping['handler.'.$message] = current($handlers);
             } else {
                 $d = new Definition(ChainHandler::class, array($handlers));
                 $d->setPrivate(true);
                 $serviceId = hash('sha1', $message);
                 $definitions[$serviceId] = $d;
-                $handlersByMessage[$message] = new Reference($serviceId);
+                $handlersLocatorMapping['handler.'.$message] = new Reference($serviceId);
             }
         }
         $container->addDefinitions($definitions);
 
-        $handlersLocatorMapping = array();
-        foreach ($handlersByMessage as $message => $handler) {
-            $handlersLocatorMapping['handler.'.$message] = $handler;
-        }
-
         $handlerResolver = $container->getDefinition('messenger.handler_resolver');
         $handlerResolver->replaceArgument(0, ServiceLocatorTagPass::register($container, $handlersLocatorMapping));
+
+        if ($container->hasDefinition('console.command.messenger_debug')) {
+            $container->getDefinition('console.command.messenger_debug')
+                ->replaceArgument(0, array_map(function (array $handlers): array {
+                    return array_map('strval', $handlers);
+                }, $handlersByMessage));
+        }
     }
 
     private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId): array
@@ -161,14 +164,20 @@ class MessengerPass implements CompilerPassInterface
     private function registerReceivers(ContainerBuilder $container)
     {
         $receiverMapping = array();
-        foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
-            foreach ($tags as $tag) {
-                $receiverMapping[$id] = new Reference($id);
+        $taggedReceivers = $container->findTaggedServiceIds($this->receiverTag);
 
+        foreach ($taggedReceivers as $id => $tags) {
+            $receiverMapping[$id] = new Reference($id);
+
+            foreach ($tags as $tag) {
                 if (isset($tag['name'])) {
                     $receiverMapping[$tag['name']] = $receiverMapping[$id];
                 }
             }
+        }
+
+        if (1 === \count($taggedReceivers) && $container->hasDefinition('console.command.messenger_consume_messages')) {
+            $container->getDefinition('console.command.messenger_consume_messages')->replaceArgument(3, (string) current($receiverMapping));
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
@@ -178,9 +187,9 @@ class MessengerPass implements CompilerPassInterface
     {
         $senderLocatorMapping = array();
         foreach ($container->findTaggedServiceIds($this->senderTag) as $id => $tags) {
-            foreach ($tags as $tag) {
-                $senderLocatorMapping[$id] = new Reference($id);
+            $senderLocatorMapping[$id] = new Reference($id);
 
+            foreach ($tags as $tag) {
                 if (isset($tag['name'])) {
                     $senderLocatorMapping[$tag['name']] = $senderLocatorMapping[$id];
                 }

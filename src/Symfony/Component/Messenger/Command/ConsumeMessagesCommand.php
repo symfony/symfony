@@ -37,14 +37,16 @@ class ConsumeMessagesCommand extends Command
     private $bus;
     private $receiverLocator;
     private $logger;
+    private $defaultReceiverName;
 
-    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null)
+    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, string $defaultReceiverName = null)
     {
         parent::__construct();
 
         $this->bus = $bus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
+        $this->defaultReceiverName = $defaultReceiverName;
     }
 
     /**
@@ -54,7 +56,7 @@ class ConsumeMessagesCommand extends Command
     {
         $this
             ->setDefinition(array(
-                new InputArgument('receiver', InputArgument::REQUIRED, 'Name of the receiver'),
+                new InputArgument('receiver', $this->defaultReceiverName ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'Name of the receiver', $this->defaultReceiverName),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),

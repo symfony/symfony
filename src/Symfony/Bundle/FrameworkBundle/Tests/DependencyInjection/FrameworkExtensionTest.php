@@ -533,30 +533,20 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessengerTransports()
     {
         $container = $this->createContainerFromFile('messenger_transports');
-        $this->assertTrue($container->hasDefinition('messenger.sender.default'));
-        $this->assertTrue($container->getDefinition('messenger.sender.default')->hasTag('messenger.sender'));
-        $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.sender.default')->getTag('messenger.sender'));
-        $this->assertTrue($container->hasDefinition('messenger.receiver.default'));
-        $this->assertTrue($container->getDefinition('messenger.receiver.default')->hasTag('messenger.receiver'));
-        $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.receiver.default')->getTag('messenger.receiver'));
+        $this->assertTrue($container->hasDefinition('messenger.transport.default'));
+        $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
+        $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.sender'));
+        $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
+        $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.transport.default')->getTag('messenger.sender'));
 
-        $this->assertTrue($container->hasDefinition('messenger.sender.customised'));
-        $senderFactory = $container->getDefinition('messenger.sender.customised')->getFactory();
-        $senderArguments = $container->getDefinition('messenger.sender.customised')->getArguments();
+        $this->assertTrue($container->hasDefinition('messenger.transport.customised'));
+        $transportFactory = $container->getDefinition('messenger.transport.customised')->getFactory();
+        $transportArguments = $container->getDefinition('messenger.transport.customised')->getArguments();
 
-        $this->assertEquals(array(new Reference('messenger.transport_factory'), 'createSender'), $senderFactory);
-        $this->assertCount(2, $senderArguments);
-        $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $senderArguments[0]);
-        $this->assertSame(array('queue' => array('name' => 'Queue')), $senderArguments[1]);
-
-        $this->assertTrue($container->hasDefinition('messenger.receiver.customised'));
-        $receiverFactory = $container->getDefinition('messenger.receiver.customised')->getFactory();
-        $receiverArguments = $container->getDefinition('messenger.receiver.customised')->getArguments();
-
-        $this->assertEquals(array(new Reference('messenger.transport_factory'), 'createReceiver'), $receiverFactory);
-        $this->assertCount(2, $receiverArguments);
-        $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $receiverArguments[0]);
-        $this->assertSame(array('queue' => array('name' => 'Queue')), $receiverArguments[1]);
+        $this->assertEquals(array(new Reference('messenger.transport_factory'), 'createTransport'), $transportFactory);
+        $this->assertCount(2, $transportArguments);
+        $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $transportArguments[0]);
+        $this->assertSame(array('queue' => array('name' => 'Queue')), $transportArguments[1]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
     }

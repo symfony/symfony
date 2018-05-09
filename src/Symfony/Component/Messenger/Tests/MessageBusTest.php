@@ -26,6 +26,15 @@ class MessageBusTest extends TestCase
         $this->assertInstanceOf(MessageBusInterface::class, $bus);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Messenger\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid type for message argument. Expected object, but got "string".
+     */
+    public function testItDispatchInvalidMessageType()
+    {
+        (new MessageBus())->dispatch('wrong');
+    }
+
     public function testItCallsMiddlewareAndChainTheReturnValue()
     {
         $message = new DummyMessage('Hello');

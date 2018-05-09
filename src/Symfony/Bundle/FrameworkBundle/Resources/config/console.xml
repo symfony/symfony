@@ -73,8 +73,14 @@
             <argument type="service" id="message_bus" />
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>null</argument> <!-- Default receiver name -->
 
             <tag name="console.command" command="messenger:consume-messages" />
+        </service>
+
+        <service id="console.command.messenger_debug" class="Symfony\Component\Messenger\Command\DebugCommand">
+            <argument type="collection" /> <!-- Message to handlers mapping -->
+            <tag name="console.command" command="debug:messenger" />
         </service>
 
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">

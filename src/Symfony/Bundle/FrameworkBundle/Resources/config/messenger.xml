@@ -60,7 +60,7 @@
         </service>
 
         <!-- transports -->
-        <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\Factory\ChainTransportFactory">
+        <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\TransportFactory">
             <argument type="tagged" tag="messenger.transport_factory" />
         </service>
 

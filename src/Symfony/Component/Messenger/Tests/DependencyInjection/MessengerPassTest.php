@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator;
@@ -114,6 +115,41 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertEquals(array(AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
+    }
+
+    public function testItRegistersOneReceiverAndSetsTheDefaultOneOnTheCommand()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
+            new Reference('message_bus'),
+            new Reference('messenger.receiver_locator'),
+            null,
+            null,
+        ));
+
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('name' => 'amqp'));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(AmqpReceiver::class, $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
+    }
+
+    public function testItRegistersMultipleReceiversAndDoesNotSetTheDefaultOneOnTheCommand()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
+            new Reference('message_bus'),
+            new Reference('messenger.receiver_locator'),
+            null,
+            null,
+        ));
+
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('name' => 'amqp'));
+        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', array('name' => 'dummy'));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertNull($container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
     }
 
     public function testItRegistersSenders()

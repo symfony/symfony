@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-08T11:29:29Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-05-08T12:49:40Z
+
+Looks like a safe guard to me =/ which we usually dont do ;-)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-08T14:33:18Z
+
+@ro0NL how would you improve the DX in this case then?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-05-08T15:04:08Z
+
+>  how would you improve the DX in this case then?
+
+Depends.. how does `dispatch()` receive a string? If passed manually you are violating the contract already..
+
+edit: also in php7.2 this cannot even happen anymore at the language level :) due new `object` type.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-09T11:20:51Z
+
+> also in php7.2 this cannot even happen anymore at the language level :) due new object type.
+
+But because it doesn't in PHP 7.1, it makes sense to throw :)

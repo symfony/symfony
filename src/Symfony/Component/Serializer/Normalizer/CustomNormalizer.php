@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, VaryingSupportInterface
 {
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
@@ -71,8 +71,8 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * {@inheritdoc}
      */
-    public function hasCacheableSupportsMethod(): bool
+    public function isSupportVariedOnDataAndContext(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ !== \get_class($this);
     }
 }

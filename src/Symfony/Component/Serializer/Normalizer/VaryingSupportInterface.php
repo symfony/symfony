@@ -12,15 +12,16 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 /**
- * Marker interface for normalizers and denormalizers that use
- * only the type and the format in their supports*() methods.
- *
- * By implementing this interface, the return value of the
- * supports*() methods will be cached by type and format.
+ * Defines the criteria by which normalizers and denormalizers may vary
+ * their support.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface CacheableSupportsMethodInterface
+interface VaryingSupportInterface
 {
-    public function hasCacheableSupportsMethod(): bool;
+    /**
+     * Checks whether the normalization and denormalization support
+     * will vary depending on the data and context provided.
+     */
+    public function isSupportVariedOnDataAndContext(): bool;
 }

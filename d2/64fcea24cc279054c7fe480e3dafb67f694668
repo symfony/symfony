@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-03T17:26:44Z
+
+WDYT of moving all the added logic to a new exception class, child of LogicException?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-05-04T12:16:45Z
+
+@nicolas-grekas I added the new Exception class.
+
+Note: Exception::trace is private, So I need reflection. line and file are protected ;).
+and `get*` methods are final

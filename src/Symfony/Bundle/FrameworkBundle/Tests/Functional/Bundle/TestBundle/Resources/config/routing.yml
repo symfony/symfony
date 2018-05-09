@@ -48,3 +48,7 @@ fragment_inlined:
 array_controller:
     path:     /array_controller
     defaults: { _controller: [ArrayController, someAction] }
+
+no_kernel_response_invocation:
+    path: /no_kernel_response_invocation
+    defaults: { _controller: TestBundle:NoKernelResponseInvocationOnException:index }

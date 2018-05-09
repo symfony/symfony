@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
@@ -39,6 +40,10 @@ class MessageBus implements MessageBusInterface
      */
     public function dispatch($message)
     {
+        if (!\is_object($message)) {
+            throw new InvalidArgumentException(sprintf('Invalid type for message argument. Expected object, but got "%s".', \gettype($message)));
+        }
+
         return \call_user_func($this->callableForNextMiddleware(0), $message);
     }
 

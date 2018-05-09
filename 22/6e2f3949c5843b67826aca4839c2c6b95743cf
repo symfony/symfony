@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-04-27T20:37:43Z
+
+Ah nice, this will make life a lot easier for complex exclusion rules in existing codebases!
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2018-05-01T20:51:05Z
+
+This is awesome, great job!
+
+---------------------------------------------------------------------------
+
+by magnetik at 2018-05-02T12:26:42Z
+
+I've updated the PR according to the changes. I'll do a PR for symfony doc too if needed.

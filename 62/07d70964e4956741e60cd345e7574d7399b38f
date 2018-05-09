@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-04T18:20:25Z
+
+One less PR to do on my list :)
+
+The tactician debug command looks like this:
+
+```txt
+Tactician routing
+=================
+
+Bus: default
+------------
+
+ ----------------------------------------------------- -----------------
+  Command                                               Handler Service
+ ----------------------------------------------------- -----------------
+  League\Tactician\Bundle\Tests\Fake\FakeCommand        a.handler
+  League\Tactician\Bundle\Tests\Fake\OtherFakeCommand   b.handler
+ ----------------------------------------------------- -----------------
+```
+
+https://github.com/thephpleague/tactician-bundle/blob/master/tests/Integration/DebugCommandTest.php#L37-L48
+
+Would be great to have messages <-> handlers too here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-04T18:27:39Z
+
+A message can have multiple handlers .. :thinking:
+
+Also the intend was concerning end users who mostly care about `$bus->dispatch($whatCanIPutHere)`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-04T18:30:33Z
+
+> A message can have multiple handlers ..
+
+Wasn't the case with tactician, but it's not a problem here. Just show all associated handlers.
+
+> Also the intend was concerning end users who mostly care about $bus->dispatch($whatCanIPutHere).
+
+Would still be useful in this way :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-08T06:25:27Z
+
+Latest version
+
+![image](https://user-images.githubusercontent.com/1047696/38464001-602e24f4-3b06-11e8-9905-fe0a01d23cb5.png)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-21T18:31:35Z
+
+I *do* like the table layout mentioned above https://github.com/symfony/symfony/pull/26803#issuecomment-378697046 - it's just a bit easier to read.
+
+I realize that it's possible for a message to have several handlers. This is an edge-case, and I think we could handle that like this:
+
+```txt
+ ----------------------------------------------------- -----------------
+  Command                                               Handler Service
+ ----------------------------------------------------- -----------------
+  League\Tactician\Bundle\Tests\Fake\FakeCommand        a.handler
+                                                        c.handler
+  League\Tactician\Bundle\Tests\Fake\OtherFakeCommand   b.handler
+ ----------------------------------------------------- -----------------
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-25T16:42:12Z
+
+This PR needs to be updated following #26864 :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-28T07:40:19Z
+
+Rebased.
+
+@sroze we cant group messages per bus as there's no such concept, so it's still a single list of messages.
+
+@weaverryan can you update the table example with handler services like `League\Tactician\Bundle\Tests\Fake\FakeCommandHandler` and then tell me if 2 column layout works for you :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-28T14:26:14Z
+
+As we talked about, the table layout I suggested won’t work - class names are too long. So, the original format should be used, but probably with some added coloration to make it nice and clear :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-05-03T13:07:14Z
+
+Here's a current screenshot, which I think looks quite good :).
+
+<img width="802" alt="screen shot 2018-05-03 at 9 06 01 am" src="https://user-images.githubusercontent.com/121003/39578117-48041d48-4eb1-11e8-8191-de1a7f9ece7e.png">
+
+We could perhaps do it in a different PR, but what about showing where each message is routed?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-05-09T09:09:16Z
+
+Thx @sroze .. still no clue about failing test :(
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-09T10:04:09Z
+
+@ro0NL : `deps=high` failure expected. For `deps=low`, try updating the Framework bundle `composer.json` file to require `symfony/messenger` `~4.1-beta2`
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-09T11:25:45Z
+
+The `-beta2` part is important, as `prefer-stable` and `prefer-lowest` is used, so it selects the released beta1 first when using just `@beta`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-05-09T11:35:49Z
+
+your're right. switched it to `@dev`. Not sure `beta2` will resolve... :S should we try? :sweat:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-09T11:42:36Z
+
+That's usually what is done, so unless I'm missing something it should work: https://github.com/symfony/symfony/commit/e81005ed5e4ae2f4f53afda12cec49e8131df488. It should resolve as far as `minimum-stability` allows it (which does)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-09T11:59:33Z
+
+Yay, and tests are all green now. Thanks @ogizanagi for the hint.

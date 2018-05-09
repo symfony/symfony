@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-07T16:59:41Z
+
+What exactly was the bug?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-07T17:02:36Z
+
+The original envelope was not properly passed along the whole middleware stack when calling `$next($message)`, so items were vanished in between.
+This fixes it and also allows altering the message and the envelope items through middlewares.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-07T18:08:29Z
+
+I've pushed another commit to https://github.com/sroze/symfony/pull/6 for the TraceableBus which misses a small update.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-09T18:25:58Z
+
+Merging as we found and fixed the bug that was almost to bug in beta1.

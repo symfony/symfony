@@ -263,7 +263,7 @@ class ConfigurationTest extends TestCase
                 'encoder' => 'messenger.transport.serializer',
                 'decoder' => 'messenger.transport.serializer',
                 'default_bus' => null,
-                'buses' => array('default' => array('default_middleware' => true, 'middleware' => array())),
+                'buses' => array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())),
             ),
         );
     }

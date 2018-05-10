@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-07T18:21:27Z
+
+I'm not sure this is a good idea, is it?
+This is like by-id vs by-type autowiring.
+Messages are VO objects, their interface are mostly meaningless to me.
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-07T18:27:38Z
+
+I foresee it being a burden to declare all the messages you want sent in your config. This would alleviate that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-07T18:33:10Z
+
+But this makes it impossible to opt-out from a handler while implementing an interface or extending a base message class. This feels a lot like global interface-based configuration, which is a no-go.
+Creating a new message class should require one to explicitly tell where it should be handled IMHO.
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-07T18:44:02Z
+
+Yeah, I understand what you're saying. I have thought of alternative solutions that would work within the current implementation.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-07T18:47:19Z
+
+> But this makes it impossible to opt-out from a handler
+
+That's for senders, not handlers. Also you can opt-out by specifying the specific message class on the routing configuration as classes take precedence over interfaces in SenderLocator.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-07T18:49:08Z
+
+~Putting a :-1: here to prevent merging unless the discussion resolves the issue.~
+
+~@ogizanagi this is still doing interface-based configuration. It's nice that there is a way to work around it, but that shouldn't be needed at all IMHO. It should be the other way around.~
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-07T19:14:12Z
+
+Is the same issue blocker applicable to wildcard `'*'` option too?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-07T19:29:12Z
+
+For the record, this is what it would allows:
+```yaml
+framework:
+    messenger:
+        transports:
+            amqp: ...
+            aws: ...
+        routing:
+            App\Message\AMQPMessageInterface: amqp
+            App\Message\AWSMessageInterface: aws
+```
+from here, all my messages that need to be send through amqp transport will implement `AMQPMessageInterface` and so on. Otherwise, I must configure each new message class within the routing configuration.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-07T19:46:16Z
+
+But I understand what @nicolas-grekas says too and probably this goal should be reached in another way around...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-07T20:49:11Z
+
+OK, I get it better now. I'm removing my -1 above, this may actually be a good idea: this is configuration-based already and senders are not bound by messages' interfaces. The issue here is finding which sender to select for a given message, and when no sender is explicitly defined, falling back to interfaces then `*` should be OK. Sorry for the misunderstanding.
+
+I then have a question: what about parent classes? e.g VarDumper's AbstractCloner checks them before:
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/VarDumper/Cloner/AbstractCloner.php#L273
+
+Don't we want to do the same here?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-07T22:15:36Z
+
+Parent classes supports added.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-07T22:35:59Z
+
+We should be clear that this is a fallback: when no sender exists for a given class, we check the parents. One could expect that when a sender is registered for a given interface, it gets all the messages from that type even if a class-specific sender is also configured. Correct ?
+
+>  `App\Message\AMQPMessageInterface: amqp`
+
+Note that I feel like this kind of dispatching should be avoided: messages should be independent of the sender that may handle them, isn't it? The interface should be semantic instead, allowing to label message by "kinds", and not by infrastructure component.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-07T23:58:18Z
+
+> We should be clear that this is a fallback: when no sender exists for a given class, we check the parents.
+
+Indeed...
+
+> One could expect that when a sender is registered for a given interface, it gets all the messages from that type even if a class-specific sender is also configured. Correct ?
+
+Sorry I'm not sure to understand your statement very well... `when a sender is registered for a given interface` it's used to send all messages that implement that interface unless exists `a class-specific sender also configured` for the same message, which probably should be a different sender and the message shouldn't implement that interface. Anyway this is the current order of priority: `'class|parents|interfaces|*': sender_name`.
+
+> Note that I feel like this kind of dispatching should be avoided: messages should be independent of the sender that may handle them, isn't it?
+
+It's just an example, but I guess it depeds of how many senders you have and how many senders are handling the same kind of messages.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-08T11:27:01Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-09T19:18:03Z
+
+Rebased.

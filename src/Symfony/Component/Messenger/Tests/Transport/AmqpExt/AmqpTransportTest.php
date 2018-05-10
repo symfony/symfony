@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
@@ -45,11 +46,11 @@ class AmqpTransportTest extends TestCase
         $amqpEnvelope->method('getBody')->willReturn('body');
         $amqpEnvelope->method('getHeaders')->willReturn(array('my' => 'header'));
 
-        $decoder->method('decode')->with(array('body' => 'body', 'headers' => array('my' => 'header')))->willReturn($decodedMessage);
+        $decoder->method('decode')->with(array('body' => 'body', 'headers' => array('my' => 'header')))->willReturn(Envelope::wrap($decodedMessage));
         $connection->method('get')->willReturn($amqpEnvelope);
 
-        $transport->receive(function ($message) use ($transport, $decodedMessage) {
-            $this->assertSame($decodedMessage, $message);
+        $transport->receive(function (Envelope $envelope) use ($transport, $decodedMessage) {
+            $this->assertSame($decodedMessage, $envelope->getMessage());
 
             $transport->stop();
         });

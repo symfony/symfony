@@ -41,12 +41,12 @@ class ConsumeMessagesCommand extends Command
 
     public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, string $defaultReceiverName = null)
     {
-        parent::__construct();
-
         $this->bus = $bus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->defaultReceiverName = $defaultReceiverName;
+
+        parent::__construct();
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Fixtures;
 
-class DummyMessage
+class DummyMessage implements DummyMessageInterface
 {
     private $message;
 

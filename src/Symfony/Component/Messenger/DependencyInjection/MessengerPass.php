@@ -63,7 +63,7 @@ class MessengerPass implements CompilerPassInterface
             }
 
             if ($container->hasDefinition('messenger.data_collector')) {
-                $this->registerBusToCollector($container, $busId, $tags[0]);
+                $this->registerBusToCollector($container, $busId);
             }
         }
 
@@ -177,8 +177,8 @@ class MessengerPass implements CompilerPassInterface
             $receiverMapping[$id] = new Reference($id);
 
             foreach ($tags as $tag) {
-                if (isset($tag['name'])) {
-                    $receiverMapping[$tag['name']] = $receiverMapping[$id];
+                if (isset($tag['alias'])) {
+                    $receiverMapping[$tag['alias']] = $receiverMapping[$id];
                 }
             }
         }
@@ -202,8 +202,8 @@ class MessengerPass implements CompilerPassInterface
             $senderLocatorMapping[$id] = new Reference($id);
 
             foreach ($tags as $tag) {
-                if (isset($tag['name'])) {
-                    $senderLocatorMapping[$tag['name']] = $senderLocatorMapping[$id];
+                if (isset($tag['alias'])) {
+                    $senderLocatorMapping[$tag['alias']] = $senderLocatorMapping[$id];
                 }
             }
         }
@@ -211,7 +211,7 @@ class MessengerPass implements CompilerPassInterface
         $container->getDefinition('messenger.sender_locator')->replaceArgument(0, $senderLocatorMapping);
     }
 
-    private function registerBusToCollector(ContainerBuilder $container, string $busId, array $tag)
+    private function registerBusToCollector(ContainerBuilder $container, string $busId)
     {
         $container->setDefinition(
             $tracedBusId = 'debug.traced.'.$busId,

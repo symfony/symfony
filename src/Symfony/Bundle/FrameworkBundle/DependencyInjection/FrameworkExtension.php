@@ -1511,8 +1511,8 @@ class FrameworkExtension extends Extension
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
                 ->setArguments(array($transport['dsn'], $transport['options']))
-                ->addTag('messenger.receiver', array('name' => $name))
-                ->addTag('messenger.sender', array('name' => $name))
+                ->addTag('messenger.receiver', array('alias' => $name))
+                ->addTag('messenger.sender', array('alias' => $name))
             ;
             $container->setDefinition('messenger.transport.'.$name, $transportDefinition);
         }

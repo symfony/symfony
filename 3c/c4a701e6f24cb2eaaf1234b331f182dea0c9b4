@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-10T14:05:56Z
+
+Me too :) Could we have a test case this? or it's already covered?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-10T14:08:50Z
+
+@yceruto : It's already covered (see failing tests in the description :) ).
+We missed it because of the component activity and not systematically rebasing PRs after a merge, hence not re-triggering a fresh build.

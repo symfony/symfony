@@ -157,6 +157,35 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('test', $obj->getBar());
     }
 
+    public function testConstructorDenormalizeWithArgumentArrayOfObjects()
+    {
+        $extractor = new PropertyInfoExtractor(array(), array(new PhpDocExtractor()));
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer(array(new ArrayDenormalizer(), $normalizer));
+
+        $expectedObjectInner1 = new ObjectInner();
+        $expectedObjectInner1->foo = 1;
+        $expectedObjectInner2 = new ObjectInner();
+        $expectedObjectInner2->foo = 2;
+
+        $data = array(
+            'id' => 10,
+            'inners' => array(array('foo' => 1), array('foo' => 2)),
+        );
+
+        $obj = $serializer->denormalize($data, DummyWithConstructorArrayOfObjects::class);
+
+        $this->assertInstanceOf(DummyWithConstructorArrayOfObjects::class, $obj);
+        $this->assertSame(10, $obj->getId());
+        $this->assertEquals(
+            array(
+                $expectedObjectInner1,
+                $expectedObjectInner2,
+            ),
+            $obj->getInners()
+        );
+    }
+
     public function testConstructorWithObjectDenormalize()
     {
         $data = new \stdClass();
@@ -1150,6 +1179,32 @@ class ObjectConstructorArgsWithDefaultValueDummy
     public function otherMethod()
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class DummyWithConstructorArrayOfObjects
+{
+    private $id;
+
+    /**
+     * @var ObjectInner[]
+     */
+    private $inners;
+
+    public function __construct($id, array $inners)
+    {
+        $this->id = $id;
+        $this->inners = $inners;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getInners(): array
+    {
+        return $this->inners;
     }
 }
 

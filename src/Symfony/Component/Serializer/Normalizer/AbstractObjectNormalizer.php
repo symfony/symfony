@@ -158,6 +158,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
+     * @internal
+     */
+    protected function parseConstructorParameter(array &$data, $key, array &$context, \ReflectionParameter $constructorParameter, $format)
+    {
+        if (!$constructorParameter->hasType() || $constructorParameter->getType()->isBuiltin()) {
+            return $this->validateAndDenormalize($constructorParameter->getDeclaringClass()->name, $constructorParameter->name, $data[$key], $format, $context);
+        }
+
+        return parent::parseConstructorParameter($data, $key, $context, $constructorParameter, $format);
+    }
+
+    /**
      * Gets and caches attributes for the given object, format and context.
      *
      * @param object      $object

@@ -406,32 +406,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         $params = array_merge($params, $data[$paramName]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    $parameterData = $data[$key];
-                    if (null === $parameterData && $constructorParameter->allowsNull()) {
-                        $params[] = null;
-                        // Don't run set for a parameter passed to the constructor
-                        unset($data[$key]);
-                        continue;
-                    }
-                    try {
-                        if (null !== $constructorParameter->getClass()) {
-                            if (!$this->serializer instanceof DenormalizerInterface) {
-                                throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), self::class));
-                            }
-                            $parameterClass = $constructorParameter->getClass()->getName();
-                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $paramName));
-                        }
-                    } catch (\ReflectionException $e) {
-                        throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
-                    } catch (MissingConstructorArgumentsException $e) {
-                        if (!$constructorParameter->getType()->allowsNull()) {
-                            throw $e;
-                        }
-                        $parameterData = null;
-                    }
-
                     // Don't run set for a parameter passed to the constructor
-                    $params[] = $parameterData;
+                    $params[] = $this->parseConstructorParameter($data, $key, $context, $constructorParameter, $format);
                     unset($data[$key]);
                 } elseif (array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? array())) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
@@ -452,6 +428,39 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         return new $class();
+    }
+
+    /**
+     * @internal
+     */
+    protected function parseConstructorParameter(array &$data, $key, array &$context, \ReflectionParameter $constructorParameter, $format)
+    {
+        $parameterData = $data[$key];
+        if (null === $parameterData && $constructorParameter->allowsNull()) {
+            $params[] = null;
+            // Don't run set for a parameter passed to the constructor
+            unset($data[$key]);
+
+            return $parameterData;
+        }
+        try {
+            if (null !== $constructorParameter->getClass()) {
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot create an instance of "%s" from serialized data because the serializer injected in "%s" is not a denormalizer', $constructorParameter->getClass(), self::class));
+                }
+                $parameterClass = $constructorParameter->getClass()->getName();
+                $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $constructorParameter->name));
+            }
+        } catch (\ReflectionException $e) {
+            throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
+        } catch (MissingConstructorArgumentsException $e) {
+            if (!$constructorParameter->getType()->allowsNull()) {
+                throw $e;
+            }
+            $parameterData = null;
+        }
+
+        return $parameterData;
     }
 
     /**

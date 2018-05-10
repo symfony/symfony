@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -52,9 +53,9 @@ class AmqpTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function send($message): void
+    public function send(Envelope $envelope): void
     {
-        ($this->sender ?? $this->getSender())->send($message);
+        ($this->sender ?? $this->getSender())->send($envelope);
     }
 
     private function getReceiver()

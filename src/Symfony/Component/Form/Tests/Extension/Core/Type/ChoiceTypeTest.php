@@ -2568,7 +2568,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
-        /**
+    /**
      * @dataProvider provideTrimCases
      */
     public function testTrimIsDisabled($multiple, $expanded)

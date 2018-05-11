@@ -61,12 +61,10 @@ class Type
      * @param bool        $nullable
      * @param string|null $class
      * @param bool        $collection
-     * @param Type|null   $collectionKeyType
-     * @param Type|null   $collectionValueType
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($builtinType, $nullable = false, $class = null, $collection = false, Type $collectionKeyType = null, Type $collectionValueType = null)
+    public function __construct($builtinType, $nullable = false, $class = null, $collection = false, self $collectionKeyType = null, self $collectionValueType = null)
     {
         if (!in_array($builtinType, self::$builtinTypes)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));

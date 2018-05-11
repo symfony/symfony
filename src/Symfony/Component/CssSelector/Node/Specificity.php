@@ -48,7 +48,7 @@ class Specificity
     /**
      * @return self
      */
-    public function plus(Specificity $specificity)
+    public function plus(self $specificity)
     {
         return new self($this->a + $specificity->a, $this->b + $specificity->b, $this->c + $specificity->c);
     }
@@ -69,7 +69,7 @@ class Specificity
      *
      * @return int
      */
-    public function compareTo(Specificity $specificity)
+    public function compareTo(self $specificity)
     {
         if ($this->a !== $specificity->a) {
             return $this->a > $specificity->a ? 1 : -1;

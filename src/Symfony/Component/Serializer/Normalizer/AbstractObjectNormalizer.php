@@ -301,7 +301,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      *
-     * @param array  $data
      * @param string $attribute
      * @param mixed  $attributeValue
      *

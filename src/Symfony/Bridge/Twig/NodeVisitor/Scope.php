@@ -20,7 +20,7 @@ class Scope
     private $data = array();
     private $left = false;
 
-    public function __construct(Scope $parent = null)
+    public function __construct(self $parent = null)
     {
         $this->parent = $parent;
     }

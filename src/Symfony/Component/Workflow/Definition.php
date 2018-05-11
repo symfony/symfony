@@ -30,7 +30,6 @@ final class Definition
     /**
      * @param string[]     $places
      * @param Transition[] $transitions
-     * @param string|null  $initialPlace
      */
     public function __construct(array $places, array $transitions, string $initialPlace = null, MetadataStoreInterface $metadataStore = null)
     {

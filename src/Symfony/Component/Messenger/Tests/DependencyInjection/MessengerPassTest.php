@@ -98,6 +98,53 @@ class MessengerPassTest extends TestCase
         $this->assertEquals(array(new Reference(PrioritizedHandler::class), new Reference(HandlerWithMultipleMessages::class)), $definition->getArgument(0));
     }
 
+    public function testGetClassesAndMethodsAndPrioritiesFromTheSubscriber()
+    {
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(HandlerMappingMethods::class, HandlerMappingMethods::class)
+            ->addTag('messenger.message_handler')
+        ;
+        $container
+            ->register(PrioritizedHandler::class, PrioritizedHandler::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $handlerLocatorDefinition = $container->getDefinition($container->getDefinition('messenger.handler_resolver')->getArgument(0));
+        $handlerMapping = $handlerLocatorDefinition->getArgument(0);
+
+        $this->assertArrayHasKey('handler.'.DummyMessage::class, $handlerMapping);
+        $this->assertArrayHasKey('handler.'.SecondMessage::class, $handlerMapping);
+
+        $dummyHandlerReference = (string) $handlerMapping['handler.'.DummyMessage::class]->getValues()[0];
+        $dummyHandlerDefinition = $container->getDefinition($dummyHandlerReference);
+        $this->assertSame('callable', $dummyHandlerDefinition->getClass());
+        $this->assertEquals(array(new Reference(HandlerMappingMethods::class), 'dummyMethod'), $dummyHandlerDefinition->getArgument(0));
+        $this->assertSame(array('Closure', 'fromCallable'), $dummyHandlerDefinition->getFactory());
+
+        $secondHandlerReference = (string) $handlerMapping['handler.'.SecondMessage::class]->getValues()[0];
+        $secondHandlerDefinition = $container->getDefinition($secondHandlerReference);
+        $this->assertSame(ChainHandler::class, $secondHandlerDefinition->getClass());
+        $this->assertEquals(new Reference(PrioritizedHandler::class), $secondHandlerDefinition->getArgument(0)[1]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerMappingWithNonExistentMethod": method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerMappingWithNonExistentMethod::dummyMethod()" does not exist.
+     */
+    public function testThrowsExceptionIfTheHandlerMethodDoesNotExist()
+    {
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(HandlerMappingWithNonExistentMethod::class, HandlerMappingWithNonExistentMethod::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
     public function testItRegistersReceivers()
     {
         $container = $this->getContainerBuilder();
@@ -397,7 +444,7 @@ class UndefinedMessageHandler
 
 class UndefinedMessageHandlerViaInterface implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array(UndefinedMessage::class);
     }
@@ -434,30 +481,71 @@ class BuiltinArgumentTypeHandler
 
 class HandlerWithMultipleMessages implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array(
             DummyMessage::class,
             SecondMessage::class,
         );
     }
+
+    public function __invoke()
+    {
+    }
 }
 
 class PrioritizedHandler implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array(
             array(SecondMessage::class, 10),
+        );
+    }
+
+    public function __invoke()
+    {
+    }
+}
+
+class HandlerMappingMethods implements MessageSubscriberInterface
+{
+    public static function getHandledMessages(): iterable
+    {
+        return array(
+            DummyMessage::class => 'dummyMethod',
+            SecondMessage::class => array('secondMessage', 20),
+        );
+    }
+
+    public function dummyMethod()
+    {
+    }
+
+    public function secondMessage()
+    {
+    }
+}
+
+class HandlerMappingWithNonExistentMethod implements MessageSubscriberInterface
+{
+    public static function getHandledMessages(): iterable
+    {
+        return array(
+            DummyMessage::class => 'dummyMethod',
         );
     }
 }
 
 class HandleNoMessageHandler implements MessageSubscriberInterface
 {
-    public static function getHandledMessages(): array
+    public static function getHandledMessages(): iterable
     {
         return array();
+    }
+
+    public function __invoke()
+    {
     }
 }
 

@@ -377,13 +377,15 @@ class ErrorHandler
      */
     public function handleError($type, $message, $file, $line)
     {
-        $level = error_reporting() | E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED;
+        $level = error_reporting();
+        $silenced = 0 === ($level & $type);
+        $level |= E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED;
         $log = $this->loggedErrors & $type;
         $throw = $this->thrownErrors & $type & $level;
         $type &= $level | $this->screamedErrors;
 
         if (!$type || (!$log && !$throw)) {
-            return $type && $log;
+            return !$silenced && $type && $log;
         }
         $scope = $this->scopedErrors & $type;
 
@@ -479,7 +481,7 @@ class ErrorHandler
             }
         }
 
-        return $type && $log;
+        return !$silenced && $type && $log;
     }
 
     /**

@@ -100,7 +100,7 @@ class Command
         array_unshift($this->bits, $bit);
 
         foreach ($this->labels as $label => $index) {
-            $this->labels[$label] += 1;
+            ++$this->labels[$label];
         }
 
         return $this;

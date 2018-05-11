@@ -129,10 +129,9 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                         $statistics[$name]['misses'] += 1;
                     }
                 } elseif ('getItems' === $call->name) {
-                    $count = $call->hits + $call->misses;
-                    $statistics[$name]['reads'] += $count;
+                    $statistics[$name]['reads'] += $call->hits + $call->misses;
                     $statistics[$name]['hits'] += $call->hits;
-                    $statistics[$name]['misses'] += $count - $call->misses;
+                    $statistics[$name]['misses'] += $call->misses;
                 } elseif ('hasItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
                     if (false === $call->result) {

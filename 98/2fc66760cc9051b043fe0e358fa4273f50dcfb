@@ -1,0 +1,285 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-27T00:05:44Z
+
+From my experience the EventSubscriber return value to configure callbacks has a really bad DX. It's not clear what array structure can be returned without reading the doc. Repeating that in the `MessageSubscriberInterface` seems bad to me.
+
+How about using a value object like
+
+```php
+    public static function getHandledMessages(): array
+    {
+        return [
+            new MessageCallback(CreateNumber::class, 'createNumber', 10),
+            new MessageCallback(AnotherMessage::class, 'anotherMethod'),
+        ];
+    }
+```
+
+```php
+class MessageCallback
+{
+    public function __construct(string $messageClass, string $method = '__invoke', int $priority = 0)
+    {
+    }
+}
+```
+
+This way the code is self-explaining and you don't have to deal with mixed returns like array of array or array of string or non-associative array.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-27T06:53:23Z
+
+I like it!
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-27T09:20:19Z
+
+But the point of this PR is actually to make it consistent with the EventSubscriber to improve the developer experience 🙃
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-27T09:44:43Z
+
+Learning from mistakes and improving them seems more important to me. Also the EventSubscriber with it's array structure is probably not gonna make it like this into the EventDispatcher PSR that got revived. But something like my propal is really flexible and clear. Just make MessageCallback an interface with getters and voila.
+I would also suggest to make the return value `iterable` instead of array.
+I could imagine an implementation that just configures all public methods of the subscriber as handlers with the typehints (similar to the `__invoke` autowiring but for several methods).
+
+```php
+    public static function getHandledMessages(): iterable
+    {
+        return new PublicMethodsAsHandlers(self::class);
+    }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-27T09:53:59Z
+
+public static function getHandledMessages(): HandledMessagesDescription
+`return (new HandledMessagesDescription())->someFluentApi()...`?
+
+but this looks like a lot of code infrastructure, which means this works only with a compiled container, because when not compiled the overhead of building this configuration can become significant, especially compared to the array approach, isn't it?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-27T09:56:59Z
+
+I don't see where the overhead is when using a value object or a fluent api? This is just setters and getters.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-27T09:57:58Z
+
+@nicolas-grekas I prefer the array approach (with the `MessageCallback ` - or similar name - value object) than the fluent API as it's much simpler for everybody, to use, understand and maintain. There isn't anything complex to build here that requires a fluent API I believe.
+
+I like the `return new PublicMethodsAsHandlers(self::class);` example also.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-27T10:40:53Z
+
+@sroze the array of EventSubscriberInteface is very simple when you have to register a single listener. But when you need to register 2 listeners for the same event, I admit that I get it wrong half of the time (doing `array('foo', 'bar')` instead of `array(array('foo'), array('bar'))`. I even went as far as writing a unit test taking all my subscribers and validating the structure being returned.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-27T10:49:11Z
+
+Would it make sense to use the static method as a configurator?
+```php
+static function configureHandledMessages(HandledMessagesDescriptor $config)
+{
+    $config->...
+}
+```
+
+BUT on the other end, any objects we put here tightly couples the interface to the descriptor.
+It could be a blocker when taking interoperability into account: by forcing an object wrapper, we forbid any custom extension of the return value. An array doesn't have this drawback.
+(just thinking loud :) )
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-27T11:03:44Z
+
+One more idea that closes the circle in my eyes:
+
+Remove https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Handler/MessageHandlerInterface.php and instead offer a trait/abstract class that implements
+
+```php
+public static function getHandledMessages(): iterable
+{
+    return [
+        new ReflectedMethodCallback(self::class, '__invoke'),
+    ];
+}
+```
+
+This is self-explaining, does not require more code than implementing the marker interface and does not require a marker interface at all. A marker interface without methods is usually just a workaround anyway.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-27T11:10:20Z
+
+I think this is building infrastructure on top of conventions. We should design first and implement after IMHO.
+Another issue with using objects is that it will make it much harder for IDEs to use the return value to provide auto-completion.
+On a DX perspective, I really much prefer injecting the descriptor than have a "new" in the body of the method. The reason is that "new" forces to know *what* type to create; while passing by argument is just perfect for providing autocompletion.
+
+Disclaimer: the arguments I'm giving here are done while taking the existing static method descriptions we already have. @Tobion uses the word "mistake" above, I'm really not sure this was a mistake at all. And more importantly, I want to be sure whatever new system we use is actually better.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T06:26:43Z
+
+As @Tobion spotted, using an injected argument enforces a single style of configuration (the DX is bound to the style provided by`HandledMessagesDescriptor` in my example above). While this can be nice for autocompletion, I don't think we can make a universal enough style (that could eg fit a FIG PSR - which is not a goal here, but still nice for guiding the thought).
+
+I'm also not really convinced by returning objects, for similar reasons: a locally created object forces also a style, or if we make it an interface, the interface could only provide a way to retrieve the state of the configuration, without providing any contractual guarantee (unlike the injected argument btw).
+
+For this reasons, I now think this method should return an array.
+I also think we can provide a builder for this array if we want to, but this builder should be an (optional) implementation detail used in some implementations of `getHandledMessages()`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-04-29T09:59:11Z
+
+> For this reasons, I now think this method should return an array.
+
+Why not iterable?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T19:39:19Z
+
+Or iterable, just low-level data structure :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-01T18:32:45Z
+
+I've introduced a `MessageSubscriberConfiguration` object that can be used to specify the priority and/or method name. To reduce the complexity, I've removed the ability to have priority or method name from the tags.
+
+And updated the PR description :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-02T21:08:00Z
+
+Three things:
+
+1. There should be an interface for `MessageSubscriberConfiguration` which only requires the getters. Most people will obviously use the `MessageSubscriberConfiguration` value object implementation but thats an implementation detail that should not be part of the `MessageSubscriberInterface`
+2. Returning a string instead of MessageSubscriberConfiguration should not be supported anymore. No mixed return values please.
+3.  I think the name `getHandledMessages` is not optimal because it sounds like the messages have already been handled. But what it means it can handle the messages. How about `getMessageHandlers`?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T07:01:30Z
+
+> There should be an interface for MessageSubscriberConfiguration [...] value object
+
+I appreciate the potentiality of such interface at some point in the future but as you mentioned, this is a value object and I don’t believe we need an interface for that (we can add it later in case it’s useful, without any BC break).
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T07:08:36Z
+
+> Returning a string instead of MessageSubscriberConfiguration should not be supported anymore. No mixed return values please.
+
+I’m actually not sure about this one. On a developer perspective, the usual would be to simply define the message class; therefore making it easier (than having to instanciate this value object) seems logical. On the other hand, the “simple option” is to just use the type hint on `_invoke`, that’s probably enough (and a good practice to promote anyway).
+
+@symfony/deciders by using 👍 and 👎 on this comment, do you think it’s a good idea to drop the ability to use the class name as a string in the message subscribers’ static method?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-03T10:49:18Z
+
+In https://github.com/symfony/symfony/pull/27034#issuecomment-385229190 I gave my reasoning explaining why I think returning object is not a good idea. Instead, I suggest to use a builder:
+return (new FooBuilder())->add(...)->add()->toArray().
+or
+return [HandledMessageDescription::build(...), etc], with build() returning an array.
+
+Basically, the getter on MessageSubscriberConfiguration should not be exposed as they have no meaning (they are just techinal requirements to acces the state) and thus they should not be part of the subscriber interfaces.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T10:58:49Z
+
+@nicolas-grekas well, we can have both :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-03T11:01:35Z
+
+> if we make it an interface, the interface could only provide a way to retrieve the state of the configuration, without providing any contractual guarantee
+
+I don't understand what you mean? Could you clarify?
+So you propose to return some random array structure again similar to EventSubscriber?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-03T11:24:17Z
+
+> I don't understand what you mean? Could you clarify?
+
+if the static method in the interface describes a way to return VO, then the interface of the VO becomes part of the abstraction (the getters on the VO are bound to the interface).
+At at the abstraction level, describing the handled messages does not require accessing any state - only setters are needed inside the static method. But since we need a technical means to access the state of the VO on the outside, we must add getters on it. And this is a leak in the abstraction.
+
+The Config component does it correctly: it provides a way to describe a hierarchical structure using OOP, but doesn't leak in the resulting data structure.
+
+My previous proposal (injecting a configurator) does not have this issue BTW. But instead of binding the getters to the abstraction, it binds the setters. A bit better, but not much as you spotted.
+
+> So you propose to return some random an array structure again similar to EventSubscriber?
+
+yes - to the same extent any hierarchical formats like yaml and xml are "random".
+
+@sroze  we cannot have both, because that'd still be a leak at the abstraction level.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-03T13:00:21Z
+
+> But since we need a technical means to access the state of the VO on the outside, we must add getters on it. And this is a leak in the abstraction.
+
+I don't see the difference between getters and an array with keys. Both leak information in the same way. I'm not sure what you are trying to achieve here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-03T14:44:39Z
+
+I'm seeking for a solution that improves the situation. And that could be generic, so that we could reuse it in other similar situations. With the reasoning I have given, I believe we didn't find any. I'm :-1:.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-03T14:46:12Z
+
+@sroze if you want to move forward here, I suggest to isolate things that are unrelated to the return format of the static method in another PR if that makes sense.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T14:47:26Z
+
+@nicolas-grekas i.e. revert to the array-notation, right?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-04T08:33:25Z
+
+Alright, that's fair that there are different point of views and it's a tricky question, therefore let's make that in two steps: I reverted the introduction of the VO and kept the array EventDispatcher-like syntax (while changing the `getHandledMessages()` signature to return a `iterable` rather than an `array`).
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-05T11:15:03Z
+
+Shall we go ahead with this one?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-08T15:33:16Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-09T07:47:01Z
+
+@fabpot could you update your review please?

@@ -101,7 +101,7 @@ class MessengerPassTest extends TestCase
     public function testItRegistersReceivers()
     {
         $container = $this->getContainerBuilder();
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('name' => 'amqp'));
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
 
         (new MessengerPass())->process($container);
 
@@ -128,7 +128,7 @@ class MessengerPassTest extends TestCase
             null,
         ));
 
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('name' => 'amqp'));
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
 
         (new MessengerPass())->process($container);
 
@@ -145,8 +145,8 @@ class MessengerPassTest extends TestCase
             null,
         ));
 
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('name' => 'amqp'));
-        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', array('name' => 'dummy'));
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
+        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', array('alias' => 'dummy'));
 
         (new MessengerPass())->process($container);
 
@@ -156,7 +156,7 @@ class MessengerPassTest extends TestCase
     public function testItRegistersSenders()
     {
         $container = $this->getContainerBuilder();
-        $container->register(AmqpSender::class, AmqpSender::class)->addTag('messenger.sender', array('name' => 'amqp'));
+        $container->register(AmqpSender::class, AmqpSender::class)->addTag('messenger.sender', array('alias' => 'amqp'));
 
         (new MessengerPass())->process($container);
 

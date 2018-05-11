@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-08T06:49:11Z
+
+So is "Security" for the Security component? I know the answer, but I'm afraid that someone that thinks "Oh a bug in the security configuration", might follow that link instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-09T18:07:02Z
+
+@fabpot updated.
+
+Status: needs review

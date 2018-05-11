@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -129,12 +130,6 @@ class RouterListener implements EventSubscriberInterface
             unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
-            if ($this->debug && $e instanceof NoConfigurationException) {
-                $event->setResponse($this->createWelcomeResponse());
-
-                return;
-            }
-
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
 
             if ($referer = $request->headers->get('referer')) {
@@ -149,11 +144,23 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        if (!$this->debug || !($e = $event->getException()) instanceof NotFoundHttpException) {
+            return;
+        }
+
+        if ($e->getPrevious() instanceof NoConfigurationException) {
+            $event->setResponse($this->createWelcomeResponse());
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
             KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
+            KernelEvents::EXCEPTION => array('onKernelException', -64),
         );
     }
 

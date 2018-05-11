@@ -41,6 +41,6 @@ class FirewallMap implements FirewallMapInterface
             }
         }
 
-        return array(array(), null);
+        return array(array(), null, null);
     }
 }

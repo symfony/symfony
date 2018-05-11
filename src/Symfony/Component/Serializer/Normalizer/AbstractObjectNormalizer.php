@@ -228,7 +228,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Validates the submitted data and denormalizes it.
      *
-     * @param mixed       $data
+     * @param mixed $data
      *
      * @return mixed
      *
@@ -297,7 +297,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      *
-     * @param mixed  $attributeValue
+     * @param mixed $attributeValue
      */
     private function updateData(array $data, string $attribute, $attributeValue): array
     {

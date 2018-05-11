@@ -157,7 +157,7 @@ class FlattenException
         return $this->previous;
     }
 
-    public function setPrevious(FlattenException $previous)
+    public function setPrevious(self $previous)
     {
         $this->previous = $previous;
     }

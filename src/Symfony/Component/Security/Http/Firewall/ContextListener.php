@@ -45,8 +45,8 @@ class ContextListener implements ListenerInterface
     private $trustResolver;
 
     /**
-     * @param TokenStorageInterface                     $tokenStorage
-     * @param iterable|UserProviderInterface[]          $userProviders
+     * @param TokenStorageInterface            $tokenStorage
+     * @param iterable|UserProviderInterface[] $userProviders
      */
     public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {

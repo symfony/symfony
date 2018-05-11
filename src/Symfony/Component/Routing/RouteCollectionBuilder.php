@@ -118,7 +118,7 @@ class RouteCollectionBuilder
      * @param string                 $prefix
      * @param RouteCollectionBuilder $builder
      */
-    public function mount($prefix, RouteCollectionBuilder $builder)
+    public function mount($prefix, self $builder)
     {
         $builder->prefix = trim(trim($prefix), '/');
         $this->routes[] = $builder;
@@ -255,7 +255,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    private function addResource(ResourceInterface $resource): RouteCollectionBuilder
+    private function addResource(ResourceInterface $resource): self
     {
         $this->resources[] = $resource;
 

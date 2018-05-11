@@ -588,7 +588,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Guesses how to write the property value.
      *
-     * @param mixed  $value
+     * @param mixed $value
      */
     private function getWriteAccessInfo(string $class, string $property, $value): array
     {

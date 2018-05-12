@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-08T23:41:41Z
+
+Thank you @jvasseur, comments addressed. Do you confirm it fixes your issue?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-09T13:44:39Z
+
+@nicolas-grekas could you add a test for that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-09T18:50:03Z
+
+Test added.

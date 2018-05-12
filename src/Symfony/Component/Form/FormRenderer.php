@@ -132,6 +132,9 @@ class FormRenderer implements FormRendererInterface
         $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
         if ($renderOnlyOnce && $view->isRendered()) {
+            // This is not allowed, because it would result in rendering same IDs multiple times, which is not valid.
+            @trigger_error(sprintf('You are calling "form_%s" for field "%s" which has already been rendered before, trying to render fields which were already rendered is deprecated since Symfony 4.2 and will throw an exception in 5.0.', $blockNameSuffix, $view->vars['name']), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('Field "%s" has already been rendered. Save result of previous  render call to variable and output that instead.', $view->vars['name']));
             return '';
         }
 

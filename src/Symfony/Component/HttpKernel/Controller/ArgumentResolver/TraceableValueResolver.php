@@ -26,10 +26,10 @@ final class TraceableValueResolver implements ArgumentValueResolverInterface
     private $inner;
     private $stopwatch;
 
-    public function __construct(ArgumentValueResolverInterface $inner, ?Stopwatch $stopwatch = null)
+    public function __construct(ArgumentValueResolverInterface $inner, Stopwatch $stopwatch)
     {
         $this->inner = $inner;
-        $this->stopwatch = $stopwatch ?? new Stopwatch();
+        $this->stopwatch = $stopwatch;
     }
 
     /**

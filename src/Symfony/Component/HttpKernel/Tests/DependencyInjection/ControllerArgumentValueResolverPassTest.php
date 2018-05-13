@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class ControllerArgumentValueResolverPassTest extends TestCase
 {
@@ -52,7 +53,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('n3.traceable'));
     }
 
-    public function testInDebug()
+    public function testInDebugWithStopWatchDefinition()
     {
         $services = array(
             'n3' => array(array()),
@@ -68,6 +69,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 
         $definition = new Definition(ArgumentResolver::class, array(null, array()));
         $container = new ContainerBuilder();
+        $container->register('debug.stopwatch', Stopwatch::class);
         $container->setDefinition('argument_resolver', $definition);
 
         foreach ($services as $id => list($tag)) {
@@ -86,6 +88,24 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('n1'));
         $this->assertTrue($container->hasDefinition('n2'));
         $this->assertTrue($container->hasDefinition('n3'));
+    }
+
+    public function testInDebugWithouStopWatchDefinition()
+    {
+        $expected = array(new Reference('n1'));
+
+        $definition = new Definition(ArgumentResolver::class, array(null, array()));
+        $container = new ContainerBuilder();
+        $container->register('n1')->addTag('controller.argument_value_resolver');
+        $container->setDefinition('argument_resolver', $definition);
+
+        $container->setParameter('kernel.debug', true);
+
+        (new ControllerArgumentValueResolverPass())->process($container);
+        $this->assertEquals($expected, $definition->getArgument(1)->getValues());
+
+        $this->assertFalse($container->hasDefinition('debug.n1'));
+        $this->assertTrue($container->hasDefinition('n1'));
     }
 
     public function testReturningEmptyArrayWhenNoService()

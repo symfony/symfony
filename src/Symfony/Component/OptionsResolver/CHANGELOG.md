@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+ * added `OptionResolverNested` and support for nesting options
+
 3.4.0
 -----
 

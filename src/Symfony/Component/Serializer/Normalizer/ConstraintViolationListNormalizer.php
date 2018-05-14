@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+class ConstraintViolationListNormalizer implements NormalizerInterface, VaryingSupportInterface
 {
     /**
      * {@inheritdoc}
@@ -60,8 +60,8 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * {@inheritdoc}
      */
-    public function hasCacheableSupportsMethod(): bool
+    public function isSupportVariedOnDataAndContext(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ !== \get_class($this);
     }
 }

@@ -43,9 +43,9 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function hasCacheableSupportsMethod(): bool
+    public function isSupportVariedOnDataAndContext(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ !== \get_class($this);
     }
 
     /**

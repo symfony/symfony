@@ -161,7 +161,12 @@ class RouteCollection implements \IteratorAggregate, \Countable
         $prefixedRoutes = array();
 
         foreach ($this->routes as $name => $route) {
-            $prefixedRoutes[$prefix.$name] = $route;
+            if (null !== $route->getDefault('_canonical_route')) {
+                $prefixedRouteName = $prefix . $route->getDefault('_canonical_route');
+                $route->setDefault('_canonical_route', $prefixedRouteName);
+            }
+
+            $prefixedRoutes[$prefix . $name] = $route;
         }
 
         $this->routes = $prefixedRoutes;

@@ -248,24 +248,37 @@ class MessengerPass implements CompilerPassInterface
         $container->getDefinition('messenger.data_collector')->addMethodCall('registerBus', array($busId, new Reference($tracedBusId)));
     }
 
-    private function registerBusMiddleware(ContainerBuilder $container, string $busId, array $middleware)
+    private function registerBusMiddleware(ContainerBuilder $container, string $busId, array $middlewareCollection)
     {
-        $container->getDefinition($busId)->replaceArgument(0, array_map(function (string $name) use ($container, $busId) {
-            if (!$container->has($messengerMiddlewareId = 'messenger.middleware.'.$name)) {
-                $messengerMiddlewareId = $name;
+        $middlewareReferences = array();
+        foreach ($middlewareCollection as $middlewareItem) {
+            $id = $middlewareItem['id'];
+            $arguments = $middlewareItem['arguments'] ?? array();
+            if (!$container->has($messengerMiddlewareId = 'messenger.middleware.'.$id)) {
+                $messengerMiddlewareId = $id;
             }
 
             if (!$container->has($messengerMiddlewareId)) {
-                throw new RuntimeException(sprintf('Invalid middleware "%s": define such service to be able to use it.', $name));
+                throw new RuntimeException(sprintf('Invalid middleware "%s": define such service to be able to use it.', $id));
             }
 
-            if ($container->getDefinition($messengerMiddlewareId)->isAbstract()) {
+            if (($definition = $container->findDefinition($messengerMiddlewareId))->isAbstract()) {
                 $childDefinition = new ChildDefinition($messengerMiddlewareId);
+                $count = \count($definition->getArguments());
+                foreach (array_values($arguments ?? array()) as $key => $argument) {
+                    // Parent definition can provide default arguments.
+                    // Replace each explicitly or add if not set:
+                    $key < $count ? $childDefinition->replaceArgument($key, $argument) : $childDefinition->addArgument($argument);
+                }
 
-                $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$name, $childDefinition);
+                $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$id, $childDefinition);
+            } elseif ($arguments) {
+                throw new RuntimeException(sprintf('Invalid middleware factory "%s": a middleware factory must be an abstract definition.', $id));
             }
 
-            return new Reference($messengerMiddlewareId);
-        }, $middleware));
+            $middlewareReferences[] = new Reference($messengerMiddlewareId);
+        }
+
+        $container->getDefinition($busId)->replaceArgument(0, $middlewareReferences);
     }
 }

@@ -1468,12 +1468,17 @@ class FrameworkExtension extends Extension
             $config['default_bus'] = key($config['buses']);
         }
 
-        $defaultMiddleware = array('before' => array('logging'), 'after' => array('route_messages', 'call_message_handler'));
+        $defaultMiddleware = array(
+            'before' => array(array('id' => 'logging')),
+            'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
+        );
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['default_middleware'] ? array_merge($defaultMiddleware['before'], $bus['middleware'], $defaultMiddleware['after']) : $bus['middleware'];
 
-            if (!$validationConfig['enabled'] && \in_array('messenger.middleware.validation', $middleware, true)) {
-                throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
+            foreach ($middleware as $middlewareItem) {
+                if (!$validationConfig['enabled'] && 'messenger.middleware.validation' === $middlewareItem['id']) {
+                    throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
+                }
             }
 
             $container->setParameter($busId.'.middleware', $middleware);

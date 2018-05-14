@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-02T20:00:15Z
+
+I don't see the point of the `- doctrine_transaction_middleware: ['entity_manager_name']` syntax if we support `- {id: doctrine_transaction_middleware, arguments: ['entity_manager_name']}`. And the last one is more explicit.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-02T20:23:17Z
+
+> I don't see the point of the - doctrine_transaction_middleware: ['entity_manager_name'] syntax if we support - {id: doctrine_transaction_middleware, arguments: ['entity_manager_name']}.
+
+Same as for keeping the simple `- logger` syntax, which could be replaced by `- id: logger`.
+It's less cumbersome to read & write.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-02T21:00:23Z
+
+To me, using these arguments is the "advanced" way of configuring the middleware: using the object syntax with the `id` is simple enough that we don't need to use another confusing syntax IMHO.
+
+```patch
+-             - doctrine_transaction_middleware: ['entity_manager_name']
++             - {id: 'doctrine_transaction_middleware', arguments: ['entity_manager_name']}
+```
+
+Or do I miss something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T23:07:18Z
+
+@sroze or drop the `{id: *}` style altogether?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-03T06:23:37Z
+
+@sroze : Obviously you didn't miss anything. I just like this syntax :) (and I expected end-users to have a preference for it too but that's just my guess).
+So, let's have a little poll:
+
+1. Current (concrete services and factories short syntaxes)
+    ```yml
+    middleware:
+      - logger
+      - doctrine_transaction_middleware: ['entity_manager_name']
+    ```
+
+1. Drop the factories short syntax:
+    ```yml
+    middleware:
+      - logger
+      - id: doctrine_transaction_middleware:
+        arguments: ['entity_manager_name']
+    ```
+
+1. Drop every short syntaxes:
+    ```yml
+    middleware:
+      - id: logger
+      - id: doctrine_transaction_middleware:
+        arguments: ['entity_manager_name']
+    ```
+
+1. Drop array syntax:
+    ```yml
+    middleware:
+      logger: ~
+      doctrine_transaction_middleware: ['entity_manager_name']
+    ```
+
+My own preference is 1. Perhaps 4.
+I think I blindly excluded the last one at first because it requires unique keys, but actually I don't think it makes sense to configure the same middleware, even with a different config, in the very same bus. ~~The very same limitation still exists anyway in the current internal implementation but the syntax would allow it later if we need it.~~ Changed
+The other reason is that it enforces providing `~` for concrete services (`logger: ~`) which are not configurable anyway but might let you think so.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T06:56:49Z
+
+Looking at it this way, 4 looks nicer but the “one only” limitation is too many assumptions IMHO. 3 is verbose and 4 not really coherent. Let’s keep 1 then, good point 😃
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-11T10:03:11Z
+
+Failure on `deps=high` is expected.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-11T12:24:18Z
+
+I've just created the PR on https://github.com/doctrine/DoctrineBundle/pull/817 to wire the services when the component is enabled.

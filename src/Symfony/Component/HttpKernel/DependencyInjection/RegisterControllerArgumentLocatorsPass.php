@@ -33,11 +33,13 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 {
     private $resolverServiceId;
     private $controllerTag;
+    private $controllerLocator;
 
-    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments')
+    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator')
     {
         $this->resolverServiceId = $resolverServiceId;
         $this->controllerTag = $controllerTag;
+        $this->controllerLocator = $controllerLocator;
     }
 
     public function process(ContainerBuilder $container)
@@ -179,6 +181,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
         }
 
         $container->getDefinition($this->resolverServiceId)
-            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $controllers));
+            ->replaceArgument(0, $controllerLocatorRef = ServiceLocatorTagPass::register($container, $controllers));
+
+        $container->setAlias($this->controllerLocator, (string) $controllerLocatorRef);
     }
 }

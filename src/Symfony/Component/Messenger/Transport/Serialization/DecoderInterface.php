@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
@@ -19,16 +21,16 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 interface DecoderInterface
 {
     /**
-     * Decodes the message from an encoded-form.
+     * Decodes an envelope and its message from an encoded-form.
      *
-     * The `$encodedMessage` parameter is a key-value array that
-     * describes the message, that will be used by the different transports.
+     * The `$encodedEnvelope` parameter is a key-value array that
+     * describes the envelope and its content, that will be used by the different transports.
      *
      * The most common keys are:
      * - `body` (string) - the message body
      * - `headers` (string<string>) - a key/value pair of headers
      *
-     * @return object
+     * @return Envelope
      */
-    public function decode(array $encodedMessage);
+    public function decode(array $encodedEnvelope): Envelope;
 }

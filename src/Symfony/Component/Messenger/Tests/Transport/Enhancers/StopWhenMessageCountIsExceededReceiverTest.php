@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Enhancers;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\CallbackReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMessageCountIsExceededReceiver;
@@ -25,9 +26,9 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
     public function testReceiverStopsWhenMaximumCountExceeded($max, $shouldStop)
     {
         $callable = function ($handler) {
-            $handler(new DummyMessage('First message'));
-            $handler(new DummyMessage('Second message'));
-            $handler(new DummyMessage('Third message'));
+            $handler(Envelope::wrap(new DummyMessage('First message')));
+            $handler(Envelope::wrap(new DummyMessage('Second message')));
+            $handler(Envelope::wrap(new DummyMessage('Third message')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
@@ -78,7 +79,7 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
     public function testReceiverLogsMaximumCountExceededWhenLoggerIsGiven()
     {
         $callable = function ($handler) {
-            $handler(new DummyMessage('First message'));
+            $handler(Envelope::wrap(new DummyMessage('First message')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)

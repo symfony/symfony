@@ -4,17 +4,33 @@
 
 {% block toolbar %}
     {% if collector.messages|length > 0 %}
+        {% set status_color = collector.exceptionsCount ? 'red' %}
         {% set icon %}
             {{ include('@WebProfiler/Icon/messenger.svg') }}
             <span class="sf-toolbar-value">{{ collector.messages|length }}</span>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: 'messenger' }) }}
+        {% set text %}
+            {% for bus in collector.buses %}
+                {% set exceptionsCount = collector.exceptionsCount(bus) %}
+                <div class="sf-toolbar-info-piece">
+                    <b>{{ bus }}</b>
+                    <span
+                        title="{{ exceptionsCount }} message(s) with exceptions"
+                        class="sf-toolbar-status sf-toolbar-status-{{ exceptionsCount ? 'red' }}"
+                    >
+                        {{ collector.messages(bus)|length }}
+                    </span>
+                </div>
+            {% endfor %}
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: 'messenger', status: status_color }) }}
     {% endif %}
 {% endblock %}
 
 {% block menu %}
-<span class="label">
+<span class="label {{ collector.exceptionsCount ? 'label-status-error' }}">
     <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
     <strong>Messages</strong>
 
@@ -24,7 +40,28 @@
 </span>
 {% endblock %}
 
+{% block head %}
+    {{ parent() }}
+    <style>
+        .message-item thead th { position: relative; cursor: pointer; user-select: none; padding-right: 35px; }
+        .message-item tbody tr td:first-child { width: 115px; }
+
+        .message-item .label { float: right; padding: 1px 5px; opacity: .75; margin-left: 5px; }
+        .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none }
+        .message-item .icon svg { height: 24px; width: 24px; }
+
+        .message-item .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
+        .message-item .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
+
+        .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid #B0413E; }
+
+        .message-item .sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+    </style>
+{% endblock %}
+
 {% block panel %}
+    {% import _self as helper %}
+
     <h2>Messages</h2>
 
     {% if collector.messages is empty %}
@@ -32,41 +69,99 @@
             <p>No messages have been collected.</p>
         </div>
     {% else %}
-        <table>
-            <thead>
-            <tr>
-                <th>Bus</th>
-                <th>Message</th>
-                <th>Result</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for message in collector.messages %}
-                <tr>
-                    <td>{{ message.bus }}</td>
-                    <td>
-                        {% if message.result.object is defined %}
-                            {{ profiler_dump(message.message.object, maxDepth=2) }}
-                        {% else %}
-                            {{ message.message.type }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if message.result.object is defined %}
-                            {{ profiler_dump(message.result.object, maxDepth=2) }}
-                        {% elseif message.result.type is defined %}
-                            {{ message.result.type }}
-                            {% if message.result.value is defined %}
-                                {{ message.result.value }}
-                            {% endif %}
-                        {% endif %}
-                        {% if message.exception.type is defined %}
-                            {{ message.exception.type }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+    <div class="sf-tabs message-bus">
+        <div class="tab">
+            {% set messages = collector.messages %}
+            {% set exceptionsCount = collector.exceptionsCount %}
+            <h3 class="tab-title">All<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+
+            <div class="tab-content">
+                <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+                {{ helper.render_bus_messages(messages, true) }}
+            </div>
+        </div>
+
+        {% for bus in collector.buses %}
+        <div class="tab message-bus">
+            {% set messages = collector.messages(bus) %}
+            {% set exceptionsCount = collector.exceptionsCount(bus) %}
+            <h3 class="tab-title">{{ bus }}<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+
+            <div class="tab-content">
+                <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
+                {{ helper.render_bus_messages(messages) }}
+            </div>
+        </div>
+        {% endfor %}
     {% endif %}
+
 {% endblock %}
+
+{% macro render_bus_messages(messages, showBus = false) %}
+    {% set discr = random() %}
+    {% for i, dispatchCall in messages %}
+    <table class="message-item">
+        <thead>
+        <tr>
+            <th colspan="2" class="sf-toggle"
+                data-toggle-selector="#message-item-{{ discr }}-{{ i }}-details"
+                data-toggle-initial="{{ loop.first ? 'display' }}"
+            >
+                <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
+                {% if showBus %}
+                    <span class="label">{{ dispatchCall.bus }}</span>
+                {% endif %}
+                {% if dispatchCall.exception is defined %}
+                    <span class="label status-error">exception</span>
+                {% endif %}
+                <a class="toggle-button">
+                    <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
+                    <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>
+                </a>
+            </th>
+        </tr>
+        </thead>
+        <tbody id="message-item-{{ discr }}-{{ i }}-details" class="sf-toggle-content">
+            {% if showBus %}
+            <tr>
+                <td class="text-bold">Bus</td>
+                <td>{{ dispatchCall.bus }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td class="text-bold">Message</td>
+                <td>{{ profiler_dump(dispatchCall.message.value, maxDepth=2) }}</td>
+            </tr>
+            <tr>
+                <td class="text-bold">Envelope items</td>
+                <td>
+                    {% for item in dispatchCall.envelopeItems %}
+                        {{ profiler_dump(item) }}
+                    {% else %}
+                        <span class="text-muted">No items</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td class="text-bold">Result</td>
+                <td>
+                    {% if dispatchCall.result is defined %}
+                        {{ profiler_dump(dispatchCall.result.seek('value'), maxDepth=2) }}
+                    {% elseif dispatchCall.exception is defined %}
+                        <span class="text-danger">No result as an exception occurred</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% if dispatchCall.exception is defined %}
+            <tr>
+                <td class="text-bold">Exception</td>
+                <td>
+                    {{ profiler_dump(dispatchCall.exception.value, maxDepth=1) }}
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% endfor %}
+{% endmacro %}

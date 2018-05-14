@@ -29,19 +29,27 @@ class TraceableMessageBus implements MessageBusInterface
      */
     public function dispatch($message)
     {
+        $callTime = microtime(true);
+        $messageToTrace = $message instanceof Envelope ? $message->getMessage() : $message;
+        $envelopeItems = $message instanceof Envelope ? array_values($message->all()) : null;
+
         try {
             $result = $this->decoratedBus->dispatch($message);
 
             $this->dispatchedMessages[] = array(
-                'message' => $message,
+                'envelopeItems' => $envelopeItems,
+                'message' => $messageToTrace,
                 'result' => $result,
+                'callTime' => $callTime,
             );
 
             return $result;
         } catch (\Throwable $e) {
             $this->dispatchedMessages[] = array(
-                'message' => $message,
+                'envelopeItems' => $envelopeItems,
+                'message' => $messageToTrace,
                 'exception' => $e,
+                'callTime' => $callTime,
             );
 
             throw $e;

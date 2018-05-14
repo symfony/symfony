@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-05-11T16:49:07Z
+
+Why is it on 3.4 and not 2.7?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-11T17:09:21Z
+
+See #27236 for 2.7 (~HHVM might be red for the Lock component, I need to check this before merging here.~)

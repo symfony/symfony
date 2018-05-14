@@ -238,10 +238,10 @@ class DateTimeTypeTest extends BaseTypeTest
             'widget' => 'single_text',
         ));
 
-        $form->submit('2010-06-02T03:04:00Z');
+        $form->submit('2010-06-02T03:04:00');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00Z', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
     }
 
     public function testSubmitStringSingleTextWithSeconds()
@@ -254,10 +254,10 @@ class DateTimeTypeTest extends BaseTypeTest
             'with_seconds' => true,
         ));
 
-        $form->submit('2010-06-02T03:04:05Z');
+        $form->submit('2010-06-02T03:04:05');
 
         $this->assertEquals('2010-06-02 03:04:05', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:05Z', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:05', $form->getViewData());
     }
 
     public function testSubmitDifferentPattern()

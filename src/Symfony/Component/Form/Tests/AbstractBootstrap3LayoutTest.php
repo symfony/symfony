@@ -1603,7 +1603,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@type="datetime-local"]
     [@name="name"]
     [@class="my&class form-control"]
-    [@value="2011-02-03T04:05:06Z"]
+    [@value="2011-02-03T04:05:06"]
 '
         );
     }
@@ -1624,7 +1624,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@type="datetime-local"]
     [@name="name"]
     [@class="my&class form-control"]
-    [@value="2011-02-03T04:05:06Z"]
+    [@value="2011-02-03T04:05:06"]
 '
         );
     }

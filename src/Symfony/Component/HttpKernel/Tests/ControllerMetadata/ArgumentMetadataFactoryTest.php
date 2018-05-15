@@ -36,9 +36,10 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature1'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('foo', self::class, false, false, null),
+            new ArgumentMetadata('foo', 'self', false, false, null),
             new ArgumentMetadata('bar', 'array', false, false, null),
             new ArgumentMetadata('baz', 'callable', false, false, null),
+            new ArgumentMetadata('quux', TestCase::class, false, false, null),
         ), $arguments);
     }
 
@@ -47,7 +48,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature2'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('foo', self::class, false, true, null, true),
+            new ArgumentMetadata('foo', 'self', false, true, null, true),
             new ArgumentMetadata('bar', __NAMESPACE__.'\FakeClassThatDoesNotExist', false, true, null, true),
             new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, true, null, true),
         ), $arguments);
@@ -117,7 +118,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    private function signature1(self $foo, array $bar, callable $baz)
+    private function signature1(self $foo, array $bar, callable $baz, TestCase $quux)
     {
     }
 

@@ -12,10 +12,12 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -28,7 +30,7 @@ class AddConsoleCommandPassTest extends TestCase
     public function testProcess($public)
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->setParameter('my-command.class', 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
 
         $definition = new Definition('%my-command.class%');
@@ -127,7 +129,7 @@ class AddConsoleCommandPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         $definition = new Definition('Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
         $definition->addTag('console.command');
@@ -145,7 +147,7 @@ class AddConsoleCommandPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         $definition = new Definition('SplObjectStorage');
         $definition->addTag('console.command');
@@ -174,6 +176,79 @@ class AddConsoleCommandPassTest extends TestCase
         $alias2 = $alias1.'_my-command2';
         $this->assertTrue($container->hasAlias($alias1));
         $this->assertTrue($container->hasAlias($alias2));
+    }
+
+    public function testProcessOnChildDefinitionWithClass()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';
+
+        $parentId = 'my-parent-command';
+        $childId = 'my-child-command';
+
+        $parentDefinition = new Definition(/* no class */);
+        $parentDefinition->setAbstract(true)->setPublic(false);
+
+        $childDefinition = new ChildDefinition($parentId);
+        $childDefinition->addTag('console.command')->setPublic(true);
+        $childDefinition->setClass($className);
+
+        $container->setDefinition($parentId, $parentDefinition);
+        $container->setDefinition($childId, $childDefinition);
+
+        $container->compile();
+        $command = $container->get($childId);
+
+        $this->assertInstanceOf($className, $command);
+    }
+
+    public function testProcessOnChildDefinitionWithParentClass()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';
+
+        $parentId = 'my-parent-command';
+        $childId = 'my-child-command';
+
+        $parentDefinition = new Definition($className);
+        $parentDefinition->setAbstract(true)->setPublic(false);
+
+        $childDefinition = new ChildDefinition($parentId);
+        $childDefinition->addTag('console.command')->setPublic(true);
+
+        $container->setDefinition($parentId, $parentDefinition);
+        $container->setDefinition($childId, $childDefinition);
+
+        $container->compile();
+        $command = $container->get($childId);
+
+        $this->assertInstanceOf($className, $command);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The definition for "my-child-command" has no class.
+     */
+    public function testProcessOnChildDefinitionWithoutClass()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+
+        $parentId = 'my-parent-command';
+        $childId = 'my-child-command';
+
+        $parentDefinition = new Definition();
+        $parentDefinition->setAbstract(true)->setPublic(false);
+
+        $childDefinition = new ChildDefinition($parentId);
+        $childDefinition->addTag('console.command')->setPublic(true);
+
+        $container->setDefinition($parentId, $parentDefinition);
+        $container->setDefinition($childId, $childDefinition);
+
+        $container->compile();
     }
 }
 

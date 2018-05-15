@@ -31,6 +31,7 @@ trait BlockingStoreTestTrait
      * This test is time sensible: the $clockDelay could be adjust.
      *
      * @requires extension pcntl
+     * @requires extension posix
      * @requires function pcntl_sigwaitinfo
      */
     public function testBlockingLocks()

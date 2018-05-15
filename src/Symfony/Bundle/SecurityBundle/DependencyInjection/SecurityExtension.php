@@ -223,13 +223,14 @@ class SecurityExtension extends Extension
         $mapDef = $container->getDefinition('security.firewall.map');
         $map = $authenticationProviders = array();
         foreach ($firewalls as $name => $firewall) {
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds);
+            list($matcher, $listeners, $exceptionListener, $logoutListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds);
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
             $context
                 ->replaceArgument(0, $listeners)
                 ->replaceArgument(1, $exceptionListener)
+                ->replaceArgument(2, $logoutListener)
             ;
             $map[$contextId] = $matcher;
         }
@@ -260,7 +261,7 @@ class SecurityExtension extends Extension
 
         // Security disabled?
         if (false === $firewall['security']) {
-            return array($matcher, array(), null);
+            return array($matcher, array(), null, null);
         }
 
         // Provider id (take the first registered provider if none defined)
@@ -287,15 +288,15 @@ class SecurityExtension extends Extension
         }
 
         // Logout listener
+        $logoutListenerId = null;
         if (isset($firewall['logout'])) {
-            $listenerId = 'security.logout_listener.'.$id;
-            $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(3, array(
+            $logoutListenerId = 'security.logout_listener.'.$id;
+            $logoutListener = $container->setDefinition($logoutListenerId, new DefinitionDecorator('security.logout_listener'));
+            $logoutListener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
             ));
-            $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
@@ -305,16 +306,16 @@ class SecurityExtension extends Extension
                 $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
                 $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
             }
-            $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
+            $logoutListener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
             if (isset($firewall['logout']['csrf_token_generator'])) {
-                $listener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
+                $logoutListener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
             // add session logout handler
             if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {
-                $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+                $logoutListener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
             }
 
             // add cookie logout handler
@@ -323,12 +324,12 @@ class SecurityExtension extends Extension
                 $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
                 $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
 
-                $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
+                $logoutListener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
             }
 
             // add custom handlers
             foreach ($firewall['logout']['handlers'] as $handlerId) {
-                $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
+                $logoutListener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
 
             // register with LogoutUrlGenerator
@@ -365,7 +366,7 @@ class SecurityExtension extends Extension
 
         $container->setAlias(new Alias('security.user_checker.'.$id, false), $firewall['user_checker']);
 
-        return array($matcher, $listeners, $exceptionListener);
+        return array($matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null);
     }
 
     private function createContextListener($container, $contextKey)

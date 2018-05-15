@@ -76,7 +76,6 @@ abstract class CompleteConfigurationTest extends TestCase
             array(),
             array(
                 'security.channel_listener',
-                'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',

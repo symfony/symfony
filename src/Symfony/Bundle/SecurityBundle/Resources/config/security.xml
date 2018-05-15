@@ -152,6 +152,7 @@
         <service id="security.firewall.context" class="%security.firewall.context.class%" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
+            <argument />  <!-- LogoutListener -->
         </service>
 
         <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator" public="false">

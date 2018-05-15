@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-05-04T10:15:16Z
+
+This was recently rejected in #26473. Do we want to revise that decision?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-04T10:20:05Z
+
+Well, currently, the PhpExecutableFinder is unusable with open_basedir. So I would say that this is one of the case where we should use `@`
+
+---------------------------------------------------------------------------
+
+by cbj4074 at 2018-05-05T14:34:56Z
+
+I appreciate the desire not to use `@`, like, ever, but what are the alternatives? Maybe users can live with them.
+
+The alternatives seem to be:
+
+1. Don't use the `PhpExecutableFinder` component at all if `open_basedir` is non-empty. Users would have to go out of their way to avoid using this component, particularly in third-party use-cases, e.g., Laravel.
+2. Determine every file/directory that the executable finder could possibly query, and add all of those paths to the `open_basedir` directive. Is this practical on every system? Maybe... I haven't investigated it. And it seems that any environment variables configured on the system could affect which paths need to be added. Basically, it seems that users would need some type of Symfony-provided tool to scan the system, examine any environment variables, and print-out a string that needs to be added to `open_basedir`. Otherwise, it's guess-and-check and hope nothing breaks when deployed to other environments (let's be realistic, not everybody employs proper CI workflow).
+
+I will say that I have mixed feelings about modifying my PHP configuration just to avoid warnings or errors that an arbitrary library will cause otherwise. In this specific instance, I'm not "purposely doing anything" with `PhpExecutableFinder`. Laravel seems to be using it for whatever purpose. Nothing seems to "break" if I simply suppress the calls (as in this PR), so its ability to find the `php` executable on my system seems not to be necessary in my specific case.
+
+Whatever you all think... I'm not going to kick and scream. :) But I would like to know how best to determine which paths need to be added to `open_basedir` if ultimately this PR is not merged.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by chinawilon at 2018-05-10T12:16:33Z
+
+PhpExecutableFinder line:65
+
+```php
+ if (is_executable($php = PHP_BINDIR.('\\' === DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+            return $php;
+ }
+```
+is_executable() throw warnings when open_basedir is non-empty !

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
  * This is a wrapper around the actual firewall configuration which allows us
@@ -23,15 +24,17 @@ class FirewallContext
 {
     private $listeners;
     private $exceptionListener;
+    private $logoutListener;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
+    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, LogoutListener $logoutListener = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
+        $this->logoutListener = $logoutListener;
     }
 
     public function getContext()
     {
-        return array($this->listeners, $this->exceptionListener);
+        return array($this->listeners, $this->exceptionListener, $this->logoutListener);
     }
 }

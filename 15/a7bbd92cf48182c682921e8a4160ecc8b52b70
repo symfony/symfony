@@ -1,0 +1,227 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-03T12:23:23Z
+
+~~👎  because https://github.com/symfony/symfony/issues/7104#issuecomment-278625482, sorry~~
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-12T16:13:49Z
+
+I guess `TraceableFirewallListener` will need to be updated when merging in 3.4/4.0
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-14T13:16:45Z
+
+Is there something missing for this PR to be merged?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-11-17T14:19:38Z
+
+Note that this will defeat the lazy-loading added in 3.4, as the loop will always iterate until it reaches the logout listener, and it is at the end.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-12-03T14:32:23Z
+
+@chalasr @nicolas-grekas @stof @xabbuh I tried to exclude the logout listener from others to allow lazy-loading. I guess it introduced BC breaks so I would like you to review this.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-12-03T15:46:40Z
+
+I don't understand why tests fail on PHP > 7.0, seems like a routing issue... Tests pass on my computer with PHP 7.1.12
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-12-15T16:08:16Z
+
+Should I duplicate this PR to get more visibility? The logout listener never did work so I thought this would have got more attention.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-15T16:49:45Z
+
+@MatTheCat No need for reopening a new one.
+Sorry for not giving you more feedback yet, but be sure that this has my attention.
+That's an important bug which exists for a long time, if we can fix it, we need to do it right.
+I think it's close to be ok, you tried a lot of approaches and that's great. What prevents me to approve is the fact we need to change some public api, hence I want to review it more throughly, check it out and see if we can do that more transparently.
+Note that as of 3.3 `FirewallContext::getContext()` is deprecated in favor of separated `getListeners()` and `getExceptionListener()`, which means we would need to add a new public method when merging this up to 3.3, hence I'm not comfortable with this as is. Please be a bit more a patient, I will give more inputs as soon as I have time.
+Thanks for your understanding.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-12-27T09:46:55Z
+
+I rebased one last time. People impacted by this issue will have to disable `logout` in their configuration and call their handler in the controller of their logout route.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-27T12:53:34Z
+
+Given that this implies public API changes in patch releases, I think that the previous version would be better (passing a fake token to logout handlers if no one exists in the token storage).
+@stof @xabbuh what do you think?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-12-27T14:27:35Z
+
+I think this PR first commit doesn't introduce any BC break. Are we really willing to let this bug live for the sake of lazy loading?
+
+On the other hand nearly nobody cared or noticed so maybe this can be scheduled for 5.0?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-01-17T08:02:18Z
+
+Way to go Symfony
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-22T14:25:37Z
+
+Why did you close this?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-01-23T19:49:48Z
+
+Seems obvious this PR won't go anywhere so I won't take care of it anymore.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-23T21:30:35Z
+
+That's open source, complex topics need time, and we all spend as much time as possible here. Some PRs were merged after more than 2 years of discussion on this repository.
+I know how much frustrating it can be to don't get feedback, especially since we move forward on different topics everyday.
+
+Here the related issue is quite complex, hence it needs time for being fixed correctly.
+Be sure that this _will_ go somewhere, nothing will be lost. I perfectly understand your concerns and you did a very great work at trying different approaches, thank you for that, it's useful.
+
+Closing the PR makes the discussion stops, while this does need discussion, more inputs from different point of views. I'll try to take this over as soon as possible, your work eliminates a lot of possibilities, that's great.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-01-24T12:29:38Z
+
+There doesn't seem to be any discussion. I can reopen this but this will be pointless without any intent to fix.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-04-24T07:15:56Z
+
+Rebased on master because I don't see how to fix this without BC break.
+
+---------------------------------------------------------------------------
+
+by antoligy at 2018-05-01T15:03:00Z
+
+Hey, any movement towards making Symfony's security component more useful for non-trivial authentication setups is huge progress so thanks for pursuing this so avidly @MatTheCat.
+
+How can people help get this, or something like it, merged into the mainline more quickly?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-02T07:35:36Z
+
+BTW this PR is now against `master`.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-02T07:53:48Z
+
+> I thought changing `FirewallMap::getListeners` return was a BC break. Anyways I fixed this.
+
+@MatTheCat If I read the code correctly, it merely adds a 3rd item to the return values, which by default is null if it doesn't exist. In your current solution, it looks like the PR will be backwards compatible, though I might have missed something.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-02T08:43:29Z
+
+Uh okay that would be great.
+
+I don't understand why the build is failing though :disappointed:
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-03T16:31:58Z
+
+![jobs](https://user-images.githubusercontent.com/1898254/39590099-3576d87e-4f00-11e8-9f32-ae41edb89894.png)
+
+What is the difference between these jobs? Why would one fails and not the others?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-04T10:38:50Z
+
+Tests pass :tada:
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-10T13:11:48Z
+
+As this is a bugfix could this be scheduled for Symfony 4.1?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-05-11T15:00:29Z
+
+@MatTheCat Almost good. However, we should be able to fix this bug on 2.7 by
+- removing the deprecation, we will need to add it starting from 4.1 only (or 4.2 if we can't finish this in time)
+- marking the new `FirewallContext::getLogoutListener()` method as internal, we will remove the flag starting from 4.1 (|4.2)
+
+Could you please give it a try? I can help if needed.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-11T17:53:45Z
+
+I don't really understand but I can do it.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-11T18:48:00Z
+
+Done. As `FirewallContext` only has a `getContext` getter in 2.7 I didn't add `getLogoutListener`. Got same failure on `PHP: 7.1` job and still don't understand why.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-15T09:38:22Z
+
+composer.json of the bundle needs an update, and the CHANGELOG of the component should tell about the added element to the interface
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-15T10:08:11Z
+
+> composer.json of the bundle needs an update
+
+Does that mean mean I have to increment `symfony/security` version?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-05-15T10:12:06Z
+
+> the CHANGELOG of the component should tell about the added element to the interface
+
+Something like
+
+> `Symfony\Component\Security\Http\FirewallMap::getListeners` must return a logout listener as third element
+
+?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-05-15T10:16:52Z
+
+> Does that mean mean I have to increment symfony/security version?
+
+yea, SecurityBundle's `symfony/security` requirement should be `"~2.7.47|~2.8.40"` (https://github.com/symfony/symfony/pull/24805#pullrequestreview-120136627)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-15T13:15:14Z
+
+After merging this (and once it is propagated until master), we should get another PR against master to deprecate the case of returning only 2 elements in the firewall map. This can be checked in the Firewall class.

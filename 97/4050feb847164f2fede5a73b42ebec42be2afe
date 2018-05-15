@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-14T14:07:56Z
+
+To me this is a bugfix and should be opened against 2.7 branch.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2018-05-14T17:17:53Z
+
+@Tobion agree, let's rebase on 2.7

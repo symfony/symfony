@@ -382,6 +382,27 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertSame(array(2, 1, 'foo' => 3), $def->getArguments());
     }
 
+    public function testBindings()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'stdClass')
+            ->setBindings(array('a' => '1', 'b' => '2'))
+        ;
+
+        $child = $container->setDefinition('child', new ChildDefinition('parent'))
+            ->setBindings(array('b' => 'B', 'c' => 'C'))
+        ;
+
+        $this->process($container);
+
+        $bindings = array();
+        foreach ($container->getDefinition('child')->getBindings() as $k => $v) {
+            $bindings[$k] = $v->getValues()[0];
+        }
+        $this->assertEquals(array('b' => 'B', 'c' => 'C', 'a' => '1'), $bindings);
+    }
+
     public function testSetAutoconfiguredOnServiceIsParent()
     {
         $container = new ContainerBuilder();

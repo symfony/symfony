@@ -80,7 +80,6 @@ class File extends \SplFileInfo
         return null;
     }
 
-
     /**
      * Returns the mime type of the file.
      *

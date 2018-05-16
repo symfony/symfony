@@ -129,15 +129,33 @@ EOF
                 $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
             }
 
-            $containerDir = $fs->exists($warmupDir.'/'.$containerDir) ? false : $containerDir;
-
-            $fs->rename($realCacheDir, $oldCacheDir);
-            $fs->rename($warmupDir, $realCacheDir);
-
-            if ($containerDir) {
-                $fs->rename($oldCacheDir.'/'.$containerDir, $realCacheDir.'/'.$containerDir);
-                touch($realCacheDir.'/'.$containerDir.'.legacy');
+            if (!$fs->exists($warmupDir.'/'.$containerDir)) {
+                $fs->rename($realCacheDir.'/'.$containerDir, $warmupDir.'/'.$containerDir);
+                touch($warmupDir.'/'.$containerDir.'.legacy');
             }
+
+            if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
+                foreach ($mounts as $mount) {
+                    $mount = array_slice(explode(' ', $mount), 1, -3);
+                    if (!\in_array(array_pop($mount), array('vboxfs', 'nfs'))) {
+                        continue;
+                    }
+                    $mount = implode(' ', $mount).'/';
+
+                    if (0 === strpos($realCacheDir, $mount)) {
+                        $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
+                        $oldCacheDir = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($oldCacheDir) {
+                $fs->rename($realCacheDir, $oldCacheDir);
+            } else {
+                $fs->remove($realCacheDir);
+            }
+            $fs->rename($warmupDir, $realCacheDir);
 
             if ($output->isVerbose()) {
                 $io->comment('Removing old cache directory...');

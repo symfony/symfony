@@ -1243,7 +1243,7 @@ class Request
      *
      * @param string $format The format
      *
-     * @return string The associated mime type (null if not found)
+     * @return string|null The associated mime type (null if not found)
      */
     public function getMimeType($format)
     {

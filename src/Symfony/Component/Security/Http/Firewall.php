@@ -47,13 +47,22 @@ class Firewall implements EventSubscriberInterface
         }
 
         // register listeners for this firewall
-        list($listeners, $exceptionListener) = $this->map->getListeners($event->getRequest());
+        $listeners = $this->map->getListeners($event->getRequest());
+
+        $authenticationListeners = $listeners[0];
+        $exceptionListener = $listeners[1];
+        $logoutListener = isset($listeners[2]) ? $listeners[2] : null;
+
         if (null !== $exceptionListener) {
             $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
             $exceptionListener->register($this->dispatcher);
         }
 
-        return $this->handleRequest($event, $listeners);
+        $this->handleRequest($event, $authenticationListeners);
+
+        if (null !== $logoutListener) {
+            $logoutListener->handle($event);
+        }
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)

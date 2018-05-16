@@ -52,6 +52,8 @@ class ReflectionExtractorTest extends TestCase
                 'DOB',
                 'Id',
                 '123',
+                'self',
+                'realParent',
                 'c',
                 'd',
                 'e',
@@ -154,6 +156,8 @@ class ReflectionExtractorTest extends TestCase
             array('donotexist', null),
             array('staticGetter', null),
             array('staticSetter', null),
+            array('self', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy'))),
+            array('realParent', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy'))),
         );
     }
 
@@ -171,6 +175,8 @@ class ReflectionExtractorTest extends TestCase
             array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true))),
             array('bar', array(new Type(Type::BUILTIN_TYPE_INT))),
             array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
+            array('buz', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy'))),
+            array('biz', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'stdClass'))),
             array('donotexist', null),
         );
     }

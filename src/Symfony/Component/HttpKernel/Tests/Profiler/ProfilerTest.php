@@ -44,7 +44,7 @@ class ProfilerTest extends TestCase
     public function testReset()
     {
         $collector = $this->getMockBuilder(DataCollectorInterface::class)
-            ->setMethods(['collect', 'getName', 'reset'])
+            ->setMethods(array('collect', 'getName', 'reset'))
             ->getMock();
         $collector->expects($this->any())->method('getName')->willReturn('mock');
         $collector->expects($this->once())->method('reset');

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware\Configuration;
 
-use Symfony\Component\Messenger\EnvelopeItemInterface;
+use Symfony\Component\Messenger\TransportableEnvelopeItemInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  *
  * @experimental in 4.1
  */
-final class ValidationConfiguration implements EnvelopeItemInterface
+final class ValidationConfiguration implements TransportableEnvelopeItemInterface
 {
     private $groups;
 

@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
-use Symfony\Component\Messenger\EnvelopeItemInterface;
+use Symfony\Component\Messenger\TransportableEnvelopeItemInterface;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
  * @experimental in 4.1
  */
-final class SerializerConfiguration implements EnvelopeItemInterface
+final class SerializerConfiguration implements TransportableEnvelopeItemInterface
 {
     private $context;
 

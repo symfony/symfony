@@ -25,13 +25,4 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
  */
 final class ReceivedMessage implements EnvelopeItemInterface
 {
-    public function serialize()
-    {
-        return '';
-    }
-
-    public function unserialize($serialized)
-    {
-        // noop
-    }
 }

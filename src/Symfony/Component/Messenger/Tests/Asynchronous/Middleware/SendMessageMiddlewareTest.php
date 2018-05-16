@@ -16,8 +16,10 @@ use Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\TransportableEnvelopeItemInterface;
 
 class SendMessageMiddlewareTest extends TestCase
 {
@@ -35,6 +37,27 @@ class SendMessageMiddlewareTest extends TestCase
         $next->expects($this->never())->method($this->anything());
 
         $middleware->handle($message, $next);
+    }
+
+    public function testItSendsEnvelopeWithTransportableItemsOnly()
+    {
+        $envelope = Envelope::wrap(new DummyMessage('Hey'))
+            ->with(new TransportableItem())
+            ->with(new NonTransportableItem())
+        ;
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+
+        $middleware = new SendMessageMiddleware(new InMemorySenderLocator(array(
+            $sender,
+        )));
+
+        $sender->expects($this->once())->method('send')->with(Envelope::wrap(new DummyMessage('Hey'))
+            ->with(new TransportableItem())
+        );
+        $next->expects($this->never())->method($this->anything());
+
+        $middleware->handle($envelope, $next);
     }
 
     public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
@@ -113,4 +136,21 @@ class InMemorySenderLocator implements SenderLocatorInterface
     {
         return $this->senders;
     }
+}
+
+class TransportableItem implements TransportableEnvelopeItemInterface
+{
+    public function serialize()
+    {
+        // no op
+    }
+
+    public function unserialize($serialized)
+    {
+        // no op
+    }
+}
+
+class NonTransportableItem implements EnvelopeItemInterface
+{
 }

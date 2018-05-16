@@ -46,12 +46,17 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$session = $event->getRequest()->getSession()) {
+        if (!$session = $this->getSession()) {
+            return;
+        }
+
+        $response = $event->getResponse();
+        if ($response->isCacheable()) {
             return;
         }
 
         if ($session->isStarted() || ($session instanceof Session && $session->hasBeenStarted())) {
-            $event->getResponse()
+            $response
                 ->setPrivate()
                 ->setMaxAge(0)
                 ->headers->addCacheControlDirective('must-revalidate');

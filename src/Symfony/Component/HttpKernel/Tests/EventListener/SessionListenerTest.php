@@ -76,4 +76,25 @@ class SessionListenerTest extends TestCase
         $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
     }
+
+    public function testResponseIsNotPrivateWhenCachable()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+
+        $container = new Container();
+        $container->set('session', $session);
+
+        $listener = new SessionListener($container);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $request = new Request();
+        $response = new Response();
+        $response->setSharedMaxAge(600);
+
+        $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertSame('600', $response->headers->getCacheControlDirective('s-maxage'));
+    }
 }

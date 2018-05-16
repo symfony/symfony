@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
@@ -75,8 +74,4 @@ class EnvelopeTest extends TestCase
         $this->assertArrayHasKey(ValidationConfiguration::class, $configs);
         $this->assertSame($validationConfig, $configs[ValidationConfiguration::class]);
     }
-}
-
-class FooConfigurationConsumer implements EnvelopeAwareInterface
-{
 }

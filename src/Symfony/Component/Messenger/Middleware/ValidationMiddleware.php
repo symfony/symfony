@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -20,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ValidationMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
+class ValidationMiddleware implements MiddlewareInterface
 {
     private $validator;
 
@@ -29,21 +28,20 @@ class ValidationMiddleware implements MiddlewareInterface, EnvelopeAwareInterfac
         $this->validator = $validator;
     }
 
-    public function handle($message, callable $next)
+    public function handle(Envelope $envelope, callable $next)
     {
-        $envelope = Envelope::wrap($message);
-        $subject = $envelope->getMessage();
+        $message = $envelope->getMessage();
         $groups = null;
         /** @var ValidationConfiguration|null $validationConfig */
         if ($validationConfig = $envelope->get(ValidationConfiguration::class)) {
             $groups = $validationConfig->getGroups();
         }
 
-        $violations = $this->validator->validate($subject, null, $groups);
+        $violations = $this->validator->validate($message, null, $groups);
         if (\count($violations)) {
-            throw new ValidationFailedException($subject, $violations);
+            throw new ValidationFailedException($message, $violations);
         }
 
-        return $next($message);
+        return $next($envelope);
     }
 }

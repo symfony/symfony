@@ -687,8 +687,8 @@ class HandleNoMessageHandler implements MessageSubscriberInterface
 
 class UselessMiddleware implements MiddlewareInterface
 {
-    public function handle($message, callable $next)
+    public function handle(Envelope $envelope, callable $next)
     {
-        return $next($message);
+        return $next($envelope);
     }
 }

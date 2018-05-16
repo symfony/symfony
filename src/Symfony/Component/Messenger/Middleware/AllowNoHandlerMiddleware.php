@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 
 /**
@@ -18,10 +19,10 @@ use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
  */
 class AllowNoHandlerMiddleware implements MiddlewareInterface
 {
-    public function handle($message, callable $next)
+    public function handle(Envelope $envelope, callable $next)
     {
         try {
-            return $next($message);
+            return $next($envelope);
         } catch (NoHandlerForMessageException $e) {
             // We allow not having a handler for this message.
         }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -28,12 +29,14 @@ class LoggingMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle($message, callable $next)
+    public function handle(Envelope $envelope, callable $next)
     {
+        $message = $envelope->getMessage();
+
         $this->logger->debug('Starting handling message {class}', $this->createContext($message));
 
         try {
-            $result = $next($message);
+            $result = $next($envelope);
         } catch (\Throwable $e) {
             $this->logger->warning('An exception occurred while handling message {class}', array_merge(
                 $this->createContext($message),

@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
@@ -20,7 +21,7 @@ class LoggingMiddlewareTest extends TestCase
 {
     public function testDebugLogAndNextMiddleware()
     {
-        $message = new DummyMessage('Hey');
+        $envelope = Envelope::wrap(new DummyMessage('Hey'));
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -31,11 +32,11 @@ class LoggingMiddlewareTest extends TestCase
         $next
             ->expects($this->once())
             ->method('__invoke')
-            ->with($message)
+            ->with($envelope)
             ->willReturn('Hello')
         ;
 
-        $result = (new LoggingMiddleware($logger))->handle($message, $next);
+        $result = (new LoggingMiddleware($logger))->handle($envelope, $next);
 
         $this->assertSame('Hello', $result);
     }
@@ -45,7 +46,7 @@ class LoggingMiddlewareTest extends TestCase
      */
     public function testWarningLogOnException()
     {
-        $message = new DummyMessage('Hey');
+        $envelope = Envelope::wrap(new DummyMessage('Hey'));
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -60,10 +61,10 @@ class LoggingMiddlewareTest extends TestCase
         $next
             ->expects($this->once())
             ->method('__invoke')
-            ->with($message)
+            ->with($envelope)
             ->willThrowException(new \Exception())
         ;
 
-        (new LoggingMiddleware($logger))->handle($message, $next);
+        (new LoggingMiddleware($logger))->handle($envelope, $next);
     }
 }

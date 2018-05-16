@@ -73,7 +73,7 @@ class File extends \SplFileInfo
     public function getPathinfoExtension()
     {
         $info = pathinfo($this->getClientOriginalName());
-        if(array_key_exists('extension', $info)){
+        if (array_key_exists('extension', $info)) {
             return $info['extension'];
         }
         return null;

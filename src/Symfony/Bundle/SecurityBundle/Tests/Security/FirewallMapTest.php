@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
+use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class FirewallMapTest extends TestCase
 {
@@ -36,7 +37,7 @@ class FirewallMapTest extends TestCase
 
         $firewallMap = new FirewallMap($container, $map);
 
-        $this->assertEquals(array(array(), null), $firewallMap->getListeners($request));
+        $this->assertEquals(array(array(), null, null), $firewallMap->getListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
@@ -52,7 +53,7 @@ class FirewallMapTest extends TestCase
 
         $firewallMap = new FirewallMap($container, $map);
 
-        $this->assertEquals(array(array(), null), $firewallMap->getListeners($request));
+        $this->assertEquals(array(array(), null, null), $firewallMap->getListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
@@ -72,6 +73,9 @@ class FirewallMapTest extends TestCase
         $exceptionListener = $this->getMockBuilder(ExceptionListener::class)->disableOriginalConstructor()->getMock();
         $firewallContext->expects($this->once())->method('getExceptionListener')->willReturn($exceptionListener);
 
+        $logoutListener = $this->getMockBuilder(LogoutListener::class)->disableOriginalConstructor()->getMock();
+        $firewallContext->expects($this->once())->method('getLogoutListener')->willReturn($logoutListener);
+
         $matcher = $this->getMockBuilder(RequestMatcherInterface::class)->getMock();
         $matcher->expects($this->once())
             ->method('matches')
@@ -83,7 +87,7 @@ class FirewallMapTest extends TestCase
 
         $firewallMap = new FirewallMap($container, array('security.firewall.map.context.foo' => $matcher));
 
-        $this->assertEquals(array(array($listener), $exceptionListener), $firewallMap->getListeners($request));
+        $this->assertEquals(array(array($listener), $exceptionListener, $logoutListener), $firewallMap->getListeners($request));
         $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
         $this->assertEquals('security.firewall.map.context.foo', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }

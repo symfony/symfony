@@ -49,7 +49,7 @@ class PhpExecutableFinder
         }
 
         if ($php = getenv('PHP_PATH')) {
-            if (!is_executable($php)) {
+            if (!@is_executable($php)) {
                 return false;
             }
 
@@ -57,12 +57,12 @@ class PhpExecutableFinder
         }
 
         if ($php = getenv('PHP_PEAR_PHP_BIN')) {
-            if (is_executable($php)) {
+            if (@is_executable($php)) {
                 return $php;
             }
         }
 
-        if (is_executable($php = PHP_BINDIR.('\\' === DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+        if (@is_executable($php = PHP_BINDIR.('\\' === DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
             return $php;
         }
 

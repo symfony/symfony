@@ -138,6 +138,7 @@
         <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
+            <argument />  <!-- LogoutListener -->
             <argument />  <!-- FirewallConfig -->
         </service>
 

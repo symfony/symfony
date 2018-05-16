@@ -121,10 +121,10 @@ class _FirewallMap
         $context = $this->getFirewallContext($request);
 
         if (null === $context) {
-            return array(array(), null);
+            return array(array(), null, null);
         }
 
-        return array($context->getListeners(), $context->getExceptionListener());
+        return array($context->getListeners(), $context->getExceptionListener(), $context->getLogoutListener());
     }
 
     /**

@@ -176,7 +176,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             if (!$reflectionType = $reflectionParameter->getType()) {
                 return;
             }
-            $type = $this->extractFromReflectionType($reflectionType);
+            $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod);
 
             // HHVM reports variadics with "array" but not builtin type hints
             if (!$reflectionType->isBuiltin() && Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType()) {
@@ -188,7 +188,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             } elseif (Type::BUILTIN_TYPE_CALLABLE === $info[1]) {
                 $type = new Type(Type::BUILTIN_TYPE_CALLABLE, $reflectionParameter->allowsNull());
             } else {
-                $type = new Type(Type::BUILTIN_TYPE_OBJECT, $reflectionParameter->allowsNull(), $info[1]);
+                $type = new Type(Type::BUILTIN_TYPE_OBJECT, $reflectionParameter->allowsNull(), $this->resolveTypeName($info[1], $reflectionMethod));
             }
         } else {
             return;
@@ -217,7 +217,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         if ($this->supportsParameterType && $reflectionType = $reflectionMethod->getReturnType()) {
-            return array($this->extractFromReflectionType($reflectionType));
+            return array($this->extractFromReflectionType($reflectionType, $reflectionMethod));
         }
 
         if (\in_array($prefix, array('is', 'can'))) {
@@ -228,11 +228,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * Extracts data from the PHP 7 reflection type.
      *
-     * @param \ReflectionType $reflectionType
-     *
      * @return Type
      */
-    private function extractFromReflectionType(\ReflectionType $reflectionType)
+    private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionMethod $reflectionMethod)
     {
         $phpTypeOrClass = $reflectionType instanceof \ReflectionNamedType ? $reflectionType->getName() : $reflectionType->__toString();
         $nullable = $reflectionType->allowsNull();
@@ -244,10 +242,22 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         } elseif ($reflectionType->isBuiltin()) {
             $type = new Type($phpTypeOrClass, $nullable);
         } else {
-            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $phpTypeOrClass);
+            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflectionMethod));
         }
 
         return $type;
+    }
+
+    private function resolveTypeName($name, \ReflectionMethod $reflectionMethod)
+    {
+        if ('self' === $lcName = strtolower($name)) {
+            return $reflectionMethod->getDeclaringClass()->name;
+        }
+        if ('parent' === $lcName && $parent = $reflectionMethod->getDeclaringClass()->getParentClass()) {
+            return $parent->name;
+        }
+
+        return $name;
     }
 
     /**

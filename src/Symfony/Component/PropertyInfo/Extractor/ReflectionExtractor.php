@@ -153,7 +153,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if (!$reflectionType = $reflectionParameter->getType()) {
             return null;
         }
-        $type = $this->extractFromReflectionType($reflectionType);
+        $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod);
 
         if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
             $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type);
@@ -175,7 +175,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         if ($reflectionType = $reflectionMethod->getReturnType()) {
-            return array($this->extractFromReflectionType($reflectionType));
+            return array($this->extractFromReflectionType($reflectionType, $reflectionMethod));
         }
 
         if (\in_array($prefix, array('is', 'can'))) {
@@ -185,7 +185,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    private function extractFromReflectionType(\ReflectionType $reflectionType): Type
+    private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionMethod $reflectionMethod): Type
     {
         $phpTypeOrClass = $reflectionType->getName();
         $nullable = $reflectionType->allowsNull();
@@ -197,10 +197,22 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         } elseif ($reflectionType->isBuiltin()) {
             $type = new Type($phpTypeOrClass, $nullable);
         } else {
-            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $phpTypeOrClass);
+            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflectionMethod));
         }
 
         return $type;
+    }
+
+    private function resolveTypeName(string $name, \ReflectionMethod $reflectionMethod): string
+    {
+        if ('self' === $lcName = strtolower($name)) {
+            return $reflectionMethod->getDeclaringClass()->name;
+        }
+        if ('parent' === $lcName && $parent = $reflectionMethod->getDeclaringClass()->getParentClass()) {
+            return $parent->name;
+        }
+
+        return $name;
     }
 
     private function isPublicProperty(string $class, string $property): bool

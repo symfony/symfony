@@ -251,8 +251,6 @@ class RouteCollectionBuilder
     /**
      * Adds a resource for this collection.
      *
-     * @param ResourceInterface $resource
-     *
      * @return $this
      */
     private function addResource(ResourceInterface $resource): self

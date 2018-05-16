@@ -46,12 +46,8 @@ class ContextListener implements ListenerInterface
     private $logoutOnUserChange = false;
 
     /**
-     * @param TokenStorageInterface                     $tokenStorage
-     * @param iterable|UserProviderInterface[]          $userProviders
-     * @param string                                    $contextKey
-     * @param LoggerInterface|null                      $logger
-     * @param EventDispatcherInterface|null             $dispatcher
-     * @param AuthenticationTrustResolverInterface|null $trustResolver
+     * @param iterable|UserProviderInterface[] $userProviders
+     * @param string                           $contextKey
      */
     public function __construct(TokenStorageInterface $tokenStorage, $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {

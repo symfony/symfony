@@ -58,7 +58,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $param->allowsNull());
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param, $reflection), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $param->allowsNull());
         }
 
         return $arguments;
@@ -107,23 +107,35 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      *
      * @return null|string
      */
-    private function getType(\ReflectionParameter $parameter)
+    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function)
     {
         if ($this->supportsParameterType) {
             if (!$type = $parameter->getType()) {
                 return;
             }
-            $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
-            if ('array' === $typeName && !$type->isBuiltin()) {
+            $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+            if ('array' === $name && !$type->isBuiltin()) {
                 // Special case for HHVM with variadics
                 return;
             }
-
-            return $typeName;
+        } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $name)) {
+            $name = $name[1];
+        } else {
+            return;
         }
+        $lcName = strtolower($name);
 
-        if (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $info)) {
-            return $info[1];
+        if ('self' !== $lcName && 'parent' !== $lcName) {
+            return $name;
+        }
+        if (!$function instanceof \ReflectionMethod) {
+            return;
+        }
+        if ('self' === $lcName) {
+            return $function->getDeclaringClass()->name;
+        }
+        if ($parent = $function->getDeclaringClass()->getParentClass()) {
+            return $parent->name;
         }
     }
 }

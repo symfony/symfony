@@ -53,8 +53,6 @@ class XPathExpr
     }
 
     /**
-     * @param $condition
-     *
      * @return $this
      */
     public function addCondition($condition)

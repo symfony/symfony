@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -38,6 +40,23 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new AbstractObjectNormalizerDummy();
 
         $this->assertInstanceOf(__NAMESPACE__.'\Dummy', $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), array()));
+    }
+
+    public function testDenormalizeWithDiscriminatorAndPropertyInfo()
+    {
+        $propertyTypeExtractor = $this->createMock(PropertyTypeExtractorInterface::class);
+        $propertyTypeExtractor->expects($this->exactly(2))
+            ->method('getTypes')
+            ->withConsecutive(
+                array(MappedDummyChild::class, 'foo'),
+                array(MappedDummyChild::class, 'bar')
+            );
+
+        $normalizer = new AbstractObjectNormalizerWithMetadata($propertyTypeExtractor);
+
+        $data = array('foo' => 'dummy', 'bar' => 1);
+        $class = MappedDummy::class;
+        $normalizer->denormalize($data, $class);
     }
 
     /**
@@ -104,11 +123,26 @@ class Dummy
     public $baz;
 }
 
+/**
+ * @DiscriminatorMap(typeProperty="foo", mapping={
+ *   "dummy"="Symfony\Component\Serializer\Tests\Normalizer\MappedDummyChild"
+ * })
+ */
+class MappedDummy
+{
+    public $foo;
+}
+
+class MappedDummyChild extends Dummy
+{
+    public $bar;
+}
+
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
 {
-    public function __construct()
+    public function __construct(PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
-        parent::__construct(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        parent::__construct(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())), null, $propertyTypeExtractor);
     }
 
     protected function extractAttributes($object, $format = null, array $context = array())

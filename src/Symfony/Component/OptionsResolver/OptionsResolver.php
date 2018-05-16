@@ -975,7 +975,7 @@ class OptionsResolver implements Options
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed  $value The value to return the type of
+     * @param mixed $value The value to return the type of
      */
     private function formatTypeOf($value, ?string $type): string
     {

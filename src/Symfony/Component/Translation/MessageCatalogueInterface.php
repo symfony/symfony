@@ -105,7 +105,7 @@ interface MessageCatalogueInterface
      *
      * The two catalogues must have the same locale.
      */
-    public function addCatalogue(MessageCatalogueInterface $catalogue);
+    public function addCatalogue(self $catalogue);
 
     /**
      * Merges translations from the given Catalogue into the current one
@@ -113,7 +113,7 @@ interface MessageCatalogueInterface
      *
      * This is used to provide default translations when they do not exist for the current locale.
      */
-    public function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
+    public function addFallbackCatalogue(self $catalogue);
 
     /**
      * Gets the fallback catalogue.

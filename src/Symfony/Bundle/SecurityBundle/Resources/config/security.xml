@@ -150,6 +150,7 @@
         <service id="security.firewall.context" class="%security.firewall.context.class%" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
+            <argument>null</argument>  <!-- FC Symfony >3.4 -->
             <argument />  <!-- LogoutListener -->
         </service>
 

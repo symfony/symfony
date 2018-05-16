@@ -76,6 +76,7 @@ class File extends \SplFileInfo
         if (array_key_exists('extension', $info)) {
             return $info['extension'];
         }
+        
         return null;
     }
 

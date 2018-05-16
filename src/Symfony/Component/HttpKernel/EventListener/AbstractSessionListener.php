@@ -46,7 +46,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$session = $this->getSession()) {
+        if (!$session = $event->getRequest()->getSession()) {
             return;
         }
 

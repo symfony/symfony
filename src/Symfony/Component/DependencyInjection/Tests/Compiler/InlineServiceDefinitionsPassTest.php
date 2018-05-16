@@ -92,7 +92,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertNotSame($container->getDefinition('bar'), $arguments[2]);
     }
 
-    public function testProcessInlinesMixedServicesLoop()
+    public function testProcessDoesNotInlineMixedServicesLoop()
     {
         $container = new ContainerBuilder();
         $container
@@ -108,7 +108,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals($container->getDefinition('foo')->getArgument(0), $container->getDefinition('bar'));
+        $this->assertEquals(new Reference('bar'), $container->getDefinition('foo')->getArgument(0));
     }
 
     /**

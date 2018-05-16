@@ -27,6 +27,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
 {
     private $usedBindings = array();
     private $unusedBindings = array();
+    private $errorMessages = array();
 
     /**
      * {@inheritdoc}
@@ -37,11 +38,19 @@ class ResolveBindingsPass extends AbstractRecursivePass
             parent::process($container);
 
             foreach ($this->unusedBindings as list($key, $serviceId)) {
-                throw new InvalidArgumentException(sprintf('Unused binding "%s" in service "%s".', $key, $serviceId));
+                $message = sprintf('Unused binding "%s" in service "%s".', $key, $serviceId);
+                if ($this->errorMessages) {
+                    $message .= sprintf("\nCould be related to%s:", 1 < \count($this->errorMessages) ? ' one of' : '');
+                }
+                foreach ($this->errorMessages as $m) {
+                    $message .= "\n - ".$m;
+                }
+                throw new InvalidArgumentException($message);
             }
         } finally {
             $this->usedBindings = array();
             $this->unusedBindings = array();
+            $this->errorMessages = array();
         }
     }
 
@@ -94,6 +103,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 $calls[] = array($constructor, $value->getArguments());
             }
         } catch (RuntimeException $e) {
+            $this->errorMessages[] = $e->getMessage();
             $this->container->getDefinition($this->currentId)->addError($e->getMessage());
 
             return parent::processValue($value, $isRoot);

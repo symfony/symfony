@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\TypedReference;
 
@@ -55,6 +56,21 @@ class ResolveBindingsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setBindings(array('$quz' => '123'));
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegexp Unused binding "$quz" in service [\s\S]+ Invalid service ".*\\ParentNotExists": class NotExists not found\.
+     */
+    public function testMissingParent()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(ParentNotExists::class, ParentNotExists::class);
         $definition->setBindings(array('$quz' => '123'));
 
         $pass = new ResolveBindingsPass();

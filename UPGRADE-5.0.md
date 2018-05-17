@@ -78,6 +78,8 @@ Security
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
  * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
  * The `ExpressionVoter::addExpressionLanguageProvider()` method has been removed.
+ * The `FirewallMapInterface::getListeners()` method must return an array of 3 elements,
+   the 3rd one must be either a `LogoutListener` instance or `null`.
 
 SecurityBundle
 --------------
@@ -85,6 +87,8 @@ SecurityBundle
  * The `logout_on_user_change` firewall option has been removed.
  * The `switch_user.stateless` firewall option has been removed.
  * The `SecurityUserValueResolver` class has been removed.
+ * Passing a `FirewallConfig` instance as 3rd argument to  the `FirewallContext` constructor 
+   now throws a `\TypeError`, pass a `LogoutListener` instance instead.
 
 Translation
 -----------

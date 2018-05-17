@@ -558,14 +558,21 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('messenger_routing');
         $senderLocatorDefinition = $container->getDefinition('messenger.asynchronous.routing.sender_locator');
+        $sendMessageMiddlewareDefinition = $container->getDefinition('messenger.middleware.route_messages');
 
         $messageToSenderIdsMapping = array(
-            DummyMessage::class => array('amqp'),
-            SecondMessage::class => array('amqp', 'audit', null),
-            '*' => array('amqp'),
+            DummyMessage::class => '.messenger.chain_sender.'.DummyMessage::class,
+            SecondMessage::class => '.messenger.chain_sender.'.SecondMessage::class,
+            '*' => 'amqp',
+        );
+        $messageToSendAndHandleMapping = array(
+            DummyMessage::class => false,
+            SecondMessage::class => true,
+            '*' => false,
         );
 
         $this->assertSame($messageToSenderIdsMapping, $senderLocatorDefinition->getArgument(1));
+        $this->assertSame($messageToSendAndHandleMapping, $sendMessageMiddlewareDefinition->getArgument(1));
     }
 
     /**

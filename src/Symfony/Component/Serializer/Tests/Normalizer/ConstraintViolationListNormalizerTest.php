@@ -43,19 +43,20 @@ class ConstraintViolationListNormalizerTest extends TestCase
         ));
 
         $expected = array(
-            'title' => 'An error occurred',
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
             'detail' => 'd: a
 4: 1',
             'violations' => array(
                     array(
                         'propertyPath' => 'd',
-                        'message' => 'a',
-                        'code' => 'f',
+                        'title' => 'a',
+                        'type' => 'urn:uuid:f',
                     ),
                     array(
                         'propertyPath' => '4',
-                        'message' => '1',
-                        'code' => '6',
+                        'title' => '1',
+                        'type' => 'urn:uuid:6',
                     ),
                 ),
         );

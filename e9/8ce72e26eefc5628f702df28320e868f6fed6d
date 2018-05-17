@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-12T19:46:59Z
+
+Good idea.
+I'd suggest to be bullet proof using parse_str for normalization:
+php > parse_str('a.b', $a);
+php > print_r($a);
+Array
+(
+    [a_b] =>
+)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-12T20:15:28Z
+
+Not sure what do you mean. Can you be more specific? Should I change this validation approach to just normalization approach? Frankly, I would like that more, so I don't have to do that by myself in userspace.
+
+Some cases are also handled internally by php's `setcookie`
+
+```
+ErrorException:
+Warning: Cookie names cannot contain any of the following '=,; \t\r\n\013\014'
+
+  at vendor\symfony\http-foundation\Session\Storage\Handler\AbstractSessionHandler.php:148
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-13T11:27:52Z
+
+Instead of checking for some chars (there are more that are turned to an underscore), I was thinking about doing the check like this:
+parse_str($name, $parsedName);
+if (array($name => '') !== $parsedName) => the name is invalid

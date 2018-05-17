@@ -62,6 +62,26 @@ class File extends \SplFileInfo
     }
 
     /**
+     * Returns the extension based on the original name with pathinfo.
+     *
+     * This method uses pathinfo() function.
+     *
+     * @return string|null The pathinfo extension or null if it cannot be guessed
+     *
+     * @see pathinfo()
+     */
+    public function getPathinfoExtension()
+    {
+        $extension = null;
+        $info = pathinfo($this->getClientOriginalName());
+        if (array_key_exists('extension', $info)) {
+            $extension = $info['extension'];
+        }
+        
+        return $extension;
+    }
+
+    /**
      * Returns the mime type of the file.
      *
      * The mime type is guessed using a MimeTypeGuesser instance, which uses finfo(),

@@ -4,6 +4,7 @@ CHANGELOG
 4.1.0
 -----
 
+ * added `getPathinfoExtension()` to find extension File by pathinfo function.
  * Query string normalization uses `parse_str()` instead of custom parsing logic.
  * Passing the file size to the constructor of the `UploadedFile` class is deprecated.
  * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.

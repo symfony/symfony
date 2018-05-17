@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-15T07:25:38Z
+
+The reason why we need to be able to put bindings there is because of autoconfiguration using ChildDefinition too (and doing this transformation early)

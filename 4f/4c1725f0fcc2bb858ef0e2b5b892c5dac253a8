@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-15T08:49:25Z
+
+Can't we merge this in lower branches too?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-15T08:50:11Z
+
+that's not a bugfix but an improvement, so that's for master

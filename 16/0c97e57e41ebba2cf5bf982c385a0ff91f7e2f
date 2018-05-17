@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-11T13:31:45Z
+
+Rebased and ready.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-11T14:34:19Z
+
+I’m afraid that such interaction would cause troubles when developers add
+another transport but forget to update their worker script: it would prompt
+the transport same rather than failing so their monitoring wouldn’t pick it
+up (obsly when they run the worker somewhere that “supports” interactions).
+On Fri, 11 May 2018 at 15:49, Yonel Ceruto <notifications@github.com> wrote:
+
+> *@yceruto* commented on this pull request.
+> ------------------------------
+>
+> In src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
+> <https://github.com/symfony/symfony/pull/27230#discussion_r187619381>:
+>
+> >
+> -    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, string $defaultReceiverName = null)
+> +    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = null)
+>
+> Small tweak in the test to prove it
+> https://github.com/symfony/symfony/pull/27230/files#diff-9a060054c9ccf980baeb5ee6e153c5a2R34
+>
+> —
+> You are receiving this because you commented.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/27230#discussion_r187619381>, or mute
+> the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEdd8CzFRKR22oPaINOQvF8kCsVdcks5txZcFgaJpZM4T6mOr>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-11T14:45:18Z
+
+Is that really an issue?
+I think the best practice for scripts is to always use `--no-interaction` and define all arguments.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-11T15:10:32Z
+
+I agree completely with @ogizanagi.
+
+It's really useful only for development. In production you must always configure the receiver argument without interaction.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-14T13:02:58Z
+
+What about to disable the interaction mode on debug false ?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-14T17:48:44Z
+
+That is a great idea 👍
+
+On Mon, 14 May 2018 at 14:03, Yonel Ceruto <notifications@github.com> wrote:
+
+> What about to disable the interaction mode on debug false ?
+>
+> —
+> You are receiving this because you commented.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/27230#issuecomment-388808618>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEWJSWIwIUwOFN3eRp-1ZtH9mJd61ks5tyYCIgaJpZM4T6mOr>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-14T17:55:48Z
+
+That would still not solve the case the dev adds a receiver where previously there was only one and the script calls the command without explicit arguments (hence fails). So, also make the argument required if no debug?
+Then it's probably semantically more correct to inject a default in the constructor rather than a `$debug` argument?
+Disabling interaction on debug false isn't really something we do.
+Again, do we really care?

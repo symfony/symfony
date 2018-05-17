@@ -103,7 +103,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setAutowired($parentDef->isAutowired());
         $def->setChanges($parentDef->getChanges());
 
-        $def->setBindings($parentDef->getBindings());
+        $def->setBindings($definition->getBindings() + $parentDef->getBindings());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();

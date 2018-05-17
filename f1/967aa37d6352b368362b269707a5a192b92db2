@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T10:22:14Z
+
+What's the use-case for such change?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-22T17:34:38Z
+
+Actually I think returning several senders does not make sense. It should be `public function getSenderForMessage($message): ?SenderInterface`; If multiple senders are wanted, just return a ChainSender implementation. And the forwardToSenderAndHandler logic should not depend on some arbitrary null value that violates the interface anyway. It could just be a marker interface implemented by the sender. Or an additional method in the SenderInterface like `forwardToHandler: bool`
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-22T17:41:35Z
+
+I appreciate and agree that this isn't the "cleanest" solution but it has the benefit of being simple and working well 🙃I see the point of the `ChainSender` but I don't really get the "marker interface implemented by the sender". What do you mean? How would you configure this on the `framework.messenger` configuration?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-25T22:21:32Z
+
+Something like where handle defaults to false.
+
+```
+framework:
+    messenger:
+        routing:
+            'My\Message\ToBeSentToTwoSenders':
+                senders: [amqp, audit]
+                handle: bool
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T06:35:04Z
+
+So, shouldn't we change the interface as @Tobion suggests, allowing only one sender?
+The configuration can be kept the same, creating a chained sender when needed.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-04-30T16:48:37Z
+
+@Tobion are you willing to make this change? I'd definitly approve it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-04-30T19:47:58Z
+
+I try to get to it tomorrow
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-03T13:14:30Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-05-06T20:06:31Z
+
+I implemented the single sender using a ChainSender approach.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-09T18:56:23Z
+
+@Tobion, unfortunately, you are going to have to rebase. Last step 🤞

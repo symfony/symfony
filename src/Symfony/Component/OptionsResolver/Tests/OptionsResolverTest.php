@@ -1914,4 +1914,414 @@ class OptionsResolverTest extends TestCase
             ),
         ));
     }
+
+    public function testIsNestedOption()
+    {
+        $this->resolver->setDefaults(array(
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setDefined(array('host', 'port'));
+            },
+        ));
+        $this->assertTrue($this->resolver->isNested('database'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The option "foo" does not exist. Defined options are: "host", "port".
+     */
+    public function testFailsIfUndefinedNestedOption()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setDefined(array('host', 'port'));
+            },
+        ));
+        $this->resolver->resolve(array(
+            'database' => array('foo' => 'bar'),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @expectedExceptionMessage The required option "host" is missing.
+     */
+    public function testFailsIfMissingRequiredNestedOption()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setRequired('host');
+            },
+        ));
+        $this->resolver->resolve(array(
+            'database' => array(),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "logging" with value null is expected to be of type "bool", but is of type "NULL".
+     */
+    public function testFailsIfInvalidTypeNestedOption()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefined('logging')
+                    ->setAllowedTypes('logging', 'bool');
+            },
+        ));
+        $this->resolver->resolve(array(
+            'database' => array('logging' => null),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The nested option "database" with value null is expected to be of type array, but is of type "NULL".
+     */
+    public function testFailsIfNotArrayIsGivenForNestedOptions()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setDefined('host');
+            },
+        ));
+        $this->resolver->resolve(array(
+            'database' => null,
+        ));
+    }
+
+    public function testResolveNestedOptionsWithoutDefault()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setDefined(array('host', 'port'));
+            },
+        ));
+        $actualOptions = $this->resolver->resolve();
+        $expectedOptions = array(
+            'name' => 'default',
+            'database' => array(),
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testResolveNestedOptionsWithDefault()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setDefaults(array(
+                    'host' => 'localhost',
+                    'port' => 3306,
+                ));
+            },
+        ));
+        $actualOptions = $this->resolver->resolve();
+        $expectedOptions = array(
+            'name' => 'default',
+            'database' => array(
+                'host' => 'localhost',
+                'port' => 3306,
+            ),
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testResolveMultipleNestedOptions()
+    {
+        $this->resolver->setDefaults(array(
+            'name' => 'default',
+            'database' => function (OptionsResolver $resolver) {
+                $resolver
+                    ->setRequired(array('dbname', 'host'))
+                    ->setDefaults(array(
+                        'port' => 3306,
+                        'slaves' => function (OptionsResolver $resolver) {
+                            $resolver->setDefaults(array(
+                                'host' => 'slave1',
+                                'port' => 3306,
+                            ));
+                        },
+                    ));
+            },
+        ));
+        $actualOptions = $this->resolver->resolve(array(
+            'name' => 'custom',
+            'database' => array(
+                'dbname' => 'test',
+                'host' => 'localhost',
+                'port' => null,
+                'slaves' => array('host' => 'slave2'),
+            ),
+        ));
+        $expectedOptions = array(
+            'name' => 'custom',
+            'database' => array(
+                'port' => null,
+                'slaves' => array('port' => 3306, 'host' => 'slave2'),
+                'dbname' => 'test',
+                'host' => 'localhost',
+            ),
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testResolveLazyOptionUsingNestedOption()
+    {
+        $this->resolver->setDefaults(array(
+            'version' => function (Options $options) {
+                return $options['database']['server_version'];
+            },
+            'database' => function (OptionsResolver $resolver) {
+                $resolver->setDefault('server_version', '3.15');
+            },
+        ));
+        $actualOptions = $this->resolver->resolve();
+        $expectedOptions = array(
+            'database' => array('server_version' => '3.15'),
+            'version' => '3.15',
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testNormalizeNestedOptionValue()
+    {
+        $this->resolver
+            ->setDefaults(array(
+                'database' => function (OptionsResolver $resolver) {
+                    $resolver->setDefaults(array(
+                        'port' => 3306,
+                        'host' => 'localhost',
+                        'dbname' => 'demo',
+                    ));
+                },
+            ))
+            ->setNormalizer('database', function (Options $options, $value) {
+                ksort($value);
+
+                return $value;
+            });
+        $actualOptions = $this->resolver->resolve(array(
+            'database' => array('dbname' => 'test'),
+        ));
+        $expectedOptions = array(
+            'database' => array('dbname' => 'test', 'host' => 'localhost', 'port' => 3306),
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testOverwrittenNestedOptionNotEvaluatedIfLazyDefault()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            Assert::fail('Should not be called');
+        });
+        // defined by subclass
+        $this->resolver->setDefault('foo', function (Options $options) {
+            return 'lazy';
+        });
+        $this->assertSame(array('foo' => 'lazy'), $this->resolver->resolve());
+    }
+
+    public function testOverwrittenNestedOptionNotEvaluatedIfScalarDefault()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            Assert::fail('Should not be called');
+        });
+        // defined by subclass
+        $this->resolver->setDefault('foo', 'bar');
+        $this->assertSame(array('foo' => 'bar'), $this->resolver->resolve());
+    }
+
+    public function testOverwrittenLazyOptionNotEvaluatedIfNestedOption()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', function (Options $options) {
+            Assert::fail('Should not be called');
+        });
+        // defined by subclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver->setDefault('bar', 'baz');
+        });
+        $this->assertSame(array('foo' => array('bar' => 'baz')), $this->resolver->resolve());
+    }
+
+    public function testResolveAllNestedOptionDefinitions()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver->setRequired('bar');
+        });
+        // defined by subclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver->setDefault('bar', 'baz');
+        });
+        // defined by subclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver->setDefault('ping', 'pong');
+        });
+        $this->assertSame(array('foo' => array('ping' => 'pong', 'bar' => 'baz')), $this->resolver->resolve());
+    }
+
+    public function testNormalizeNestedValue()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver->setDefault('bar', null);
+        });
+        // defined by subclass
+        $this->resolver->setNormalizer('foo', function (Options $options, $resolvedValue) {
+            if (null === $resolvedValue['bar']) {
+                $resolvedValue['bar'] = 'baz';
+            }
+
+            return $resolvedValue;
+        });
+        $this->assertSame(array('foo' => array('bar' => 'baz')), $this->resolver->resolve());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testFailsIfCyclicDependencyBetweenSameNestedOption()
+    {
+        $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
+            $resolver->setDefault('slaves', $parent['database']);
+        });
+        $this->resolver->resolve();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testFailsIfCyclicDependencyBetweenNestedOptionAndParentLazyOption()
+    {
+        $this->resolver->setDefaults(array(
+            'version' => function (Options $options) {
+                return $options['database']['server_version'];
+            },
+            'database' => function (OptionsResolver $resolver, Options $parent) {
+                $resolver->setDefault('server_version', $parent['version']);
+            },
+        ));
+        $this->resolver->resolve();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testFailsIfCyclicDependencyBetweenNormalizerAndNestedOption()
+    {
+        $this->resolver
+            ->setDefault('name', 'default')
+            ->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
+                $resolver->setDefault('host', $parent['name']);
+            })
+            ->setNormalizer('name', function (Options $options, $value) {
+                $options['database'];
+            });
+        $this->resolver->resolve();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testFailsIfCyclicDependencyBetweenNestedOptions()
+    {
+        $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
+            $resolver->setDefault('host', $parent['slave']['host']);
+        });
+        $this->resolver->setDefault('slave', function (OptionsResolver $resolver, Options $parent) {
+            $resolver->setDefault('host', $parent['database']['host']);
+        });
+        $this->resolver->resolve();
+    }
+
+    public function testGetAccessToParentOptionFromNestedOption()
+    {
+        $this->resolver->setDefaults(array(
+            'version' => 3.15,
+            'database' => function (OptionsResolver $resolver, Options $parent) {
+                $resolver->setDefault('server_version', $parent['version']);
+            },
+        ));
+        $this->assertSame(array('version' => 3.15, 'database' => array('server_version' => 3.15)), $this->resolver->resolve());
+    }
+
+    public function testNestedClosureWithoutTypeHintNotInvoked()
+    {
+        $closure = function ($resolver) {
+            Assert::fail('Should not be called');
+        };
+        $this->resolver->setDefault('foo', $closure);
+        $this->assertSame(array('foo' => $closure), $this->resolver->resolve());
+    }
+
+    public function testNestedClosureWithoutTypeHint2ndArgumentNotInvoked()
+    {
+        $closure = function (OptionsResolver $resolver, $parent) {
+            Assert::fail('Should not be called');
+        };
+        $this->resolver->setDefault('foo', $closure);
+        $this->assertSame(array('foo' => $closure), $this->resolver->resolve());
+    }
+
+    public function testResolveLazyOptionWithTransitiveDefaultDependency()
+    {
+        $this->resolver->setDefaults(array(
+            'ip' => null,
+            'database' => function (OptionsResolver $resolver, Options $parent) {
+                $resolver->setDefault('host', $parent['ip']);
+                $resolver->setDefault('master_slave', function (OptionsResolver $resolver, Options $parent) {
+                    $resolver->setDefault('host', $parent['host']);
+                });
+            },
+            'secondary_slave' => function (Options $options) {
+                return $options['database']['master_slave']['host'];
+            },
+        ));
+        $actualOptions = $this->resolver->resolve(array('ip' => '127.0.0.1'));
+        $expectedOptions = array(
+            'ip' => '127.0.0.1',
+            'database' => array(
+                'host' => '127.0.0.1',
+                'master_slave' => array('host' => '127.0.0.1'),
+            ),
+            'secondary_slave' => '127.0.0.1',
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testAccessToParentOptionFromNestedNormalizerAndLazyOption()
+    {
+        $this->resolver->setDefaults(array(
+            'debug' => true,
+            'database' => function (OptionsResolver $resolver, Options $parent) {
+                $resolver
+                    ->setDefined('logging')
+                    ->setDefault('profiling', function (Options $options) use ($parent) {
+                        return $parent['debug'];
+                    })
+                    ->setNormalizer('logging', function (Options $options, $value) use ($parent) {
+                        return false === $parent['debug'] ? true : $value;
+                    });
+            },
+        ));
+        $actualOptions = $this->resolver->resolve(array(
+            'debug' => false,
+            'database' => array('logging' => false),
+        ));
+        $expectedOptions = array(
+            'debug' => false,
+            'database' => array('profiling' => false, 'logging' => true),
+        );
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
 }

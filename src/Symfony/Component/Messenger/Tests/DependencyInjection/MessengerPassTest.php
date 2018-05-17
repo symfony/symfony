@@ -166,24 +166,7 @@ class MessengerPassTest extends TestCase
         $this->assertEquals(array(AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
     }
 
-    public function testItRegistersOneReceiverAndSetsTheDefaultOneOnTheCommand()
-    {
-        $container = $this->getContainerBuilder();
-        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
-            new Reference('message_bus'),
-            new Reference('messenger.receiver_locator'),
-            null,
-            null,
-        ));
-
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
-
-        (new MessengerPass())->process($container);
-
-        $this->assertSame(AmqpReceiver::class, $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
-    }
-
-    public function testItRegistersMultipleReceiversAndDoesNotSetTheDefaultOneOnTheCommand()
+    public function testItRegistersMultipleReceiversAndSetsTheReceiverNamesOnTheCommand()
     {
         $container = $this->getContainerBuilder();
         $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
@@ -198,7 +181,7 @@ class MessengerPassTest extends TestCase
 
         (new MessengerPass())->process($container);
 
-        $this->assertNull($container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
+        $this->assertSame(array('amqp', 'dummy'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
     }
 
     public function testItRegistersSenders()

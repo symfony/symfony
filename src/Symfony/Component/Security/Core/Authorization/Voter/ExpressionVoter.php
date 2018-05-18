@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
@@ -28,12 +29,27 @@ class ExpressionVoter implements VoterInterface
 {
     private $expressionLanguage;
     private $trustResolver;
+    private $authChecker;
     private $roleHierarchy;
 
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null)
+    /**
+     * @param AuthorizationCheckerInterface $authChecker
+     */
+    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, $authChecker = null, RoleHierarchyInterface $roleHierarchy = null)
     {
+        if ($authChecker instanceof RoleHierarchyInterface) {
+            @trigger_error(sprintf('Passing a RoleHierarchyInterface to "%s()" is deprecated since Symfony 4.2. Pass an AuthorizationCheckerInterface instead.', __METHOD__), E_USER_DEPRECATED);
+            $roleHierarchy = $authChecker;
+            $authChecker = null;
+        } elseif (null === $authChecker) {
+            @trigger_error(sprintf('Argument 3 passed to "%s()" should be an instanceof AuthorizationCheckerInterface, not passing it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        } elseif (!$authChecker instanceof AuthorizationCheckerInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 3 passed to %s() must be an instance of %s or null, %s given.', __METHOD__, AuthorizationCheckerInterface::class, is_object($authChecker) ? get_class($authChecker) : gettype($authChecker)));
+        }
+
         $this->expressionLanguage = $expressionLanguage;
         $this->trustResolver = $trustResolver;
+        $this->authChecker = $authChecker;
         $this->roleHierarchy = $roleHierarchy;
     }
 
@@ -87,6 +103,7 @@ class ExpressionVoter implements VoterInterface
             'subject' => $subject,
             'roles' => array_map(function ($role) { return $role->getRole(); }, $roles),
             'trust_resolver' => $this->trustResolver,
+            'auth_checker' => $this->authChecker,
         );
 
         // this is mainly to propose a better experience when the expression is used

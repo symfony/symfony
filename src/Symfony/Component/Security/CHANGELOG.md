@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* added the `is_granted()` function in security expressions
+* deprecated the `has_role()` function in security expressions, use `is_granted()` instead
+
 4.1.0
 -----
 

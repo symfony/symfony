@@ -370,7 +370,7 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('guard')
                                                     ->cannotBeEmpty()
                                                     ->info('An expression to block the transition')
-                                                    ->example('is_fully_authenticated() and has_role(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
+                                                    ->example('is_fully_authenticated() and is_granted(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
                                                 ->end()
                                                 ->arrayNode('from')
                                                     ->beforeNormalization()

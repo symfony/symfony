@@ -119,6 +119,7 @@
         <service id="security.access.expression_voter" class="Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter">
             <argument type="service" id="security.expression_language" />
             <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.authorization_checker" />
             <argument type="service" id="security.role_hierarchy" on-invalid="null" />
             <tag name="security.voter" priority="245" />
         </service>

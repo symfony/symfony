@@ -64,7 +64,9 @@ FrameworkBundle
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.
  * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is not supported anymore.
  * The `RequestDataCollector` class has been removed. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
-
+ * `extract-validation-messages` option added to `debug:translation` and `translation:update` that enables extracting validation 
+ messages from entities.
+ 
 HttpFoundation
 --------------
 

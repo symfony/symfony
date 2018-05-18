@@ -426,6 +426,8 @@ class ObjectNormalizerTest extends TestCase
             array(
                 array(
                     'bar' => function ($bar) {
+                        $this->assertEquals('baz', $bar);
+
                         return 'baz';
                     },
                 ),
@@ -435,8 +437,12 @@ class ObjectNormalizerTest extends TestCase
             ),
             array(
                 array(
-                    'bar' => function ($bar) {
-                        return;
+                    'bar' => function ($value, $object, $attributeName, $format, $context) {
+                        $this->assertSame('baz', $value);
+                        $this->assertInstanceOf(ObjectConstructorDummy::class, $object);
+                        $this->assertSame('bar', $attributeName);
+                        $this->assertSame('any', $format);
+                        $this->assertArrayHasKey('circular_reference_limit', $context);
                     },
                 ),
                 'baz',
@@ -634,6 +640,18 @@ class ObjectNormalizerTest extends TestCase
 
         $result = $serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
         $this->assertEquals($expected, $result);
+
+        $this->normalizer->setMaxDepthHandler(function ($object, $parentObject, $attributeName, $format, $context) {
+            $this->assertSame('level3', $object);
+            $this->assertInstanceOf(MaxDepthDummy::class, $parentObject);
+            $this->assertSame('foo', $attributeName);
+            $this->assertSame('test', $format);
+            $this->assertArrayHasKey(ObjectNormalizer::ENABLE_MAX_DEPTH, $context);
+
+            return 'handler';
+        });
+
+        $serializer->normalize($level1, 'test', array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
     }
 
     /**

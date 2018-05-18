@@ -20,6 +20,7 @@
         "symfony/event-dispatcher": "~4.1",
         "symfony/http-foundation": "~4.1",
         "symfony/debug": "~3.4|~4.0",
+        "symfony/polyfill-ctype": "~1.8",
         "psr/log": "~1.0"
     },
     "require-dev": {
@@ -45,7 +46,7 @@
     "conflict": {
         "symfony/config": "<3.4",
         "symfony/dependency-injection": "<4.1",
-        "symfony/var-dumper": "<3.4",
+        "symfony/var-dumper": "<4.1",
         "twig/twig": "<1.34|<2.4,>=2"
     },
     "suggest": {
@@ -64,7 +65,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

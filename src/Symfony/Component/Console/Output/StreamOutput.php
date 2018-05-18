@@ -83,31 +83,34 @@ class StreamOutput extends Output
      *
      * Colorization is disabled if not supported by the stream:
      *
-     *  -  the stream is redirected (eg php file.php >log)
-     *  -  Windows without VT100 support, Ansicon, ConEmu, Mintty
-     *  -  non tty consoles
+     * This is tricky on Windows, because Cygwin, Msys2 etc emulate pseudo
+     * terminals via named pipes, so we can only check the environment.
+     *
+     * Reference: Composer\XdebugHandler\Process::supportsColor
+     * https://github.com/composer/xdebug-handler
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
     protected function hasColorSupport()
     {
-        if (function_exists('stream_isatty') && !@stream_isatty($this->stream)) {
-            return false;
-        }
         if (DIRECTORY_SEPARATOR === '\\') {
-            if (function_exists('sapi_windows_vt100_support')) {
-                $vt100Enabled = @sapi_windows_vt100_support($this->stream);
-            } else {
-                $vt100Enabled = '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD;
-            }
-
-            return
-                $vt100Enabled
+            return (function_exists('sapi_windows_vt100_support')
+                && @sapi_windows_vt100_support($this->stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
         }
 
-        return function_exists('posix_isatty') && @posix_isatty($this->stream);
+        if (function_exists('stream_isatty')) {
+            return @stream_isatty($this->stream);
+        }
+
+        if (function_exists('posix_isatty')) {
+            return @posix_isatty($this->stream);
+        }
+
+        $stat = @fstat($this->stream);
+        // Check if formatted mode is S_IFCHR
+        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
     }
 }

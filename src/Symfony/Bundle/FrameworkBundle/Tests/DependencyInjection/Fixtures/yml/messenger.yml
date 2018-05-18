@@ -1,5 +1,6 @@
 framework:
     messenger:
+        serializer: false
         routing:
-            'App\Bar': ['sender.bar', 'sender.biz']
-            'App\Foo': 'sender.foo'
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage': ['sender.bar', 'sender.biz']
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage': 'sender.foo'

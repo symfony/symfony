@@ -64,7 +64,11 @@ class DebugProcessor implements DebugLoggerInterface
             return $this->records[$hash];
         }
 
-        return $this->records ? \call_user_func_array('array_merge', $this->records) : array();
+        if (0 === \count($this->records)) {
+            return array();
+        }
+
+        return array_merge(...array_values($this->records));
     }
 
     /**

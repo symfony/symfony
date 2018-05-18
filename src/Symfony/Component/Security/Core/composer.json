@@ -28,7 +28,7 @@
         "psr/log": "~1.0"
     },
     "suggest": {
-        "psr/container": "To instantiate the Security class",
+        "psr/container-implementation": "To instantiate the Security class",
         "symfony/event-dispatcher": "",
         "symfony/http-foundation": "",
         "symfony/validator": "For using the user password constraint",
@@ -44,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

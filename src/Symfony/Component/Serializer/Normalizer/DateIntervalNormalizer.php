@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  *
  * @author Jérôme Parmentier <jerome@prmntr.me>
  */
-class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterface
+class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT_KEY = 'dateinterval_format';
 
@@ -53,6 +53,14 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function supportsNormalization($data, $format = null)
     {
         return $data instanceof \DateInterval;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
     }
 
     /**

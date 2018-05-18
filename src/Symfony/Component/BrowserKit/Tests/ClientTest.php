@@ -594,6 +594,39 @@ class ClientTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider getTestsForMetaRefresh
+     */
+    public function testFollowMetaRefresh(string $content, string $expectedEndingUrl, bool $followMetaRefresh = true)
+    {
+        $client = new TestClient();
+        $client->followMetaRefresh($followMetaRefresh);
+        $client->setNextResponse(new Response($content));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals($expectedEndingUrl, $client->getRequest()->getUri());
+    }
+
+    public function getTestsForMetaRefresh()
+    {
+        return array(
+            array('<html><head><meta http-equiv="Refresh" content="4" /><meta http-equiv="refresh" content="0; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;URL=\'http://www.example.com/redirected\'"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content=\'0;URL="http://www.example.com/redirected"\'/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0; URL = http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;URL= http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><noscript><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></noscript></head></head></html>', 'http://www.example.com/redirected'),
+            // Non-zero timeout should not result in a redirect.
+            array('<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'),
+            array('<html><body></body></html>', 'http://www.example.com/foo/foobar'),
+            // Invalid meta tag placement should not result in a redirect.
+            array('<html><body><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected"/></body></html>', 'http://www.example.com/foo/foobar'),
+            // Valid meta refresh should not be followed if disabled.
+            array('<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar', false),
+        );
+    }
+
     public function testBack()
     {
         $client = new TestClient();

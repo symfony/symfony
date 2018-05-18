@@ -146,7 +146,14 @@ class XmlFileLoader extends FileLoader
         foreach ($services as $service) {
             if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
                 if ('prototype' === $service->tagName) {
-                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'), (string) $service->getAttribute('exclude'));
+                    $excludes = array_column($this->getChildren($service, 'exclude'), 'nodeValue');
+                    if ($service->hasAttribute('exclude')) {
+                        if (count($excludes) > 0) {
+                            throw new InvalidArgumentException('You cannot use both the attribute "exclude" and <exclude> tags at the same time.');
+                        }
+                        $excludes = array($service->getAttribute('exclude'));
+                    }
+                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'), $excludes);
                 } else {
                     $this->setDefinition((string) $service->getAttribute('id'), $definition);
                 }

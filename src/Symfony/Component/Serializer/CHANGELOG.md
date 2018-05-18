@@ -4,6 +4,8 @@ CHANGELOG
 4.1.0
 -----
 
+* added `CacheableSupportsMethodInterface` for normalizers and denormalizers that use
+  only the type and the format in their `supports*()` methods
 * added `MissingConstructorArgumentsException` new exception for deserialization failure
   of objects that needs data insertion in constructor
 * added an optional `default_constructor_arguments` option of context to specify a default data in

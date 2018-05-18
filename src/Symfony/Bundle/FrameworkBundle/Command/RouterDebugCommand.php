@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -67,7 +68,7 @@ EOF
     /**
      * {@inheritdoc}
      *
-     * @throws \InvalidArgumentException When route does not exist
+     * @throws InvalidArgumentException When route does not exist
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -84,7 +85,7 @@ EOF
             }
 
             if (!$route) {
-                throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
+                throw new InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
 
             $helper->describe($io, $route, array(

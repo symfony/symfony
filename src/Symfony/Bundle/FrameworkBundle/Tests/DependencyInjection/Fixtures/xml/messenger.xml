@@ -7,11 +7,12 @@
 
     <framework:config>
         <framework:messenger>
-            <framework:routing message-class="App\Bar">
+            <framework:serializer enabled="false" />
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage">
                 <framework:sender service="sender.bar" />
                 <framework:sender service="sender.biz" />
             </framework:routing>
-            <framework:routing message-class="App\Foo">
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage">
                 <framework:sender service="sender.foo" />
             </framework:routing>
         </framework:messenger>

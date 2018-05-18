@@ -243,7 +243,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = ($this->privates['factory_simple'] ?? $this->getFactorySimpleService())->getInstance();
+        return $this->services['factory_service_simple'] = $this->getFactorySimpleService()->getInstance();
     }
 
     /**
@@ -381,7 +381,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getRuntimeErrorService()
     {
-        return $this->services['runtime_error'] = new \stdClass(($this->privates['errored_definition'] ?? $this->getErroredDefinitionService()));
+        return $this->services['runtime_error'] = new \stdClass($this->getErroredDefinitionService());
     }
 
     /**
@@ -428,7 +428,7 @@ class ProjectServiceContainer extends Container
     {
         @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 
-        return $this->privates['factory_simple'] = new \SimpleFactoryClass('foo');
+        return new \SimpleFactoryClass('foo');
     }
 
     public function getParameter($name)

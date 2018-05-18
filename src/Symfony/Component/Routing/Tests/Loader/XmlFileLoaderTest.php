@@ -420,7 +420,6 @@ class XmlFileLoaderTest extends TestCase
 
         $route = $routeCollection->get('baz_route');
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
-
     }
 
     public function testImportRouteWithNamePrefix()

@@ -53,6 +53,7 @@
     {% else %}
         {# sort collected logs in groups #}
         {% set deprecation_logs, debug_logs, info_and_error_logs, silenced_logs = [], [], [], [] %}
+        {% set has_error_logs = false %}
         {% for log in collector.logs %}
             {% if log.scream is defined and not log.scream %}
                 {% set deprecation_logs = deprecation_logs|merge([log]) %}
@@ -62,11 +63,14 @@
                 {% set debug_logs = debug_logs|merge([log]) %}
             {% else %}
                 {% set info_and_error_logs = info_and_error_logs|merge([log]) %}
+                {% if log.priorityName != 'INFO' %}
+                    {% set has_error_logs = true %}
+                {% endif %}
             {% endif %}
         {% endfor %}
 
         <div class="sf-tabs">
-            <div class="tab">
+            <div class="tab {{ has_error_logs ? 'active' }}">
                 <h3 class="tab-title">Info. &amp; Errors <span class="badge status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' }}">{{ collector.counterrors ?: info_and_error_logs|length }}</span></h3>
                 <p class="text-muted">Informational and error log messages generated during the execution of the application.</p>
 
@@ -81,7 +85,7 @@
                 </div>
             </div>
 
-            <div class="tab">
+            <div class="tab {{ not has_error_logs and collector.countdeprecations > 0 ? 'active' }}">
                 {# 'deprecation_logs|length' is not used because deprecations are
                 now grouped and the group count doesn't match the message count #}
                 <h3 class="tab-title">Deprecations <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span></h3>

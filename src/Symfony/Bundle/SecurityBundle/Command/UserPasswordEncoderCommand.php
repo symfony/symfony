@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -171,7 +173,7 @@ EOF
 
         return $passwordQuestion->setValidator(function ($value) {
             if ('' === trim($value)) {
-                throw new \Exception('The password must not be empty.');
+                throw new InvalidArgumentException('The password must not be empty.');
             }
 
             return $value;
@@ -190,7 +192,7 @@ EOF
         }
 
         if (empty($this->userClasses)) {
-            throw new \RuntimeException('There are no configured encoders for the "security" extension.');
+            throw new RuntimeException('There are no configured encoders for the "security" extension.');
         }
 
         if (!$input->isInteractive() || 1 === count($this->userClasses)) {

@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
-use Symfony\Component\Messenger\MiddlewareInterface;
-use Symfony\Component\Messenger\HandlerLocatorInterface;
+use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

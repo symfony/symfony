@@ -60,8 +60,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case Type::DATETIMETZ:
             case 'vardatetime':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array(), Guess::HIGH_CONFIDENCE);
-            case 'datetime_immutable';
-            case 'datetimetz_immutable';
+            case 'datetime_immutable':
+            case 'datetimetz_immutable':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case 'dateinterval':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateIntervalType', array(), Guess::HIGH_CONFIDENCE);

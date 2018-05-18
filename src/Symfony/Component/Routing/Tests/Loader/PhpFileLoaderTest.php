@@ -88,7 +88,8 @@ class PhpFileLoaderTest extends TestCase
     {
         $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
         $loader = new PhpFileLoader($locator);
-        $routeCollection = $loader->load('php_dsl.php');
+        $routeCollectionClosure = $loader->load('php_dsl.php');
+        $routeCollectionObject = $loader->load('php_object_dsl.php');
 
         $expectedCollection = new RouteCollection();
 
@@ -122,9 +123,15 @@ class PhpFileLoaderTest extends TestCase
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_root.php')));
-        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl.php')));
 
-        $this->assertEquals($expectedCollection, $routeCollection);
+        $expectedCollectionClosure = $expectedCollection;
+        $expectedCollectionObject = clone $expectedCollection;
+
+        $expectedCollectionClosure->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl.php')));
+        $expectedCollectionObject->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_object_dsl.php')));
+
+        $this->assertEquals($expectedCollectionClosure, $routeCollectionClosure);
+        $this->assertEquals($expectedCollectionObject, $routeCollectionObject);
     }
 
     public function testRoutingConfiguratorCanImportGlobPatterns()

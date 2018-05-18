@@ -63,15 +63,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
-    const VERSION = '4.1.0-DEV';
-    const VERSION_ID = 40100;
+    const VERSION = '4.2.0-DEV';
+    const VERSION_ID = 40200;
     const MAJOR_VERSION = 4;
-    const MINOR_VERSION = 1;
+    const MINOR_VERSION = 2;
     const RELEASE_VERSION = 0;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '01/2019';
-    const END_OF_LIFE = '07/2019';
+    const END_OF_MAINTENANCE = '07/2019';
+    const END_OF_LIFE = '01/2020';
 
     public function __construct(string $environment, bool $debug)
     {
@@ -392,6 +392,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     }
 
     /**
+     * Gets the patterns defining the classes to parse and cache for annotations.
+     */
+    public function getAnnotatedClassesToCompile(): array
+    {
+        return array();
+    }
+
+    /**
      * Initializes bundles.
      *
      * @throws \LogicException if two bundles share a common name
@@ -540,9 +548,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             // Because concurrent requests might still be using them,
             // old container files are not removed immediately,
             // but on a next dump of the container.
+            static $legacyContainers = array();
             $oldContainerDir = dirname($oldContainer->getFileName());
-            foreach (glob(dirname($oldContainerDir).'/*.legacy') as $legacyContainer) {
-                if ($oldContainerDir.'.legacy' !== $legacyContainer && @unlink($legacyContainer)) {
+            $legacyContainers[$oldContainerDir.'.legacy'] = true;
+            foreach (glob(dirname($oldContainerDir).DIRECTORY_SEPARATOR.'*.legacy') as $legacyContainer) {
+                if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
                     (new Filesystem())->remove(substr($legacyContainer, 0, -7));
                 }
             }

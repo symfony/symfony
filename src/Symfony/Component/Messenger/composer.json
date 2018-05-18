@@ -20,6 +20,7 @@
     },
     "require-dev": {
         "psr/log": "~1.0",
+        "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4.6|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
@@ -29,7 +30,7 @@
         "symfony/var-dumper": "~3.4|~4.0"
     },
     "suggest": {
-        "sroze/enqueue-bridge": "For using the php-enqueue library as an adapter."
+        "sroze/enqueue-bridge": "For using the php-enqueue library as a transport."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },
@@ -40,7 +41,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

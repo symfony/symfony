@@ -38,7 +38,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     private $propertyTypeExtractor;
     private $attributesCache = array();
-    private $cache = array();
 
     /**
      * @var callable|null
@@ -97,11 +96,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
             if ($maxDepthReached) {
-                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue);
+                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue, $object, $attribute, $format, $context);
             }
 
             if (isset($this->callbacks[$attribute])) {
-                $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
+                $attributeValue = \call_user_func($this->callbacks[$attribute], $attributeValue, $object, $attribute, $format, $context);
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -225,11 +224,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (!isset($this->cache[$type])) {
-            $this->cache[$type] = class_exists($type) || (interface_exists($type) && null !== $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
-        }
-
-        return $this->cache[$type];
+        return \class_exists($type) || (\interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
     /**

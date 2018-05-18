@@ -28,7 +28,7 @@ class ClassDiscriminatorMappingTest extends TestCase
         ));
 
         $this->assertEquals(AbstractDummyFirstChild::class, $mapping->getClassForType('first'));
-        $this->assertEquals(null, $mapping->getClassForType('second'));
+        $this->assertNull($mapping->getClassForType('second'));
     }
 
     public function testMappedObjectType()
@@ -38,6 +38,6 @@ class ClassDiscriminatorMappingTest extends TestCase
         ));
 
         $this->assertEquals('first', $mapping->getMappedObjectType(new AbstractDummyFirstChild()));
-        $this->assertEquals(null, $mapping->getMappedObjectType(new AbstractDummySecondChild()));
+        $this->assertNull($mapping->getMappedObjectType(new AbstractDummySecondChild()));
     }
 }

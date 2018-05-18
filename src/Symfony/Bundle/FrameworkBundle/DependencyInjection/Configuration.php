@@ -971,25 +971,26 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('messenger')
                     ->info('Messenger configuration')
                     ->{!class_exists(FullStack::class) && interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                    ->fixXmlConfig('adapter')
+                    ->fixXmlConfig('transport')
+                    ->fixXmlConfig('bus', 'buses')
                     ->children()
                         ->arrayNode('routing')
                             ->useAttributeAsKey('message_class')
                             ->beforeNormalization()
                                 ->always()
                                 ->then(function ($config) {
-                                    if (!is_array($config)) {
+                                    if (!\is_array($config)) {
                                         return array();
                                     }
 
                                     $newConfig = array();
                                     foreach ($config as $k => $v) {
-                                        if (!is_int($k)) {
-                                            $newConfig[$k] = array('senders' => is_array($v) ? array_values($v) : array($v));
+                                        if (!\is_int($k)) {
+                                            $newConfig[$k] = array('senders' => \is_array($v) ? array_values($v) : array($v));
                                         } else {
                                             $newConfig[$v['message-class']]['senders'] = array_map(
                                                 function ($a) {
-                                                    return is_string($a) ? $a : $a['service'];
+                                                    return \is_string($a) ? $a : $a['service'];
                                                 },
                                                 array_values($v['sender'])
                                             );
@@ -1009,7 +1010,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('serializer')
-                            ->canBeDisabled()
+                            ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('format')->defaultValue('json')->end()
@@ -1023,15 +1024,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('encoder')->defaultValue('messenger.transport.serializer')->end()
                         ->scalarNode('decoder')->defaultValue('messenger.transport.serializer')->end()
-                        ->arrayNode('middlewares')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->arrayNode('validation')
-                                    ->{!class_exists(FullStack::class) && class_exists(Validation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('adapters')
+                        ->arrayNode('transports')
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->beforeNormalization()
@@ -1047,6 +1040,56 @@ class Configuration implements ConfigurationInterface
                                         ->normalizeKeys(false)
                                         ->defaultValue(array())
                                         ->prototype('variable')
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('default_bus')->defaultValue(null)->end()
+                        ->arrayNode('buses')
+                            ->defaultValue(array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())))
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->booleanNode('default_middleware')->defaultTrue()->end()
+                                    ->arrayNode('middleware')
+                                        ->beforeNormalization()
+                                            ->ifString()
+                                            ->then(function (string $middleware) {
+                                                return array($middleware);
+                                            })
+                                        ->end()
+                                        ->defaultValue(array())
+                                        ->prototype('array')
+                                            ->beforeNormalization()
+                                                ->always()
+                                                ->then(function ($middleware): array {
+                                                    if (!\is_array($middleware)) {
+                                                        return array('id' => $middleware);
+                                                    }
+                                                    if (isset($middleware['id'])) {
+                                                        return $middleware;
+                                                    }
+                                                    if (\count($middleware) > 1) {
+                                                        throw new \InvalidArgumentException(sprintf('There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "%s".', json_encode($middleware)));
+                                                    }
+
+                                                    return array(
+                                                        'id' => key($middleware),
+                                                        'arguments' => current($middleware),
+                                                    );
+                                                })
+                                            ->end()
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('id')->isRequired()->cannotBeEmpty()->end()
+                                                ->arrayNode('arguments')
+                                                    ->normalizeKeys(false)
+                                                    ->defaultValue(array())
+                                                    ->prototype('variable')
+                                                ->end()
+                                            ->end()
                                         ->end()
                                     ->end()
                                 ->end()

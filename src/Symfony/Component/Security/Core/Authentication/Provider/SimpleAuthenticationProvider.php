@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,20 +48,7 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
         $user = $authToken->getUser();
 
         if (!$user instanceof UserInterface) {
-            try {
-                $user = $this->userProvider->loadUserByUsername($user);
-
-                if (!$user instanceof UserInterface) {
-                    throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
-                }
-            } catch (UsernameNotFoundException $e) {
-                $e->setUsername($user);
-                throw $e;
-            } catch (\Exception $e) {
-                $e = new AuthenticationServiceException($e->getMessage(), 0, $e);
-                $e->setToken($token);
-                throw $e;
-            }
+            return $authToken;
         }
 
         $this->userChecker->checkPreAuth($user);

@@ -42,7 +42,7 @@ class GuardEvent extends Event
     public function setBlocked($blocked)
     {
         if (!$blocked) {
-            $this->transitionBlockerList->reset();
+            $this->transitionBlockerList->clear();
 
             return;
         }

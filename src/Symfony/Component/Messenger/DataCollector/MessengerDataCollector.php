@@ -14,21 +14,57 @@ namespace Symfony\Component\Messenger\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\Messenger\MiddlewareInterface;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\Messenger\TraceableMessageBus;
+use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
  * @experimental in 4.1
  */
-class MessengerDataCollector extends DataCollector implements MiddlewareInterface
+class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
+    private $traceableBuses = array();
+
+    public function registerBus(string $name, TraceableMessageBus $bus)
+    {
+        $this->traceableBuses[$name] = $bus;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        // noop
+        // Noop. Everything is collected live by the traceable buses & cloned as late as possible.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function lateCollect()
+    {
+        $this->data = array('messages' => array(), 'buses' => array_keys($this->traceableBuses));
+
+        $messages = array();
+        foreach ($this->traceableBuses as $busName => $bus) {
+            foreach ($bus->getDispatchedMessages() as $message) {
+                $debugRepresentation = $this->cloneVar($this->collectMessage($busName, $message));
+                $messages[] = array($debugRepresentation, $message['callTime']);
+            }
+        }
+
+        // Order by call time
+        usort($messages, function (array $a, array $b): int {
+            return $a[1] > $b[1] ? 1 : -1;
+        });
+
+        // Keep the messages clones only
+        $this->data['messages'] = array_map(function (array $item): Data {
+            return $item[0];
+        }, $messages);
     }
 
     /**
@@ -45,58 +81,62 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
     public function reset()
     {
         $this->data = array();
+        foreach ($this->traceableBuses as $traceableBus) {
+            $traceableBus->reset();
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle($message, callable $next)
+    private function collectMessage(string $busName, array $tracedMessage)
     {
+        $message = $tracedMessage['message'];
+
         $debugRepresentation = array(
+            'bus' => $busName,
+            'envelopeItems' => $tracedMessage['envelopeItems'] ?? null,
             'message' => array(
-                'type' => \get_class($message),
-                'object' => $this->cloneVar($message),
+                'type' => new ClassStub(\get_class($message)),
+                'value' => $message,
             ),
         );
 
-        $exception = null;
-        try {
-            $result = $next($message);
-
-            if (\is_object($result)) {
-                $debugRepresentation['result'] = array(
-                    'type' => \get_class($result),
-                    'object' => $this->cloneVar($result),
-                );
-            } elseif (\is_array($result)) {
-                $debugRepresentation['result'] = array(
-                    'type' => 'array',
-                    'object' => $this->cloneVar($result),
-                );
-            } else {
-                $debugRepresentation['result'] = array(
-                    'type' => \gettype($result),
-                    'value' => $result,
-                );
-            }
-        } catch (\Throwable $exception) {
-            $debugRepresentation['exception'] = array(
-                'type' => \get_class($exception),
-                'message' => $exception->getMessage(),
+        if (array_key_exists('result', $tracedMessage)) {
+            $result = $tracedMessage['result'];
+            $debugRepresentation['result'] = array(
+                'type' => \is_object($result) ? \get_class($result) : gettype($result),
+                'value' => $result,
             );
         }
 
-        $this->data['messages'][] = $debugRepresentation;
+        if (isset($tracedMessage['exception'])) {
+            $exception = $tracedMessage['exception'];
 
-        if (null !== $exception) {
-            throw $exception;
+            $debugRepresentation['exception'] = array(
+                'type' => \get_class($exception),
+                'value' => $exception,
+            );
         }
 
-        return $result;
+        return $debugRepresentation;
     }
 
-    public function getMessages(): array
+    public function getExceptionsCount(string $bus = null): int
     {
-        return $this->data['messages'] ?? array();
+        return array_reduce($this->getMessages($bus), function (int $carry, Data $message) {
+            return $carry += isset($message['exception']) ? 1 : 0;
+        }, 0);
+    }
+
+    public function getMessages(string $bus = null): array
+    {
+        $messages = $this->data['messages'] ?? array();
+
+        return $bus ? array_filter($messages, function (Data $message) use ($bus): bool {
+            return $bus === $message['bus'];
+        }) : $messages;
+    }
+
+    public function getBuses(): array
+    {
+        return $this->data['buses'];
     }
 }

@@ -34,6 +34,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -524,58 +527,63 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
-        $this->assertTrue($container->hasDefinition('message_bus'));
-        $this->assertFalse($container->hasDefinition('messenger.middleware.doctrine_transaction'));
+        $this->assertTrue($container->hasAlias('message_bus'));
+        $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
+        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
     }
 
-    public function testMessengerValidationEnabled()
+    public function testMessengerTransports()
     {
-        $container = $this->createContainerFromFile('messenger_validation_enabled');
-        $this->assertTrue($definition = $container->hasDefinition('messenger.middleware.validator'));
+        $container = $this->createContainerFromFile('messenger_transports');
+        $this->assertTrue($container->hasDefinition('messenger.transport.default'));
+        $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
+        $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.sender'));
+        $this->assertEquals(array(array('alias' => 'default')), $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
+        $this->assertEquals(array(array('alias' => 'default')), $container->getDefinition('messenger.transport.default')->getTag('messenger.sender'));
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.customised'));
+        $transportFactory = $container->getDefinition('messenger.transport.customised')->getFactory();
+        $transportArguments = $container->getDefinition('messenger.transport.customised')->getArguments();
+
+        $this->assertEquals(array(new Reference('messenger.transport_factory'), 'createTransport'), $transportFactory);
+        $this->assertCount(2, $transportArguments);
+        $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $transportArguments[0]);
+        $this->assertSame(array('queue' => array('name' => 'Queue')), $transportArguments[1]);
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
     }
 
-    public function testMessengerValidationDisabled()
+    public function testMessengerRouting()
     {
-        $container = $this->createContainerFromFile('messenger_validation_disabled');
-        $this->assertFalse($container->hasDefinition('messenger.middleware.validator'));
-    }
+        $container = $this->createContainerFromFile('messenger_routing');
+        $senderLocatorDefinition = $container->getDefinition('messenger.asynchronous.routing.sender_locator');
 
-    public function testMessengerAdapter()
-    {
-        $container = $this->createContainerFromFile('messenger_adapter');
-        $this->assertTrue($container->hasDefinition('messenger.sender.default'));
-        $this->assertTrue($container->getDefinition('messenger.sender.default')->hasTag('messenger.sender'));
-        $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.sender.default')->getTag('messenger.sender'));
-        $this->assertTrue($container->hasDefinition('messenger.receiver.default'));
-        $this->assertTrue($container->getDefinition('messenger.receiver.default')->hasTag('messenger.receiver'));
-        $this->assertEquals(array(array('name' => 'default')), $container->getDefinition('messenger.receiver.default')->getTag('messenger.receiver'));
+        $messageToSenderIdsMapping = array(
+            DummyMessage::class => array('amqp'),
+            SecondMessage::class => array('amqp', 'audit', null),
+            '*' => array('amqp'),
+        );
 
-        $this->assertTrue($container->hasDefinition('messenger.sender.customised'));
-        $senderFactory = $container->getDefinition('messenger.sender.customised')->getFactory();
-        $senderArguments = $container->getDefinition('messenger.sender.customised')->getArguments();
-
-        $this->assertEquals(array(new Reference('messenger.adapter_factory'), 'createSender'), $senderFactory);
-        $this->assertCount(2, $senderArguments);
-        $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $senderArguments[0]);
-        $this->assertSame(array('queue' => array('name' => 'Queue')), $senderArguments[1]);
-
-        $this->assertTrue($container->hasDefinition('messenger.receiver.customised'));
-        $receiverFactory = $container->getDefinition('messenger.receiver.customised')->getFactory();
-        $receiverArguments = $container->getDefinition('messenger.receiver.customised')->getArguments();
-
-        $this->assertEquals(array(new Reference('messenger.adapter_factory'), 'createReceiver'), $receiverFactory);
-        $this->assertCount(2, $receiverArguments);
-        $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $receiverArguments[0]);
-        $this->assertSame(array('queue' => array('name' => 'Queue')), $receiverArguments[1]);
+        $this->assertSame($messageToSenderIdsMapping, $senderLocatorDefinition->getArgument(1));
     }
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Using the default encoder/decoder, Symfony Messenger requires the Serializer. Enable it or install it by running "composer require symfony/serializer-pack".
+     * @expectedExceptionMessage The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".
      */
     public function testMessengerTransportConfigurationWithoutSerializer()
     {
         $this->createContainerFromFile('messenger_transport_no_serializer');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".
+     */
+    public function testMessengerAMQPTransportConfigurationWithoutSerializer()
+    {
+        $this->createContainerFromFile('messenger_amqp_transport_no_serializer');
     }
 
     public function testMessengerTransportConfiguration()
@@ -588,6 +596,47 @@ abstract class FrameworkExtensionTest extends TestCase
         $serializerTransportDefinition = $container->getDefinition('messenger.transport.serializer');
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
         $this->assertSame(array('enable_max_depth' => true), $serializerTransportDefinition->getArgument(2));
+    }
+
+    public function testMessengerWithMultipleBuses()
+    {
+        $container = $this->createContainerFromFile('messenger_multiple_buses');
+
+        $this->assertTrue($container->has('messenger.bus.commands'));
+        $this->assertSame(array(), $container->getDefinition('messenger.bus.commands')->getArgument(0));
+        $this->assertEquals(array(
+            array('id' => 'logging'),
+            array('id' => 'route_messages'),
+            array('id' => 'call_message_handler'),
+        ), $container->getParameter('messenger.bus.commands.middleware'));
+        $this->assertTrue($container->has('messenger.bus.events'));
+        $this->assertSame(array(), $container->getDefinition('messenger.bus.events')->getArgument(0));
+        $this->assertEquals(array(
+            array('id' => 'logging'),
+            array('id' => 'with_factory', 'arguments' => array('foo', true, array('bar' => 'baz'))),
+            array('id' => 'allow_no_handler', 'arguments' => array()),
+            array('id' => 'route_messages'),
+            array('id' => 'call_message_handler'),
+        ), $container->getParameter('messenger.bus.events.middleware'));
+        $this->assertTrue($container->has('messenger.bus.queries'));
+        $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
+        $this->assertEquals(array(
+            array('id' => 'route_messages', 'arguments' => array()),
+            array('id' => 'allow_no_handler', 'arguments' => array()),
+            array('id' => 'call_message_handler', 'arguments' => array()),
+        ), $container->getParameter('messenger.bus.queries.middleware'));
+
+        $this->assertTrue($container->hasAlias('message_bus'));
+        $this->assertSame('messenger.bus.commands', (string) $container->getAlias('message_bus'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "{"foo":["qux"],"bar":["baz"]}"
+     */
+    public function testMessengerMiddlewareFactoryErroneousFormat()
+    {
+        $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
     public function testTranslator()

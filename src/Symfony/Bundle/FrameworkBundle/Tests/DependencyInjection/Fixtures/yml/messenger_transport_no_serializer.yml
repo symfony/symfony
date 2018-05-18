@@ -4,5 +4,5 @@ framework:
     messenger:
         serializer:
             enabled: true
-        adapters:
+        transports:
             default: 'amqp://localhost/%2f/messages'

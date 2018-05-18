@@ -473,7 +473,7 @@ EOF;
                 $code .= $this->indent($this->compileStaticPrefixCollection($route, $state, $prefixLen + strlen($prefix)));
                 $code .= "\n                    .')'";
                 $state->regex .= ')';
-                $state->markTail += 1;
+                ++$state->markTail;
                 continue;
             }
 

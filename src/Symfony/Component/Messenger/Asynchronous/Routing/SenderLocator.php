@@ -32,13 +32,29 @@ class SenderLocator implements SenderLocatorInterface
      */
     public function getSendersForMessage($message): array
     {
-        $senderIds = $this->messageToSenderIdsMapping[\get_class($message)] ?? $this->messageToSenderIdsMapping['*'] ?? array();
-
         $senders = array();
-        foreach ($senderIds as $senderId) {
+        foreach ($this->getSenderIds($message) as $senderId) {
             $senders[] = $this->senderServiceLocator->get($senderId);
         }
 
         return $senders;
+    }
+
+    private function getSenderIds($message): array
+    {
+        if (isset($this->messageToSenderIdsMapping[\get_class($message)])) {
+            return $this->messageToSenderIdsMapping[\get_class($message)];
+        }
+        if ($messageToSenderIdsMapping = array_intersect_key($this->messageToSenderIdsMapping, class_parents($message))) {
+            return current($messageToSenderIdsMapping);
+        }
+        if ($messageToSenderIdsMapping = array_intersect_key($this->messageToSenderIdsMapping, class_implements($message))) {
+            return current($messageToSenderIdsMapping);
+        }
+        if (isset($this->messageToSenderIdsMapping['*'])) {
+            return $this->messageToSenderIdsMapping['*'];
+        }
+
+        return array();
     }
 }

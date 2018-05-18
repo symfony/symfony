@@ -15,6 +15,8 @@ namespace Symfony\Component\Messenger\Handler;
  * Handlers can implement this interface to handle multiple messages.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
 interface MessageSubscriberInterface extends MessageHandlerInterface
 {
@@ -32,9 +34,14 @@ interface MessageSubscriberInterface extends MessageHandlerInterface
      *         [SecondMessage::class, -10],
      *     ];
      *
-     * The `__invoke` method of the handler will be called as usual with the message to handle.
+     * It can also specify a method and/or a priority per message:
      *
-     * @return array
+     *     return [
+     *         FirstMessage::class => 'firstMessageMethod',
+     *         SecondMessage::class => ['secondMessageMethod', 20],
+     *     ];
+     *
+     * The `__invoke` method of the handler will be called as usual with the message to handle.
      */
-    public static function getHandledMessages(): array;
+    public static function getHandledMessages(): iterable;
 }

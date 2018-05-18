@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
@@ -97,11 +96,6 @@ class GuardAuthenticatorHandler
      */
     public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $guardAuthenticator, string $providerKey): ?Response
     {
-        $token = $this->tokenStorage->getToken();
-        if ($token instanceof PostAuthenticationGuardToken && $providerKey === $token->getProviderKey()) {
-            $this->tokenStorage->setToken(null);
-        }
-
         $response = $guardAuthenticator->onAuthenticationFailure($request, $authenticationException);
         if ($response instanceof Response || null === $response) {
             // returning null is ok, it means they want the request to continue

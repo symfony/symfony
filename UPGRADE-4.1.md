@@ -23,6 +23,7 @@ DependencyInjection
 -------------------
 
  * Deprecated the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods.
+ * Deprecated support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`.
 
 EventDispatcher
 ---------------
@@ -153,6 +154,7 @@ Validator
 Workflow
 --------
 
+ * Deprecated the `DefinitionBuilder::reset()` method, use the `clear()` one instead.
  * Deprecated the `add` method in favor of the `addWorkflow` method in `Workflow\Registry`.
  * Deprecated `SupportStrategyInterface` in favor of `WorkflowSupportStrategyInterface`.
  * Deprecated the class `ClassInstanceSupportStrategy` in favor of the class `InstanceOfSupportStrategy`.

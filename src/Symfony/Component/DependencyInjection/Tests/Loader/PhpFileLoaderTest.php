@@ -68,6 +68,7 @@ class PhpFileLoaderTest extends TestCase
     public function provideConfig()
     {
         yield array('basic');
+        yield array('object');
         yield array('defaults');
         yield array('instanceof');
         yield array('prototype');

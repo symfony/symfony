@@ -136,6 +136,25 @@ class FileLoaderTest extends TestCase
         );
     }
 
+    public function testRegisterClassesWithExcludeAsArray()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('sub_dir', 'Sub');
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*', array(
+                'Prototype/%sub_dir%',
+                'Prototype/OtherDir/AnotherSub/DeeperBaz.php',
+            )
+        );
+        $this->assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Baz::class));
+        $this->assertFalse($container->has(Bar::class));
+        $this->assertFalse($container->has(DeeperBaz::class));
+    }
+
     public function testNestedRegisterClasses()
     {
         $container = new ContainerBuilder();

@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------
+
+by mablae at 2018-04-29T14:36:28Z
+
+@nicolas-grekas Thanks for your feedback. I will correct these spots. Sorry for steeling your time with inconsistent Docblocks.
+
+I was not sure about introducing the ModificationInterface at all. Maybe that's over engineered?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-04-30T11:27:21Z
+
+I'm really not fond of adding new methods to `EntryManagerInterface`, especially since this method is a direct 1:1 conversion of the PHP extension's `ldap_modify_batch` function.
+
+I'm absolutely not against adding new methods directly to the `ExtLdap`'s `EntryManager`, but that method should not be in the global `EntryManager` interface (especially since this is also a breaking change), as this leaks PHP's poorly designed LDAP extension. The whole point of the component is to hide that logic.
+
+Also, I would also remove the `ModificationInterface`, as it is only used by the extension.
+We will design something better, and more flexible in later versions of the component. I would also change the name of the `Modification` class to something more specific, like `UpdateOperation` as, the batch operations actually only update a single entry's attribute, in an atomic way, and rename `modifyBatch()` to `applyOperations()`.
+
+I feel that in the long term, would should use the`update(Entry $entry)` to apply a change set for a given entry. The `Entry` class should actually calculate and hold the change set, until changes are be applied with the EM's `update(Entry $entry)` method. The actual logic behind the update would then be completely hidden from the implementation details.
+
+That was actually the design that I wished for at first, but this was never done due to time constraints.
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-04-30T15:39:08Z
+
+> I'm really not fond of adding new methods to EntryManagerInterface, especially since this method is a direct 1:1 conversion of the PHP extension's ldap_modify_batch function.
+
+Ok.
+
+> I'm absolutely not against adding new methods directly to the ExtLdap's EntryManager, but that method should not be in the global EntryManager interface (especially since this is also a breaking change), as this leaks PHP's poorly designed LDAP extension. The whole point of the component is to hide that logic.
+
+> Also, I would also remove the ModificationInterface, as it is only used by the extension.
+We will design something better, and more flexible in later versions of the component. I would also change the name of the Modification class to something more specific, like UpdateOperation as, the batch operations actually only update a single entry's attribute, in an atomic way, and rename modifyBatch() to applyOperations().
+
+Is `UpdateOperation` really a good fit for removal?
+
+> I feel that in the long term, would should use theupdate(Entry $entry) to apply a change set for a given entry. The Entry class should actually calculate and hold the change set, until changes are be applied with the EM's update(Entry $entry) method. The actual logic behind the update would then be completely hidden from the implementation details.
+
+> That was actually the design that I wished for at first, but this was never done due to time constraints.
+
+I also thought about this direction but it will be much more work, like UnitOfWork state management, correct?
+
+What to do? Simplify the current approach like you suggested or close the PR for the moment?
+
+Thanks for your review!
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-04-30T15:49:54Z
+
+Keep the current approach for now, just remove the method from the interface.
+
+Regarding UpdateOperation, the remove is only applied to a single attribute value, or all values for a single attribute, but this is in reality a form of update.
+
+In LDAP, entries are the first class objects. Attributes are directly embedded within an entry, which means that all these operations (add, remove, remove_all, update) are actually all part of the same update.
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-04-30T16:52:13Z
+
+> In LDAP, entries are the first class objects. Attributes are directly embedded within an entry, which means that all these operations (add, remove, remove_all, update) are actually all part of the same update.
+
+Okay, thanks! I will update the PR tonight.
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-04-30T18:27:03Z
+
+@csarrazi I updated the code as you have suggested.
+
+Test Results because LDAP is not covered by Travis:
+
+![image](https://user-images.githubusercontent.com/389360/39443238-458c1dd0-4cb4-11e8-861f-e066c5263459.png)
+
+I have used an openldap docker image for testing and pointed the bootstrap directory to the fixtures.
+Worked like a charm after removing the root org from base.ldif which was already created by the docker image: https://gist.github.com/mablae/f23cc8d715c8b2a1de23a656b1fe8499
+
+@csarrazi How do you run the tests? Maybe including this docker stuff in `Tests` makes sense?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-04-30T18:52:57Z
+
+@mablae You can use the csarrazi/symfony-ldap Docker container, if you want to test easily :)
+
+This is what I actually run for testing on my end:
+
+```bash
+docker run -d --name ldap -p 3389:389 \
+    -v "/Users/csarrazi/Projects/csarrazi/symfony/src/Symfony/Component/Ldap/Tests/Fixtures/data:/init-ldap.d" \
+    -e "LDAP_SUFFIX=dc=symfony,dc=com" \
+    -e "LDAP_ROOTDN=cn=admin,dc=symfony,dc=com" \
+    -e "LDAP_ROOTPW=symfony" \
+    csarrazi/symfony-ldap
+```
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-05-01T12:26:10Z
+
+Docs PR added, too
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-05-03T23:15:57Z
+
+From my side it's ready, what do you think, @csarrazi ?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-05-04T18:36:26Z
+
+LGTM. Sorry for the late answer, the week has been pretty busy, as always :)
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-05-09T16:55:23Z
+
+Someone please remove "Need work" in that case. 😄  If anything is missing or can made better just let me know. We even have still some time until `4.2` to make better.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2018-05-13T05:55:24Z
+
+Ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by mablae at 2018-05-13T12:12:34Z
+
+Thanks @fabpot !
+
+I have updated the code according to your suggestions and rebased/squashed it against current master.

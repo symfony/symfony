@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by jhedstrom at 2018-05-02T16:16:04Z
+
+Thanks @nicolas-grekas for the review! I've made those changes, and also made the test a bit more robust (2 meta tags), and the logic in `getMetaRefresh` capable of handling more than one `meta` tag.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T17:28:10Z
+
+Thanks for the first round of changes, here is a next step. Should be good on my side after it.
+
+---------------------------------------------------------------------------
+
+by jhedstrom at 2018-05-02T21:58:43Z
+
+I've made the changes suggested above. I included the only-zero time change, but the spec does allow for non-zero time redirects, so that may come up again :)
+
+I'm on the fence as to whether this is a bug fix or a feature. If folks think it is more of a feature, I can update the CHANGELOG as needed.
+
+---------------------------------------------------------------------------
+
+by codedokode at 2018-05-03T05:42:13Z
+
+I wanted to note that some sites use a combination of `<noscript>` and `<meta>` on every page to redirect clients to "JavaScript required" page (although the content is available without JS). Example: https://vk.com/ has the following code:
+
+```html
+<noscript><meta http-equiv="refresh" content="0; URL=/badbrowser.php"></noscript>
+```
+
+This change will make impossible to access such sites with Crawler. Therefore I would suggest to add an option to enable this and make the option disabled by default. Or ignore `meta refresh` inside a `noscript` tag.
+
+Also, the Refresh can be sent as a HTTP header.
+
+---------------------------------------------------------------------------
+
+by jhedstrom at 2018-05-03T15:46:36Z
+
+> Or ignore meta refresh inside a noscript tag.
+
+That's actually the main motivation for this, to _follow_ those inside `<noscript>` tags, as that's how Drupal's BigPipe degrades for non-JS browser sessions.
+
+I think a separate option sounds reasonable here, since sometimes folks would want to follow them, and other times they would not if there was no support for non-JS sessions.
+
+---------------------------------------------------------------------------
+
+by jhedstrom at 2018-05-17T16:18:37Z
+
+I've made the changes noted above, including adding the redirect to the browser history.

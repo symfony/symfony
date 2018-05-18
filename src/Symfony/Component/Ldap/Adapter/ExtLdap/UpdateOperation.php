@@ -34,8 +34,12 @@ class UpdateOperation
      */
     public function __construct(int $operationType, string $attribute, ?array $values)
     {
-        $this->assertValidOperationType($operationType);
-        $this->assertNullValuesOnRemoveAll($operationType, $values);
+        if (!in_array($operationType, $this->validOperationTypes, true)) {
+            throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
+        }
+        if (LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
+            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', gettype($values)));
+        }
 
         $this->operationType = $operationType;
         $this->attribute = $attribute;
@@ -49,28 +53,5 @@ class UpdateOperation
             'modtype' => $this->operationType,
             'values' => $this->values,
         );
-    }
-
-    /**
-     * @param int $operationType
-     */
-    private function assertValidOperationType(int $operationType): void
-    {
-        if (!in_array($operationType, $this->validOperationTypes, true)) {
-            throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
-        }
-    }
-
-    /**
-     * @param int        $operationType
-     * @param array|null $values
-     *
-     * @throws \Symfony\Component\Ldap\Exception\UpdateOperationException
-     */
-    private function assertNullValuesOnRemoveAll(int $operationType, ?array $values): void
-    {
-        if (LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
-            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', gettype($values)));
-        }
     }
 }

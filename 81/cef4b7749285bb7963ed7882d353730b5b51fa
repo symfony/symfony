@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-14T17:03:38Z
+
+I think the strict comparison should be added in the 3.4 branch already
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-14T17:32:03Z
+
+This is a BC break. Booleans are not relevant here, user can pass numeric strings.
+
+---------------------------------------------------------------------------
+
+by mimol91 at 2018-05-14T17:36:58Z
+
+@ostrolucky
+All of const `CHECK_DNS_TYPE_ANY` are not numeric. If someone pass numeric as string it will behave in this same way.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-14T17:39:00Z
+
+I see. All good then!

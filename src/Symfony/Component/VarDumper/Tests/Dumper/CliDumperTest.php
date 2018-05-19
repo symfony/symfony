@@ -61,7 +61,10 @@ array:24 [
   5 => -INF
   6 => {$intMax}
   "str" => "déjà\\n"
-  7 => b"é\\x00"
+  7 => b"""
+    é\\x00test\\t\\n
+    ing
+    """
   "[]" => []
   "res" => stream resource {@{$res}
 %A  wrapper_type: "plainfile"

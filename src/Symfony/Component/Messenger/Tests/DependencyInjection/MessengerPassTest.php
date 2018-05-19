@@ -41,6 +41,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class MessengerPassTest extends TestCase
 {
@@ -559,6 +560,39 @@ class MessengerPassTest extends TestCase
         ));
 
         (new MessengerPass())->process($container);
+    }
+
+    public function testDecoratesWithTraceableMiddlewareOnDebug()
+    {
+        $container = $this->getContainerBuilder();
+
+        $container->register($busId = 'message_bus', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus');
+        $container->register('abstract_middleware', UselessMiddleware::class)->setAbstract(true);
+        $container->register('concrete_middleware', UselessMiddleware::class);
+
+        $container->setParameter($middlewareParameter = $busId.'.middleware', array(
+            array('id' => 'abstract_middleware'),
+            array('id' => 'concrete_middleware'),
+        ));
+
+        $container->setParameter('kernel.debug', true);
+        $container->register('debug.stopwatch', Stopwatch::class);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertNotNull($concreteDef = $container->getDefinition('.messenger.debug.traced.concrete_middleware'));
+        $this->assertEquals(array(
+            new Reference('.messenger.debug.traced.concrete_middleware.inner'),
+            new Reference('debug.stopwatch'),
+            null,
+        ), $concreteDef->getArguments());
+
+        $this->assertNotNull($abstractDef = $container->getDefinition(".messenger.debug.traced.$busId.middleware.abstract_middleware"));
+        $this->assertEquals(array(
+            new Reference(".messenger.debug.traced.$busId.middleware.abstract_middleware.inner"),
+            new Reference('debug.stopwatch'),
+            $busId,
+        ), $abstractDef->getArguments());
     }
 
     public function testItRegistersTheDebugCommand()

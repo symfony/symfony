@@ -26,12 +26,12 @@ use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
  */
 class DebugCommandTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         putenv('COLUMNS=');
     }

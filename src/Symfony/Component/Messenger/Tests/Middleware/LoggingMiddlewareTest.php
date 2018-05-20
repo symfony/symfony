@@ -21,7 +21,7 @@ class LoggingMiddlewareTest extends TestCase
 {
     public function testDebugLogAndNextMiddleware()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -46,7 +46,7 @@ class LoggingMiddlewareTest extends TestCase
      */
     public function testWarningLogOnException()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger

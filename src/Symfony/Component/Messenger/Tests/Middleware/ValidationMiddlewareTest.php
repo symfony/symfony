@@ -23,7 +23,7 @@ class ValidationMiddlewareTest extends TestCase
 {
     public function testValidateAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'));
+        $envelope = new Envelope($message = new DummyMessage('Hey'));
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
@@ -47,7 +47,7 @@ class ValidationMiddlewareTest extends TestCase
 
     public function testValidateWithConfigurationAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
+        $envelope = (new Envelope($message = new DummyMessage('Hey')))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
@@ -75,7 +75,7 @@ class ValidationMiddlewareTest extends TestCase
      */
     public function testValidationFailedException()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'));
+        $envelope = new Envelope($message = new DummyMessage('Hey'));
 
         $violationList = $this->createMock(ConstraintViolationListInterface::class);
         $violationList

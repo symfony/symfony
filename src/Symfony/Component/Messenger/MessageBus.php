@@ -44,7 +44,7 @@ class MessageBus implements MessageBusInterface
             throw new InvalidArgumentException(sprintf('Invalid type for message argument. Expected object, but got "%s".', \gettype($message)));
         }
 
-        return \call_user_func($this->callableForNextMiddleware(0), Envelope::wrap($message));
+        return \call_user_func($this->callableForNextMiddleware(0), $message instanceof Envelope ? $message : new Envelope($message));
     }
 
     private function callableForNextMiddleware(int $index): callable

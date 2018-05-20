@@ -21,7 +21,7 @@ class AllowNoHandlerMiddlewareTest extends TestCase
 {
     public function testItCallsNextMiddlewareAndReturnsItsResult()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
 
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
         $next->expects($this->once())->method('__invoke')->with($envelope)->willReturn('Foo');
@@ -37,7 +37,7 @@ class AllowNoHandlerMiddlewareTest extends TestCase
 
         $middleware = new AllowNoHandlerMiddleware();
 
-        $this->assertNull($middleware->handle(Envelope::wrap(new DummyMessage('Hey')), $next));
+        $this->assertNull($middleware->handle(new Envelope(new DummyMessage('Hey')), $next));
     }
 
     /**
@@ -50,6 +50,6 @@ class AllowNoHandlerMiddlewareTest extends TestCase
         $next->expects($this->once())->method('__invoke')->will($this->throwException(new \RuntimeException('Something went wrong.')));
 
         $middleware = new AllowNoHandlerMiddleware();
-        $middleware->handle(Envelope::wrap(new DummyMessage('Hey')), $next);
+        $middleware->handle(new Envelope(new DummyMessage('Hey')), $next);
     }
 }

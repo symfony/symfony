@@ -41,7 +41,7 @@ class MessageBusTest extends TestCase
     public function testItCallsMiddlewareAndChainTheReturnValue()
     {
         $message = new DummyMessage('Hello');
-        $envelope = Envelope::wrap($message);
+        $envelope = new Envelope($message);
         $responseFromDepthMiddleware = 1234;
 
         $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();

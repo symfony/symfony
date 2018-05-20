@@ -25,7 +25,7 @@ class SendMessageMiddlewareTest extends TestCase
 {
     public function testItSendsTheMessageToAssignedSender()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
@@ -39,7 +39,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItAlsoCallsTheNextMiddlewareBasedOnTheMessageClass()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
@@ -55,7 +55,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItAlsoCallsTheNextMiddlewareBasedOnTheMessageParentClass()
     {
-        $envelope = Envelope::wrap(new ChildDummyMessage('Hey'));
+        $envelope = (new Envelope(new ChildDummyMessage('Hey')));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
@@ -71,7 +71,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItAlsoCallsTheNextMiddlewareBasedOnTheMessageInterface()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
@@ -87,7 +87,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItAlsoCallsTheNextMiddlewareBasedOnWildcard()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
@@ -103,7 +103,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItCallsTheNextMiddlewareWhenNoSenderForThisMessage()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'));
+        $envelope = new Envelope(new DummyMessage('Hey'));
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator(null));
@@ -115,7 +115,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItSkipsReceivedMessages()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'))->with(new ReceivedMessage());
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedMessage());
 
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));

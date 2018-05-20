@@ -36,16 +36,6 @@ final class Envelope
     }
 
     /**
-     * Wrap a message into an envelope if not already wrapped.
-     *
-     * @param Envelope|object $message
-     */
-    public static function wrap($message): self
-    {
-        return $message instanceof self ? $message : new self($message);
-    }
-
-    /**
      * @return Envelope a new Envelope instance with additional item
      */
     public function with(EnvelopeItemInterface $item): self

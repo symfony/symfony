@@ -21,7 +21,7 @@ class HandleMessageMiddlewareTest extends TestCase
 {
     public function testItCallsTheHandlerAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'));
+        $envelope = new Envelope($message = new DummyMessage('Hey'));
 
         $handler = $this->createPartialMock(\stdClass::class, array('__invoke'));
         $handler->method('__invoke')->willReturn('Hello');

@@ -29,7 +29,7 @@ class SerializerTest extends TestCase
             new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
         );
 
-        $envelope = Envelope::wrap(new DummyMessage('Hello'));
+        $envelope = new Envelope(new DummyMessage('Hello'));
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
     }
@@ -40,7 +40,7 @@ class SerializerTest extends TestCase
             new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
         );
 
-        $envelope = Envelope::wrap(new DummyMessage('Hello'))
+        $envelope = (new Envelope(new DummyMessage('Hello')))
             ->with(new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
             ->with(new ValidationConfiguration(array('foo', 'bar')))
         ;
@@ -54,7 +54,7 @@ class SerializerTest extends TestCase
             new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
         );
 
-        $encoded = $serializer->encode(Envelope::wrap(new DummyMessage('Hello')));
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('Hello')));
 
         $this->assertArrayHasKey('body', $encoded);
         $this->assertArrayHasKey('headers', $encoded);
@@ -73,7 +73,7 @@ class SerializerTest extends TestCase
 
         $encoder = new Serializer($serializer, 'csv', array('foo' => 'bar'));
 
-        $encoded = $encoder->encode(Envelope::wrap($message));
+        $encoded = $encoder->encode((new Envelope($message)));
         $decoded = $encoder->decode($encoded);
 
         $this->assertSame('Yay', $encoded['body']);
@@ -86,7 +86,7 @@ class SerializerTest extends TestCase
             new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
         );
 
-        $envelope = Envelope::wrap(new DummyMessage('Hello'))
+        $envelope = (new Envelope(new DummyMessage('Hello')))
             ->with(new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
             ->with(new ValidationConfiguration(array('foo', 'bar')))
         ;

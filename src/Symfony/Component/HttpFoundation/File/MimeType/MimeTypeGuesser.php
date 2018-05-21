@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 /**
  * A singleton mime type guesser.
@@ -44,14 +44,16 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @var MimeTypeGuesser
      */
-    private static $instance = null;
+    private static $instance;
 
     /**
      * All registered MimeTypeGuesserInterface instances.
      *
-     * @var array
+     * @var MimeTypeGuesserInterface[]
      */
     protected $guessers = array();
+
+    private $nativeGuessersLoaded = false;
 
     /**
      * Returns the singleton instance.
@@ -75,18 +77,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
         self::$instance = null;
     }
 
-    /**
-     * Registers all natively provided mime type guessers.
-     */
     private function __construct()
     {
-        if (FileBinaryMimeTypeGuesser::isSupported()) {
-            $this->register(new FileBinaryMimeTypeGuesser());
-        }
-
-        if (FileinfoMimeTypeGuesser::isSupported()) {
-            $this->register(new FileinfoMimeTypeGuesser());
-        }
     }
 
     /**
@@ -125,7 +117,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
             throw new AccessDeniedException($path);
         }
 
-        if (!$this->guessers) {
+        if (!$guessers = $this->getGuessers()) {
             $msg = 'Unable to guess the mime type as no guessers are available';
             if (!FileinfoMimeTypeGuesser::isSupported()) {
                 $msg .= ' (Did you enable the php_fileinfo extension?)';
@@ -133,10 +125,32 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
             throw new \LogicException($msg);
         }
 
-        foreach ($this->guessers as $guesser) {
+        foreach ($guessers as $guesser) {
             if (null !== $mimeType = $guesser->guess($path)) {
                 return $mimeType;
             }
         }
+    }
+
+    /**
+     * @return MimeTypeGuesserInterface[]
+     */
+    private function getGuessers()
+    {
+        if (!$this->nativeGuessersLoaded) {
+            // register all natively provided mime type guessers.
+
+            if (FileinfoMimeTypeGuesser::isSupported()) {
+                $this->guessers[] = new FileinfoMimeTypeGuesser();
+            }
+
+            if (FileBinaryMimeTypeGuesser::isSupported()) {
+                $this->guessers[] = new FileBinaryMimeTypeGuesser();
+            }
+
+            $this->nativeGuessersLoaded = true;
+        }
+
+        return $this->guessers;
     }
 }

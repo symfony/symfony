@@ -314,4 +314,110 @@ class EnvVarProcessorTest extends TestCase
             return 'foo';
         });
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid configuration: env var "key:foo" does not contain a key specifier.
+     */
+    public function testGetEnvKeyInvalidKey()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('key', 'foo', function ($name) {
+            $this->fail('Should not get here');
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Resolved value of "foo" did not result in an array value.
+     * @dataProvider noArrayValues
+     */
+    public function testGetEnvKeyNoArrayResult($value)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+    }
+
+    public function noArrayValues()
+    {
+        return array(
+            array(null),
+            array('string'),
+            array(1),
+            array(true),
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Key "index" not found in
+     * @dataProvider invalidArrayValues
+     */
+    public function testGetEnvKeyArrayKeyNotFound($value)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+    }
+
+    public function invalidArrayValues()
+    {
+        return array(
+            array(array()),
+            array(array('index2' => 'value')),
+            array(array('index', 'index2')),
+        );
+    }
+
+    /**
+     * @dataProvider arrayValues
+     */
+    public function testGetEnvKey($value)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->assertSame($value['index'], $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        }));
+    }
+
+    public function arrayValues()
+    {
+        return array(
+            array(array('index' => 'password')),
+            array(array('index' => 'true')),
+            array(array('index' => false)),
+            array(array('index' => '1')),
+            array(array('index' => 1)),
+            array(array('index' => '1.1')),
+            array(array('index' => 1.1)),
+            array(array('index' => array())),
+            array(array('index' => array('val1', 'val2'))),
+        );
+    }
+
+    public function testGetEnvKeyChained()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->assertSame('password', $processor->getEnv('key', 'index:file:foo', function ($name) {
+            $this->assertSame('file:foo', $name);
+
+            return array(
+                'index' => 'password',
+            );
+        }));
+    }
 }

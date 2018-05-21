@@ -710,6 +710,7 @@ class NumberFormatter
         } elseif (isset(self::$customRoundingList[$roundingModeAttribute])) {
             $roundingCoef = pow(10, $precision);
             $value *= $roundingCoef;
+            $value = (float) (string) $value;
 
             switch ($roundingModeAttribute) {
                 case self::ROUND_CEILING:

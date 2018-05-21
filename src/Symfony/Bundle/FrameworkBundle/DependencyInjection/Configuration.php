@@ -461,7 +461,16 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
-                        ->scalarNode('name')->end()
+                        ->scalarNode('name')
+                            ->validate()
+                                ->ifTrue(function ($v) {
+                                    parse_str($v, $parsed);
+
+                                    return implode('&', array_keys($parsed)) !== (string) $v;
+                                })
+                                ->thenInvalid('Session name %s contains illegal character(s)')
+                            ->end()
+                        ->end()
                         ->scalarNode('cookie_lifetime')->end()
                         ->scalarNode('cookie_path')->end()
                         ->scalarNode('cookie_domain')->end()

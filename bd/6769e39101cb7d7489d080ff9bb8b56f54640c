@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by Koc at 2018-04-15T13:59:14Z
+
+Looks interesting and useful, but not sure that creating another interface and not depends on PSR6 is good idea.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-15T14:00:35Z
+
+The FIG provides the most common denominator. On the other side, it should not slowdown innovation.
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-04-15T14:18:22Z
+
+Is it possible to wrap any PSR6-compatible adapter to use it with this new interfaces? Maybe through ProxyAdapter.
+
+If yes - 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-15T14:45:51Z
+
+> Is it possible to wrap any PSR6-compatible adapter to use it with this new interfaces? Maybe through ProxyAdapter.
+
+Correct, through ProxyAdapter!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-16T14:16:41Z
+
+Test failures are "legit" though (at least, it looks like some tests try to tag with a non-taggable adapter).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-16T14:54:29Z
+
+Failures fixed (the fabbot one is a false positive.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-17T13:18:37Z
+
+Abstracting this common fetch-or-compute logic also creates a nice extension point to implement [stampede protection](https://en.wikipedia.org/wiki/Cache_stampede).
+Here is a paper hinting several stampede protection strategies: http://www.vldb.org/pvldb/vol8/p886-vattani.pdf
+Any of the possible strategies would be implementable on top of this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-18T08:48:57Z
+
+I just pushed an updated implementation of `ChainAdapter` and `ProxyAdapter`. It turns out that the originally proposed `getMultiple()` method is really hard to implement correctly in `ChainAdapter` especially (`getMultiple` should call `getMultiple` on compatible chained adapters, otherwise this is useless for stampede protection - or it conflicts with batch save of deferred items).
+For this reason, I removed `getMultiple()` from the proposed interfaces: the added complexity is not worth it. We could add it back (in a separate interface) if someone comes with a real-world use case that justifies it. For now, I don't see the need for it that would counterbalance the added complexity.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-23T08:54:49Z
+
+ping @Nyholm FYI

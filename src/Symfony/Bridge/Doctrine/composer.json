@@ -24,6 +24,7 @@
     "require-dev": {
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
+<<<<<<< HEAD
         "symfony/form": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/property-access": "~3.4|~4.0",
@@ -33,6 +34,17 @@
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/validator": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
+=======
+        "symfony/form": "^3.3.10|~4.0",
+        "symfony/http-kernel": "~2.8|~3.0|~4.0",
+        "symfony/property-access": "~2.8|~3.0|~4.0",
+        "symfony/property-info": "~2.8|3.0|~4.0",
+        "symfony/proxy-manager-bridge": "~2.8|~3.0|~4.0",
+        "symfony/security": "^2.8.31|^3.3.13|~4.0",
+        "symfony/expression-language": "~2.8|~3.0|~4.0",
+        "symfony/validator": "^3.2.5|~4.0",
+        "symfony/translation": "~2.8|~3.0|~4.0",
+>>>>>>> 3.4
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "^2.4.5"

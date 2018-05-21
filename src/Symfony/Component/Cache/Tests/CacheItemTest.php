@@ -55,6 +55,9 @@ class CacheItemTest extends TestCase
     public function testTag()
     {
         $item = new CacheItem();
+        $r = new \ReflectionProperty($item, 'isTaggable');
+        $r->setAccessible(true);
+        $r->setValue($item, true);
 
         $this->assertSame($item, $item->tag('foo'));
         $this->assertSame($item, $item->tag(array('bar', 'baz')));
@@ -72,6 +75,24 @@ class CacheItemTest extends TestCase
     public function testInvalidTag($tag)
     {
         $item = new CacheItem();
+        $r = new \ReflectionProperty($item, 'isTaggable');
+        $r->setAccessible(true);
+        $r->setValue($item, true);
+
         $item->tag($tag);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Cache\Exception\LogicException
+     * @expectedExceptionMessage Cache item "foo" comes from a non tag-aware pool: you cannot tag it.
+     */
+    public function testNonTaggableItem()
+    {
+        $item = new CacheItem();
+        $r = new \ReflectionProperty($item, 'key');
+        $r->setAccessible(true);
+        $r->setValue($item, 'foo');
+
+        $item->tag(array());
     }
 }

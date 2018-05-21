@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Exception\LogicException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -29,6 +30,7 @@ final class CacheItem implements CacheItemInterface
     protected $prevTags = array();
     protected $innerItem;
     protected $poolHash;
+    protected $isTaggable = false;
 
     /**
      * {@inheritdoc}
@@ -109,7 +111,10 @@ final class CacheItem implements CacheItemInterface
      */
     public function tag($tags)
     {
-        if (!\is_array($tags)) {
+        if (!$this->isTaggable) {
+            throw new LogicException(sprintf('Cache item "%s" comes from a non tag-aware pool: you cannot tag it.', $this->key));
+        }
+        if (!\is_iterable($tags)) {
             $tags = array($tags);
         }
         foreach ($tags as $tag) {

@@ -121,7 +121,15 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
             foreach ($calls as $call) {
                 ++$statistics[$name]['calls'];
                 $statistics[$name]['time'] += $call->end - $call->start;
-                if ('getItem' === $call->name) {
+                if ('get' === $call->name) {
+                    ++$statistics[$name]['reads'];
+                    if ($call->hits) {
+                        ++$statistics[$name]['hits'];
+                    } else {
+                        ++$statistics[$name]['misses'];
+                        ++$statistics[$name]['writes'];
+                    }
+                } elseif ('getItem' === $call->name) {
                     ++$statistics[$name]['reads'];
                     if ($call->hits) {
                         ++$statistics[$name]['hits'];

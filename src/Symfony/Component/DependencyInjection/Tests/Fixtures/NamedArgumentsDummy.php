@@ -18,4 +18,8 @@ class NamedArgumentsDummy
     public function setSensitiveClass(CaseSensitiveClass $c)
     {
     }
+
+    public function setAnotherC($c)
+    {
+    }
 }

@@ -7,6 +7,19 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.40 (2018-05-21)
+
+ * bug #26781 [Form] Fix precision of MoneyToLocalizedStringTransformer's divisions on transform() (syastrebov)
+ * bug #27286 [Translation] Add Occitan plural rule (kylekatarnls)
+ * bug #27246 Disallow invalid characters in session.name (ostrolucky)
+ * bug #24805 [Security] Fix logout (MatTheCat)
+ * bug #27141 [Process] Suppress warnings when open_basedir is non-empty (cbj4074)
+ * bug #27250 [Session] limiting :key for GET_LOCK to 64 chars (oleg-andreyev)
+ * bug #27237 [Debug] Fix populating error_get_last() for handled silent errors (nicolas-grekas)
+ * bug #27236 [Filesystem] Fix usages of error_get_last() (nicolas-grekas)
+ * bug #27152 [HttpFoundation] use brace-style regex delimiters (xabbuh)
+ * feature #24896 Add CODE_OF_CONDUCT.md (egircys)
+
 * 2.8.39 (2018-04-30)
 
  * bug #27067 [HttpFoundation] Fix setting session-related ini settings (e-moe)

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-04T17:20:40Z
+
+Looks good, thank you! You'd just need to add "key" to "getProvidedTypes()" - and add tests now to verify this works as expected of course as you mentionned.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2018-05-04T19:59:53Z
+
+Tests have been added, `key` has been added to `getProvidedTypes()` and an issue has been created for the documentation (currently blocked by another MR).

@@ -144,7 +144,6 @@ class ConfigurationTest extends TestCase
         ));
     }
 
->>>>>>> 3.4
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();

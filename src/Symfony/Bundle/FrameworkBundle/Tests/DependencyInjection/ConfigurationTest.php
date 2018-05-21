@@ -129,6 +129,7 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider getTestValidTrustedProxiesData
+     * @group legacy
      */
     public function testValidTrustedProxies($trustedProxies, $processedProxies)
     {

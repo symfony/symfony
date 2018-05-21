@@ -44,6 +44,105 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }
 
+    public function getTestValidSessionName()
+    {
+        return array(
+            array(null),
+            array('PHPSESSID'),
+            array('a&b'),
+            array(',_-!@#$%^*(){}:<>/?'),
+        );
+    }
+
+    /**
+     * @dataProvider getTestInvalidSessionName
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testInvalidSessionName($sessionName)
+    {
+        $processor = new Processor();
+        $processor->processConfiguration(
+            new Configuration(true),
+            array(array('session' => array('name' => $sessionName)))
+        );
+    }
+
+    public function getTestInvalidSessionName()
+    {
+        return array(
+            array('a.b'),
+            array('a['),
+            array('a[]'),
+            array('a[b]'),
+            array('a=b'),
+            array('a+b'),
+        );
+    }
+
+    /**
+     * @dataProvider getTestValidTrustedProxiesData
+     */
+    public function testValidTrustedProxies($trustedProxies, $processedProxies)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, array(array(
+            'secret' => 's3cr3t',
+            'trusted_proxies' => $trustedProxies,
+        )));
+
+        $this->assertEquals($processedProxies, $config['trusted_proxies']);
+    }
+
+    public function getTestValidTrustedProxiesData()
+    {
+        return array(
+            array(array('127.0.0.1'), array('127.0.0.1')),
+            array(array('::1'), array('::1')),
+            array(array('127.0.0.1', '::1'), array('127.0.0.1', '::1')),
+            array(null, array()),
+            array(false, array()),
+            array(array(), array()),
+            array(array('10.0.0.0/8'), array('10.0.0.0/8')),
+            array(array('::ffff:0:0/96'), array('::ffff:0:0/96')),
+            array(array('0.0.0.0/0'), array('0.0.0.0/0')),
+        );
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testInvalidTypeTrustedProxies()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
+            array(
+                'secret' => 's3cr3t',
+                'trusted_proxies' => 'Not an IP address',
+            ),
+        ));
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testInvalidValueTrustedProxies()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, array(
+            array(
+                'secret' => 's3cr3t',
+                'trusted_proxies' => array('Not an IP address'),
+            ),
+        ));
+    }
+
+>>>>>>> 3.4
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();

@@ -457,7 +457,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             $fresh = $oldContainer = false;
             try {
-                if (\is_object($this->container = include $cache->getPath())) {
+                if (file_exists($cache->getPath()) && \is_object($this->container = include $cache->getPath())) {
                     $this->container->set('kernel', $this);
                     $oldContainer = $this->container;
                     $fresh = true;
@@ -520,7 +520,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             }
         }
 
-        if (null === $oldContainer) {
+        if (null === $oldContainer && file_exists($cache->getPath())) {
             $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             try {
                 $oldContainer = include $cache->getPath();

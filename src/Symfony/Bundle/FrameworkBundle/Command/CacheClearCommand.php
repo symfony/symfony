@@ -148,7 +148,7 @@ EOF
         if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
             foreach ($mounts as $mount) {
                 $mount = array_slice(explode(' ', $mount), 1, -3);
-                if (!\in_array(array_pop($mount), array('vboxfs', 'nfs'))) {
+                if (!\in_array(array_pop($mount), array('vboxsf', 'nfs'))) {
                     continue;
                 }
                 $mount = implode(' ', $mount).'/';

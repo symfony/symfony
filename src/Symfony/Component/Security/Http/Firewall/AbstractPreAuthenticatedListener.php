@@ -82,6 +82,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             if (null !== $this->logger) {
                 $this->logger->info('Pre-authentication successful.', array('token' => (string) $token));
             }
+
+            $this->migrateSession($request);
+
             $this->tokenStorage->setToken($token);
 
             if (null !== $this->dispatcher) {
@@ -114,4 +117,16 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      * @return array An array composed of the user and the credentials
      */
     abstract protected function getPreAuthenticatedData(Request $request);
+
+    private function migrateSession(Request $request)
+    {
+        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+            return;
+        }
+
+        // Destroying the old session is broken in php 5.4.0 - 5.4.10
+        // See https://bugs.php.net/63379
+        $destroy = \PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411;
+        $request->getSession()->migrate($destroy);
+    }
 }

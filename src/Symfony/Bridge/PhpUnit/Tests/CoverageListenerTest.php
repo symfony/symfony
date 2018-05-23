@@ -31,11 +31,11 @@ class CoverageListenerTest extends TestCase
         $dir = __DIR__.'/../Tests/Fixtures/coverage';
         $phpunit = $_SERVER['argv'][0];
 
-        exec("$php $phpunit -c $dir/phpunit-without-listener.xml.dist $dir/tests/ --coverage-text", $output);
+        exec("$php $phpunit -c $dir/phpunit-without-listener.xml.dist $dir/tests/ --coverage-text 2> /dev/null", $output);
         $output = implode("\n", $output);
         $this->assertContains('FooCov', $output);
 
-        exec("$php $phpunit -c $dir/phpunit-with-listener.xml.dist $dir/tests/ --coverage-text", $output);
+        exec("$php $phpunit -c $dir/phpunit-with-listener.xml.dist $dir/tests/ --coverage-text 2> /dev/null", $output);
         $output = implode("\n", $output);
         $this->assertNotContains('FooCov', $output);
         $this->assertContains("SutNotFoundTest::test\nCould not find the tested class.", $output);

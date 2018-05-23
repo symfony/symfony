@@ -616,6 +616,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         $selectSql = $this->getSelectSql();
         $selectStmt = $this->pdo->prepare($selectSql);
         $selectStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
+        $insertStmt = null;
 
         do {
             $selectStmt->execute();
@@ -631,9 +632,12 @@ class PdoSessionHandler extends AbstractSessionHandler
                 return is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
             }
 
-            if (!ini_get('session.use_strict_mode') && self::LOCK_TRANSACTIONAL === $this->lockMode && 'sqlite' !== $this->driver) {
-                // In strict mode, session fixation is not possible: new sessions always start with a unique
-                // random id, so that concurrency is not possible and this code path can be skipped.
+            if (null !== $insertStmt) {
+                $this->rollback();
+                throw new \RuntimeException('Failed to read session: INSERT reported a duplicate id but next SELECT did not return any data.');
+            }
+
+            if (self::LOCK_TRANSACTIONAL === $this->lockMode && 'sqlite' !== $this->driver) {
                 // Exclusive-reading of non-existent rows does not block, so we need to do an insert to block
                 // until other connections to the session are committed.
                 try {

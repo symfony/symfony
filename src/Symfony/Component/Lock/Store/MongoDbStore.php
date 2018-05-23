@@ -31,14 +31,14 @@ class MongoDbStore implements StoreInterface
 
     /**
      * @param \MongoDB\Client $mongo
-     * @param array $options
-     * List of available options:
-     *  * database: The name of the database [required]
-     *  * collection: The name of the collection [default: lock]
-     *  * resource_field: The field name for storing the lock id [default: _id] MUST be uniquely indexed if you chage it
-     *  * token_field: The field name for storing the lock token [default: token]
-     *  * acquired_field: The field name for storing the acquisition timestamp [default: acquired_at]
-     *  * expiry_field: The field name for storing the expiry-timestamp [default: expires_at].
+     * @param array           $options
+     *
+     * database: The name of the database [required]
+     * collection: The name of the collection [default: lock]
+     * resource_field: The field name for storing the lock id [default: _id] MUST be uniquely indexed if you chage it
+     * token_field: The field name for storing the lock token [default: token]
+     * acquired_field: The field name for storing the acquisition timestamp [default: acquired_at]
+     * expiry_field: The field name for storing the expiry-timestamp [default: expires_at].
      *
      * It is strongly recommended to put an index on the `expiry_field` for
      * garbage-collection. Alternatively it's possible to automatically expire
@@ -53,10 +53,9 @@ class MongoDbStore implements StoreInterface
      *     )
      *
      * More details on: http://docs.mongodb.org/manual/tutorial/expire-data/
-     *
      * @param float $initialTtl The expiration delay of locks in seconds
      */
-    public function __construct(\MongoDB\Client $mongo, array $options = [], float $initialTtl = 300.0)
+    public function __construct(\MongoDB\Client $mongo, array $options = array(), float $initialTtl = 300.0)
     {
         if (!isset($options['database'])) {
             throw new \InvalidArgumentException(
@@ -66,13 +65,13 @@ class MongoDbStore implements StoreInterface
 
         $this->mongo = $mongo;
 
-        $this->options = array_merge([
+        $this->options = array_merge(array(
             'collection' => 'lock',
             'resource_field' => '_id',
             'token_field' => 'token',
             'acquired_field' => 'acquired_at',
             'expiry_field' => 'expires_at',
-        ], $options);
+        ), $options);
 
         $this->initialTtl = $initialTtl;
     }
@@ -102,32 +101,32 @@ class MongoDbStore implements StoreInterface
     {
         $expiry = $this->createDateTime(microtime(true) + $this->initialTtl);
 
-        $filter = [
-            $this->options['resource_field'] => (string)$key,
-            '$or' => [
-                [
+        $filter = array(
+            $this->options['resource_field'] => (string) $key,
+            '$or' => array(
+                array(
                     $this->options['token_field'] => $this->getToken($key),
-                ],
-                [
-                    $this->options['expiry_field'] => [
+                ),
+                array(
+                    $this->options['expiry_field'] => array(
                         '$lte' => $this->createDateTime(),
-                    ],
-                ],
-            ],
-        ];
+                    ),
+                ),
+            ),
+        );
 
-        $update = [
-            '$set' => [
-                $this->options['resource_field'] => (string)$key,
+        $update = array(
+            '$set' => array(
+                $this->options['resource_field'] => (string) $key,
                 $this->options['token_field'] => $this->getToken($key),
                 $this->options['acquired_field'] => $this->createDateTime(),
                 $this->options['expiry_field'] => $expiry,
-            ],
-        ];
+            ),
+        );
 
-        $options = [
+        $options = array(
             'upsert' => true,
-        ];
+        );
 
         $key->reduceLifetime($this->initialTtl);
         try {
@@ -173,24 +172,24 @@ class MongoDbStore implements StoreInterface
     {
         $expiry = $this->createDateTime(microtime(true) + $ttl);
 
-        $filter = [
-            $this->options['resource_field'] => (string)$key,
+        $filter = array(
+            $this->options['resource_field'] => (string) $key,
             $this->options['token_field'] => $this->getToken($key),
-            $this->options['expiry_field'] => [
+            $this->options['expiry_field'] => array(
                 '$gte' => $this->createDateTime(),
-            ],
-        ];
+            ),
+        );
 
-        $update = [
-            '$set' =>[
-                $this->options['resource_field'] => (string)$key,
+        $update = array(
+            '$set' => array(
+                $this->options['resource_field'] => (string) $key,
                 $this->options['expiry_field'] => $expiry,
-            ],
-        ];
+            ),
+        );
 
-        $options = [
+        $options = array(
             'upsert' => true,
-        ];
+        );
 
         $key->reduceLifetime($ttl);
         try {
@@ -216,10 +215,10 @@ class MongoDbStore implements StoreInterface
      */
     public function delete(Key $key)
     {
-        $filter = [
-            $this->options['resource_field'] => (string)$key,
+        $filter = array(
+            $this->options['resource_field'] => (string) $key,
             $this->options['token_field'] => $this->getToken($key),
-        ];
+        );
 
         try {
             $result = $this->getCollection()->deleteOne($filter);
@@ -240,12 +239,12 @@ class MongoDbStore implements StoreInterface
      */
     public function exists(Key $key)
     {
-        $filter = [
-            $this->options['resource_field'] => (string)$key,
-            $this->options['expiry_field'] => [
+        $filter = array(
+            $this->options['resource_field'] => (string) $key,
+            $this->options['expiry_field'] => array(
                 '$gte' => $this->createDateTime(),
-            ],
-        ];
+            ),
+        );
 
         $key->reduceLifetime($this->initialTtl);
         $doc = $this->getCollection()->findOne($filter);

@@ -48,8 +48,8 @@ class MongoDbClientTest extends AbstractStoreTest
      */
     public function getStore()
     {
-        return new MongoDbStore(self::getMongoConnection(), [
+        return new MongoDbStore(self::getMongoConnection(), array(
             'database' => 'test',
-        ]);
+        ));
     }
 }

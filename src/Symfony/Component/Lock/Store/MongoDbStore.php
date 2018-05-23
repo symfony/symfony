@@ -37,7 +37,7 @@ class MongoDbStore implements StoreInterface
      *  * collection: The name of the collection [default: lock]
      *  * resource_field: The field name for storing the lock id [default: _id] MUST be uniquely indexed if you chage it
      *  * token_field: The field name for storing the lock token [default: token]
-     *  * aquired_field: The field name for storing the acquisition timestamp [default: aquired_at]
+     *  * acquired_field: The field name for storing the acquisition timestamp [default: acquired_at]
      *  * expiry_field: The field name for storing the expiry-timestamp [default: expires_at].
      *
      * It is strongly recommended to put an index on the `expiry_field` for
@@ -70,7 +70,7 @@ class MongoDbStore implements StoreInterface
             'collection' => 'lock',
             'resource_field' => '_id',
             'token_field' => 'token',
-            'aquired_field' => 'aquired_at',
+            'acquired_field' => 'acquired_at',
             'expiry_field' => 'expires_at',
         ], $options);
 
@@ -90,7 +90,7 @@ class MongoDbStore implements StoreInterface
      *     {
      *         _id: "test",
      *         token: {# unique token #},
-     *         aquired: new Date(),
+     *         acquired: new Date(),
      *         expires_at: new Date({# now + ttl #})
      *     },
      *     {
@@ -120,7 +120,7 @@ class MongoDbStore implements StoreInterface
             '$set' => [
                 $this->options['resource_field'] => (string)$key,
                 $this->options['token_field'] => $this->getToken($key),
-                $this->options['aquired_field'] => $this->createDateTime(),
+                $this->options['acquired_field'] => $this->createDateTime(),
                 $this->options['expiry_field'] => $expiry,
             ],
         ];
@@ -133,7 +133,7 @@ class MongoDbStore implements StoreInterface
         try {
             $this->getCollection()->updateOne($filter, $update, $options);
         } catch (\MongoDB\Driver\Exception\BulkWriteException $e) {
-            throw new LockConflictedException('Failed to aquire lock', 0, $e);
+            throw new LockConflictedException('Failed to acquire lock', 0, $e);
         }
 
         if ($key->isExpired()) {

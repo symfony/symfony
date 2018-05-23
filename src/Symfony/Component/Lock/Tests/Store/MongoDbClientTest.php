@@ -23,6 +23,9 @@ class MongoDbClientTest extends AbstractStoreTest
     public static function setupBeforeClass()
     {
         try {
+            if (!class_exists(\MongoDB\Client::class)) {
+                throw new \RuntimeException('The mongodb/mongodb package is required.');
+            }
             $client = self::getMongoConnection();
             $client->listDatabases();
         } catch (\Exception $e) {

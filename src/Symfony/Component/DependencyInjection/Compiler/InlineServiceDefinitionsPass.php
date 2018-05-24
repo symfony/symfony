@@ -106,11 +106,15 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      */
     private function isInlineableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {
+        if ($definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
+            return false;
+        }
+
         if (!$definition->isShared() || ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope(false)) {
             return true;
         }
 
-        if ($definition->isDeprecated() || $definition->isPublic() || $definition->isLazy()) {
+        if ($definition->isPublic()) {
             return false;
         }
 

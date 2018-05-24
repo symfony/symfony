@@ -50,7 +50,7 @@ class SecurityBundle extends Bundle
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());
-        $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RegisterCsrfTokenClearingLogoutHandlerPass());
     }
 }

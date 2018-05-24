@@ -27,8 +27,11 @@
     },
     "require-dev": {
         "symfony/routing": "~2.8|~3.0|~4.0",
-        "symfony/security-csrf": "^2.8.31|^3.3.13|~4.0",
+        "symfony/security-csrf": "^2.8.41|^3.3.17|^4.0.11",
         "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symfony/security-csrf": "<2.7.48 || >=2.8.0,<2.8.41 || >=3.0.0"
     },
     "suggest": {
         "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",

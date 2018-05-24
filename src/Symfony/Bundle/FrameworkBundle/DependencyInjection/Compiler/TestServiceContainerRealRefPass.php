@@ -27,13 +27,21 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
         }
 
         $testContainer = $container->getDefinition('test.service_container');
-        $privateContainer = $container->getDefinition((string) $testContainer->getArgument(2));
+        $privateContainer = $testContainer->getArgument(2);
+        if ($privateContainer instanceof Reference) {
+            $privateContainer = $container->getDefinition((string) $privateContainer);
+        }
         $definitions = $container->getDefinitions();
+        $privateServices = $privateContainer->getArgument(0);
 
-        foreach ($privateContainer->getArgument(0) as $id => $argument) {
+        foreach ($privateServices as $id => $argument) {
             if (isset($definitions[$target = (string) $argument->getValues()[0]])) {
                 $argument->setValues(array(new Reference($target)));
+            } else {
+                unset($privateServices[$id]);
             }
         }
+
+        $privateContainer->replaceArgument(0, $privateServices);
     }
 }

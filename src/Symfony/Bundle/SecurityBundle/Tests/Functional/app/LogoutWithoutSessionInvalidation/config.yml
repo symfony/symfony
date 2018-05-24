@@ -19,7 +19,7 @@ security:
                 require_previous_session: false
             remember_me:
                 always_remember_me: true
-                key: key
+                secret: secret
             logout:
                 invalidate_session: false
             anonymous: ~

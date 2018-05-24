@@ -123,10 +123,6 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         if (!$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
-
-        // Destroying the old session is broken in php 5.4.0 - 5.4.10
-        // See https://bugs.php.net/63379
-        $destroy = \PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411;
-        $request->getSession()->migrate($destroy);
+        $request->getSession()->migrate(true);
     }
 }

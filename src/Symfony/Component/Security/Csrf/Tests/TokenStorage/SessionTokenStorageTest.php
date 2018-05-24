@@ -129,4 +129,31 @@ class SessionTokenStorageTest extends TestCase
 
         $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
     }
+
+    public function testClearRemovesAllTokensFromTheConfiguredNamespace()
+    {
+        $this->storage->setToken('foo', 'bar');
+        $this->storage->clear();
+
+        $this->assertFalse($this->storage->hasToken('foo'));
+        $this->assertFalse($this->session->has(self::SESSION_NAMESPACE.'/foo'));
+    }
+
+    public function testClearDoesNotRemoveSessionValuesFromOtherNamespaces()
+    {
+        $this->session->set('foo/bar', 'baz');
+        $this->storage->clear();
+
+        $this->assertTrue($this->session->has('foo/bar'));
+        $this->assertSame('baz', $this->session->get('foo/bar'));
+    }
+
+    public function testClearDoesNotRemoveNonNamespacedSessionValues()
+    {
+        $this->session->set('foo', 'baz');
+        $this->storage->clear();
+
+        $this->assertTrue($this->session->has('foo'));
+        $this->assertSame('baz', $this->session->get('foo'));
+    }
 }

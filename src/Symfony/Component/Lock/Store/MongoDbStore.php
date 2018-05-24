@@ -246,7 +246,6 @@ class MongoDbStore implements StoreInterface
             ),
         );
 
-        $key->reduceLifetime($this->initialTtl);
         $doc = $this->getCollection()->findOne($filter);
 
         return $doc && $doc['token'] === $this->getToken($key);

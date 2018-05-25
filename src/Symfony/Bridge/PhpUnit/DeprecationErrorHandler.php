@@ -123,12 +123,13 @@ class DeprecationErrorHandler
             // triggered deprecation notice; and the fourth event (index 3)
             // represents the action that called the deprecated code. In the
             // scenario that we want to suppress, the 4th event will be an
-            // object instance of \PHPUnit\Framework\TestCase.
+            // extension of Symfony\Bundle\FrameworkBundle\Test\KernelTestCase.
             if (isset($trace[3]['object'])) {
                 $isPrivateServiceNotice = false !== strpos($msg, ' service is private, ');
                 $isNoticeForContainerGetHasUsage = 'Symfony\Component\DependencyInjection\Container' === $trace[2]['class'] && in_array($trace[2]['function'], array('get', 'has'));
-                $noticeWasTriggeredByPhpUnitTest = $trace[3]['object'] instanceof \PHPUnit\Framework\TestCase;
-                if ($isPrivateServiceNotice && $isNoticeForContainerGetHasUsage && $noticeWasTriggeredByPhpUnitTest) {
+                $kernelTestCaseClass = 'Symfony\\Bundle\\FrameworkBundle\\Test\\KernelTestCase';
+                $noticeWasTriggeredByKernelTestCase = $trace[3]['object'] instanceof $kernelTestCaseClass;
+                if ($isPrivateServiceNotice && $isNoticeForContainerGetHasUsage && $noticeWasTriggeredByKernelTestCase) {
                     return false;
                 }
             }

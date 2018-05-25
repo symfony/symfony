@@ -79,18 +79,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->debug = $debug;
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
-
-        if ($this->debug) {
-            $this->startTime = microtime(true);
-        }
     }
 
     public function __clone()
     {
-        if ($this->debug) {
-            $this->startTime = microtime(true);
-        }
-
         $this->booted = false;
         $this->container = null;
         $this->requestStackSize = 0;
@@ -102,6 +94,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function boot()
     {
+        if ($this->debug) {
+            $this->startTime = microtime(true);
+        }
+
         if (true === $this->booted) {
             if (!$this->requestStackSize && $this->resetServices) {
                 if ($this->container->has('services_resetter')) {

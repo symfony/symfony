@@ -77,7 +77,7 @@ if ('phpdbg' === PHP_SAPI) {
     $PHP .= ' -qrr';
 }
 
-$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
+$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
 

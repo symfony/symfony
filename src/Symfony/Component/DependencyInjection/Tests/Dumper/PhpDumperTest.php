@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
-use DummyProxyDumper;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -530,6 +529,19 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services13.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
     }
 
+    public function testNonSharedLazyDefinitionReferences()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setShared(false)->setLazy(true);
+        $container->register('bar', 'stdClass')->addArgument(new Reference('foo', ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, false))->setPublic(true);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new \DummyProxyDumper());
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy.php', $dumper->dump());
+    }
+
     public function testInitializePropertiesBeforeMethodCalls()
     {
         require_once self::$fixturesPath.'/includes/classes.php';
@@ -598,7 +610,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $dumper->setProxyDumper(new DummyProxyDumper());
+        $dumper->setProxyDumper(new \DummyProxyDumper());
         $dumper->dump();
 
         $this->addToAssertionCount(1);

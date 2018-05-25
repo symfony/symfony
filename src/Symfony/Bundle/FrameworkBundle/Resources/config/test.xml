@@ -16,7 +16,7 @@
             <argument>%test.client.parameters%</argument>
             <argument type="service" id="test.client.history" />
             <argument type="service" id="test.client.cookiejar" />
-            <argument type="service" id="test.service_container" />
+            <argument>test.service_container</argument>
         </service>
 
         <service id="test.client.history" class="Symfony\Component\BrowserKit\History" shared="false" />

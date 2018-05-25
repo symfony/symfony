@@ -109,30 +109,6 @@ class DeprecationErrorHandler
             }
 
             $trace = debug_backtrace(true);
-
-            // Silence deprecation warnings about private service accessed
-            // from the service container if done so from a Test class.
-            // As of Symfony 4.1, there is a new TestContainer that allows
-            // fetching of private services within tests, so we no longer
-            // need to warn about this behavior.
-            //
-            // NOTE: the event at the top of the stack $trace (index 0) should
-            // always be the PhpUnitBridge's DeprecationErrorHandler; the
-            // second event (index 1) should be the trigger_error() event;
-            // the third event (index 2) should be the actual source of the
-            // triggered deprecation notice; and the fourth event (index 3)
-            // represents the action that called the deprecated code. In the
-            // scenario that we want to suppress, the 4th event will be an
-            // object instance of \PHPUnit\Framework\TestCase.
-            if (isset($trace[3]['object'])) {
-                $isPrivateServiceNotice = false !== strpos($msg, ' service is private, ');
-                $isNoticeForContainerGetHasUsage = 'Symfony\Component\DependencyInjection\Container' === $trace[2]['class'] && in_array($trace[2]['function'], array('get', 'has'));
-                $noticeWasTriggeredByPhpUnitTest = $trace[3]['object'] instanceof \PHPUnit\Framework\TestCase;
-                if ($isPrivateServiceNotice && $isNoticeForContainerGetHasUsage && $noticeWasTriggeredByPhpUnitTest) {
-                    return false;
-                }
-            }
-
             $group = 'other';
             $isVendor = DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $inVendors($file);
 

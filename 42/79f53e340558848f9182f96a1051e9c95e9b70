@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-24T15:18:52Z
+
+this is to ensure that the special logic running in the factory method can always be called, right ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-24T15:23:34Z
+
+> this is to ensure that the special logic running in the factory method can always be called, right ?
+
+exactly yes

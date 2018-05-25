@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface;
 
 class AddSecurityVotersPassTest extends TestCase
 {
@@ -120,5 +119,12 @@ class AddSecurityVotersPassTest extends TestCase
         ;
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
+    }
+}
+
+class VoterWithoutInterface
+{
+    public function vote()
+    {
     }
 }

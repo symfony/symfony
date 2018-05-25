@@ -611,6 +611,16 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => 'a', 'a' => 'a', 'b' => 'b'), $matcher->match('/a/b'));
     }
 
+    public function testDotAllWithCatchAll()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{id}.html', array(), array('id' => '.+')));
+        $coll->add('b', new Route('/{all}', array(), array('all' => '.+')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(array('_route' => 'a', 'id' => 'foo/bar'), $matcher->match('/foo/bar.html'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

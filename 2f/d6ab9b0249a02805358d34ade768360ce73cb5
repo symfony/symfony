@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-05-25T12:20:54Z
+
+4.0 is maintained until July 2018, right?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-25T12:30:21Z
+
+@fabpot sure, [the master piece](http://symfony.com/doc/current/contributing/community/releases.html#schedule) agrees; but if we say "up to" we need to mention the upper branch that isn't master I think. And it's 4.1 now :)

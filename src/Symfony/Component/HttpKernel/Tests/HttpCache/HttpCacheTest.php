@@ -1341,6 +1341,21 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals($expected, $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
     }
 
+    /**
+     * @dataProvider getForwardedForData
+     */
+    public function testForwarderForHeaderForForwardedRequests($forwardedFor, $expected)
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        if (false !== $forwardedFor) {
+            $server['HTTP_FORWARDED'] = $forwardedFor;
+        }
+        $this->request('GET', '/', $server);
+
+        $this->assertEquals($expected, $this->kernel->getBackendRequest()->headers->get('Forwarded'));
+    }
+
     public function getXForwardedForData()
     {
         return array(
@@ -1348,6 +1363,27 @@ class HttpCacheTest extends HttpCacheTestCase
             array('10.0.0.2', '10.0.0.2, 10.0.0.1'),
             array('10.0.0.2, 10.0.0.3', '10.0.0.2, 10.0.0.3, 10.0.0.1'),
         );
+    }
+
+    public function getForwardedForData()
+    {
+        return array(
+            array(false, 'for=10.0.0.1'),
+            array('for=10.0.0.2', 'for=10.0.0.2, 10.0.0.1'),
+            array('for=10.0.0.2, 10.0.0.3', 'for=10.0.0.2, 10.0.0.3, 10.0.0.1'),
+            array('for=10.0.0.2, 10.0.0.3; proto=http; by=203.0.113.43', 'for=10.0.0.2, 10.0.0.3, 10.0.0.1; proto=http; by=203.0.113.43'),
+            array('for=10.0.0.2, 10.0.0.3;by=203.0.113.43', 'for=10.0.0.2, 10.0.0.3, 10.0.0.1;by=203.0.113.43'),
+            array('for_fail=10.0.0.2, 10.0.0.3;by=203.0.113.43', 'for_fail=10.0.0.2, 10.0.0.3;by=203.0.113.43'),
+        );
+    }
+
+    public function testForwarderForHeaderForPassRequests()
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        $this->request('POST', '/', $server);
+
+        $this->assertEquals('for=10.0.0.1', $this->kernel->getBackendRequest()->headers->get('Forwarded'));
     }
 
     public function testXForwarderForHeaderForPassRequests()

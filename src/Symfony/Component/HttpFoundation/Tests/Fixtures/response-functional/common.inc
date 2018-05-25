@@ -22,6 +22,10 @@ error_reporting(-1);
 ini_set('html_errors', 0);
 ini_set('display_errors', 1);
 
+if (ini_get('xdebug.default_enable')) {
+    xdebug_disable();
+}
+
 header_remove('X-Powered-By');
 header('Content-Type: text/plain; charset=utf-8');
 

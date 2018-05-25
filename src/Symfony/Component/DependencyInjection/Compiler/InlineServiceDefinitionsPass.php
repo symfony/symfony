@@ -88,11 +88,15 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      */
     private function isInlineableDefinition($id, Definition $definition, ServiceReferenceGraph $graph)
     {
+        if ($definition->getErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
+            return false;
+        }
+
         if (!$definition->isShared()) {
             return true;
         }
 
-        if ($definition->isDeprecated() || $definition->isPublic() || $definition->isLazy()) {
+        if ($definition->isPublic()) {
             return false;
         }
 

@@ -1,11 +1,6 @@
 imports:
     - { resource: ./../config/framework.yml }
 
-services:
-    test.security.csrf.token_storage:
-        alias: security.csrf.token_storage
-        public: true
-
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext

@@ -77,9 +77,8 @@ class CachePoolClearCommandTest extends WebTestCase
 
     private function createCommandTester()
     {
-        $container = static::$kernel->getContainer();
         $application = new Application(static::$kernel);
-        $application->add(new CachePoolClearCommand($container->get('cache.global_clearer')));
+        $application->add(new CachePoolClearCommand(static::$container->get('cache.global_clearer')));
 
         return new CommandTester($application->find('cache:pool:clear'));
     }

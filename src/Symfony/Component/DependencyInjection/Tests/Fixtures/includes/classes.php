@@ -84,16 +84,16 @@ class DummyProxyDumper implements ProxyDumper
 {
     public function isProxyCandidate(Definition $definition)
     {
-        return false;
+        return $definition->isLazy();
     }
 
     public function getProxyFactoryCode(Definition $definition, $id)
     {
-        return '';
+        return "        // lazy factory\n\n";
     }
 
     public function getProxyCode(Definition $definition)
     {
-        return '';
+        return "// proxy code\n";
     }
 }

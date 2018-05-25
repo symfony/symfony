@@ -1896,6 +1896,9 @@ EOF;
         if ($this->container->hasDefinition($id) && ($definition = $this->container->getDefinition($id)) && !$definition->isSynthetic()) {
             if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
                 $code = 'null';
+                if (!$definition->isShared()) {
+                    return $code;
+                }
             } elseif ($this->isTrivialInstance($definition)) {
                 $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
                 if ($definition->isShared()) {

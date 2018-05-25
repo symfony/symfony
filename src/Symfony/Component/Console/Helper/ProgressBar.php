@@ -424,6 +424,7 @@ final class ProgressBar
             $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
         }
 
+        $this->output->write(str_repeat("\n", $this->formatLineCount));
         $this->overwrite('');
     }
 

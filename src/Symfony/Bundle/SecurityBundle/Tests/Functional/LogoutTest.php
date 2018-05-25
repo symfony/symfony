@@ -35,18 +35,18 @@ class LogoutTest extends WebTestCase
     public function testCsrfTokensAreClearedOnLogout()
     {
         $client = $this->createClient(array('test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml'));
-        static::$kernel->getContainer()->get('test.security.csrf.token_storage')->setToken('foo', 'bar');
+        $client->getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
 
         $client->request('POST', '/login', array(
             '_username' => 'johannes',
             '_password' => 'test',
         ));
 
-        $this->assertTrue(static::$kernel->getContainer()->get('test.security.csrf.token_storage')->hasToken('foo'));
-        $this->assertSame('bar', static::$kernel->getContainer()->get('test.security.csrf.token_storage')->getToken('foo'));
+        $this->assertTrue($client->getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
+        $this->assertSame('bar', $client->getContainer()->get('security.csrf.token_storage')->getToken('foo'));
 
         $client->request('GET', '/logout');
 
-        $this->assertFalse(static::$kernel->getContainer()->get('test.security.csrf.token_storage')->hasToken('foo'));
+        $this->assertFalse($client->getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
     }
 }

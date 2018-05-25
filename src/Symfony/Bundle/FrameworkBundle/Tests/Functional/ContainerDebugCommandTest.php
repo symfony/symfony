@@ -26,12 +26,12 @@ class ContainerDebugCommandTest extends WebTestCase
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$kernel->getContainer()->getParameter('debug.container.dump'));
+        @unlink(static::$container->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:container'));
 
-        $this->assertFileExists(static::$kernel->getContainer()->getParameter('debug.container.dump'));
+        $this->assertFileExists(static::$container->getParameter('debug.container.dump'));
     }
 
     public function testNoDebug()

@@ -88,3 +88,10 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
     }
 }
+
+class VoterWithoutInterface
+{
+    public function vote()
+    {
+    }
+}

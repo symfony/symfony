@@ -7,6 +7,19 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.11 (2018-05-25)
+
+ * bug #27364 [DI] Fix bad exception on uninitialized references to non-shared services (nicolas-grekas)
+ * bug #27359 [HttpFoundation] Fix perf issue during MimeTypeGuesser intialization (nicolas-grekas)
+ * security #cve-2018-11408 [SecurityBundle] Fail if security.http_utils cannot be configured
+ * security #cve-2018-11406 clear CSRF tokens when the user is logged out
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11385 Adding session authentication strategy to Guard to avoid session fixation
+ * security #cve-2018-11385 Adding session strategy to ALL listeners to avoid *any* possible fixation
+ * security #cve-2018-11386 [HttpFoundation] Break infinite loop in PdoSessionHandler when MySQL is in loose mode
+ * bug #27341 [WebProfilerBundle] Fixed validator/dump trace CSS (yceruto)
+ * bug #27337  [FrameworkBundle] fix typo in CacheClearCommand (emilielorenzo)
+
 * 4.0.10 (2018-05-21)
 
  * bug #27264 [Validator] Use strict type in URL validator (mimol91)

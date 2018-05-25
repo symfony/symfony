@@ -68,30 +68,26 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         .'|admin/post/(?'
                             .'|(*:33)'
                             .'|new(*:43)'
-                            .'|(\\d+)(?'
-                                .'|(*:58)'
-                                .'|/(?'
-                                    .'|edit(*:73)'
-                                    .'|delete(*:86)'
-                                .')'
-                            .')'
+                            .'|(\\d+)(*:55)'
+                            .'|(\\d+)/edit(*:72)'
+                            .'|(\\d+)/delete(*:91)'
                         .')'
                         .'|blog/(?'
-                            .'|(*:104)'
-                            .'|rss\\.xml(*:120)'
+                            .'|(*:107)'
+                            .'|rss\\.xml(*:123)'
                             .'|p(?'
-                                .'|age/([^/]++)(*:144)'
-                                .'|osts/([^/]++)(*:165)'
+                                .'|age/([^/]++)(*:147)'
+                                .'|osts/([^/]++)(*:168)'
                             .')'
-                            .'|comments/(\\d+)/new(*:192)'
-                            .'|search(*:206)'
+                            .'|comments/(\\d+)/new(*:195)'
+                            .'|search(*:209)'
                         .')'
                         .'|log(?'
-                            .'|in(*:223)'
-                            .'|out(*:234)'
+                            .'|in(*:226)'
+                            .'|out(*:237)'
                         .')'
                     .')'
-                    .'|/(en|fr)?(*:253)'
+                    .'|/(en|fr)?(*:256)'
                 .')$}sD',
         );
 
@@ -102,18 +98,18 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         $routes = array(
                             33 => array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null),
                             43 => array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null),
-                            58 => array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            73 => array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            86 => array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            104 => array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null),
-                            120 => array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null),
-                            144 => array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null),
-                            165 => array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null),
-                            192 => array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            206 => array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null),
-                            223 => array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null),
-                            234 => array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null),
-                            253 => array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null),
+                            55 => array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            72 => array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            91 => array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            107 => array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null),
+                            123 => array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null),
+                            147 => array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null),
+                            168 => array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null),
+                            195 => array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            209 => array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null),
+                            226 => array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null),
+                            237 => array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null),
+                            256 => array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -139,7 +135,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         return $ret;
                 }
 
-                if (253 === $m) {
+                if (256 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));

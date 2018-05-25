@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-25T16:41:40Z
+
+These diffs on the dumped code are quite unreadable for reviewers...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-25T21:12:51Z
+
+PR updated.
+I cannot do much about the diff, but with the correct implementation, it is much shorter.
+This is ready.

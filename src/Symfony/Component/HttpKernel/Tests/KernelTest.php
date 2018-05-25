@@ -911,7 +911,7 @@ EOF;
         $preReBoot = $kernel->getStartTime();
 
         sleep(3600); //Intentionally large value to detect if ClockMock ever breaks
-        $kernel->boot();
+        $kernel->reboot(null);
 
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
     }

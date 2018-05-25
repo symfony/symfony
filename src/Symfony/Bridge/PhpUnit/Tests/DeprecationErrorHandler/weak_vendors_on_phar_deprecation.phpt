@@ -23,3 +23,5 @@ include 'phar://deprecation.phar/deprecation.php';
 --EXPECTF--
 
 Other deprecation notices (1)
+
+  1x: I come from… afar! :D

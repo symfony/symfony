@@ -365,19 +365,25 @@ class Filesystem
         if ('\\' === DIRECTORY_SEPARATOR) {
             $endPath = str_replace('\\', '/', $endPath);
             $startPath = str_replace('\\', '/', $startPath);
-        }
 
-        $stripDriveLetter = function ($path) {
-            if (strlen($path) > 2 && ':' === $path[1] && '/' === $path[2] && ctype_alpha($path[0])) {
-                return substr($path, 2);
+            $stripDriveLetter = function ($path) {
+                if (strlen($path) > 2 && ':' === $path[1] && '/' === $path[2] && ctype_alpha($path[0])) {
+                    return array(substr($path, 2), $path[0].$path[1]);
+                }
+
+                return $path;
+            };
+
+            $endPath = $stripDriveLetter($endPath);
+            $startPath = $stripDriveLetter($startPath);
+
+            if ($endPath[1] !== $startPath[1]) {
+                return '';
             }
 
-            return $path;
-        };
-
-        $endPath = $stripDriveLetter($endPath);
-        $startPath = $stripDriveLetter($startPath);
-
+            $endPath = $endPath[0];
+            $startPath = $startPath[0];
+        }
         // Split the paths into arrays
         $startPathArr = explode('/', trim($startPath, '/'));
         $endPathArr = explode('/', trim($endPath, '/'));
@@ -414,7 +420,6 @@ class Filesystem
 
         // Repeated "../" for each level need to reach the common path
         $traverser = str_repeat('../', $depth);
-
         $endPathRemainder = implode('/', array_slice($endPathArr, $index));
 
         // Construct $endPath from traversing to the common path, then to the remaining $endPath

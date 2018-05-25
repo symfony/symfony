@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-23T11:33:24Z
+
+Note that your IDE will most likely mark it as unused now, as even PhpStorm doesn't understand the syntax used (last time I checked was a few months back)

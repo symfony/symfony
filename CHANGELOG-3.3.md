@@ -7,6 +7,14 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.17 (2018-05-25)
+
+ * security #cve-2018-11407 [Ldap] cast to string when checking empty passwords
+ * security #cve-2018-11408 [SecurityBundle] Fail if security.http_utils cannot be configured
+ * security #cve-2018-11406 clear CSRF tokens when the user is logged out
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11386 [HttpFoundation] Break infinite loop in PdoSessionHandler when MySQL is in loose mode
+
 * 3.3.16 (2018-01-29)
 
  * bug #25922 [HttpFoundation] Use the correct syntax for session gc based on Pdo driver (tanasecosminromeo)

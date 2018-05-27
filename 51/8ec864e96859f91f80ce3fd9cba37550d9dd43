@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-18T13:20:14Z
+
+Can you add a test case please?
+
+---------------------------------------------------------------------------
+
+by kmadejski at 2018-04-18T13:52:23Z
+
+@nicolas-grekas sure, added in https://github.com/symfony/symfony/pull/26973/commits/3b3d5903109feadbdf4b40fb9f11929cdcc617ac
+
+---------------------------------------------------------------------------
+
+by stof at 2018-04-18T14:26:15Z
+
+I see a big issue with this change: the local IP will stay trusted even after the end of handling this sub-request
+
+---------------------------------------------------------------------------
+
+by kmadejski at 2018-04-18T14:48:09Z
+
+@stof you are right, local IP will be trusted for all subrequest within the master request, but I don't see any problem regarding that. Could you please explain or describe some use-case where it might be an issue?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T08:41:06Z
+
+> describe some use-case where it might be an issue
+
+instead of trying to answer this question, would it be possible to restore the list to the previous state?
+
+---------------------------------------------------------------------------
+
+by kmadejski at 2018-04-20T11:25:45Z
+
+@nicolas-grekas probably yes, but I think that it might be tricky.
+
+At first, it would be necessary to change this line: https://github.com/kmadejski/symfony/blob/3b3d5903109feadbdf4b40fb9f11929cdcc617ac/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php#L79 and store `Response` in some local variable, remove previously added local IP address from trusted proxies and finally return `Response`.
+
+Secondly, we would have to set some flag because `127.0.0.1` might have been intentionally set in `TRUSTED_PROXIES` and we need to know whether it should be removed after controller action execution or not.
+
+Of course, if you think that it's a good idea then I can try to do the change as described.
+However, correct me if I'm wrong, but it seems that `127.0.0.1` is *always* in trusted proxies when Symfony `HttpCache` is enabled, right? (thanks to this piece of code: https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php#L479-%23L483). For what reason it is considered as an issue when not using Symfony proxy?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2018-04-20T11:38:49Z
+
+> For what reason it is considered as an issue here?
+
+When not using Symfony proxy (so Varnish, Fastly, Nginx cache, ..)
+
+naming ;)
+
+---------------------------------------------------------------------------
+
+by kmadejski at 2018-04-26T12:03:29Z
+
+@nicolas-grekas I see that you've changed the status of this PR, should I assume that you prefer the way of trying to restore the list of trusted proxies back to the previous state?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-29T07:08:02Z
+
+The best would be to not alter the global state at all.
+Would it make sense to set the remote address to the first trusted proxy instead of 127.0.0.1 when there is one?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2018-04-29T17:11:38Z
+
+> The best would be to not alter the global state at all.
+
+true.
+
+> Would it make sense to set the remote address to the first trusted proxy instead of 127.0.0.1 when there is one?
+
+Alternatively, could we skip setting it? Tried to check blame a few rounds back for why ip is set to localhost in the first place, but seems to have been added when logic was moved in #6459. So not sure why it's done like that, but back then localhost seems to have been considered trusted: https://github.com/symfony/symfony/pull/6459/files#diff-5a6abcbb3081371c8f5e3b9434c1ec18R87
+
+---------------------------------------------------------------------------
+
+by kmadejski at 2018-05-14T08:58:26Z
+
+> Would it make sense to set the remote address to the first trusted proxy instead of 127.0.0.1 when there is one?
+
+@nicolas-grekas I did as you propose and it seems to be a pretty good solution which solves our issue. See changes in https://github.com/symfony/symfony/pull/26973/commits/434a6a11e78d2cc01ad6a717eacd0ae9d4f5f812.
+
+---------------------------------------------------------------------------
+
+by kmadejski at 2018-05-15T11:15:38Z
+
+@nicolas-grekas JFYI: I've pushed again last commit with force to restart AppVeyor build which has been failed for the unknown reason previously.

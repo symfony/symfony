@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-18T06:16:08Z
+
+As a remember me doesn't have an actual authentication attempt, but only refreshes, I think it's safe to assume that all behavior should be consistent for a refresh. If that means that in this scenario the loginfail was not triggered, it probably should be.

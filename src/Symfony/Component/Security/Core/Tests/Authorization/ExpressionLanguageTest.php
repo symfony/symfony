@@ -31,10 +31,8 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testIsAuthenticated($token, $expression, $result)
     {
-        $anonymousTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken';
-        $rememberMeTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken';
         $expressionLanguage = new ExpressionLanguage();
-        $trustResolver = new AuthenticationTrustResolver($anonymousTokenClass, $rememberMeTokenClass);
+        $trustResolver = new AuthenticationTrustResolver();
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
         $accessDecisionManager = new AccessDecisionManager(array(new RoleVoter()));

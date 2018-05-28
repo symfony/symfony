@@ -1650,4 +1650,74 @@ class OptionsResolverTest extends TestCase
 
         count($this->resolver);
     }
+
+    public function testNestedArrays()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+
+        $this->assertEquals(array(
+            'foo' => array(
+                array(
+                    1, 2,
+                ),
+            ),
+        ), $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(1, 2),
+                ),
+            )
+        ));
+    }
+
+    public function testNested2Arrays()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][][][]');
+
+        $this->assertEquals(array(
+            'foo' => array(
+                array(
+                    array(
+                        array(
+                            1, 2,
+                        ),
+                    ),
+                ),
+            ),
+        ), $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(
+                        array(
+                            array(1, 2),
+                        ),
+                    ),
+                ),
+            )
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "float[][][][]", but is of type "integer[][][][]".
+     */
+    public function testNestedArraysError()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'float[][][][]');
+
+        $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(
+                        array(
+                            array(1, 2),
+                        ),
+                    ),
+                ),
+            )
+        );
+    }
 }

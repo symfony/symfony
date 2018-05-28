@@ -878,8 +878,10 @@ class OptionsResolver implements Options
     private function verifyTypes($type, $value, array &$invalidTypes)
     {
         if ('[]' === substr($type, -2) && is_array($value)) {
-            $originalType = $type;
-            $type = substr($type, 0, -2);
+            if ($this->verifyArrayType($type, $value, $invalidTypes, $type)) {
+                return true;
+            }
+
             $invalidValues = array_filter( // Filter out valid values, keeping invalid values in the resulting array
                 $value,
                 function ($value) use ($type) {
@@ -891,7 +893,7 @@ class OptionsResolver implements Options
                 return true;
             }
 
-            $invalidTypes[$this->formatTypeOf($value, $originalType)] = true;
+            $invalidTypes[$this->formatTypeOf($value, $type)] = true;
 
             return false;
         }
@@ -905,6 +907,44 @@ class OptionsResolver implements Options
         }
 
         return false;
+    }
+
+    /**
+     * @param       $type
+     * @param array $value
+     * @param array $invalidTypes
+     *
+     * @return bool
+     */
+    private function verifyArrayType($type, array $value, array &$invalidTypes)
+    {
+        $type = substr($type, 0, -2);
+
+        if ('[]' === substr($type, -2)) {
+            $success = true;
+            foreach ($value as $item) {
+                if (!is_array($item)) {
+                    $invalidTypes[$this->formatTypeOf($item, null)] = true;
+
+                    return false;
+                }
+
+                if (!$this->verifyArrayType($type, $item, $invalidTypes)) {
+                    $success = false;
+                }
+            }
+
+            return $success;
+        }
+
+        $invalid = array_filter( // Filter out valid values, keeping invalid values in the resulting array
+            $value,
+            function ($value) use ($type) {
+                return !self::isValueValidType($type, $value);
+            }
+        );
+
+        return !count($invalid);
     }
 
     /**
@@ -975,7 +1015,7 @@ class OptionsResolver implements Options
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed  $value The value to return the type of
+     * @param mixed $value The value to return the type of
      */
     private function formatTypeOf($value, ?string $type): string
     {

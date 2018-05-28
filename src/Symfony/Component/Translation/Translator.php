@@ -54,9 +54,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $resources = array();
 
     /**
-     * @var MessageFormatterInterface
+     * @var MessageFormatterInterface[]
      */
-    private $formatter;
+    private $formatters;
 
     /**
      * @var string
@@ -89,7 +89,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $formatter = new MessageFormatter();
         }
 
-        $this->formatter = $formatter;
+        $this->formatters['default'] = $formatter;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
@@ -135,6 +135,15 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         } else {
             unset($this->catalogues[$locale]);
         }
+    }
+
+    /**
+     * @param string $domain
+     * @param MessageFormatterInterface $formatter
+     */
+    public function addFormatter(string $domain, MessageFormatterInterface $formatter)
+    {
+        $this->formatters[$domain] = $formatter;
     }
 
     /**
@@ -192,7 +201,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $domain = 'messages';
         }
 
-        return $this->formatter->format($this->getCatalogue($locale)->get((string) $id, $domain), $locale, $parameters);
+        return $this->getFormatter($domain)->format($this->getCatalogue($locale)->get((string) $id, $domain), $locale, $parameters);
     }
 
     /**
@@ -208,6 +217,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $domain = 'messages';
         }
 
+        $formatter = $this->getFormatter($domain);
+        if (!$formatter instanceof ChoiceMessageFormatterInterface) {
+            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', get_class($formatter)));
+        }
+
         $id = (string) $id;
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
@@ -220,7 +234,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             }
         }
 
-        return $this->formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);
+        return $formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);
     }
 
     /**
@@ -454,5 +468,18 @@ EOF
         }
 
         return $this->configCacheFactory;
+    }
+
+    /**
+     * @param string $domain
+     * @return MessageFormatterInterface
+     */
+    private function getFormatter(string $domain)
+    {
+        if (isset($this->formatters[$domain])) {
+            return $this->formatters[$domain];
+        }
+
+        return $this->formatters['default'];
     }
 }

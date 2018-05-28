@@ -74,6 +74,7 @@
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%kernel.debug%</argument>
             <argument>%kernel.charset%</argument>
+            <argument>%debug.file_link_format%</argument>
         </service>
 
         <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">

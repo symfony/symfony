@@ -981,6 +981,9 @@ class FrameworkExtension extends Extension
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
         $translator = $container->findDefinition('translator.default');
         $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
+        foreach ($config['domain_formatters'] as $formatter) {
+            $translator->addMethodCall('addFormatter', array($formatter['domain'], new Reference($formatter['service'])));
+        }
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);

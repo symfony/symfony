@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecated the `Symfony\Bundle\FrameworkBundle\Controller\Controller` class in favor of `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`.
  * Enabled autoconfiguration for `Psr\Log\LoggerAwareInterface`
  * Added new "auto" mode for `framework.session.cookie_secure` to turn it on when HTTPS is used
+ * Added support for configuring the `Translator` with multiple formatters.
 
 4.1.0
 -----

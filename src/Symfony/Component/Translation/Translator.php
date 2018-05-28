@@ -89,7 +89,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $formatter = new MessageFormatter();
         }
 
-        $this->formatters['default'] = $formatter;
+        $this->formatters['_default'] = $formatter;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
@@ -137,11 +137,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
     }
 
-    /**
-     * @param string $domain
-     * @param MessageFormatterInterface $formatter
-     */
-    public function addFormatter(string $domain, MessageFormatterInterface $formatter)
+    public function addFormatter(string $domain, MessageFormatterInterface $formatter): void
     {
         $this->formatters[$domain] = $formatter;
     }
@@ -470,16 +466,8 @@ EOF
         return $this->configCacheFactory;
     }
 
-    /**
-     * @param string $domain
-     * @return MessageFormatterInterface
-     */
-    private function getFormatter(string $domain)
+    private function getFormatter(string $domain): MessageFormatterInterface
     {
-        if (isset($this->formatters[$domain])) {
-            return $this->formatters[$domain];
-        }
-
-        return $this->formatters['default'];
+        return $this->formatters[$domain] ?? $this->formatters['_default'];
     }
 }

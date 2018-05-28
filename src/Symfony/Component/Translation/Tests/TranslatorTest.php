@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
@@ -566,6 +568,30 @@ class TranslatorTest extends TestCase
         // consistent behavior with Translator::trans(), which returns the string
         // unchanged if it can't be found
         $this->assertEquals('some_message2', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
+    }
+
+    public function testDomainSpecificFormatter()
+    {
+        $fooFormatter = $this->getMockBuilder(MessageFormatterInterface::class)
+            ->setMethods(array('format'))
+            ->getMock();
+        $fooFormatter->expects($this->exactly(2))
+            ->method('format')
+            ->with('foo', 'en', array());
+
+        $barFormatter = $this->getMockBuilder(MessageFormatterInterface::class)
+            ->setMethods(array('format'))
+            ->getMock();
+        $barFormatter->expects($this->exactly(1))
+            ->method('format')
+            ->with('bar', 'en', array());
+
+        $translator = new Translator('en', $fooFormatter);
+        $translator->addFormatter('bar_domain', $barFormatter);
+
+        $translator->trans('foo');
+        $translator->trans('foo', array(), 'foo_domain');
+        $translator->trans('bar', array(), 'bar_domain');
     }
 }
 

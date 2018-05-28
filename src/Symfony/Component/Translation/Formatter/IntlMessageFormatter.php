@@ -22,13 +22,17 @@ class IntlMessageFormatter implements MessageFormatterInterface, ChoiceMessageFo
      */
     public function format($message, $locale, array $parameters = array())
     {
-        $formatter = new \MessageFormatter($locale, $message);
+        try {
+            $formatter = new \MessageFormatter($locale, $message);
+        } catch (\Throwable $e) {
+            throw new \InvalidArgumentException('Invalid message format.', $e);
+        }
         if (null === $formatter) {
             throw new \InvalidArgumentException(sprintf('Invalid message format. Reason: %s (error #%d)', intl_get_error_message(), intl_get_error_code()));
         }
 
         $message = $formatter->format($parameters);
-        if ($formatter->getErrorCode() !== U_ZERO_ERROR) {
+        if (U_ZERO_ERROR !== $formatter->getErrorCode()) {
             throw new \InvalidArgumentException(sprintf('Unable to format message. Reason: %s (error #%s)', $formatter->getErrorMessage(), $formatter->getErrorCode()));
         }
 

@@ -7,6 +7,8 @@ CHANGELOG
  * Started using ICU parent locales as fallback locales.
  * deprecated `TranslatorInterface` in favor of `Symfony\Contracts\Translation\TranslatorInterface`
  * deprecated `MessageSelector`, `Interval` and `PluralizationRules`; use `IdentityTranslator` instead
+ * Added intl message formatter.
+ * Added support for one formatter per domain
 
 4.1.0
 -----
@@ -41,7 +43,6 @@ CHANGELOG
 -----
 
  * Added support for escaping `|` in plural translations with double pipe.
- * Added intl message formatter.
 
 3.1.0
 -----

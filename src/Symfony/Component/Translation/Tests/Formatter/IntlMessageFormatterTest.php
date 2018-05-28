@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation\Tests\Formatter;
 
 use Symfony\Component\Translation\Formatter\IntlMessageFormatter;
 
-class IntlMessageFormatterTest extends \PHPUnit_Framework_TestCase
+class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
@@ -34,7 +34,7 @@ class IntlMessageFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatWithNamedArguments()
     {
-        if (PHP_VERSION_ID < 50500 || version_compare(INTL_ICU_VERSION, '4.8', '<')) {
+        if (version_compare(INTL_ICU_VERSION, '4.8', '<')) {
             $this->markTestSkipped('Format with named arguments can only be run with ICU 4.8 or higher and PHP >= 5.5');
         }
 

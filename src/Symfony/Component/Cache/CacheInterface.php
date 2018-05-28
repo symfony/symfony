@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Cache;
 
-use Psr\Cache\CacheItemInterface;
-
 /**
  * Gets and stores items from a cache.
  *
@@ -22,14 +20,12 @@ use Psr\Cache\CacheItemInterface;
  * - the corresponding PSR-6 CacheItemInterface object,
  *   allowing time-based expiration control.
  *
- * If you need tag-based invalidation, use TaggableCacheInterface instead.
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 interface CacheInterface
 {
     /**
-     * @param callable(CacheItemInterface):mixed $callback Should return the computed value for the given key/item
+     * @param callable(CacheItem):mixed $callback Should return the computed value for the given key/item
      *
      * @return mixed The value corresponding to the provided key
      */

@@ -13,17 +13,17 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Component\Cache\TaggableCacheInterface;
 use Symfony\Component\Cache\Traits\GetTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface, TaggableCacheInterface, PruneableInterface, ResettableInterface
+class TagAwareAdapter implements CacheInterface, TagAwareAdapterInterface, PruneableInterface, ResettableInterface
 {
     const TAGS_PREFIX = "\0tags\0";
 

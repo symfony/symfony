@@ -4,7 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
- * added `CacheInterface` and `TaggableCacheInterface`
+ * added `CacheInterface`, which should become the preferred way to use a cache
  * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
 
 3.4.0

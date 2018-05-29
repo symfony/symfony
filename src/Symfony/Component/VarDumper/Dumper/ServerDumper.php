@@ -50,7 +50,7 @@ class ServerDumper implements DataDumperInterface
     /**
      * {@inheritdoc}
      */
-    public function dump(Data $data, $output = null): void
+    public function dump(Data $data, $output = null)
     {
         set_error_handler(array(self::class, 'nullErrorHandler'));
 

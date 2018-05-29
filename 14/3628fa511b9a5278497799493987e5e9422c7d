@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-04-15T21:56:36Z
+
+What is your opinion on making this default?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-15T22:02:51Z
+
+Tags involve extra round-trips so this cannot be the default IMHO.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-16T13:56:00Z
+
+Wooooo! So much easier than currently :). It looks like`tags: true` (the simplest config) just re-uses the same adapter for tagging. I like that. What do you think about `taggable: true` - it makes it sound a bit more like we're adding a "behavior"?
+
+And, is there a way that a user could add tagging to the `app` cache. I still think many users (for small-ish apps) will use that one pool.
+
+**Update**: About the taggable `app` cache - it looks like #26929 adds this, without any config. That makes even more sense.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-16T14:04:31Z
+
+> taggable: true
+
+A service id can also be given here, where tags will be stored. This would then look like:
+`taggable: some_pool_for_tags`. If you're OK, I'm OK :)
+
+> add tagging to the app cache
+
+not needed as you spotted in #26929: just type-hint `TaggableCacheInterface` and done with autowiring (or manually inject `cache.app.taggable`)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-04-16T14:08:05Z
+
+> A service id can also be given here, where tags will be stored. This would then look like:
+taggable: some_pool_for_tags. If you're OK, I'm OK :)
+
+Ah, of course! I think we should keep `tags` then
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T08:10:03Z
+
+Moving to 4.2.
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-28T12:43:52Z
+
+vote pending @symfony/deciders

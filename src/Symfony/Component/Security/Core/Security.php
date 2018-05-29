@@ -41,12 +41,7 @@ final class Security
             return null;
         }
 
-        $user = $token->getUser();
-        if (!is_object($user)) {
-            return null;
-        }
-
-        return $user;
+        return is_object($token->getUser()) ? $token->getUser() : null;
     }
 
     /**

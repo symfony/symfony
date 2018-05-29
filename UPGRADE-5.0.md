@@ -88,10 +88,10 @@ SecurityBundle
  * The `logout_on_user_change` firewall option has been removed.
  * The `switch_user.stateless` firewall option has been removed.
  * The `SecurityUserValueResolver` class has been removed.
- * Passing a `FirewallConfig` instance as 3rd argument to  the `FirewallContext` constructor 
+ * Passing a `FirewallConfig` instance as 3rd argument to  the `FirewallContext` constructor
    now throws a `\TypeError`, pass a `LogoutListener` instance instead.
- * The `security.authentication.trust_resolver.anonymous_class` parameter has been removed. 
- * The `security.authentication.trust_resolver.rememberme_class` parameter has been removed. 
+ * The `security.authentication.trust_resolver.anonymous_class` parameter has been removed.
+ * The `security.authentication.trust_resolver.rememberme_class` parameter has been removed.
 
 Translation
 -----------

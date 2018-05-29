@@ -466,6 +466,21 @@ class MessengerPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid middleware "foo_middleware": class "stdClass" must implement interface "Symfony\Component\Messenger\Middleware\MiddlewareInterface".
+     */
+    public function testCannotRegistersAnUnawaredMiddleware()
+    {
+        $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
+        $container->register('foo_middleware', \stdClass::class);
+        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', array(
+            array('id' => 'foo_middleware', 'arguments' => array()),
+        ));
+
+        (new MessengerPass())->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Invalid middleware factory "not_an_abstract_definition": a middleware factory must be an abstract definition.
      */
     public function testMiddlewareFactoryDefinitionMustBeAbstract()

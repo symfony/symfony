@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class CachePoolsTest extends WebTestCase
@@ -94,6 +95,25 @@ class CachePoolsTest extends WebTestCase
 
         $item = $pool2->getItem($key);
         $this->assertTrue($item->isHit());
+
+        $prefix = "\0".TagAwareAdapter::class."\0";
+        $pool4 = $container->get('cache.pool4');
+        $this->assertInstanceof(TagAwareAdapter::class, $pool4);
+        $pool4 = (array) $pool4;
+        $this->assertSame($pool4[$prefix.'pool'], $pool4[$prefix.'tags'] ?? $pool4['tags']);
+
+        $pool5 = $container->get('cache.pool5');
+        $this->assertInstanceof(TagAwareAdapter::class, $pool5);
+        $pool5 = (array) $pool5;
+        $this->assertSame($pool2, $pool5[$prefix.'tags'] ?? $pool5['tags']);
+
+        $pool6 = $container->get('cache.pool6');
+        $this->assertInstanceof(TagAwareAdapter::class, $pool6);
+        $pool6 = (array) $pool6;
+        $this->assertSame($pool4[$prefix.'pool'], $pool6[$prefix.'tags'] ?? $pool6['tags']);
+
+        $pool7 = $container->get('cache.pool7');
+        $this->assertNotInstanceof(TagAwareAdapter::class, $pool7);
     }
 
     protected static function createKernel(array $options = array())

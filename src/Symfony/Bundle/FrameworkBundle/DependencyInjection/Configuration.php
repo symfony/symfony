@@ -870,6 +870,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('adapter')->defaultValue('cache.app')->end()
+                                    ->scalarNode('tags')->defaultNull()->end()
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->integerNode('default_lifetime')->end()
                                     ->scalarNode('provider')

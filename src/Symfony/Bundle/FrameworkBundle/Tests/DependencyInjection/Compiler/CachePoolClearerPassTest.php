@@ -39,6 +39,11 @@ class CachePoolClearerPassTest extends TestCase
         $publicPool->addTag('cache.pool', array('clearer' => 'clearer_alias'));
         $container->setDefinition('public.pool', $publicPool);
 
+        $publicPool = new Definition();
+        $publicPool->addArgument('namespace');
+        $publicPool->addTag('cache.pool', array('clearer' => 'clearer_alias', 'name' => 'pool2'));
+        $container->setDefinition('public.pool2', $publicPool);
+
         $privatePool = new Definition();
         $privatePool->setPublic(false);
         $privatePool->addArgument('namespace');
@@ -55,7 +60,11 @@ class CachePoolClearerPassTest extends TestCase
             $pass->process($container);
         }
 
-        $this->assertEquals(array(array('public.pool' => new Reference('public.pool'))), $clearer->getArguments());
-        $this->assertEquals(array(array('public.pool' => new Reference('public.pool'))), $globalClearer->getArguments());
+        $expected = array(array(
+            'public.pool' => new Reference('public.pool'),
+            'pool2' => new Reference('public.pool2'),
+        ));
+        $this->assertEquals($expected, $clearer->getArguments());
+        $this->assertEquals($expected, $globalClearer->getArguments());
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * Allowed configuring taggable cache pools via a new `framework.cache.pools.tags` option (bool|service-id)
+
 4.1.0
 -----
 

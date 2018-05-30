@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by upyx at 2018-05-15T10:18:32Z
+
+Oh... Tests failed in 4.0 branch :worried:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-15T10:34:51Z
+
+That's for branch 3.4 I suppose, the bug is there also, isn't it?
+
+---------------------------------------------------------------------------
+
+by upyx at 2018-05-15T13:54:22Z
+
+@chalasr you've renamed PR. Should I change commit description?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-05-16T08:48:05Z
+
+@upyx you can, but not a requirement (the rest of the message is precise enough to not care). The reasoning behind the title change is that this change impacts FrameworkBundle only, and we use the title PR as merge commit message.
+
+---------------------------------------------------------------------------
+
+by upyx at 2018-05-16T10:23:19Z
+
+I've rebased commit on head of 3.4. Tests was broken by merging 2.8 into 3.4.

@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\WebProfilerBundle;
 
+use Symfony\Bundle\WebProfilerBundle\DependencyInjection\Compiler\RemoveInvalidDefinitionsPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -20,4 +22,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class WebProfilerBundle extends Bundle
 {
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new RemoveInvalidDefinitionsPass());
+    }
 }

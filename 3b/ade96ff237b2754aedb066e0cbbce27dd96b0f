@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-24T08:37:54Z
+
+New features should target master (aka 4.2)!
+
+---------------------------------------------------------------------------
+
+by vyshkant at 2018-04-24T11:02:43Z
+
+> New features should target master (aka 4.2)!
+
+@nicolas-grekas So I have to add a message to `CHANGELOG.md` under 4.2.0 section (not under 4.1.0)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-24T11:08:21Z
+
+> add a message to CHANGELOG.md under 4.2.0 section
+
+yes please
+
+---------------------------------------------------------------------------
+
+by vyshkant at 2018-04-24T14:17:16Z
+
+Does anybody have any idea why AppVeyor build has been failed?

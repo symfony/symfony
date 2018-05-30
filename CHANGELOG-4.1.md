@@ -7,6 +7,11 @@ in 4.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.1.0...v4.1.1
 
+* 4.1.0 (2018-05-30)
+
+ * bug #27420 Revert "feature #26702 Mark ExceptionInterfaces throwable (ostrolucky)" (nicolas-grekas)
+ * bug #27415 Insert correct parameter_bag service in AbstractController (curry684)
+
 * 4.1.0-BETA3 (2018-05-26)
 
  * bug #27388 [Routing] Account for greediness when merging route patterns (nicolas-grekas)

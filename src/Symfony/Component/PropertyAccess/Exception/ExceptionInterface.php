@@ -16,6 +16,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface ExceptionInterface extends \Throwable
+interface ExceptionInterface
 {
 }

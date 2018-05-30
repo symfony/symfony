@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ProxyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
@@ -115,5 +116,16 @@ class AbstractNormalizerTest extends TestCase
         $this->assertInstanceOf(StaticConstructorDummy::class, $dummy);
         $this->assertEquals('baz', $dummy->quz);
         $this->assertNull($dummy->foo);
+    }
+
+    /**
+     * @requires PHP 7.1
+     */
+    public function testObjectWithNullableConstructorArgument()
+    {
+        $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize(array('foo' => null), NullableConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
     }
 }

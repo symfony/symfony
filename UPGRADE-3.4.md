@@ -344,6 +344,9 @@ Security
 
  * The `GuardAuthenticatorInterface` has been deprecated and will be removed in 4.0.
    Use `AuthenticatorInterface` instead.
+   
+ * When extending `AbstractGuardAuthenticator` it's deprecated to return `null` from `getCredentials()`.
+   Return `false` from `supports()` if no credentials available.
 
 SecurityBundle
 --------------

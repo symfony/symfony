@@ -47,6 +47,7 @@ class InlineFragmentRendererTest extends TestCase
         $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en'));
         $subRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
         $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+        $subRequest->server->set('REMOTE_ADDR', '1.1.1.1');
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($subRequest));
 
@@ -99,7 +100,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         Request::setTrustedProxies(array(), 0);
 
-        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest(Request::create('/')));
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest(Request::create('/', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '1.1.1.1'))));
         $this->assertSame('foo', $strategy->render('/', Request::create('/'))->getContent());
 
         Request::setTrustedProxies(array(), -1);
@@ -187,6 +188,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
+        $expectedSubRequest->server->set('REMOTE_ADDR', '1.1.1.1');
 
         if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
             $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
@@ -211,7 +213,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest()
     {
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = Request::create('/', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '1.1.1.1'));
         if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
             $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
             $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');

@@ -77,6 +77,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.guard'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, $authenticatorReferences);
+        $listener->addMethodCall('setSessionAuthenticationStrategy', array(new Reference('security.authentication.session_strategy.'.$id)));
 
         // determine the entryPointId to use
         $entryPointId = $this->determineEntryPoint($defaultEntryPoint, $config);

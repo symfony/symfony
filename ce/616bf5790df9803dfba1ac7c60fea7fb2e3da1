@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-05-30T02:18:05Z
+
+Can you add a test to make sure we won't have any regressions in the future?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-30T06:56:12Z
+
+@fabpot added a pure regression guard on all subscribed services.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-30T08:53:01Z
+
+Changed test as discussed with @nicolas-grekas on Slack.

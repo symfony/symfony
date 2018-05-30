@@ -634,10 +634,6 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // addAllowedTypes()
-    ////////////////////////////////////////////////////////////////////////////
-
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */

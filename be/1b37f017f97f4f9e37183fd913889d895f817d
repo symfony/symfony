@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by plozmun at 2018-05-30T06:30:58Z
+
+Shouldn't it be the WebProfilerBundle composer instead TwigBundle? It's referencing itself

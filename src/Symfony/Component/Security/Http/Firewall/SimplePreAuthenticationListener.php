@@ -87,8 +87,6 @@ class SimplePreAuthenticationListener implements ListenerInterface
 
             $token = $this->authenticationManager->authenticate($token);
 
-            $this->migrateSession($request);
-
             $this->tokenStorage->setToken($token);
 
             if (null !== $this->dispatcher) {
@@ -122,17 +120,5 @@ class SimplePreAuthenticationListener implements ListenerInterface
                 throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null or a Response object', get_class($this->simpleAuthenticator)));
             }
         }
-    }
-
-    private function migrateSession(Request $request)
-    {
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
-            return;
-        }
-
-        // Destroying the old session is broken in php 5.4.0 - 5.4.10
-        // See https://bugs.php.net/63379
-        $destroy = \PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411;
-        $request->getSession()->migrate($destroy);
     }
 }

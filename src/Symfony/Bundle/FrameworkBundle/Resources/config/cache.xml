@@ -126,9 +126,8 @@
         <service id="cache.global_clearer" parent="cache.default_clearer" public="true" />
         <service id="cache.app_clearer" alias="cache.default_clearer" public="true" />
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" />
-        <service id="Symfony\Component\Cache\TaggableCacheInterface" alias="cache.app.taggable" />
         <service id="Psr\SimpleCache\CacheInterface" alias="cache.app.simple" />
         <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="cache.app" />
-        <service id="Symfony\Component\Cache\CacheInterface" alias="cache.app" />
+        <service id="Symfony\Component\Cache\CacheInterface" alias="cache.app.taggable" />
     </services>
 </container>

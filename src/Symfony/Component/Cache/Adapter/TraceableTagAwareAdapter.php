@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\TaggableCacheInterface;
+use Symfony\Component\Cache\CacheInterface;
 
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class TraceableTagAwareAdapter extends TraceableAdapter implements TaggableCacheInterface, TagAwareAdapterInterface
+class TraceableTagAwareAdapter extends TraceableAdapter implements CacheInterface, TagAwareAdapterInterface
 {
     public function __construct(TagAwareAdapterInterface $pool)
     {

@@ -33,7 +33,7 @@ class MongoDbStore implements StoreInterface
 
     /**
      * @param \MongoDB\Client $mongo
-     * @param array $options
+     * @param array           $options
      *
      * database:    The name of the database [required]
      * collection:  The name of the collection [default: lock]
@@ -53,11 +53,10 @@ class MongoDbStore implements StoreInterface
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
      *
      * Please note, the Symfony\Component\Lock\Key's $resource
-     * must not exceed 1024 bytes including structual overhead.
-     *
+     * must not exceed 1024 bytes including structural overhead.
      * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      *
-     * @param float $initialTtl The expiration delay of locks in seconds
+     * @param float           $initialTtl The expiration delay of locks in seconds
      */
     public function __construct(\MongoDB\Client $mongo, array $options, float $initialTtl = 300.0)
     {

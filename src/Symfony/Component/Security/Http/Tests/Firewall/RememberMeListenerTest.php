@@ -145,6 +145,43 @@ class RememberMeListenerTest extends TestCase
         $listener->handle($event);
     }
 
+    public function testOnCoreSecurityAuthenticationExceptionDuringAutoLoginTriggersLoginFail()
+    {
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
+
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null))
+        ;
+
+        $exception = new AuthenticationException('Authentication failed.');
+        $service
+            ->expects($this->once())
+            ->method('autoLogin')
+            ->will($this->throwException($exception))
+        ;
+
+        $service
+            ->expects($this->once())
+            ->method('loginFail')
+        ;
+
+        $manager
+            ->expects($this->never())
+            ->method('authenticate')
+        ;
+
+        $event = $this->getGetResponseEvent();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue(new Request()))
+        ;
+
+        $listener->handle($event);
+    }
+
     public function testOnCoreSecurity()
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();

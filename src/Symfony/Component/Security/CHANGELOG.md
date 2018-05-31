@@ -30,7 +30,7 @@ CHANGELOG
 
  * Added `getUser`, `getToken` and `isGranted` methods to `Security`.
  * added a `setToken()` method to the `SwitchUserEvent` class to allow to replace the created token while switching users
-   when custom token generation is required by application. 
+   when custom token generation is required by application.
  * Using voters that do not implement the `VoterInterface`is now deprecated in
    the `AccessDecisionManager` and this functionality will be removed in 4.0.
  * Using the `ContextListener` without setting the `logoutOnUserChange`
@@ -40,6 +40,8 @@ CHANGELOG
  * deprecated HTTP digest authentication
  * Added a new password encoder for the Argon2i hashing algorithm
  * deprecated `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * deprecated to return `null` from `getCredentials()` in classes that extend
+   `AbstractGuardAuthenticator`. Return `false` from `supports()` instead.
 
 3.3.0
 -----

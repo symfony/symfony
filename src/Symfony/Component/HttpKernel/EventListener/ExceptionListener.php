@@ -36,13 +36,15 @@ class ExceptionListener implements EventSubscriberInterface
     protected $logger;
     protected $debug;
     private $charset;
+    private $fileLinkFormat;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, $charset = null)
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false, $charset = null, $fileLinkFormat = null)
     {
         $this->controller = $controller;
         $this->logger = $logger;
         $this->debug = $debug;
         $this->charset = $charset;
+        $this->fileLinkFormat = $fileLinkFormat;
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
@@ -130,7 +132,7 @@ class ExceptionListener implements EventSubscriberInterface
         $attributes = array(
             'exception' => $exception = FlattenException::create($exception),
             '_controller' => $this->controller ?: function () use ($exception) {
-                $handler = new ExceptionHandler($this->debug, $this->charset);
+                $handler = new ExceptionHandler($this->debug, $this->charset, $this->fileLinkFormat);
 
                 return new Response($handler->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders());
             },

@@ -1153,12 +1153,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer'));
     }
 
-    public function testPropertyInfoDisabled()
-    {
-        $container = $this->createContainerFromFile('default_config');
-        $this->assertFalse($container->has('property_info'));
-    }
-
     public function testPropertyInfoEnabled()
     {
         $container = $this->createContainerFromFile('property_info');

@@ -24,6 +24,32 @@ class AbstractControllerTest extends ControllerTraitTest
         return new TestAbstractController();
     }
 
+    /**
+     * This test protects the default subscribed core services against accidental modification.
+     */
+    public function testSubscribedServices()
+    {
+        $subscribed = AbstractController::getSubscribedServices();
+        $expectedServices = array(
+            'router' => '?Symfony\\Component\\Routing\\RouterInterface',
+            'request_stack' => '?Symfony\\Component\\HttpFoundation\\RequestStack',
+            'http_kernel' => '?Symfony\\Component\\HttpKernel\\HttpKernelInterface',
+            'serializer' => '?Symfony\\Component\\Serializer\\SerializerInterface',
+            'session' => '?Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
+            'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
+            'templating' => '?Symfony\\Component\\Templating\\EngineInterface',
+            'twig' => '?Twig\\Environment',
+            'doctrine' => '?Doctrine\\Common\\Persistence\\ManagerRegistry',
+            'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',
+            'parameter_bag' => '?Symfony\\Component\\DependencyInjection\\ParameterBag\\ContainerBagInterface',
+            'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
+            'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
+            'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
+        );
+
+        $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
+    }
+
     public function testGetParameter()
     {
         $container = new Container(new FrozenParameterBag(array('foo' => 'bar')));

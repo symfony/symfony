@@ -21,7 +21,6 @@ class RequestTest extends TestCase
 {
     protected function tearDown()
     {
-        // reset
         Request::setTrustedProxies(array(), -1);
         Request::setTrustedHosts(array());
     }

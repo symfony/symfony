@@ -349,6 +349,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
+                    if (null === $parameterData && $constructorParameter->allowsNull()) {
+                        $params[] = null;
+                        // Don't run set for a parameter passed to the constructor
+                        unset($data[$key]);
+                        continue;
+                    }
                     try {
                         if (null !== $constructorParameter->getClass()) {
                             if (!$this->serializer instanceof DenormalizerInterface) {

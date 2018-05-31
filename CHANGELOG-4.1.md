@@ -7,6 +7,35 @@ in 4.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.1.0...v4.1.1
 
+* 4.1.0 (2018-05-30)
+
+ * bug #27420 Revert "feature #26702 Mark ExceptionInterfaces throwable (ostrolucky)" (nicolas-grekas)
+ * bug #27415 Insert correct parameter_bag service in AbstractController (curry684)
+
+* 4.1.0-BETA3 (2018-05-26)
+
+ * bug #27388 [Routing] Account for greediness when merging route patterns (nicolas-grekas)
+ * bug #27344 [HttpKernel] reset kernel start time on reboot (kiler129)
+ * bug #27365 [Serializer] Check the value of enable_max_depth if defined (dunglas)
+ * bug #27358 [PhpUnitBridge] silence some stderr outputs (ostrolucky)
+ * bug #27366 [DI] never inline lazy services (nicolas-grekas)
+ * bug #27352 Remove reference to the test container after kernel shutdown (stof)
+ * bug #27350 [HttpKernel] fix deprecation in AbstractTestSessionListener (alekitto)
+ * bug #27367 [FrameworkBundle] cleanup generated test container (nicolas-grekas)
+ * bug #27379 [FrameworkBundle] Fix using test.service_container when Client is rebooted (nicolas-grekas)
+ * bug #27364 [DI] Fix bad exception on uninitialized references to non-shared services (nicolas-grekas)
+ * bug #27359 [HttpFoundation] Fix perf issue during MimeTypeGuesser intialization (nicolas-grekas)
+ * security #cve-2018-11408 [SecurityBundle] Fail if security.http_utils cannot be configured
+ * security #cve-2018-11406 clear CSRF tokens when the user is logged out
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11385 Adding session authentication strategy to Guard to avoid session fixation
+ * security #cve-2018-11385 Adding session strategy to ALL listeners to avoid *any* possible fixation
+ * security #cve-2018-11386 [HttpFoundation] Break infinite loop in PdoSessionHandler when MySQL is in loose mode
+ * bug #27341 [WebProfilerBundle] Fixed validator/dump trace CSS (yceruto)
+ * bug #27337  [FrameworkBundle] fix typo in CacheClearCommand (emilielorenzo)
+ * bug #27292 [Serializer] Fix and improve constraintViolationListNormalizer's RFC7807 compliance (dunglas)
+
 * 4.1.0-BETA2 (2018-05-21)
 
  * bug #27312 Supress deprecation notices thrown when getting private servies from container in tests (arderyp)

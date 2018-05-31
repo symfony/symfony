@@ -35,22 +35,27 @@ class MongoDbStore implements StoreInterface
      * @param \MongoDB\Client $mongo
      * @param array           $options
      *
-     * database:    The name of the database [required]
-     * collection:  The name of the collection [default: lock]
+     * database:        The name of the database [required]
+     * collection:      The name of the collection [default: lock]
+     * drift:           Seconds to extend expiries to account for clock discrepancies [default: 0.0]
+     *
+     * Please be aware, MongoDbStore relies on clock syncronisation between
+     * the application nodes and mongodb servers. The drift option can be used
+     * to extend expiries to account for clock discrepancies.
      *
      * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
-     * Please be aware any clock drift between the application and mongo servers could
-     * cause locks to be released prematurely. To account for any drift;
-     * expireAfterSeconds can be set to a value higher than 0. The logical expiry of
-     * locks is handled by the application so setting a higher ``expireAfterSeconds``
-     * has no effect other than keeping stale data for longer.
+     *
      *
      *     db.lock.ensureIndex(
      *         { "expires_at": 1 },
-     *         { "expireAfterSeconds": 60 }
+     *         { "expireAfterSeconds": 0 }
      *     )
      *
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
+     *
+     * writeConcern, readConcern and readPreference are not specified by MongoDbStore
+     * meaning the collection's settings will take effect.
+     * @see https://docs.mongodb.com/manual/applications/replication/
      *
      * Please note, the Symfony\Component\Lock\Key's $resource
      * must not exceed 1024 bytes including structural overhead.
@@ -70,7 +75,14 @@ class MongoDbStore implements StoreInterface
 
         $this->options = array_merge(array(
             'collection' => 'lock',
+            'drift' => 0.0,
         ), $options);
+
+        if (!is_numeric($this->options['drift'])) {
+            throw new InvalidArgumentException(
+                'The "drift" option must be numeric (number of seconds)'
+            );
+        }
 
         $this->initialTtl = $initialTtl;
     }
@@ -81,7 +93,7 @@ class MongoDbStore implements StoreInterface
     public function save(Key $key)
     {
         $now = microtime(true);
-        $expiry = $this->createDateTime($now + $this->initialTtl);
+        $expiry = $this->createDateTime($now + $this->initialTtl + $this->options['drift']);
         $token = $this->getToken($key);
 
         $filter = array(
@@ -138,7 +150,7 @@ class MongoDbStore implements StoreInterface
     public function putOffExpiration(Key $key, $ttl)
     {
         $now = microtime(true);
-        $expiry = $this->createDateTime($now + $ttl);
+        $expiry = $this->createDateTime($now + $ttl + $this->options['drift']);
 
         $filter = array(
             '_id' => (string) $key,
@@ -186,7 +198,9 @@ class MongoDbStore implements StoreInterface
             'token' => $this->getToken($key),
         );
 
-        $this->getCollection()->deleteOne($filter);
+        $options = array();
+
+        $this->getCollection()->deleteOne($filter, $options);
     }
 
     /**
@@ -196,6 +210,7 @@ class MongoDbStore implements StoreInterface
     {
         $filter = array(
             '_id' => (string) $key,
+            'token' => $this->getToken($key),
             'expires_at' => array(
                 '$gte' => $this->createDateTime(),
             ),
@@ -203,7 +218,7 @@ class MongoDbStore implements StoreInterface
 
         $doc = $this->getCollection()->findOne($filter);
 
-        return $doc && $doc['token'] === $this->getToken($key);
+        return null !== $doc;
     }
 
     private function getCollection(): \MongoDB\Collection

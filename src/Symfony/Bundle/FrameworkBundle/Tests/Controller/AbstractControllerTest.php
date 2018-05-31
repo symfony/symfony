@@ -52,19 +52,31 @@ class AbstractControllerTest extends ControllerTraitTest
 
     public function testGetParameter()
     {
+        if (!class_exists(ContainerBag::class)) {
+            $this->markTestSkipped('ContainerBag class does not exist');
+        }
+
         $container = new Container(new FrozenParameterBag(array('foo' => 'bar')));
+        $container->set('parameter_bag', new ContainerBag($container));
 
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        if (!class_exists(ContainerBag::class)) {
-            $this->expectException(\LogicException::class);
-            $this->expectExceptionMessage('The "parameter_bag" service is not available. Try running "composer require dependency-injection:^4.1"');
-        } else {
-            $container->set('parameter_bag', new ContainerBag($container));
-        }
-
         $this->assertSame('bar', $controller->getParameter('foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage TestAbstractController::getParameter()" method is missing a parameter bag
+     */
+    public function testMissingParameterBag()
+    {
+        $container = new Container();
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $controller->getParameter('foo');
     }
 }
 

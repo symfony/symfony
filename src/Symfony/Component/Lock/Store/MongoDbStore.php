@@ -56,7 +56,7 @@ class MongoDbStore implements StoreInterface
      * must not exceed 1024 bytes including structural overhead.
      * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      *
-     * @param float           $initialTtl The expiration delay of locks in seconds
+     * @param float $initialTtl The expiration delay of locks in seconds
      */
     public function __construct(\MongoDB\Client $mongo, array $options, float $initialTtl = 300.0)
     {

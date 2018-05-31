@@ -65,14 +65,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name)
     {
         if (!$this->container->has('parameter_bag')) {
-            $message = 'The "parameter_bag" service could not be located. ';
-            if (!interface_exists(ContainerBagInterface::class)) {
-                $message .= 'Upgrade symfony/dependency-injection to at least 4.1.0 to have it injected automatically.';
-            } else {
-                $message .= 'Ensure that the controller is either set to be autoconfigured or wired manually to inject it.';
-            }
-
-            throw new ServiceNotFoundException('parameter_bag', null, null, array(), $message);
+            throw new ServiceNotFoundException('parameter_bag', null, null, array(),
+                'The "parameter_bag" service could not be located. Ensure that the controller is either set ' .
+                'to be autoconfigured or wired manually to inject it.');
         }
 
         return $this->container->get('parameter_bag')->get($name);

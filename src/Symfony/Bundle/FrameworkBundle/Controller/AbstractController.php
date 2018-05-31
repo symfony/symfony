@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Psr\Container\ContainerInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -64,7 +65,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name)
     {
         if (!$this->container->has('parameter_bag')) {
-            throw new \LogicException('The "parameter_bag" service is not available. Try running "composer require dependency-injection:^4.1"');
+            throw new ServiceNotFoundException('parameter_bag', null, null, array(),
+                'The "parameter_bag" service could not be located. Ensure that symfony/dependency-injection 4.1.0 or higher '.
+                'is installed and that the controller is either set to be autoconfigured or wired manually to inject it');
         }
 
         return $this->container->get('parameter_bag')->get($name);

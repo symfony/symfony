@@ -28,20 +28,20 @@ class MongoDbStore implements StoreInterface
 {
     private $mongo;
     private $options;
-    private $initialTtl;
     private $collection;
 
     /**
      * @param \MongoDB\Client $mongo
      * @param array           $options
      *
-     * database:        The name of the database [required]
-     * collection:      The name of the collection [default: lock]
-     * drift:           Seconds to extend expiries to account for clock discrepancies [default: 0.0]
+     * database:    The name of the database [required]
+     * collection:  The name of the collection [default: lock]
+     * initialTtl:  The expiration delay of locks in seconds [default: 300.0]
      *
-     * Please be aware, MongoDbStore relies on clock syncronisation between
-     * the application nodes and mongodb servers. The drift option can be used
-     * to extend expiries to account for clock discrepancies.
+     * CAUTION: This store relies on all client and server nodes to have
+     * synchronized clocks for lock expiry to occur at the correct time.
+     * To ensure locks don't expire prematurely; the ttl's should be set with enough
+     * extra time to account for any clock drift between nodes.
      *
      * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
      *
@@ -59,10 +59,8 @@ class MongoDbStore implements StoreInterface
      * Please note, the Symfony\Component\Lock\Key's $resource
      * must not exceed 1024 bytes including structural overhead.
      * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
-     *
-     * @param float $initialTtl The expiration delay of locks in seconds
      */
-    public function __construct(\MongoDB\Client $mongo, array $options, float $initialTtl = 300.0)
+    public function __construct(\MongoDB\Client $mongo, array $options)
     {
         if (!isset($options['database'])) {
             throw new InvalidArgumentException(
@@ -74,16 +72,8 @@ class MongoDbStore implements StoreInterface
 
         $this->options = array_merge(array(
             'collection' => 'lock',
-            'drift' => 0.0,
+            'initialTtl' => 300.0,
         ), $options);
-
-        if (!is_numeric($this->options['drift'])) {
-            throw new InvalidArgumentException(
-                'The "drift" option must be numeric (number of seconds)'
-            );
-        }
-
-        $this->initialTtl = $initialTtl;
     }
 
     /**
@@ -91,9 +81,8 @@ class MongoDbStore implements StoreInterface
      */
     public function save(Key $key)
     {
-        $now = microtime(true);
-        $expiry = $this->createDateTime($now + $this->initialTtl + $this->options['drift']);
         $token = $this->getToken($key);
+        $now = microtime(true);
 
         $filter = array(
             '_id' => (string) $key,
@@ -113,7 +102,7 @@ class MongoDbStore implements StoreInterface
             '$set' => array(
                 '_id' => (string) $key,
                 'token' => $token,
-                'expires_at' => $expiry,
+                'expires_at' => $this->createDateTime($now + $this->options['initialTtl']),
             ),
         );
 
@@ -121,7 +110,7 @@ class MongoDbStore implements StoreInterface
             'upsert' => true,
         );
 
-        $key->reduceLifetime($this->initialTtl);
+        $key->reduceLifetime($this->options['initialTtl']);
         try {
             $this->getCollection()->updateOne($filter, $update, $options);
         } catch (\MongoDB\Driver\Exception\WriteException $e) {
@@ -149,7 +138,6 @@ class MongoDbStore implements StoreInterface
     public function putOffExpiration(Key $key, $ttl)
     {
         $now = microtime(true);
-        $expiry = $this->createDateTime($now + $ttl + $this->options['drift']);
 
         $filter = array(
             '_id' => (string) $key,
@@ -162,7 +150,7 @@ class MongoDbStore implements StoreInterface
         $update = array(
             '$set' => array(
                 '_id' => (string) $key,
-                'expires_at' => $expiry,
+                'expires_at' => $this->createDateTime($now + $ttl),
             ),
         );
 

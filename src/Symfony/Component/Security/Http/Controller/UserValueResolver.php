@@ -35,7 +35,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
     public function supports(Request $request, ArgumentMetadata $argument)
     {
         // only security user implementations are supported
-        if (UserInterface::class !== $argument->getType()) {
+        if (!$argument->getType() || !$this->implementsCorrectInterface($argument->getType())) {
             return false;
         }
 
@@ -53,5 +53,15 @@ final class UserValueResolver implements ArgumentValueResolverInterface
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
         yield $this->tokenStorage->getToken()->getUser();
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    private function implementsCorrectInterface($type)
+    {
+        return UserInterface::class === $type || array_key_exists(UserInterface::class, class_implements($type));
     }
 }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-22T18:07:29Z
+
+Very nice. Though I think it should be on `master` as it's a new feature :)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-23T08:37:19Z
+
+This looks nice :heart_eyes: can the same be be done for regular dispatcher?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-23T09:11:47Z
+
+@ostrolucky : Theoretically yes of course, but in practice there are usually (perhaps not that much) more regular events dispatched than messages, so this may have a significant performances impact on dev. I remember trying to do the same for the translations panel but the perfs decrease was too much important for the benefits. We could give a try anyway.
+
+@sroze : Could still go to 4.1 to me as it completes the first PR improving the panel and changes are almost only additions, small and easy to test (and code is extracted from the validator panel). But of course you're right and there is no urge. So, your call :)

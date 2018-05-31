@@ -78,7 +78,7 @@ class ExpressionLanguage
         return $this->parse(
             $expression,
             array_keys(
-                $values instanceof \Traversable
+                $values instanceof \ArrayObject
                     ? iterator_to_array($values)
                     : $values
             )

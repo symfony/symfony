@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-29T13:49:33Z
+
+Should we tell about any corresponding deprecation in UPGRADE-3.4.md also?
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-29T13:52:31Z
+
+I'm not sure why you would to upgrade 3.4 also but to me it's pretty fine to enhance the upgrade document only for 4.0
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-29T19:47:13Z
+
+This should be merged on branch 3.4, where we advertise for changes needed to prepare for 4.0.
+I'm surprised there is no corresponding changes on UPGRADE-3.4.md. Could anyone have a look?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-30T09:37:47Z
+
+So, following the link in the description gives the answer: the depreciation should be advertised in UPGRADE-3.4.md for sure.
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-30T09:41:30Z
+
+I'm still not sure as this is deprecated since 3.4 so I should not care *unless* upgrading to 4.
+However if that's the practice followed here, I'll be happy to change the base of this PR, _just let me know_.
+After this I'll change what @iltar reviewed in order to make the docs consistent.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-30T09:44:33Z
+
+I do confirm this should be on 3.4 :)
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-30T09:59:14Z
+
+@nicolas-grekas I've changed the PR base branch
+@iltar I've fixed what you've requested
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-30T10:00:28Z
+
+Thank you @DonCallisto
+Can you please also update UPGRADE-3.4.md?
+I invite you to compare both files (4.0 and 3.4) to figure out what I'm talking about since my first comment :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-30T10:02:06Z
+
+And `src/Symfony/Component/Security/CHANGELOG.md` also should be updated BTW!
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-30T10:02:38Z
+
+Ok, thank you for this advices. I'll take a look at them ASAP.
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-30T11:15:03Z
+
+@nicolas-grekas updated. Please check if fits well and let me know if anything else has to be changed.
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-30T12:06:58Z
+
+Now it's hopefully fine
+
+---------------------------------------------------------------------------
+
+by DonCallisto at 2018-05-31T07:30:01Z
+
+@fabpot fixed

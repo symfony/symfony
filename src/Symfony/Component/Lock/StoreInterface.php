@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock;
 
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 
 /**
@@ -25,6 +26,7 @@ interface StoreInterface
      * Stores the resource if it's not locked by someone else.
      *
      * @throws LockConflictedException
+     * @throws LockExpiredException
      */
     public function save(Key $key);
 
@@ -34,6 +36,7 @@ interface StoreInterface
      * If the store does not support this feature it should throw a NotSupportedException.
      *
      * @throws LockConflictedException
+     * @throws LockExpiredException
      * @throws NotSupportedException
      */
     public function waitAndSave(Key $key);
@@ -46,6 +49,7 @@ interface StoreInterface
      * @param float $ttl amount of second to keep the lock in the store
      *
      * @throws LockConflictedException
+     * @throws LockExpiredException
      * @throws NotSupportedException
      */
     public function putOffExpiration(Key $key, $ttl);

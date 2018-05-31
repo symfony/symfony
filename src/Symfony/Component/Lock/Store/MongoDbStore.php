@@ -14,6 +14,8 @@ namespace Symfony\Component\Lock\Store;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
+use Symfony\Component\Lock\Exception\LockStorageException;
+use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
@@ -31,34 +33,36 @@ class MongoDbStore implements StoreInterface
 
     /**
      * @param \MongoDB\Client $mongo
-     * @param array           $options
+     * @param array $options
      *
-     * database: The name of the database [required]
-     * collection: The name of the collection [default: lock]
-     * resource_field: The field name for storing the lock id [default: _id] MUST be uniquely indexed if you chage it
-     * token_field: The field name for storing the lock token [default: token]
-     * acquired_field: The field name for storing the acquisition timestamp [default: acquired_at]
-     * expiry_field: The field name for storing the expiry-timestamp [default: expires_at].
+     * database:    The name of the database [required]
+     * collection:  The name of the collection [default: lock]
      *
-     * It is strongly recommended to put an index on the `expiry_field` for
-     * garbage-collection. Alternatively it's possible to automatically expire
-     * the locks in the database as described below:
+     * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
+     * Please be aware any clock drift between the application and mongo servers could
+     * cause locks to be released prematurely. To account for any drift;
+     * expireAfterSeconds can be set to a value higher than 0. The logical expiry of
+     * locks is handled by the application so setting a higher ``expireAfterSeconds``
+     * has no effect other than keeping stale data for longer.
      *
-     * A TTL collections can be used on MongoDB 2.2+ to cleanup expired locks
-     * automatically. Such an index can for example look like this:
-     *
-     *     db.<session-collection>.ensureIndex(
-     *         { "<expiry-field>": 1 },
-     *         { "expireAfterSeconds": 0 }
+     *     db.lock.ensureIndex(
+     *         { "expires_at": 1 },
+     *         { "expireAfterSeconds": 60 }
      *     )
      *
-     * More details on: http://docs.mongodb.org/manual/tutorial/expire-data/
+     * @see http://docs.mongodb.org/manual/tutorial/expire-data/
+     *
+     * Please note, the Symfony\Component\Lock\Key's $resource
+     * must not exceed 1024 bytes including structual overhead.
+     *
+     * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
+     *
      * @param float $initialTtl The expiration delay of locks in seconds
      */
-    public function __construct(\MongoDB\Client $mongo, array $options = array(), float $initialTtl = 300.0)
+    public function __construct(\MongoDB\Client $mongo, array $options, float $initialTtl = 300.0)
     {
         if (!isset($options['database'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'You must provide the "database" option for MongoDBStore'
             );
         }
@@ -67,10 +71,6 @@ class MongoDbStore implements StoreInterface
 
         $this->options = array_merge(array(
             'collection' => 'lock',
-            'resource_field' => '_id',
-            'token_field' => 'token',
-            'acquired_field' => 'acquired_at',
-            'expiry_field' => 'expires_at',
         ), $options);
 
         $this->initialTtl = $initialTtl;
@@ -78,38 +78,22 @@ class MongoDbStore implements StoreInterface
 
     /**
      * {@inheritdoc}
-     *
-     * db.lock.update(
-     *     {
-     *         _id: "test",
-     *         expires_at: {
-     *             $lte : new Date()
-     *         }
-     *     },
-     *     {
-     *         _id: "test",
-     *         token: {# unique token #},
-     *         acquired: new Date(),
-     *         expires_at: new Date({# now + ttl #})
-     *     },
-     *     {
-     *         upsert: 1
-     *     }
-     * );
      */
     public function save(Key $key)
     {
-        $expiry = $this->createDateTime(microtime(true) + $this->initialTtl);
+        $now = microtime(true);
+        $expiry = $this->createDateTime($now + $this->initialTtl);
+        $token = $this->getToken($key);
 
         $filter = array(
-            $this->options['resource_field'] => (string) $key,
+            '_id' => (string) $key,
             '$or' => array(
                 array(
-                    $this->options['token_field'] => $this->getToken($key),
+                    'token' => $token,
                 ),
                 array(
-                    $this->options['expiry_field'] => array(
-                        '$lte' => $this->createDateTime(),
+                    'expires_at' => array(
+                        '$lte' => $this->createDateTime($now),
                     ),
                 ),
             ),
@@ -117,10 +101,9 @@ class MongoDbStore implements StoreInterface
 
         $update = array(
             '$set' => array(
-                $this->options['resource_field'] => (string) $key,
-                $this->options['token_field'] => $this->getToken($key),
-                $this->options['acquired_field'] => $this->createDateTime(),
-                $this->options['expiry_field'] => $expiry,
+                '_id' => (string) $key,
+                'token' => $token,
+                'expires_at' => $expiry,
             ),
         );
 
@@ -131,8 +114,10 @@ class MongoDbStore implements StoreInterface
         $key->reduceLifetime($this->initialTtl);
         try {
             $this->getCollection()->updateOne($filter, $update, $options);
-        } catch (\MongoDB\Driver\Exception\BulkWriteException $e) {
+        } catch (\MongoDB\Driver\Exception\WriteException $e) {
             throw new LockConflictedException('Failed to acquire lock', 0, $e);
+        } catch (\Exception $e) {
+            throw new LockStorageException($e->getMessage(), 0, $e);
         }
 
         if ($key->isExpired()) {
@@ -142,7 +127,7 @@ class MongoDbStore implements StoreInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new InvalidArgumentException(sprintf(
+        throw new NotSupportedException(sprintf(
             'The store "%s" does not supports blocking locks.',
             __CLASS__
         ));
@@ -150,40 +135,24 @@ class MongoDbStore implements StoreInterface
 
     /**
      * {@inheritdoc}
-     *
-     * db.lock.update(
-     *     {
-     *         _id: "test",
-     *         token: {# unique token #},
-     *         expires_at: {
-     *             $gte : new Date()
-     *         }
-     *     },
-     *     {
-     *         _id: "test",
-     *         expires_at: new Date({# now + ttl #})
-     *     },
-     *     {
-     *         upsert: 1
-     *     }
-     * );
      */
     public function putOffExpiration(Key $key, $ttl)
     {
-        $expiry = $this->createDateTime(microtime(true) + $ttl);
+        $now = microtime(true);
+        $expiry = $this->createDateTime($now + $ttl);
 
         $filter = array(
-            $this->options['resource_field'] => (string) $key,
-            $this->options['token_field'] => $this->getToken($key),
-            $this->options['expiry_field'] => array(
-                '$gte' => $this->createDateTime(),
+            '_id' => (string) $key,
+            'token' => $this->getToken($key),
+            'expires_at' => array(
+                '$gte' => $this->createDateTime($now),
             ),
         );
 
         $update = array(
             '$set' => array(
-                $this->options['resource_field'] => (string) $key,
-                $this->options['expiry_field'] => $expiry,
+                '_id' => (string) $key,
+                'expires_at' => $expiry,
             ),
         );
 
@@ -194,8 +163,10 @@ class MongoDbStore implements StoreInterface
         $key->reduceLifetime($ttl);
         try {
             $this->getCollection()->updateOne($filter, $update, $options);
-        } catch (\MongoDB\Driver\Exception\BulkWriteException $e) {
+        } catch (\MongoDB\Driver\Exception\WriteException $e) {
             throw new LockConflictedException('Failed to put off the expiration of the lock', 0, $e);
+        } catch (\Exception $e) {
+            throw new LockStorageException($e->getMessage(), 0, $e);
         }
 
         if ($key->isExpired()) {
@@ -208,40 +179,25 @@ class MongoDbStore implements StoreInterface
 
     /**
      * {@inheritdoc}
-     *
-     * db.lock.remove({
-     *     _id: "test"
-     * });
      */
     public function delete(Key $key)
     {
         $filter = array(
-            $this->options['resource_field'] => (string) $key,
-            $this->options['token_field'] => $this->getToken($key),
+            '_id' => (string) $key,
+            'token' => $this->getToken($key),
         );
 
-        try {
-            $result = $this->getCollection()->deleteOne($filter);
-        } catch (\MongoDB\Driver\Exception\BulkWriteException $e) {
-            throw new LockConflictedException('Failed to delete lock', 0, $e);
-        }
+        $this->getCollection()->deleteOne($filter);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * db.lock.find({
-     *     _id: "test",
-     *     expires_at: {
-     *         $gte : new Date()
-     *     }
-     * });
      */
     public function exists(Key $key)
     {
         $filter = array(
-            $this->options['resource_field'] => (string) $key,
-            $this->options['expiry_field'] => array(
+            '_id' => (string) $key,
+            'expires_at' => array(
                 '$gte' => $this->createDateTime(),
             ),
         );

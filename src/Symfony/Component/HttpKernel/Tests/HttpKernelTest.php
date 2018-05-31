@@ -349,6 +349,8 @@ class HttpKernelTest extends TestCase
 
         $kernel = $this->getHttpKernel($dispatcher);
         $kernel->handle($request, $kernel::MASTER_REQUEST, false);
+
+        Request::setTrustedProxies(array(), -1);
     }
 
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = array())

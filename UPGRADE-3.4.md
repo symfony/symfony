@@ -344,7 +344,7 @@ Security
 
  * The `GuardAuthenticatorInterface` has been deprecated and will be removed in 4.0.
    Use `AuthenticatorInterface` instead.
-   
+
  * When extending `AbstractGuardAuthenticator` it's deprecated to return `null` from `getCredentials()`.
    Return `false` from `supports()` if no credentials available.
 
@@ -413,13 +413,13 @@ TwigBridge
 
  * deprecated the `Symfony\Bridge\Twig\Form\TwigRenderer` class, use the `FormRenderer`
    class from the Form component instead
-   
-    * the service `twig.form.renderer` is now an instance of `FormRenderer`. 
-      So you might have to adjust your type-hints to `FormRendererInterface` if you are still relying on 
+
+    * the service `twig.form.renderer` is now an instance of `FormRenderer`.
+      So you might have to adjust your type-hints to `FormRendererInterface` if you are still relying on
       the `TwigRendererInterface` which was deprecated in Symfony 3.2
-      
-    * retrieving the Renderer runtime from the twig environment via 
-      `$twig->getRuntime('Symfony\Bridge\Twig\Form\TwigRenderer')` is not working anymore 
+
+    * retrieving the Renderer runtime from the twig environment via
+      `$twig->getRuntime('Symfony\Bridge\Twig\Form\TwigRenderer')` is not working anymore
        and should be replaced with `$twig->getRuntime('Symfony\Component\Form\FormRenderer')` instead
 
  * deprecated `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability

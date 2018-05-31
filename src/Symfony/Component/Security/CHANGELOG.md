@@ -16,6 +16,8 @@ CHANGELOG
  * deprecated HTTP digest authentication
  * Added a new password encoder for the Argon2i hashing algorithm
  * deprecated `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * deprecated to return `null` from `getCredentials()` in classes that extend 
+   `AbstractGuardAuthenticator`. Return `false` from `supports()` instead.
 
 3.3.0
 -----

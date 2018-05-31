@@ -75,7 +75,14 @@ class ExpressionLanguage
      */
     public function evaluate($expression, $values = array())
     {
-        return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
+        return $this->parse(
+            $expression,
+            array_keys(
+                $values instanceof \ArrayObject
+                    ? iterator_to_array($values)
+                    : $values
+            )
+        )->getNodes()->evaluate($this->functions, $values);
     }
 
     /**

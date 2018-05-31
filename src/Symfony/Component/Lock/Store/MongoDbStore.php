@@ -45,7 +45,6 @@ class MongoDbStore implements StoreInterface
      *
      * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
      *
-     *
      *     db.lock.ensureIndex(
      *         { "expires_at": 1 },
      *         { "expireAfterSeconds": 0 }

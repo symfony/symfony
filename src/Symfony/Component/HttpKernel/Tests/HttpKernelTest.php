@@ -291,6 +291,8 @@ class HttpKernelTest extends TestCase
         $request->headers->set('X_FORWARDED_FOR', '3.3.3.3');
 
         $kernel->handle($request, $kernel::MASTER_REQUEST, false);
+
+        Request::setTrustedProxies(array());
     }
 
     protected function getResolver($controller = null)

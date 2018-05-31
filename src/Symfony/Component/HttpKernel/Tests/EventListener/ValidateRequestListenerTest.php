@@ -21,6 +21,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ValidateRequestListenerTest extends TestCase
 {
+    protected function tearDown()
+    {
+        Request::setTrustedProxies(array());
+    }
+
     /**
      * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
      */

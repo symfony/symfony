@@ -20,6 +20,7 @@ class RequestTest extends TestCase
 {
     protected function tearDown()
     {
+        Request::setTrustedProxies(array());
         Request::setTrustedHosts(array());
     }
 
@@ -750,8 +751,6 @@ class RequestTest extends TestCase
         ));
         $port = $request->getPort();
         $this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
-
-        Request::setTrustedProxies(array());
     }
 
     /**
@@ -827,8 +826,6 @@ class RequestTest extends TestCase
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
         $this->assertEquals($expected[0], $request->getClientIp());
-
-        Request::setTrustedProxies(array());
     }
 
     /**
@@ -839,8 +836,6 @@ class RequestTest extends TestCase
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
         $this->assertEquals($expected, $request->getClientIps());
-
-        Request::setTrustedProxies(array());
     }
 
     /**
@@ -851,8 +846,6 @@ class RequestTest extends TestCase
         $request = $this->getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies);
 
         $this->assertEquals($expected, $request->getClientIps());
-
-        Request::setTrustedProxies(array());
     }
 
     public function getClientIpsForwardedProvider()
@@ -974,8 +967,6 @@ class RequestTest extends TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $clientIps = $request->getClientIps();
-
-        Request::setTrustedProxies(array());
 
         $this->assertSame($expectedIps, $clientIps);
     }

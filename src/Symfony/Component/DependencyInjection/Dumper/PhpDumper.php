@@ -1809,12 +1809,15 @@ EOF;
 
     private function isSingleUsePrivateNode(ServiceReferenceGraphNode $node): bool
     {
-        if ($node->getValue()->isPublic()) {
+        if (!$node->getValue() || $node->getValue()->isPublic()) {
             return false;
         }
         $ids = array();
         foreach ($node->getInEdges() as $edge) {
-            if ($edge->isLazy() || !$edge->getSourceNode()->getValue()->isShared()) {
+            if (!$value = $edge->getSourceNode()->getValue()) {
+                continue;
+            }
+            if ($edge->isLazy() || !$value->isShared()) {
                 return false;
             }
             $ids[$edge->getSourceNode()->getId()] = true;

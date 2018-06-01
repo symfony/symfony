@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Allowed configuring taggable cache pools via a new `framework.cache.pools.tags` option (bool|service-id)
+ * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead
 
 4.1.0
 -----

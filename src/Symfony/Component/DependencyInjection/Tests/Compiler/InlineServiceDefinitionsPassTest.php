@@ -157,11 +157,11 @@ class InlineServiceDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $baz1 = $container->getDefinition('foo')->getArgument(0)->getArgument(0);
-        $baz2 = $container->getDefinition('foo')->getArgument(1)->getArgument(0);
+        $baz1 = $container->getDefinition('foo')->getArgument(0)->getArgument(0)->clearTag('container.inlined');
+        $baz2 = $container->getDefinition('foo')->getArgument(1)->getArgument(0)->clearTag('container.inlined');
 
-        $this->assertEquals($container->getDefinition('baz'), $baz1);
-        $this->assertEquals($container->getDefinition('baz'), $baz2);
+        $this->assertEquals($container->getDefinition('baz')->clearTag('container.inlined'), $baz1);
+        $this->assertEquals($container->getDefinition('baz')->clearTag('container.inlined'), $baz2);
         $this->assertNotSame($baz1, $baz2);
     }
 

@@ -16,4 +16,4 @@ services:
     decorated:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\StdClassDecorator
         public: true
-        arguments: [!service { class: stdClass, public: false }]
+        arguments: [!service { class: stdClass, public: false, tags: [{ name: container.inlined }] }]

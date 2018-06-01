@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
@@ -211,7 +212,7 @@ trait MemcachedTrait
      */
     protected function doFetch(array $ids)
     {
-        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', PhpSerializer::class.'::handleUnserializeCallback');
         try {
             $encodedIds = array_map('rawurlencode', $ids);
 
@@ -223,8 +224,6 @@ trait MemcachedTrait
             }
 
             return $result;
-        } catch (\Error $e) {
-            throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         } finally {
             ini_set('unserialize_callback_func', $unserializeCallbackHandler);
         }

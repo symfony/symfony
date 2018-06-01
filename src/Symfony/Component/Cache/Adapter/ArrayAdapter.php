@@ -15,6 +15,8 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Serializer\IdentitySerializer;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
 use Symfony\Component\Cache\Traits\GetTrait;
@@ -35,7 +37,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
      */
     public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
-        $this->storeSerialized = $storeSerialized;
+        $this->setSerializer($storeSerialized ? new PhpSerializer() : new IdentitySerializer());
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
@@ -60,13 +62,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         try {
             if (!$isHit) {
                 $this->values[$key] = $value = null;
-            } elseif (!$this->storeSerialized) {
-                $value = $this->values[$key];
-            } elseif ('b:0;' === $value = $this->values[$key]) {
-                $value = false;
-            } elseif (false === $value = unserialize($value)) {
-                $this->values[$key] = $value = null;
-                $isHit = false;
+            } else {
+                $value = $this->unserialize($this->values[$key]);
             }
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));
@@ -120,15 +117,13 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
             return true;
         }
-        if ($this->storeSerialized) {
-            try {
-                $value = serialize($value);
-            } catch (\Exception $e) {
-                $type = is_object($value) ? get_class($value) : gettype($value);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
+        try {
+            $value = $this->serialize($value);
+        } catch (\Exception $e) {
+            $type = is_object($value) ? get_class($value) : gettype($value);
+            CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
 
-                return false;
-            }
+            return false;
         }
         if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
             $expiry = microtime(true) + $item["\0*\0defaultLifetime"];

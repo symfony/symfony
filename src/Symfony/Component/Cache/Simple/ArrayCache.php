@@ -15,6 +15,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Serializer\IdentitySerializer;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
 
@@ -37,7 +39,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
     public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
         $this->defaultLifetime = $defaultLifetime;
-        $this->storeSerialized = $storeSerialized;
+        $this->setSerializer($storeSerialized ? new PhpSerializer() : new IdentitySerializer());
     }
 
     /**
@@ -109,16 +111,14 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         if (false === $ttl = $this->normalizeTtl($ttl)) {
             return $this->deleteMultiple(array_keys($valuesArray));
         }
-        if ($this->storeSerialized) {
-            foreach ($valuesArray as $key => $value) {
-                try {
-                    $valuesArray[$key] = serialize($value);
-                } catch (\Exception $e) {
-                    $type = is_object($value) ? get_class($value) : gettype($value);
-                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
+        foreach ($valuesArray as $key => $value) {
+            try {
+                $valuesArray[$key] = $this->serialize($value);
+            } catch (\Exception $e) {
+                $type = is_object($value) ? get_class($value) : gettype($value);
+                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
 
-                    return false;
-                }
+                return false;
             }
         }
         $expiry = 0 < $ttl ? microtime(true) + $ttl : PHP_INT_MAX;

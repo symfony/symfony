@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 
 /**
  * @author Piotr Stankowski <git@trakos.pl>
@@ -89,7 +90,7 @@ trait PhpFilesTrait
             if ('N;' === $value) {
                 $values[$id] = null;
             } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                $values[$id] = parent::unserialize($value);
+                $values[$id] = $this->unserialize($value);
             }
         }
 
@@ -118,7 +119,7 @@ trait PhpFilesTrait
                 $value = serialize($value);
             } elseif (\is_array($value)) {
                 $serialized = serialize($value);
-                $unserialized = parent::unserialize($serialized);
+                $unserialized = $this->unserialize($serialized);
                 // Store arrays serialized if they contain any objects or references
                 if ($unserialized !== $value || (false !== strpos($serialized, ';R:') && preg_match('/;R:[1-9]/', $serialized))) {
                     $value = $serialized;
@@ -156,5 +157,32 @@ trait PhpFilesTrait
         }
 
         return @unlink($file);
+    }
+
+    /**
+     * Like the native unserialize() function but throws an exception if anything goes wrong.
+     *
+     * @param string $value
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    protected function unserialize($serialized)
+    {
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', PhpSerializer::class.'::handleUnserializeCallback');
+        try {
+            if ('b:0;' === $serialized) {
+                return false;
+            } elseif (false === $value = unserialize($serialized)) {
+                throw new CacheException('failed to unserialize value');
+            }
+
+            return $value;
+        } catch (\Error $e) {
+            throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+        } finally {
+            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
+        }
     }
 }

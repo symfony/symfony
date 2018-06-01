@@ -202,33 +202,6 @@ trait AbstractTrait
         $this->ids = array();
     }
 
-    /**
-     * Like the native unserialize() function but throws an exception if anything goes wrong.
-     *
-     * @param string $value
-     *
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    protected static function unserialize($value)
-    {
-        if ('b:0;' === $value) {
-            return false;
-        }
-        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
-        try {
-            if (false !== $value = unserialize($value)) {
-                return $value;
-            }
-            throw new \DomainException('Failed to unserialize cached value');
-        } catch (\Error $e) {
-            throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
-        } finally {
-            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
-        }
-    }
-
     private function getId($key)
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
@@ -254,13 +227,5 @@ trait AbstractTrait
         }
 
         return $id;
-    }
-
-    /**
-     * @internal
-     */
-    public static function handleUnserializeCallback($class)
-    {
-        throw new \DomainException('Class not found: '.$class);
     }
 }

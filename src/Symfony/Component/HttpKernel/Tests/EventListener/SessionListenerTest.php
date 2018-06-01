@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -58,8 +59,7 @@ class SessionListenerTest extends TestCase
     public function testResponseIsPrivate()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->once())->method('isStarted')->willReturn(false);
-        $session->expects($this->once())->method('hasBeenStarted')->willReturn(true);
+        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('session', $session);
@@ -70,6 +70,40 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $response = new Response();
         $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+    }
+
+    public function testSurrogateMasterRequestIsPublic()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->expects($this->exactly(4))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1, 1, 1));
+
+        $container = new Container();
+        $container->set('session', $session);
+
+        $listener = new SessionListener($container);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $request = new Request();
+        $response = new Response();
+        $response->setCache(array('public' => true, 'max_age' => '30'));
+        $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $this->assertTrue($request->hasSession());
+
+        $subRequest = clone $request;
+        $this->assertSame($request->getSession(), $subRequest->getSession());
+        $listener->onKernelRequest(new GetResponseEvent($kernel, $subRequest, HttpKernelInterface::MASTER_REQUEST));
+        $listener->onKernelResponse(new FilterResponseEvent($kernel, $subRequest, HttpKernelInterface::MASTER_REQUEST, $response));
+        $listener->onFinishRequest(new FinishRequestEvent($kernel, $subRequest, HttpKernelInterface::MASTER_REQUEST));
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertSame('30', $response->headers->getCacheControlDirective('max-age'));
+
         $listener->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
 
         $this->assertTrue($response->headers->hasCacheControlDirective('private'));

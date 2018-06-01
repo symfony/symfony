@@ -66,8 +66,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     {
         if (!$this->container->has('parameter_bag')) {
             throw new ServiceNotFoundException('parameter_bag', null, null, array(),
-                'The "parameter_bag" service could not be located. Ensure that the controller is either set '.
-                'to be autoconfigured or wired manually to inject it.');
+                sprintf('The "getParameter()" method of the controller can\'t get the value of the "%s" parameter because the "parameter_bag" service could not be located. Either enable autoconfigure for the controller service or inject a ServiceLocator referencing a "parameter_bag" service manually in the controller.', $name));
         }
 
         return $this->container->get('parameter_bag')->get($name);

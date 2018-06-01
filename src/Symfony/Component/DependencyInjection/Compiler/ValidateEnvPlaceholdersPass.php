@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -42,21 +41,20 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             return;
         }
 
-        $defaultBag = new ParameterBag($container->getParameterBag()->all());
+        $defaultBag = new ParameterBag($resolvingBag->all());
         $envTypes = $resolvingBag->getProvidedTypes();
         try {
             foreach ($resolvingBag->getEnvPlaceholders() + $resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
-                $prefix = (false === $i = strpos($env, ':')) ? 'string' : substr($env, 0, $i);
-                $types = $envTypes[$prefix] ?? array('string');
-                $default = ($hasEnv = (false === $i && $defaultBag->has("env($env)"))) ? $defaultBag->get("env($env)") : null;
-
-                if (null !== $default && !in_array($type = self::getType($default), $types, true)) {
-                    throw new LogicException(sprintf('Invalid type for env parameter "env(%s)". Expected "%s", but got "%s".', $env, implode('", "', $types), $type));
-                }
-
                 $values = array();
-                foreach ($types as $type) {
-                    $values[$type] = $hasEnv ? $default : self::$typeFixtures[$type] ?? null;
+                if (false === $i = strpos($env, ':')) {
+                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : null;
+                    $defaultType = null !== $default ? self::getType($default) : 'string';
+                    $values[$defaultType] = $default;
+                } else {
+                    $prefix = substr($env, 0, $i);
+                    foreach ($envTypes[$prefix] ?? array('string') as $type) {
+                        $values[$type] = self::$typeFixtures[$type] ?? null;
+                    }
                 }
                 foreach ($placeholders as $placeholder) {
                     BaseNode::setPlaceholder($placeholder, $values);

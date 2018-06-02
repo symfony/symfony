@@ -26,10 +26,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('debug');
+        $treeBuilder = new TreeBuilder('debug');
 
-        $rootNode
+        $treeBuilder->getRootNode()
             ->children()
                 ->integerNode('max_items')
                     ->info('Max number of displayed items past the first level, -1 means no limit')

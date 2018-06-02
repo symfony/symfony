@@ -6,6 +6,11 @@ Cache
 
  * Deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
 
+Config
+------
+
+ * Deprecated constructing a `TreeBuilder` without passing root node information.
+
 Security
 --------
 

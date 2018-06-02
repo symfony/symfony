@@ -223,6 +223,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    /**
+     * @group legacy
+     */
     public function testConfigurationWithoutRootNode(): void
     {
         $container = new ContainerBuilder();
@@ -246,9 +249,8 @@ class EnvConfiguration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('env_extension');
-        $rootNode
+        $treeBuilder = new TreeBuilder('env_extension');
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('scalar_node')->end()
                 ->scalarNode('scalar_node_not_empty')->cannotBeEmpty()->end()

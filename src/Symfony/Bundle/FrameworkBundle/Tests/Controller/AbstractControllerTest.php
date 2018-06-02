@@ -67,7 +67,7 @@ class AbstractControllerTest extends ControllerTraitTest
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage The "getParameter()" method of the controller can't get the value of the "foo" parameter
+     * @expectedExceptionMessage TestAbstractController::getParameter()" method is missing a parameter bag
      */
     public function testMissingParameterBag()
     {

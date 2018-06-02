@@ -65,8 +65,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name)
     {
         if (!$this->container->has('parameter_bag')) {
-            throw new ServiceNotFoundException('parameter_bag', null, null, array(),
-                sprintf('The "getParameter()" method of the controller can\'t get the value of the "%s" parameter because the "parameter_bag" service could not be located. Either enable autoconfigure for the controller service or inject a ServiceLocator referencing a "parameter_bag" service manually in the controller.', $name));
+            throw new ServiceNotFoundException('parameter_bag', null, null, array(), sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', get_class($this)));
         }
 
         return $this->container->get('parameter_bag')->get($name);

@@ -507,33 +507,19 @@ abstract class BaseNode implements NodeInterface
         return $value;
     }
 
-    private static function getType($value): string
-    {
-        switch ($type = \gettype($value)) {
-            case 'boolean':
-                return 'bool';
-            case 'double':
-                return 'float';
-            case 'integer':
-                return 'int';
-        }
-
-        return $type;
-    }
-
     private function doValidateType($value): void
     {
-        if (null === $this->handlingPlaceholder || null === $value) {
-            $this->validateType($value);
-
-            return;
-        }
-
-        if (!$this->allowPlaceholders()) {
+        if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
             $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', get_class($this), $this->getPath()));
             $e->setPath($this->getPath());
 
             throw $e;
+        }
+
+        if (null === $this->handlingPlaceholder || null === $value) {
+            $this->validateType($value);
+
+            return;
         }
 
         $knownTypes = array_keys(self::$placeholders[$this->handlingPlaceholder]);

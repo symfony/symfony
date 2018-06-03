@@ -22,31 +22,31 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ValidateEnvPlaceholdersPassTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Invalid type for env parameter "env(FOO)". Expected "string", but got "bool".
-     */
-    public function testDefaultEnvIsValidatedByType()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('env(FOO)', true);
-        $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
-            'scalar_node' => '%env(FOO)%',
-        ));
-
-        $this->doProcess($container);
-    }
-
     public function testEnvsAreValidatedInConfig()
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
+        $container->setParameter('env(FLOATISH)', 3.2);
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = array(
             'scalar_node' => '%env(NULLED)%',
+            'scalar_node_not_empty' => '%env(FLOATISH)%',
             'int_node' => '%env(int:FOO)%',
             'float_node' => '%env(float:BAR)%',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
+    public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FLOATISH)', 3.2);
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
+            'float_node' => '%env(FLOATISH)%',
         ));
 
         $this->doProcess($container);

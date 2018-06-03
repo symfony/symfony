@@ -106,6 +106,7 @@ trait ControllerTrait
                 }
             }
         }
+
         return new RedirectResponse($url, $status);
     }
 

@@ -70,6 +70,7 @@ class PhpDumper extends Dumper
     private $inlinedRequires = array();
     private $circularReferences = array();
     private $singleUsePrivateIds = array();
+    private $addThrow = false;
 
     /**
      * @var ProxyDumper
@@ -125,6 +126,7 @@ class PhpDumper extends Dumper
             'build_time' => time(),
         ), $options);
 
+        $this->addThrow = false;
         $this->namespace = $options['namespace'];
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
@@ -556,10 +558,13 @@ EOTXT
 
     private function isTrivialInstance(Definition $definition): bool
     {
+        if ($definition->getErrors()) {
+            return true;
+        }
         if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
             return false;
         }
-        if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < count($definition->getArguments()) || $definition->getErrors()) {
+        if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < count($definition->getArguments())) {
             return false;
         }
 
@@ -1318,6 +1323,18 @@ EOF;
 
     private function endClass(): string
     {
+        if ($this->addThrow) {
+            return <<<'EOF'
+
+    protected function throw($message)
+    {
+        throw new RuntimeException($message);
+    }
+}
+
+EOF;
+        }
+
         return <<<'EOF'
 }
 
@@ -1525,6 +1542,11 @@ EOF;
                 list($this->definitionVariables, $this->referenceVariables, $this->variableCount) = $scope;
             }
         } elseif ($value instanceof Definition) {
+            if ($e = $value->getErrors()) {
+                $this->addThrow = true;
+
+                return sprintf('$this->throw(%s)', $this->export(reset($e)));
+            }
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables[$value], $interpolate);
             }
@@ -1670,6 +1692,11 @@ EOF;
                     return $code;
                 }
             } elseif ($this->isTrivialInstance($definition)) {
+                if ($e = $definition->getErrors()) {
+                    $this->addThrow = true;
+
+                    return sprintf('$this->throw(%s)', $this->export(reset($e)));
+                }
                 $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
                 if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
                     $code = sprintf('$this->%s[\'%s\'] = %s', $definition->isPublic() ? 'services' : 'privates', $id, $code);

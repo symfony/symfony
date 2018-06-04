@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-02T14:52:13Z
+
+I have pushed the changes @nicolas-grekas and I have discussed and updated the PR description. If this looks good, I'll add some tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T15:23:06Z
+
+Looks good to me :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-05-02T15:40:41Z
+
+Even if the implementation is good, I don't like this feature.
+It adds another way of doing things without really reducing the line of code needed.
+
+And this is going to be accepted, it will needs some tests
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T23:31:00Z
+
+@lyrixx I didn't like autowiring first. Now I like it. Might be the same for you here. About tests, we agree, see mentions of it above :) Another way of doing things? For sure, but there is a huge benefit for DX: enabling autocompletion (as described in linked issue #23898). And this doesn't leak to the outside world: it stays a pure implementation detail. Definitely worth it IMHO.
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-10T14:48:16Z
+
+I added a happy path test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-10T18:09:19Z
+
+Would be nice to have a few more test cases covering:
+- that methods from parents are ignored
+- that methods from children are ignored
+- that parent getSubscribedServices/setContainer methods are called
+
+Otherwise, it looks great to me, thank you!
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-10T18:45:42Z
+
+I have added the requested tests.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-05-28T12:15:50Z
+
+Just one question, insteand of writing `return $this->service(__CLASS__, __FUNCTION__);`,
+Can't we play with the backtrace to get `__CLASS__, __FUNCTION__` Automatically ?
+Or at least `__METHOD__` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-28T12:52:21Z
+
+> can't we play with the backtrace to get `__CLASS__`, `__FUNCTION__`
+
+this is a runtime call, that'd be too slow
+
+> least `__METHOD__`
+
+we discussed about it in https://github.com/symfony/symfony/pull/27077#discussion_r184783829
+
+actually, I think removing the "service" helper might be nice.
+Ppl would have to write `$this->container->get(__METHOD__)` instead of the current `$this->service(__CLASS__, __FUNCTION__)`. I like it because it means one less indirection. For traits authors, they'd have to write `$this->container->get(__CLASS__.'::'.__FUNCTION__)`. But their pb I think, that's a small overhead for an uncommon case.
+
+@kbond ok for you?
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-30T20:33:35Z
+
+My only hesitation is it makes creating composable traits (which I think/hope will not be uncommon) not as intuitive. I can see people putting `$this->container->get(__METHOD__)` in their trait methods and being confused as to why it isn't working - I was.
+
+That being said, if composable traits aren't common, it is easier to do `$this->container->get(__METHOD__)`.
+
+Seems prudent to keep it simple now and add a `service()` helper later if it becomes problematic. I will update the PR.
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-05-31T13:18:47Z
+
+I removed the `service()` method and updated docs and this PR description.

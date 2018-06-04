@@ -1,0 +1,148 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-31T16:04:04Z
+
+Would you agree making this error message more verbose to give more context?
+
+Original:
+
+```
+The "parameter_bag" service could not be located. Ensure that the controller is
+either set to be autoconfigured or wired manually to inject it.
+```
+
+Proposal:
+
+```php
+sprintf('The "getParameter()" method of the controller can\'t get the value of
+the "%s" parameter because the "parameter_bag" service could not be located.
+Either enable autowiring for the controller or inject the "parameter_bag"
+service manually in the controller.', $name);
+```
+
+My concern with the current message is that the user wrote `$this->getParameter('foo')` and the error message is about something strange called `parameter_bag` that the user didn't use anywhere in their code.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-05-31T17:14:34Z
+
+You’re right - I missed that. I like your message more :)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-31T17:43:19Z
+
+@javiereguiluz that suggestion is wrong on 2 counts: first off [autowiring won't fix it](https://github.com/symfony/symfony/issues/27436#issuecomment-393528545), it needs autoconfigure. Secondly injecting `parameter_bag`  into the controller manually won't work as it has to be in whatever is in `$this->container`, effectively meaning you need to have a `ServiceLocator` or make the `parameter_bag` service public, both of which are unfeasible for end-user developers not at home in DI innards.
+
+In practice autoconfigure is the only viable solution to the problem. Realizing that makes you second guess whether this generic feature was a good idea to begin with even though autoconfigure+autowire is now *recommended* config - it's still not *required*.
+
+edit: out of the box thinking - shouldn't we just rock hard fail somewhere at compile-time if an AbstractController is used but doesn't get its ServiceLocator injected in any way? I suspect the missing `parameter_bag` is just the first and smallest of issues one would run into (most subscribed services in its list are private).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-31T17:58:55Z
+
+> autoconfigure+autowire is now recommended config - it's still not required.
+
+that's still the case, autoconfiguration+autowiring is not the only way to define a service locator for a service subscriber. Using the `container.service_subscriber` tag + its attributes are the really low level way to handle this configuration.
+
+Of course in practice, esp. for AbstractController, it's still the most common way to configure them, so that the message is OK mentioning these imho.
+
+> shouldn't we just rock hard fail somewhere at compile-time if an AbstractController is used but doesn't get its ServiceLocator injected in any way
+
+what would be the criteria? from the inside of the class, all service locators look the same :)
+and at compile time, it's just a service subscriber. So yes, we could remove a few "?" in front of types returned by getSubscribedServices, but that's not possible for optional deps, and all are here. For AbstractControllers, because of the special way they are handled, I'm not sure we can do anything, do we?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-31T20:46:14Z
+
+> the really low level way to handle this configuration
+
+Which makes it "unfeasible for end-user developers" like I said and only realistic for those that do not really require better DX in error messages like that in the first place.
+
+> For AbstractControllers, because of the special way they are handled, I'm not sure we can do anything, do we?
+
+There's multiple things we could do actually. Reviewing the default subscriptions quickly we have 5 that could (should?) lose the optional as they're direct dependencies of FrameworkBundle:
+```
+yes 'router' => '?'.RouterInterface::class,
+yes 'request_stack' => '?'.RequestStack::class,
+yes 'http_kernel' => '?'.HttpKernelInterface::class,
+no  'serializer' => '?'.SerializerInterface::class,
+yes 'session' => '?'.SessionInterface::class,
+no  'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
+no  'templating' => '?'.EngineInterface::class,
+no  'twig' => '?'.Environment::class,
+no  'doctrine' => '?'.ManagerRegistry::class,
+no  'form.factory' => '?'.FormFactoryInterface::class,
+no  'security.token_storage' => '?'.TokenStorageInterface::class,
+no  'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
+yes 'parameter_bag' => '?'.ContainerBagInterface::class,
+no  'message_bus' => '?'.MessageBusInterface::class,
+```
+This automatically makes them candidates for a late-phase compiler pass to check integrity - any service that derives from AbstractController can have its `getSubscribedServices` queried, and we can then fail hard at compile-time if any mandatory ones (including user added ones) cannot resolve.
+
+It's the difference between getting "You've screwed up on how to use AbstractController for <10 reasons>" during compiletime for all of them at once, or 10 separate vague errors about missing parameter bags, request stacks and HTTP kernels at runtime.
+
+(actually the compiler pass could generically check all `ServiceSubscriberInterface` implementers for this as at that point we know whether mandatory references can *ever* be resolved on this container, and tell the user to add the `?` in front if it's intentional that we can't find it... but that could potentially be considered a BC break)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-31T20:52:06Z
+
+Meanwhile, how about this for the issue at hand, mainly adapting Javier's suggestion to implementation:
+
+```
+sprintf('The "getParameter()" method of the controller can\'t get the value of
+the "%s" parameter because the "parameter_bag" service could not be located.
+Either enable autoconfigure for the controller service or inject a ServiceLocator
+referencing a "parameter_bag" service manually in the controller.', $name);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-31T21:04:07Z
+
+> 5 that could (should?) lose the optional
+
+Could, but what would we gain doing so? Nothing related to the issue at glance. To which one then? This means "shouldn't" to me :)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-31T21:24:47Z
+
+It's related to the second question: should having a ServiceLocator with a mandatory but undefined reference crash unexpectedly during development or right away at compiletime right after wrongly defining it?
+
+I think for DX it'd be better to fail early, and it'd fix the entire issue at hand ages before we ever got to the `getParameter` function. TS would've been happy to get a *"Controllers deriving from AbstractController must contain a ServiceLocator with valid references to 'router', 'request_stack', 'http_kernel', 'session' and 'parameter_bag' services. Enable autoconfigure for the controller service to handle this automatically"* 30 seconds after upgrading to Symfony 4.1.
+
+It'd even microscopically improve performance as it would mean `getParameter` can just be reduced to `$this->container->get('parameter_bag')->get($parameter)` without needing the runtime check for existence on every call first.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-31T21:39:30Z
+
+But this wouldn't fail at compile time. Or based on *what* criteria would it fail? What would be the trigger to throw this when the issue is precisely that this controller was *not* registered for the compiler pass that looks for building locators for subscribers?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-05-31T22:13:18Z
+
+If we can autoconfigure services that implement `ServiceSubscriberInterface` we can also enumerate them and check that we can resolve what they subscribe to? `AbstractController` implements it so it would automatically be subject to that check.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-01T07:12:03Z
+
+Here is a proposal to fix the DX issue: #27462
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-06-01T22:25:12Z
+
+Good idea, but let's also fix the error message now as it's currently just wrong in 4.1. Just pushed my last proposal merging Javier's suggestion with mine.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-06-03T09:00:39Z
+
+Ah ok, understandable from that perspective.

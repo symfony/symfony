@@ -180,7 +180,7 @@ class ProfilerController
             $this->cspHandler->disableCsp();
         }
 
-        if (null === $session = $request->getSession()) {
+        if (!$request->hasSession()) {
             $ip =
             $method =
             $statusCode =
@@ -190,6 +190,8 @@ class ProfilerController
             $limit =
             $token = null;
         } else {
+            $session = $request->getSession();
+
             $ip = $request->query->get('ip', $session->get('_profiler_search_ip'));
             $method = $request->query->get('method', $session->get('_profiler_search_method'));
             $statusCode = $request->query->get('status_code', $session->get('_profiler_search_status_code'));
@@ -289,7 +291,9 @@ class ProfilerController
         $limit = $request->query->get('limit');
         $token = $request->query->get('token');
 
-        if (null !== $session = $request->getSession()) {
+        if ($request->hasSession()) {
+            $session = $request->getSession();
+
             $session->set('_profiler_search_ip', $ip);
             $session->set('_profiler_search_method', $method);
             $session->set('_profiler_search_status_code', $statusCode);

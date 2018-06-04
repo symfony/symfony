@@ -2096,6 +2096,77 @@ YAML;
 
         return $tests;
     }
+
+    /**
+     * @dataProvider invalidCharacters
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testNotAllowedNonPrintableUnicodeCharactersThatAreNotUtf8AreNotParsed(string $sequence)
+    {
+        $this->parser->parse('foo'.$sequence);
+    }
+
+    public function invalidCharacters(): array
+    {
+        $characters = array();
+
+        // C1 control block
+        for ($c = 0x80; $c <= 0x9F; ++$c) {
+            // NEL (#x85) is allowed
+            if (0x85 === $c) {
+                continue;
+            }
+
+            $characters[] = array(\chr($c));
+        }
+
+        return $characters;
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider legacyInvalidCharacters
+     */
+    public function testParsingNotAllowedNonPrintableCharactersIsDeprecated($char)
+    {
+        $deprecations = array();
+        $prevErrorHandler = set_error_handler(function ($type, $message, $file, $line, $context = array()) use (&$prevErrorHandler, &$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $message;
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($type, $message, $file, $line, $context) : false;
+        });
+
+        try {
+            $this->parser->parse('foo'.$char);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertCount(1, $deprecations);
+        $this->assertStringMatchesFormat('Parsing YAML strings that contain the "%a" unicode sequence is deprecated since Symfony 4.3 and will throw a ParseException in 5.0.', $deprecations[0]);
+    }
+
+    public function legacyInvalidCharacters(): array
+    {
+        $characters = array();
+
+        // C0 control block
+        for ($c = 0; $c <= 0x1F; ++$c) {
+            // TAB (#x9), LF (#xA), and CR (#xD) are allowed
+            if (\in_array($c, array(0x9, 0xA, 0xD), true)) {
+                continue;
+            }
+
+            $characters[] = array(\chr($c));
+        }
+
+        // the DEL character
+        $characters[] = array(\chr(0x7F));
+
+        return $characters;
+    }
 }
 
 class B

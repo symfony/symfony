@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * parsing YAML strings that contain any of the unicode sequences forbidden by the specification is deprecated and
+   will throw a `ParseException` in 5.0
+
 4.2.0
 -----
 

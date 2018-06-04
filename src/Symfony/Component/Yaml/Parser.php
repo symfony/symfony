@@ -160,6 +160,12 @@ class Parser
 
             Inline::initialize($flags, $this->getRealCurrentLineNb(), $this->filename);
 
+            if (preg_match('/([\x00-\x08\x0B-\x0C\x0E-\x1F\x7F])/', $this->currentLine, $matches)) {
+                @trigger_error(sprintf('Parsing YAML strings that contain the "0x%X" unicode sequence is deprecated since Symfony 4.3 and will throw a ParseException in 5.0.', $matches[1]), E_USER_DEPRECATED);
+                // to be thrown in 5.0
+                //throw new ParseException(sprintf('Unexpected character 0x%X', $matches[1]));
+            }
+
             $isRef = $mergeNode = false;
             if ('-' === $this->currentLine[0] && self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#u', rtrim($this->currentLine), $values)) {
                 if ($context && 'mapping' == $context) {

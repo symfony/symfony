@@ -282,3 +282,8 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
+
+Yaml
+----
+
+ * Parsing YAML strings that contain any of the unicode sequences forbidden by the specification throws a `ParseException`.

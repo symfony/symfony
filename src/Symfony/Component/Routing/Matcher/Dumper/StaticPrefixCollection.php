@@ -176,7 +176,7 @@ class StaticPrefixCollection
                     break;
                 }
                 $subPattern = substr($prefix, $i, $j - $i);
-                if ($prefix !== $anotherPrefix && !preg_match('/^\(\[[^\]]++\]\+\+\)$/', $subPattern) && !preg_match('{(?<!'.$subPattern.')}', '')) {
+                if ($prefix !== $anotherPrefix && !preg_match('{(?<!'.$subPattern.')}', '')) {
                     // sub-patterns of variable length are not considered as common prefixes because their greediness would break in-order matching
                     break;
                 }

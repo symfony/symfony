@@ -25,7 +25,7 @@ col-sm-2
         {{ block('fieldset_form_row') }}
     {%- else -%}
     {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
+        {%- if help is defined and help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
         <div class="form-group row{% if (not compound or force_error|default(false)) and not valid %} is-invalid{% endif %}">
@@ -40,7 +40,7 @@ col-sm-2
 
 {% block fieldset_form_row -%}
     {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
+    {%- if help is defined and help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     <fieldset class="form-group">

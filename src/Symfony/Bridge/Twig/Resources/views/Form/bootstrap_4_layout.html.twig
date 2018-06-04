@@ -259,7 +259,7 @@
         {%- set element = 'fieldset' -%}
     {%- endif -%}
     {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
+    {%- if help is defined and help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     <{{ element|default('div') }} class="form-group">
@@ -295,7 +295,7 @@
 {# Help #}
 
 {% block form_help -%}
-    {%- if help is not empty -%}
+    {%- if help is defined and help is not empty -%}
         <small id="{{ id }}_help" class="form-text text-muted">
             {%- if translation_domain is same as(false) -%}
                 {{- help -}}

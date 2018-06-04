@@ -108,7 +108,7 @@
 
 {% block form_row -%}
     {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
+    {%- if help is defined and help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
@@ -176,7 +176,7 @@
 {# Help #}
 
 {% block form_help -%}
-    {%- if help is not empty -%}
+    {%- if help is defined and help is not empty -%}
         <span id="{{ id }}_help" class="help-block">
             {%- if translation_domain is same as(false) -%}
                 {{- help -}}

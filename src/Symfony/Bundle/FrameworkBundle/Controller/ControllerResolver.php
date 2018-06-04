@@ -51,16 +51,22 @@ class ControllerResolver extends ContainerControllerResolver
      */
     protected function instantiateController($class)
     {
-        return $this->configureController(parent::instantiateController($class));
+        return $this->configureController(parent::instantiateController($class), $class);
     }
 
-    private function configureController($controller)
+    private function configureController($controller, string $class)
     {
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }
-        if ($controller instanceof AbstractController && null !== $previousContainer = $controller->setContainer($this->container)) {
-            $controller->setContainer($previousContainer);
+        if ($controller instanceof AbstractController) {
+            if (null === $previousContainer = $controller->setContainer($this->container)) {
+                @trigger_error(sprintf('Auto-injection of the container for "%s" is deprecated since Symfony 4.2. Configure it as a service instead.', $class), E_USER_DEPRECATED);
+                // To be uncommented on Symfony 5:
+                //throw new \LogicException(sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
+            } else {
+                $controller->setContainer($previousContainer);
+            }
         }
 
         return $controller;

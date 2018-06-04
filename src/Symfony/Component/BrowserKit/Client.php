@@ -284,14 +284,16 @@ abstract class Client
     /**
      * Submits a form.
      *
-     * @param Form  $form   A Form instance
-     * @param array $values An array of form field values
+     * @param Form  $form             A Form instance
+     * @param array $values           An array of form field values
+     * @param array $serverParameters An array of server parameters
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = array(), $serverParameters = array())
+    public function submit(Form $form, array $values = array()/*, array $serverParameters = array()*/)
     {
         $form->setValues($values);
+        $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
 
         return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $serverParameters);
     }

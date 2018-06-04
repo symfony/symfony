@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-29T11:36:28Z
+
+@palex-fpt why did you close ?
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-05-29T11:40:58Z
+
+oops. I did not notice it was added to 3.4 milestone. I thought it should be based on 3.4 branch and resubmit it.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-05-29T12:12:42Z
+
+@palex-fpt no need for a new PR, we can switch the target branch while merging, but you can also do it on your side https://blog.github.com/2016-08-15-change-the-base-branch-of-a-pull-request/ (and rebase).

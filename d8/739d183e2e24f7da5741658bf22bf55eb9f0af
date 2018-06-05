@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-03T08:13:24Z
+
+@tarlepp since you reported a slowdown on Slack, can you please try this PR and report any results?
+
+---------------------------------------------------------------------------
+
+by staabm at 2018-06-03T08:18:17Z
+
+The blackfire link in the desc doesnt work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-03T08:24:53Z
+
+@staabm updated thanks.
+
+Note that our test suite is pretty nice on this topic, coverage is pretty great. I also used this patch to compile Blackfire's container, and it produces exactly same output. Confidence is good on my side :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-04T21:11:18Z
+
+Do we need upgrade notes here? This is mostly internal thing IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-05T09:34:36Z
+
+@stof agreed, thanks for the review, comments addressed.

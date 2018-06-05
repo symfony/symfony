@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -222,6 +223,17 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    public function testConfigurationWithoutRootNode(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension(new EnvConfigurationWithoutRootNode()));
+        $container->loadFromExtension('env_extension');
+
+        $this->doProcess($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -267,9 +279,23 @@ class EnvConfiguration implements ConfigurationInterface
     }
 }
 
+class EnvConfigurationWithoutRootNode implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        return new TreeBuilder();
+    }
+}
+
 class EnvExtension extends Extension
 {
+    private $configuration;
     private $config;
+
+    public function __construct(ConfigurationInterface $configuration = null)
+    {
+        $this->configuration = $configuration ?? new EnvConfiguration();
+    }
 
     public function getAlias()
     {
@@ -278,12 +304,16 @@ class EnvExtension extends Extension
 
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        return new EnvConfiguration();
+        return $this->configuration;
     }
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        try {
+            $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        } catch (TreeWithoutRootNodeException $e) {
+            $this->config = null;
+        }
     }
 
     public function getConfig()

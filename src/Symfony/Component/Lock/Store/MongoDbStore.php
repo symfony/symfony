@@ -45,10 +45,12 @@ class MongoDbStore implements StoreInterface
      *
      * writeConcern, readConcern and readPreference are not specified by MongoDbStore
      * meaning the collection's settings will take effect.
+     *
      * @see https://docs.mongodb.com/manual/applications/replication/
      *
      * Please note, the Symfony\Component\Lock\Key's $resource
      * must not exceed 1024 bytes including structural overhead.
+     *
      * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      */
     public function __construct(\MongoDB\Client $mongo, array $options)

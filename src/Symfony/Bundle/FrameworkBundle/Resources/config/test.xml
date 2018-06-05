@@ -16,7 +16,6 @@
             <argument>%test.client.parameters%</argument>
             <argument type="service" id="test.client.history" />
             <argument type="service" id="test.client.cookiejar" />
-            <argument>test.service_container</argument>
         </service>
 
         <service id="test.client.history" class="Symfony\Component\BrowserKit\History" shared="false" />
@@ -36,13 +35,12 @@
         </service>
 
         <service id="test.service_container" class="Symfony\Bundle\FrameworkBundle\Test\TestContainer" public="true">
-            <argument type="service" id="parameter_bag" on-invalid="null" />
-            <argument type="service" id="service_container" />
-            <argument type="service">
-                <service class="Symfony\Component\DependencyInjection\ServiceLocator">
-                    <argument type="collection" />
-                </service>
-            </argument>
+            <argument type="service" id="kernel" />
+            <argument>test.private_services_locator</argument>
+        </service>
+
+        <service id="test.private_services_locator" class="Symfony\Component\DependencyInjection\ServiceLocator" public="true">
+            <argument type="collection" />
         </service>
     </services>
 </container>

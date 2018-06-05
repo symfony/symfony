@@ -22,15 +22,11 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('test.service_container')) {
+        if (!$container->hasDefinition('test.private_services_locator')) {
             return;
         }
 
-        $testContainer = $container->getDefinition('test.service_container');
-        $privateContainer = $testContainer->getArgument(2);
-        if ($privateContainer instanceof Reference) {
-            $privateContainer = $container->getDefinition((string) $privateContainer);
-        }
+        $privateContainer = $container->getDefinition('test.private_services_locator');
         $definitions = $container->getDefinitions();
         $privateServices = $privateContainer->getArgument(0);
 

@@ -55,7 +55,12 @@ class CachePoolClearerPassTest extends TestCase
         $container->setAlias('clearer_alias', 'clearer');
 
         $pass = new RemoveUnusedDefinitionsPass();
-        $pass->setRepeatedPass(new RepeatedPass(array($pass)));
+        foreach ($container->getCompiler()->getPassConfig()->getRemovingPasses() as $removingPass) {
+            if ($removingPass instanceof RepeatedPass) {
+                $pass->setRepeatedPass(new RepeatedPass(array($pass)));
+                break;
+            }
+        }
         foreach (array(new CachePoolPass(), $pass, new CachePoolClearerPass()) as $pass) {
             $pass->process($container);
         }

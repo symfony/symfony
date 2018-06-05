@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,7 +25,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $container
+        $inlineable = $container
             ->register('inlinable.service')
             ->setPublic(false)
         ;
@@ -40,7 +39,8 @@ class InlineServiceDefinitionsPassTest extends TestCase
 
         $arguments = $container->getDefinition('service')->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $arguments[0]);
-        $this->assertSame($container->getDefinition('inlinable.service'), $arguments[0]);
+        $this->assertSame($inlineable, $arguments[0]);
+        $this->assertFalse($container->has('inlinable.service'));
     }
 
     public function testProcessDoesNotInlinesWhenAliasedServiceIsShared()
@@ -70,7 +70,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
             ->register('foo')
             ->setShared(false)
         ;
-        $container
+        $bar = $container
             ->register('bar')
             ->setPublic(false)
             ->setShared(false)
@@ -88,8 +88,9 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertEquals($container->getDefinition('foo'), $arguments[0]);
         $this->assertNotSame($container->getDefinition('foo'), $arguments[0]);
         $this->assertSame($ref, $arguments[1]);
-        $this->assertEquals($container->getDefinition('bar'), $arguments[2]);
-        $this->assertNotSame($container->getDefinition('bar'), $arguments[2]);
+        $this->assertEquals($bar, $arguments[2]);
+        $this->assertNotSame($bar, $arguments[2]);
+        $this->assertFalse($container->has('bar'));
     }
 
     public function testProcessDoesNotInlineMixedServicesLoop()
@@ -327,7 +328,6 @@ class InlineServiceDefinitionsPassTest extends TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));
-        $repeatedPass->process($container);
+        (new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()))->process($container);
     }
 }

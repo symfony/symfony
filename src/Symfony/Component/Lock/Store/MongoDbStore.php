@@ -20,7 +20,8 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
- * MongoDbStore is a StoreInterface implementation using MongoDB as store engine.
+ * MongoDbStore is a StoreInterface implementation using MongoDB as a storage
+ * engine.
  *
  * @author Joe Bennett <joe@assimtech.com>
  */
@@ -42,16 +43,17 @@ class MongoDbStore implements StoreInterface
      * synchronized clocks for lock expiry to occur at the correct time.
      * To ensure locks don't expire prematurely; the lock TTL should be set
      * with enough extra time to account for any clock drift between nodes.
+     * @see self::createTTLIndex()
      *
-     * @see self::createTTLIndex() For more info on creating a TTL index
+     * CAUTION: The locked resouce name is indexed in the ``_id`` field of the
+     * lock collection.
+     * An indexed field's value in MongoDB can be a maximum of 1024 bytes in
+     * length inclusive of structural overhead.
+     * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      *
      * writeConcern, readConcern and readPreference are not specified by
      * MongoDbStore meaning the collection's settings will take effect.
      * @see https://docs.mongodb.com/manual/applications/replication/
-     *
-     * Please note, the Symfony\Component\Lock\Key's $resource
-     * must not exceed 1024 bytes including structural overhead.
-     * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      */
     public function __construct(\MongoDB\Client $mongo, array $options)
     {

@@ -43,13 +43,13 @@ class MongoDbStore implements StoreInterface
      * lock collection.
      * An indexed field's value in MongoDB can be a maximum of 1024 bytes in
      * length inclusive of structural overhead.
+     *
      * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      *
      * CAUTION: This store relies on all client and server nodes to have
      * synchronized clocks for lock expiry to occur at the correct time.
      * To ensure locks don't expire prematurely; the lock TTL should be set
      * with enough extra time to account for any clock drift between nodes.
-     *
      * @see self::createTTLIndex()
      *
      * writeConcern, readConcern and readPreference are not specified by

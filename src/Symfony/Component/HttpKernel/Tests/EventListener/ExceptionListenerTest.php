@@ -165,7 +165,9 @@ class ExceptionListenerTest extends TestCase
         $event = new GetResponseForExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
 
         $listener->onKernelException($event);
+        $this->assertNull($event->getResponse());
 
+        $listener->onKernelException($event);
         $this->assertContains('Whoops, looks like something went wrong.', $event->getResponse()->getContent());
     }
 }

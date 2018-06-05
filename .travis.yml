@@ -39,6 +39,7 @@ cache:
 services:
     - memcached
     - mongodb
+    - mysql
     - redis-server
     - rabbitmq
 

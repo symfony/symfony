@@ -40,16 +40,19 @@ class MongoDbStore implements StoreInterface
      *
      * CAUTION: This store relies on all client and server nodes to have
      * synchronized clocks for lock expiry to occur at the correct time.
-     * To ensure locks don't expire prematurely; the ttl's should be set with enough
-     * extra time to account for any clock drift between nodes.
+     * To ensure locks don't expire prematurely; the lock TTL should be set
+     * with enough extra time to account for any clock drift between nodes.
      *
-     * writeConcern, readConcern and readPreference are not specified by MongoDbStore
-     * meaning the collection's settings will take effect.
+     * @see self::createTTLIndex() For more info on creating a TTL index
+     *
+     * writeConcern, readConcern and readPreference are not specified by
+     * MongoDbStore meaning the collection's settings will take effect.
      *
      * @see https://docs.mongodb.com/manual/applications/replication/
      *
      * Please note, the Symfony\Component\Lock\Key's $resource
      * must not exceed 1024 bytes including structural overhead.
+     *
      * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
      */
     public function __construct(\MongoDB\Client $mongo, array $options)

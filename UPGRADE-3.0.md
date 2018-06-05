@@ -511,6 +511,24 @@ UPGRADE FROM 2.x to 3.0
       }
    }
    ```
+   
+   If you're using `PUT` requests you need to pass the request method to the form:
+
+   Before:
+
+   ```php
+   $form = $this->createForm(FormType::class, $entity);
+   $form->submit($request);
+   ```
+
+   After:
+
+   ```php
+   $form = $this->createForm(FormType::class, $entity, [
+       'method' => $request->getMethod(),
+   ]);
+   $form->handleRequest($request);
+   ```
 
  * The events `PRE_BIND`, `BIND` and `POST_BIND` were renamed to `PRE_SUBMIT`, `SUBMIT`
    and `POST_SUBMIT`.

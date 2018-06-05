@@ -55,4 +55,11 @@ class MongoDbClientTest extends AbstractStoreTest
             'database' => 'test',
         ));
     }
+
+    public function testCreateIndex()
+    {
+        $store = $this->getStore();
+
+        $this->assertTrue($store->createTTLIndex());
+    }
 }

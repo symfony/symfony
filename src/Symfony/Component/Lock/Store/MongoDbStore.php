@@ -43,15 +43,6 @@ class MongoDbStore implements StoreInterface
      * To ensure locks don't expire prematurely; the ttl's should be set with enough
      * extra time to account for any clock drift between nodes.
      *
-     * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
-     *
-     *     db.lock.ensureIndex(
-     *         { "expires_at": 1 },
-     *         { "expireAfterSeconds": 0 }
-     *     )
-     *
-     * @see http://docs.mongodb.org/manual/tutorial/expire-data/
-     *
      * writeConcern, readConcern and readPreference are not specified by MongoDbStore
      * meaning the collection's settings will take effect.
      * @see https://docs.mongodb.com/manual/applications/replication/
@@ -74,6 +65,33 @@ class MongoDbStore implements StoreInterface
             'collection' => 'lock',
             'initialTtl' => 300.0,
         ), $options);
+    }
+
+    /**
+     * Create a TTL index to automatically remove expired locks.
+     *
+     * This should be called once during database setup.
+     *
+     * Alternatively the TTL index can be created manually:
+     *
+     *  db.lock.ensureIndex(
+     *      { "expires_at": 1 },
+     *      { "expireAfterSeconds": 0 }
+     *  )
+     *
+     * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
+     *
+     * @see http://docs.mongodb.org/manual/tutorial/expire-data/
+     */
+    public function createTTLIndex(): bool
+    {
+        $keys = array(
+            'expires_at' => 1,
+        );
+        $options = array(
+            'expireAfterSeconds' => 0,
+        );
+        return $this->getCollection()->createIndex($keys, $options);
     }
 
     /**

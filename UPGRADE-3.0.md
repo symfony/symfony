@@ -595,6 +595,24 @@ UPGRADE FROM 2.x to 3.0
       }
    }
    ```
+   
+   If the form is submitted with a different request method than `POST`, you need to configure this in the form:
+
+   Before:
+
+   ```php
+   $form = $this->createForm(FormType::class, $entity);
+   $form->submit($request);
+   ```
+
+   After:
+
+   ```php
+   $form = $this->createForm(FormType::class, $entity, [
+       'method' => 'PUT',
+   ]);
+   $form->handleRequest($request);
+   ```
 
  * The events `PRE_BIND`, `BIND` and `POST_BIND` were renamed to `PRE_SUBMIT`, `SUBMIT`
    and `POST_SUBMIT`.

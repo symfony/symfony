@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-05T13:09:57Z
+
+Btw, this also solves the issue we faced in https://github.com/symfony/symfony/issues/27037 as the only way to access private services now is through a new API (so any 3.4 deprecation is an actual one)
+
+---------------------------------------------------------------------------
+
+by arderyp at 2018-06-06T02:28:08Z
+
+sounds good!  Is there going to be accompanying documentation regarding what you (@nicolas-grekas) mentioned about `static::$container` and what you (@stof) mentioned about the "new API" for accessing the test container?  I'm not sure I understand fully at the moment.

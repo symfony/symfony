@@ -87,8 +87,13 @@ class MongoDbStore implements StoreInterface
      * A TTL index MUST BE used on MongoDB 2.2+ to automatically clean up expired locks.
      *
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
+     *
+     * @return string The name of the created index as a string.
+     *
+     * @throws \MongoDB\Exception\UnsupportedException
+     * @throws \MongoDB\Exception\InvalidArgumentException
      */
-    public function createTTLIndex(): bool
+    public function createTTLIndex(): string
     {
         $keys = array(
             'expires_at' => 1,

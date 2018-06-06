@@ -29,6 +29,8 @@ class MongoDbStore implements StoreInterface
 {
     private $mongo;
     private $options;
+    private $initialTtl;
+
     private $collection;
 
     /**
@@ -37,7 +39,8 @@ class MongoDbStore implements StoreInterface
      *
      * database:    The name of the database [required]
      * collection:  The name of the collection [default: lock]
-     * initialTtl:  The expiration delay of locks in seconds [default: 300.0]
+     *
+     * @param float $initialTtl the expiration delay of locks in seconds
      *
      * CAUTION: The locked resouce name is indexed in the _id field of the
      * lock collection.
@@ -56,7 +59,7 @@ class MongoDbStore implements StoreInterface
      * MongoDbStore meaning the collection's settings will take effect.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
-    public function __construct(\MongoDB\Client $mongo, array $options)
+    public function __construct(\MongoDB\Client $mongo, array $options, float $initialTtl = 300.0)
     {
         if (!isset($options['database'])) {
             throw new InvalidArgumentException(
@@ -68,8 +71,9 @@ class MongoDbStore implements StoreInterface
 
         $this->options = array_merge(array(
             'collection' => 'lock',
-            'initialTtl' => 300.0,
         ), $options);
+
+        $this->initialTtl = $initialTtl;
     }
 
     /**
@@ -133,7 +137,7 @@ class MongoDbStore implements StoreInterface
             '$set' => array(
                 '_id' => (string) $key,
                 'token' => $token,
-                'expires_at' => $this->createDateTime($now + $this->options['initialTtl']),
+                'expires_at' => $this->createDateTime($now + $this->initialTtl),
             ),
         );
 
@@ -141,7 +145,7 @@ class MongoDbStore implements StoreInterface
             'upsert' => true,
         );
 
-        $key->reduceLifetime($this->options['initialTtl']);
+        $key->reduceLifetime($this->initialTtl);
         try {
             $this->getCollection()->updateOne($filter, $update, $options);
         } catch (\MongoDB\Driver\Exception\WriteException $e) {

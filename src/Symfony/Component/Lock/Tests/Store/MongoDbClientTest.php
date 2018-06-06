@@ -60,6 +60,6 @@ class MongoDbClientTest extends AbstractStoreTest
     {
         $store = $this->getStore();
 
-        $this->assertTrue($store->createTTLIndex());
+        $this->assertEquals($store->createTTLIndex(), 'expires_at_1');
     }
 }

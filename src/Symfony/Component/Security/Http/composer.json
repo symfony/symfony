@@ -29,7 +29,7 @@
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/security-csrf": "<3.4.11|~4.0,<4.0.11|~4.1,<=4.1.0-beta2"
+        "symfony/security-csrf": "<3.4.11|~4.0,<4.0.11"
     },
     "suggest": {
         "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",

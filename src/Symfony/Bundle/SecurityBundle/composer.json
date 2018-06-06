@@ -47,7 +47,7 @@
         "symfony/security": "4.1.0-beta1|4.1.0-beta2",
         "symfony/var-dumper": "<3.4",
         "symfony/event-dispatcher": "<3.4",
-        "symfony/framework-bundle": "<=4.1-beta2",
+        "symfony/framework-bundle": "<4.1.1",
         "symfony/console": "<3.4"
     },
     "autoload": {

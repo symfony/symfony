@@ -23,7 +23,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('test.service_container')) {
+        if (!$container->hasDefinition('test.private_services_locator')) {
             return;
         }
 
@@ -50,7 +50,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         }
 
         if ($privateServices) {
-            $definitions[(string) $definitions['test.service_container']->getArgument(2)]->replaceArgument(0, $privateServices);
+            $definitions['test.private_services_locator']->replaceArgument(0, $privateServices);
         }
     }
 }

@@ -27,7 +27,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceConta
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
@@ -136,10 +135,5 @@ class FrameworkBundle extends Bundle
         if (class_exists($class)) {
             $container->addCompilerPass(new $class(), $type, $priority);
         }
-    }
-
-    public function registerCommands(Application $application)
-    {
-        // noop
     }
 }

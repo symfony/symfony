@@ -245,6 +245,18 @@ class UrlMatcherTest extends TestCase
         }
     }
 
+    public function testMultipleParams()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo1', new Route('/foo/{a}/{b}'));
+        $coll->add('foo2', new Route('/foo/{a}/test/test/{b}'));
+        $coll->add('foo3', new Route('/foo/{a}/{b}/{c}/{d}'));
+
+        $route = $this->getUrlMatcher($coll)->match('/foo/test/test/test/bar')['_route'];
+
+        $this->assertEquals('foo2', $route);
+    }
+
     public function testDefaultRequirementForOptionalVariables()
     {
         $coll = new RouteCollection();

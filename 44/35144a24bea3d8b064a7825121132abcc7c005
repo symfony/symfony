@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-06T10:07:31Z
+
+https://github.com/symfony/symfony/commit/c93c9a588024ea6280e7f2878e0881578ff0aef5 will need to be reverted when merging this into 4.1.

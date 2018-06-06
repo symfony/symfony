@@ -128,36 +128,27 @@ class ContentSecurityPolicyHandler
         $headers = $this->getCspHeaders($response);
 
         foreach ($headers as $header => $directives) {
-            foreach (array('script-src' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce') as $type => $tokenName) {
-                if ($this->authorizesInline($directives, $type)) {
-                    continue;
-                }
-                if (!isset($headers[$header][$type])) {
-                    if (isset($headers[$header]['default-src'])) {
-                        $headers[$header][$type] = $headers[$header]['default-src'];
-                    } else {
-                        // If there is no script-src/style-src and no default-src, no additional rules required.
-                        continue;
-                    }
-                }
-                $ruleIsSet = true;
-                if (!in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
-                    $headers[$header][$type][] = '\'unsafe-inline\'';
-                }
-                $headers[$header][$type][] = sprintf('\'nonce-%s\'', $nonces[$tokenName]);
-            }
-        }
-
-        if (!$ruleIsSet) {
-            return $nonces;
-        }
-
-        foreach ($headers as $header => $directives) {
-            $response->headers->set($header, $this->generateCspHeader($directives));
-        }
-
-        return $nonces;
-    }
+			foreach (array('script-src' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce') as $type => $tokenName) {
+				foreach (array('unsafe-inline', 'unsafe-eval') as $sourceValue) {
+					if ($this->authorizes($directives, $type, $sourceValue)) {
+						continue;
+					}
+					if (!isset($headers[$header][$type])) {
+						if (isset($headers[$header]['default-src'])) {
+							$headers[$header][$type] = $headers[$header]['default-src'];
+						} else {
+							// If there is no script-src/style-src and no default-src, no additional rules required.
+							continue;
+						}
+					}
+					$ruleIsSet = true;
+					if (!in_array("'{$sourceValue}'", $headers[$header][$type], true)) {
+						$headers[$header][$type][] = "'{$sourceValue}'";
+					}
+					$headers[$header][$type][] = sprintf('\'nonce-%s\'', $nonces[$tokenName]);
+				}
+			}
+		}
 
     /**
      * Generates a valid Content-Security-Policy nonce.
@@ -207,14 +198,15 @@ class ContentSecurityPolicyHandler
     }
 
     /**
-     * Detects if the 'unsafe-inline' is prevented for a directive within the directive set.
+     * Detects if a source value is prevented for a directive within the directive set.
      *
      * @param array  $directivesSet The directive set
      * @param string $type          The name of the directive to check
+	 * @param string $sourceValue   The source value (e.g. unsafe-inline)
      *
      * @return bool
      */
-    private function authorizesInline(array $directivesSet, $type)
+    private function authorizes(array $directivesSet, $type, $sourceValue)
     {
         if (isset($directivesSet[$type])) {
             $directives = $directivesSet[$type];
@@ -224,7 +216,7 @@ class ContentSecurityPolicyHandler
             return false;
         }
 
-        return in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
+        return in_array("'{$sourceValue}'", $directives, true) && !$this->hasHashOrNonce($directives);
     }
 
     private function hasHashOrNonce(array $directives)

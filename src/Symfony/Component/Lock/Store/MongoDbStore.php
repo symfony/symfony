@@ -90,9 +90,9 @@ class MongoDbStore implements StoreInterface
      *
      * @return string The name of the created index as a string
      *
-     * @throws \MongoDB\Exception\UnsupportedException if options are not supported by the selected server
+     * @throws \MongoDB\Exception\UnsupportedException     if options are not supported by the selected server
      * @throws \MongoDB\Exception\InvalidArgumentException for parameter/option parsing errors
-     * @throws \MongoDB\Exception\DriverRuntimeException for other driver errors (e.g. connection errors)
+     * @throws \MongoDB\Exception\DriverRuntimeException   for other driver errors (e.g. connection errors)
      */
     public function createTTLIndex(): string
     {

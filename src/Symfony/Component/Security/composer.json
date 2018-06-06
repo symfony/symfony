@@ -43,7 +43,7 @@
         "symfony/ldap": "~2.8|~3.0.0"
     },
     "conflict": {
-        "symfony/http-foundation": "~2.8,<2.8.31|~3.4,<3.4-beta5"
+        "symfony/http-foundation": "~2.8,<2.8.31"
     },
     "suggest": {
         "symfony/form": "",

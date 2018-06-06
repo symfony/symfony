@@ -37,20 +37,28 @@ class ExceptionListener implements EventSubscriberInterface
     protected $debug;
     private $charset;
     private $fileLinkFormat;
+    private $silentIgnore;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, $charset = null, $fileLinkFormat = null)
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false, $charset = null, $fileLinkFormat = null, array $silentIgnore = array())
     {
         $this->controller = $controller;
         $this->logger = $logger;
         $this->debug = $debug;
         $this->charset = $charset;
         $this->fileLinkFormat = $fileLinkFormat;
+        $this->silentIgnore = $silentIgnore;
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
     {
-        $exception = $event->getException();
-        $request = $event->getRequest();
+        $exception = $prev = $event->getException();
+        do {
+            foreach ($this->silentIgnore as $class) {
+                if ($prev instanceof $class) {
+                    return;
+                }
+            }
+        } while (null !== $prev = $exception->getPrevious());
 
         $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
     }

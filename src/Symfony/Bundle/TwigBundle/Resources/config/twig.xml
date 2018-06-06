@@ -129,6 +129,9 @@
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%kernel.debug%</argument>
+            <argument>%kernel.charset%</argument>
+            <argument>%debug.file_link_format%</argument>
+            <argument type="collection" /> <!-- silent ignored exceptions -->
         </service>
 
         <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController" public="true">

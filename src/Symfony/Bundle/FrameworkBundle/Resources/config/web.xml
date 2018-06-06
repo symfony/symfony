@@ -75,6 +75,7 @@
             <argument>%kernel.debug%</argument>
             <argument>%kernel.charset%</argument>
             <argument>%debug.file_link_format%</argument>
+            <argument type="collection" /> <!-- silent ignored exceptions -->
         </service>
 
         <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">

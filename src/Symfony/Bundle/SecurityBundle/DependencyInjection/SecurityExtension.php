@@ -19,6 +19,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -28,6 +29,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
@@ -37,7 +41,7 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class SecurityExtension extends Extension
+class SecurityExtension extends Extension implements CompilerPassInterface
 {
     private $requestMatchers = array();
     private $expressions = array();
@@ -119,6 +123,21 @@ class SecurityExtension extends Extension
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
+    }
+
+    public function process(ContainerBuilder $container)
+    {
+        $silentExceptions = array(
+            AuthenticationException::class,
+            AccessDeniedException::class,
+            LogoutException::class,
+        );
+        if ($container->hasDefinition('http_exception_listener') && 6 === count(($definition = $container->getDefinition('http_exception_listener'))->getArguments())) {
+            $definition->replaceArgument(5, array_merge($definition->getArgument(5), $silentExceptions));
+        }
+        if ($container->hasDefinition('twig.exception_listener') && 6 === count(($definition = $container->getDefinition('twig.exception_listener'))->getArguments())) {
+            $definition->replaceArgument(5, array_merge($definition->getArgument(5), $silentExceptions));
+        }
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)

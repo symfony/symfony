@@ -126,13 +126,13 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 $this->createResponse(array('Content-Security-Policy' => 'frame-ancestors https: ; form-action: https:', 'Content-Security-Policy-Report-Only' => 'frame-ancestors http: ; form-action: http:')),
                 array('Content-Security-Policy' => 'frame-ancestors https: ; form-action: https:', 'Content-Security-Policy-Report-Only' => 'frame-ancestors http: ; form-action: http:', 'X-Content-Security-Policy' => null),
             ),
-			array(
-				$nonce,
-				array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
-				$this->createRequest(),
-				$this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';')),
-				array('Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';', 'X-Content-Security-Policy' => null),
-			),
+            array(
+                $nonce,
+                array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
+                $this->createRequest(),
+                $this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';')),
+                array('Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\';', 'X-Content-Security-Policy' => null),
+            ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
@@ -140,13 +140,13 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 $this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\'')),
                 array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' \'nonce-'.$nonce.'\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' \'nonce-'.$nonce.'\'; style-src \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
             ),
-			array(
-				$nonce,
-				array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
-				$this->createRequest(),
-				$this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-eval\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-eval\'')),
-				array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
-			),
+            array(
+                $nonce,
+                array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
+                $this->createRequest(),
+                $this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-eval\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-eval\'')),
+                array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
+            ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
@@ -154,13 +154,13 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 $this->createResponse(array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'')),
                 array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
             ),
-			array(
-				$nonce,
-				array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
-				$this->createRequest(),
-				$this->createResponse(array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\'')),
-				array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
-			),
+            array(
+                $nonce,
+                array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
+                $this->createRequest(),
+                $this->createResponse(array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\'')),
+                array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
+            ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
@@ -175,13 +175,13 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 $this->createResponse(array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'')),
                 array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
             ),
-			array(
-				$nonce,
-				array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
-				$this->createRequest(),
-				$this->createResponse(array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\'')),
-				array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
-			),
+            array(
+                $nonce,
+                array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
+                $this->createRequest(),
+                $this->createResponse(array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\'')),
+                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-eval\' \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
+            ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),

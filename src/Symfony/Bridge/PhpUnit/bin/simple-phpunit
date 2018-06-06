@@ -217,15 +217,6 @@ if ($components) {
         }
     }
 
-    // Fixes for colors support on appveyor
-    // See https://github.com/appveyor/ci/issues/373
-    $colorFixes = array(
-        array("S\033[0m\033[0m\033[36m\033[1mS", "E\033[0m\033[0m\033[31m\033[1mE", "I\033[0m\033[0m\033[33m\033[1mI", "F\033[0m\033[0m\033[41m\033[37mF"),
-        array("SS", "EE", "II", "FF"),
-    );
-    $colorFixes[0] = array_merge($colorFixes[0], $colorFixes[0]);
-    $colorFixes[1] = array_merge($colorFixes[1], $colorFixes[1]);
-
     while ($runningProcs) {
         usleep(300000);
         $terminatedProcs = array();
@@ -241,20 +232,7 @@ if ($components) {
         foreach ($terminatedProcs as $component => $procStatus) {
             foreach (array('out', 'err') as $file) {
                 $file = "$component/phpunit.std$file";
-
-                if ('\\' === DIRECTORY_SEPARATOR) {
-                    $h = fopen($file, 'rb');
-                    while (false !== $line = fgets($h)) {
-                        echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
-                            '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
-                            "$1m\033[$2$3$4$4",
-                            $line
-                        ));
-                    }
-                    fclose($h);
-                } else {
-                    readfile($file);
-                }
+                readfile($file);
                 unlink($file);
             }
 

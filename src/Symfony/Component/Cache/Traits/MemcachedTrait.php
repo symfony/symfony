@@ -169,12 +169,12 @@ trait MemcachedTrait
                 }
 
                 if ($oldServers !== $newServers) {
-                    // before resetting, ensure $servers is valid
-                    $client->addServers($servers);
                     $client->resetServerList();
+                    $client->addServers($servers);
                 }
+            } else {
+                $client->addServers($servers);
             }
-            $client->addServers($servers);
 
             if (null !== $username || null !== $password) {
                 if (!method_exists($client, 'setSaslAuthData')) {

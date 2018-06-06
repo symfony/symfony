@@ -68,8 +68,9 @@
         </service>
 
         <service id="http_exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-256"/>
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-2048" />
             <tag name="monolog.logger" channel="request" />
+            <tag name="kernel.reset" method="reset" />
             <argument>null</argument>
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%kernel.debug%</argument>

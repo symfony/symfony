@@ -37,6 +37,7 @@ class ExceptionListener implements EventSubscriberInterface
     protected $debug;
     private $charset;
     private $fileLinkFormat;
+    private $isTerminating = false;
 
     public function __construct($controller, LoggerInterface $logger = null, $debug = false, $charset = null, $fileLinkFormat = null)
     {
@@ -49,6 +50,17 @@ class ExceptionListener implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
+        if (null === $this->controller) {
+            if (!$event->isMasterRequest()) {
+                return;
+            }
+            if (!$this->isTerminating) {
+                $this->isTerminating = true;
+
+                return;
+            }
+            $this->isTerminating = false;
+        }
         $exception = $event->getException();
         $request = $event->getRequest();
         $eventDispatcher = func_num_args() > 2 ? func_get_arg(2) : null;
@@ -86,6 +98,11 @@ class ExceptionListener implements EventSubscriberInterface
             };
             $eventDispatcher->addListener(KernelEvents::RESPONSE, $cspRemovalListener, -128);
         }
+    }
+
+    public function reset()
+    {
+        $this->isTerminating = false;
     }
 
     public static function getSubscribedEvents()

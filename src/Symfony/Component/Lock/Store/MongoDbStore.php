@@ -35,12 +35,12 @@ class MongoDbStore implements StoreInterface
 
     /**
      * @param \MongoDB\Client $mongo
-     * @param array           $options
+     * @param array           $options      See below
+     * @param float           $initialTtl   The expiration delay of locks in seconds
      *
-     * database:    The name of the database [required]
-     * collection:  The name of the collection [default: lock]
-     *
-     * @param float $initialTtl the expiration delay of locks in seconds
+     * Options:
+     *      database:    The name of the database [required]
+     *      collection:  The name of the collection [default: lock]
      *
      * CAUTION: The locked resouce name is indexed in the _id field of the
      * lock collection.

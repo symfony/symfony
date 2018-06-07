@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
+use Symfony\Bundle\TwigBundle\Loader\NativeFilesystemLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Console\Application;
@@ -91,6 +92,10 @@ class TwigExtension extends Extension
         $envConfiguratorDefinition->replaceArgument(5, $config['number_format']['thousands_separator']);
 
         $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.native_filesystem');
+
+        if ($container->getParameter('kernel.debug')) {
+            $twigFilesystemLoaderDefinition->setClass(NativeFilesystemLoader::class);
+        }
 
         // register user-configured paths
         foreach ($config['paths'] as $path => $namespace) {

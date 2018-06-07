@@ -25,10 +25,6 @@ class PhpFilesAdapterTest extends AdapterTestCase
 
     public function createCachePool()
     {
-        if (!PhpFilesAdapter::isSupported()) {
-            $this->markTestSkipped('OPcache extension is not enabled.');
-        }
-
         return new PhpFilesAdapter('sf-cache');
     }
 

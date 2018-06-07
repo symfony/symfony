@@ -26,11 +26,14 @@ trait PhpFilesTrait
     use FilesystemCommonTrait;
 
     private $includeHandler;
-    private $zendDetectUnicode;
+
+    private static $startTime;
 
     public static function isSupported()
     {
-        return function_exists('opcache_invalidate') && ini_get('opcache.enable');
+        self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
+
+        return \function_exists('opcache_invalidate') && ini_get('opcache.enable') && ('cli' !== \PHP_SAPI || ini_get('opcache.enable_cli'));
     }
 
     /**
@@ -40,7 +43,6 @@ trait PhpFilesTrait
     {
         $time = time();
         $pruned = true;
-        $allowCompile = 'cli' !== PHP_SAPI || ini_get('opcache.enable_cli');
 
         set_error_handler($this->includeHandler);
         try {
@@ -48,11 +50,7 @@ trait PhpFilesTrait
                 list($expiresAt) = include $file;
 
                 if ($time >= $expiresAt) {
-                    $pruned = @unlink($file) && !file_exists($file) && $pruned;
-
-                    if ($allowCompile) {
-                        @opcache_invalidate($file, true);
-                    }
+                    $pruned = $this->doUnlink($file) && !file_exists($file) && $pruned;
                 }
             }
         } finally {
@@ -70,9 +68,6 @@ trait PhpFilesTrait
         $values = array();
         $now = time();
 
-        if ($this->zendDetectUnicode) {
-            $zmb = ini_set('zend.detect_unicode', 0);
-        }
         set_error_handler($this->includeHandler);
         try {
             foreach ($ids as $id) {
@@ -88,9 +83,6 @@ trait PhpFilesTrait
             }
         } finally {
             restore_error_handler();
-            if ($this->zendDetectUnicode) {
-                ini_set('zend.detect_unicode', $zmb);
-            }
         }
 
         foreach ($values as $id => $value) {
@@ -119,7 +111,7 @@ trait PhpFilesTrait
     {
         $ok = true;
         $data = array($lifetime ? time() + $lifetime : PHP_INT_MAX, '');
-        $allowCompile = 'cli' !== PHP_SAPI || ini_get('opcache.enable_cli');
+        $allowCompile = self::isSupported();
 
         foreach ($values as $key => $value) {
             if (null === $value || \is_object($value)) {
@@ -142,7 +134,8 @@ trait PhpFilesTrait
 
             $data[1] = $value;
             $file = $this->getFile($key, true);
-            $ok = $this->write($file, '<?php return '.var_export($data, true).';') && $ok;
+            // Since OPcache only compiles files older than the script execution start, set the file's mtime in the past
+            $ok = $this->write($file, '<?php return '.var_export($data, true).';', self::$startTime - 10) && $ok;
 
             if ($allowCompile) {
                 @opcache_invalidate($file, true);
@@ -154,5 +147,14 @@ trait PhpFilesTrait
         }
 
         return $ok;
+    }
+
+    protected function doUnlink($file)
+    {
+        if (self::isSupported()) {
+            @opcache_invalidate($file, true);
+        }
+
+        return @unlink($file);
     }
 }

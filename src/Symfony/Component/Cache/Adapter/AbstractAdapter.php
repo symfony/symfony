@@ -102,9 +102,13 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      * @param LoggerInterface|null $logger
      *
      * @return AdapterInterface
+     *
+     * @deprecated since Symfony 4.2
      */
     public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+
         if (null === self::$apcuSupported) {
             self::$apcuSupported = ApcuAdapter::isSupported();
         }

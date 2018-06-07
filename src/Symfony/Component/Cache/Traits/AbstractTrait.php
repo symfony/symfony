@@ -27,6 +27,7 @@ trait AbstractTrait
     private $namespaceVersion = '';
     private $versioningIsEnabled = false;
     private $deferred = array();
+    private $ids = array();
 
     /**
      * @var int|null The maximum length to enforce for identifiers or null when no limit applies
@@ -198,6 +199,7 @@ trait AbstractTrait
             $this->commit();
         }
         $this->namespaceVersion = '';
+        $this->ids = array();
     }
 
     /**
@@ -229,8 +231,6 @@ trait AbstractTrait
 
     private function getId($key)
     {
-        CacheItem::validateKey($key);
-
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->namespaceVersion = '1:';
             foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
@@ -238,11 +238,19 @@ trait AbstractTrait
             }
         }
 
+        if (\is_string($key) && isset($this->ids[$key])) {
+            return $this->namespace.$this->namespaceVersion.$this->ids[$key];
+        }
+        CacheItem::validateKey($key);
+        $this->ids[$key] = $key;
+
         if (null === $this->maxIdLength) {
             return $this->namespace.$this->namespaceVersion.$key;
         }
         if (\strlen($id = $this->namespace.$this->namespaceVersion.$key) > $this->maxIdLength) {
-            $id = $this->namespace.$this->namespaceVersion.substr_replace(base64_encode(hash('sha256', $key, true)), ':', -22);
+            // Use MD5 to favor speed over security, which is not an issue here
+            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), ':', -2);
+            $id = $this->namespace.$this->namespaceVersion.$id;
         }
 
         return $id;

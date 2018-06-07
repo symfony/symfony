@@ -20,10 +20,14 @@ class PhpFilesCache extends AbstractCache implements PruneableInterface
     use PhpFilesTrait;
 
     /**
+     * @param $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
+     *                    Doing so is encouraged because it fits perfectly OPcache's memory model.
+     *
      * @throws CacheException if OPcache is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null)
+    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, bool $appendOnly = false)
     {
+        $this->appendOnly = $appendOnly;
         self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);

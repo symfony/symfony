@@ -52,11 +52,14 @@ trait ApcuTrait
     protected function doFetch(array $ids)
     {
         try {
+            $values = array();
             foreach (apcu_fetch($ids, $ok) ?: array() as $k => $v) {
                 if (null !== $v || $ok) {
-                    yield $k => $v;
+                    $values[$k] = $v;
                 }
             }
+
+            return $values;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         }

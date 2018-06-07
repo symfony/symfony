@@ -17,6 +17,7 @@
             <argument type="service" id="request_stack" />
             <argument>%kernel.debug%</argument>
         </service>
+        <service id="Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler" alias="fragment.handler" />
 
         <service id="fragment.renderer.inline" class="Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer">
             <tag name="kernel.fragment_renderer" alias="inline" />

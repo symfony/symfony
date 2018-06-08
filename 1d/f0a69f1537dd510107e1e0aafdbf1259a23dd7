@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-06-07T14:04:02Z
+
+I see that "warning" and "error" both render a big red block.
+
+<img width="904" alt="screen shot 2018-06-07 at 16 02 06" src="https://user-images.githubusercontent.com/1275206/41104685-3882f8a4-6a6c-11e8-9a85-b4860d21c670.png">
+Im revering the change now so it is still an "error".

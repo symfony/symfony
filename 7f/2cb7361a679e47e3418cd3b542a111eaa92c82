@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-23T17:58:36Z
+
+Can we have tests reproducing the issue ? AFAIK, all tests of the SemaphoreStore are green with the existing implementation, so having it non-working means that the testsuite is not covering things properly.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-23T17:59:29Z
+
+and you worked on an outdated version of Symfony master (or you targeted the wrong branch when opening the PR), as this conflicts.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-05-23T19:57:47Z
+
+Added a test case and fix target branch
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-24T07:21:29Z
+
+I'd rather see a test about the behavior of the store (to prevent the bug beign reported) rather than a test enforcing this specific implementation (which does not prove that this implementation is the right one, but forbids replacing it)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-05-24T07:42:55Z
+
+@stof unless I missed a point, the bug reported is `semaphores are not removed which fill the system device and end with an error "no space left on device"`. It's kinda tracking a memory leak or a un-removed files which fill a disk, that's why the bug exists whereas every tests were green.
+
+The test asserts that amount of semaphores used on the OS does not increase when the lock is acquired then released, regardless of the implementation.
+Moreover a second assertion validate the test itself by checking that the amount of semaphore has  been increased when the lock was acquired, which proves that this is the right way to count the amount of semaphore used by the OS
+
+An other way to test it would be to reproduce the reported bug. Meaning either
+ - creating more than 32 000 semaphores (default value) which take ~ 2 minutes on my machine
+ - reducing this limit by changing a kernel parameter in  `/etc/sysctl.conf` (requires sudo and restart)
+
+Do you see another way to test the behavior?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-24T08:04:48Z
+
+Is `sem_release` a useless API then ?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-05-24T08:40:24Z
+
+Wouldn't say so.
+
+`sem_release` is the *right way* to release a lock, next pending `sem_acquire` will softly take the lock. BUT, it does not free the resource. If nobody want to acquire the lock, the resource will stay here (consuming 1 slot on the 32 000 available). AND because of cross concurrency, you can not be sure that nobody else use the semaphore, then you can not remove the resource safely...
+
+`sem_remove` is the brute way to the release the resource. By removing it: every pending `sem_acquire` will fail.
+
+If your application can control the amount of distinguished resource, you should `sem_release`. If not, the single workaround I found is to use the `sem_remove` and deal with the failure.
+
+For the record, we have exactly the same issue with the original implementation of `flock`, the file is not removed and consume 1 inode, but with more than millions of inodes available, this bug has not yet been reported...

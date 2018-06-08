@@ -142,7 +142,7 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        return checkdnsrr($host, 'MX');
+        return '' !== $host && checkdnsrr($host, 'MX');
     }
 
     /**

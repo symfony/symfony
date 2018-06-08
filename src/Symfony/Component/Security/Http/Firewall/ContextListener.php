@@ -226,8 +226,7 @@ class ContextListener implements ListenerInterface
 
         try {
             $token = unserialize($serializedToken);
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
         restore_error_handler();
         ini_set('unserialize_callback_func', $prevUnserializeHandler);

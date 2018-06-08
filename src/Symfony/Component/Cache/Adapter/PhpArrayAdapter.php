@@ -99,12 +99,8 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
             $value = null;
         } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
             try {
-                $e = null;
                 $value = unserialize($value);
-            } catch (\Error $e) {
-            } catch (\Exception $e) {
-            }
-            if (null !== $e) {
+            } catch (\Throwable $e) {
                 $value = null;
                 $isHit = false;
             }
@@ -238,9 +234,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
                 } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
                     try {
                         yield $key => $f($key, unserialize($value), true);
-                    } catch (\Error $e) {
-                        yield $key => $f($key, null, false);
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         yield $key => $f($key, null, false);
                     }
                 } else {

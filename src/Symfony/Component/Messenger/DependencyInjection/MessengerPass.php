@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\SenderInterface;
@@ -304,6 +305,10 @@ class MessengerPass implements CompilerPassInterface
                 $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$id, $childDefinition);
             } elseif ($arguments) {
                 throw new RuntimeException(sprintf('Invalid middleware factory "%s": a middleware factory must be an abstract definition.', $id));
+            }
+
+            if (!is_subclass_of($definition->getClass(), MiddlewareInterface::class)) {
+                throw new RuntimeException(sprintf('Invalid middleware "%s": class "%s" must implement interface "%s".', $messengerMiddlewareId, $definition->getClass(), MiddlewareInterface::class));
             }
 
             $middlewareReferences[] = new Reference($messengerMiddlewareId);

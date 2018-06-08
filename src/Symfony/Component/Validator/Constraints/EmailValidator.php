@@ -95,7 +95,7 @@ class EmailValidator extends ConstraintValidator
 
         $host = (string) substr($value, strrpos($value, '@') + 1);
 
-        if(substr($host, -1) !== '.') {
+        if (substr($host, -1) !== '.') {
             $host .= '.';
         }
 

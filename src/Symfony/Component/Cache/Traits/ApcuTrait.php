@@ -103,15 +103,13 @@ trait ApcuTrait
             }
 
             return array_keys($failures);
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
-        }
+        } catch (\Throwable $e) {
+            if (1 === count($values)) {
+                // Workaround https://github.com/krakjoe/apcu/issues/170
+                apcu_delete(key($values));
+            }
 
-        if (1 === count($values)) {
-            // Workaround https://github.com/krakjoe/apcu/issues/170
-            apcu_delete(key($values));
+            throw $e;
         }
-
-        throw $e;
     }
 }

@@ -134,6 +134,18 @@ class EmailValidator extends ConstraintValidator
     }
 
     /**
+     * Check DNS Records for MX type.
+     *
+     * @param string $host Host
+     *
+     * @return bool
+     */
+    private function checkMX($host)
+    {
+        return checkdnsrr($host, 'MX');
+    }
+
+    /**
      * Check if one of MX, A or AAAA DNS RR exists.
      *
      * @param string $host Host
@@ -142,6 +154,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkHost($host)
     {
-        return '' !== $host && (checkdnsrr($host, 'MX') || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
+        return '' !== $host && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
     }
 }

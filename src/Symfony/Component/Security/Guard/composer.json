@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/security-core": "~2.8|~3.0.0",
+        "symfony/security-core": "^2.8.41|^3.3.17",
         "symfony/security-http": "^2.8.31|^3.3.13"
     },
     "require-dev": {

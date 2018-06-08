@@ -19,7 +19,7 @@
         "php": ">=5.3.9",
         "symfony/polyfill-php56": "~1.0",
         "symfony/polyfill-php70": "~1.0",
-        "symfony/security-core": "~2.4|~3.0.0"
+        "symfony/security-core": "^2.8.41|^3.3.17"
     },
     "require-dev": {
         "symfony/http-foundation": "^2.7.38|~3.3.13"

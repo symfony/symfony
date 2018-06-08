@@ -74,15 +74,12 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         $value = $this->values[$key];
 
         if ('N;' === $value) {
-            $value = null;
-        } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
+            return null;
+        }
+        if (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
             try {
-                $e = null;
-                $value = unserialize($value);
-            } catch (\Error $e) {
-            } catch (\Exception $e) {
-            }
-            if (null !== $e) {
+                return unserialize($value);
+            } catch (\Throwable $e) {
                 return $default;
             }
         }
@@ -235,9 +232,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
                 } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
                     try {
                         yield $key => unserialize($value);
-                    } catch (\Error $e) {
-                        yield $key => $default;
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         yield $key => $default;
                     }
                 } else {

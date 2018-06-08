@@ -75,16 +75,20 @@ class SemaphoreStore implements StoreInterface
             return;
         }
 
-        $resource = sem_get(crc32($key));
+        $keyId = crc32($key);
+        $resource = sem_get($keyId);
 
-        if (\PHP_VERSION_ID < 50601) {
-            if (!$blocking) {
-                throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', get_class($this)));
-            }
-
-            $acquired = sem_acquire($resource);
+        if (\PHP_VERSION_ID >= 50601) {
+            $acquired = @sem_acquire($resource, !$blocking);
+        } elseif (!$blocking) {
+            throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', get_class($this)));
         } else {
-            $acquired = sem_acquire($resource, !$blocking);
+            $acquired = @sem_acquire($resource);
+        }
+
+        while ($blocking && !$acquired) {
+            $resource = sem_get($keyId);
+            $acquired = @sem_acquire($resource);
         }
 
         if (!$acquired) {
@@ -106,7 +110,7 @@ class SemaphoreStore implements StoreInterface
 
         $resource = $key->getState(__CLASS__);
 
-        sem_release($resource);
+        sem_remove($resource);
 
         $key->removeState(__CLASS__);
     }

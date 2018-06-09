@@ -44,7 +44,6 @@ class ExceptionListener implements EventSubscriberInterface
     public function logKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $request = $event->getRequest();
 
         $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
     }
@@ -90,7 +89,7 @@ class ExceptionListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::EXCEPTION => array(
-                array('logKernelException', 2048),
+                array('logKernelException', 0),
                 array('onKernelException', -128),
             ),
         );

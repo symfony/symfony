@@ -56,22 +56,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
      */
     public function getItem($key)
     {
-        $isHit = $this->hasItem($key);
-        try {
-            if (!$isHit) {
-                $this->values[$key] = $value = null;
-            } elseif (!$this->storeSerialized) {
-                $value = $this->values[$key];
-            } elseif ('b:0;' === $value = $this->values[$key]) {
-                $value = false;
-            } elseif (false === $value = unserialize($value)) {
-                $this->values[$key] = $value = null;
-                $isHit = false;
-            }
-        } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));
+        if (!$isHit = $this->hasItem($key)) {
             $this->values[$key] = $value = null;
-            $isHit = false;
+        } else {
+            $value = $this->storeSerialized ? $this->unfreeze($key, $isHit) : $this->values[$key];
         }
         $f = $this->createCacheItem;
 
@@ -84,7 +72,9 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     public function getItems(array $keys = array())
     {
         foreach ($keys as $key) {
-            CacheItem::validateKey($key);
+            if (!\is_string($key) || !isset($this->expiries[$key])) {
+                CacheItem::validateKey($key);
+            }
         }
 
         return $this->generateItems($keys, microtime(true), $this->createCacheItem);
@@ -120,15 +110,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
             return true;
         }
-        if ($this->storeSerialized) {
-            try {
-                $value = serialize($value);
-            } catch (\Exception $e) {
-                $type = is_object($value) ? get_class($value) : gettype($value);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
-
-                return false;
-            }
+        if ($this->storeSerialized && null === $value = $this->freeze($value)) {
+            return false;
         }
         if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
             $expiry = microtime(true) + $item["\0*\0defaultLifetime"];

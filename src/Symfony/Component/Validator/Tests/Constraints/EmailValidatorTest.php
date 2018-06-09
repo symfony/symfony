@@ -114,20 +114,20 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testDnsChecks($type, $violation)
     {
-        DnsMock::withMockedHosts(array('another-example.com' => array(array('type' => $violation ? false : $type))));
+        DnsMock::withMockedHosts(array('exemple.fr' => array(array('type' => $violation ? false : $type))));
 
         $constraint = new Email(array(
             'message' => 'myMessage',
             'MX' === $type ? 'checkMX' : 'checkHost' => true,
         ));
 
-        $this->validator->validate('foo@another-example.com', $constraint);
+        $this->validator->validate('foo@exemple.fr', $constraint);
 
         if (!$violation) {
             $this->assertNoViolation();
         } else {
             $this->buildViolation('myMessage')
-                ->setParameter('{{ value }}', '"foo@another-example.com"')
+                ->setParameter('{{ value }}', '"foo@exemple.fr"')
                 ->setCode($violation)
                 ->assertRaised();
         }

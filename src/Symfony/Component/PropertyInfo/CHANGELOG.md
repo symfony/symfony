@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+* Added the ability to extract property type based on its initial value
+
 4.2.0
 -----
 

@@ -42,6 +42,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public static $defaultArrayMutatorPrefixes = ['add', 'remove'];
 
+    private const MAP_TYPES = [
+        'integer' => Type::BUILTIN_TYPE_INT,
+        'boolean' => Type::BUILTIN_TYPE_BOOL,
+        'double' => Type::BUILTIN_TYPE_FLOAT,
+    ];
+
     private $mutatorPrefixes;
     private $accessorPrefixes;
     private $arrayMutatorPrefixes;
@@ -116,6 +122,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $fromConstructor = $this->extractFromConstructor($class, $property)
         ) {
             return $fromConstructor;
+        }
+
+        if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {
+            return $fromDefaultValue;
         }
     }
 
@@ -256,6 +266,25 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return null;
+    }
+
+    private function extractFromDefaultValue(string $class, string $property)
+    {
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+
+        $defaultValue = $reflectionClass->getDefaultProperties()[$property] ?? null;
+
+        if (null === $defaultValue) {
+            return null;
+        }
+
+        $type = \gettype($defaultValue);
+
+        return [new Type(static::MAP_TYPES[$type] ?? $type)];
     }
 
     private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionMethod $reflectionMethod): Type

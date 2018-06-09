@@ -26,10 +26,6 @@ class ProjectServiceContainer extends Container
             'bar' => 'getBarService',
             'foo' => 'getFooService',
         );
-        $this->privates = array(
-            'bar' => true,
-            'foo' => true,
-        );
 
         $this->aliases = array();
     }
@@ -39,8 +35,6 @@ class ProjectServiceContainer extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-            'bar' => true,
-            'foo' => true,
         );
     }
 
@@ -67,17 +61,19 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the private 'bar' shared service.
+     * Gets the public 'bar' shared service.
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected function getBarService($lazyLoad = true)
     {
-        return $this->services['bar'] = new \stdClass(${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'});
+        // lazy factory for stdClass
+
+        return new \stdClass();
     }
 
     /**
-     * Gets the private 'foo' service.
+     * Gets the public 'foo' shared service.
      *
      * @return \stdClass
      */

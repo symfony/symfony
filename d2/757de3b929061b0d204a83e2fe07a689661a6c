@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-05-31T16:35:13Z
+
+third option: inject a no-op session strategy in listeners belonging to stateless firewalls
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-31T16:36:54Z
+
+your first approach requires every listener to set the firewall name as a request attribute before calling the session strategy (which is very easy to miss as it is not part of the explicit API of the session strategy). So IMO, that's not a good approach
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-05-31T16:46:47Z
+
+I like the noop-idea, It does not even need to be a new no-op class. A second session migration strategy for stateless firewalls would solve that, which gets a `NONE` strategy set in the constructor.
+
+The respective listeners must then get the "stateless migration strategy" injected (instead of https://github.com/weaverryan/symfony/blob/4d5bc448ee2c192c9f4ef964e3006a63a707029e/src/Symfony/Bundle/SecurityBundle/Resources/config/security_listeners.xml#L178)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-05-31T17:12:30Z
+
+No op is a great idea - I’ll update
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-01T15:08:15Z
+
+I've just updated to use a noop approach. I think this is solid. Unless anyone sees a major issue, I'll extend this to all of the other listeners & add some tests.
+
+For `SimplePreAuthenticationListener`, I'm using setter injection because there are already so many optional constructor args. I'm not sure if, in the future, this should or should not be a required dependency. We could say "hey, you need to pass this in if you are storing the token in the session" OR we could eventually force (via some deprecations in 4.2) the user to pass this in, telling them to pass in a noop if they don't want session migration.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-06-01T19:06:51Z
+
+Why do we need a noop strategy at all if you can simply not inject a strategy for the same behavior?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-02T16:20:29Z
+
+Good question - it’s just a technical work around. The listener service is created in the factory, but the factory doesn’t know whether or not it will live in a stateless firewall. So, it can’t be smart enough (unless I’m missing an idea - very possible) to know if it should or should not inject the session strategy. To work around that, we simply *always* inject a session strategy, but then in SecurityExtension, we change that session strategy to be a noop for stateless firewalls. It’s a tricky dance.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-04T14:38:30Z
+
+This is ready for review. I was very careful, but as I don't believe there are tests on the "factory" classes that build the auth listeners, I appreciate close review.
+
+I added a test for `GuardAuthenticationHandler`. We could also add tests for all the auth listeners - I'm happy to do that, but it would be quite a bit of test refactoring or duplication (as you need to build a test that successfully authenticates, which is often quite a lot of code). But if we feel better with those tests, let me know!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-07T15:09:21Z
+
+Ok, CI is happy!
+
+To summarize: the only downside to this PR is on a technical level: the fact that I'm using setter injection everywhere to avoid trying to add this dependency to the constructor (when every class already has optional deps). I've made the setters final, so, if we want to change this in the future, we could decide to do that with less trouble.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-07T17:12:44Z
+
+LGTM. I'd just suggest moving the `final` note to an annotation, as real `final` tokens block legit usages (e.g. lazy proxies) and we try to avoid them here usually.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-07T17:40:28Z
+
+Done!
+
+~~I'll make a separate PR for 3.4 for `UsernamePasswordJsonAuthenticationListener`, but it won't block this (that is on my list).~~ - see #27556
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-09T17:07:03Z
+
+> I would just make the setSessionAuthenticationStrategy() internal to not introduce any new public api in a patch and just fix our own listeners until this reaches master. 👍 anyways
+
+We could do this, but technically speaking, if anyone uses the components, then they would need to use these methods to migrate the session. So, I'm not sure that we can

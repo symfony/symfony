@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Exception\NamespaceNotFoundException;
@@ -304,10 +305,6 @@ class ApplicationTest extends TestCase
         $application->findNamespace('bar');
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Console\Exception\CommandNotFoundException
-     * @expectedExceptionMessage Command "foo1" is not defined
-     */
     public function testFindUniqueNameButNamespaceName()
     {
         $application = new Application();
@@ -315,7 +312,21 @@ class ApplicationTest extends TestCase
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 
-        $application->find($commandName = 'foo1');
+        $output = $application->find($commandName = 'foo1');
+        $this->assertInstanceOf(ListCommand::class, $output);
+        $this->assertAttributeSame('foo1', 'namespace', $output);
+    }
+
+    public function testFindNamespaceNameWithNamespaceSeparator()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        $output = $application->find($commandName = 'foo:');
+        $this->assertInstanceOf(ListCommand::class, $output);
+        $this->assertAttributeSame('foo', 'namespace', $output);
     }
 
     public function testFind()
@@ -655,13 +666,13 @@ class ApplicationTest extends TestCase
         );
 
         try {
-            $application->find('foo');
+            $application->find('bar');
             $this->fail('->find() throws a CommandNotFoundException if command is not defined');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command is not defined');
             $this->assertSame($expectedAlternatives, $e->getAlternatives());
 
-            $this->assertRegExp('/Command "foo" is not defined\..*Did you mean one of these\?.*/Ums', $e->getMessage());
+            $this->assertRegExp('/Command "bar" is not defined\..*Did you mean one of these\?.*/Ums', $e->getMessage());
         }
     }
 

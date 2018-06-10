@@ -25,6 +25,8 @@ use Symfony\Component\Console\Input\InputDefinition;
  */
 class ListCommand extends Command
 {
+    private $namespace;
+
     /**
      * {@inheritdoc}
      */
@@ -63,6 +65,12 @@ EOF
         return $this->createDefinition();
     }
 
+
+    public function setNamespace(string $namespace): void
+    {
+        $this->namespace = $namespace;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -72,8 +80,10 @@ EOF
         $helper->describe($output, $this->getApplication(), array(
             'format' => $input->getOption('format'),
             'raw_text' => $input->getOption('raw'),
-            'namespace' => $input->getArgument('namespace'),
+            'namespace' => $this->namespace ?: $input->getArgument('namespace'),
         ));
+
+        $this->namespace = null;
     }
 
     /**

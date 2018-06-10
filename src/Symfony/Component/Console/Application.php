@@ -77,6 +77,7 @@ class Application
     private $defaultCommand;
     private $singleCommand;
     private $initialized;
+    private $namespaces;
 
     /**
      * @param string $name    The name of the application
@@ -535,6 +536,10 @@ class Application
      */
     public function getNamespaces()
     {
+        if ($this->namespaces !== null) {
+            return $this->namespaces;
+        }
+
         $namespaces = array();
         foreach ($this->all() as $command) {
             $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
@@ -544,7 +549,7 @@ class Application
             }
         }
 
-        return array_values(array_unique(array_filter($namespaces)));
+        return $this->namespaces = array_values(array_unique(array_filter($namespaces)));
     }
 
     /**
@@ -613,6 +618,14 @@ class Application
 
         // if no commands matched or we just matched namespaces
         if (empty($commands) || count(preg_grep('{^'.$expr.'$}i', $commands)) < 1) {
+            // offer list if this is just NS (e.g. "make" and not "make:v")
+            if (in_array($name, $this->getNamespaces())) {
+                $listCmd = $this->get('list');
+                $listCmd->setNamespace($name);
+
+                return $listCmd;
+            }
+
             if (false !== $pos = strrpos($name, ':')) {
                 // check if a namespace exists and contains commands
                 $this->findNamespace(substr($name, 0, $pos));
@@ -645,6 +658,14 @@ class Application
 
         $exact = in_array($name, $commands, true) || isset($aliases[$name]);
         if (count($commands) > 1 && !$exact) {
+            $nsCandidate = rtrim($name, ':');
+            if (in_array($nsCandidate, $this->getNamespaces())) {
+                $listCmd = $this->get('list');
+                $listCmd->setNamespace($nsCandidate);
+
+                return $listCmd;
+            }
+
             $usableWidth = $this->terminal->getWidth() - 10;
             $abbrevs = array_values($commands);
             $maxLen = 0;

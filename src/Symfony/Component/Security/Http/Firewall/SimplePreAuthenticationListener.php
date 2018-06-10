@@ -68,7 +68,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
     /**
      * Call this method if your authentication token is stored to a session.
      *
-     * @final since version 2.8
+     * @final
      */
     public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
     {

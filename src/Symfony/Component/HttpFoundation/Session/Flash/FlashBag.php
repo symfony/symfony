@@ -16,30 +16,16 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  *
  * @author Drak <drak@zikula.org>
  */
-class FlashBag implements FlashBagInterface, \IteratorAggregate
+class FlashBag implements FlashBagInterface
 {
     private $name = 'flashes';
-
-    /**
-     * Flash messages.
-     *
-     * @var array
-     */
     private $flashes = array();
-
-    /**
-     * The storage key for flashes in the session
-     *
-     * @var string
-     */
     private $storageKey;
 
     /**
-     * Constructor.
-     *
-     * @param string $storageKey The key used to store flashes in the session.
+     * @param string $storageKey The key used to store flashes in the session
      */
-    public function __construct($storageKey = '_sf2_flashes')
+    public function __construct(string $storageKey = '_symfony_flashes')
     {
         $this->storageKey = $storageKey;
     }
@@ -162,15 +148,5 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
     public function clear()
     {
         return $this->all();
-    }
-
-    /**
-     * Returns an iterator for flashes.
-     *
-     * @return \ArrayIterator An \ArrayIterator instance
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->all());
     }
 }

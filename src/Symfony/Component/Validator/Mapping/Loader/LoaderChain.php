@@ -15,12 +15,11 @@ use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Calls multiple LoaderInterface instances in a chain
+ * Loads validation metadata from multiple {@link LoaderInterface} instances.
  *
- * This class accepts multiple instances of LoaderInterface to be passed to the
- * constructor. When loadClassMetadata() is called, the same method is called
- * in <em>all</em> of these loaders, regardless of whether any of them was
- * successful or not.
+ * Pass the loaders when constructing the chain. Once
+ * {@link loadClassMetadata()} is called, that method will be called on all
+ * loaders in the chain.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -29,11 +28,9 @@ class LoaderChain implements LoaderInterface
     protected $loaders;
 
     /**
-     * Accepts a list of LoaderInterface instances
+     * @param LoaderInterface[] $loaders The metadata loaders to use
      *
-     * @param LoaderInterface[] $loaders An array of LoaderInterface instances
-     *
-     * @throws MappingException If any of the loaders does not implement LoaderInterface
+     * @throws MappingException If any of the loaders has an invalid type
      */
     public function __construct(array $loaders)
     {
@@ -47,7 +44,7 @@ class LoaderChain implements LoaderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
@@ -58,5 +55,13 @@ class LoaderChain implements LoaderInterface
         }
 
         return $success;
+    }
+
+    /**
+     * @return LoaderInterface[]
+     */
+    public function getLoaders()
+    {
+        return $this->loaders;
     }
 }

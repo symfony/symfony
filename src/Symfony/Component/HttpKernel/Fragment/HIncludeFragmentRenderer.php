@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
-if (!defined('ENT_SUBSTITUTE')) {
-    define('ENT_SUBSTITUTE', 8);
-}
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\UriSigner;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Loader\ExistsLoaderInterface;
 
 /**
  * Implements the Hinclude rendering strategy.
@@ -34,14 +33,12 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     private $charset;
 
     /**
-     * Constructor.
-     *
-     * @param EngineInterface|\Twig_Environment $templating            An EngineInterface or a \Twig_Environment instance
-     * @param UriSigner                         $signer                A UriSigner instance
-     * @param string                            $globalDefaultTemplate The global default content (it can be a template name or the content)
-     * @param string                            $charset
+     * @param EngineInterface|Environment $templating            An EngineInterface or a Twig instance
+     * @param UriSigner                   $signer                A UriSigner instance
+     * @param string                      $globalDefaultTemplate The global default content (it can be a template name or the content)
+     * @param string                      $charset
      */
-    public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null, $charset = 'utf-8')
+    public function __construct($templating = null, UriSigner $signer = null, string $globalDefaultTemplate = null, string $charset = 'utf-8')
     {
         $this->setTemplating($templating);
         $this->globalDefaultTemplate = $globalDefaultTemplate;
@@ -52,14 +49,14 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Sets the templating engine to use to render the default content.
      *
-     * @param EngineInterface|\Twig_Environment|null $templating An EngineInterface or a \Twig_Environment instance
+     * @param EngineInterface|Environment|null $templating An EngineInterface or an Environment instance
      *
      * @throws \InvalidArgumentException
      */
     public function setTemplating($templating)
     {
-        if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
-            throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of \Twig_Environment or Symfony\Component\Templating\EngineInterface');
+        if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof Environment) {
+            throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of Twig\Environment or Symfony\Component\Templating\EngineInterface');
         }
 
         $this->templating = $templating;
@@ -68,7 +65,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Checks if a templating engine has been set.
      *
-     * @return Boolean true if the templating engine has been set, false otherwise
+     * @return bool true if the templating engine has been set, false otherwise
      */
     public function hasTemplating()
     {
@@ -91,7 +88,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
                 throw new \LogicException('You must use a proper URI when using the Hinclude rendering strategy or set a URL signer.');
             }
 
-            $uri = $this->signer->sign($this->generateFragmentUri($uri, $request));
+            // we need to sign the absolute URI, but want to return the path only.
+            $uri = substr($this->signer->sign($this->generateFragmentUri($uri, $request, true)), strlen($request->getSchemeAndHttpHost()));
         }
 
         // We need to replace ampersands in the URI with the encoded form in order to return valid html/xml content.
@@ -110,11 +108,12 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (count($attributes) > 0) {
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',
-                    htmlspecialchars($attribute, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset, false),
-                    htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset, false)
+                    htmlspecialchars($attribute, $flags, $this->charset, false),
+                    htmlspecialchars($value, $flags, $this->charset, false)
                 );
             }
         }
@@ -122,12 +121,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
     }
 
-    /**
-     * @param string $template
-     *
-     * @return boolean
-     */
-    private function templateExists($template)
+    private function templateExists(string $template): bool
     {
         if ($this->templating instanceof EngineInterface) {
             try {
@@ -138,15 +132,19 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         $loader = $this->templating->getLoader();
-        if ($loader instanceof \Twig_ExistsLoaderInterface) {
+        if ($loader instanceof ExistsLoaderInterface || method_exists($loader, 'exists')) {
             return $loader->exists($template);
         }
 
         try {
-            $loader->getSource($template);
+            if (method_exists($loader, 'getSourceContext')) {
+                $loader->getSourceContext($template);
+            } else {
+                $loader->getSource($template);
+            }
 
             return true;
-        } catch (\Twig_Error_Loader $e) {
+        } catch (LoaderError $e) {
         }
 
         return false;

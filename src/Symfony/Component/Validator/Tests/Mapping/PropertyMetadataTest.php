@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
-class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
+class PropertyMetadataTest extends TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
 
     public function testInvalidPropertyName()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ValidatorException');
 
         new PropertyMetadata(self::CLASSNAME, 'foobar');
     }
@@ -41,5 +42,15 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($metadata->isPublic($entity));
         $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromRemovedProperty()
+    {
+        $entity = new Entity('foobar');
+        $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
+        $metadata->name = 'test';
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ValidatorException');
+        $metadata->getPropertyValue($entity);
     }
 }

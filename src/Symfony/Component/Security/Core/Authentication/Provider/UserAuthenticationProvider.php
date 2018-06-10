@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 /**
  * UserProviderInterface retrieves users for UsernamePasswordToken tokens.
@@ -32,15 +33,9 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     private $providerKey;
 
     /**
-     * Constructor.
-     *
-     * @param UserCheckerInterface $userChecker                An UserCheckerInterface interface
-     * @param string               $providerKey                A provider key
-     * @param Boolean              $hideUserNotFoundExceptions Whether to hide user not found exception or not
-     *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserCheckerInterface $userChecker, $providerKey, $hideUserNotFoundExceptions = true)
+    public function __construct(UserCheckerInterface $userChecker, string $providerKey, bool $hideUserNotFoundExceptions = true)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -57,23 +52,23 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return null;
+            throw new AuthenticationException('The token is not supported by this authentication provider.');
         }
 
         $username = $token->getUsername();
-        if (empty($username)) {
-            $username = 'NONE_PROVIDED';
+        if ('' === $username || null === $username) {
+            $username = AuthenticationProviderInterface::USERNAME_NONE_PROVIDED;
         }
 
         try {
             $user = $this->retrieveUser($username, $token);
-        } catch (UsernameNotFoundException $notFound) {
+        } catch (UsernameNotFoundException $e) {
             if ($this->hideUserNotFoundExceptions) {
-                throw new BadCredentialsException('Bad credentials', 0, $notFound);
+                throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
-            $notFound->setUsername($username);
+            $e->setUsername($username);
 
-            throw $notFound;
+            throw $e;
         }
 
         if (!$user instanceof UserInterface) {
@@ -86,13 +81,13 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->userChecker->checkPostAuth($user);
         } catch (BadCredentialsException $e) {
             if ($this->hideUserNotFoundExceptions) {
-                throw new BadCredentialsException('Bad credentials', 0, $e);
+                throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
 
             throw $e;
         }
 
-        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token));
         $authenticatedToken->setAttributes($token->getAttributes());
 
         return $authenticatedToken;
@@ -104,6 +99,26 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     public function supports(TokenInterface $token)
     {
         return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey();
+    }
+
+    /**
+     * Retrieves roles from user and appends SwitchUserRole if original token contained one.
+     *
+     * @return array The user roles
+     */
+    private function getRoles(UserInterface $user, TokenInterface $token)
+    {
+        $roles = $user->getRoles();
+
+        foreach ($token->getRoles() as $role) {
+            if ($role instanceof SwitchUserRole) {
+                $roles[] = $role;
+
+                break;
+            }
+        }
+
+        return $roles;
     }
 
     /**
@@ -121,9 +136,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Does additional checks on the user and token (like validating the
      * credentials).
-     *
-     * @param UserInterface         $user  The retrieved UserInterface instance
-     * @param UsernamePasswordToken $token The UsernamePasswordToken token to be authenticated
      *
      * @throws AuthenticationException if the credentials could not be validated
      */

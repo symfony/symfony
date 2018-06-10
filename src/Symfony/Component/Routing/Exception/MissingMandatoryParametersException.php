@@ -16,8 +16,6 @@ namespace Symfony\Component\Routing\Exception;
  * mandatory parameters.
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
- *
- * @api
  */
 class MissingMandatoryParametersException extends \InvalidArgumentException implements ExceptionInterface
 {

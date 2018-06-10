@@ -14,86 +14,55 @@ namespace Symfony\Component\CssSelector\Parser;
 /**
  * CSS selector token.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class Token
 {
-    const TYPE_FILE_END   = 'eof';
-    const TYPE_DELIMITER  = 'delimiter';
+    const TYPE_FILE_END = 'eof';
+    const TYPE_DELIMITER = 'delimiter';
     const TYPE_WHITESPACE = 'whitespace';
     const TYPE_IDENTIFIER = 'identifier';
-    const TYPE_HASH       = 'hash';
-    const TYPE_NUMBER     = 'number';
-    const TYPE_STRING     = 'string';
+    const TYPE_HASH = 'hash';
+    const TYPE_NUMBER = 'number';
+    const TYPE_STRING = 'string';
 
-    /**
-     * @var int
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $value;
-
-    /**
-     * @var int
-     */
     private $position;
 
-    /**
-     * @param int    $type
-     * @param string $value
-     * @param int    $position
-     */
-    public function __construct($type, $value, $position)
+    public function __construct(?string $type, ?string $value, ?int $position)
     {
         $this->type = $type;
         $this->value = $value;
         $this->position = $position;
     }
 
-    /**
-     * @return int
-     */
-    public function getType()
+    public function getType(): ?int
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return $this->position;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isFileEnd()
+    public function isFileEnd(): bool
     {
         return self::TYPE_FILE_END === $this->type;
     }
 
-    /**
-     * @param array $values
-     *
-     * @return boolean
-     */
-    public function isDelimiter(array $values = array())
+    public function isDelimiter(array $values = array()): bool
     {
         if (self::TYPE_DELIMITER !== $this->type) {
             return false;
@@ -106,50 +75,32 @@ class Token
         return in_array($this->value, $values);
     }
 
-    /**
-     * @return boolean
-     */
-    public function isWhitespace()
+    public function isWhitespace(): bool
     {
         return self::TYPE_WHITESPACE === $this->type;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isIdentifier()
+    public function isIdentifier(): bool
     {
         return self::TYPE_IDENTIFIER === $this->type;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isHash()
+    public function isHash(): bool
     {
         return self::TYPE_HASH === $this->type;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isNumber()
+    public function isNumber(): bool
     {
         return self::TYPE_NUMBER === $this->type;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isString()
+    public function isString(): bool
     {
         return self::TYPE_STRING === $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->value) {
             return sprintf('<%s "%s" at %s>', $this->type, $this->value, $this->position);

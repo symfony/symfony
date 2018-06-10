@@ -14,79 +14,46 @@ namespace Symfony\Component\CssSelector\Parser;
 /**
  * CSS selector reader.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class Reader
 {
-    /**
-     * @var string
-     */
     private $source;
-
-    /**
-     * @var int
-     */
     private $length;
+    private $position = 0;
 
-    /**
-     * @var int
-     */
-    private $position;
-
-    /**
-     * @param string $source
-     */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
         $this->length = strlen($source);
-        $this->position = 0;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEOF()
+    public function isEOF(): bool
     {
         return $this->position >= $this->length;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
 
-    /**
-     * @return int
-     */
-    public function getRemainingLength()
+    public function getRemainingLength(): int
     {
         return $this->length - $this->position;
     }
 
-    /**
-     * @param int $length
-     * @param int $offset
-     *
-     * @return string
-     */
-    public function getSubstring($length, $offset = 0)
+    public function getSubstring(int $length, int $offset = 0): string
     {
         return substr($this->source, $this->position + $offset, $length);
     }
 
-    /**
-     * @param string $string
-     *
-     * @return int
-     */
-    public function getOffset($string)
+    public function getOffset(string $string)
     {
         $position = strpos($this->source, $string, $this->position);
 
@@ -94,11 +61,9 @@ class Reader
     }
 
     /**
-     * @param string $pattern
-     *
-     * @return bool
+     * @return array|false
      */
-    public function findPattern($pattern)
+    public function findPattern(string $pattern)
     {
         $source = substr($this->source, $this->position);
 
@@ -109,16 +74,11 @@ class Reader
         return false;
     }
 
-    /**
-     * @param int $length
-     */
-    public function moveForward($length)
+    public function moveForward(int $length)
     {
         $this->position += $length;
     }
 
-    /**
-     */
     public function moveToEnd()
     {
         $this->position = $this->length;

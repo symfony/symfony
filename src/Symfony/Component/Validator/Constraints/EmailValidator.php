@@ -11,22 +11,65 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Egulias\EmailValidator\Validation\EmailValidation;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class EmailValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * @internal
+     */
+    const PATTERN_HTML5 = '/^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/';
+
+    /**
+     * @internal
+     */
+    const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
+
+    private static $emailPatterns = array(
+        Email::VALIDATION_MODE_LOOSE => self::PATTERN_LOOSE,
+        Email::VALIDATION_MODE_HTML5 => self::PATTERN_HTML5,
+    );
+
+    /**
+     * @var string
+     */
+    private $defaultMode;
+
+    /**
+     * @param string $defaultMode
+     */
+    public function __construct($defaultMode = Email::VALIDATION_MODE_LOOSE)
+    {
+        if (is_bool($defaultMode)) {
+            @trigger_error(sprintf('Calling `new %s(%s)` is deprecated since Symfony 4.1, use `new %s("%s")` instead.', self::class, $defaultMode ? 'true' : 'false', self::class, $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE), E_USER_DEPRECATED);
+
+            $defaultMode = $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE;
+        }
+
+        if (!in_array($defaultMode, Email::$validationModes, true)) {
+            throw new \InvalidArgumentException('The "defaultMode" parameter value is not valid.');
+        }
+
+        $this->defaultMode = $defaultMode;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Email) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Email');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
@@ -36,50 +79,91 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if ($valid) {
-            $host = substr($value, strpos($value, '@') + 1);
+        if (null !== $constraint->strict) {
+            @trigger_error(sprintf('The %s::$strict property is deprecated since Symfony 4.1. Use %s::mode="%s" instead.', Email::class, Email::class, Email::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
 
-            if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
-                // Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
-                $valid = false;
-            }
-
-            // Check for host DNS resource records
-            if ($valid && $constraint->checkMX) {
-                $valid = $this->checkMX($host);
-            } elseif ($valid && $constraint->checkHost) {
-                $valid = $this->checkHost($host);
+            if ($constraint->strict) {
+                $constraint->mode = Email::VALIDATION_MODE_STRICT;
+            } else {
+                $constraint->mode = Email::VALIDATION_MODE_LOOSE;
             }
         }
 
-        if (!$valid) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+        if (null === $constraint->mode) {
+            $constraint->mode = $this->defaultMode;
+        }
+
+        if (!in_array($constraint->mode, Email::$validationModes, true)) {
+            throw new \InvalidArgumentException(sprintf('The %s::$mode parameter value is not valid.', get_class($constraint)));
+        }
+
+        if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {
+            if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
+                throw new RuntimeException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
+            }
+
+            $strictValidator = new \Egulias\EmailValidator\EmailValidator();
+
+            if (interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, new NoRFCWarningsValidation())) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::INVALID_FORMAT_ERROR)
+                    ->addViolation();
+
+                return;
+            } elseif (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::INVALID_FORMAT_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+        } elseif (!preg_match(self::$emailPatterns[$constraint->mode], $value)) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Email::INVALID_FORMAT_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        $host = (string) substr($value, strrpos($value, '@') + 1);
+
+        // Check for host DNS resource records
+        if ($constraint->checkMX) {
+            if (!$this->checkMX($host)) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::MX_CHECK_FAILED_ERROR)
+                    ->addViolation();
+            }
+
+            return;
+        }
+
+        if ($constraint->checkHost && !$this->checkHost($host)) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Email::HOST_CHECK_FAILED_ERROR)
+                ->addViolation();
         }
     }
 
     /**
      * Check DNS Records for MX type.
-     *
-     * @param string $host Host
-     *
-     * @return Boolean
      */
-    private function checkMX($host)
+    private function checkMX(string $host): bool
     {
-        return checkdnsrr($host, 'MX');
+        return '' !== $host && checkdnsrr($host, 'MX');
     }
 
     /**
      * Check if one of MX, A or AAAA DNS RR exists.
-     *
-     * @param string $host Host
-     *
-     * @return Boolean
      */
-    private function checkHost($host)
+    private function checkHost(string $host): bool
     {
-        return $this->checkMX($host) || (checkdnsrr($host, "A") || checkdnsrr($host, "AAAA"));
+        return '' !== $host && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
     }
 }

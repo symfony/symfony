@@ -15,13 +15,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Encapsulates common logic of {@link FormType} and {@link ButtonType}.
  *
  * This type does not appear in the form's type inheritance chain and as such
- * cannot be extended (via {@link FormTypeExtension}s) nor themed.
+ * cannot be extended (via {@link \Symfony\Component\Form\FormExtensionInterface}) nor themed.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -33,6 +33,7 @@ abstract class BaseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setDisabled($options['disabled']);
+        $builder->setAutoInitialize($options['auto_initialize']);
     }
 
     /**
@@ -43,6 +44,7 @@ abstract class BaseType extends AbstractType
         $name = $form->getName();
         $blockName = $options['block_name'] ?: $form->getName();
         $translationDomain = $options['translation_domain'];
+        $labelFormat = $options['label_format'];
 
         if ($view->parent) {
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {
@@ -55,8 +57,12 @@ abstract class BaseType extends AbstractType
                 $uniqueBlockPrefix = '_'.$blockName;
             }
 
-            if (!$translationDomain) {
+            if (null === $translationDomain) {
                 $translationDomain = $view->parent->vars['translation_domain'];
+            }
+
+            if (!$labelFormat) {
+                $labelFormat = $view->parent->vars['label_format'];
             }
         } else {
             $id = $name;
@@ -71,51 +77,48 @@ abstract class BaseType extends AbstractType
 
         $blockPrefixes = array();
         for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
-            array_unshift($blockPrefixes, $type->getName());
+            array_unshift($blockPrefixes, $type->getBlockPrefix());
         }
         $blockPrefixes[] = $uniqueBlockPrefix;
 
-        if (!$translationDomain) {
-            $translationDomain = 'messages';
-        }
-
         $view->vars = array_replace($view->vars, array(
-            'form'                => $view,
-            'id'                  => $id,
-            'name'                => $name,
-            'full_name'           => $fullName,
-            'disabled'            => $form->isDisabled(),
-            'label'               => $options['label'],
-            'multipart'           => false,
-            'attr'                => $options['attr'],
-            'block_prefixes'      => $blockPrefixes,
+            'form' => $view,
+            'id' => $id,
+            'name' => $name,
+            'full_name' => $fullName,
+            'disabled' => $form->isDisabled(),
+            'label' => $options['label'],
+            'label_format' => $labelFormat,
+            'multipart' => false,
+            'attr' => $options['attr'],
+            'block_prefixes' => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
-            'translation_domain'  => $translationDomain,
+            'translation_domain' => $translationDomain,
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
             // collection form have different types (dynamically), they should
             // be rendered differently.
             // https://github.com/symfony/symfony/issues/5038
-            'cache_key'           => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getName(),
+            'cache_key' => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getBlockPrefix(),
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'block_name'         => null,
-            'disabled'           => false,
-            'label'              => null,
-            'attr'               => array(),
+            'block_name' => null,
+            'disabled' => false,
+            'label' => null,
+            'label_format' => null,
+            'attr' => array(),
             'translation_domain' => null,
+            'auto_initialize' => true,
         ));
 
-        $resolver->setAllowedTypes(array(
-            'attr'       => 'array',
-        ));
+        $resolver->setAllowedTypes('attr', 'array');
     }
 }

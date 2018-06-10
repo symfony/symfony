@@ -11,18 +11,12 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\IniFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
+class IniFileLoaderTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testLoad()
     {
         $loader = new IniFileLoader();

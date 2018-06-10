@@ -14,45 +14,30 @@ namespace Symfony\Component\CssSelector\Node;
 /**
  * Represents a "<selector>.<name>" node.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class ClassNode extends AbstractNode
 {
-    /**
-     * @var NodeInterface
-     */
     private $selector;
-
-    /**
-     * @var string
-     */
     private $name;
 
-    /**
-     * @param NodeInterface $selector
-     * @param string        $name
-     */
-    public function __construct(NodeInterface $selector, $name)
+    public function __construct(NodeInterface $selector, string $name)
     {
         $this->selector = $selector;
         $this->name = $name;
     }
 
-    /**
-     * @return NodeInterface
-     */
-    public function getSelector()
+    public function getSelector(): NodeInterface
     {
         return $this->selector;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -60,7 +45,7 @@ class ClassNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function getSpecificity()
+    public function getSpecificity(): Specificity
     {
         return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
     }
@@ -68,7 +53,7 @@ class ClassNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%s[%s.%s]', $this->getNodeName(), $this->selector, $this->name);
     }

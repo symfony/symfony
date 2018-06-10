@@ -12,8 +12,12 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormView;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
 
 /**
  * FormExtension extends Twig with form capabilities.
@@ -21,29 +25,8 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormExtension extends \Twig_Extension
+class FormExtension extends AbstractExtension
 {
-    /**
-     * This property is public so that it can be accessed directly from compiled
-     * templates without having to call a getter, which slightly decreases performance.
-     *
-     * @var TwigRendererInterface
-     */
-    public $renderer;
-
-    public function __construct(TwigRendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRuntime(\Twig_Environment $environment)
-    {
-        $this->renderer->setEnvironment($environment);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -61,16 +44,16 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'form_enctype' => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\FormEnctypeNode', array('is_safe' => array('html'))),
-            'form_widget'  => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
-            'form_errors'  => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
-            'form_label'   => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
-            'form_row'     => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
-            'form_rest'    => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
-            'form'         => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\RenderBlockNode', array('is_safe' => array('html'))),
-            'form_start'   => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\RenderBlockNode', array('is_safe' => array('html'))),
-            'form_end'     => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\RenderBlockNode', array('is_safe' => array('html'))),
-            'csrf_token'   => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
+            new TwigFunction('form_widget', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_errors', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_label', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_help', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_row', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_rest', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_start', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('form_end', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
+            new TwigFunction('csrf_token', array('Symfony\Component\Form\FormRenderer', 'renderCsrfToken')),
         );
     }
 
@@ -80,7 +63,8 @@ class FormExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'humanize' => new \Twig_Filter_Method($this, 'renderer->humanize'),
+            new TwigFilter('humanize', array('Symfony\Component\Form\FormRenderer', 'humanize')),
+            new TwigFilter('form_encode_currency', array('Symfony\Component\Form\FormRenderer', 'encodeCurrency'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
 
@@ -90,40 +74,9 @@ class FormExtension extends \Twig_Extension
     public function getTests()
     {
         return array(
-            'selectedchoice' => new \Twig_Test_Method($this, 'isSelectedChoice'),
+            new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
+            new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
         );
-    }
-
-    /**
-     * Returns whether a choice is selected for a given form value.
-     *
-     * Unfortunately Twig does not support an efficient way to execute the
-     * "is_selected" closure passed to the template by ChoiceType. It is faster
-     * to implement the logic here (around 65ms for a specific form).
-     *
-     * Directly implementing the logic here is also faster than doing so in
-     * ChoiceView (around 30ms).
-     *
-     * The worst option tested so far is to implement the logic in ChoiceView
-     * and access the ChoiceView method directly in the template. Doing so is
-     * around 220ms slower than doing the method call here in the filter. Twig
-     * seems to be much more efficient at executing filters than at executing
-     * methods of an object.
-     *
-     * @param ChoiceView   $choice        The choice to check.
-     * @param string|array $selectedValue The selected value to compare.
-     *
-     * @return Boolean Whether the choice is selected.
-     *
-     * @see ChoiceView::isSelected()
-     */
-    public function isSelectedChoice(ChoiceView $choice, $selectedValue)
-    {
-        if (is_array($selectedValue)) {
-            return false !== array_search($choice->value, $selectedValue, true);
-        }
-
-        return $choice->value === $selectedValue;
     }
 
     /**
@@ -133,4 +86,32 @@ class FormExtension extends \Twig_Extension
     {
         return 'form';
     }
+}
+
+/**
+ * Returns whether a choice is selected for a given form value.
+ *
+ * This is a function and not callable due to performance reasons.
+ *
+ * @param string|array $selectedValue The selected value to compare
+ *
+ * @return bool Whether the choice is selected
+ *
+ * @see ChoiceView::isSelected()
+ */
+function twig_is_selected_choice(ChoiceView $choice, $selectedValue)
+{
+    if (is_array($selectedValue)) {
+        return in_array($choice->value, $selectedValue, true);
+    }
+
+    return $choice->value === $selectedValue;
+}
+
+/**
+ * @internal
+ */
+function twig_is_root_form(FormView $formView)
+{
+    return null === $formView->parent;
 }

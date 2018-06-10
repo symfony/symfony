@@ -16,54 +16,55 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DirectoryResource implements ResourceInterface, \Serializable
+class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
 {
     private $resource;
     private $pattern;
 
     /**
-     * Constructor.
+     * @param string      $resource The file path to the resource
+     * @param string|null $pattern  A pattern to restrict monitored files
      *
-     * @param string $resource The file path to the resource
-     * @param string $pattern  A pattern to restrict monitored files
+     * @throws \InvalidArgumentException
      */
-    public function __construct($resource, $pattern = null)
+    public function __construct(string $resource, string $pattern = null)
     {
-        $this->resource = $resource;
+        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
         $this->pattern = $pattern;
+
+        if (false === $this->resource || !is_dir($this->resource)) {
+            throw new \InvalidArgumentException(sprintf('The directory "%s" does not exist.', $resource));
+        }
     }
 
     /**
-     * Returns a string representation of the Resource.
-     *
-     * @return string A string representation of the Resource
+     * {@inheritdoc}
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return md5(serialize(array($this->resource, $this->pattern)));
     }
 
     /**
-     * Returns the resource tied to this Resource.
-     *
-     * @return mixed The resource
+     * @return string The file path to the resource
      */
     public function getResource()
     {
         return $this->resource;
     }
 
+    /**
+     * Returns the pattern to restrict monitored files.
+     *
+     * @return string|null
+     */
     public function getPattern()
     {
         return $this->pattern;
     }
 
     /**
-     * Returns true if the resource has not been updated since the given timestamp.
-     *
-     * @param integer $timestamp The last time the resource was loaded
-     *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * {@inheritdoc}
      */
     public function isFresh($timestamp)
     {
@@ -71,7 +72,10 @@ class DirectoryResource implements ResourceInterface, \Serializable
             return false;
         }
 
-        $newestMTime = filemtime($this->resource);
+        if ($timestamp < filemtime($this->resource)) {
+            return false;
+        }
+
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only check matching files
             if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
@@ -84,10 +88,20 @@ class DirectoryResource implements ResourceInterface, \Serializable
                 continue;
             }
 
-            $newestMTime = max($file->getMTime(), $newestMTime);
+            // for broken links
+            try {
+                $fileMTime = $file->getMTime();
+            } catch (\RuntimeException $e) {
+                continue;
+            }
+
+            // early return if a file's mtime exceeds the passed timestamp
+            if ($timestamp < $fileMTime) {
+                return false;
+            }
         }
 
-        return $newestMTime < $timestamp;
+        return true;
     }
 
     public function serialize()

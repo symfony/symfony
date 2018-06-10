@@ -23,8 +23,8 @@ class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatche
     {
         return array(
             '_controller' => 'Some controller reference...',
-            'path'        => $path,
-            'scheme'      => $scheme,
+            'path' => $path,
+            'scheme' => $scheme,
         );
     }
 }

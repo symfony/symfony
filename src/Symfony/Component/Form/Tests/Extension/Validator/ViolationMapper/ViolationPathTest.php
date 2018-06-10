@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ViolationPathTest extends \PHPUnit_Framework_TestCase
+class ViolationPathTest extends TestCase
 {
     public function providePaths()
     {
@@ -30,7 +31,8 @@ class ViolationPathTest extends \PHPUnit_Framework_TestCase
             )),
             array('children[address][street]', array(
                 array('address', true, true),
-            ), 'children[address]'),
+                array('street', true, true),
+            ), 'children[address].children[street]'),
             array('children[address].data', array(
                 array('address', true, true),
             ), 'children[address]'),
@@ -94,7 +96,7 @@ class ViolationPathTest extends \PHPUnit_Framework_TestCase
         $path = new ViolationPath($string);
 
         $this->assertSame($slicedPath, $path->__toString());
-        $this->assertSame(count($entries), count($path->getElements()));
+        $this->assertCount(count($entries), $path->getElements());
         $this->assertSame(count($entries), $path->getLength());
 
         foreach ($entries as $index => $entry) {
@@ -126,7 +128,7 @@ class ViolationPathTest extends \PHPUnit_Framework_TestCase
     public function testGetParent($violationPath, $parentPath)
     {
         $path = new ViolationPath($violationPath);
-        $parent = $parentPath === null ? null : new ViolationPath($parentPath);
+        $parent = null === $parentPath ? null : new ViolationPath($parentPath);
 
         $this->assertEquals($parent, $path->getParent());
     }

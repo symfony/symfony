@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Debug\Exception;
 
+use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
- * FlattenException wraps a PHP Exception to be able to serialize it.
+ * FlattenException wraps a PHP Error or Exception to be able to serialize it.
  *
  * Basically, this class removes all objects from the trace.
  *
@@ -34,6 +35,11 @@ class FlattenException
 
     public static function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
+        return static::createFromThrowable($exception, $statusCode, $headers);
+    }
+
+    public static function createFromThrowable(\Throwable $exception, ?int $statusCode = null, array $headers = array()): self
+    {
         $e = new static();
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
@@ -41,6 +47,8 @@ class FlattenException
         if ($exception instanceof HttpExceptionInterface) {
             $statusCode = $exception->getStatusCode();
             $headers = array_merge($headers, $exception->getHeaders());
+        } elseif ($exception instanceof RequestExceptionInterface) {
+            $statusCode = 400;
         }
 
         if (null === $statusCode) {
@@ -49,12 +57,15 @@ class FlattenException
 
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
-        $e->setTraceFromException($exception);
-        $e->setClass(get_class($exception));
+        $e->setTraceFromThrowable($exception);
+        $e->setClass($exception instanceof FatalThrowableError ? $exception->getOriginalClassName() : \get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
-        if ($exception->getPrevious()) {
-            $e->setPrevious(static::create($exception->getPrevious()));
+
+        $previous = $exception->getPrevious();
+
+        if ($previous instanceof \Throwable) {
+            $e->setPrevious(static::createFromThrowable($previous));
         }
 
         return $e;
@@ -66,8 +77,8 @@ class FlattenException
         foreach (array_merge(array($this), $this->getAllPrevious()) as $exception) {
             $exceptions[] = array(
                 'message' => $exception->getMessage(),
-                'class'   => $exception->getClass(),
-                'trace'   => $exception->getTrace(),
+                'class' => $exception->getClass(),
+                'trace' => $exception->getTrace(),
             );
         }
 
@@ -149,7 +160,7 @@ class FlattenException
         return $this->previous;
     }
 
-    public function setPrevious(FlattenException $previous)
+    public function setPrevious(self $previous)
     {
         $this->previous = $previous;
     }
@@ -170,52 +181,33 @@ class FlattenException
         return $this->trace;
     }
 
+    /**
+     * @deprecated since 4.1, use {@see setTraceFromThrowable()} instead.
+     */
     public function setTraceFromException(\Exception $exception)
     {
-        $trace = $exception->getTrace();
+        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1, use "setTraceFromThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
 
-        if ($exception instanceof FatalErrorException) {
-            if (function_exists('xdebug_get_function_stack')) {
-                $trace = array_slice(array_reverse(xdebug_get_function_stack()), 4);
+        $this->setTraceFromThrowable($exception);
+    }
 
-                foreach ($trace as $i => $frame) {
-                    //  XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
-                    if (!isset($frame['type'])) {
-                        $trace[$i]['type'] = '??';
-                    }
-
-                    if ('dynamic' === $trace[$i]['type']) {
-                        $trace[$i]['type'] = '->';
-                    } elseif ('static' === $trace[$i]['type']) {
-                        $trace[$i]['type'] = '::';
-                    }
-
-                    // XDebug also has a different name for the parameters array
-                    if (isset($frame['params']) && !isset($frame['args'])) {
-                        $trace[$i]['args'] = $frame['params'];
-                        unset($trace[$i]['params']);
-                    }
-                }
-            } else {
-                $trace = array_slice(array_reverse($trace), 1);
-            }
-        }
-
-        $this->setTrace($trace, $exception->getFile(), $exception->getLine());
+    public function setTraceFromThrowable(\Throwable $throwable): void
+    {
+        $this->setTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
     }
 
     public function setTrace($trace, $file, $line)
     {
         $this->trace = array();
         $this->trace[] = array(
-            'namespace'   => '',
+            'namespace' => '',
             'short_class' => '',
-            'class'       => '',
-            'type'        => '',
-            'function'    => '',
-            'file'        => $file,
-            'line'        => $line,
-            'args'        => array(),
+            'class' => '',
+            'type' => '',
+            'function' => '',
+            'file' => $file,
+            'line' => $line,
+            'args' => array(),
         );
         foreach ($trace as $entry) {
             $class = '';
@@ -227,39 +219,46 @@ class FlattenException
             }
 
             $this->trace[] = array(
-                'namespace'   => $namespace,
+                'namespace' => $namespace,
                 'short_class' => $class,
-                'class'       => isset($entry['class']) ? $entry['class'] : '',
-                'type'        => isset($entry['type']) ? $entry['type'] : '',
-                'function'    => isset($entry['function']) ? $entry['function'] : null,
-                'file'        => isset($entry['file']) ? $entry['file'] : null,
-                'line'        => isset($entry['line']) ? $entry['line'] : null,
-                'args'        => isset($entry['args']) ? $this->flattenArgs($entry['args']) : array(),
+                'class' => isset($entry['class']) ? $entry['class'] : '',
+                'type' => isset($entry['type']) ? $entry['type'] : '',
+                'function' => isset($entry['function']) ? $entry['function'] : null,
+                'file' => isset($entry['file']) ? $entry['file'] : null,
+                'line' => isset($entry['line']) ? $entry['line'] : null,
+                'args' => isset($entry['args']) ? $this->flattenArgs($entry['args']) : array(),
             );
         }
     }
 
-    private function flattenArgs($args, $level = 0)
+    private function flattenArgs($args, $level = 0, &$count = 0)
     {
         $result = array();
         foreach ($args as $key => $value) {
-            if (is_object($value)) {
+            if (++$count > 1e4) {
+                return array('array', '*SKIPPED over 10000 entries*');
+            }
+            if ($value instanceof \__PHP_Incomplete_Class) {
+                // is_object() returns false on PHP<=7.1
+                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
+            } elseif (is_object($value)) {
                 $result[$key] = array('object', get_class($value));
             } elseif (is_array($value)) {
                 if ($level > 10) {
                     $result[$key] = array('array', '*DEEP NESTED ARRAY*');
                 } else {
-                    $result[$key] = array('array', $this->flattenArgs($value, ++$level));
+                    $result[$key] = array('array', $this->flattenArgs($value, $level + 1, $count));
                 }
             } elseif (null === $value) {
                 $result[$key] = array('null', null);
             } elseif (is_bool($value)) {
                 $result[$key] = array('boolean', $value);
+            } elseif (is_int($value)) {
+                $result[$key] = array('integer', $value);
+            } elseif (is_float($value)) {
+                $result[$key] = array('float', $value);
             } elseif (is_resource($value)) {
                 $result[$key] = array('resource', get_resource_type($value));
-            } elseif ($value instanceof \__PHP_Incomplete_Class) {
-                // Special case of object, is_object will return false
-                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
             } else {
                 $result[$key] = array('string', (string) $value);
             }

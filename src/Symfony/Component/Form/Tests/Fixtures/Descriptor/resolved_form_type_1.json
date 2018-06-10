@@ -1,0 +1,68 @@
+{
+    "class": "Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType",
+    "block_prefix": "choice",
+    "options": {
+        "own": [
+            "choice_attr",
+            "choice_label",
+            "choice_loader",
+            "choice_name",
+            "choice_translation_domain",
+            "choice_value",
+            "choices",
+            "expanded",
+            "group_by",
+            "multiple",
+            "placeholder",
+            "preferred_choices"
+        ],
+        "overridden": {
+            "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [
+                "compound",
+                "data_class",
+                "empty_data",
+                "error_bubbling",
+                "trim"
+            ]
+        },
+        "parent": {
+            "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [
+                "action",
+                "attr",
+                "auto_initialize",
+                "block_name",
+                "by_reference",
+                "data",
+                "disabled",
+                "help",
+                "inherit_data",
+                "label",
+                "label_attr",
+                "label_format",
+                "mapped",
+                "method",
+                "post_max_size_message",
+                "property_path",
+                "required",
+                "translation_domain",
+                "upload_max_size_message"
+            ]
+        },
+        "extension": {
+            "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension": [
+                "csrf_field_name",
+                "csrf_message",
+                "csrf_protection",
+                "csrf_token_id",
+                "csrf_token_manager"
+            ]
+        },
+        "required": []
+    },
+    "parent_types": [
+        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType"
+    ],
+    "type_extensions": [
+        "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension"
+    ]
+}

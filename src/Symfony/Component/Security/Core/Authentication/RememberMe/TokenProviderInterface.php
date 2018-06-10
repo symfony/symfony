@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
+
 /**
- * Interface for TokenProviders
+ * Interface for TokenProviders.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -42,14 +44,13 @@ interface TokenProviderInterface
      * @param string    $series
      * @param string    $tokenValue
      * @param \DateTime $lastUsed
+     *
      * @throws TokenNotFoundException if the token is not found
      */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed);
 
     /**
      * Creates a new token.
-     *
-     * @param PersistentTokenInterface $token
      */
     public function createNewToken(PersistentTokenInterface $token);
 }

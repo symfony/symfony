@@ -1,0 +1,70 @@
+{% use "bootstrap_3_layout.html.twig" %}
+
+{% block form_start -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-horizontal')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_start %}
+
+{# Labels #}
+
+{% block form_label -%}
+    {%- if label is same as(false) -%}
+        <div class="{{ block('form_label_class') }}"></div>
+    {%- else -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ block('form_label_class'))|trim}) -%}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock form_label %}
+
+{% block form_label_class -%}
+col-sm-2
+{%- endblock form_label_class %}
+
+{# Rows #}
+
+{% block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+        {{- form_label(form) -}}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        </div>
+{##}</div>
+{%- endblock form_row %}
+
+{% block submit_row -%}
+    <div class="form-group">{#--#}
+        <div class="{{ block('form_label_class') }}"></div>{#--#}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+        </div>{#--#}
+    </div>
+{%- endblock submit_row %}
+
+{% block reset_row -%}
+    <div class="form-group">{#--#}
+        <div class="{{ block('form_label_class') }}"></div>{#--#}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+        </div>{#--#}
+    </div>
+{%- endblock reset_row %}
+
+{% block form_group_class -%}
+col-sm-10
+{%- endblock form_group_class %}
+
+{% block checkbox_row -%}
+    <div class="form-group{% if not valid %} has-error{% endif %}">{#--#}
+        <div class="{{ block('form_label_class') }}"></div>{#--#}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+            {{- form_errors(form) -}}
+        </div>{#--#}
+    </div>
+{%- endblock checkbox_row %}

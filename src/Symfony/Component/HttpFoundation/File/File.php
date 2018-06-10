@@ -20,22 +20,18 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  * A file in the file system.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class File extends \SplFileInfo
 {
     /**
      * Constructs a new file from the given path.
      *
-     * @param string  $path      The path to the file
-     * @param Boolean $checkPath Whether to check the path or not
+     * @param string $path      The path to the file
+     * @param bool   $checkPath Whether to check the path or not
      *
      * @throws FileNotFoundException If the given path is not a file
-     *
-     * @api
      */
-    public function __construct($path, $checkPath = true)
+    public function __construct(string $path, bool $checkPath = true)
     {
         if ($checkPath && !is_file($path)) {
             throw new FileNotFoundException($path);
@@ -53,8 +49,6 @@ class File extends \SplFileInfo
      * to guess the file extension.
      *
      * @return string|null The guessed extension or null if it cannot be guessed
-     *
-     * @api
      *
      * @see ExtensionGuesser
      * @see getMimeType()
@@ -74,11 +68,9 @@ class File extends \SplFileInfo
      * mime_content_type() and the system binary "file" (in this order), depending on
      * which of those are available.
      *
-     * @return string|null The guessed mime type (i.e. "application/pdf")
+     * @return string|null The guessed mime type (e.g. "application/pdf")
      *
      * @see MimeTypeGuesser
-     *
-     * @api
      */
     public function getMimeType()
     {
@@ -88,38 +80,24 @@ class File extends \SplFileInfo
     }
 
     /**
-     * Returns the extension of the file.
-     *
-     * \SplFileInfo::getExtension() is not available before PHP 5.3.6
-     *
-     * @return string The extension
-     *
-     * @api
-     */
-    public function getExtension()
-    {
-        return pathinfo($this->getBasename(), PATHINFO_EXTENSION);
-    }
-
-    /**
      * Moves the file to a new location.
      *
      * @param string $directory The destination folder
      * @param string $name      The new file name
      *
-     * @return File A File object representing the new file
+     * @return self A File object representing the new file
      *
      * @throws FileException if the target file could not be created
-     *
-     * @api
      */
     public function move($directory, $name = null)
     {
         $target = $this->getTargetFile($directory, $name);
 
-        if (!@rename($this->getPathname(), $target)) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+        $renamed = rename($this->getPathname(), $target);
+        restore_error_handler();
+        if (!$renamed) {
+            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error)));
         }
 
         @chmod($target, 0666 & ~umask());
@@ -130,16 +108,16 @@ class File extends \SplFileInfo
     protected function getTargetFile($directory, $name = null)
     {
         if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0777, true)) {
+            if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
                 throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
             }
         } elseif (!is_writable($directory)) {
             throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
         }
 
-        $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
+        $target = rtrim($directory, '/\\').DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
 
-        return new File($target, false);
+        return new self($target, false);
     }
 
     /**

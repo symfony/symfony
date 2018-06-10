@@ -47,12 +47,10 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
     /**
      * Extracts the duplicated value from an array.
      *
-     * @param array $array
-     *
      * @return mixed The value
      *
-     * @throws TransformationFailedException If the given value is not an array or
-     *                                       if the given array can not be transformed.
+     * @throws TransformationFailedException if the given value is not an array or
+     *                                       if the given array can not be transformed
      */
     public function reverseTransform($array)
     {
@@ -64,7 +62,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         $emptyKeys = array();
 
         foreach ($this->keys as $key) {
-            if (!empty($array[$key])) {
+            if (isset($array[$key]) && '' !== $array[$key] && false !== $array[$key] && array() !== $array[$key]) {
                 if ($array[$key] !== $result) {
                     throw new TransformationFailedException(
                         'All values in the array should be the same'
@@ -78,7 +76,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         if (count($emptyKeys) > 0) {
             if (count($emptyKeys) == count($this->keys)) {
                 // All keys empty
-                return null;
+                return;
             }
 
             throw new TransformationFailedException(

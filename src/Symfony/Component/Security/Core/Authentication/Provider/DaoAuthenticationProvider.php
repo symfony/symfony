@@ -31,16 +31,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     private $encoderFactory;
     private $userProvider;
 
-    /**
-     * Constructor.
-     *
-     * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
-     * @param UserCheckerInterface    $userChecker                An UserCheckerInterface instance
-     * @param string                  $providerKey                The provider key
-     * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
-     * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
-     */
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, EncoderFactoryInterface $encoderFactory, bool $hideUserNotFoundExceptions = true)
     {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
 
@@ -59,7 +50,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('The credentials were changed from another session.');
             }
         } else {
-            if ("" === ($presentedPassword = $token->getCredentials())) {
+            if ('' === ($presentedPassword = $token->getCredentials())) {
                 throw new BadCredentialsException('The presented password cannot be empty.');
             }
 
@@ -87,13 +78,13 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             }
 
             return $user;
-        } catch (UsernameNotFoundException $notFound) {
-            $notFound->setUsername($username);
-            throw $notFound;
-        } catch (\Exception $repositoryProblem) {
-            $ex = new AuthenticationServiceException($repositoryProblem->getMessage(), 0, $repositoryProblem);
-            $ex->setToken($token);
-            throw $ex;
+        } catch (UsernameNotFoundException $e) {
+            $e->setUsername($username);
+            throw $e;
+        } catch (\Exception $e) {
+            $e = new AuthenticationServiceException($e->getMessage(), 0, $e);
+            $e->setToken($token);
+            throw $e;
         }
     }
 }

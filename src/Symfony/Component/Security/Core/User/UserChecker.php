@@ -28,24 +28,12 @@ class UserChecker implements UserCheckerInterface
      */
     public function checkPreAuth(UserInterface $user)
     {
-        if (!$user instanceof AdvancedUserInterface) {
+        if (!$user instanceof AdvancedUserInterface && !$user instanceof User) {
             return;
         }
 
-        if (!$user->isCredentialsNonExpired()) {
-            $ex = new CredentialsExpiredException('User credentials have expired.');
-            $ex->setUser($user);
-            throw $ex;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkPostAuth(UserInterface $user)
-    {
-        if (!$user instanceof AdvancedUserInterface) {
-            return;
+        if ($user instanceof AdvancedUserInterface && !$user instanceof User) {
+            @trigger_error(sprintf('Calling %s with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.', __METHOD__), E_USER_DEPRECATED);
         }
 
         if (!$user->isAccountNonLocked()) {
@@ -62,6 +50,26 @@ class UserChecker implements UserCheckerInterface
 
         if (!$user->isAccountNonExpired()) {
             $ex = new AccountExpiredException('User account has expired.');
+            $ex->setUser($user);
+            throw $ex;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkPostAuth(UserInterface $user)
+    {
+        if (!$user instanceof AdvancedUserInterface && !$user instanceof User) {
+            return;
+        }
+
+        if ($user instanceof AdvancedUserInterface && !$user instanceof User) {
+            @trigger_error(sprintf('Calling %s with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        if (!$user->isCredentialsNonExpired()) {
+            $ex = new CredentialsExpiredException('User credentials have expired.');
             $ex->setUser($user);
             throw $ex;
         }

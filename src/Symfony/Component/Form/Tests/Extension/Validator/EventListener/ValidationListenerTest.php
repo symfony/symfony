@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
@@ -19,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ValidationListenerTest extends \PHPUnit_Framework_TestCase
+class ValidationListenerTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -54,14 +55,10 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $this->violationMapper = $this->getMock('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface');
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+        $this->violationMapper = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface')->getMock();
         $this->listener = new ValidationListener($this->validator, $this->violationMapper);
         $this->message = 'Message';
         $this->messageTemplate = 'Message template';
@@ -70,7 +67,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getConstraintViolation($code = null)
     {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, new Form());
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
@@ -91,7 +88,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
     }
 
     // More specific mapping tests can be found in ViolationMapperTest
@@ -113,7 +110,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testMapViolationAllowsNonSyncIfInvalid()
     {
-        $violation = $this->getConstraintViolation(Form::ERR_INVALID);
+        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR);
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())
@@ -161,5 +158,13 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('mapViolation');
 
         $this->listener->validateForm(new FormEvent($form, null));
+    }
+
+    public function testValidatorInterface()
+    {
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+
+        $listener = new ValidationListener($validator, $this->violationMapper);
+        $this->assertAttributeSame($validator, 'validator', $listener);
     }
 }

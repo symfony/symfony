@@ -15,32 +15,31 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Extends the \RecursiveDirectoryIterator to support relative paths
+ * Extends the \RecursiveDirectoryIterator to support relative paths.
  *
  * @author Victor Berchet <victor@suumit.com>
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
     /**
-     * @var boolean
+     * @var bool
      */
     private $ignoreUnreadableDirs;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $rewindable;
 
+    // these 3 properties take part of the performance optimization to avoid redoing the same work in all iterations
+    private $rootPath;
+    private $subPath;
+    private $directorySeparator = '/';
+
     /**
-     * Constructor.
-     *
-     * @param string  $path
-     * @param int     $flags
-     * @param boolean $ignoreUnreadableDirs
-     *
      * @throws \RuntimeException
      */
-    public function __construct($path, $flags, $ignoreUnreadableDirs = false)
+    public function __construct(string $path, int $flags, bool $ignoreUnreadableDirs = false)
     {
         if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
             throw new \RuntimeException('This iterator only support returning current as fileinfo.');
@@ -48,16 +47,30 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 
         parent::__construct($path, $flags);
         $this->ignoreUnreadableDirs = $ignoreUnreadableDirs;
+        $this->rootPath = $path;
+        if ('/' !== DIRECTORY_SEPARATOR && !($flags & self::UNIX_PATHS)) {
+            $this->directorySeparator = DIRECTORY_SEPARATOR;
+        }
     }
 
     /**
-     * Return an instance of SplFileInfo with support for relative paths
+     * Return an instance of SplFileInfo with support for relative paths.
      *
      * @return SplFileInfo File information
      */
     public function current()
     {
-        return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
+        // the logic here avoids redoing the same work in all iterations
+
+        if (null === $subPathname = $this->subPath) {
+            $subPathname = $this->subPath = (string) $this->getSubPath();
+        }
+        if ('' !== $subPathname) {
+            $subPathname .= $this->directorySeparator;
+        }
+        $subPathname .= $this->getFilename();
+
+        return new SplFileInfo($this->rootPath.$this->directorySeparator.$subPathname, $this->subPath, $subPathname);
     }
 
     /**
@@ -68,7 +81,18 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function getChildren()
     {
         try {
-            return parent::getChildren();
+            $children = parent::getChildren();
+
+            if ($children instanceof self) {
+                // parent method will call the constructor with default arguments, so unreadable dirs won't be ignored anymore
+                $children->ignoreUnreadableDirs = $this->ignoreUnreadableDirs;
+
+                // performance optimization to avoid redoing the same work in all children
+                $children->rewindable = &$this->rewindable;
+                $children->rootPath = $this->rootPath;
+            }
+
+            return $children;
         } catch (\UnexpectedValueException $e) {
             if ($this->ignoreUnreadableDirs) {
                 // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
@@ -80,7 +104,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     }
 
     /**
-     * Do nothing for non rewindable stream
+     * Do nothing for non rewindable stream.
      */
     public function rewind()
     {
@@ -88,16 +112,13 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             return;
         }
 
-        // @see https://bugs.php.net/bug.php?id=49104
-        parent::next();
-
         parent::rewind();
     }
 
     /**
      * Checks if the stream is rewindable.
      *
-     * @return Boolean true when the stream is rewindable, false otherwise
+     * @return bool true when the stream is rewindable, false otherwise
      */
     public function isRewindable()
     {

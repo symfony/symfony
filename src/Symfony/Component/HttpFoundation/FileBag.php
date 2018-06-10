@@ -14,23 +14,17 @@ namespace Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * FileBag is a container for HTTP headers.
+ * FileBag is a container for uploaded files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- *
- * @api
  */
 class FileBag extends ParameterBag
 {
     private static $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
 
     /**
-     * Constructor.
-     *
      * @param array $parameters An array of HTTP files
-     *
-     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -39,8 +33,6 @@ class FileBag extends ParameterBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function replace(array $files = array())
     {
@@ -50,8 +42,6 @@ class FileBag extends ParameterBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function set($key, $value)
     {
@@ -64,8 +54,6 @@ class FileBag extends ParameterBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function add(array $files = array())
     {
@@ -79,7 +67,7 @@ class FileBag extends ParameterBag
      *
      * @param array|UploadedFile $file A (multi-dimensional) array of uploaded file information
      *
-     * @return array A (multi-dimensional) array of UploadedFile instances
+     * @return UploadedFile[]|UploadedFile|null A (multi-dimensional) array of UploadedFile instances
      */
     protected function convertFileInformation($file)
     {
@@ -96,10 +84,13 @@ class FileBag extends ParameterBag
                 if (UPLOAD_ERR_NO_FILE == $file['error']) {
                     $file = null;
                 } else {
-                    $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['size'], $file['error']);
+                    $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['error']);
                 }
             } else {
                 $file = array_map(array($this, 'convertFileInformation'), $file);
+                if (array_keys($keys) === $keys) {
+                    $file = array_filter($file);
+                }
             }
         }
 
@@ -117,8 +108,6 @@ class FileBag extends ParameterBag
      *
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
-     *
-     * @param array $data
      *
      * @return array
      */
@@ -140,13 +129,13 @@ class FileBag extends ParameterBag
             unset($files[$k]);
         }
 
-        foreach (array_keys($data['name']) as $key) {
+        foreach ($data['name'] as $key => $name) {
             $files[$key] = $this->fixPhpFilesArray(array(
-                'error'    => $data['error'][$key],
-                'name'     => $data['name'][$key],
-                'type'     => $data['type'][$key],
+                'error' => $data['error'][$key],
+                'name' => $name,
+                'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
-                'size'     => $data['size'][$key]
+                'size' => $data['size'][$key],
             ));
         }
 

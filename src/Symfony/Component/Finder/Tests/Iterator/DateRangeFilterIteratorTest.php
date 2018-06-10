@@ -21,7 +21,9 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($size, $expected)
     {
-        $inner = new Iterator(self::$files);
+        $files = self::$files;
+        $files[] = self::toAbsolute('doesnotexist');
+        $inner = new Iterator($files);
 
         $iterator = new DateRangeFilterIterator($inner, $size);
 
@@ -37,11 +39,21 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo',
             '.foo/.bar',
             'foo bar',
             '.foo/bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         );
 
         $since2MonthsAgo = array(
@@ -49,20 +61,26 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'test.py',
             'foo',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo',
             '.foo/.bar',
             'foo bar',
             '.foo/bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         );
 
         $untilLastMonth = array(
-            '.git',
-            'foo',
             'foo/bar.tmp',
             'test.php',
-            'toto',
-            '.foo',
         );
 
         return array(

@@ -1,0 +1,12 @@
+{
+    "Version": "2.1.38.39",
+    "Names": {
+        "ace": "acehnés",
+        "arp": "arapaho",
+        "bho": "bhojpuri",
+        "grc": "griego antiguo",
+        "nso": "sotho septentrional",
+        "ss": "siswati",
+        "wo": "wolof"
+    }
+}

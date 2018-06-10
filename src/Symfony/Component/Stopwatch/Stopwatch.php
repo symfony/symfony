@@ -19,18 +19,35 @@ namespace Symfony\Component\Stopwatch;
 class Stopwatch
 {
     /**
+     * @var bool
+     */
+    private $morePrecision;
+
+    /**
      * @var Section[]
      */
     private $sections;
 
     /**
-     * @var array
+     * @var Section[]
      */
     private $activeSections;
 
-    public function __construct()
+    /**
+     * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
+     */
+    public function __construct(bool $morePrecision = false)
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
+        $this->morePrecision = $morePrecision;
+        $this->reset();
+    }
+
+    /**
+     * @return Section[]
+     */
+    public function getSections()
+    {
+        return $this->sections;
     }
 
     /**
@@ -58,7 +75,7 @@ class Stopwatch
      *
      * The id parameter is used to retrieve the events from this section.
      *
-     * @see getSectionEvents
+     * @see getSectionEvents()
      *
      * @param string $id The identifier of the section
      *
@@ -82,7 +99,7 @@ class Stopwatch
      * @param string $name     The event name
      * @param string $category The event category
      *
-     * @return StopwatchEvent A StopwatchEvent instance
+     * @return StopwatchEvent
      */
     public function start($name, $category = null)
     {
@@ -90,7 +107,7 @@ class Stopwatch
     }
 
     /**
-     * Checks if the event was started
+     * Checks if the event was started.
      *
      * @param string $name The event name
      *
@@ -106,7 +123,7 @@ class Stopwatch
      *
      * @param string $name The event name
      *
-     * @return StopwatchEvent A StopwatchEvent instance
+     * @return StopwatchEvent
      */
     public function stop($name)
     {
@@ -118,7 +135,7 @@ class Stopwatch
      *
      * @param string $name The event name
      *
-     * @return StopwatchEvent A StopwatchEvent instance
+     * @return StopwatchEvent
      */
     public function lap($name)
     {
@@ -126,180 +143,34 @@ class Stopwatch
     }
 
     /**
+     * Returns a specific event by name.
+     *
+     * @param string $name The event name
+     *
+     * @return StopwatchEvent
+     */
+    public function getEvent($name)
+    {
+        return end($this->activeSections)->getEvent($name);
+    }
+
+    /**
      * Gets all events for a given section.
      *
      * @param string $id A section identifier
      *
-     * @return StopwatchEvent[] An array of StopwatchEvent instances
+     * @return StopwatchEvent[]
      */
     public function getSectionEvents($id)
     {
         return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : array();
     }
-}
-
-
-/**
- * @internal This class is for internal usage only
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-class Section
-{
-    /**
-     * @var StopwatchEvent[]
-     */
-    private $events = array();
 
     /**
-     * @var null|float
+     * Resets the stopwatch to its original state.
      */
-    private $origin;
-
-    /**
-     * @var string
-     */
-    private $id;
-
-    /**
-     * @var Section[]
-     */
-    private $children = array();
-
-    /**
-     * Constructor.
-     *
-     * @param float|null $origin Set the origin of the events in this section, use null to set their origin to their start time
-     */
-    public function __construct($origin = null)
+    public function reset()
     {
-        $this->origin = is_numeric($origin) ? $origin : null;
-    }
-
-    /**
-     * Returns the child section.
-     *
-     * @param string $id The child section identifier
-     *
-     * @return Section|null The child section or null when none found
-     */
-    public function get($id)
-    {
-        foreach ($this->children as $child) {
-            if ($id === $child->getId()) {
-                return $child;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Creates or re-opens a child section.
-     *
-     * @param string|null $id null to create a new section, the identifier to re-open an existing one.
-     *
-     * @return Section A child section
-     */
-    public function open($id)
-    {
-        if (null === $session = $this->get($id)) {
-            $session = $this->children[] = new self(microtime(true) * 1000);
-        }
-
-        return $session;
-    }
-
-    /**
-     * @return string The identifier of the section
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Sets the session identifier.
-     *
-     * @param string $id The session identifier
-     *
-     * @return Section The current section
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Starts an event.
-     *
-     * @param string $name     The event name
-     * @param string $category The event category
-     *
-     * @return StopwatchEvent The event
-     */
-    public function startEvent($name, $category)
-    {
-        if (!isset($this->events[$name])) {
-            $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category);
-        }
-
-        return $this->events[$name]->start();
-    }
-
-    /**
-     * Checks if the event was started
-     *
-     * @param string $name The event name
-     *
-     * @return bool
-     */
-    public function isEventStarted($name)
-    {
-        return isset($this->events[$name]) && $this->events[$name]->isStarted();
-    }
-
-    /**
-     * Stops an event.
-     *
-     * @param string $name The event name
-     *
-     * @return StopwatchEvent The event
-     *
-     * @throws \LogicException When the event has not been started
-     */
-    public function stopEvent($name)
-    {
-        if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not started.', $name));
-        }
-
-        return $this->events[$name]->stop();
-    }
-
-    /**
-     * Stops then restarts an event.
-     *
-     * @param string $name The event name
-     *
-     * @return StopwatchEvent The event
-     *
-     * @throws \LogicException When the event has not been started
-     */
-    public function lap($name)
-    {
-        return $this->stopEvent($name)->start();
-    }
-
-    /**
-     * Returns the events from this section.
-     *
-     * @return StopwatchEvent[] An array of StopwatchEvent instances
-     */
-    public function getEvents()
-    {
-        return $this->events;
+        $this->sections = $this->activeSections = array('__root__' => new Section(null, $this->morePrecision));
     }
 }

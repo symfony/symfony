@@ -1,6 +1,104 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* added `CacheableSupportsMethodInterface` for normalizers and denormalizers that use
+  only the type and the format in their `supports*()` methods
+* added `MissingConstructorArgumentsException` new exception for deserialization failure
+  of objects that needs data insertion in constructor
+* added an optional `default_constructor_arguments` option of context to specify a default data in
+  case the object is not initializable by its constructor because of data missing
+* added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
+* added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
+  maximum depth is reached
+* added optional `int[] $ignoredNodeTypes` argument to `XmlEncoder::__construct`. XML decoding now
+  ignores comment node types by default.
+* added `ConstraintViolationListNormalizer`
+
+4.0.0
+-----
+
+ * removed the `SerializerAwareEncoder` and `SerializerAwareNormalizer` classes,
+   use the `SerializerAwareTrait` instead
+ * removed the `Serializer::$normalizerCache` and `Serializer::$denormalizerCache`
+   properties
+ * added an optional `string $format = null` argument to `AbstractNormalizer::instantiateObject`
+ * added an optional `array $context = array()` to `Serializer::supportsNormalization`, `Serializer::supportsDenormalization`,
+   `Serializer::supportsEncoding` and `Serializer::supportsDecoding`
+
+3.4.0
+-----
+
+ * added `AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT` context option
+   to disable throwing an `UnexpectedValueException` on a type mismatch
+ * added support for serializing `DateInterval` objects
+ * added getter for extra attributes in `ExtraAttributesException`
+ * improved `CsvEncoder` to handle variable nested structures
+ * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable
+ * added `$context` when checking for encoding, decoding and normalizing in `Serializer`
+
+3.3.0
+-----
+
+ * added `SerializerPass`
+
+3.1.0
+-----
+
+ * added support for serializing objects that implement `JsonSerializable`
+ * added the `DenormalizerAwareTrait` and `NormalizerAwareTrait` traits to
+   support normalizer/denormalizer awareness
+ * added the `DenormalizerAwareInterface` and `NormalizerAwareInterface`
+   interfaces to support normalizer/denormalizer awareness
+ * added a PSR-6 compatible adapter for caching metadata
+ * added a `MaxDepth` option to limit the depth of the object graph when
+   serializing objects
+ * added support for serializing `SplFileInfo` objects
+ * added support for serializing objects that implement `DateTimeInterface`
+ * added `AbstractObjectNormalizer` as a base class for normalizers that deal
+   with objects
+ * added support to relation deserialization
+
+2.7.0
+-----
+
+ * added support for serialization and deserialization groups including
+   annotations, XML and YAML mapping.
+ * added `AbstractNormalizer` to factorise code and ease normalizers development
+ * added circular references handling for `PropertyNormalizer`
+ * added support for a context key called `object_to_populate` in `AbstractNormalizer`
+   to reuse existing objects in the deserialization process
+ * added `NameConverterInterface` and `CamelCaseToSnakeCaseNameConverter`
+ * [DEPRECATION] `GetSetMethodNormalizer::setCamelizedAttributes()` and
+   `PropertyNormalizer::setCamelizedAttributes()` are replaced by
+   `CamelCaseToSnakeCaseNameConverter`
+ * [DEPRECATION] the `Exception` interface has been renamed to `ExceptionInterface`
+ * added `ObjectNormalizer` leveraging the `PropertyAccess` component to normalize
+   objects containing both properties and getters / setters / issers / hassers methods.
+ * added `xml_type_cast_attributes` context option for allowing users to opt-out of typecasting
+   xml attributes.
+
+2.6.0
+-----
+
+ * added a new serializer: `PropertyNormalizer`. Like `GetSetMethodNormalizer`,
+   this normalizer will map an object's properties to an array.
+ * added circular references handling for `GetSetMethodNormalizer`
+
+2.5.0
+-----
+
+ * added support for `is.*` getters in `GetSetMethodNormalizer`
+
+2.4.0
+-----
+
+ * added `$context` support for XMLEncoder.
+ * [DEPRECATION] JsonEncode and JsonDecode where modified to throw
+   an exception if error found. No need for get*Error() functions
+
 2.3.0
 -----
 

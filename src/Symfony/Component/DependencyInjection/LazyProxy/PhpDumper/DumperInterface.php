@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\LazyProxy\PhpDumper;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * Lazy proxy dumper capable of generating the instantiation logic php code for proxied services.
+ * Lazy proxy dumper capable of generating the instantiation logic PHP code for proxied services.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
@@ -22,8 +22,6 @@ interface DumperInterface
 {
     /**
      * Inspects whether the given definitions should produce proxy instantiation logic in the dumped container.
-     *
-     * @param Definition $definition
      *
      * @return bool
      */
@@ -33,16 +31,15 @@ interface DumperInterface
      * Generates the code to be used to instantiate a proxy in the dumped factory code.
      *
      * @param Definition $definition
-     * @param string     $id         service identifier
+     * @param string     $id          Service identifier
+     * @param string     $factoryCode The code to execute to create the service
      *
      * @return string
      */
-    public function getProxyFactoryCode(Definition $definition, $id);
+    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode);
 
     /**
      * Generates the code for the lazy proxy.
-     *
-     * @param Definition $definition
      *
      * @return string
      */

@@ -18,20 +18,17 @@ use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FormType extends BaseType
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -40,6 +37,8 @@ class FormType extends BaseType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
+
+        $isDataOptionSet = array_key_exists('data', $options);
 
         $builder
             ->setRequired($options['required'])
@@ -50,13 +49,11 @@ class FormType extends BaseType
             ->setByReference($options['by_reference'])
             ->setInheritData($options['inherit_data'])
             ->setCompound($options['compound'])
-            ->setData(isset($options['data']) ? $options['data'] : null)
-            ->setDataLocked(isset($options['data']))
+            ->setData($isDataOptionSet ? $options['data'] : null)
+            ->setDataLocked($isDataOptionSet)
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
             ->setMethod($options['method'])
-            ->setAction($options['action'])
-            ->setAutoInitialize($options['auto_initialize'])
-        ;
+            ->setAction($options['action']);
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
@@ -71,7 +68,6 @@ class FormType extends BaseType
         parent::buildView($view, $form, $options);
 
         $name = $form->getName();
-        $readOnly = $options['read_only'];
 
         if ($view->parent) {
             if ('' === $name) {
@@ -79,25 +75,25 @@ class FormType extends BaseType
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!$readOnly) {
-                $readOnly = $view->parent->vars['read_only'];
+            if (!isset($view->vars['attr']['readonly']) && isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly']) {
+                $view->vars['attr']['readonly'] = true;
             }
         }
 
+        $formConfig = $form->getConfig();
         $view->vars = array_replace($view->vars, array(
-            'read_only'  => $readOnly,
-            'errors'     => $form->getErrors(),
-            'valid'      => $form->isSubmitted() ? $form->isValid() : true,
-            'value'      => $form->getViewData(),
-            'data'       => $form->getNormData(),
-            'required'   => $form->isRequired(),
-            'max_length' => $options['max_length'],
-            'pattern'    => $options['pattern'],
-            'size'       => null,
+            'errors' => $form->getErrors(),
+            'valid' => $form->isSubmitted() ? $form->isValid() : true,
+            'value' => $form->getViewData(),
+            'data' => $form->getNormData(),
+            'required' => $form->isRequired(),
+            'size' => null,
             'label_attr' => $options['label_attr'],
-            'compound'   => $form->getConfig()->getCompound(),
-            'method'     => $form->getConfig()->getMethod(),
-            'action'     => $form->getConfig()->getAction(),
+            'help' => $options['help'],
+            'compound' => $formConfig->getCompound(),
+            'method' => $formConfig->getMethod(),
+            'action' => $formConfig->getAction(),
+            'submitted' => $form->isSubmitted(),
         ));
     }
 
@@ -121,9 +117,9 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
@@ -145,55 +141,50 @@ class FormType extends BaseType
             };
         };
 
+        // Wrap "post_max_size_message" in a closure to translate it lazily
+        $uploadMaxSizeMessage = function (Options $options) {
+            return function () use ($options) {
+                return $options['post_max_size_message'];
+            };
+        };
+
         // For any form that is not represented by a single HTML control,
         // errors should bubble up by default
         $errorBubbling = function (Options $options) {
             return $options['compound'];
         };
 
-        // BC with old "virtual" option
-        $inheritData = function (Options $options) {
-            if (null !== $options['virtual']) {
-                // Uncomment this as soon as the deprecation note should be shown
-                // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
-                return $options['virtual'];
-            }
-
-            return false;
-        };
-
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setOptional(array(
+        $resolver->setDefined(array(
             'data',
         ));
 
         $resolver->setDefaults(array(
-            'data_class'         => $dataClass,
-            'empty_data'         => $emptyData,
-            'trim'               => true,
-            'required'           => true,
-            'read_only'          => false,
-            'max_length'         => null,
-            'pattern'            => null,
-            'property_path'      => null,
-            'mapped'             => true,
-            'by_reference'       => true,
-            'error_bubbling'     => $errorBubbling,
-            'label_attr'         => array(),
-            'virtual'            => null,
-            'inherit_data'       => $inheritData,
-            'compound'           => true,
-            'method'             => 'POST',
+            'data_class' => $dataClass,
+            'empty_data' => $emptyData,
+            'trim' => true,
+            'required' => true,
+            'property_path' => null,
+            'mapped' => true,
+            'by_reference' => true,
+            'error_bubbling' => $errorBubbling,
+            'label_attr' => array(),
+            'inherit_data' => false,
+            'compound' => true,
+            'method' => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
-            'action'             => '',
-            'auto_initialize'    => true,
+            'action' => '',
+            'attr' => array(),
+            'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+            'upload_max_size_message' => $uploadMaxSizeMessage, // internal
+            'help' => null,
         ));
 
-        $resolver->setAllowedTypes(array(
-            'label_attr' => 'array',
-        ));
+        $resolver->setAllowedTypes('label_attr', 'array');
+        $resolver->setAllowedTypes('upload_max_size_message', array('callable'));
+        $resolver->setAllowedTypes('help', array('string', 'null'));
     }
 
     /**
@@ -201,13 +192,12 @@ class FormType extends BaseType
      */
     public function getParent()
     {
-        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form';
     }

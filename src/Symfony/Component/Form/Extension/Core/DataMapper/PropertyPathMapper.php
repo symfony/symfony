@@ -17,25 +17,17 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * A data mapper using property paths to read/write data.
+ * Maps arrays/objects to/from forms using property paths.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class PropertyPathMapper implements DataMapperInterface
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
-    /**
-     * Creates a new property path mapper.
-     *
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -43,11 +35,9 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function mapDataToForms($data, $forms)
     {
-        if (null === $data || array() === $data) {
-            return;
-        }
+        $empty = null === $data || array() === $data;
 
-        if (!is_array($data) && !is_object($data)) {
+        if (!$empty && !is_array($data) && !is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
@@ -55,8 +45,10 @@ class PropertyPathMapper implements DataMapperInterface
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
-            if (null !== $propertyPath && $config->getMapped()) {
+            if (!$empty && null !== $propertyPath && $config->getMapped()) {
                 $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
+            } else {
+                $form->setData($form->getConfig()->getData());
             }
         }
     }
@@ -78,9 +70,15 @@ class PropertyPathMapper implements DataMapperInterface
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
-            // Write-back is disabled if the form is not synchronized (transformation failed)
-            // and if the form is disabled (modification not allowed)
-            if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
+            // Write-back is disabled if the form is not synchronized (transformation failed),
+            // if the form was not submitted and if the form is disabled (modification not allowed)
+            if (null !== $propertyPath && $config->getMapped() && $form->isSubmitted() && $form->isSynchronized() && !$form->isDisabled()) {
+                // If the field is of type DateTime and the data is the same skip the update to
+                // keep the original object hash
+                if ($form->getData() instanceof \DateTime && $form->getData() == $this->propertyAccessor->getValue($data, $propertyPath)) {
+                    continue;
+                }
+
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
                 if (!is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {

@@ -19,26 +19,17 @@ namespace Symfony\Component\Config\Definition\Builder;
 class ValidationBuilder
 {
     protected $node;
-    public $rules;
+    public $rules = array();
 
-    /**
-     * Constructor
-     *
-     * @param NodeDefinition $node The related node
-     */
     public function __construct(NodeDefinition $node)
     {
         $this->node = $node;
-
-        $this->rules = array();
     }
 
     /**
      * Registers a closure to run as normalization or an expression builder to build it if null is provided.
      *
-     * @param \Closure $closure
-     *
-     * @return ExprBuilder|ValidationBuilder
+     * @return ExprBuilder|$this
      */
     public function rule(\Closure $closure = null)
     {

@@ -33,13 +33,13 @@ class Version
      *     Version::compare('1.2.3', '1.2.4', '==', 2)
      *     // => true
      *
-     * @param string       $version1  A version string.
-     * @param string       $version2  A version string to compare.
-     * @param string       $operator  The comparison operator.
-     * @param integer|null $precision The number of components to compare. Pass
-     *                                NULL to compare the versions unchanged.
+     * @param string   $version1  A version string
+     * @param string   $version2  A version string to compare
+     * @param string   $operator  The comparison operator
+     * @param int|null $precision The number of components to compare. Pass
+     *                            NULL to compare the versions unchanged.
      *
-     * @return Boolean Whether the comparison succeeded.
+     * @return bool Whether the comparison succeeded
      *
      * @see normalize()
      */
@@ -63,17 +63,17 @@ class Version
      *     Version::normalize('1.2.3', 2);
      *     // => '1.2'
      *
-     * @param string       $version   A version string.
-     * @param integer|null $precision The number of components to include. Pass
-     *                                NULL to return the version unchanged.
+     * @param string   $version   A version string
+     * @param int|null $precision The number of components to include. Pass
+     *                            NULL to return the version unchanged.
      *
-     * @return string|null The normalized version or NULL if it couldn't be
-     *                     normalized.
+     * @return string|null the normalized version or NULL if it couldn't be
+     *                     normalized
      */
     public static function normalize($version, $precision)
     {
         if (null === $precision) {
-           return $version;
+            return $version;
         }
 
         $pattern = '[^\.]+';
@@ -82,8 +82,8 @@ class Version
             $pattern = sprintf('[^\.]+(\.%s)?', $pattern);
         }
 
-        if (!preg_match('/^' . $pattern . '/', $version, $matches)) {
-            return null;
+        if (!preg_match('/^'.$pattern.'/', $version, $matches)) {
+            return;
         }
 
         return $matches[0];
@@ -92,5 +92,7 @@ class Version
     /**
      * Must not be instantiated.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 }

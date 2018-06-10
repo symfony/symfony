@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="asset.request_context.base_path"></parameter>
+        <parameter key="asset.request_context.secure">false</parameter>
+    </parameters>
+
+    <services>
+        <defaults public="false" />
+
+        <service id="assets.packages" class="Symfony\Component\Asset\Packages">
+            <argument type="service" id="assets.empty_package" /> <!-- default package -->
+            <argument type="collection" /> <!-- named packages -->
+        </service>
+        <service id="Symfony\Component\Asset\Packages" alias="assets.packages" />
+
+        <service id="assets.empty_package" class="Symfony\Component\Asset\Package">
+            <argument type="service" id="assets.empty_version_strategy" />
+        </service>
+
+        <service id="assets.context" class="Symfony\Component\Asset\Context\RequestStackContext">
+            <argument type="service" id="request_stack" />
+            <argument>%asset.request_context.base_path%</argument>
+            <argument>%asset.request_context.secure%</argument>
+        </service>
+
+        <service id="assets.path_package" class="Symfony\Component\Asset\PathPackage" abstract="true">
+            <argument /> <!-- base path -->
+            <argument /> <!-- version strategy -->
+            <argument type="service" id="assets.context" />
+        </service>
+
+        <service id="assets.url_package" class="Symfony\Component\Asset\UrlPackage" abstract="true">
+            <argument /> <!-- base URLs -->
+            <argument /> <!-- version strategy -->
+            <argument type="service" id="assets.context" />
+        </service>
+
+        <service id="assets.static_version_strategy" class="Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy" abstract="true">
+            <argument /> <!-- version -->
+            <argument /> <!-- format -->
+        </service>
+
+        <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" />
+
+        <service id="assets.json_manifest_version_strategy" class="Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy" abstract="true">
+            <argument /> <!-- manifest path -->
+        </service>
+    </services>
+</container>

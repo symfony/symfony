@@ -21,35 +21,36 @@ use Symfony\Component\Process\Exception\RuntimeException;
  * print $p->getOutput()."\n";
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class PhpProcess extends Process
 {
-    private $executableFinder;
-
     /**
-     * Constructor.
-     *
-     * @param string  $script  The PHP script to run (as a string)
-     * @param string  $cwd     The working directory
-     * @param array   $env     The environment variables
-     * @param integer $timeout The timeout in seconds
-     * @param array   $options An array of options for proc_open
-     *
-     * @api
+     * @param string      $script  The PHP script to run (as a string)
+     * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
+     * @param int         $timeout The timeout in seconds
      */
-    public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
+    public function __construct(string $script, string $cwd = null, array $env = null, int $timeout = 60)
     {
-        parent::__construct(null, $cwd, $env, $script, $timeout, $options);
+        $executableFinder = new PhpExecutableFinder();
+        if (false === $php = $executableFinder->find(false)) {
+            $php = null;
+        } else {
+            $php = array_merge(array($php), $executableFinder->findArguments());
+        }
+        if ('phpdbg' === PHP_SAPI) {
+            $file = tempnam(sys_get_temp_dir(), 'dbg');
+            file_put_contents($file, $script);
+            register_shutdown_function('unlink', $file);
+            $php[] = $file;
+            $script = null;
+        }
 
-        $this->executableFinder = new PhpExecutableFinder();
+        parent::__construct($php, $cwd, $env, $script, $timeout);
     }
 
     /**
      * Sets the path to the PHP binary to use.
-     *
-     * @api
      */
     public function setPhpBinary($php)
     {
@@ -59,15 +60,12 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public function start($callback = null)
+    public function start(callable $callback = null, array $env = array())
     {
         if (null === $this->getCommandLine()) {
-            if (false === $php = $this->executableFinder->find()) {
-                throw new RuntimeException('Unable to find the PHP executable.');
-            }
-            $this->setCommandLine($php);
+            throw new RuntimeException('Unable to find the PHP executable.');
         }
 
-        parent::start($callback);
+        parent::start($callback, $env);
     }
 }

@@ -11,10 +11,14 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
+use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Loader\ExistsLoaderInterface;
 
 /**
  * ExceptionController.
@@ -26,12 +30,14 @@ class ExceptionController
     protected $twig;
     protected $debug;
     protected $profiler;
+    private $fileLinkFormat;
 
-    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, $debug)
+    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->debug = $debug;
+        $this->fileLinkFormat = $fileLinkFormat;
     }
 
     /**
@@ -40,6 +46,8 @@ class ExceptionController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function showAction($token)
     {
@@ -53,7 +61,7 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->twig->getLoader()->exists($template)) {
-            $handler = new ExceptionHandler();
+            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
             return new Response($handler->getContent($exception), 200, array('Content-Type' => 'text/html'));
         }
@@ -63,10 +71,10 @@ class ExceptionController
         return new Response($this->twig->render(
             $template,
             array(
-                'status_code'    => $code,
-                'status_text'    => Response::$statusTexts[$code],
-                'exception'      => $exception,
-                'logger'         => null,
+                'status_code' => $code,
+                'status_text' => Response::$statusTexts[$code],
+                'exception' => $exception,
+                'logger' => null,
                 'currentContent' => '',
             )
         ), 200, array('Content-Type' => 'text/html'));
@@ -78,6 +86,8 @@ class ExceptionController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function cssAction($token)
     {
@@ -91,7 +101,7 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->templateExists($template)) {
-            $handler = new ExceptionHandler();
+            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
             return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
         }
@@ -108,7 +118,7 @@ class ExceptionController
     protected function templateExists($template)
     {
         $loader = $this->twig->getLoader();
-        if ($loader instanceof \Twig_ExistsLoaderInterface) {
+        if ($loader instanceof ExistsLoaderInterface) {
             return $loader->exists($template);
         }
 
@@ -116,7 +126,7 @@ class ExceptionController
             $loader->getSource($template);
 
             return true;
-        } catch (\Twig_Error_Loader $e) {
+        } catch (LoaderError $e) {
         }
 
         return false;

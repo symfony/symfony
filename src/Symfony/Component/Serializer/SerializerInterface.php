@@ -12,18 +12,18 @@
 namespace Symfony\Component\Serializer;
 
 /**
- * Defines the interface of the Serializer
+ * Defines the interface of the Serializer.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface SerializerInterface
 {
     /**
-     * Serializes data in the appropriate format
+     * Serializes data in the appropriate format.
      *
-     * @param mixed  $data    any data
-     * @param string $format  format name
-     * @param array  $context options normalizers/encoders have access to
+     * @param mixed  $data    Any data
+     * @param string $format  Format name
+     * @param array  $context Options normalizers/encoders have access to
      *
      * @return string
      */

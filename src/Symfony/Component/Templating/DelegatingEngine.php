@@ -15,26 +15,19 @@ namespace Symfony\Component\Templating;
  * DelegatingEngine selects an engine for a given template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 {
     /**
      * @var EngineInterface[]
      */
-    protected $engines;
+    protected $engines = array();
 
     /**
-     * Constructor.
-     *
      * @param EngineInterface[] $engines An array of EngineInterface instances to add
-     *
-     * @api
      */
     public function __construct(array $engines = array())
     {
-        $this->engines = array();
         foreach ($engines as $engine) {
             $this->addEngine($engine);
         }
@@ -42,8 +35,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function render($name, array $parameters = array())
     {
@@ -52,8 +43,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function stream($name, array $parameters = array())
     {
@@ -67,21 +56,12 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function exists($name)
     {
         return $this->getEngine($name)->exists($name);
     }
 
-    /**
-     * Adds an engine.
-     *
-     * @param EngineInterface $engine An EngineInterface instance
-     *
-     * @api
-     */
     public function addEngine(EngineInterface $engine)
     {
         $this->engines[] = $engine;
@@ -89,8 +69,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($name)
     {
@@ -106,13 +84,11 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * Get an engine able to render the given template.
      *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
      * @return EngineInterface The engine
      *
      * @throws \RuntimeException if no engine able to work with the template is found
-     *
-     * @api
      */
     public function getEngine($name)
     {

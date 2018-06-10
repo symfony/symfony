@@ -11,15 +11,10 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-abstract class AbstractAnnotationLoaderTest extends \PHPUnit_Framework_TestCase
-{
-    protected function setUp()
-    {
-        if (!class_exists('Doctrine\\Common\\Version')) {
-            $this->markTestSkipped('Doctrine is not available.');
-        }
-    }
+use PHPUnit\Framework\TestCase;
 
+abstract class AbstractAnnotationLoaderTest extends TestCase
+{
     public function getReader()
     {
         return $this->getMockBuilder('Doctrine\Common\Annotations\Reader')

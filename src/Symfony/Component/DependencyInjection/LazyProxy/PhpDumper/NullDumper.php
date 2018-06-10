@@ -17,11 +17,13 @@ use Symfony\Component\DependencyInjection\Definition;
  * Null dumper, negates any proxy code generation for any given service definition.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @final
  */
 class NullDumper implements DumperInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isProxyCandidate(Definition $definition)
     {
@@ -29,15 +31,15 @@ class NullDumper implements DumperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id)
+    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null)
     {
         return '';
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getProxyCode(Definition $definition)
     {

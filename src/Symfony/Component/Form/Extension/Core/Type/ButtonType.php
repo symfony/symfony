@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\ButtonTypeInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A form button.
@@ -25,14 +26,25 @@ class ButtonType extends BaseType implements ButtonTypeInterface
      */
     public function getParent()
     {
-        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'button';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults(array(
+            'auto_initialize' => false,
+        ));
     }
 }

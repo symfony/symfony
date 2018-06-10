@@ -15,7 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Util\ServerParams;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -23,43 +25,13 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CsrfValidationListener implements EventSubscriberInterface
 {
-    /**
-     * The name of the CSRF field
-     * @var string
-     */
     private $fieldName;
-
-    /**
-     * The provider for generating and validating CSRF tokens
-     * @var CsrfProviderInterface
-     */
-    private $csrfProvider;
-
-    /**
-     * A text mentioning the intention of the CSRF token
-     *
-     * Validation of the token will only succeed if it was generated in the
-     * same session and with the same intention.
-     *
-     * @var string
-     */
-    private $intention;
-
-    /**
-     * The message displayed in case of an error.
-     * @var string
-     */
+    private $tokenManager;
+    private $tokenId;
     private $errorMessage;
-
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var null|string
-     */
     private $translationDomain;
+    private $serverParams;
 
     public static function getSubscribedEvents()
     {
@@ -68,23 +40,26 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
-    public function __construct($fieldName, CsrfProviderInterface $csrfProvider, $intention, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct(string $fieldName, CsrfTokenManagerInterface $tokenManager, string $tokenId, string $errorMessage, TranslatorInterface $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
     {
         $this->fieldName = $fieldName;
-        $this->csrfProvider = $csrfProvider;
-        $this->intention = $intention;
+        $this->tokenManager = $tokenManager;
+        $this->tokenId = $tokenId;
         $this->errorMessage = $errorMessage;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
+        $this->serverParams = $serverParams ?: new ServerParams();
     }
 
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
-        $data = $event->getData();
+        $postRequestSizeExceeded = 'POST' === $form->getConfig()->getMethod() && $this->serverParams->hasPostMaxSizeBeenExceeded();
 
-        if ($form->isRoot() && $form->getConfig()->getOption('compound')) {
-            if (!isset($data[$this->fieldName]) || !$this->csrfProvider->isCsrfTokenValid($this->intention, $data[$this->fieldName])) {
+        if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
+            $data = $event->getData();
+
+            if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {
                 $errorMessage = $this->errorMessage;
 
                 if (null !== $this->translator) {
@@ -96,20 +71,8 @@ class CsrfValidationListener implements EventSubscriberInterface
 
             if (is_array($data)) {
                 unset($data[$this->fieldName]);
+                $event->setData($data);
             }
         }
-
-        $event->setData($data);
-    }
-
-    /**
-     * Alias of {@link preSubmit()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link preSubmit()} instead.
-     */
-    public function preBind(FormEvent $event)
-    {
-        $this->preSubmit($event);
     }
 }

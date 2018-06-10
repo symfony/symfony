@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Twig\Environment;
 
 /**
  * Test for TemplateManager class.
@@ -22,7 +23,7 @@ use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 class TemplateManagerTest extends TestCase
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twigEnvironment;
 
@@ -32,26 +33,21 @@ class TemplateManagerTest extends TestCase
     protected $profiler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $profile;
-
-    /**
      * @var \Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager
      */
     protected $templateManager;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         $profiler = $this->mockProfiler();
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = array(
-            'data_collector.foo'=>array('foo','FooBundle:Collector:foo'),
-            'data_collector.bar'=>array('bar','FooBundle:Collector:bar'),
-            'data_collector.baz'=>array('baz','FooBundle:Collector:baz')
-            );
+            'data_collector.foo' => array('foo', 'FooBundle:Collector:foo'),
+            'data_collector.bar' => array('bar', 'FooBundle:Collector:bar'),
+            'data_collector.baz' => array('baz', 'FooBundle:Collector:baz'),
+        );
 
         $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);
     }
@@ -66,7 +62,7 @@ class TemplateManagerTest extends TestCase
     }
 
     /**
-     * if template exists in both profile and profiler then its name should be returned
+     * if template exists in both profile and profiler then its name should be returned.
      */
     public function testGetNameValidTemplate()
     {
@@ -81,28 +77,6 @@ class TemplateManagerTest extends TestCase
             ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
 
         $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName($profile, 'foo'));
-    }
-
-    /**
-     * template should be loaded for 'foo' because other collectors are
-     * missing in profile or in profiler
-     */
-    public function testGetTemplates()
-    {
-        $profile = $this->mockProfile();
-        $profile->expects($this->any())
-            ->method('hasCollector')
-            ->will($this->returnCallback(array($this, 'profilerHasCallback')));
-
-        $this->profiler->expects($this->any())
-            ->method('has')
-            ->withAnyParameters()
-            ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
-
-        $result = $this->templateManager->getTemplates($profile);
-        $this->assertArrayHasKey('foo',$result);
-        $this->assertArrayNotHasKey('bar',$result);
-        $this->assertArrayNotHasKey('baz',$result);
     }
 
     public function profilerHasCallback($panel)
@@ -129,24 +103,23 @@ class TemplateManagerTest extends TestCase
 
     protected function mockProfile()
     {
-        $this->profile = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profile')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return  $this->profile;
+        return $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profile')->disableOriginalConstructor()->getMock();
     }
 
     protected function mockTwigEnvironment()
     {
-        $this->twigEnvironment = $this->getMockBuilder('Twig_Environment')->getMock();
+        $this->twigEnvironment = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
 
         $this->twigEnvironment->expects($this->any())
             ->method('loadTemplate')
             ->will($this->returnValue('loadedTemplate'));
 
-        $this->twigEnvironment->expects($this->any())
-            ->method('getLoader')
-            ->will($this->returnValue($this->getMock('\Twig_LoaderInterface')));
+        if (interface_exists('Twig\Loader\SourceContextLoaderInterface')) {
+            $loader = $this->getMockBuilder('Twig\Loader\SourceContextLoaderInterface')->getMock();
+        } else {
+            $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
+        }
+        $this->twigEnvironment->expects($this->any())->method('getLoader')->will($this->returnValue($loader));
 
         return $this->twigEnvironment;
     }

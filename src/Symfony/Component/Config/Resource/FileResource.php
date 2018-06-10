@@ -18,34 +18,37 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements ResourceInterface, \Serializable
+class FileResource implements SelfCheckingResourceInterface, \Serializable
 {
+    /**
+     * @var string|false
+     */
     private $resource;
 
     /**
-     * Constructor.
-     *
      * @param string $resource The file path to the resource
+     *
+     * @throws \InvalidArgumentException
      */
-    public function __construct($resource)
+    public function __construct(string $resource)
     {
-        $this->resource = realpath($resource);
+        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
+
+        if (false === $this->resource) {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $resource));
+        }
     }
 
     /**
-     * Returns a string representation of the Resource.
-     *
-     * @return string A string representation of the Resource
+     * {@inheritdoc}
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return $this->resource;
     }
 
     /**
-     * Returns the resource tied to this Resource.
-     *
-     * @return mixed The resource
+     * @return string The canonicalized, absolute path to the resource
      */
     public function getResource()
     {
@@ -53,19 +56,11 @@ class FileResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * Returns true if the resource has not been updated since the given timestamp.
-     *
-     * @param integer $timestamp The last time the resource was loaded
-     *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * {@inheritdoc}
      */
     public function isFresh($timestamp)
     {
-        if (!file_exists($this->resource)) {
-            return false;
-        }
-
-        return filemtime($this->resource) < $timestamp;
+        return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
     }
 
     public function serialize()

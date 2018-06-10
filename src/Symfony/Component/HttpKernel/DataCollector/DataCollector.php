@@ -11,16 +11,28 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+use Symfony\Component\VarDumper\Caster\CutStub;
+use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+
 /**
  * DataCollector.
  *
  * Children of this class must store the collected data in the data property.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bschussek@symfony.com>
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
-    protected $data;
+    protected $data = array();
+
+    /**
+     * @var ClonerInterface
+     */
+    private $cloner;
 
     public function serialize()
     {
@@ -33,43 +45,49 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
     }
 
     /**
-     * Converts a PHP variable to a string.
+     * Converts the variable into a serializable Data instance.
      *
-     * @param mixed $var A PHP variable
+     * This array can be displayed in the template using
+     * the VarDumper component.
      *
-     * @return string The string representation of the variable
+     * @param mixed $var
+     *
+     * @return Data
      */
-    protected function varToString($var)
+    protected function cloneVar($var)
     {
-        if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+        if ($var instanceof Data) {
+            return $var;
         }
-
-        if (is_array($var)) {
-            $a = array();
-            foreach ($var as $k => $v) {
-                $a[] = sprintf('%s => %s', $k, $this->varToString($v));
+        if (null === $this->cloner) {
+            if (!class_exists(CutStub::class)) {
+                throw new \LogicException(sprintf('The VarDumper component is needed for the %s() method. Install symfony/var-dumper version 3.4 or above.', __METHOD__));
             }
-
-            return sprintf("Array(%s)", implode(', ', $a));
+            $this->cloner = new VarCloner();
+            $this->cloner->setMaxItems(-1);
+            $this->cloner->addCasters($this->getCasters());
         }
 
-        if (is_resource($var)) {
-            return sprintf('Resource(%s)', get_resource_type($var));
-        }
+        return $this->cloner->cloneVar($var);
+    }
 
-        if (null === $var) {
-            return 'null';
-        }
+    /**
+     * @return callable[] The casters to add to the cloner
+     */
+    protected function getCasters()
+    {
+        return array(
+            '*' => function ($v, array $a, Stub $s, $isNested) {
+                if (!$v instanceof Stub) {
+                    foreach ($a as $k => $v) {
+                        if (is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
+                            $a[$k] = new CutStub($v);
+                        }
+                    }
+                }
 
-        if (false === $var) {
-            return 'false';
-        }
-
-        if (true === $var) {
-            return 'true';
-        }
-
-        return (string) $var;
+                return $a;
+            },
+        );
     }
 }

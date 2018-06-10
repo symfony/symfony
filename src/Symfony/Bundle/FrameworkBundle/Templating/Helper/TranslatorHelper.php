@@ -15,19 +15,12 @@ use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * TranslatorHelper.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TranslatorHelper extends Helper
 {
     protected $translator;
 
-    /**
-     * Constructor.
-     *
-     * @param TranslatorInterface $translator A TranslatorInterface instance
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -50,9 +43,7 @@ class TranslatorHelper extends Helper
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

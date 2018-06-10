@@ -11,33 +11,29 @@
 
 namespace Symfony\Bridge\Twig\Tests\Translation;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Bridge\Twig\Tests\TestCase;
+use Twig\Environment;
+use Twig\Error\Error;
+use Twig\Loader\ArrayLoader;
 
 class TwigExtractorTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            $this->markTestSkipped('The "Translation" component is not available');
-        }
-    }
-
     /**
      * @dataProvider getExtractData
      */
     public function testExtract($template, $messages)
     {
-        $loader = new \Twig_Loader_Array(array());
-        $twig = new \Twig_Environment($loader, array(
+        $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
+        $twig = new Environment($loader, array(
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
         ));
-        $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
@@ -76,6 +72,81 @@ class TwigExtractorTest extends TestCase
             // make sure this works with twig's named arguments
             array('{{ "new key" | trans(domain="domain") }}', array('new key' => 'domain')),
             array('{{ "new key" | transchoice(domain="domain", count=1) }}', array('new key' => 'domain')),
+        );
+    }
+
+    /**
+     * @expectedException \Twig\Error\Error
+     * @dataProvider resourcesWithSyntaxErrorsProvider
+     */
+    public function testExtractSyntaxError($resources)
+    {
+        $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
+
+        $extractor = new TwigExtractor($twig);
+
+        try {
+            $extractor->extract($resources, new MessageCatalogue('en'));
+        } catch (Error $e) {
+            if (method_exists($e, 'getSourceContext')) {
+                $this->assertSame(dirname(__DIR__).strtr('/Fixtures/extractor/syntax_error.twig', '/', DIRECTORY_SEPARATOR), $e->getFile());
+                $this->assertSame(1, $e->getLine());
+                $this->assertSame('Unclosed "block".', $e->getMessage());
+            } else {
+                $this->expectExceptionMessageRegExp('/Unclosed "block" in ".*extractor(\\/|\\\\)syntax_error\\.twig" at line 1/');
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function resourcesWithSyntaxErrorsProvider()
+    {
+        return array(
+            array(__DIR__.'/../Fixtures'),
+            array(__DIR__.'/../Fixtures/extractor/syntax_error.twig'),
+            array(new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')),
+        );
+    }
+
+    /**
+     * @dataProvider resourceProvider
+     */
+    public function testExtractWithFiles($resource)
+    {
+        $loader = new ArrayLoader(array());
+        $twig = new Environment($loader, array(
+            'strict_variables' => true,
+            'debug' => true,
+            'cache' => false,
+            'autoescape' => false,
+        ));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
+
+        $extractor = new TwigExtractor($twig);
+        $catalogue = new MessageCatalogue('en');
+        $extractor->extract($resource, $catalogue);
+
+        $this->assertTrue($catalogue->has('Hi!', 'messages'));
+        $this->assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
+    }
+
+    /**
+     * @return array
+     */
+    public function resourceProvider()
+    {
+        $directory = __DIR__.'/../Fixtures/extractor/';
+
+        return array(
+            array($directory.'with_translations.html.twig'),
+            array(array($directory.'with_translations.html.twig')),
+            array(array(new \SplFileInfo($directory.'with_translations.html.twig'))),
+            array(new \ArrayObject(array($directory.'with_translations.html.twig'))),
+            array(new \ArrayObject(array(new \SplFileInfo($directory.'with_translations.html.twig')))),
         );
     }
 }

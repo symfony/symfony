@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -29,7 +29,7 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('username_parameter', '_username');
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
-        $this->addOption('intention', 'authenticate');
+        $this->addOption('csrf_token_id', 'authenticate');
         $this->addOption('post_only', true);
     }
 
@@ -49,7 +49,7 @@ class FormLoginFactory extends AbstractFactory
 
         $node
             ->children()
-                ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
+                ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
             ->end()
         ;
     }
@@ -63,8 +63,9 @@ class FormLoginFactory extends AbstractFactory
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
         ;
 
@@ -75,12 +76,10 @@ class FormLoginFactory extends AbstractFactory
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
 
-        if (isset($config['csrf_provider'])) {
-            $container
-                ->getDefinition($listenerId)
-                ->addArgument(new Reference($config['csrf_provider']))
-            ;
-        }
+        $container
+            ->getDefinition($listenerId)
+            ->addArgument(isset($config['csrf_token_generator']) ? new Reference($config['csrf_token_generator']) : null)
+        ;
 
         return $listenerId;
     }
@@ -89,7 +88,7 @@ class FormLoginFactory extends AbstractFactory
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))
+            ->setDefinition($entryPointId, new ChildDefinition('security.authentication.form_entry_point'))
             ->addArgument(new Reference('security.http_utils'))
             ->addArgument($config['login_path'])
             ->addArgument($config['use_forward'])

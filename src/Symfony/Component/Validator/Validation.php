@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 /**
  * Entry point for the Validator component.
  *
@@ -24,9 +26,9 @@ final class Validation
      * If you want to configure the validator, use
      * {@link createValidatorBuilder()} instead.
      *
-     * @return ValidatorInterface The new validator.
+     * @return ValidatorInterface The new validator
      */
-    public static function createValidator()
+    public static function createValidator(): ValidatorInterface
     {
         return self::createValidatorBuilder()->getValidator();
     }
@@ -34,9 +36,9 @@ final class Validation
     /**
      * Creates a configurable builder for validator objects.
      *
-     * @return ValidatorBuilderInterface The new builder.
+     * @return ValidatorBuilderInterface The new builder
      */
-    public static function createValidatorBuilder()
+    public static function createValidatorBuilder(): ValidatorBuilder
     {
         return new ValidatorBuilder();
     }

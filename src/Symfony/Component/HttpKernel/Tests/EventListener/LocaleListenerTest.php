@@ -11,23 +11,24 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use Symfony\Component\HttpKernel\EventListener\LocaleListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class LocaleListenerTest extends \PHPUnit_Framework_TestCase
+class LocaleListenerTest extends TestCase
 {
+    private $requestStack;
+
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
+        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
     }
 
     public function testDefaultLocaleWithoutSession()
     {
-        $listener = new LocaleListener('fr');
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request = Request::create('/'));
 
         $listener->onKernelRequest($event);
@@ -37,11 +38,10 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     public function testLocaleFromRequestAttribute()
     {
         $request = Request::create('/');
-        session_name('foo');
-        $request->cookies->set('foo', 'value');
+        $request->cookies->set(session_name(), 'value');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr');
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -50,29 +50,45 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testLocaleSetForRoutingContext()
     {
-        if (!class_exists('Symfony\Component\Routing\Router')) {
-            $this->markTestSkipped('The "Routing" component is not available');
-        }
-
         // the request context is updated
-        $context = $this->getMock('Symfony\Component\Routing\RequestContext');
+        $context = $this->getMockBuilder('Symfony\Component\Routing\RequestContext')->getMock();
         $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
 
-        $router = $this->getMock('Symfony\Component\Routing\Router', array('getContext'), array(), '', false);
+        $router = $this->getMockBuilder('Symfony\Component\Routing\Router')->setMethods(array('getContext'))->disableOriginalConstructor()->getMock();
         $router->expects($this->once())->method('getContext')->will($this->returnValue($context));
 
         $request = Request::create('/');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', $router);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelRequest($this->getEvent($request));
+    }
+
+    public function testRouterResetWithParentRequestOnKernelFinishRequest()
+    {
+        // the request context is updated
+        $context = $this->getMockBuilder('Symfony\Component\Routing\RequestContext')->getMock();
+        $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
+
+        $router = $this->getMockBuilder('Symfony\Component\Routing\Router')->setMethods(array('getContext'))->disableOriginalConstructor()->getMock();
+        $router->expects($this->once())->method('getContext')->will($this->returnValue($context));
+
+        $parentRequest = Request::create('/');
+        $parentRequest->setLocale('es');
+
+        $this->requestStack->expects($this->once())->method('getParentRequest')->will($this->returnValue($parentRequest));
+
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FinishRequestEvent')->disableOriginalConstructor()->getMock();
+
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
+        $listener->onKernelFinishRequest($event);
     }
 
     public function testRequestLocaleIsNotOverridden()
     {
         $request = Request::create('/');
         $request->setLocale('de');
-        $listener = new LocaleListener('fr');
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -81,6 +97,6 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getEvent(Request $request)
     {
-        return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);
+        return new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
     }
 }

@@ -9,19 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\ProxyManager\LazyProxy\Tests\Instantiator;
+namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}
+ * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
- *
- * @covers \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper
  */
-class ProxyDumperTest extends \PHPUnit_Framework_TestCase
+class ProxyDumperTest extends TestCase
 {
     /**
      * @var ProxyDumper
@@ -29,20 +28,17 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
     protected $dumper;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->dumper = new ProxyDumper();
     }
 
     /**
      * @dataProvider getProxyCandidates
-     *
-     * @param Definition $definition
-     * @param bool       $expected
      */
-    public function testIsProxyCandidate(Definition $definition, $expected)
+    public function testIsProxyCandidate(Definition $definition, bool $expected)
     {
         $this->assertSame($expected, $this->dumper->isProxyCandidate($definition));
     }
@@ -56,10 +52,18 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
         $code = $this->dumper->getProxyCode($definition);
 
         $this->assertStringMatchesFormat(
-            '%Aclass SymfonyBridgeProxyManagerLazyProxyTestsInstantiatorProxyDumperTest%aextends%w'
-                . '\Symfony\Bridge\ProxyManager\LazyProxy\Tests\Instantiator%a',
+            '%Aclass ProxyDumperTest%aextends%w'
+                .'\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a',
             $code
         );
+    }
+
+    public function testDeterministicProxyCode()
+    {
+        $definition = new Definition(__CLASS__);
+        $definition->setLazy(true);
+
+        $this->assertSame($this->dumper->getProxyCode($definition), $this->dumper->getProxyCode($definition));
     }
 
     public function testGetProxyFactoryCode()
@@ -68,16 +72,23 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
 
         $definition->setLazy(true);
 
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo');
+        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
 
         $this->assertStringMatchesFormat(
-            '%wif ($lazyLoad) {%w$container = $this;%wreturn $this->services[\'foo\'] = new '
-            . 'SymfonyBridgeProxyManagerLazyProxyTestsInstantiatorProxyDumperTest_%s(%wfunction '
-            . '(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($container) {'
-            . '%w$proxy->setProxyInitializer(null);%w$wrappedInstance = $container->getFooService(false);'
-            . '%wreturn true;%w}%w);%w}%w',
+            '%A$wrappedInstance = $this->getFoo2Service(false);%w$proxy->setProxyInitializer(null);%A',
             $code
         );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Missing factory code to construct the service "foo".
+     */
+    public function testGetProxyFactoryCodeWithoutCustomMethod()
+    {
+        $definition = new Definition(__CLASS__);
+        $definition->setLazy(true);
+        $this->dumper->getProxyFactoryCode($definition, 'foo');
     }
 
     /**
@@ -88,7 +99,7 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
         $definitions = array(
             array(new Definition(__CLASS__), true),
             array(new Definition('stdClass'), true),
-            array(new Definition('foo' . uniqid()), false),
+            array(new Definition(uniqid('foo', true)), false),
             array(new Definition(), false),
         );
 

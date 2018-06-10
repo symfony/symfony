@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Definition;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * Node which only allows a finite set of values.
@@ -23,14 +22,14 @@ class EnumNode extends ScalarNode
 {
     private $values;
 
-    public function __construct($name, NodeInterface $parent = null, array $values = array())
+    public function __construct(?string $name, NodeInterface $parent = null, array $values = array(), string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
         $values = array_unique($values);
-        if (count($values) <= 1) {
-            throw new \InvalidArgumentException('$values must contain at least two distinct elements.');
+        if (empty($values)) {
+            throw new \InvalidArgumentException('$values must contain at least one element.');
         }
 
-        parent::__construct($name, $parent);
+        parent::__construct($name, $parent, $pathSeparator);
         $this->values = $values;
     }
 
@@ -55,5 +54,13 @@ class EnumNode extends ScalarNode
         }
 
         return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function allowPlaceholders(): bool
+    {
+        return false;
     }
 }

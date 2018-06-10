@@ -11,16 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-class ParameterBagTest extends \PHPUnit_Framework_TestCase
+class ParameterBagTest extends TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::__construct
-     */
     public function testConstructor()
     {
         $bag = new ParameterBag($parameters = array(
@@ -30,9 +28,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::clear
-     */
     public function testClear()
     {
         $bag = new ParameterBag($parameters = array(
@@ -43,9 +38,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $bag->all(), '->clear() removes all parameters');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::remove
-     */
     public function testRemove()
     {
         $bag = new ParameterBag(array(
@@ -54,14 +46,8 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         ));
         $bag->remove('foo');
         $this->assertEquals(array('bar' => 'bar'), $bag->all(), '->remove() removes a parameter');
-        $bag->remove('BAR');
-        $this->assertEquals(array(), $bag->all(), '->remove() converts key to lowercase before removing');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::get
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::set
-     */
     public function testGetSet()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
@@ -70,10 +56,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $bag->set('foo', 'baz');
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
-
-        $bag->set('Foo', 'baz1');
-        $this->assertEquals('baz1', $bag->get('foo'), '->set() converts the key to lowercase');
-        $this->assertEquals('baz1', $bag->get('FOO'), '->get() converts the key to lowercase');
 
         try {
             $bag->get('baba');
@@ -84,53 +66,62 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetThrowParameterNotFoundException()
+    /**
+     * @dataProvider provideGetThrowParameterNotFoundExceptionData
+     */
+    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage)
     {
         $bag = new ParameterBag(array(
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
+            'fiz' => array('bar' => array('boo' => 12)),
         ));
 
-        try {
-            $bag->get('foo1');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "foo1". Did you mean this: "foo"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(ParameterNotFoundException::class);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->setExpectedException(ParameterNotFoundException::class, $exceptionMessage);
         }
 
-        try {
-            $bag->get('bag');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
-        }
-
-        try {
-            $bag->get('');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "".', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
-        }
+        $bag->get($parameterKey);
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::has
-     */
+    public function provideGetThrowParameterNotFoundExceptionData()
+    {
+        return array(
+            array('foo1', 'You have requested a non-existent parameter "foo1". Did you mean this: "foo"?'),
+            array('bag', 'You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz"?'),
+            array('', 'You have requested a non-existent parameter "".'),
+
+            array('fiz.bar.boo', 'You have requested a non-existent parameter "fiz.bar.boo". You cannot access nested array items, do you want to inject "fiz" instead?'),
+        );
+    }
+
     public function testHas()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
-        $this->assertTrue($bag->has('Foo'), '->has() converts the key to lowercase');
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolveValue
-     */
+    public function testMixedCase()
+    {
+        $bag = new ParameterBag(array(
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'BAR' => 'baz',
+        ));
+
+        $bag->remove('BAR');
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $bag->all());
+
+        $bag->set('Foo', 'baz1');
+        $this->assertEquals('foo', $bag->get('foo'));
+        $this->assertEquals('baz1', $bag->get('Foo'));
+    }
+
     public function testResolveValue()
     {
         $bag = new ParameterBag(array());
@@ -198,9 +189,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
-     */
     public function testResolveIndicatesWhyAParameterIsNeeded()
     {
         $bag = new ParameterBag(array('foo' => '%bar%'));
@@ -220,9 +208,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
-     */
     public function testResolveUnescapesValue()
     {
         $bag = new ParameterBag(array(
@@ -236,9 +221,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => array('ding' => 'I\'m a bar %foo %bar')), $bag->get('foo'), '->resolveValue() supports % escaping by doubling it');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::escapeValue
-     */
     public function testEscapeValue()
     {
         $bag = new ParameterBag();
@@ -253,7 +235,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
      * @dataProvider stringsWithSpacesProvider
      */
     public function testResolveStringWithSpacesReturnsString($expected, $test, $description)

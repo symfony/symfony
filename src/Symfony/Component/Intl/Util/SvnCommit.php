@@ -18,16 +18,12 @@ namespace Symfony\Component\Intl\Util;
  */
 class SvnCommit
 {
-    /**
-     * @var \SimpleXMLElement
-     */
     private $svnInfo;
 
     /**
      * Creates a commit from the given "svn info" data.
      *
-     * @param \SimpleXMLElement $svnInfo The XML result from the "svn info"
-     *                                   command.
+     * @param \SimpleXMLElement $svnInfo the XML result from the "svn info" command
      */
     public function __construct(\SimpleXMLElement $svnInfo)
     {
@@ -37,7 +33,7 @@ class SvnCommit
     /**
      * Returns the revision of the commit.
      *
-     * @return string The revision of the commit.
+     * @return string The revision of the commit
      */
     public function getRevision()
     {
@@ -47,7 +43,7 @@ class SvnCommit
     /**
      * Returns the author of the commit.
      *
-     * @return string The author name.
+     * @return string The author name
      */
     public function getAuthor()
     {
@@ -57,7 +53,7 @@ class SvnCommit
     /**
      * Returns the date of the commit.
      *
-     * @return string The commit date.
+     * @return string The commit date
      */
     public function getDate()
     {

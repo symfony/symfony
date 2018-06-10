@@ -15,28 +15,26 @@ namespace Symfony\Component\HttpFoundation;
  * RequestMatcher compares a pre-defined set of checks against a Request instance.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class RequestMatcher implements RequestMatcherInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $path;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $host;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $methods = array();
 
     /**
-     * @var string
+     * @var string[]
      */
     private $ips = array();
 
@@ -46,27 +44,45 @@ class RequestMatcher implements RequestMatcherInterface
     private $attributes = array();
 
     /**
+     * @var string[]
+     */
+    private $schemes = array();
+
+    /**
      * @param string|null          $path
      * @param string|null          $host
      * @param string|string[]|null $methods
      * @param string|string[]|null $ips
      * @param array                $attributes
+     * @param string|string[]|null $schemes
      */
-    public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array())
+    public function __construct(string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = array(), $schemes = null)
     {
         $this->matchPath($path);
         $this->matchHost($host);
         $this->matchMethod($methods);
         $this->matchIps($ips);
+        $this->matchScheme($schemes);
+
         foreach ($attributes as $k => $v) {
             $this->matchAttribute($k, $v);
         }
     }
 
     /**
+     * Adds a check for the HTTP scheme.
+     *
+     * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
+     */
+    public function matchScheme($scheme)
+    {
+        $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : array();
+    }
+
+    /**
      * Adds a check for the URL host name.
      *
-     * @param string $regexp A Regexp
+     * @param string|null $regexp A Regexp
      */
     public function matchHost($regexp)
     {
@@ -76,7 +92,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the URL path info.
      *
-     * @param string $regexp A Regexp
+     * @param string|null $regexp A Regexp
      */
     public function matchPath($regexp)
     {
@@ -96,11 +112,11 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the client IP.
      *
-     * @param string|string[] $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     * @param string|string[]|null $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
     public function matchIps($ips)
     {
-        $this->ips = (array) $ips;
+        $this->ips = null !== $ips ? (array) $ips : array();
     }
 
     /**
@@ -110,7 +126,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map('strtoupper', (array) $method);
+        $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : array();
     }
 
     /**
@@ -126,12 +142,14 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function matches(Request $request)
     {
-        if ($this->methods && !in_array($request->getMethod(), $this->methods)) {
+        if ($this->schemes && !in_array($request->getScheme(), $this->schemes, true)) {
+            return false;
+        }
+
+        if ($this->methods && !in_array($request->getMethod(), $this->methods, true)) {
             return false;
         }
 
@@ -155,6 +173,6 @@ class RequestMatcher implements RequestMatcherInterface
 
         // Note to future implementors: add additional checks above the
         // foreach above or else your check might not be run!
-        return count($this->ips) === 0;
+        return 0 === count($this->ips);
     }
 }

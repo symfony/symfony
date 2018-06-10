@@ -34,18 +34,13 @@ abstract class AccountStatusException extends AuthenticationException
         return $this->user;
     }
 
-    /**
-     * Set the user.
-     *
-     * @param UserInterface $user
-     */
     public function setUser(UserInterface $user)
     {
         $this->user = $user;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -56,7 +51,7 @@ abstract class AccountStatusException extends AuthenticationException
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($str)
     {

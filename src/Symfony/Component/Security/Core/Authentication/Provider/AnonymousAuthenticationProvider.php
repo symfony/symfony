@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
@@ -22,16 +23,20 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 {
-    private $key;
+    /**
+     * Used to determine if the token is created by the application
+     * instead of a malicious client.
+     *
+     * @var string
+     */
+    private $secret;
 
     /**
-     * Constructor.
-     *
-     * @param string $key The key shared with the authentication token
+     * @param string $secret The secret shared with the AnonymousToken
      */
-    public function __construct($key)
+    public function __construct(string $secret)
     {
-        $this->key = $key;
+        $this->secret = $secret;
     }
 
     /**
@@ -40,10 +45,10 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return null;
+            throw new AuthenticationException('The token is not supported by this authentication provider.');
         }
 
-        if ($this->key !== $token->getKey()) {
+        if ($this->secret !== $token->getSecret()) {
             throw new BadCredentialsException('The Token does not contain the expected key.');
         }
 

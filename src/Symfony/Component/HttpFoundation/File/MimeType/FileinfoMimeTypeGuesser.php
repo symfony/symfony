@@ -24,21 +24,19 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
     private $magicFile;
 
     /**
-     * Constructor.
-     *
      * @param string $magicFile A magic file to use with the finfo instance
      *
-     * @link http://www.php.net/manual/en/function.finfo-open.php
+     * @see http://www.php.net/manual/en/function.finfo-open.php
      */
-    public function __construct($magicFile = null)
+    public function __construct(string $magicFile = null)
     {
         $this->magicFile = $magicFile;
     }
 
     /**
-     * Returns whether this guesser is supported on the current OS/PHP setup
+     * Returns whether this guesser is supported on the current OS/PHP setup.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isSupported()
     {
@@ -59,11 +57,11 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         if (!self::isSupported()) {
-            return null;
+            return;
         }
 
         if (!$finfo = new \finfo(FILEINFO_MIME_TYPE, $this->magicFile)) {
-            return null;
+            return;
         }
 
         return $finfo->file($path);

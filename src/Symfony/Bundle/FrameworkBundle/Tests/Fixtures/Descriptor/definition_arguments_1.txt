@@ -1,0 +1,22 @@
+ ---------------- ----------------------------- 
+ [32m Option         [39m [32m Value                       [39m 
+ ---------------- ----------------------------- 
+  Service ID       -                            
+  Class            Full\Qualified\Class1        
+  Tags             -                            
+  Public           yes                          
+  Synthetic        no                           
+  Lazy             yes                          
+  Shared           yes                          
+  Abstract         yes                          
+  Autowired        no                           
+  Autoconfigured   no                           
+  Factory Class    Full\Qualified\FactoryClass  
+  Factory Method   get                          
+[39;49m  Arguments        Service(.definition_2)[39;49m[39;49m       [39;49m
+[39;49m                   [39;49m[39;49m%parameter%[39;49m[39;49m                  [39;49m
+[39;49m                   [39;49m[39;49mInlined Service[39;49m[39;49m              [39;49m
+[39;49m                   [39;49m[39;49mArray (3 element(s))[39;49m[39;49m         [39;49m
+[39;49m                   [39;49mIterator (2 element(s))      
+ ---------------- ----------------------------- 
+

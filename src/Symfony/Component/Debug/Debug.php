@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\ClassLoader\DebugClassLoader;
-
 /**
  * Registers all the debug tools.
  *
@@ -27,13 +25,10 @@ class Debug
      *
      * This method registers an error handler and an exception handler.
      *
-     * If the Symfony ClassLoader component is available, a special
-     * class loader is also registered.
-     *
-     * @param integer $errorReportingLevel The level of error reporting you want
-     * @param Boolean $displayErrors       Whether to display errors (for development) or just log them (for production)
+     * @param int  $errorReportingLevel The level of error reporting you want
+     * @param bool $displayErrors       Whether to display errors (for development) or just log them (for production)
      */
-    public static function enable($errorReportingLevel = null, $displayErrors = true)
+    public static function enable($errorReportingLevel = E_ALL, $displayErrors = true)
     {
         if (static::$enabled) {
             return;
@@ -41,18 +36,25 @@ class Debug
 
         static::$enabled = true;
 
-        error_reporting(-1);
+        if (null !== $errorReportingLevel) {
+            error_reporting($errorReportingLevel);
+        } else {
+            error_reporting(E_ALL);
+        }
 
-        ErrorHandler::register($errorReportingLevel, $displayErrors);
-        if ('cli' !== php_sapi_name()) {
+        if (!\in_array(PHP_SAPI, array('cli', 'phpdbg'), true)) {
+            ini_set('display_errors', 0);
             ExceptionHandler::register();
-        // CLI - display errors only if they're not already logged to STDERR
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
+            // CLI - display errors only if they're not already logged to STDERR
             ini_set('display_errors', 1);
         }
-
-        if (class_exists('Symfony\Component\ClassLoader\DebugClassLoader')) {
-            DebugClassLoader::enable();
+        if ($displayErrors) {
+            ErrorHandler::register(new ErrorHandler(new BufferingLogger()));
+        } else {
+            ErrorHandler::register()->throwAt(0, true);
         }
+
+        DebugClassLoader::enable();
     }
 }

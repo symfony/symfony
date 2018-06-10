@@ -41,6 +41,13 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             '.foo',
             '.bar',
             'foo bar',
+            'qux',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         );
 
         $lessThanOrEqualTo1 = array(
@@ -50,23 +57,39 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/.git',
             '.foo',
             '.foo/.bar',
             '.bar',
             'foo bar',
             '.foo/bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         );
 
         $graterThanOrEqualTo1 = array(
+            'toto/.git',
             'foo/bar.tmp',
             '.foo/.bar',
             '.foo/bar',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
         );
 
         $equalTo1 = array(
+            'toto/.git',
             'foo/bar.tmp',
             '.foo/.bar',
             '.foo/bar',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
         );
 
         return array(
@@ -77,5 +100,4 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             array(1, 1, $this->toAbsolute($equalTo1)),
         );
     }
-
 }

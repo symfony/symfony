@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Config\Definition;
 
+use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+
 /**
  * Common Interface among all nodes.
  *
@@ -38,14 +42,14 @@ interface NodeInterface
     /**
      * Returns true when the node is required.
      *
-     * @return Boolean If the node is required
+     * @return bool If the node is required
      */
     public function isRequired();
 
     /**
      * Returns true when the node has a default value.
      *
-     * @return Boolean If the node has a default value
+     * @return bool If the node has a default value
      */
     public function hasDefaultValue();
 
@@ -53,16 +57,19 @@ interface NodeInterface
      * Returns the default value of the node.
      *
      * @return mixed The default value
+     *
      * @throws \RuntimeException if the node has no default value
      */
     public function getDefaultValue();
 
     /**
-     * Normalizes the supplied value.
+     * Normalizes a value.
      *
      * @param mixed $value The value to normalize
      *
      * @return mixed The normalized value
+     *
+     * @throws InvalidTypeException if the value type is invalid
      */
     public function normalize($value);
 
@@ -72,7 +79,10 @@ interface NodeInterface
      * @param mixed $leftSide
      * @param mixed $rightSide
      *
-     * @return mixed The merged values
+     * @return mixed The merged value
+     *
+     * @throws ForbiddenOverwriteException if the configuration path cannot be overwritten
+     * @throws InvalidTypeException        if the value type is invalid
      */
     public function merge($leftSide, $rightSide);
 
@@ -82,6 +92,9 @@ interface NodeInterface
      * @param mixed $value The value to finalize
      *
      * @return mixed The finalized value
+     *
+     * @throws InvalidTypeException          if the value type is invalid
+     * @throws InvalidConfigurationException if the value is invalid configuration
      */
     public function finalize($value);
 }

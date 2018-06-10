@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Kernel;
 
 class WebTestCase extends BaseWebTestCase
 {
@@ -23,18 +22,19 @@ class WebTestCase extends BaseWebTestCase
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
-        if (!class_exists('Twig_Environment')) {
-            $this->markTestSkipped('Twig is not available.');
-        }
-
-        parent::setUp();
+        static::deleteTmpDir();
     }
 
-    protected function deleteTmpDir($testCase)
+    public static function tearDownAfterClass()
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
+        static::deleteTmpDir();
+    }
+
+    protected static function deleteTmpDir()
+    {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
             return;
         }
 
@@ -46,7 +46,7 @@ class WebTestCase extends BaseWebTestCase
     {
         require_once __DIR__.'/app/AppKernel.php';
 
-        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\AppKernel';
+        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel';
     }
 
     protected static function createKernel(array $options = array())
@@ -58,10 +58,16 @@ class WebTestCase extends BaseWebTestCase
         }
 
         return new $class(
+            static::getVarDir(),
             $options['test_case'],
             isset($options['root_config']) ? $options['root_config'] : 'config.yml',
-            isset($options['environment']) ? $options['environment'] : 'frameworkbundletest'.strtolower($options['test_case']),
+            isset($options['environment']) ? $options['environment'] : strtolower(static::getVarDir().$options['test_case']),
             isset($options['debug']) ? $options['debug'] : true
         );
+    }
+
+    protected static function getVarDir()
+    {
+        return 'FB'.substr(strrchr(get_called_class(), '\\'), 1);
     }
 }

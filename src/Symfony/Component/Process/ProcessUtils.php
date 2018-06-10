@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+
 /**
  * ProcessUtils is a bunch of utility methods.
  *
@@ -21,40 +23,47 @@ namespace Symfony\Component\Process;
 class ProcessUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
     }
 
     /**
-     * Escapes a string to be used as a shell argument.
+     * Validates and normalizes a Process input.
      *
-     * @param string $argument The argument that will be escaped
+     * @param string $caller The name of method call that validates the input
+     * @param mixed  $input  The input to validate
      *
-     * @return string The escaped argument
+     * @return mixed The validated input
+     *
+     * @throws InvalidArgumentException In case the input is not valid
      */
-    public static function escapeArgument($argument)
+    public static function validateInput($caller, $input)
     {
-        //Fix for PHP bug #43784 escapeshellarg removes % from given string
-        //Fix for PHP bug #49446 escapeshellarg dosn`t work on windows
-        //@see https://bugs.php.net/bug.php?id=43784
-        //@see https://bugs.php.net/bug.php?id=49446
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $escapedArgument = '';
-            foreach (preg_split('/([%"])/i', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
-                if ('"' == $part) {
-                    $escapedArgument .= '\\"';
-                } elseif ('%' == $part) {
-                    $escapedArgument .= '^%';
-                } else {
-                    $escapedArgument .= escapeshellarg($part);
-                }
+        if (null !== $input) {
+            if (is_resource($input)) {
+                return $input;
+            }
+            if (is_string($input)) {
+                return $input;
+            }
+            if (is_scalar($input)) {
+                return (string) $input;
+            }
+            if ($input instanceof Process) {
+                return $input->getIterator($input::ITER_SKIP_ERR);
+            }
+            if ($input instanceof \Iterator) {
+                return $input;
+            }
+            if ($input instanceof \Traversable) {
+                return new \IteratorIterator($input);
             }
 
-            return $escapedArgument;
+            throw new InvalidArgumentException(sprintf('%s only accepts strings, Traversable objects or stream resources.', $caller));
         }
 
-        return escapeshellarg($argument);
+        return $input;
     }
 }

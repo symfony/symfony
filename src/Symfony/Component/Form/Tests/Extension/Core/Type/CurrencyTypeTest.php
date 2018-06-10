@@ -11,27 +11,49 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class CurrencyTypeTest extends TypeTestCase
+class CurrencyTypeTest extends BaseTypeTest
 {
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CurrencyType';
+
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }
 
     public function testCurrenciesAreSelectable()
     {
-        $form = $this->factory->create('currency');
-        $view = $form->createView();
-        $choices = $view->vars['choices'];
+        $choices = $this->factory->create(static::TESTED_TYPE)
+            ->createView()->vars['choices'];
 
         $this->assertContains(new ChoiceView('EUR', 'EUR', 'Euro'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('USD', 'USD', 'US Dollar'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices, '', false, false);
     }
 
+    /**
+     * @requires extension intl
+     */
+    public function testChoiceTranslationLocaleOption()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, array(
+                'choice_translation_locale' => 'uk',
+            ))
+            ->createView()->vars['choices'];
+
+        // Don't check objects for identity
+        $this->assertContains(new ChoiceView('EUR', 'EUR', 'євро'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('USD', 'USD', 'долар США'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('SIT', 'SIT', 'словенський толар'), $choices, '', false, false);
+    }
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        parent::testSubmitNull($expected, $norm, '');
+    }
 }

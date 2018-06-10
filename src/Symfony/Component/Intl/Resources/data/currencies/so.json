@@ -1,0 +1,33 @@
+{
+    "Version": "2.1.38.69",
+    "Names": {
+        "DJF": [
+            "DJF",
+            "Faran Jabbuuti"
+        ],
+        "ETB": [
+            "ETB",
+            "Birta Itoobbiya"
+        ],
+        "EUR": [
+            "€",
+            "Yuuroo"
+        ],
+        "SAR": [
+            "SAR",
+            "Riyaalka Sacuudiga"
+        ],
+        "SOS": [
+            "S",
+            "Shilin soomaali"
+        ],
+        "TZS": [
+            "TZS",
+            "Shilin Tansaani"
+        ],
+        "USD": [
+            "US$",
+            "Doollar maraykan"
+        ]
+    }
+}

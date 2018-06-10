@@ -27,25 +27,42 @@ class JsonResponse extends Response
     protected $data;
     protected $callback;
 
+    // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
+    // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+    const DEFAULT_ENCODING_OPTIONS = 15;
+
+    protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
+
     /**
-     * Constructor.
-     *
-     * @param mixed   $data    The response data
-     * @param integer $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param mixed $data    The response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
+     * @param bool  $json    If the data is already a JSON string
      */
-    public function __construct($data = null, $status = 200, $headers = array())
+    public function __construct($data = null, int $status = 200, array $headers = array(), bool $json = false)
     {
         parent::__construct('', $status, $headers);
 
         if (null === $data) {
             $data = new \ArrayObject();
         }
-        $this->setData($data);
+
+        $json ? $this->setJson($data) : $this->setData($data);
     }
 
     /**
-     * {@inheritDoc}
+     * Factory method for chainability.
+     *
+     * Example:
+     *
+     *     return JsonResponse::create($data, 200)
+     *         ->setSharedMaxAge(300);
+     *
+     * @param mixed $data    The json response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
+     *
+     * @return static
      */
     public static function create($data = null, $status = 200, $headers = array())
     {
@@ -53,22 +70,38 @@ class JsonResponse extends Response
     }
 
     /**
+     * Make easier the creation of JsonResponse from raw json.
+     */
+    public static function fromJsonString($data = null, $status = 200, $headers = array())
+    {
+        return new static($data, $status, $headers, true);
+    }
+
+    /**
      * Sets the JSONP callback.
      *
-     * @param string $callback
+     * @param string|null $callback The JSONP callback or null to use none
      *
-     * @return JsonResponse
+     * @return $this
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When the callback name is not valid
      */
     public function setCallback($callback = null)
     {
         if (null !== $callback) {
-            // taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
-            $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*+$/u';
+            // partially taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
+            // partially taken from https://github.com/willdurand/JsonpCallbackValidator
+            //      JsonpCallbackValidator is released under the MIT License. See https://github.com/willdurand/JsonpCallbackValidator/blob/v1.1.0/LICENSE for details.
+            //      (c) William Durand <william.durand1@gmail.com>
+            $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*(?:\[(?:"(?:\\\.|[^"\\\])*"|\'(?:\\\.|[^\'\\\])*\'|\d+)\])*?$/u';
+            $reserved = array(
+                'break', 'do', 'instanceof', 'typeof', 'case', 'else', 'new', 'var', 'catch', 'finally', 'return', 'void', 'continue', 'for', 'switch', 'while',
+                'debugger', 'function', 'this', 'with', 'default', 'if', 'throw', 'delete', 'in', 'try', 'class', 'enum', 'extends', 'super',  'const', 'export',
+                'import', 'implements', 'let', 'private', 'public', 'yield', 'interface', 'package', 'protected', 'static', 'null', 'true', 'false',
+            );
             $parts = explode('.', $callback);
             foreach ($parts as $part) {
-                if (!preg_match($pattern, $part)) {
+                if (!preg_match($pattern, $part) || in_array($part, $reserved, true)) {
                     throw new \InvalidArgumentException('The callback name is not valid.');
                 }
             }
@@ -80,24 +113,76 @@ class JsonResponse extends Response
     }
 
     /**
-     * Sets the data to be sent as json.
+     * Sets a raw string containing a JSON document to be sent.
      *
-     * @param mixed $data
+     * @param string $json
      *
-     * @return JsonResponse
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function setData($data = array())
+    public function setJson($json)
     {
-        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        $this->data = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+        $this->data = $json;
 
         return $this->update();
     }
 
     /**
-     * Updates the content and headers according to the json data and callback.
+     * Sets the data to be sent as JSON.
      *
-     * @return JsonResponse
+     * @param mixed $data
+     *
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setData($data = array())
+    {
+        try {
+            $data = json_encode($data, $this->encodingOptions);
+        } catch (\Exception $e) {
+            if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                throw $e->getPrevious() ?: $e;
+            }
+            throw $e;
+        }
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException(json_last_error_msg());
+        }
+
+        return $this->setJson($data);
+    }
+
+    /**
+     * Returns options used while encoding data to JSON.
+     *
+     * @return int
+     */
+    public function getEncodingOptions()
+    {
+        return $this->encodingOptions;
+    }
+
+    /**
+     * Sets options used while encoding data to JSON.
+     *
+     * @param int $encodingOptions
+     *
+     * @return $this
+     */
+    public function setEncodingOptions($encodingOptions)
+    {
+        $this->encodingOptions = (int) $encodingOptions;
+
+        return $this->setData(json_decode($this->data));
+    }
+
+    /**
+     * Updates the content and headers according to the JSON data and callback.
+     *
+     * @return $this
      */
     protected function update()
     {
@@ -105,7 +190,7 @@ class JsonResponse extends Response
             // Not using application/javascript for compatibility reasons with older browsers.
             $this->headers->set('Content-Type', 'text/javascript');
 
-            return $this->setContent(sprintf('%s(%s);', $this->callback, $this->data));
+            return $this->setContent(sprintf('/**/%s(%s);', $this->callback, $this->data));
         }
 
         // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)

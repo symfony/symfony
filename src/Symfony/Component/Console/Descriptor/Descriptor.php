@@ -16,35 +16,62 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 abstract class Descriptor implements DescriptorInterface
 {
-    public function describe($object, array $options = array())
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function describe(OutputInterface $output, $object, array $options = array())
     {
+        $this->output = $output;
+
         switch (true) {
             case $object instanceof InputArgument:
-                return $this->describeInputArgument($object, $options);
+                $this->describeInputArgument($object, $options);
+                break;
             case $object instanceof InputOption:
-                return $this->describeInputOption($object, $options);
+                $this->describeInputOption($object, $options);
+                break;
             case $object instanceof InputDefinition:
-                return $this->describeInputDefinition($object, $options);
+                $this->describeInputDefinition($object, $options);
+                break;
             case $object instanceof Command:
-                return $this->describeCommand($object, $options);
+                $this->describeCommand($object, $options);
+                break;
             case $object instanceof Application:
-                return $this->describeApplication($object, $options);
+                $this->describeApplication($object, $options);
+                break;
+            default:
+                throw new InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
         }
+    }
 
-        throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+    /**
+     * Writes content to output.
+     *
+     * @param string $content
+     * @param bool   $decorated
+     */
+    protected function write($content, $decorated = false)
+    {
+        $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
 
     /**
      * Describes an InputArgument instance.
-     *
-     * @param InputArgument $argument
-     * @param array         $options
      *
      * @return string|mixed
      */
@@ -53,18 +80,12 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes an InputOption instance.
      *
-     * @param InputOption $option
-     * @param array       $options
-     *
      * @return string|mixed
      */
     abstract protected function describeInputOption(InputOption $option, array $options = array());
 
     /**
      * Describes an InputDefinition instance.
-     *
-     * @param InputDefinition $definition
-     * @param array           $options
      *
      * @return string|mixed
      */
@@ -73,18 +94,12 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes a Command instance.
      *
-     * @param Command $command
-     * @param array   $options
-     *
      * @return string|mixed
      */
     abstract protected function describeCommand(Command $command, array $options = array());
 
     /**
      * Describes an Application instance.
-     *
-     * @param Application $application
-     * @param array       $options
      *
      * @return string|mixed
      */

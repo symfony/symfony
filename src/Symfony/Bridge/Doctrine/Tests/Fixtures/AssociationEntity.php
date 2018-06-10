@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
@@ -26,18 +26,20 @@ class AssociationEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SingleIdentEntity")
-     * @var \Symfony\Bridge\Doctrine\Tests\Form\Fixtures\SingleIdentEntity
+     * @ORM\ManyToOne(targetEntity="SingleIntIdEntity")
+     *
+     * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity
      */
     public $single;
 
     /**
-     * @ORM\ManyToOne(targetEntity="CompositeIdentEntity")
+     * @ORM\ManyToOne(targetEntity="CompositeIntIdEntity")
      * @ORM\JoinColumns({
      *  @ORM\JoinColumn(name="composite_id1", referencedColumnName="id1"),
      *  @ORM\JoinColumn(name="composite_id2", referencedColumnName="id2")
      * })
-     * @var \Symfony\Bridge\Doctrine\Tests\Form\Fixtures\CompositeIdentEntity
+     *
+     * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity
      */
     public $composite;
 }

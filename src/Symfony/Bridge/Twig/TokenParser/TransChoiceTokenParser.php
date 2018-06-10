@@ -12,6 +12,12 @@
 namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\TransNode;
+use Twig\Error\SyntaxError;
+use Twig\Node\Expression\AbstractExpression;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Node;
+use Twig\Node\TextNode;
+use Twig\Token;
 
 /**
  * Token Parser for the 'transchoice' tag.
@@ -23,18 +29,16 @@ class TransChoiceTokenParser extends TransTokenParser
     /**
      * Parses a token and returns a node.
      *
-     * @param \Twig_Token $token A Twig_Token instance
+     * @return Node
      *
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
-     *
-     * @throws \Twig_Error_Syntax
+     * @throws SyntaxError
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $vars = new \Twig_Node_Expression_Array(array(), $lineno);
+        $vars = new ArrayExpression(array(), $lineno);
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
@@ -56,18 +60,18 @@ class TransChoiceTokenParser extends TransTokenParser
         if ($stream->test('into')) {
             // {% transchoice count into "fr" %}
             $stream->next();
-            $locale =  $this->parser->getExpressionParser()->parseExpression();
+            $locale = $this->parser->getExpressionParser()->parseExpression();
         }
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        $stream->expect(Token::BLOCK_END_TYPE);
 
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
 
-        if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message must be a simple text.');
+        if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
+            throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext()->getName());
         }
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        $stream->expect(Token::BLOCK_END_TYPE);
 
         return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }

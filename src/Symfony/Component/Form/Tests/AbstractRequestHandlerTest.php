@@ -11,21 +11,36 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\RequestHandlerInterface;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractRequestHandlerTest extends TestCase
 {
     /**
-     * @var \Symfony\Component\Form\RequestHandlerInterface
+     * @var RequestHandlerInterface
      */
     protected $requestHandler;
 
+    /**
+     * @var FormFactory
+     */
+    protected $factory;
+
     protected $request;
+
+    protected $serverParams;
 
     protected function setUp()
     {
+        $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize', 'getContentLength'))->getMock();
         $this->requestHandler = $this->getRequestHandler();
+        $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
     }
 
@@ -86,7 +101,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitSimpleFormWithNullIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method)
     {
         $form = $this->getMockForm('param1', $method, false);
 
@@ -94,9 +109,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             'paramx' => array(),
         ));
 
-        $form->expects($this->once())
-            ->method('submit')
-            ->with($this->identicalTo(null), 'PATCH' !== $method);
+        $form->expects($this->never())
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -104,7 +118,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitCompoundFormWithArrayIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method)
     {
         $form = $this->getMockForm('param1', $method, true);
 
@@ -112,9 +126,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             'paramx' => array(),
         ));
 
-        $form->expects($this->once())
-            ->method('submit')
-            ->with($this->identicalTo(array()), 'PATCH' !== $method);
+        $form->expects($this->never())
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -251,15 +264,116 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitMultipleFiles($method)
+    {
+        $form = $this->getMockForm('param1', $method);
+        $file = $this->getMockFile();
+
+        $this->setRequestData($method, array(
+            'param1' => null,
+        ), array(
+            'param2' => $this->getMockFile('2'),
+            'param1' => $file,
+            'param3' => $this->getMockFile('3'),
+        ));
+
+        $form->expects($this->once())
+             ->method('submit')
+             ->with($file, 'PATCH' !== $method);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitFileWithNamelessForm($method)
+    {
+        $form = $this->getMockForm(null, $method);
+        $file = $this->getMockFile();
+
+        $this->setRequestData($method, array(
+            '' => null,
+        ), array(
+            '' => $file,
+        ));
+
+        $form->expects($this->once())
+             ->method('submit')
+             ->with($file, 'PATCH' !== $method);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
+     * @dataProvider getPostMaxSizeFixtures
+     */
+    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())
+    {
+        $this->serverParams->expects($this->once())
+            ->method('getContentLength')
+            ->will($this->returnValue($contentLength));
+        $this->serverParams->expects($this->any())
+            ->method('getNormalizedIniPostMaxSize')
+            ->will($this->returnValue($iniMax));
+
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
+        $this->setRequestData('POST', array(), array());
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        if ($shouldFail) {
+            $error = new FormError($options['post_max_size_message'], null, $errorParams);
+            $error->setOrigin($form);
+
+            $this->assertEquals(array($error), iterator_to_array($form->getErrors()));
+            $this->assertTrue($form->isSubmitted());
+        } else {
+            $this->assertCount(0, $form->getErrors());
+            $this->assertFalse($form->isSubmitted());
+        }
+    }
+
+    public function getPostMaxSizeFixtures()
+    {
+        return array(
+            array(pow(1024, 3) + 1, '1G', true, array('{{ max }}' => '1G')),
+            array(pow(1024, 3), '1G', false),
+            array(pow(1024, 2) + 1, '1M', true, array('{{ max }}' => '1M')),
+            array(pow(1024, 2), '1M', false),
+            array(1024 + 1, '1K', true, array('{{ max }}' => '1K')),
+            array(1024, '1K', false),
+            array(null, '1K', false),
+            array(1024, '', false),
+            array(1024, 0, false),
+        );
+    }
+
+    public function testUploadedFilesAreAccepted()
+    {
+        $this->assertTrue($this->requestHandler->isFileUpload($this->getMockFile()));
+    }
+
+    public function testInvalidFilesAreRejected()
+    {
+        $this->assertFalse($this->requestHandler->isFileUpload($this->getInvalidFile()));
+    }
+
     abstract protected function setRequestData($method, $data, $files = array());
 
     abstract protected function getRequestHandler();
 
-    abstract protected function getMockFile();
+    abstract protected function getMockFile($suffix = '');
+
+    abstract protected function getInvalidFile();
 
     protected function getMockForm($name, $method = null, $compound = true)
     {
-        $config = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')->getMock();
         $config->expects($this->any())
             ->method('getMethod')
             ->will($this->returnValue($method));
@@ -267,7 +381,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getCompound')
             ->will($this->returnValue($compound));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $form->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));

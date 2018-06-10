@@ -19,18 +19,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator HTML extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class HtmlExtension extends AbstractExtension
 {
-    /**
-     * Constructor.
-     *
-     * @param Translator $translator
-     */
     public function __construct(Translator $translator)
     {
         $translator
@@ -45,14 +42,14 @@ class HtmlExtension extends AbstractExtension
     public function getPseudoClassTranslators()
     {
         return array(
-            'checked'  => array($this, 'translateChecked'),
-            'link'     => array($this, 'translateLink'),
+            'checked' => array($this, 'translateChecked'),
+            'link' => array($this, 'translateLink'),
             'disabled' => array($this, 'translateDisabled'),
-            'enabled'  => array($this, 'translateEnabled'),
+            'enabled' => array($this, 'translateEnabled'),
             'selected' => array($this, 'translateSelected'),
-            'invalid'  => array($this, 'translateInvalid'),
-            'hover'    => array($this, 'translateHover'),
-            'visited'  => array($this, 'translateVisited'),
+            'invalid' => array($this, 'translateInvalid'),
+            'hover' => array($this, 'translateHover'),
+            'visited' => array($this, 'translateVisited'),
         );
     }
 
@@ -67,8 +64,6 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateChecked(XPathExpr $xpath)
@@ -81,8 +76,6 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateLink(XPathExpr $xpath)
@@ -91,16 +84,14 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateDisabled(XPathExpr $xpath)
     {
         return $xpath->addCondition(
-            "("
-                ."@disabled and"
-                ."("
+            '('
+                .'@disabled and'
+                .'('
                     ."(name(.) = 'input' and @type != 'hidden')"
                     ." or name(.) = 'button'"
                     ." or name(.) = 'select'"
@@ -109,21 +100,19 @@ class HtmlExtension extends AbstractExtension
                     ." or name(.) = 'fieldset'"
                     ." or name(.) = 'optgroup'"
                     ." or name(.) = 'option'"
-                .")"
-            .") or ("
+                .')'
+            .') or ('
                 ."(name(.) = 'input' and @type != 'hidden')"
                 ." or name(.) = 'button'"
                 ." or name(.) = 'select'"
                 ." or name(.) = 'textarea'"
-            .")"
-            ." and ancestor::fieldset[@disabled]"
+            .')'
+            .' and ancestor::fieldset[@disabled]'
         );
         // todo: in the second half, add "and is not a descendant of that fieldset element's first legend element child, if any."
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateEnabled(XPathExpr $xpath)
@@ -150,19 +139,16 @@ class HtmlExtension extends AbstractExtension
                     ." or name(.) = 'textarea'"
                     ." or name(.) = 'keygen'"
                 .')'
-                ." and not (@disabled or ancestor::fieldset[@disabled])"
+                .' and not (@disabled or ancestor::fieldset[@disabled])'
             .') or ('
                 ."name(.) = 'option' and not("
-                    ."@disabled or ancestor::optgroup[@disabled]"
+                    .'@disabled or ancestor::optgroup[@disabled]'
                 .')'
             .')'
         );
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
@@ -189,8 +175,6 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateSelected(XPathExpr $xpath)
@@ -199,8 +183,6 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateInvalid(XPathExpr $xpath)
@@ -209,8 +191,6 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateHover(XPathExpr $xpath)
@@ -219,8 +199,6 @@ class HtmlExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateVisited(XPathExpr $xpath)

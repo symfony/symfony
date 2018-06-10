@@ -1,0 +1,40 @@
+{
+    "name": "symfony/asset",
+    "type": "library",
+    "description": "Symfony Asset Component",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "suggest": {
+        "symfony/http-foundation": ""
+    },
+    "require-dev": {
+        "symfony/http-foundation": "~3.4|~4.0",
+        "symfony/http-kernel": "~3.4|~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Asset\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    }
+}

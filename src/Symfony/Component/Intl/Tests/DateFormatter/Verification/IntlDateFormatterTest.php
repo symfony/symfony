@@ -25,26 +25,47 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
     protected function setUp()
     {
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         parent::setUp();
     }
 
     /**
-     * It seems IntlDateFormatter caches the timezone id when not explicitly set via constructor or by the
-     * setTimeZoneId() method. Since testFormatWithDefaultTimezoneIntl() runs using the default environment
-     * time zone, this test would use it too if not running in a separated process.
-     *
-     * @runInSeparateProcess
+     * @dataProvider formatTimezoneProvider
      */
-    public function testFormatWithTimezoneFromEnvironmentVariable()
+    public function testFormatTimezone($pattern, $timezone, $expected)
     {
-        parent::testFormatWithTimezoneFromEnvironmentVariable();
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        parent::testFormatTimezone($pattern, $timezone, $expected);
+    }
+
+    public function testFormatUtcAndGmtAreSplit()
+    {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        parent::testFormatUtcAndGmtAreSplit();
+    }
+
+    /**
+     * @dataProvider dateAndTimeTypeProvider
+     */
+    public function testDateAndTimeType($timestamp, $datetype, $timetype, $expected)
+    {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        parent::testDateAndTimeType($timestamp, $datetype, $timetype, $expected);
     }
 
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
-        return new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
+        IntlTestHelper::requireFullIntl($this, '55.1');
+
+        if (!$formatter = new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern)) {
+            throw new \InvalidArgumentException(intl_get_error_message());
+        }
+
+        return $formatter;
     }
 
     protected function getIntlErrorMessage()

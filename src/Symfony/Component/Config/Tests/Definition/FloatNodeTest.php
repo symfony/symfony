@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\FloatNode;
 
-class FloatNodeTest extends \PHPUnit_Framework_TestCase
+class FloatNodeTest extends TestCase
 {
     /**
      * @dataProvider getValidValues
@@ -22,6 +23,19 @@ class FloatNodeTest extends \PHPUnit_Framework_TestCase
     {
         $node = new FloatNode('test');
         $this->assertSame($value, $node->normalize($value));
+    }
+
+    /**
+     * @dataProvider getValidValues
+     *
+     * @param int $value
+     */
+    public function testValidNonEmptyValues($value)
+    {
+        $node = new FloatNode('test');
+        $node->setAllowEmptyValue(false);
+
+        $this->assertSame($value, $node->finalize($value));
     }
 
     public function getValidValues()
@@ -34,7 +48,7 @@ class FloatNodeTest extends \PHPUnit_Framework_TestCase
             // Integer are accepted too, they will be cast
             array(17),
             array(-10),
-            array(0)
+            array(0),
         );
     }
 

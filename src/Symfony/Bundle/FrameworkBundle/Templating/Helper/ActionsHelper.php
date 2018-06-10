@@ -24,11 +24,6 @@ class ActionsHelper extends Helper
 {
     private $handler;
 
-    /**
-     * Constructor.
-     *
-     * @param FragmentHandler $handler A FragmentHandler instance
-     */
     public function __construct(FragmentHandler $handler)
     {
         $this->handler = $handler;
@@ -42,7 +37,7 @@ class ActionsHelper extends Helper
      *
      * @return string The fragment content
      *
-     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     * @see FragmentHandler::render()
      */
     public function render($uri, array $options = array())
     {
@@ -58,9 +53,7 @@ class ActionsHelper extends Helper
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

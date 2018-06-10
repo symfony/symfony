@@ -21,17 +21,17 @@ use Symfony\Component\Config\Definition\VariableNode;
 class VariableNodeDefinition extends NodeDefinition
 {
     /**
-     * Instantiate a Node
+     * Instantiate a Node.
      *
      * @return VariableNode The node
      */
     protected function instantiateNode()
     {
-        return new VariableNode($this->name, $this->parent);
+        return new VariableNode($this->name, $this->parent, $this->pathSeparator);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function createNode()
     {
@@ -49,14 +49,12 @@ class VariableNodeDefinition extends NodeDefinition
             $node->setDefaultValue($this->defaultValue);
         }
 
-        if (false === $this->allowEmptyValue) {
-            $node->setAllowEmptyValue($this->allowEmptyValue);
-        }
-
+        $node->setAllowEmptyValue($this->allowEmptyValue);
         $node->addEquivalentValue(null, $this->nullEquivalent);
         $node->addEquivalentValue(true, $this->trueEquivalent);
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setRequired($this->required);
+        $node->setDeprecated($this->deprecationMessage);
 
         if (null !== $this->validation) {
             $node->setFinalValidationClosures($this->validation->rules);
@@ -64,5 +62,4 @@ class VariableNodeDefinition extends NodeDefinition
 
         return $node;
     }
-
 }

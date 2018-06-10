@@ -18,84 +18,66 @@ namespace Symfony\Component\Validator;
  */
 class ConstraintViolation implements ConstraintViolationInterface
 {
-    /**
-     * @var string
-     */
     private $message;
-
-    /**
-     * @var string
-     */
     private $messageTemplate;
-
-    /**
-     * @var array
-     */
-    private $messageParameters;
-
-    /**
-     * @var integer|null
-     */
-    private $messagePluralization;
-
-    /**
-     * @var mixed
-     */
+    private $parameters;
+    private $plural;
     private $root;
-
-    /**
-     * @var string
-     */
     private $propertyPath;
-
-    /**
-     * @var mixed
-     */
     private $invalidValue;
-
-    /**
-     * @var mixed
-     */
+    private $constraint;
     private $code;
+    private $cause;
 
     /**
      * Creates a new constraint violation.
      *
-     * @param string       $message               The violation message.
-     * @param string       $messageTemplate       The raw violation message.
-     * @param array        $messageParameters     The parameters to substitute
-     *                                            in the raw message.
-     * @param mixed        $root                  The value originally passed
-     *                                            to the validator.
-     * @param string       $propertyPath          The property path from the
-     *                                            root value to the invalid
-     *                                            value.
-     * @param mixed        $invalidValue          The invalid value causing the
-     *                                            violation.
-     * @param integer|null $messagePluralization  The pluralization parameter.
-     * @param mixed        $code                  The error code of the
-     *                                            violation, if any.
+     * @param string          $message         The violation message
+     * @param string          $messageTemplate The raw violation message
+     * @param array           $parameters      The parameters to substitute in the
+     *                                         raw violation message
+     * @param mixed           $root            The value originally passed to the
+     *                                         validator
+     * @param string          $propertyPath    The property path from the root
+     *                                         value to the invalid value
+     * @param mixed           $invalidValue    The invalid value that caused this
+     *                                         violation
+     * @param int|null        $plural          The number for determining the plural
+     *                                         form when translating the message
+     * @param mixed           $code            The error code of the violation
+     * @param Constraint|null $constraint      The constraint whose validation
+     *                                         caused the violation
+     * @param mixed           $cause           The cause of the violation
      */
-    public function __construct($message, $messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue, $messagePluralization = null, $code = null)
+    public function __construct(?string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, $code = null, Constraint $constraint = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
-        $this->messageParameters = $messageParameters;
-        $this->messagePluralization = $messagePluralization;
+        $this->parameters = $parameters;
+        $this->plural = $plural;
         $this->root = $root;
         $this->propertyPath = $propertyPath;
         $this->invalidValue = $invalidValue;
+        $this->constraint = $constraint;
         $this->code = $code;
+        $this->cause = $cause;
     }
 
     /**
      * Converts the violation into a string for debugging purposes.
      *
-     * @return string The violation as string.
+     * @return string The violation as string
      */
     public function __toString()
     {
-        $class = (string) (is_object($this->root) ? get_class($this->root) : $this->root);
+        if (is_object($this->root)) {
+            $class = 'Object('.get_class($this->root).')';
+        } elseif (is_array($this->root)) {
+            $class = 'Array';
+        } else {
+            $class = (string) $this->root;
+        }
+
         $propertyPath = (string) $this->propertyPath;
         $code = $this->code;
 
@@ -111,7 +93,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageTemplate()
     {
@@ -119,23 +101,23 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getMessageParameters()
+    public function getParameters()
     {
-        return $this->messageParameters;
+        return $this->parameters;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getMessagePluralization()
+    public function getPlural()
     {
-        return $this->messagePluralization;
+        return $this->plural;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessage()
     {
@@ -143,7 +125,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRoot()
     {
@@ -151,7 +133,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPropertyPath()
     {
@@ -159,7 +141,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getInvalidValue()
     {
@@ -167,7 +149,27 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the constraint whose validation caused the violation.
+     *
+     * @return Constraint|null The constraint or null if it is not known
+     */
+    public function getConstraint()
+    {
+        return $this->constraint;
+    }
+
+    /**
+     * Returns the cause of the violation.
+     *
+     * @return mixed
+     */
+    public function getCause()
+    {
+        return $this->cause;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getCode()
     {

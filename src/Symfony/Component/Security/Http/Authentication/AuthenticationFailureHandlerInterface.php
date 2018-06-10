@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Interface for custom authentication failure handlers.
@@ -29,9 +30,6 @@ interface AuthenticationFailureHandlerInterface
      * This is called when an interactive authentication attempt fails. This is
      * called by authentication listeners inheriting from
      * AbstractAuthenticationListener.
-     *
-     * @param Request                 $request
-     * @param AuthenticationException $exception
      *
      * @return Response The response to return, never null
      */

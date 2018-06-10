@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class UrlTypeTest extends TypeTestCase
+class UrlTypeTest extends TextTypeTest
 {
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
+
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
-        $form = $this->factory->create('url', 'name');
+        $form = $this->factory->create(static::TESTED_TYPE, 'name');
 
         $form->submit('www.domain.com');
 
@@ -25,7 +27,7 @@ class UrlTypeTest extends TypeTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => 'http',
         ));
 
@@ -37,7 +39,7 @@ class UrlTypeTest extends TypeTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => 'http',
         ));
 
@@ -47,9 +49,21 @@ class UrlTypeTest extends TypeTestCase
         $this->assertSame('', $form->getViewData());
     }
 
+    public function testSubmitAddsNoDefaultProtocolIfNull()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'default_protocol' => 'http',
+        ));
+
+        $form->submit(null);
+
+        $this->assertNull($form->getData());
+        $this->assertSame('', $form->getViewData());
+    }
+
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => null,
         ));
 
@@ -57,5 +71,23 @@ class UrlTypeTest extends TypeTestCase
 
         $this->assertSame('www.domain.com', $form->getData());
         $this->assertSame('www.domain.com', $form->getViewData());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfDefaultProtocolIsInvalid()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'default_protocol' => array(),
+        ));
+    }
+
+    public function testSubmitWithNonStringDataDoesNotBreakTheFixUrlProtocolListener()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit(array('domain.com', 'www.domain.com'));
+
+        $this->assertSame(array('domain.com', 'www.domain.com'), $form->getData());
     }
 }

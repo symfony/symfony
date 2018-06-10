@@ -22,7 +22,7 @@ class UsernameNotFoundException extends AuthenticationException
     private $username;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageKey()
     {
@@ -50,7 +50,7 @@ class UsernameNotFoundException extends AuthenticationException
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -61,12 +61,20 @@ class UsernameNotFoundException extends AuthenticationException
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($str)
     {
         list($this->username, $parentData) = unserialize($str);
 
         parent::unserialize($parentData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageData()
+    {
+        return array('{{ username }}' => $this->username);
     }
 }

@@ -11,73 +11,33 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
+use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
+use Symfony\Component\Form\Tests\Extension\Core\Type\TextTypeTest;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validation;
 
-class FormTypeValidatorExtensionTest extends TypeTestCase
+class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
-    public function testValidationGroupNullByDefault()
-    {
-        $form =  $this->factory->create('form');
-
-        $this->assertNull($form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsTransformedToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => 'group',
-        ));
-
-        $this->assertEquals(array('group'), $form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array('group1', 'group2'),
-        ));
-
-        $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToFalse()
-    {
-        $form = $this->factory->create('form', null, array(
-                'validation_groups' => false,
-            ));
-
-        $this->assertEquals(array(), $form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToCallback()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
-        ));
-
-        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
-    }
-
-    public function testValidationGroupsCanBeSetToClosure()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => function(FormInterface $form){ return null; },
-        ));
-
-        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
-    }
+    use ValidatorExtensionTrait;
 
     public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder(
-            'form',
+            FormTypeTest::TESTED_TYPE,
             null,
             array(
                 'validation_groups' => 'group',
             )
         );
-        $builder->add('firstName', 'form');
+        $builder->add('firstName', FormTypeTest::TESTED_TYPE);
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())
@@ -87,5 +47,44 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
 
         // specific data is irrelevant
         $form->submit(array());
+    }
+
+    public function testValidConstraint()
+    {
+        $form = $this->createForm(array('constraints' => $valid = new Valid()));
+
+        $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
+    }
+
+    public function testValidatorInterface()
+    {
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+
+        $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
+        $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
+    }
+
+    public function testGroupSequenceWithConstraintsOption()
+    {
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->create(FormTypeTest::TESTED_TYPE, null, (array('validation_groups' => new GroupSequence(array('First', 'Second')))))
+            ->add('field', TextTypeTest::TESTED_TYPE, array(
+                'constraints' => array(
+                    new Length(array('min' => 10, 'groups' => array('First'))),
+                    new Email(array('groups' => array('Second'))),
+                ),
+            ))
+        ;
+
+        $form->submit(array('field' => 'wrong'));
+
+        $this->assertCount(1, $form->getErrors(true));
+    }
+
+    protected function createForm(array $options = array())
+    {
+        return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);
     }
 }

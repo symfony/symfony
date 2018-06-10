@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class DoctrineOrmExtension extends AbstractExtension
 {
@@ -27,7 +27,7 @@ class DoctrineOrmExtension extends AbstractExtension
     protected function loadTypes()
     {
         return array(
-            new Type\EntityType($this->registry, PropertyAccess::getPropertyAccessor()),
+            new EntityType($this->registry),
         );
     }
 

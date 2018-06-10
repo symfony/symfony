@@ -11,34 +11,24 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
+class PhpFileLoaderTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\PhpFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        $this->assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\PhpFileLoader::load
-     */
     public function testLoad()
     {
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -46,5 +36,70 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load(__DIR__.'/../Fixtures/php/simple.php');
 
         $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
+    }
+
+    public function testConfigServices()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/services9.php');
+        $container->getDefinition('errored_definition')->addError('Service "errored_definition" is broken.');
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
+    }
+
+    /**
+     * @dataProvider provideConfig
+     */
+    public function testConfig($file)
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/'.$file.'.php');
+
+        $container->compile();
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringMatchesFormatFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
+    }
+
+    public function provideConfig()
+    {
+        yield array('basic');
+        yield array('object');
+        yield array('defaults');
+        yield array('instanceof');
+        yield array('prototype');
+        yield array('child');
+        yield array('php7');
+        yield array('anonymous');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.
+     */
+    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator());
+        $loader->load($fixtures.'/config/services_autoconfigure_with_parent.php');
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid factory "factory:method": the `service:method` notation is not available when using PHP-based DI configuration. Use "[ref('factory'), 'method']" instead.
+     */
+    public function testFactoryShortNotationNotAllowed()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator());
+        $loader->load($fixtures.'/config/factory_short_notation.php');
+        $container->compile();
     }
 }

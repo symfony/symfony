@@ -82,7 +82,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
             'type' => '',
             'tmp_name' => '',
             'error' => UPLOAD_ERR_NO_FILE,
-            'size' => 0
+            'size' => 0,
         )));
 
         $form->expects($this->once())
@@ -203,17 +203,28 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
     protected function getRequestHandler()
     {
-        return new NativeRequestHandler();
+        return new NativeRequestHandler($this->serverParams);
     }
 
-    protected function getMockFile()
+    protected function getMockFile($suffix = '')
+    {
+        return array(
+            'name' => 'upload'.$suffix.'.txt',
+            'type' => 'text/plain',
+            'tmp_name' => 'owfdskjasdfsa'.$suffix,
+            'error' => UPLOAD_ERR_OK,
+            'size' => 100,
+        );
+    }
+
+    protected function getInvalidFile()
     {
         return array(
             'name' => 'upload.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa',
-            'error' => UPLOAD_ERR_OK,
-            'size' => 100,
+            'error' => '0',
+            'size' => '100',
         );
     }
 }

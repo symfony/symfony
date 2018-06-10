@@ -1,0 +1,67 @@
+{
+    "class": "Full\\Qualified\\Class1",
+    "public": true,
+    "synthetic": false,
+    "lazy": true,
+    "shared": true,
+    "abstract": true,
+    "autowire": false,
+    "autoconfigure": false,
+    "arguments": [
+        {
+            "type": "service",
+            "id": ".definition_2"
+        },
+        "%parameter%",
+        {
+            "class": "inline_service",
+            "public": false,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "arguments": [
+                "arg1",
+                "arg2"
+            ],
+            "file": null,
+            "tags": []
+        },
+        [
+            "foo",
+            {
+                "type": "service",
+                "id": ".definition_2"
+            },
+            {
+                "class": "inline_service",
+                "public": false,
+                "synthetic": false,
+                "lazy": false,
+                "shared": true,
+                "abstract": false,
+                "autowire": false,
+                "autoconfigure": false,
+                "arguments": [],
+                "file": null,
+                "tags": []
+            }
+        ],
+        [
+            {
+                "type": "service",
+                "id": "definition_1"
+            },
+            {
+                "type": "service",
+                "id": ".definition_2"
+            }
+        ]
+    ],
+    "file": null,
+    "factory_class": "Full\\Qualified\\FactoryClass",
+    "factory_method": "get",
+    "tags": []
+}

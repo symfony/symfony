@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <!-- DataCollectorTranslator -->
+        <service id="translator.data_collector" class="Symfony\Component\Translation\DataCollectorTranslator">
+            <argument type="service" id="translator.data_collector.inner" />
+        </service>
+
+        <!-- DataCollector -->
+        <service id="data_collector.translation" class="Symfony\Component\Translation\DataCollector\TranslationDataCollector">
+            <tag name="data_collector" template="@WebProfiler/Collector/translation.html.twig" id="translation" priority="275" />
+            <argument type="service" id="translator.data_collector" />
+        </service>
+    </services>
+</container>

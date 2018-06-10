@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\UriSigner;
 
-class UriSignerTest extends \PHPUnit_Framework_TestCase
+class UriSignerTest extends TestCase
 {
     public function testSign()
     {
@@ -33,5 +34,31 @@ class UriSignerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo')));
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar')));
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&0=integer')));
+
+        $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo'), $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
+    }
+
+    public function testCheckWithDifferentArgSeparator()
+    {
+        $this->iniSet('arg_separator.output', '&amp;');
+        $signer = new UriSigner('foobar');
+
+        $this->assertSame(
+            'http://example.com/foo?baz=bay&foo=bar&_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D',
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+        );
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+    }
+
+    public function testCheckWithDifferentParameter()
+    {
+        $signer = new UriSigner('foobar', 'qux');
+
+        $this->assertSame(
+            'http://example.com/foo?baz=bay&foo=bar&qux=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D',
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+        );
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
     }
 }

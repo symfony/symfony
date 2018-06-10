@@ -12,7 +12,7 @@
 namespace Symfony\Component\Finder;
 
 /**
- * Extends \SplFileInfo to support relative paths
+ * Extends \SplFileInfo to support relative paths.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -22,13 +22,11 @@ class SplFileInfo extends \SplFileInfo
     private $relativePathname;
 
     /**
-     * Constructor
-     *
      * @param string $file             The file name
      * @param string $relativePath     The relative path
      * @param string $relativePathname The relative path name
      */
-    public function __construct($file, $relativePath, $relativePathname)
+    public function __construct(string $file, string $relativePath, string $relativePathname)
     {
         parent::__construct($file);
         $this->relativePath = $relativePath;
@@ -36,7 +34,9 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the relative path
+     * Returns the relative path.
+     *
+     * This path does not contain the file name.
      *
      * @return string the relative path
      */
@@ -46,7 +46,9 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the relative path name
+     * Returns the relative path name.
+     *
+     * This path contains the file name.
      *
      * @return string the relative path name
      */
@@ -56,7 +58,7 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the contents of the file
+     * Returns the contents of the file.
      *
      * @return string the contents of the file
      *
@@ -64,12 +66,11 @@ class SplFileInfo extends \SplFileInfo
      */
     public function getContents()
     {
-        $level = error_reporting(0);
+        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
         $content = file_get_contents($this->getPathname());
-        error_reporting($level);
+        restore_error_handler();
         if (false === $content) {
-            $error = error_get_last();
-            throw new \RuntimeException($error['message']);
+            throw new \RuntimeException($error);
         }
 
         return $content;

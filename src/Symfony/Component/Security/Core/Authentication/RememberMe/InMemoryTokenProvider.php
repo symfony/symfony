@@ -22,6 +22,9 @@ class InMemoryTokenProvider implements TokenProviderInterface
 {
     private $tokens = array();
 
+    /**
+     * {@inheritdoc}
+     */
     public function loadTokenBySeries($series)
     {
         if (!isset($this->tokens[$series])) {
@@ -31,6 +34,9 @@ class InMemoryTokenProvider implements TokenProviderInterface
         return $this->tokens[$series];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed)
     {
         if (!isset($this->tokens[$series])) {
@@ -47,11 +53,17 @@ class InMemoryTokenProvider implements TokenProviderInterface
         $this->tokens[$series] = $token;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteTokenBySeries($series)
     {
         unset($this->tokens[$series]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createNewToken(PersistentTokenInterface $token)
     {
         $this->tokens[$token->getSeries()] = $token;

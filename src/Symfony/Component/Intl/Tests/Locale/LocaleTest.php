@@ -21,6 +21,17 @@ class LocaleTest extends AbstractLocaleTest
         $this->call('acceptFromHttp', 'pt-br,en-us;q=0.7,en;q=0.5');
     }
 
+    public function testCanonicalize()
+    {
+        $this->assertSame('en', $this->call('canonicalize', ''));
+        $this->assertSame('en', $this->call('canonicalize', '.utf8'));
+        $this->assertSame('fr_FR', $this->call('canonicalize', 'FR-fr'));
+        $this->assertSame('fr_FR', $this->call('canonicalize', 'FR-fr.utf8'));
+        $this->assertSame('uz_Latn', $this->call('canonicalize', 'UZ-lATN'));
+        $this->assertSame('uz_Cyrl_UZ', $this->call('canonicalize', 'UZ-cYRL-uz'));
+        $this->assertSame('123', $this->call('canonicalize', 123));
+    }
+
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
      */
@@ -28,8 +39,8 @@ class LocaleTest extends AbstractLocaleTest
     {
         $subtags = array(
             'language' => 'pt',
-            'script'   => 'Latn',
-            'region'   => 'BR'
+            'script' => 'Latn',
+            'region' => 'BR',
         );
         $this->call('composeLocale', $subtags);
     }
@@ -129,7 +140,7 @@ class LocaleTest extends AbstractLocaleTest
     {
         $langtag = array(
             'pt-Latn-BR',
-            'pt-BR'
+            'pt-BR',
         );
         $this->call('lookup', $langtag, 'pt-BR-x-priv1');
     }
@@ -148,6 +159,13 @@ class LocaleTest extends AbstractLocaleTest
     public function testSetDefault()
     {
         $this->call('setDefault', 'pt_BR');
+    }
+
+    public function testSetDefaultAcceptsEn()
+    {
+        $this->call('setDefault', 'en');
+
+        $this->assertSame('en', $this->call('getDefault'));
     }
 
     protected function call($methodName)

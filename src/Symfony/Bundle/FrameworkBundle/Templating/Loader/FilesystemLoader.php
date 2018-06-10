@@ -25,22 +25,13 @@ class FilesystemLoader implements LoaderInterface
 {
     protected $locator;
 
-    /**
-     * Constructor.
-     *
-     * @param FileLocatorInterface $locator A FileLocatorInterface instance
-     */
     public function __construct(FileLocatorInterface $locator)
     {
         $this->locator = $locator;
     }
 
     /**
-     * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
-     *
-     * @return FileStorage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * {@inheritdoc}
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -54,12 +45,7 @@ class FilesystemLoader implements LoaderInterface
     }
 
     /**
-     * Returns true if the template is still fresh.
-     *
-     * @param TemplateReferenceInterface $template The template name as an array
-     * @param integer                    $time     The last modification time of the cached template (timestamp)
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

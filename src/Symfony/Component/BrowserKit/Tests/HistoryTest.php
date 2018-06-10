@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request;
 
-class HistoryTest extends \PHPUnit_Framework_TestCase
+class HistoryTest extends TestCase
 {
     public function testAdd()
     {
@@ -54,7 +55,7 @@ class HistoryTest extends \PHPUnit_Framework_TestCase
             $history->current();
             $this->fail('->current() throws a \LogicException if the history is empty');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->current() throws a \LogicException if the history is empty');
+            $this->assertInstanceOf('LogicException', $e, '->current() throws a \LogicException if the history is empty');
         }
 
         $history->add(new Request('http://www.example.com/', 'get'));
@@ -71,7 +72,7 @@ class HistoryTest extends \PHPUnit_Framework_TestCase
             $history->back();
             $this->fail('->back() throws a \LogicException if the history is already on the first page');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->current() throws a \LogicException if the history is already on the first page');
+            $this->assertInstanceOf('LogicException', $e, '->current() throws a \LogicException if the history is already on the first page');
         }
 
         $history->add(new Request('http://www.example1.com/', 'get'));
@@ -90,7 +91,7 @@ class HistoryTest extends \PHPUnit_Framework_TestCase
             $history->forward();
             $this->fail('->forward() throws a \LogicException if the history is already on the last page');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->forward() throws a \LogicException if the history is already on the last page');
+            $this->assertInstanceOf('LogicException', $e, '->forward() throws a \LogicException if the history is already on the last page');
         }
 
         $history->back();

@@ -37,12 +37,22 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             'foo bar',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         );
 
         $onlyDirectories = array(
             '.git',
             'foo',
+            'qux',
             'toto',
+            'toto/.git',
             '.foo',
         );
 
@@ -55,7 +65,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
 
 class InnerTypeIterator extends \ArrayIterator
 {
-   public function current()
+    public function current()
     {
         return new \SplFileInfo(parent::current());
     }

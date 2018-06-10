@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Definition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
- * This node represents a numeric value in the config tree
+ * This node represents a numeric value in the config tree.
  *
  * @author David Jeanmonod <david.jeanmonod@gmail.com>
  */
@@ -23,15 +23,15 @@ class NumericNode extends ScalarNode
     protected $min;
     protected $max;
 
-    public function __construct($name, NodeInterface $parent = null, $min = null, $max = null)
+    public function __construct(?string $name, NodeInterface $parent = null, $min = null, $max = null, string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
-        parent::__construct($name, $parent);
+        parent::__construct($name, $parent, $pathSeparator);
         $this->min = $min;
         $this->max = $max;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function finalizeValue($value)
     {
@@ -51,5 +51,14 @@ class NumericNode extends ScalarNode
         }
 
         return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isValueEmpty($value)
+    {
+        // a numeric value cannot be empty
+        return false;
     }
 }

@@ -11,15 +11,16 @@
 
 namespace Symfony\Component\Templating\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Helper\Helper;
 
-class HelperTest extends \PHPUnit_Framework_TestCase
+class HelperTest extends TestCase
 {
     public function testGetSetCharset()
     {
         $helper = new ProjectTemplateHelper();
         $helper->setCharset('ISO-8859-1');
-        $this->assertTrue('ISO-8859-1' === $helper->getCharset(), '->setCharset() sets the charset set related to this helper');
+        $this->assertSame('ISO-8859-1', $helper->getCharset(), '->setCharset() sets the charset set related to this helper');
     }
 }
 

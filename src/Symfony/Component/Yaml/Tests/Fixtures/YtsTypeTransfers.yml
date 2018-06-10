@@ -52,10 +52,10 @@ php: |
 test: Forcing Strings
 brief: >
     Any YAML type can be forced into a string using the
-    explicit !str method.
+    explicit !!str method.
 yaml: |
-    date string: !str 2001-08-01
-    number string: !str 192
+    date string: !!str 2001-08-01
+    number string: !!str 192
 php: |
     array(
       'date string' => '2001-08-01',
@@ -176,28 +176,10 @@ brief: >
 yaml: |
     zero: 0
     simple: 12
-    one-thousand: 1,000
-    negative one-thousand: -1,000
 php: |
     array(
       'zero' => 0,
       'simple' => 12,
-      'one-thousand' => 1000,
-      'negative one-thousand' => -1000
-    )
----
-test: Integers as Map Keys
-brief: >
-    An integer can be used a dictionary key.
-yaml: |
-    1: one
-    2: two
-    3: three
-php: |
-    array(
-        1 => 'one',
-        2 => 'two',
-        3 => 'three'
     )
 ---
 test: Floats
@@ -208,12 +190,10 @@ brief: >
      positive and negative infinity and "not a number."
 yaml: |
      a simple float: 2.00
-     larger float: 1,000.09
      scientific notation: 1.00009e+3
 php: |
      array(
        'a simple float' => 2.0,
-       'larger float' => 1000.09,
        'scientific notation' => 1000.09
      )
 ---
@@ -226,11 +206,11 @@ brief: >
     time zone.
 yaml: |
     iso8601: 2001-12-14t21:59:43.10-05:00
-    space seperated: 2001-12-14 21:59:43.10 -05:00
+    space separated: 2001-12-14 21:59:43.10 -05:00
 php: |
     array(
       'iso8601' => mktime( 2001, 12, 14, 21, 59, 43, 0.10, "-05:00" ),
-      'space seperated' => mktime( 2001, 12, 14, 21, 59, 43, 0.10, "-05:00" )
+      'space separated' => mktime( 2001, 12, 14, 21, 59, 43, 0.10, "-05:00" )
     )
 ---
 test: Date

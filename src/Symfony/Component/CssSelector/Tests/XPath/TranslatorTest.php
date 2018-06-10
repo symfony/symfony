@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\CssSelector\Tests\XPath;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
 use Symfony\Component\CssSelector\XPath\Translator;
 
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends TestCase
 {
     /** @dataProvider getXpathLiteralTestData */
     public function testXpathLiteral($value, $literal)
@@ -36,7 +37,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertEquals(count($elementsId), count($elements));
+        $this->assertCount(count($elementsId), $elements);
         foreach ($elements as $element) {
             $this->assertTrue(in_array($element->attributes()->id, $elementsId));
         }
@@ -49,7 +50,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->registerExtension(new HtmlExtension($translator));
         $document = new \DOMDocument();
         $document->strictErrorChecking = false;
-        libxml_use_internal_errors(true);
+        $internalErrors = libxml_use_internal_errors(true);
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
@@ -59,6 +60,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 $this->assertTrue(in_array($element->attributes()->id, $elementsId));
             }
         }
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
     }
 
     /** @dataProvider getHtmlShakespearTestData */
@@ -72,7 +75,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $document = simplexml_import_dom($document);
         $bodies = $document->xpath('//body');
         $elements = $bodies[0]->xpath($translator->cssToXPath($css));
-        $this->assertEquals($count, count($elements));
+        $this->assertCount($count, $elements);
     }
 
     public function getXpathLiteralTestData()
@@ -88,44 +91,46 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function getCssToXPathTestData()
     {
         return array(
-            array('*', "*"),
-            array('e', "e"),
-            array('*|e', "e"),
-            array('e|f', "e:f"),
-            array('e[foo]', "e[@foo]"),
-            array('e[foo|bar]', "e[@foo:bar]"),
+            array('*', '*'),
+            array('e', 'e'),
+            array('*|e', 'e'),
+            array('e|f', 'e:f'),
+            array('e[foo]', 'e[@foo]'),
+            array('e[foo|bar]', 'e[@foo:bar]'),
             array('e[foo="bar"]', "e[@foo = 'bar']"),
             array('e[foo~="bar"]', "e[@foo and contains(concat(' ', normalize-space(@foo), ' '), ' bar ')]"),
             array('e[foo^="bar"]', "e[@foo and starts-with(@foo, 'bar')]"),
             array('e[foo$="bar"]', "e[@foo and substring(@foo, string-length(@foo)-2) = 'bar']"),
             array('e[foo*="bar"]', "e[@foo and contains(@foo, 'bar')]"),
+            array('e[foo!="bar"]', "e[not(@foo) or @foo != 'bar']"),
+            array('e[foo!="bar"][foo!="baz"]', "e[(not(@foo) or @foo != 'bar') and (not(@foo) or @foo != 'baz')]"),
             array('e[hreflang|="en"]', "e[@hreflang and (@hreflang = 'en' or starts-with(@hreflang, 'en-'))]"),
-            array('e:nth-child(1)', "*/*[name() = 'e' and (position() = 1)]"),
-            array('e:nth-last-child(1)', "*/*[name() = 'e' and (position() = last() - 0)]"),
-            array('e:nth-last-child(2n+2)', "*/*[name() = 'e' and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"),
-            array('e:nth-of-type(1)', "*/e[position() = 1]"),
-            array('e:nth-last-of-type(1)', "*/e[position() = last() - 0]"),
+            array('e:nth-child(1)', "*/*[(name() = 'e') and (position() = 1)]"),
+            array('e:nth-last-child(1)', "*/*[(name() = 'e') and (position() = last() - 0)]"),
+            array('e:nth-last-child(2n+2)', "*/*[(name() = 'e') and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"),
+            array('e:nth-of-type(1)', '*/e[position() = 1]'),
+            array('e:nth-last-of-type(1)', '*/e[position() = last() - 0]'),
             array('div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 0]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"),
-            array('e:first-child', "*/*[name() = 'e' and (position() = 1)]"),
-            array('e:last-child', "*/*[name() = 'e' and (position() = last())]"),
-            array('e:first-of-type', "*/e[position() = 1]"),
-            array('e:last-of-type', "*/e[position() = last()]"),
-            array('e:only-child', "*/*[name() = 'e' and (last() = 1)]"),
-            array('e:only-of-type', "e[last() = 1]"),
-            array('e:empty', "e[not(*) and not(string-length())]"),
-            array('e:EmPTY', "e[not(*) and not(string-length())]"),
-            array('e:root', "e[not(parent::*)]"),
-            array('e:hover', "e[0]"),
+            array('e:first-child', "*/*[(name() = 'e') and (position() = 1)]"),
+            array('e:last-child', "*/*[(name() = 'e') and (position() = last())]"),
+            array('e:first-of-type', '*/e[position() = 1]'),
+            array('e:last-of-type', '*/e[position() = last()]'),
+            array('e:only-child', "*/*[(name() = 'e') and (last() = 1)]"),
+            array('e:only-of-type', 'e[last() = 1]'),
+            array('e:empty', 'e[not(*) and not(string-length())]'),
+            array('e:EmPTY', 'e[not(*) and not(string-length())]'),
+            array('e:root', 'e[not(parent::*)]'),
+            array('e:hover', 'e[0]'),
             array('e:contains("foo")', "e[contains(string(.), 'foo')]"),
             array('e:ConTains(foo)', "e[contains(string(.), 'foo')]"),
             array('e.warning', "e[@class and contains(concat(' ', normalize-space(@class), ' '), ' warning ')]"),
             array('e#myid', "e[@id = 'myid']"),
-            array('e:not(:nth-child(odd))', "e[not(position() - 1 >= 0 and (position() - 1) mod 2 = 0)]"),
-            array('e:nOT(*)', "e[0]"),
-            array('e f', "e/descendant-or-self::*/f"),
-            array('e > f', "e/f"),
-            array('e + f', "e/following-sibling::*[name() = 'f' and (position() = 1)]"),
-            array('e ~ f', "e/following-sibling::f"),
+            array('e:not(:nth-child(odd))', 'e[not(position() - 1 >= 0 and (position() - 1) mod 2 = 0)]'),
+            array('e:nOT(*)', 'e[0]'),
+            array('e f', 'e/descendant-or-self::*/f'),
+            array('e > f', 'e/f'),
+            array('e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"),
+            array('e ~ f', 'e/following-sibling::f'),
             array('div#container p', "div[@id = 'container']/descendant-or-self::*/p"),
         );
     }

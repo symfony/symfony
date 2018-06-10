@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:messenger default-bus="messenger.bus.commands">
+            <framework:bus name="messenger.bus.commands" />
+            <framework:bus name="messenger.bus.events">
+                <framework:middleware id="with_factory">
+                    <framework:argument>foo</framework:argument>
+                    <framework:argument>true</framework:argument>
+                    <framework:argument>
+                        <framework:bar>baz</framework:bar>
+                    </framework:argument>
+                </framework:middleware>
+                <framework:middleware id="allow_no_handler" />
+            </framework:bus>
+            <framework:bus name="messenger.bus.queries" default-middleware="false">
+                <framework:middleware id="route_messages" />
+                <framework:middleware id="allow_no_handler" />
+                <framework:middleware id="call_message_handler" />
+            </framework:bus>
+        </framework:messenger>
+    </framework:config>
+</container>

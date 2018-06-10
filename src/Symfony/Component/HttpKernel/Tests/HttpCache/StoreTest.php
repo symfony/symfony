@@ -11,22 +11,23 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 
-class StoreTest extends \PHPUnit_Framework_TestCase
+class StoreTest extends TestCase
 {
     protected $request;
     protected $response;
+
+    /**
+     * @var Store
+     */
     protected $store;
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, array());
 
@@ -91,9 +92,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase
     {
         $cacheKey = $this->storeSimpleEntry();
         $entries = $this->getStoreMetadata($cacheKey);
-        list ($req, $res) = $entries[0];
+        list($req, $res) = $entries[0];
 
-        $this->assertEquals('ena94a8fe5ccb19ba61c4c0873d391e987982fbbd3', $res['x-content-digest'][0]);
+        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
     }
 
     public function testFindsAStoredEntryWithLookup()
@@ -143,7 +144,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase
     {
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
-        $this->assertEquals($this->getStorePath('en'.sha1('test')), $response->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test')), $response->getContent());
     }
 
     public function testInvalidatesMetaAndEntityStoreEntriesWithInvalidate()
@@ -172,6 +173,16 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->store->lookup($req2));
     }
 
+    public function testDoesNotReturnEntriesThatSlightlyVaryWithLookup()
+    {
+        $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
+        $req2 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bam'));
+        $res = new Response('test', 200, array('Vary' => array('Foo', 'Bar')));
+        $this->store->write($req1, $res);
+
+        $this->assertNull($this->store->lookup($req2));
+    }
+
     public function testStoresMultipleResponsesForEachVaryCombination()
     {
         $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
@@ -186,9 +197,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $res3 = new Response('test 3', 200, array('Vary' => 'Foo Bar'));
         $this->store->write($req3, $res3);
 
-        $this->assertEquals($this->getStorePath('en'.sha1('test 3')), $this->store->lookup($req3)->getContent());
-        $this->assertEquals($this->getStorePath('en'.sha1('test 2')), $this->store->lookup($req2)->getContent());
-        $this->assertEquals($this->getStorePath('en'.sha1('test 1')), $this->store->lookup($req1)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 3')), $this->store->lookup($req3)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 2')), $this->store->lookup($req2)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 1')), $this->store->lookup($req1)->getContent());
 
         $this->assertCount(3, $this->getStoreMetadata($key));
     }
@@ -198,17 +209,17 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
         $res1 = new Response('test 1', 200, array('Vary' => 'Foo Bar'));
         $key = $this->store->write($req1, $res1);
-        $this->assertEquals($this->getStorePath('en'.sha1('test 1')), $this->store->lookup($req1)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 1')), $this->store->lookup($req1)->getContent());
 
         $req2 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Bling', 'HTTP_BAR' => 'Bam'));
         $res2 = new Response('test 2', 200, array('Vary' => 'Foo Bar'));
         $this->store->write($req2, $res2);
-        $this->assertEquals($this->getStorePath('en'.sha1('test 2')), $this->store->lookup($req2)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 2')), $this->store->lookup($req2)->getContent());
 
         $req3 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
         $res3 = new Response('test 3', 200, array('Vary' => 'Foo Bar'));
         $key = $this->store->write($req3, $res3);
-        $this->assertEquals($this->getStorePath('en'.sha1('test 3')), $this->store->lookup($req3)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 3')), $this->store->lookup($req3)->getContent());
 
         $this->assertCount(2, $this->getStoreMetadata($key));
     }
@@ -223,6 +234,33 @@ class StoreTest extends \PHPUnit_Framework_TestCase
 
         $this->store->unlock($req);
         $this->assertFalse($this->store->isLocked($req));
+    }
+
+    public function testPurgeHttps()
+    {
+        $request = Request::create('https://example.com/foo');
+        $this->store->write($request, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($request));
+
+        $this->assertTrue($this->store->purge('https://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($request));
+    }
+
+    public function testPurgeHttpAndHttps()
+    {
+        $requestHttp = Request::create('https://example.com/foo');
+        $this->store->write($requestHttp, new Response('foo'));
+
+        $requestHttps = Request::create('http://example.com/foo');
+        $this->store->write($requestHttps, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttps));
+
+        $this->assertTrue($this->store->purge('http://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertEmpty($this->getStoreMetadata($requestHttps));
     }
 
     protected function storeSimpleEntry($path = null, $headers = array())

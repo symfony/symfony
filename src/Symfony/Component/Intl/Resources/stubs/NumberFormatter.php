@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Intl\NumberFormatter\NumberFormatter as IntlNumberFormatter;
+
 /**
- * Stub implementation for the NumberFormatter class of the intl extension
+ * Stub implementation for the NumberFormatter class of the intl extension.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see \Symfony\Component\Intl\NumberFormatter\NumberFormatter
+ * @see IntlNumberFormatter
  */
-class NumberFormatter extends \Symfony\Component\Intl\NumberFormatter\NumberFormatter
+class NumberFormatter extends IntlNumberFormatter
 {
 }

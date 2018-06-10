@@ -1,0 +1,41 @@
+{
+    "Version": "2.1.38.69",
+    "Names": {
+        "BYB": [
+            "BYB",
+            "Belarusian New Rouble (1994–1999)"
+        ],
+        "BYN": [
+            "BYN",
+            "Belarusian Rouble"
+        ],
+        "BYR": [
+            "BYR",
+            "Belarusian Rouble (2000–2016)"
+        ],
+        "JPY": [
+            "JP¥",
+            "Japanese Yen"
+        ],
+        "LVR": [
+            "LVR",
+            "Latvian Rouble"
+        ],
+        "RUB": [
+            "RUB",
+            "Russian Rouble"
+        ],
+        "RUR": [
+            "RUR",
+            "Russian Rouble (1991–1998)"
+        ],
+        "TJR": [
+            "TJR",
+            "Tajikistani Rouble"
+        ],
+        "USD": [
+            "US$",
+            "US Dollar"
+        ]
+    }
+}

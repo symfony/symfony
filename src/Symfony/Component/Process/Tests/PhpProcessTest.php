@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpProcess;
 
-class PhpProcessTest extends \PHPUnit_Framework_TestCase
+class PhpProcessTest extends TestCase
 {
     public function testNonBlockingWorks()
     {
@@ -25,5 +26,23 @@ PHP
         $process->start();
         $process->wait();
         $this->assertEquals($expected, $process->getOutput());
+    }
+
+    public function testCommandLine()
+    {
+        $process = new PhpProcess(<<<'PHP'
+<?php echo phpversion().PHP_SAPI;
+PHP
+        );
+
+        $commandLine = $process->getCommandLine();
+
+        $process->start();
+        $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after start');
+
+        $process->wait();
+        $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
+
+        $this->assertSame(PHP_VERSION.PHP_SAPI, $process->getOutput());
     }
 }

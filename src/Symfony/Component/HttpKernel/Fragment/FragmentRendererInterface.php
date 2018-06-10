@@ -13,13 +13,12 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Interface implemented by all rendering strategies.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @see Symfony\Component\HttpKernel\FragmentRenderer
  */
 interface FragmentRendererInterface
 {

@@ -12,11 +12,18 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
@@ -29,24 +36,28 @@ use Symfony\Component\HttpFoundation\Request;
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
 class RouterListener implements EventSubscriberInterface
 {
     private $matcher;
     private $context;
     private $logger;
-    private $request;
+    private $requestStack;
+    private $projectDir;
+    private $debug;
 
     /**
-     * Constructor.
-     *
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
-     * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
-     * @param LoggerInterface|null                        $logger  The logger
+     * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
+     * @param RequestStack                                $requestStack A RequestStack instance
+     * @param RequestContext|null                         $context      The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
+     * @param LoggerInterface|null                        $logger       The logger
+     * @param string                                      $projectDir
+     * @param bool                                        $debug
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct($matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -58,35 +69,39 @@ class RouterListener implements EventSubscriberInterface
 
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
+        $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->projectDir = $projectDir;
+        $this->debug = $debug;
+    }
+
+    private function setCurrentRequest(Request $request = null)
+    {
+        if (null !== $request) {
+            try {
+                $this->context->fromRequest($request);
+            } catch (\UnexpectedValueException $e) {
+                throw new BadRequestHttpException($e->getMessage(), $e, $e->getCode());
+            }
+        }
     }
 
     /**
-     * Sets the current Request.
+     * After a sub-request is done, we need to reset the routing context to the parent request so that the URL generator
+     * operates on the correct context again.
      *
-     * The application should call this method whenever the Request
-     * object changes (entering a Request scope for instance, but
-     * also when leaving a Request scope -- especially when they are
-     * nested).
-     *
-     * @param Request|null $request A Request instance
+     * @param FinishRequestEvent $event
      */
-    public function setRequest(Request $request = null)
+    public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        if (null !== $request && $this->request !== $request) {
-            $this->context->fromRequest($request);
-        }
-        $this->request = $request;
+        $this->setCurrentRequest($this->requestStack->getParentRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
-        // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
-        // we call setRequest even if most of the time, it has already been done to keep compatibility
-        // with frameworks which do not use the Symfony service container
-        $this->setRequest($request);
+        $this->setCurrentRequest($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
@@ -103,38 +118,61 @@ class RouterListener implements EventSubscriberInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+                $this->logger->info('Matched route "{route}".', array(
+                    'route' => isset($parameters['_route']) ? $parameters['_route'] : 'n/a',
+                    'route_parameters' => $parameters,
+                    'request_uri' => $request->getUri(),
+                    'method' => $request->getMethod(),
+                ));
             }
 
             $request->attributes->add($parameters);
-            unset($parameters['_route']);
-            unset($parameters['_controller']);
+            unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
 
+            if ($referer = $request->headers->get('referer')) {
+                $message .= sprintf(' (from "%s")', $referer);
+            }
+
             throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
-            $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
+            $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), implode(', ', $e->getAllowedMethods()));
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
     }
 
-    private function parametersToString(array $parameters)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        $pieces = array();
-        foreach ($parameters as $key => $val) {
-            $pieces[] = sprintf('"%s": "%s"', $key, (is_string($val) ? $val : json_encode($val)));
+        if (!$this->debug || !($e = $event->getException()) instanceof NotFoundHttpException) {
+            return;
         }
 
-        return implode(', ', $pieces);
+        if ($e->getPrevious() instanceof NoConfigurationException) {
+            $event->setResponse($this->createWelcomeResponse());
+        }
     }
 
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+            KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
+            KernelEvents::EXCEPTION => array('onKernelException', -64),
         );
+    }
+
+    private function createWelcomeResponse()
+    {
+        $version = Kernel::VERSION;
+        $baseDir = realpath($this->projectDir).DIRECTORY_SEPARATOR;
+        $docVersion = substr(Kernel::VERSION, 0, 3);
+
+        ob_start();
+        include __DIR__.'/../Resources/welcome.html.php';
+
+        return new Response(ob_get_clean(), Response::HTTP_NOT_FOUND);
     }
 }

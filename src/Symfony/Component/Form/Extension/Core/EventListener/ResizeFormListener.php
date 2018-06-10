@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * Resize a collection form element based on the data sent from the client.
@@ -23,34 +24,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
     protected $type;
-
-    /**
-     * @var array
-     */
     protected $options;
-
-    /**
-     * Whether children could be added to the group
-     * @var Boolean
-     */
     protected $allowAdd;
-
-    /**
-     * Whether children could be removed from the group
-     * @var Boolean
-     */
     protected $allowDelete;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false)
+    private $deleteEmpty;
+
+    /**
+     * @param string        $type
+     * @param array         $options
+     * @param bool          $allowAdd    Whether children could be added to the group
+     * @param bool          $allowDelete Whether children could be removed from the group
+     * @param bool|callable $deleteEmpty
+     */
+    public function __construct(string $type, array $options = array(), bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
+        $this->deleteEmpty = $deleteEmpty;
     }
 
     public static function getSubscribedEvents()
@@ -94,12 +88,8 @@ class ResizeFormListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        if (null === $data || '' === $data) {
+        if (!is_array($data)) {
             $data = array();
-        }
-
-        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
-            throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
         // Remove all empty rows
@@ -128,6 +118,10 @@ class ResizeFormListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
+        // At this point, $data is an array or an array-like object that already contains the
+        // new entries, which were added by the data mapper. The data mapper ignores existing
+        // entries, so we need to manually unset removed entries in the collection.
+
         if (null === $data) {
             $data = array();
         }
@@ -136,38 +130,38 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        // The data mapper only adds, but does not remove items, so do this
-        // here
-        if ($this->allowDelete) {
-            foreach ($data as $name => $child) {
-                if (!$form->has($name)) {
+        if ($this->deleteEmpty) {
+            $previousData = $form->getData();
+            /** @var FormInterface $child */
+            foreach ($form as $name => $child) {
+                $isNew = !isset($previousData[$name]);
+                $isEmpty = is_callable($this->deleteEmpty) ? call_user_func($this->deleteEmpty, $child->getData()) : $child->isEmpty();
+
+                // $isNew can only be true if allowAdd is true, so we don't
+                // need to check allowAdd again
+                if ($isEmpty && ($isNew || $this->allowDelete)) {
                     unset($data[$name]);
+                    $form->remove($name);
                 }
             }
         }
 
+        // The data mapper only adds, but does not remove items, so do this
+        // here
+        if ($this->allowDelete) {
+            $toDelete = array();
+
+            foreach ($data as $name => $child) {
+                if (!$form->has($name)) {
+                    $toDelete[] = $name;
+                }
+            }
+
+            foreach ($toDelete as $name) {
+                unset($data[$name]);
+            }
+        }
+
         $event->setData($data);
-    }
-
-    /**
-     * Alias of {@link preSubmit()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link preSubmit()} instead.
-     */
-    public function preBind(FormEvent $event)
-    {
-        $this->preSubmit($event);
-    }
-
-    /**
-     * Alias of {@link onSubmit()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link onSubmit()} instead.
-     */
-    public function onBind(FormEvent $event)
-    {
-        $this->onSubmit($event);
     }
 }

@@ -24,7 +24,10 @@ class FixUrlProtocolListener implements EventSubscriberInterface
 {
     private $defaultProtocol;
 
-    public function __construct($defaultProtocol = 'http')
+    /**
+     * @param string|null $defaultProtocol The URL scheme to add when there is none or null to not modify the data
+     */
+    public function __construct(?string $defaultProtocol = 'http')
     {
         $this->defaultProtocol = $defaultProtocol;
     }
@@ -33,20 +36,9 @@ class FixUrlProtocolListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
+        if ($this->defaultProtocol && $data && is_string($data) && !preg_match('~^[\w+.-]+://~', $data)) {
             $event->setData($this->defaultProtocol.'://'.$data);
         }
-    }
-
-    /**
-     * Alias of {@link onSubmit()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link onSubmit()} instead.
-     */
-    public function onBind(FormEvent $event)
-    {
-        $this->onSubmit($event);
     }
 
     public static function getSubscribedEvents()

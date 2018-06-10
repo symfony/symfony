@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="web_server.command.server_run" class="Symfony\Bundle\WebServerBundle\Command\ServerRunCommand">
+            <argument>%kernel.project_dir%/public</argument>
+            <argument>%kernel.environment%</argument>
+            <tag name="console.command" command="server:run" />
+        </service>
+
+        <service id="web_server.command.server_start" class="Symfony\Bundle\WebServerBundle\Command\ServerStartCommand">
+            <argument>%kernel.project_dir%/public</argument>
+            <argument>%kernel.environment%</argument>
+            <tag name="console.command" command="server:start" />
+        </service>
+
+        <service id="web_server.command.server_stop" class="Symfony\Bundle\WebServerBundle\Command\ServerStopCommand">
+            <tag name="console.command" command="server:stop" />
+        </service>
+
+        <service id="web_server.command.server_status" class="Symfony\Bundle\WebServerBundle\Command\ServerStatusCommand">
+            <tag name="console.command" command="server:status" />
+        </service>
+
+        <service id="web_server.command.server_log" class="Symfony\Bundle\WebServerBundle\Command\ServerLogCommand">
+            <tag name="console.command" command="server:log" />
+        </service>
+    </services>
+</container>

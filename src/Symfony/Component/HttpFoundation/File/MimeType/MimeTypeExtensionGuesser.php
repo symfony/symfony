@@ -23,8 +23,6 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
      * This list has been updated from upstream on 2013-04-23.
      *
      * @see http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
-     *
-     * @var array
      */
     protected $defaultExtensions = array(
         'application/andrew-inset' => 'ez',
@@ -601,6 +599,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'application/x-xliff+xml' => 'xlf',
         'application/x-xpinstall' => 'xpi',
         'application/x-xz' => 'xz',
+        'application/x-zip-compressed' => 'zip',
         'application/x-zmachine' => 'z1',
         'application/xaml+xml' => 'xaml',
         'application/xcap-diff+xml' => 'xdf',
@@ -655,11 +654,13 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'chemical/x-csml' => 'csml',
         'chemical/x-xyz' => 'xyz',
         'image/bmp' => 'bmp',
+        'image/x-ms-bmp' => 'bmp',
         'image/cgm' => 'cgm',
         'image/g3fax' => 'g3',
         'image/gif' => 'gif',
         'image/ief' => 'ief',
         'image/jpeg' => 'jpeg',
+        'image/pjpeg' => 'jpeg',
         'image/ktx' => 'ktx',
         'image/png' => 'png',
         'image/prs.btif' => 'btif',
@@ -722,6 +723,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'text/plain' => 'txt',
         'text/prs.lines.tag' => 'dsc',
         'text/richtext' => 'rtx',
+        'text/rtf' => 'rtf',
         'text/sgml' => 'sgml',
         'text/tab-separated-values' => 'tsv',
         'text/troff' => 't',
@@ -741,6 +743,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'text/vnd.sun.j2me.app-descriptor' => 'jad',
         'text/vnd.wap.wml' => 'wml',
         'text/vnd.wap.wmlscript' => 'wmls',
+        'text/vtt' => 'vtt',
         'text/x-asm' => 's',
         'text/x-c' => 'c',
         'text/x-fortran' => 'f',

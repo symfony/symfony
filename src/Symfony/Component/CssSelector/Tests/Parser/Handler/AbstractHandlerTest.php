@@ -9,8 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Tests\Handler;
+namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
@@ -18,7 +19,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractHandlerTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractHandlerTest extends TestCase
 {
     /** @dataProvider getHandleValueTestData */
     public function testHandleValue($value, Token $expectedToken, $remainingContent)
@@ -43,7 +44,9 @@ abstract class AbstractHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract public function getHandleValueTestData();
+
     abstract public function getDontHandleValueTestData();
+
     abstract protected function generateHandler();
 
     protected function assertStreamEmpty(TokenStream $stream)

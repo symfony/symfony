@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class ResponseTestCase extends \PHPUnit_Framework_TestCase
+abstract class ResponseTestCase extends TestCase
 {
     public function testNoCacheControlHeaderOnAttachmentUsingHTTPSAndMSIE()
     {

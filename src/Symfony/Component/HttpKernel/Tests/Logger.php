@@ -85,44 +85,4 @@ class Logger implements LoggerInterface
     {
         $this->log('debug', $message, $context);
     }
-
-    /**
-     * @deprecated
-     */
-    public function emerg($message, array $context = array())
-    {
-        trigger_error('Use emergency() which is PSR-3 compatible', E_USER_DEPRECATED);
-
-        $this->log('emergency', $message, $context);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function crit($message, array $context = array())
-    {
-        trigger_error('Use crit() which is PSR-3 compatible', E_USER_DEPRECATED);
-
-        $this->log('critical', $message, $context);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function err($message, array $context = array())
-    {
-        trigger_error('Use err() which is PSR-3 compatible', E_USER_DEPRECATED);
-
-        $this->log('error', $message, $context);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function warn($message, array $context = array())
-    {
-        trigger_error('Use warn() which is PSR-3 compatible', E_USER_DEPRECATED);
-
-        $this->log('warning', $message, $context);
-    }
 }

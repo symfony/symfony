@@ -17,23 +17,23 @@ use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
+use Twig\Extension\AbstractExtension;
+use Twig\NodeVisitor\NodeVisitorInterface;
+use Twig\TokenParser\AbstractTokenParser;
+use Twig\TwigFilter;
 
 /**
  * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TranslationExtension extends \Twig_Extension
+class TranslationExtension extends AbstractExtension
 {
     private $translator;
     private $translationNodeVisitor;
 
-    public function __construct(TranslatorInterface $translator, \Twig_NodeVisitorInterface $translationNodeVisitor = null)
+    public function __construct(TranslatorInterface $translator = null, NodeVisitorInterface $translationNodeVisitor = null)
     {
-        if (!$translationNodeVisitor) {
-            $translationNodeVisitor = new TranslationNodeVisitor();
-        }
-
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
@@ -49,15 +49,15 @@ class TranslationExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'trans' => new \Twig_Filter_Method($this, 'trans'),
-            'transchoice' => new \Twig_Filter_Method($this, 'transchoice'),
+            new TwigFilter('trans', array($this, 'trans')),
+            new TwigFilter('transchoice', array($this, 'transchoice')),
         );
     }
 
     /**
      * Returns the token parser instance to add to the existing list.
      *
-     * @return array An array of Twig_TokenParser instances
+     * @return AbstractTokenParser[]
      */
     public function getTokenParsers()
     {
@@ -80,18 +80,18 @@ class TranslationExtension extends \Twig_Extension
      */
     public function getNodeVisitors()
     {
-        return array($this->translationNodeVisitor, new TranslationDefaultDomainNodeVisitor());
+        return array($this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor());
     }
 
     public function getTranslationNodeVisitor()
     {
-        return $this->translationNodeVisitor;
+        return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
     public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
-        if (null === $domain) {
-            $domain = 'messages';
+        if (null === $this->translator) {
+            return strtr($message, $arguments);
         }
 
         return $this->translator->trans($message, $arguments, $domain, $locale);
@@ -99,17 +99,15 @@ class TranslationExtension extends \Twig_Extension
 
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
-        if (null === $domain) {
-            $domain = 'messages';
+        if (null === $this->translator) {
+            return strtr($message, $arguments);
         }
 
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {

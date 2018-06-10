@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
- * SessionTest
+ * SessionTest.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Robert Schönthal <seroscho@googlemail.com>
  * @author Drak <drak@zikula.org>
  */
-class SessionTest extends \PHPUnit_Framework_TestCase
+class SessionTest extends TestCase
 {
     /**
      * @var \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
@@ -136,7 +137,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         return array(
             array('foo', 'bar', array('foo' => 'bar')),
             array('foo.bar', 'too much beer', array('foo.bar' => 'too much beer')),
-            array('great', 'symfony2 is great', array('great' => 'symfony2 is great')),
+            array('great', 'symfony is great', array('great' => 'symfony is great')),
         );
     }
 
@@ -176,6 +177,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->session->start();
         $this->session->save();
+
+        $this->assertFalse($this->session->isStarted());
     }
 
     public function testGetId()
@@ -190,12 +193,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface', $this->session->getFlashBag());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Session\Session::getIterator
-     */
     public function testGetIterator()
     {
-        $attributes = array('hello' => 'world', 'symfony2' => 'rocks');
+        $attributes = array('hello' => 'world', 'symfony' => 'rocks');
         foreach ($attributes as $key => $val) {
             $this->session->set($key, $val);
         }
@@ -203,25 +203,40 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $i = 0;
         foreach ($this->session as $key => $val) {
             $this->assertEquals($attributes[$key], $val);
-            $i++;
+            ++$i;
         }
 
         $this->assertEquals(count($attributes), $i);
     }
 
-    /**
-     * @covers \Symfony\Component\HttpFoundation\Session\Session::count
-     */
     public function testGetCount()
     {
         $this->session->set('hello', 'world');
-        $this->session->set('symfony2', 'rocks');
+        $this->session->set('symfony', 'rocks');
 
-        $this->assertEquals(2, count($this->session));
+        $this->assertCount(2, $this->session);
     }
 
     public function testGetMeta()
     {
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $this->session->getMetadataBag());
+    }
+
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->session->isEmpty());
+
+        $this->session->set('hello', 'world');
+        $this->assertFalse($this->session->isEmpty());
+
+        $this->session->remove('hello');
+        $this->assertTrue($this->session->isEmpty());
+
+        $flash = $this->session->getFlashBag();
+        $flash->set('hello', 'world');
+        $this->assertFalse($this->session->isEmpty());
+
+        $flash->get('hello');
+        $this->assertTrue($this->session->isEmpty());
     }
 }

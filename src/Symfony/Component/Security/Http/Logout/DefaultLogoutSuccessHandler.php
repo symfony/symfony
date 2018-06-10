@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 /**
  * Default logout success handler will redirect users to a configured path.
@@ -26,19 +25,14 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
     protected $httpUtils;
     protected $targetUrl;
 
-    /**
-     * @param HttpUtils $httpUtils
-     * @param string    $targetUrl
-     */
-    public function __construct(HttpUtils $httpUtils, $targetUrl = '/')
+    public function __construct(HttpUtils $httpUtils, string $targetUrl = '/')
     {
         $this->httpUtils = $httpUtils;
-
         $this->targetUrl = $targetUrl;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onLogoutSuccess(Request $request)
     {

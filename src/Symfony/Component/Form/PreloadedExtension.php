@@ -14,39 +14,31 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
- * A form extension with preloaded types, type exceptions and type guessers.
+ * A form extension with preloaded types, type extensions and type guessers.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class PreloadedExtension implements FormExtensionInterface
 {
-    /**
-     * @var array
-     */
     private $types = array();
-
-    /**
-     * @var array
-     */
     private $typeExtensions = array();
-
-    /**
-     * @var FormTypeGuesserInterface
-     */
     private $typeGuesser;
 
     /**
      * Creates a new preloaded extension.
      *
-     * @param array                         $types          The types that the extension should support.
-     * @param array                         $typeExtensions The type extensions that the extension should support.
-     * @param FormTypeGuesserInterface|null $typeGuesser    The guesser that the extension should support.
+     * @param FormTypeInterface[]            $types          The types that the extension should support
+     * @param FormTypeExtensionInterface[][] $typeExtensions The type extensions that the extension should support
+     * @param FormTypeGuesserInterface|null  $typeGuesser    The guesser that the extension should support
      */
     public function __construct(array $types, array $typeExtensions, FormTypeGuesserInterface $typeGuesser = null)
     {
-        $this->types = $types;
         $this->typeExtensions = $typeExtensions;
         $this->typeGuesser = $typeGuesser;
+
+        foreach ($types as $type) {
+            $this->types[get_class($type)] = $type;
+        }
     }
 
     /**

@@ -9,57 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
-class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
+class MergeExtensionConfigurationPassTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testAutoloadMainExtension()
     {
-        $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerBuilder');
-        $params = $this->getMock('Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBag');
+        $container = new ContainerBuilder();
+        $container->registerExtension(new LoadedExtension());
+        $container->registerExtension(new NotLoadedExtension());
+        $container->loadFromExtension('loaded', array());
 
-        $container->expects($this->at(0))
-            ->method('getExtensionConfig')
-            ->with('loaded')
-            ->will($this->returnValue(array(array())));
-        $container->expects($this->at(1))
-            ->method('getExtensionConfig')
-            ->with('notloaded')
-            ->will($this->returnValue(array()));
-        $container->expects($this->once())
-            ->method('loadFromExtension')
-            ->with('notloaded', array());
-
-        $container->expects($this->any())
-            ->method('getParameterBag')
-            ->will($this->returnValue($params));
-        $params->expects($this->any())
-            ->method('all')
-            ->will($this->returnValue(array()));
-        $container->expects($this->any())
-            ->method('getDefinitions')
-            ->will($this->returnValue(array()));
-        $container->expects($this->any())
-            ->method('getAliases')
-            ->will($this->returnValue(array()));
-        $container->expects($this->any())
-            ->method('getExtensions')
-            ->will($this->returnValue(array()));
-
-        $configPass = new MergeExtensionConfigurationPass(array('loaded', 'notloaded'));
+        $configPass = new MergeExtensionConfigurationPass(array('loaded', 'not_loaded'));
         $configPass->process($container);
+
+        $this->assertTrue($container->hasDefinition('loaded.foo'));
+        $this->assertTrue($container->hasDefinition('not_loaded.bar'));
+    }
+}
+
+class LoadedExtension extends Extension
+{
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $container->register('loaded.foo');
+    }
+}
+
+class NotLoadedExtension extends Extension
+{
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $container->register('not_loaded.bar');
     }
 }

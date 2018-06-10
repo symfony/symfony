@@ -12,24 +12,26 @@
 namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 
 /**
- * Parser and formatter for 12 hour format (1-12)
+ * Parser and formatter for 12 hour format (1-12).
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class Hour1201Transformer extends HourTransformer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         return $this->padLeft($dateTime->format('g'), $length);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function normalizeHour($hour, $marker = null)
+    public function normalizeHour(int $hour, string $marker = null): int
     {
         if ('PM' !== $marker && 12 === $hour) {
             $hour = 0;
@@ -42,21 +44,21 @@ class Hour1201Transformer extends HourTransformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         return '\d{1,2}';
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array(
             'hour' => (int) $matched,
-            'hourInstance' => $this
+            'hourInstance' => $this,
         );
     }
 }

@@ -1,0 +1,25 @@
+{% block _text_id_widget %}
+{% spaceless %}
+    <div id="container">
+        {{ form_widget(form) }}
+    </div>
+{% endspaceless %}
+{% endblock _text_id_widget %}
+
+{% block _names_entry_label %}
+{% spaceless %}
+    {% if label is empty %}
+        {% set label = name|humanize %}
+    {% endif %}
+    <label>Custom label: {{ label|trans({}, translation_domain) }}</label>
+{% endspaceless %}
+{% endblock _names_entry_label %}
+
+{% block _name_c_entry_label %}
+{% spaceless %}
+    {% if label is empty %}
+        {% set label = name|humanize %}
+    {% endif %}
+    <label>Custom name label: {{ label|trans({}, translation_domain) }}</label>
+{% endspaceless %}
+{% endblock _name_c_entry_label %}

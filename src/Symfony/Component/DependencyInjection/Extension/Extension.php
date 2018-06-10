@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -26,10 +25,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
+    private $processedConfigs = array();
+
     /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
+     * {@inheritdoc}
      */
     public function getXsdValidationBasePath()
     {
@@ -37,9 +36,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     }
 
     /**
-     * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string The XML namespace
+     * {@inheritdoc}
      */
     public function getNamespace()
     {
@@ -69,7 +66,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     public function getAlias()
     {
         $className = get_class($this);
-        if (substr($className, -9) != 'Extension') {
+        if ('Extension' != substr($className, -9)) {
             throw new BadMethodCallException('This extension does not follow the naming convention; you must overwrite the getAlias() method.');
         }
         $classBaseName = substr(strrchr($className, '\\'), 1, -9);
@@ -78,23 +75,27 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        $reflected = new \ReflectionClass($this);
-        $namespace = $reflected->getNamespaceName();
+        $class = get_class($this);
+        $class = substr_replace($class, '\Configuration', strrpos($class, '\\'));
+        $class = $container->getReflectionClass($class);
 
-        $class = $namespace.'\\Configuration';
-        if (class_exists($class)) {
-            $r = new \ReflectionClass($class);
-            $container->addResource(new FileResource($r->getFileName()));
+        if (!$class) {
+            return null;
+        }
 
-            if (!method_exists($class, '__construct')) {
-                $configuration = new $class();
+        if (!$class->implementsInterface(ConfigurationInterface::class)) {
+            @trigger_error(sprintf('Not implementing "%s" in the extension configuration class "%s" is deprecated since Symfony 4.1.', ConfigurationInterface::class, $class->getName()), E_USER_DEPRECATED);
+            //throw new LogicException(sprintf('The extension configuration class "%s" must implement "%s".', $class->getName(), ConfigurationInterface::class));
 
-                return $configuration;
-            }
+            return null;
+        }
+
+        if (!($constructor = $class->getConstructor()) || !$constructor->getNumberOfRequiredParameters()) {
+            return $class->newInstance();
         }
 
         return null;
@@ -104,14 +105,23 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     {
         $processor = new Processor();
 
-        return $processor->processConfiguration($configuration, $configs);
+        return $this->processedConfigs[] = $processor->processConfiguration($configuration, $configs);
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     *
-     * @return Boolean Whether the configuration is enabled
+     * @internal
+     */
+    final public function getProcessedConfigs()
+    {
+        try {
+            return $this->processedConfigs;
+        } finally {
+            $this->processedConfigs = array();
+        }
+    }
+
+    /**
+     * @return bool Whether the configuration is enabled
      *
      * @throws InvalidArgumentException When the config is not enableable
      */
@@ -121,6 +131,6 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
             throw new InvalidArgumentException("The config array has no 'enabled' key.");
         }
 
-        return (Boolean) $container->getParameterBag()->resolveValue($config['enabled']);
+        return (bool) $container->getParameterBag()->resolveValue($config['enabled']);
     }
 }

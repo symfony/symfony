@@ -26,10 +26,6 @@ interface LogoutHandlerInterface
      * This method is called by the LogoutListener when a user has requested
      * to be logged out. Usually, you would unset session variables, or remove
      * cookies, etc.
-     *
-     * @param Request        $request
-     * @param Response       $response
-     * @param TokenInterface $token
      */
     public function logout(Request $request, Response $response, TokenInterface $token);
 }

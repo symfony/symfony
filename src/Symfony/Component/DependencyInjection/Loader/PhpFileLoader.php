@@ -11,47 +11,63 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 /**
  * PhpFileLoader loads service definitions from a PHP file.
  *
  * The PHP file is required and the $container variable can be
- * used form the file to change the container.
+ * used within the file to change the container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpFileLoader extends FileLoader
 {
     /**
-     * Loads a PHP file.
-     *
-     * @param mixed  $file The resource
-     * @param string $type The resource type
+     * {@inheritdoc}
      */
-    public function load($file, $type = null)
+    public function load($resource, $type = null)
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;
         $loader = $this;
 
-        $path = $this->locator->locate($file);
+        $path = $this->locator->locate($resource);
         $this->setCurrentDir(dirname($path));
-        $this->container->addResource(new FileResource($path));
+        $this->container->fileExists($path);
 
-        include $path;
+        // the closure forbids access to the private scope in the included file
+        $load = \Closure::bind(function ($path) use ($container, $loader, $resource, $type) {
+            return include $path;
+        }, $this, ProtectedPhpFileLoader::class);
+
+        $callback = $load($path);
+
+        if (\is_object($callback) && \is_callable($callback)) {
+            $callback(new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource), $this->container, $this);
+        }
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'php' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'php' === $type;
     }
+}
+
+/**
+ * @internal
+ */
+final class ProtectedPhpFileLoader extends PhpFileLoader
+{
 }

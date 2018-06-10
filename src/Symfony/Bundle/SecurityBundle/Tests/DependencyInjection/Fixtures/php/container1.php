@@ -1,7 +1,6 @@
 <?php
 
 $container->loadFromExtension('security', array(
-    'acl' => array(),
     'encoders' => array(
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => array(
@@ -61,21 +60,44 @@ $container->loadFromExtension('security', array(
     ),
 
     'firewalls' => array(
-        'simple' => array('pattern' => '/login', 'security' => false),
+        'simple' => array('provider' => 'default', 'pattern' => '/login', 'security' => false),
         'secure' => array('stateless' => true,
+            'provider' => 'default',
             'http_basic' => true,
-            'http_digest' => array('key' => 'TheKey'),
             'form_login' => true,
             'anonymous' => true,
             'switch_user' => true,
             'x509' => true,
+            'remote_user' => true,
             'logout' => true,
+            'remember_me' => array('secret' => 'TheSecret'),
+            'user_checker' => null,
+        ),
+        'host' => array(
+            'provider' => 'default',
+            'pattern' => '/test',
+            'host' => 'foo\\.example\\.org',
+            'methods' => array('GET', 'POST'),
+            'anonymous' => true,
+            'http_basic' => true,
+        ),
+        'with_user_checker' => array(
+            'provider' => 'default',
+            'user_checker' => 'app.user_checker',
+            'anonymous' => true,
+            'http_basic' => true,
+        ),
+        'simple_auth' => array(
+            'provider' => 'default',
+            'anonymous' => true,
+            'simple_form' => array('authenticator' => 'simple_authenticator'),
         ),
     ),
 
     'access_control' => array(
         array('path' => '/blog/524', 'role' => 'ROLE_USER', 'requires_channel' => 'https', 'methods' => array('get', 'POST')),
         array('path' => '/blog/.*', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'),
+        array('path' => '/blog/524', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY', 'allow_if' => "token.getUsername() matches '/^admin/'"),
     ),
 
     'role_hierarchy' => array(

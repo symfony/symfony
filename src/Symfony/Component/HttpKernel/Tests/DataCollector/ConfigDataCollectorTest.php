@@ -11,21 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
+class ConfigDataCollectorTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testCollect()
     {
         $kernel = new KernelForTest('test', true);
@@ -33,35 +27,20 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
 
-        $this->assertSame('test',$c->getEnv());
+        $this->assertSame('test', $c->getEnv());
         $this->assertTrue($c->isDebug());
-        $this->assertSame('config',$c->getName());
-        $this->assertSame('testkernel',$c->getAppName());
-        $this->assertSame(PHP_VERSION,$c->getPhpVersion());
-        $this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
+        $this->assertSame('config', $c->getName());
+        $this->assertSame('testkernel', $c->getAppName());
+        $this->assertRegExp('~^'.preg_quote($c->getPhpVersion(), '~').'~', PHP_VERSION);
+        $this->assertRegExp('~'.preg_quote((string) $c->getPhpVersionExtra(), '~').'$~', PHP_VERSION);
+        $this->assertSame(PHP_INT_SIZE * 8, $c->getPhpArchitecture());
+        $this->assertSame(class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
+        $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
+        $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());
-
-        // if else clause because we don't know it
-        if (extension_loaded('xdebug')) {
-            $this->assertTrue($c->hasXdebug());
-        } else {
-            $this->assertFalse($c->hasXdebug());
-        }
-
-        // if else clause because we don't know it
-        if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
-                ||
-                (extension_loaded('apc') && ini_get('apc.enabled'))
-                ||
-                (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
-                ||
-                (extension_loaded('xcache') && ini_get('xcache.cacher'))
-                ||
-                (extension_loaded('wincache') && ini_get('wincache.ocenabled')))) {
-            $this->assertTrue($c->hasAccelerator());
-        } else {
-            $this->assertFalse($c->hasAccelerator());
-        }
+        $this->assertSame(extension_loaded('xdebug'), $c->hasXDebug());
+        $this->assertSame(extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
+        $this->assertSame(extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
     }
 }
 
@@ -73,10 +52,6 @@ class KernelForTest extends Kernel
     }
 
     public function registerBundles()
-    {
-    }
-
-    public function init()
     {
     }
 

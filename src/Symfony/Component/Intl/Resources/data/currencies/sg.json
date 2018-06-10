@@ -1,0 +1,233 @@
+{
+    "Version": "2.1.39.11",
+    "Names": {
+        "AED": [
+            "AED",
+            "dirâm tî âEmirâti tî Arâbo Ôko"
+        ],
+        "AOA": [
+            "AOA",
+            "kwânza tî Angoläa"
+        ],
+        "AUD": [
+            "A$",
+            "dolära tî Ostralïi"
+        ],
+        "BHD": [
+            "BHD",
+            "dolùara tî Bahrâina"
+        ],
+        "BIF": [
+            "BIF",
+            "farânga tî Burundïi"
+        ],
+        "BWP": [
+            "BWP",
+            "pûla tî Botswana"
+        ],
+        "CAD": [
+            "CA$",
+            "dolära tî kanadäa"
+        ],
+        "CDF": [
+            "CDF",
+            "farânga tî Kongöo"
+        ],
+        "CHF": [
+            "CHF",
+            "farânga tî Sûîsi"
+        ],
+        "CNY": [
+            "CN¥",
+            "yuan renminbi tî Shîni"
+        ],
+        "CVE": [
+            "CVE",
+            "eskûêdo tî Kâpo-Vêre"
+        ],
+        "DJF": [
+            "DJF",
+            "farânga tî Dibutïi"
+        ],
+        "DZD": [
+            "DZD",
+            "dinäri tî Alzerïi"
+        ],
+        "EGP": [
+            "EGP",
+            "pôndo tî Kâmitâ"
+        ],
+        "ERN": [
+            "ERN",
+            "nakafa tî Eritrëe"
+        ],
+        "ETB": [
+            "ETB",
+            "bir tî Etiopïi"
+        ],
+        "EUR": [
+            "€",
+            "zoröo"
+        ],
+        "GBP": [
+            "£",
+            "pôndo tî Anglëe"
+        ],
+        "GHC": [
+            "GHC",
+            "sêdi tî Ganäa"
+        ],
+        "GMD": [
+            "GMD",
+            "dalasi tî gambïi"
+        ],
+        "GNS": [
+            "GNS",
+            "sili tî Ginëe"
+        ],
+        "INR": [
+            "₹",
+            "rupïi tî Ênnde"
+        ],
+        "JPY": [
+            "JP¥",
+            "yêni tî Zapön"
+        ],
+        "KES": [
+            "KES",
+            "shilîngi tî Kenyäa"
+        ],
+        "KMF": [
+            "KMF",
+            "farânga tî Kömôro"
+        ],
+        "LRD": [
+            "LRD",
+            "dolära tî Liberïa"
+        ],
+        "LSL": [
+            "LSL",
+            "loti tî Lesôtho"
+        ],
+        "LYD": [
+            "LYD",
+            "dinäar tî Libïi"
+        ],
+        "MAD": [
+            "MAD",
+            "dirâm tî Marôko"
+        ],
+        "MGA": [
+            "MGA",
+            "ariâri tî Madagasikära"
+        ],
+        "MRO": [
+            "MRO",
+            "ugîya tî Moritanïi (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
+            "ugîya tî Moritanïi"
+        ],
+        "MUR": [
+            "MUR",
+            "rupïi tî Mörîsi"
+        ],
+        "MWK": [
+            "MWK",
+            "kwâtia tî Malawïi"
+        ],
+        "MZM": [
+            "MZM",
+            "metikala tî Mozambîka"
+        ],
+        "NAD": [
+            "NAD",
+            "dolära tî Namibïi"
+        ],
+        "NGN": [
+            "NGN",
+            "nâîra tî Nizerïa"
+        ],
+        "RWF": [
+            "RWF",
+            "farânga tî Ruandäa"
+        ],
+        "SAR": [
+            "SAR",
+            "riâli tî Saûdi Arabïi"
+        ],
+        "SCR": [
+            "SCR",
+            "rupïi tî Sëyshêle"
+        ],
+        "SDG": [
+            "SDG",
+            "pôndo tî Sudäan"
+        ],
+        "SHP": [
+            "SHP",
+            "pôndo tî Zûâ Sênt-Helêna"
+        ],
+        "SLL": [
+            "SLL",
+            "leône tî Sierâ-Leône"
+        ],
+        "SOS": [
+            "SOS",
+            "shilîngi tî Somalïi"
+        ],
+        "STD": [
+            "STD",
+            "dôbra tî Sâô Tomë na Prinsîpe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
+            "dôbra tî Sâô Tomë na Prinsîpe"
+        ],
+        "SZL": [
+            "SZL",
+            "lilangùeni tî Swazïlânde"
+        ],
+        "TND": [
+            "TND",
+            "dinära tî Tunizïi"
+        ],
+        "TZS": [
+            "TZS",
+            "shilîngi tî Tanzanïi"
+        ],
+        "UGX": [
+            "UGX",
+            "shilîngi tî Ugandäa"
+        ],
+        "USD": [
+            "US$",
+            "dol$ara ttî äLetäa-Ôko tî Amerîka"
+        ],
+        "XAF": [
+            "FCFA",
+            "farânga CFA (BEAC)"
+        ],
+        "XOF": [
+            "CFA",
+            "farânga CFA (BCEAO)"
+        ],
+        "ZAR": [
+            "ZAR",
+            "rânde tî Mbongo-Afrîka"
+        ],
+        "ZMK": [
+            "ZMK",
+            "kwâtia tî Zambïi (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "kwâtia tî Zambïi"
+        ],
+        "ZWD": [
+            "ZWD",
+            "dolära tî Zimbäbwe"
+        ]
+    }
+}

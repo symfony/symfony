@@ -12,13 +12,18 @@
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
 use Symfony\Bridge\Twig\Node\TransNode;
+use Twig\Environment;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\FilterExpression;
+use Twig\Node\Node;
+use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
  * TranslationNodeVisitor extracts translation messages.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
+class TranslationNodeVisitor extends AbstractNodeVisitor
 {
     const UNDEFINED_DOMAIN = '_undefined';
 
@@ -45,16 +50,16 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+    protected function doEnterNode(Node $node, Environment $env)
     {
         if (!$this->enabled) {
             return $node;
         }
 
         if (
-            $node instanceof \Twig_Node_Expression_Filter &&
+            $node instanceof FilterExpression &&
             'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof \Twig_Node_Expression_Constant
+            $node->getNode('node') instanceof ConstantExpression
         ) {
             // extract constant nodes with a trans filter
             $this->messages[] = array(
@@ -62,9 +67,9 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             );
         } elseif (
-            $node instanceof \Twig_Node_Expression_Filter &&
+            $node instanceof FilterExpression &&
             'transchoice' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof \Twig_Node_Expression_Constant
+            $node->getNode('node') instanceof ConstantExpression
         ) {
             // extract constant nodes with a trans filter
             $this->messages[] = array(
@@ -75,7 +80,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
             // extract trans nodes
             $this->messages[] = array(
                 $node->getNode('body')->getAttribute('data'),
-                $this->getReadDomainFromNode($node->getNode('domain')),
+                $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
             );
         }
 
@@ -85,7 +90,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+    protected function doLeaveNode(Node $node, Environment $env)
     {
         return $node;
     }
@@ -98,13 +103,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
         return 0;
     }
 
-    /**
-     * @param \Twig_Node $arguments
-     * @param int        $index
-     *
-     * @return string|null
-     */
-    private function getReadDomainFromArguments(\Twig_Node $arguments, $index)
+    private function getReadDomainFromArguments(Node $arguments, int $index): ?string
     {
         if ($arguments->hasNode('domain')) {
             $argument = $arguments->getNode('domain');
@@ -117,18 +116,9 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
         return $this->getReadDomainFromNode($argument);
     }
 
-    /**
-     * @param \Twig_Node $node
-     *
-     * @return string|null
-     */
-    private function getReadDomainFromNode(\Twig_Node $node = null)
+    private function getReadDomainFromNode(Node $node): ?string
     {
-        if (null === $node) {
-            return null;
-        }
-
-        if ($node instanceof \Twig_Node_Expression_Constant) {
+        if ($node instanceof ConstantExpression) {
             return $node->getAttribute('value');
         }
 

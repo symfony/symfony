@@ -32,8 +32,6 @@ class AcceptHeader
     private $sorted = true;
 
     /**
-     * Constructor.
-     *
      * @param AcceptHeaderItem[] $items
      */
     public function __construct(array $items)
@@ -48,18 +46,23 @@ class AcceptHeader
      *
      * @param string $headerValue
      *
-     * @return AcceptHeader
+     * @return self
      */
     public static function fromString($headerValue)
     {
         $index = 0;
 
-        return new self(array_map(function ($itemValue) use (&$index) {
-            $item = AcceptHeaderItem::fromString($itemValue);
+        $parts = HeaderUtils::split((string) $headerValue, ',;=');
+
+        return new self(array_map(function ($subParts) use (&$index) {
+            $part = array_shift($subParts);
+            $attributes = HeaderUtils::combine($subParts);
+
+            $item = new AcceptHeaderItem($part[0], $attributes);
             $item->setIndex($index++);
 
             return $item;
-        }, preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $headerValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
+        }, $parts));
     }
 
     /**
@@ -77,7 +80,7 @@ class AcceptHeader
      *
      * @param string $value
      *
-     * @return Boolean
+     * @return bool
      */
     public function has($value)
     {
@@ -93,15 +96,13 @@ class AcceptHeader
      */
     public function get($value)
     {
-        return isset($this->items[$value]) ? $this->items[$value] : null;
+        return $this->items[$value] ?? $this->items[explode('/', $value)[0].'/*'] ?? $this->items['*/*'] ?? $this->items['*'] ?? null;
     }
 
     /**
      * Adds an item.
      *
-     * @param AcceptHeaderItem $item
-     *
-     * @return AcceptHeader
+     * @return $this
      */
     public function add(AcceptHeaderItem $item)
     {
@@ -128,7 +129,7 @@ class AcceptHeader
      *
      * @param string $pattern
      *
-     * @return AcceptHeader
+     * @return self
      */
     public function filter($pattern)
     {
@@ -150,12 +151,12 @@ class AcceptHeader
     }
 
     /**
-     * Sorts items by descending quality
+     * Sorts items by descending quality.
      */
     private function sort()
     {
         if (!$this->sorted) {
-            uasort($this->items, function ($a, $b) {
+            uasort($this->items, function (AcceptHeaderItem $a, AcceptHeaderItem $b) {
                 $qA = $a->getQuality();
                 $qB = $b->getQuality();
 

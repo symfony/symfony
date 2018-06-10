@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class CountValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -35,29 +35,26 @@ class CountValidator extends ConstraintValidator
 
         $count = count($value);
 
-        if ($constraint->min == $constraint->max && $count != $constraint->min) {
-            $this->context->addViolation($constraint->exactMessage, array(
-                '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
-
-            return;
-        }
-
         if (null !== $constraint->max && $count > $constraint->max) {
-            $this->context->addViolation($constraint->maxMessage, array(
-                '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->max,
-            ), $value, (int) $constraint->max);
+            $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+                ->setParameter('{{ count }}', $count)
+                ->setParameter('{{ limit }}', $constraint->max)
+                ->setInvalidValue($value)
+                ->setPlural((int) $constraint->max)
+                ->setCode(Count::TOO_MANY_ERROR)
+                ->addViolation();
 
             return;
         }
 
         if (null !== $constraint->min && $count < $constraint->min) {
-            $this->context->addViolation($constraint->minMessage, array(
-                '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
+            $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+                ->setParameter('{{ count }}', $count)
+                ->setParameter('{{ limit }}', $constraint->min)
+                ->setInvalidValue($value)
+                ->setPlural((int) $constraint->min)
+                ->setCode(Count::TOO_FEW_ERROR)
+                ->addViolation();
         }
     }
 }

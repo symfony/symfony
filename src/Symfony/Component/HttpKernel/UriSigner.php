@@ -19,21 +19,22 @@ namespace Symfony\Component\HttpKernel;
 class UriSigner
 {
     private $secret;
+    private $parameter;
 
     /**
-     * Constructor.
-     *
-     * @param string $secret A secret
+     * @param string $secret    A secret
+     * @param string $parameter Query string parameter to use
      */
-    public function __construct($secret)
+    public function __construct(string $secret, string $parameter = '_hash')
     {
         $this->secret = $secret;
+        $this->parameter = $parameter;
     }
 
     /**
      * Signs a URI.
      *
-     * The given URI is signed by adding a _hash query string parameter
+     * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
      *
      * @param string $uri A URI to sign
@@ -42,31 +43,64 @@ class UriSigner
      */
     public function sign($uri)
     {
-        return $uri.(false === (strpos($uri, '?')) ? '?' : '&').'_hash='.$this->computeHash($uri);
+        $url = parse_url($uri);
+        if (isset($url['query'])) {
+            parse_str($url['query'], $params);
+        } else {
+            $params = array();
+        }
+
+        $uri = $this->buildUrl($url, $params);
+
+        return $uri.(false === strpos($uri, '?') ? '?' : '&').$this->parameter.'='.$this->computeHash($uri);
     }
 
     /**
      * Checks that a URI contains the correct hash.
      *
-     * The _hash query string parameter must be the last one
-     * (as it is generated that way by the sign() method, it should
-     * never be a problem).
-     *
      * @param string $uri A signed URI
      *
-     * @return Boolean True if the URI is signed correctly, false otherwise
+     * @return bool True if the URI is signed correctly, false otherwise
      */
     public function check($uri)
     {
-        if (!preg_match('/^(.*)(?:\?|&)_hash=(.+?)$/', $uri, $matches)) {
+        $url = parse_url($uri);
+        if (isset($url['query'])) {
+            parse_str($url['query'], $params);
+        } else {
+            $params = array();
+        }
+
+        if (empty($params[$this->parameter])) {
             return false;
         }
 
-        return $this->computeHash($matches[1]) === $matches[2];
+        $hash = urlencode($params[$this->parameter]);
+        unset($params[$this->parameter]);
+
+        return $this->computeHash($this->buildUrl($url, $params)) === $hash;
     }
 
     private function computeHash($uri)
     {
-        return urlencode(base64_encode(hash_hmac('sha1', $uri, $this->secret, true)));
+        return urlencode(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)));
+    }
+
+    private function buildUrl(array $url, array $params = array())
+    {
+        ksort($params, SORT_STRING);
+        $url['query'] = http_build_query($params, '', '&');
+
+        $scheme = isset($url['scheme']) ? $url['scheme'].'://' : '';
+        $host = isset($url['host']) ? $url['host'] : '';
+        $port = isset($url['port']) ? ':'.$url['port'] : '';
+        $user = isset($url['user']) ? $url['user'] : '';
+        $pass = isset($url['pass']) ? ':'.$url['pass'] : '';
+        $pass = ($user || $pass) ? "$pass@" : '';
+        $path = isset($url['path']) ? $url['path'] : '';
+        $query = isset($url['query']) && $url['query'] ? '?'.$url['query'] : '';
+        $fragment = isset($url['fragment']) ? '#'.$url['fragment'] : '';
+
+        return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
     }
 }

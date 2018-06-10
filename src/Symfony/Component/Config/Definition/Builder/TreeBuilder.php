@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
@@ -22,7 +23,6 @@ class TreeBuilder implements NodeParentInterface
 {
     protected $tree;
     protected $root;
-    protected $builder;
 
     /**
      * Creates the root node.
@@ -51,13 +51,31 @@ class TreeBuilder implements NodeParentInterface
      */
     public function buildTree()
     {
-        if (null === $this->root) {
-            throw new \RuntimeException('The configuration tree has no root node.');
-        }
+        $this->assertTreeHasRootNode();
         if (null !== $this->tree) {
             return $this->tree;
         }
 
         return $this->tree = $this->root->getNode(true);
+    }
+
+    public function setPathSeparator(string $separator)
+    {
+        $this->assertTreeHasRootNode();
+
+        // unset last built as changing path separator changes all nodes
+        $this->tree = null;
+
+        $this->root->setPathSeparator($separator);
+    }
+
+    /**
+     * @throws \RuntimeException if root node is not defined
+     */
+    private function assertTreeHasRootNode()
+    {
+        if (null === $this->root) {
+            throw new TreeWithoutRootNodeException('The configuration tree has no root node.');
+        }
     }
 }

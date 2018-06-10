@@ -21,10 +21,12 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator function extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class FunctionExtension extends AbstractExtension
 {
@@ -34,26 +36,19 @@ class FunctionExtension extends AbstractExtension
     public function getFunctionTranslators()
     {
         return array(
-            'nth-child'        => array($this, 'translateNthChild'),
-            'nth-last-child'   => array($this, 'translateNthLastChild'),
-            'nth-of-type'      => array($this, 'translateNthOfType'),
+            'nth-child' => array($this, 'translateNthChild'),
+            'nth-last-child' => array($this, 'translateNthLastChild'),
+            'nth-of-type' => array($this, 'translateNthOfType'),
             'nth-last-of-type' => array($this, 'translateNthLastOfType'),
-            'contains'         => array($this, 'translateContains'),
-            'lang'             => array($this, 'translateLang'),
+            'contains' => array($this, 'translateContains'),
+            'lang' => array($this, 'translateLang'),
         );
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     * @param boolean      $last
-     * @param boolean      $addNameTest
-     *
-     * @return XPathExpr
-     *
      * @throws ExpressionErrorException
      */
-    public function translateNthChild(XPathExpr $xpath, FunctionNode $function, $last = false, $addNameTest = true)
+    public function translateNthChild(XPathExpr $xpath, FunctionNode $function, bool $last = false, bool $addNameTest = true): XPathExpr
     {
         try {
             list($a, $b) = Parser::parseSeries($function->getArguments());
@@ -84,7 +79,7 @@ class FunctionExtension extends AbstractExtension
 
         if ($last) {
             $expr = 'last() - '.$expr;
-            $b--;
+            --$b;
         }
 
         if (0 !== $b) {
@@ -108,37 +103,20 @@ class FunctionExtension extends AbstractExtension
         // -1n+6 means elements 6 and previous
     }
 
-    /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
-     * @return XPathExpr
-     */
-    public function translateNthLastChild(XPathExpr $xpath, FunctionNode $function)
+    public function translateNthLastChild(XPathExpr $xpath, FunctionNode $function): XPathExpr
     {
         return $this->translateNthChild($xpath, $function, true);
     }
 
-    /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
-     * @return XPathExpr
-     */
-    public function translateNthOfType(XPathExpr $xpath, FunctionNode $function)
+    public function translateNthOfType(XPathExpr $xpath, FunctionNode $function): XPathExpr
     {
         return $this->translateNthChild($xpath, $function, false, false);
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
-     * @return XPathExpr
-     *
      * @throws ExpressionErrorException
      */
-    public function translateNthLastOfType(XPathExpr $xpath, FunctionNode $function)
+    public function translateNthLastOfType(XPathExpr $xpath, FunctionNode $function): XPathExpr
     {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:nth-of-type()" is not implemented.');
@@ -148,14 +126,9 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
-     * @return XPathExpr
-     *
      * @throws ExpressionErrorException
      */
-    public function translateContains(XPathExpr $xpath, FunctionNode $function)
+    public function translateContains(XPathExpr $xpath, FunctionNode $function): XPathExpr
     {
         $arguments = $function->getArguments();
         foreach ($arguments as $token) {
@@ -174,14 +147,9 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
-     * @return XPathExpr
-     *
      * @throws ExpressionErrorException
      */
-    public function translateLang(XPathExpr $xpath, FunctionNode $function)
+    public function translateLang(XPathExpr $xpath, FunctionNode $function): XPathExpr
     {
         $arguments = $function->getArguments();
         foreach ($arguments as $token) {

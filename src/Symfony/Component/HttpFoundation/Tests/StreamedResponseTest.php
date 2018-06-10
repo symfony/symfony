@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class StreamedResponseTest extends \PHPUnit_Framework_TestCase
+class StreamedResponseTest extends TestCase
 {
     public function testConstructor()
     {
@@ -34,7 +35,6 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('1.1', $response->getProtocolVersion());
         $this->assertNotEquals('chunked', $response->headers->get('Transfer-Encoding'), 'Apache assumes responses with a Transfer-Encoding header set to chunked to already be encoded.');
-        $this->assertEquals('no-cache, private', $response->headers->get('Cache-Control'));
     }
 
     public function testPrepareWith10Protocol()
@@ -47,15 +47,25 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('1.0', $response->getProtocolVersion());
         $this->assertNull($response->headers->get('Transfer-Encoding'));
-        $this->assertEquals('no-cache, private', $response->headers->get('Cache-Control'));
     }
 
     public function testPrepareWithHeadRequest()
     {
-        $response = new StreamedResponse(function () { echo 'foo'; });
+        $response = new StreamedResponse(function () { echo 'foo'; }, 200, array('Content-Length' => '123'));
         $request = Request::create('/', 'HEAD');
 
         $response->prepare($request);
+
+        $this->assertSame('123', $response->headers->get('Content-Length'));
+    }
+
+    public function testPrepareWithCacheHeaders()
+    {
+        $response = new StreamedResponse(function () { echo 'foo'; }, 200, array('Cache-Control' => 'max-age=600, public'));
+        $request = Request::create('/', 'GET');
+
+        $response->prepare($request);
+        $this->assertEquals('max-age=600, public', $response->headers->get('Cache-Control'));
     }
 
     public function testSendContent()
@@ -83,15 +93,6 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testSetCallbackNonCallable()
-    {
-        $response = new StreamedResponse(null);
-        $response->setCallback(null);
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetContent()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
@@ -110,5 +111,16 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response);
         $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    public function testReturnThis()
+    {
+        $response = new StreamedResponse(function () {});
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendContent());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendContent());
+
+        $response = new StreamedResponse(function () {});
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendHeaders());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendHeaders());
     }
 }

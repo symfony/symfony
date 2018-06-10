@@ -13,13 +13,12 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
-
     protected static $tmpDir;
     protected static $files;
 
     public static function setUpBeforeClass()
     {
-        self::$tmpDir = realpath(sys_get_temp_dir()).DIRECTORY_SEPARATOR.'symfony2_finder';
+        self::$tmpDir = realpath(sys_get_temp_dir()).DIRECTORY_SEPARATOR.'symfony_finder';
 
         self::$files = array(
             '.git/',
@@ -32,7 +31,17 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto/',
-            'foo bar'
+            'toto/.git/',
+            'foo bar',
+            'qux_0_1.php',
+            'qux_2_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux/',
+            'qux/baz_1_2.py',
+            'qux/baz_100_1.py',
         );
 
         self::$files = self::toAbsolute(self::$files);
@@ -75,13 +84,17 @@ abstract class RealIteratorTestCase extends IteratorTestCase
          * Without the call to setUpBeforeClass() property can be null.
          */
         if (!self::$tmpDir) {
-            self::$tmpDir = realpath(sys_get_temp_dir()).DIRECTORY_SEPARATOR.'symfony2_finder';
+            self::$tmpDir = realpath(sys_get_temp_dir()).DIRECTORY_SEPARATOR.'symfony_finder';
         }
 
         if (is_array($files)) {
             $f = array();
             foreach ($files as $file) {
-                $f[] = self::$tmpDir.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $file);
+                if (is_array($file)) {
+                    $f[] = self::toAbsolute($file);
+                } else {
+                    $f[] = self::$tmpDir.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $file);
+                }
             }
 
             return $f;
@@ -103,5 +116,4 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
         return $f;
     }
-
 }

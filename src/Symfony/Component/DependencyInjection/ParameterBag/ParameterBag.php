@@ -19,32 +19,22 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * Holds parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ParameterBag implements ParameterBagInterface
 {
-    protected $parameters;
-    protected $resolved;
+    protected $parameters = array();
+    protected $resolved = false;
 
     /**
-     * Constructor.
-     *
      * @param array $parameters An array of parameters
-     *
-     * @api
      */
     public function __construct(array $parameters = array())
     {
-        $this->parameters = array();
         $this->add($parameters);
-        $this->resolved = false;
     }
 
     /**
      * Clears all parameters.
-     *
-     * @api
      */
     public function clear()
     {
@@ -55,22 +45,16 @@ class ParameterBag implements ParameterBagInterface
      * Adds parameters to the service container parameters.
      *
      * @param array $parameters An array of parameters
-     *
-     * @api
      */
     public function add(array $parameters)
     {
         foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
+            $this->set($key, $value);
         }
     }
 
     /**
-     * Gets the service container parameters.
-     *
-     * @return array An array of parameters
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -78,19 +62,11 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Gets a service container parameter.
-     *
-     * @param string $name The parameter name
-     *
-     * @return mixed  The parameter value
-     *
-     * @throws ParameterNotFoundException if the parameter is not defined
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function get($name)
     {
-        $name = strtolower($name);
+        $name = (string) $name;
 
         if (!array_key_exists($name, $this->parameters)) {
             if (!$name) {
@@ -98,14 +74,30 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $alternatives = array();
-            foreach (array_keys($this->parameters) as $key) {
+            foreach ($this->parameters as $key => $parameterValue) {
                 $lev = levenshtein($name, $key);
                 if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
                     $alternatives[] = $key;
                 }
             }
 
-            throw new ParameterNotFoundException($name, null, null, null, $alternatives);
+            $nonNestedAlternative = null;
+            if (!count($alternatives) && false !== strpos($name, '.')) {
+                $namePartsLength = array_map('strlen', explode('.', $name));
+                $key = substr($name, 0, -1 * (1 + array_pop($namePartsLength)));
+                while (count($namePartsLength)) {
+                    if ($this->has($key)) {
+                        if (is_array($this->get($key))) {
+                            $nonNestedAlternative = $key;
+                        }
+                        break;
+                    }
+
+                    $key = substr($key, 0, -1 * (1 + array_pop($namePartsLength)));
+                }
+            }
+
+            throw new ParameterNotFoundException($name, null, null, null, $alternatives, $nonNestedAlternative);
         }
 
         return $this->parameters[$name];
@@ -116,42 +108,32 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
-     *
-     * @api
      */
     public function set($name, $value)
     {
-        $this->parameters[strtolower($name)] = $value;
+        $this->parameters[(string) $name] = $value;
     }
 
     /**
-     * Returns true if a parameter name is defined.
-     *
-     * @param string $name The parameter name
-     *
-     * @return Boolean true if the parameter name is defined, false otherwise
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function has($name)
     {
-        return array_key_exists(strtolower($name), $this->parameters);
+        return array_key_exists((string) $name, $this->parameters);
     }
 
     /**
      * Removes a parameter.
      *
      * @param string $name The parameter name
-     *
-     * @api
      */
     public function remove($name)
     {
-        unset($this->parameters[strtolower($name)]);
+        unset($this->parameters[(string) $name]);
     }
 
     /**
-     * Replaces parameter placeholders (%name%) by their values for all parameters.
+     * {@inheritdoc}
      */
     public function resolve()
     {
@@ -183,22 +165,22 @@ class ParameterBag implements ParameterBagInterface
      *
      * @return mixed The resolved value
      *
-     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem
      */
     public function resolveValue($value, array $resolving = array())
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $args = array();
             foreach ($value as $k => $v) {
-                $args[$this->resolveValue($k, $resolving)] = $this->resolveValue($v, $resolving);
+                $args[\is_string($k) ? $this->resolveValue($k, $resolving) : $k] = $this->resolveValue($v, $resolving);
             }
 
             return $args;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value) || 2 > \strlen($value)) {
             return $value;
         }
 
@@ -206,16 +188,16 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Resolves parameters inside a string
+     * Resolves parameters inside a string.
      *
      * @param string $value     The string to resolve
      * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
      * @return string The resolved string
      *
-     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem
      */
     public function resolveString($value, array $resolving = array())
     {
@@ -223,7 +205,7 @@ class ParameterBag implements ParameterBagInterface
         // as the preg_replace_callback throw an exception when trying
         // a non-string in a parameter value
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
-            $key = strtolower($match[1]);
+            $key = $match[1];
 
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
@@ -234,20 +216,18 @@ class ParameterBag implements ParameterBagInterface
             return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
 
-        $self = $this;
-
-        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {
+        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($resolving, $value) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
             }
 
-            $key = strtolower($match[1]);
+            $key = $match[1];
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
-            $resolved = $self->get($key);
+            $resolved = $this->get($key);
 
             if (!is_string($resolved) && !is_numeric($resolved)) {
                 throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
@@ -256,7 +236,7 @@ class ParameterBag implements ParameterBagInterface
             $resolved = (string) $resolved;
             $resolving[$key] = true;
 
-            return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);
+            return $this->isResolved() ? $resolved : $this->resolveString($resolved, $resolving);
         }, $value);
     }
 
@@ -266,7 +246,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function escapeValue($value)
     {
@@ -286,6 +266,9 @@ class ParameterBag implements ParameterBagInterface
         return $value;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function unescapeValue($value)
     {
         if (is_string($value)) {

@@ -12,24 +12,32 @@
 namespace Symfony\Component\Form\Util;
 
 /**
- * Iterator that returns only forms from a form tree that do not inherit their
- * parent data.
+ * Iterator that traverses an array of forms.
  *
- * If the iterator encounters a form that inherits its parent data, it enters
- * the form and traverses its children as well.
+ * Contrary to \ArrayIterator, this iterator recognizes changes in the original
+ * array during iteration.
+ *
+ * You can wrap the iterator into a {@link \RecursiveIteratorIterator} in order to
+ * enter any child form that inherits its parent's data and iterate the children
+ * of that form as well.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class InheritDataAwareIterator extends VirtualFormAwareIterator
+class InheritDataAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {
     /**
-     * Creates a new iterator.
-     *
-     * @param \Symfony\Component\Form\FormInterface[] $forms An array
+     * {@inheritdoc}
      */
-    public function __construct(array $forms)
+    public function getChildren()
     {
-        // Skip the deprecation error
-        \ArrayIterator::__construct($forms);
+        return new static($this->current());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildren()
+    {
+        return (bool) $this->current()->getConfig()->getInheritData();
     }
 }

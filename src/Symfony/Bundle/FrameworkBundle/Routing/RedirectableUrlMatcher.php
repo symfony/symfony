@@ -21,7 +21,7 @@ class RedirectableUrlMatcher extends BaseMatcher
     /**
      * Redirects the user to another URL.
      *
-     * @param string $path   The path info to redirect to.
+     * @param string $path   The path info to redirect to
      * @param string $route  The route that matched
      * @param string $scheme The URL scheme (null to keep the current one)
      *
@@ -31,12 +31,12 @@ class RedirectableUrlMatcher extends BaseMatcher
     {
         return array(
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',
-            'path'        => $path,
-            'permanent'   => true,
-            'scheme'      => $scheme,
-            'httpPort'    => $this->context->getHttpPort(),
-            'httpsPort'   => $this->context->getHttpsPort(),
-            '_route'      => $route,
+            'path' => $path,
+            'permanent' => true,
+            'scheme' => $scheme,
+            'httpPort' => $this->context->getHttpPort(),
+            'httpsPort' => $this->context->getHttpsPort(),
+            '_route' => $route,
         );
     }
 }

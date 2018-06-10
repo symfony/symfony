@@ -20,11 +20,9 @@ class KernelForOverrideName extends Kernel
 
     public function registerBundles()
     {
-
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-
     }
 }

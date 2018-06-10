@@ -2,9 +2,16 @@
 
 class ProxyManagerBridgeFooClass
 {
-    public $foo, $moo;
+    public static $destructorCount = 0;
 
-    public $bar = null, $initialized = false, $configured = false, $called = false, $arguments = array();
+    public $foo;
+    public $moo;
+
+    public $bar = null;
+    public $initialized = false;
+    public $configured = false;
+    public $called = false;
+    public $arguments = array();
 
     public function __construct($arguments = array())
     {
@@ -32,5 +39,10 @@ class ProxyManagerBridgeFooClass
     public function setBar($value = null)
     {
         $this->bar = $value;
+    }
+
+    public function __destruct()
+    {
+        ++self::$destructorCount;
     }
 }

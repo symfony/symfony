@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
-class MultiplePcreFilterIteratorTest extends \PHPUnit_Framework_TestCase
+class MultiplePcreFilterIteratorTest extends TestCase
 {
     /**
      * @dataProvider getIsRegexFixtures
@@ -38,6 +39,9 @@ class MultiplePcreFilterIteratorTest extends \PHPUnit_Framework_TestCase
             array('/foo/imsxu', true, 'valid regex with multiple modifiers'),
             array('#foo#', true, '"#" is a valid delimiter'),
             array('{foo}', true, '"{,}" is a valid delimiter pair'),
+            array('[foo]', true, '"[,]" is a valid delimiter pair'),
+            array('(foo)', true, '"(,)" is a valid delimiter pair'),
+            array('<foo>', true, '"<,>" is a valid delimiter pair'),
             array('*foo.*', false, '"*" is not considered as a valid delimiter'),
             array('?foo.?', false, '"?" is not considered as a valid delimiter'),
         );

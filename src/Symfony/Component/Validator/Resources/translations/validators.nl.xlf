@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Deze waarde mag niet waar zijn.</target>
+                <target>Deze waarde moet onwaar zijn.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
@@ -35,12 +35,12 @@
                 <target>Eén of meer van de ingegeven waarden zijn ongeldig.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>De velden {{ fields }} werden niet verwacht.</target>
+                <source>This field was not expected.</source>
+                <target>Dit veld werd niet verwacht.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>De velden {{ fields }} ontbreken.</target>
+                <source>This field is missing.</source>
+                <target>Dit veld ontbreekt.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>Het bestand is niet gevonden.</target>
+                <target>Het bestand kon niet gevonden worden.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Deze waarde is ongeldig.</target>
+                <target>Deze waarde is niet geldig.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Het bestand kon niet geüpload worden.</target>
+                <target>Het bestand kon niet worden geüpload.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -140,15 +140,15 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Deze waarde representeert geen geldige taal.</target>
+                <target>Deze waarde is geen geldige taal.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Deze waarde representeert geen geldige lokalisering.</target>
+                <target>Deze waarde is geen geldige locale.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Deze waarde representeert geen geldig land.</target>
+                <target>Deze waarde is geen geldig land.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -175,16 +175,16 @@
                 <target>De afbeelding is niet hoog genoeg ({{ height }}px). De minimaal verwachte hoogte is {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Deze waarde moet het huidige wachtwoord van de gebruiker zijn.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Deze waarde moet exact {{ limit }} tekens lang zijn.</target>
+                <target>Deze waarde moet exact {{ limit }} teken lang zijn.|Deze waarde moet exact {{ limit }} tekens lang zijn.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Het bestand is niet geheel geüpload.</target>
+                <target>Het bestand is slechts gedeeltelijk geüpload.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Er is geen tijdelijke map geconfigureerd in php.ini.</target>
+                <target>Er is geen tijdelijke map geconfigureerd in php.ini, of de gespecificeerde map bestaat niet.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -259,7 +259,7 @@
                 <target>Deze waarde moet groter dan of gelijk aan {{ compared_value }} zijn.</target>
             </trans-unit>
             <trans-unit id="68">
-                <source>This value should be identical  to {{ compared_value_type }} {{ compared_value }}.</source>
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Deze waarde moet identiek zijn aan {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">
@@ -272,11 +272,47 @@
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Deze waarde moet niet gelijk zijn aan {{ compared_value }}.</target>
+                <target>Deze waarde mag niet gelijk zijn aan {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
-                <source>This valuemahould not be identical to {{ compared_value }}.</source>
-                <target>Deze waarde moet niet identiek zijn aan {{ compared_value }}.</target>
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Deze waarde mag niet identiek zijn aan {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>De afbeeldingsverhouding is te groot ({{ ratio }}). Maximale verhouding is {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>De afbeeldingsverhouding is te klein ({{ ratio }}). Minimale verhouding is {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>De afbeelding is vierkant ({{ width }}x{{ height }}px). Vierkante afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>De afbeelding is liggend ({{ width }}x{{ height }}px). Liggende afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>De afbeelding is staand ({{ width }}x{{ height }}px). Staande afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Lege bestanden zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Deze waarde is niet in de verwachte tekencodering {{ charset }}.</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Dit is geen geldige bedrijfsidentificatiecode (BIC/SWIFT).</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Fout</target>
             </trans-unit>
         </body>
     </file>

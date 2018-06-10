@@ -26,9 +26,7 @@ interface AuthenticationTrustResolverInterface
      *
      * If null is passed, the method must return false.
      *
-     * @param TokenInterface $token
-     *
-     * @return Boolean
+     * @return bool
      */
     public function isAnonymous(TokenInterface $token = null);
 
@@ -36,18 +34,14 @@ interface AuthenticationTrustResolverInterface
      * Resolves whether the passed token implementation is authenticated
      * using remember-me capabilities.
      *
-     * @param TokenInterface $token
-     *
-     * @return Boolean
+     * @return bool
      */
     public function isRememberMe(TokenInterface $token = null);
 
     /**
      * Resolves whether the passed token implementation is fully authenticated.
      *
-     * @param TokenInterface $token
-     *
-     * @return Boolean
+     * @return bool
      */
     public function isFullFledged(TokenInterface $token = null);
 }

@@ -1,0 +1,1133 @@
+{
+    "Version": "2.1.39.11",
+    "Names": {
+        "ADP": [
+            "ADP",
+            "Andorrese peseta"
+        ],
+        "AED": [
+            "AED",
+            "Verenigde Arabyske Emiraten-dirham"
+        ],
+        "AFA": [
+            "AFA",
+            "Afghani (1927–2002)"
+        ],
+        "AFN": [
+            "AFN",
+            "Afghaanske afghani"
+        ],
+        "ALL": [
+            "ALL",
+            "Albanese lek"
+        ],
+        "AMD": [
+            "AMD",
+            "Armeense dram"
+        ],
+        "ANG": [
+            "ANG",
+            "Nederlânsk-Antilliaanske gûne"
+        ],
+        "AOA": [
+            "AOA",
+            "Angolese kwanza"
+        ],
+        "AOK": [
+            "AOK",
+            "Angolese kwanza (1977–1990)"
+        ],
+        "AON": [
+            "AON",
+            "Angolese nieuwe kwanza (1990–2000)"
+        ],
+        "AOR": [
+            "AOR",
+            "Angolese kwanza reajustado (1995–1999)"
+        ],
+        "ARA": [
+            "ARA",
+            "Argentynske austral"
+        ],
+        "ARL": [
+            "ARL",
+            "Argentynske peso ley (1970–1983)"
+        ],
+        "ARM": [
+            "ARM",
+            "Argentynske peso (1881–1970)"
+        ],
+        "ARP": [
+            "ARP",
+            "Argentynske peso (1983–1985)"
+        ],
+        "ARS": [
+            "ARS",
+            "Argentynske peso"
+        ],
+        "ATS": [
+            "ATS",
+            "Eastenrykse schilling"
+        ],
+        "AUD": [
+            "AU$",
+            "Australyske dollar"
+        ],
+        "AWG": [
+            "AWG",
+            "Arubaanske gulden"
+        ],
+        "AZM": [
+            "AZM",
+            "Azerbeidzjaanske manat (1993–2006)"
+        ],
+        "AZN": [
+            "AZN",
+            "Azerbeidzjaanske manat"
+        ],
+        "BAD": [
+            "BAD",
+            "Bosnyske dinar"
+        ],
+        "BAM": [
+            "BAM",
+            "Bosnyske convertibele mark"
+        ],
+        "BAN": [
+            "BAN",
+            "Nije Bosnyske dinar (1994–1997)"
+        ],
+        "BBD": [
+            "BBD",
+            "Barbadaanske dollar"
+        ],
+        "BDT": [
+            "BDT",
+            "Bengalese taka"
+        ],
+        "BEC": [
+            "BEC",
+            "Belgyske frank (convertibel)"
+        ],
+        "BEF": [
+            "BEF",
+            "Belgyske frank"
+        ],
+        "BEL": [
+            "BEL",
+            "Belgyske frank (finansjeel)"
+        ],
+        "BGL": [
+            "BGL",
+            "Bulgaarse harde lev"
+        ],
+        "BGM": [
+            "BGM",
+            "Bulgaarse socialistyske lev"
+        ],
+        "BGN": [
+            "BGN",
+            "Bulgaarse lev"
+        ],
+        "BGO": [
+            "BGO",
+            "Bulgaarse lev (1879–1952)"
+        ],
+        "BHD": [
+            "BHD",
+            "Bahreinse dinar"
+        ],
+        "BIF": [
+            "BIF",
+            "Burundese frank"
+        ],
+        "BMD": [
+            "BMD",
+            "Bermuda-dollar"
+        ],
+        "BND": [
+            "BND",
+            "Bruneise dollar"
+        ],
+        "BOB": [
+            "BOB",
+            "Boliviaanske boliviano"
+        ],
+        "BOL": [
+            "BOL",
+            "Boliviaanske boliviano (1863–1963)"
+        ],
+        "BOP": [
+            "BOP",
+            "Boliviaanske peso"
+        ],
+        "BOV": [
+            "BOV",
+            "Boliviaanske mvdol"
+        ],
+        "BRB": [
+            "BRB",
+            "Braziliaanske cruzeiro novo (1967–1986)"
+        ],
+        "BRC": [
+            "BRC",
+            "Braziliaanske cruzado"
+        ],
+        "BRE": [
+            "BRE",
+            "Braziliaanske cruzeiro (1990–1993)"
+        ],
+        "BRL": [
+            "R$",
+            "Braziliaanske real"
+        ],
+        "BRN": [
+            "BRN",
+            "Braziliaanske cruzado novo"
+        ],
+        "BRR": [
+            "BRR",
+            "Braziliaanske cruzeiro"
+        ],
+        "BRZ": [
+            "BRZ",
+            "Braziliaanske cruzeiro (1942–1967)"
+        ],
+        "BSD": [
+            "BSD",
+            "Bahamaanske dollar"
+        ],
+        "BTN": [
+            "BTN",
+            "Bhutaanske ngultrum"
+        ],
+        "BUK": [
+            "BUK",
+            "Birmese kyat"
+        ],
+        "BWP": [
+            "BWP",
+            "Botswaanske pula"
+        ],
+        "BYB": [
+            "BYB",
+            "Wit-Russyske nieuwe roebel (1994–1999)"
+        ],
+        "BYN": [
+            "BYN",
+            "Wit-Russyske roebel"
+        ],
+        "BYR": [
+            "BYR",
+            "Wit-Russyske roebel (2000–2016)"
+        ],
+        "BZD": [
+            "BZD",
+            "Belizaanske dollar"
+        ],
+        "CAD": [
+            "C$",
+            "Canadese dollar"
+        ],
+        "CDF": [
+            "CDF",
+            "Congolese frank"
+        ],
+        "CHE": [
+            "CHE",
+            "WIR euro"
+        ],
+        "CHF": [
+            "CHF",
+            "Zwitserse frank"
+        ],
+        "CHW": [
+            "CHW",
+            "WIR franc"
+        ],
+        "CLE": [
+            "CLE",
+            "Sileenske escudo"
+        ],
+        "CLF": [
+            "CLF",
+            "Sileenske unidades de fomento"
+        ],
+        "CLP": [
+            "CLP",
+            "Sileenske peso"
+        ],
+        "CNY": [
+            "CN¥",
+            "Sineeske yuan renminbi"
+        ],
+        "COP": [
+            "COP",
+            "Kolombiaanske peso"
+        ],
+        "COU": [
+            "COU",
+            "Unidad de Valor Real"
+        ],
+        "CRC": [
+            "CRC",
+            "Costaricaanske colón"
+        ],
+        "CSD": [
+            "CSD",
+            "Alde Servyske dinar"
+        ],
+        "CSK": [
+            "CSK",
+            "Tsjechoslowaakse harde koruna"
+        ],
+        "CUC": [
+            "CUC",
+            "Kubaanske convertibele peso"
+        ],
+        "CUP": [
+            "CUP",
+            "Kubaanske peso"
+        ],
+        "CVE": [
+            "CVE",
+            "Kaapverdyske escudo"
+        ],
+        "CYP": [
+            "CYP",
+            "Cyprysk pûn"
+        ],
+        "CZK": [
+            "CZK",
+            "Tsjechyske kroon"
+        ],
+        "DDM": [
+            "DDM",
+            "East-Dútske ostmark"
+        ],
+        "DEM": [
+            "DEM",
+            "Dútske mark"
+        ],
+        "DJF": [
+            "DJF",
+            "Djiboutiaanske frank"
+        ],
+        "DKK": [
+            "DKK",
+            "Deenske kroon"
+        ],
+        "DOP": [
+            "DOP",
+            "Dominikaanske peso"
+        ],
+        "DZD": [
+            "DZD",
+            "Algerynske dinar"
+        ],
+        "ECS": [
+            "ECS",
+            "Ecuadoraanske sucre"
+        ],
+        "ECV": [
+            "ECV",
+            "Ecuadoraanske unidad de valor constante (UVC)"
+        ],
+        "EEK": [
+            "EEK",
+            "Estlânske kroon"
+        ],
+        "EGP": [
+            "EGP",
+            "Egyptysk pûn"
+        ],
+        "ERN": [
+            "ERN",
+            "Eritrese nakfa"
+        ],
+        "ESA": [
+            "ESA",
+            "Spaanske peseta (account A)"
+        ],
+        "ESB": [
+            "ESB",
+            "Spaanske peseta (convertibele account)"
+        ],
+        "ESP": [
+            "ESP",
+            "Spaanske peseta"
+        ],
+        "ETB": [
+            "ETB",
+            "Ethiopyske birr"
+        ],
+        "EUR": [
+            "€",
+            "Euro"
+        ],
+        "FIM": [
+            "FIM",
+            "Finse markka"
+        ],
+        "FJD": [
+            "FJ$",
+            "Fiji-dollar"
+        ],
+        "FKP": [
+            "FKP",
+            "Falklâneilânske pûn"
+        ],
+        "FRF": [
+            "FRF",
+            "Franske franc"
+        ],
+        "GBP": [
+            "£",
+            "Brits pûn"
+        ],
+        "GEK": [
+            "GEK",
+            "Georgyske kupon larit"
+        ],
+        "GEL": [
+            "GEL",
+            "Georgyske lari"
+        ],
+        "GHC": [
+            "GHC",
+            "Ghanese cedi (1979–2007)"
+        ],
+        "GHS": [
+            "GHS",
+            "Ghanese cedi"
+        ],
+        "GIP": [
+            "GIP",
+            "Gibraltarees pûn"
+        ],
+        "GMD": [
+            "GMD",
+            "Gambiaanske dalasi"
+        ],
+        "GNF": [
+            "GNF",
+            "Guinese franc"
+        ],
+        "GNS": [
+            "GNS",
+            "Guinese syli"
+        ],
+        "GQE": [
+            "GQE",
+            "Equatoriaal-Guinese ekwele guineana"
+        ],
+        "GRD": [
+            "GRD",
+            "Grykse drachme"
+        ],
+        "GTQ": [
+            "GTQ",
+            "Guatemalteekse quetzal"
+        ],
+        "GWE": [
+            "GWE",
+            "Portugees-Guinese escudo"
+        ],
+        "GWP": [
+            "GWP",
+            "Guinee-Bissause peso"
+        ],
+        "GYD": [
+            "GYD",
+            "Guyaanske dollar"
+        ],
+        "HKD": [
+            "HK$",
+            "Hongkongske dollar"
+        ],
+        "HNL": [
+            "HNL",
+            "Hondurese lempira"
+        ],
+        "HRD": [
+            "HRD",
+            "Kroatyske dinar"
+        ],
+        "HRK": [
+            "HRK",
+            "Kroatyske kuna"
+        ],
+        "HTG": [
+            "HTG",
+            "Haïtiaanske gourde"
+        ],
+        "HUF": [
+            "HUF",
+            "Hongaarse forint"
+        ],
+        "IDR": [
+            "IDR",
+            "Indonesyske roepia"
+        ],
+        "IEP": [
+            "IEP",
+            "Ierske pûn"
+        ],
+        "ILP": [
+            "ILP",
+            "Israëlysk pûn"
+        ],
+        "ILS": [
+            "₪",
+            "Israëlyske nieuwe shekel"
+        ],
+        "INR": [
+            "₹",
+            "Indiase roepie"
+        ],
+        "IQD": [
+            "IQD",
+            "Iraakse dinar"
+        ],
+        "IRR": [
+            "IRR",
+            "Iraanske rial"
+        ],
+        "ISK": [
+            "ISK",
+            "Yslânske kroon"
+        ],
+        "ITL": [
+            "ITL",
+            "Italiaanske lire"
+        ],
+        "JMD": [
+            "JMD",
+            "Jamaikaanske dollar"
+        ],
+        "JOD": [
+            "JOD",
+            "Jordaanske dinar"
+        ],
+        "JPY": [
+            "JP¥",
+            "Japanse yen"
+        ],
+        "KES": [
+            "KES",
+            "Keniaanske shilling"
+        ],
+        "KGS": [
+            "KGS",
+            "Kirgizyske som"
+        ],
+        "KHR": [
+            "KHR",
+            "Kambodjaanske riel"
+        ],
+        "KMF": [
+            "KMF",
+            "Komorese frank"
+        ],
+        "KPW": [
+            "KPW",
+            "Noard-Koreaanske won"
+        ],
+        "KRH": [
+            "KRH",
+            "Sûd-Koreaanske hwan (1953–1962)"
+        ],
+        "KRO": [
+            "KRO",
+            "Alde Sûd-Koreaanske won (1945–1953)"
+        ],
+        "KRW": [
+            "₩",
+            "Sûd-Koreaanske won"
+        ],
+        "KWD": [
+            "KWD",
+            "Koeweitse dinar"
+        ],
+        "KYD": [
+            "KYD",
+            "Caymaneilânske dollar"
+        ],
+        "KZT": [
+            "KZT",
+            "Kazachstaanske tenge"
+        ],
+        "LAK": [
+            "LAK",
+            "Laotiaanske kip"
+        ],
+        "LBP": [
+            "LBP",
+            "Libaneeske pûn"
+        ],
+        "LKR": [
+            "LKR",
+            "Sri Lankaanske roepie"
+        ],
+        "LRD": [
+            "LRD",
+            "Liberiaanske dollar"
+        ],
+        "LSL": [
+            "LSL",
+            "Lesothaanske loti"
+        ],
+        "LTL": [
+            "LTL",
+            "Litouwse litas"
+        ],
+        "LTT": [
+            "LTT",
+            "Litouwse talonas"
+        ],
+        "LUC": [
+            "LUC",
+            "Lúksemboargske convertibele franc"
+        ],
+        "LUF": [
+            "LUF",
+            "Lúksemboargske frank"
+        ],
+        "LUL": [
+            "LUL",
+            "Lúksemboargske finansjele franc"
+        ],
+        "LVL": [
+            "LVL",
+            "Letse lats"
+        ],
+        "LVR": [
+            "LVR",
+            "Letse roebel"
+        ],
+        "LYD": [
+            "LYD",
+            "Libyske dinar"
+        ],
+        "MAD": [
+            "MAD",
+            "Marokkaanske dirham"
+        ],
+        "MAF": [
+            "MAF",
+            "Marokkaanske franc"
+        ],
+        "MCF": [
+            "MCF",
+            "Monegaskyske frank"
+        ],
+        "MDC": [
+            "MDC",
+            "Moldavyske cupon"
+        ],
+        "MDL": [
+            "MDL",
+            "Moldavyske leu"
+        ],
+        "MGA": [
+            "MGA",
+            "Malagassyske ariary"
+        ],
+        "MGF": [
+            "MGF",
+            "Malagassyske franc"
+        ],
+        "MKD": [
+            "MKD",
+            "Macedonyske denar"
+        ],
+        "MKN": [
+            "MKN",
+            "Macedonyske denar (1992–1993)"
+        ],
+        "MLF": [
+            "MLF",
+            "Malinese franc"
+        ],
+        "MMK": [
+            "MMK",
+            "Myanmarese kyat"
+        ],
+        "MNT": [
+            "MNT",
+            "Mongoalske tugrik"
+        ],
+        "MOP": [
+            "MOP",
+            "Macause pataca"
+        ],
+        "MRO": [
+            "MRO",
+            "Mauritaanske ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
+            "Mauritaanske ouguiya"
+        ],
+        "MTL": [
+            "MTL",
+            "Maltese lire"
+        ],
+        "MTP": [
+            "MTP",
+            "Maltees pûn"
+        ],
+        "MUR": [
+            "MUR",
+            "Mauritiaanske roepie"
+        ],
+        "MVR": [
+            "MVR",
+            "Maldivyske rufiyaa"
+        ],
+        "MWK": [
+            "MWK",
+            "Malawyske kwacha"
+        ],
+        "MXN": [
+            "MX$",
+            "Meksikaanske peso"
+        ],
+        "MXP": [
+            "MXP",
+            "Meksikaanske sulveren peso (1861–1992)"
+        ],
+        "MXV": [
+            "MXV",
+            "Meksikaanske unidad de inversion (UDI)"
+        ],
+        "MYR": [
+            "MYR",
+            "Maleisyske ringgit"
+        ],
+        "MZE": [
+            "MZE",
+            "Mozambikaanske escudo"
+        ],
+        "MZM": [
+            "MZM",
+            "Alde Mozambikaanske metical"
+        ],
+        "MZN": [
+            "MZN",
+            "Mozambikaanske metical"
+        ],
+        "NAD": [
+            "NAD",
+            "Namibyske dollar"
+        ],
+        "NGN": [
+            "NGN",
+            "Nigeriaanske naira"
+        ],
+        "NIC": [
+            "NIC",
+            "Nicaraguaanske córdoba (1988–1991)"
+        ],
+        "NIO": [
+            "NIO",
+            "Nicaraguaanske córdoba"
+        ],
+        "NLG": [
+            "NLG",
+            "Nederlânske gûne"
+        ],
+        "NOK": [
+            "NOK",
+            "Noarske kroon"
+        ],
+        "NPR": [
+            "NPR",
+            "Nepalese roepie"
+        ],
+        "NZD": [
+            "NZ$",
+            "Nij-Seelânske dollar"
+        ],
+        "OMR": [
+            "OMR",
+            "Omaanske rial"
+        ],
+        "PAB": [
+            "PAB",
+            "Panamese balboa"
+        ],
+        "PEI": [
+            "PEI",
+            "Peruaanske inti"
+        ],
+        "PEN": [
+            "PEN",
+            "Peruaanske sol"
+        ],
+        "PES": [
+            "PES",
+            "Peruaanske sol (1863–1985)"
+        ],
+        "PGK": [
+            "PGK",
+            "Papuaanske kina"
+        ],
+        "PHP": [
+            "PHP",
+            "Filipynske peso"
+        ],
+        "PKR": [
+            "PKR",
+            "Pakistaanske roepie"
+        ],
+        "PLN": [
+            "PLN",
+            "Poalske zloty"
+        ],
+        "PLZ": [
+            "PLZ",
+            "Poalske zloty (1950–1995)"
+        ],
+        "PTE": [
+            "PTE",
+            "Portugeeske escudo"
+        ],
+        "PYG": [
+            "PYG",
+            "Paraguayaanske guarani"
+        ],
+        "QAR": [
+            "QAR",
+            "Katarese rial"
+        ],
+        "RHD": [
+            "RHD",
+            "Rhodesyske dollar"
+        ],
+        "ROL": [
+            "ROL",
+            "Alde Roemeenske leu"
+        ],
+        "RON": [
+            "RON",
+            "Roemeenske leu"
+        ],
+        "RSD": [
+            "RSD",
+            "Servyske dinar"
+        ],
+        "RUB": [
+            "RUB",
+            "Russyske roebel"
+        ],
+        "RUR": [
+            "RUR",
+            "Russyske roebel (1991–1998)"
+        ],
+        "RWF": [
+            "RWF",
+            "Rwandese frank"
+        ],
+        "SAR": [
+            "SAR",
+            "Saoedi-Arabyske riyal"
+        ],
+        "SBD": [
+            "SI$",
+            "Salomon-dollar"
+        ],
+        "SCR": [
+            "SCR",
+            "Seychelse roepie"
+        ],
+        "SDD": [
+            "SDD",
+            "Soedaneeske dinar"
+        ],
+        "SDG": [
+            "SDG",
+            "Soedaneeske pûn"
+        ],
+        "SDP": [
+            "SDP",
+            "Soedaneeske pûn (1957–1998)"
+        ],
+        "SEK": [
+            "SEK",
+            "Sweedske kroon"
+        ],
+        "SGD": [
+            "SGD",
+            "Singaporese dollar"
+        ],
+        "SHP": [
+            "SHP",
+            "Sint-Heleenske pûn"
+        ],
+        "SIT": [
+            "SIT",
+            "Sloveenske tolar"
+        ],
+        "SKK": [
+            "SKK",
+            "Slowaakse koruna"
+        ],
+        "SLL": [
+            "SLL",
+            "Sierraleoonse leone"
+        ],
+        "SOS": [
+            "SOS",
+            "Somalyske shilling"
+        ],
+        "SRD": [
+            "SRD",
+            "Surinaamske dollar"
+        ],
+        "SRG": [
+            "SRG",
+            "Surinaamske gulden"
+        ],
+        "SSP": [
+            "SSP",
+            "Sûd-Soedaneeske pûn"
+        ],
+        "STD": [
+            "STD",
+            "Santomese dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
+            "Santomese dobra"
+        ],
+        "SUR": [
+            "SUR",
+            "Sovjet-roebel"
+        ],
+        "SVC": [
+            "SVC",
+            "Salvadoraanske colón"
+        ],
+        "SYP": [
+            "SYP",
+            "Syrysk pûn"
+        ],
+        "SZL": [
+            "SZL",
+            "Swazyske lilangeni"
+        ],
+        "THB": [
+            "฿",
+            "Thaise baht"
+        ],
+        "TJR": [
+            "TJR",
+            "Tadzjikistaanske roebel"
+        ],
+        "TJS": [
+            "TJS",
+            "Tadzjikistaanske somoni"
+        ],
+        "TMM": [
+            "TMM",
+            "Turkmeense manat (1993–2009)"
+        ],
+        "TMT": [
+            "TMT",
+            "Turkmeense manat"
+        ],
+        "TND": [
+            "TND",
+            "Tunesyske dinar"
+        ],
+        "TOP": [
+            "TOP",
+            "Tongaanske paʻanga"
+        ],
+        "TPE": [
+            "TPE",
+            "Timorese escudo"
+        ],
+        "TRL": [
+            "TRL",
+            "Turkse lire"
+        ],
+        "TRY": [
+            "TRY",
+            "Turkse lira"
+        ],
+        "TTD": [
+            "TTD",
+            "Trinidad en Tobago-dollar"
+        ],
+        "TWD": [
+            "NT$",
+            "Nije Taiwanese dollar"
+        ],
+        "TZS": [
+            "TZS",
+            "Tanzaniaanske shilling"
+        ],
+        "UAH": [
+            "UAH",
+            "Oekraïense hryvnia"
+        ],
+        "UAK": [
+            "UAK",
+            "Oekraïense karbovanetz"
+        ],
+        "UGS": [
+            "UGS",
+            "Oegandese shilling (1966–1987)"
+        ],
+        "UGX": [
+            "UGX",
+            "Oegandese shilling"
+        ],
+        "USD": [
+            "US$",
+            "Amerikaanske dollar"
+        ],
+        "USN": [
+            "USN",
+            "Amerikaanske dollar (folgjende dei)"
+        ],
+        "USS": [
+            "USS",
+            "Amerikaanske dollar (zelfde dei)"
+        ],
+        "UYI": [
+            "UYI",
+            "Uruguayaanske peso en geïndexeerde eenheden"
+        ],
+        "UYP": [
+            "UYP",
+            "Uruguayaanske peso (1975–1993)"
+        ],
+        "UYU": [
+            "UYU",
+            "Uruguayaanske peso"
+        ],
+        "UZS": [
+            "UZS",
+            "Oezbekistaanske sum"
+        ],
+        "VEB": [
+            "VEB",
+            "Fenezolaanske bolivar (1871–2008)"
+        ],
+        "VEF": [
+            "VEF",
+            "Fenezolaanske bolivar"
+        ],
+        "VND": [
+            "₫",
+            "Fietnameeske dong"
+        ],
+        "VNN": [
+            "VNN",
+            "Alde Fietnameeske dong (1978–1985)"
+        ],
+        "VUV": [
+            "VUV",
+            "Vanuatuaanske vatu"
+        ],
+        "WST": [
+            "WST",
+            "Samoaanske tala"
+        ],
+        "XAF": [
+            "FCFA",
+            "CFA-frank"
+        ],
+        "XCD": [
+            "EC$",
+            "East-Karibyske dollar"
+        ],
+        "XEU": [
+            "XEU",
+            "European Currency Unit"
+        ],
+        "XFO": [
+            "XFO",
+            "Franse gouden franc"
+        ],
+        "XFU": [
+            "XFU",
+            "Franse UIC-franc"
+        ],
+        "XOF": [
+            "CFA",
+            "CFA-franc BCEAO"
+        ],
+        "XPF": [
+            "XPF",
+            "CFP-franc"
+        ],
+        "XRE": [
+            "XRE",
+            "RINET-fondsen"
+        ],
+        "YDD": [
+            "YDD",
+            "Jemenityske dinar"
+        ],
+        "YER": [
+            "YER",
+            "Jemenityske rial"
+        ],
+        "YUD": [
+            "YUD",
+            "Joegoslavyske harde dinar"
+        ],
+        "YUM": [
+            "YUM",
+            "Joegoslavyske noviy-dinar"
+        ],
+        "YUN": [
+            "YUN",
+            "Joegoslavyske convertibele dinar"
+        ],
+        "YUR": [
+            "YUR",
+            "Joegoslavyske herfoarme dinar (1992–1993)"
+        ],
+        "ZAL": [
+            "ZAL",
+            "Sûd-Afrikaanske rand (finansjeel)"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Sûd-Afrikaanske rand"
+        ],
+        "ZMK": [
+            "ZMK",
+            "Sambiaanske kwacha (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Sambiaanske kwacha"
+        ],
+        "ZRN": [
+            "ZRN",
+            "Saïreeske nije Saïre"
+        ],
+        "ZRZ": [
+            "ZRZ",
+            "Saïreeske Saïre"
+        ],
+        "ZWD": [
+            "ZWD",
+            "Simbabwaanske dollar"
+        ],
+        "ZWL": [
+            "ZWL",
+            "Simbabwaanske dollar (2009)"
+        ],
+        "ZWR": [
+            "ZWR",
+            "Simbabwaanske dollar (2008)"
+        ]
+    }
+}

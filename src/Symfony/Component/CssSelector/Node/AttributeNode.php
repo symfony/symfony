@@ -14,46 +14,22 @@ namespace Symfony\Component\CssSelector\Node;
 /**
  * Represents a "<selector>[<namespace>|<attribute> <operator> <value>]" node.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class AttributeNode extends AbstractNode
 {
-    /**
-     * @var NodeInterface
-     */
     private $selector;
-
-    /**
-     * @var string
-     */
     private $namespace;
-
-    /**
-     * @var string
-     */
     private $attribute;
-
-    /**
-     * @var string
-     */
     private $operator;
-
-    /**
-     * @var string
-     */
     private $value;
 
-    /**
-     * @param NodeInterface $selector
-     * @param string        $namespace
-     * @param string        $attribute
-     * @param string        $operator
-     * @param string        $value
-     */
-    public function __construct(NodeInterface $selector, $namespace, $attribute, $operator, $value)
+    public function __construct(NodeInterface $selector, ?string $namespace, string $attribute, string $operator, ?string $value)
     {
         $this->selector = $selector;
         $this->namespace = $namespace;
@@ -62,42 +38,27 @@ class AttributeNode extends AbstractNode
         $this->value = $value;
     }
 
-    /**
-     * @return NodeInterface
-     */
-    public function getSelector()
+    public function getSelector(): NodeInterface
     {
         return $this->selector;
     }
 
-    /**
-     * @return string
-     */
-    public function getNamespace()
+    public function getNamespace(): ?string
     {
         return $this->namespace;
     }
 
-    /**
-     * @return string
-     */
-    public function getAttribute()
+    public function getAttribute(): string
     {
         return $this->attribute;
     }
 
-    /**
-     * @return string
-     */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -105,7 +66,7 @@ class AttributeNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function getSpecificity()
+    public function getSpecificity(): Specificity
     {
         return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
     }
@@ -113,7 +74,7 @@ class AttributeNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         $attribute = $this->namespace ? $this->namespace.'|'.$this->attribute : $this->attribute;
 

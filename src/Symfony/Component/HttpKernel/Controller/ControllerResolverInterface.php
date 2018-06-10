@@ -17,13 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
  * A ControllerResolverInterface implementation knows how to determine the
  * controller to execute based on a Request object.
  *
- * It can also determine the arguments to pass to the Controller.
- *
  * A Controller can be any valid PHP callable.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface ControllerResolverInterface
 {
@@ -36,28 +32,10 @@ interface ControllerResolverInterface
      * The resolver must only throw an exception when it should be able to load
      * controller but cannot because of some errors made by the developer.
      *
-     * @param Request $request A Request instance
+     * @return callable|false A PHP callable representing the Controller,
+     *                        or false if this resolver is not able to determine the controller
      *
-     * @return mixed|Boolean A PHP callable representing the Controller,
-     *                       or false if this resolver is not able to determine the controller
-     *
-     * @throws \InvalidArgumentException|\LogicException If the controller can't be found
-     *
-     * @api
+     * @throws \LogicException If a controller was found based on the request but it is not callable
      */
     public function getController(Request $request);
-
-    /**
-     * Returns the arguments to pass to the controller.
-     *
-     * @param Request $request    A Request instance
-     * @param mixed   $controller A PHP callable
-     *
-     * @return array An array of arguments to pass to the controller
-     *
-     * @throws \RuntimeException When value for argument given is not provided
-     *
-     * @api
-     */
-    public function getArguments(Request $request, $controller);
 }

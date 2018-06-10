@@ -18,13 +18,11 @@ use Symfony\Component\Finder\Comparator\NumberComparator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SizeRangeFilterIterator extends FilterIterator
+class SizeRangeFilterIterator extends \FilterIterator
 {
     private $comparators = array();
 
     /**
-     * Constructor.
-     *
      * @param \Iterator          $iterator    The Iterator to filter
      * @param NumberComparator[] $comparators An array of NumberComparator instances
      */
@@ -38,7 +36,7 @@ class SizeRangeFilterIterator extends FilterIterator
     /**
      * Filters the iterator values.
      *
-     * @return Boolean true if the value should be kept, false otherwise
+     * @return bool true if the value should be kept, false otherwise
      */
     public function accept()
     {

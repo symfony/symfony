@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 /**
+ * @deprecated since Symfony 4.1
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface TraceableEventDispatcherInterface
+interface TraceableEventDispatcherInterface extends EventDispatcherInterface
 {
     /**
      * Gets the called listeners.
@@ -29,4 +33,9 @@ interface TraceableEventDispatcherInterface
      * @return array An array of not called listeners
      */
     public function getNotCalledListeners();
+
+    /**
+     * Resets the trace.
+     */
+    public function reset();
 }

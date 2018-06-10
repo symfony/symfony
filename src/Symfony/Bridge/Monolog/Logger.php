@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -20,62 +20,40 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
+class Logger extends BaseLogger implements DebugLoggerInterface
 {
     /**
-     * @deprecated since 2.2, to be removed in 3.0. Use emergency() which is PSR-3 compatible.
+     * {@inheritdoc}
      */
-    public function emerg($message, array $context = array())
-    {
-        return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
-    }
-
-    /**
-     * @deprecated since 2.2, to be removed in 3.0. Use critical() which is PSR-3 compatible.
-     */
-    public function crit($message, array $context = array())
-    {
-        return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
-    }
-
-    /**
-     * @deprecated since 2.2, to be removed in 3.0. Use error() which is PSR-3 compatible.
-     */
-    public function err($message, array $context = array())
-    {
-        return parent::addRecord(BaseLogger::ERROR, $message, $context);
-    }
-
-    /**
-     * @deprecated since 2.2, to be removed in 3.0. Use warning() which is PSR-3 compatible.
-     */
-    public function warn($message, array $context = array())
-    {
-        return parent::addRecord(BaseLogger::WARNING, $message, $context);
-    }
-
-    /**
-     * @see Symfony\Component\HttpKernel\Log\DebugLoggerInterface
-     */
-    public function getLogs()
+    public function getLogs(/* Request $request = null */)
     {
         if ($logger = $this->getDebugLogger()) {
-            return $logger->getLogs();
+            return \call_user_func_array(array($logger, 'getLogs'), \func_get_args());
         }
 
         return array();
     }
 
     /**
-     * @see Symfony\Component\HttpKernel\Log\DebugLoggerInterface
+     * {@inheritdoc}
      */
-    public function countErrors()
+    public function countErrors(/* Request $request = null */)
     {
         if ($logger = $this->getDebugLogger()) {
-            return $logger->countErrors();
+            return \call_user_func_array(array($logger, 'countErrors'), \func_get_args());
         }
 
         return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        if ($logger = $this->getDebugLogger()) {
+            $logger->clear();
+        }
     }
 
     /**
@@ -85,6 +63,12 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     private function getDebugLogger()
     {
+        foreach ($this->processors as $processor) {
+            if ($processor instanceof DebugLoggerInterface) {
+                return $processor;
+            }
+        }
+
         foreach ($this->handlers as $handler) {
             if ($handler instanceof DebugLoggerInterface) {
                 return $handler;

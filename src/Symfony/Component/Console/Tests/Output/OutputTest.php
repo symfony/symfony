@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\Output;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class OutputTest extends \PHPUnit_Framework_TestCase
+class OutputTest extends TestCase
 {
     public function testConstructor()
     {
@@ -35,6 +36,35 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $output = new TestOutput();
         $output->setVerbosity(Output::VERBOSITY_QUIET);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
+
+        $this->assertTrue($output->isQuiet());
+        $this->assertFalse($output->isVerbose());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_NORMAL);
+        $this->assertFalse($output->isQuiet());
+        $this->assertFalse($output->isVerbose());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_VERBOSE);
+        $this->assertFalse($output->isQuiet());
+        $this->assertTrue($output->isVerbose());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_VERY_VERBOSE);
+        $this->assertFalse($output->isQuiet());
+        $this->assertTrue($output->isVerbose());
+        $this->assertTrue($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_DEBUG);
+        $this->assertFalse($output->isQuiet());
+        $this->assertTrue($output->isVerbose());
+        $this->assertTrue($output->isVeryVerbose());
+        $this->assertTrue($output->isDebug());
     }
 
     public function testWriteWithVerbosityQuiet()
@@ -49,6 +79,19 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $output = new TestOutput();
         $output->writeln(array('foo', 'bar'));
         $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
+    }
+
+    public function testWriteAnIterableOfMessages()
+    {
+        $output = new TestOutput();
+        $output->writeln($this->generateMessages());
+        $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an iterable of messages to output');
+    }
+
+    private function generateMessages(): iterable
+    {
+        yield 'foo';
+        yield 'bar';
     }
 
     /**
@@ -84,17 +127,7 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $output->getFormatter()->setStyle('FOO', $fooStyle);
         $output->setDecorated(true);
         $output->writeln('<foo>foo</foo>');
-        $this->assertEquals("\033[33;41;5mfoo\033[0m\n", $output->output, '->writeln() decorates the output');
-    }
-
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Unknown output type given (24)
-     */
-    public function testWriteWithInvalidOutputType()
-    {
-        $output = new TestOutput();
-        $output->writeln('<foo>foo</foo>', 24);
+        $this->assertEquals("\033[33;41;5mfoo\033[39;49;25m\n", $output->output, '->writeln() decorates the output');
     }
 
     public function testWriteWithInvalidStyle()
@@ -108,6 +141,35 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $output->clear();
         $output->writeln('<bar>foo</bar>');
         $this->assertEquals("<bar>foo</bar>\n", $output->output, '->writeln() do nothing when a style does not exist');
+    }
+
+    /**
+     * @dataProvider verbosityProvider
+     */
+    public function testWriteWithVerbosityOption($verbosity, $expected, $msg)
+    {
+        $output = new TestOutput();
+
+        $output->setVerbosity($verbosity);
+        $output->clear();
+        $output->write('1', false);
+        $output->write('2', false, Output::VERBOSITY_QUIET);
+        $output->write('3', false, Output::VERBOSITY_NORMAL);
+        $output->write('4', false, Output::VERBOSITY_VERBOSE);
+        $output->write('5', false, Output::VERBOSITY_VERY_VERBOSE);
+        $output->write('6', false, Output::VERBOSITY_DEBUG);
+        $this->assertEquals($expected, $output->output, $msg);
+    }
+
+    public function verbosityProvider()
+    {
+        return array(
+            array(Output::VERBOSITY_QUIET, '2', '->write() in QUIET mode only outputs when an explicit QUIET verbosity is passed'),
+            array(Output::VERBOSITY_NORMAL, '123', '->write() in NORMAL mode outputs anything below an explicit VERBOSE verbosity'),
+            array(Output::VERBOSITY_VERBOSE, '1234', '->write() in VERBOSE mode outputs anything below an explicit VERY_VERBOSE verbosity'),
+            array(Output::VERBOSITY_VERY_VERBOSE, '12345', '->write() in VERY_VERBOSE mode outputs anything below an explicit DEBUG verbosity'),
+            array(Output::VERBOSITY_DEBUG, '123456', '->write() in DEBUG mode outputs everything'),
+        );
     }
 }
 

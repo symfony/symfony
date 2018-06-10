@@ -14,40 +14,53 @@ namespace Symfony\Component\Security\Core\Authentication\Provider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class RememberMeAuthenticationProvider implements AuthenticationProviderInterface
 {
     private $userChecker;
-    private $key;
+    private $secret;
     private $providerKey;
 
-    public function __construct(UserCheckerInterface $userChecker, $key, $providerKey)
+    /**
+     * @param UserCheckerInterface $userChecker An UserCheckerInterface interface
+     * @param string               $secret      A secret
+     * @param string               $providerKey A provider secret
+     */
+    public function __construct(UserCheckerInterface $userChecker, string $secret, string $providerKey)
     {
         $this->userChecker = $userChecker;
-        $this->key = $key;
+        $this->secret = $secret;
         $this->providerKey = $providerKey;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return;
+            throw new AuthenticationException('The token is not supported by this authentication provider.');
         }
 
-        if ($this->key !== $token->getKey()) {
-            throw new BadCredentialsException('The presented key does not match.');
+        if ($this->secret !== $token->getSecret()) {
+            throw new BadCredentialsException('The presented secret does not match.');
         }
 
         $user = $token->getUser();
+        $this->userChecker->checkPreAuth($user);
         $this->userChecker->checkPostAuth($user);
 
-        $authenticatedToken = new RememberMeToken($user, $this->providerKey, $this->key);
+        $authenticatedToken = new RememberMeToken($user, $this->providerKey, $this->secret);
         $authenticatedToken->setAttributes($token->getAttributes());
 
         return $authenticatedToken;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof RememberMeToken && $token->getProviderKey() === $this->providerKey;

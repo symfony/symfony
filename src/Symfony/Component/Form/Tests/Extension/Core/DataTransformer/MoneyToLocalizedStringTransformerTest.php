@@ -11,23 +11,19 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
+class MoneyToLocalizedStringTransformerTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
-
-        \Locale::setDefault('de_AT');
-    }
-
     public function testTransform()
     {
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_AT');
+
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->assertEquals('1,23', $transformer->transform(123));
@@ -37,7 +33,7 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('abcd');
     }
@@ -51,6 +47,11 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testReverseTransform()
     {
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_AT');
+
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->assertEquals(123, $transformer->reverseTransform('1,23'));
@@ -60,7 +61,7 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->reverseTransform(12345);
     }
@@ -70,5 +71,23 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $transformer = new MoneyToLocalizedStringTransformer();
 
         $this->assertNull($transformer->reverseTransform(''));
+    }
+
+    public function testFloatToIntConversionMismatchOnReversTransform()
+    {
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
+        IntlTestHelper::requireFullIntl($this, false);
+        \Locale::setDefault('de_AT');
+
+        $this->assertSame(3655, (int) $transformer->reverseTransform('36,55'));
+    }
+
+    public function testFloatToIntConversionMismatchOnTransform()
+    {
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, MoneyToLocalizedStringTransformer::ROUND_DOWN, 100);
+        IntlTestHelper::requireFullIntl($this, false);
+        \Locale::setDefault('de_AT');
+
+        $this->assertSame('10,20', $transformer->transform(1020));
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
@@ -29,13 +30,11 @@ class TemplateFinder implements TemplateFinderInterface
     private $templates;
 
     /**
-     * Constructor.
-     *
      * @param KernelInterface             $kernel  A KernelInterface instance
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param string                      $rootDir The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, $rootDir)
+    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, string $rootDir)
     {
         $this->kernel = $kernel;
         $this->parser = $parser;
@@ -45,7 +44,7 @@ class TemplateFinder implements TemplateFinderInterface
     /**
      * Find all the templates in the bundle and in the kernel Resources folder.
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return TemplateReferenceInterface[]
      */
     public function findAllTemplates()
     {
@@ -55,7 +54,7 @@ class TemplateFinder implements TemplateFinderInterface
 
         $templates = array();
 
-        foreach ($this->kernel->getBundles() as $name => $bundle) {
+        foreach ($this->kernel->getBundles() as $bundle) {
             $templates = array_merge($templates, $this->findTemplatesInBundle($bundle));
         }
 
@@ -69,7 +68,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @param string $dir The folder where to look for templates
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return TemplateReferenceInterface[]
      */
     private function findTemplatesInFolder($dir)
     {
@@ -93,12 +92,15 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @param BundleInterface $bundle The bundle where to look for templates
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return TemplateReferenceInterface[]
      */
     private function findTemplatesInBundle(BundleInterface $bundle)
     {
-        $templates = $this->findTemplatesInFolder($bundle->getPath().'/Resources/views');
         $name = $bundle->getName();
+        $templates = array_unique(array_merge(
+            $this->findTemplatesInFolder($bundle->getPath().'/Resources/views'),
+            $this->findTemplatesInFolder($this->rootDir.'/'.$name.'/views')
+        ));
 
         foreach ($templates as $i => $template) {
             $templates[$i] = $template->set('bundle', $name);

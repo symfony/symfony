@@ -17,19 +17,37 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class TimeValidator extends ConstraintValidator
 {
-    const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
+    const PATTERN = '/^(\d{2}):(\d{2}):(\d{2})$/';
 
     /**
-     * {@inheritDoc}
+     * Checks whether a time is valid.
+     *
+     * @param int $hour   The hour
+     * @param int $minute The minute
+     * @param int $second The second
+     *
+     * @return bool Whether the time is valid
+     *
+     * @internal
+     */
+    public static function checkTime($hour, $minute, $second)
+    {
+        return $hour >= 0 && $hour < 24 && $minute >= 0 && $minute < 60 && $second >= 0 && $second < 60;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value || $value instanceof \DateTime) {
+        if (!$constraint instanceof Time) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Time');
+        }
+
+        if (null === $value || '' === $value || $value instanceof \DateTimeInterface) {
             return;
         }
 
@@ -39,8 +57,20 @@ class TimeValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+        if (!preg_match(static::PATTERN, $value, $matches)) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Time::INVALID_FORMAT_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        if (!self::checkTime($matches[1], $matches[2], $matches[3])) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Time::INVALID_TIME_ERROR)
+                ->addViolation();
         }
     }
 }

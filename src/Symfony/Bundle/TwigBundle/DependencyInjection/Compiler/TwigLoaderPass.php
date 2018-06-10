@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
- * Adds services tagged twig.loader as Twig loaders
+ * Adds services tagged twig.loader as Twig loaders.
  *
  * @author Daniel Leech <daniel@dantleech.com>
  */
@@ -29,21 +29,32 @@ class TwigLoaderPass implements CompilerPassInterface
             return;
         }
 
-        // register additional template loaders
-        $loaderIds = $container->findTaggedServiceIds('twig.loader');
+        $prioritizedLoaders = array();
+        $found = 0;
 
-        if (count($loaderIds) === 0) {
+        foreach ($container->findTaggedServiceIds('twig.loader', true) as $id => $attributes) {
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $prioritizedLoaders[$priority][] = $id;
+            ++$found;
+        }
+
+        if (!$found) {
             throw new LogicException('No twig loaders found. You need to tag at least one loader with "twig.loader"');
         }
 
-        if (count($loaderIds) === 1) {
-            $container->setAlias('twig.loader', key($loaderIds));
+        if (1 === $found) {
+            $container->setAlias('twig.loader', $id)->setPrivate(true);
         } else {
             $chainLoader = $container->getDefinition('twig.loader.chain');
-            foreach (array_keys($loaderIds) as $id) {
-                $chainLoader->addMethodCall('addLoader', array(new Reference($id)));
+            krsort($prioritizedLoaders);
+
+            foreach ($prioritizedLoaders as $loaders) {
+                foreach ($loaders as $loader) {
+                    $chainLoader->addMethodCall('addLoader', array(new Reference($loader)));
+                }
             }
-            $container->setAlias('twig.loader', 'twig.loader.chain');
+
+            $container->setAlias('twig.loader', 'twig.loader.chain')->setPrivate(true);
         }
     }
 }

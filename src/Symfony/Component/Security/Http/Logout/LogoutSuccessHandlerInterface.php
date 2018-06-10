@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * LogoutSuccesshandlerInterface.
@@ -28,8 +29,6 @@ interface LogoutSuccessHandlerInterface
 {
     /**
      * Creates a Response object to send upon a successful logout.
-     *
-     * @param Request $request
      *
      * @return Response never null
      */

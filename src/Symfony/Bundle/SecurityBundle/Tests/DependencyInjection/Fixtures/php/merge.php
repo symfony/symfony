@@ -16,5 +16,5 @@ $container->loadFromExtension('security', array(
 
     'role_hierarchy' => array(
         'FOO' => array('MOO'),
-    )
+    ),
 ));

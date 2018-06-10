@@ -1,0 +1,6 @@
+services:
+    foo_service:
+        class:    FooClass
+        tags:
+          # tag name is an empty string
+          - { name: '', foo: bar }

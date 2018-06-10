@@ -12,12 +12,9 @@
 namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
-use Symfony\Component\Finder\Tests\Iterator\MockSplFileInfo;
-use Symfony\Component\Finder\Tests\Iterator\MockFileListIterator;
 
 class FilecontentFilterIteratorTest extends IteratorTestCase
 {
-
     public function testAccept()
     {
         $inner = new MockFileListIterator(array('test.txt'));
@@ -53,31 +50,31 @@ class FilecontentFilterIteratorTest extends IteratorTestCase
         $inner = new MockFileListIterator();
 
         $inner[] = new MockSplFileInfo(array(
-            'name'     => 'a.txt',
+            'name' => 'a.txt',
             'contents' => 'Lorem ipsum...',
-            'type'     => 'file',
-            'mode'     => 'r+')
+            'type' => 'file',
+            'mode' => 'r+', )
         );
 
         $inner[] = new MockSplFileInfo(array(
-            'name'     => 'b.yml',
+            'name' => 'b.yml',
             'contents' => 'dolor sit...',
-            'type'     => 'file',
-            'mode'     => 'r+')
+            'type' => 'file',
+            'mode' => 'r+', )
         );
 
         $inner[] = new MockSplFileInfo(array(
-            'name'     => 'some/other/dir/third.php',
+            'name' => 'some/other/dir/third.php',
             'contents' => 'amet...',
-            'type'     => 'file',
-            'mode'     => 'r+')
+            'type' => 'file',
+            'mode' => 'r+', )
         );
 
         $inner[] = new MockSplFileInfo(array(
-            'name'     => 'unreadable-file.txt',
+            'name' => 'unreadable-file.txt',
             'contents' => false,
-            'type'     => 'file',
-            'mode'     => 'r+')
+            'type' => 'file',
+            'mode' => 'r+', )
         );
 
         return array(

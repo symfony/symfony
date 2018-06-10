@@ -1,0 +1,33 @@
+{
+    "Version": "2.1.38.39",
+    "Names": {
+        "AMD": [
+            "AMD",
+            "dram armenio"
+        ],
+        "CAD": [
+            "CAD",
+            "dólar canadiense"
+        ],
+        "ERN": [
+            "ERN",
+            "nafka"
+        ],
+        "EUR": [
+            "EUR",
+            "euro"
+        ],
+        "THB": [
+            "THB",
+            "bat"
+        ],
+        "USD": [
+            "USD",
+            "dólar estadounidense"
+        ],
+        "VND": [
+            "VND",
+            "dong"
+        ]
+    }
+}

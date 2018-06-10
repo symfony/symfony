@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -29,26 +30,24 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * Example : "file:/path/to/the/storage/folder"
      *
-     * @param string $dsn The DSN
-     *
      * @throws \RuntimeException
      */
-    public function __construct($dsn)
+    public function __construct(string $dsn)
     {
         if (0 !== strpos($dsn, 'file:')) {
             throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $dsn));
         }
         $this->folder = substr($dsn, 5);
 
-        if (!is_dir($this->folder)) {
-            mkdir($this->folder, 0777, true);
+        if (!is_dir($this->folder) && false === @mkdir($this->folder, 0777, true) && !is_dir($this->folder)) {
+            throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $this->folder));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $statusCode = null)
     {
         $file = $this->getIndexFilename();
 
@@ -61,11 +60,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         $result = array();
         while (count($result) < $limit && $line = $this->readLineFromFile($file)) {
-            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
-
+            $values = str_getcsv($line);
+            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode) = $values;
             $csvTime = (int) $csvTime;
 
-            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method)) {
+            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method) || $statusCode && false === strpos($csvStatusCode, $statusCode)) {
                 continue;
             }
 
@@ -78,12 +77,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
             }
 
             $result[$csvToken] = array(
-                'token'  => $csvToken,
-                'ip'     => $csvIp,
+                'token' => $csvToken,
+                'ip' => $csvIp,
                 'method' => $csvMethod,
-                'url'    => $csvUrl,
-                'time'   => $csvTime,
+                'url' => $csvUrl,
+                'time' => $csvTime,
                 'parent' => $csvParent,
+                'status_code' => $csvStatusCode,
             );
         }
 
@@ -116,7 +116,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function read($token)
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
-            return null;
+            return;
         }
 
         return $this->createProfileFromData($token, unserialize(file_get_contents($file)));
@@ -124,6 +124,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \RuntimeException
      */
     public function write(Profile $profile)
     {
@@ -133,21 +135,30 @@ class FileProfilerStorage implements ProfilerStorageInterface
         if (!$profileIndexed) {
             // Create directory
             $dir = dirname($file);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0777, true);
+            if (!is_dir($dir) && false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $dir));
             }
         }
 
+        $profileToken = $profile->getToken();
+        // when there are errors in sub-requests, the parent and/or children tokens
+        // may equal the profile token, resulting in infinite loops
+        $parentToken = $profile->getParentToken() !== $profileToken ? $profile->getParentToken() : null;
+        $childrenToken = array_filter(array_map(function (Profile $p) use ($profileToken) {
+            return $profileToken !== $p->getToken() ? $p->getToken() : null;
+        }, $profile->getChildren()));
+
         // Store profile
         $data = array(
-            'token'    => $profile->getToken(),
-            'parent'   => $profile->getParentToken(),
-            'children' => array_map(function ($p) { return $p->getToken(); }, $profile->getChildren()),
-            'data'     => $profile->getCollectors(),
-            'ip'       => $profile->getIp(),
-            'method'   => $profile->getMethod(),
-            'url'      => $profile->getUrl(),
-            'time'     => $profile->getTime(),
+            'token' => $profileToken,
+            'parent' => $parentToken,
+            'children' => $childrenToken,
+            'data' => $profile->getCollectors(),
+            'ip' => $profile->getIp(),
+            'method' => $profile->getMethod(),
+            'url' => $profile->getUrl(),
+            'time' => $profile->getTime(),
+            'status_code' => $profile->getStatusCode(),
         );
 
         if (false === file_put_contents($file, serialize($data))) {
@@ -167,6 +178,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getUrl(),
                 $profile->getTime(),
                 $profile->getParentToken(),
+                $profile->getStatusCode(),
             ));
             fclose($file);
         }
@@ -215,7 +227,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $position = ftell($file);
 
         if (0 === $position) {
-            return null;
+            return;
         }
 
         while (true) {
@@ -254,6 +266,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
+        $profile->setStatusCode($data['status_code']);
         $profile->setCollectors($data['data']);
 
         if (!$parent && $data['parent']) {

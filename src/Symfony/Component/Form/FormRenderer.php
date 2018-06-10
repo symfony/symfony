@@ -13,7 +13,8 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Twig\Environment;
 
 /**
  * Renders a form into HTML using a rendering engine.
@@ -24,35 +25,16 @@ class FormRenderer implements FormRendererInterface
 {
     const CACHE_KEY_VAR = 'unique_block_prefix';
 
-    /**
-     * @var FormRendererEngineInterface
-     */
     private $engine;
-
-    /**
-     * @var CsrfProviderInterface
-     */
-    private $csrfProvider;
-
-    /**
-     * @var array
-     */
+    private $csrfTokenManager;
     private $blockNameHierarchyMap = array();
-
-    /**
-     * @var array
-     */
     private $hierarchyLevelMap = array();
-
-    /**
-     * @var array
-     */
     private $variableStack = array();
 
-    public function __construct(FormRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(FormRendererEngineInterface $engine, CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->engine = $engine;
-        $this->csrfProvider = $csrfProvider;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
 
     /**
@@ -66,21 +48,21 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormView $view, $themes)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
     {
-        $this->engine->setTheme($view, $themes);
+        $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken($intention)
+    public function renderCsrfToken($tokenId)
     {
-        if (null === $this->csrfProvider) {
-            throw new BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
+        if (null === $this->csrfTokenManager) {
+            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct().');
         }
 
-        return $this->csrfProvider->generateCsrfToken($intention);
+        return $this->csrfTokenManager->getToken($tokenId)->getValue();
     }
 
     /**
@@ -236,10 +218,11 @@ class FormRenderer implements FormRendererInterface
 
         // Escape if no resource exists for this block
         if (!$resource) {
-            throw new LogicException(sprintf(
-                'Unable to render the form as none of the following blocks exist: "%s".',
-                implode('", "', array_reverse($blockNameHierarchy))
-            ));
+            if (count($blockNameHierarchy) !== count(array_unique($blockNameHierarchy))) {
+                throw new LogicException(sprintf('Unable to render the form because the block names array contains duplicates: "%s".', implode('", "', array_reverse($blockNameHierarchy))));
+            }
+
+            throw new LogicException(sprintf('Unable to render the form as none of the following blocks exist: "%s".', implode('", "', array_reverse($blockNameHierarchy))));
         }
 
         // Merge the passed with the existing attributes
@@ -279,8 +262,7 @@ class FormRenderer implements FormRendererInterface
         // Clear the caches if they were filled for the first time within
         // this function call
         if ($hierarchyInit) {
-            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey]);
-            unset($this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
+            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey], $this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
         }
 
         if ($varInit) {
@@ -299,6 +281,22 @@ class FormRenderer implements FormRendererInterface
      */
     public function humanize($text)
     {
-        return ucfirst(trim(strtolower(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
+        return ucfirst(strtolower(trim(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
+    }
+
+    /**
+     * @internal
+     */
+    public function encodeCurrency(Environment $environment, $text, $widget = '')
+    {
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
+        }
+
+        return str_replace('{{ widget }}', $widget, $text);
     }
 }

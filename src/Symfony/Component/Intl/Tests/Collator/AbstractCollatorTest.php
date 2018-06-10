@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Intl\Tests\Collator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Collator\Collator;
-use Symfony\Component\Intl\Locale;
 
 /**
  * Test case for Collator implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractCollatorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCollatorTest extends TestCase
 {
     /**
      * @dataProvider asortProvider

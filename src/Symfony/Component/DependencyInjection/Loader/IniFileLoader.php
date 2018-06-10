@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -22,41 +22,72 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class IniFileLoader extends FileLoader
 {
     /**
-     * Loads a resource.
-     *
-     * @param mixed  $file The resource
-     * @param string $type The resource type
-     *
-     * @throws InvalidArgumentException When ini file is not valid
+     * {@inheritdoc}
      */
-    public function load($file, $type = null)
+    public function load($resource, $type = null)
     {
-        $path = $this->locator->locate($file);
+        $path = $this->locator->locate($resource);
 
-        $this->container->addResource(new FileResource($path));
+        $this->container->fileExists($path);
 
+        // first pass to catch parsing errors
         $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
-            throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $file));
+            throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $resource));
         }
+
+        // real raw parsing
+        $result = parse_ini_file($path, true, INI_SCANNER_RAW);
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
-                $this->container->setParameter($key, $value);
+                $this->container->setParameter($key, $this->phpize($value));
             }
         }
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'ini' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'ini' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'ini' === $type;
+    }
+
+    /**
+     * Note that the following features are not supported:
+     *  * strings with escaped quotes are not supported "foo\"bar";
+     *  * string concatenation ("foo" "bar").
+     */
+    private function phpize($value)
+    {
+        // trim on the right as comments removal keep whitespaces
+        $value = rtrim($value);
+        $lowercaseValue = strtolower($value);
+
+        switch (true) {
+            case defined($value):
+                return constant($value);
+            case 'yes' === $lowercaseValue || 'on' === $lowercaseValue:
+                return true;
+            case 'no' === $lowercaseValue || 'off' === $lowercaseValue || 'none' === $lowercaseValue:
+                return false;
+            case isset($value[1]) && (
+                ("'" === $value[0] && "'" === $value[strlen($value) - 1]) ||
+                ('"' === $value[0] && '"' === $value[strlen($value) - 1])
+            ):
+                // quoted string
+                return substr($value, 1, -1);
+            default:
+                return XmlUtils::phpize($value);
+        }
     }
 }

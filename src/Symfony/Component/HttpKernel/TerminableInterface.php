@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Pierre Minnieur <pierre.minnieur@sensiolabs.de>
- *
- * @api
  */
 interface TerminableInterface
 {
@@ -29,11 +27,6 @@ interface TerminableInterface
      * Terminates a request/response cycle.
      *
      * Should be called after sending the response and before shutting down the kernel.
-     *
-     * @param Request  $request  A Request instance
-     * @param Response $response A Response instance
-     *
-     * @api
      */
     public function terminate(Request $request, Response $response);
 }

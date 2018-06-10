@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony Form Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,32 +12,54 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/intl": "~2.3",
-        "symfony/options-resolver": "~2.1",
-        "symfony/property-access": "~2.2"
+        "php": "^7.1.3",
+        "symfony/event-dispatcher": "~3.4|~4.0",
+        "symfony/intl": "~3.4|~4.0",
+        "symfony/options-resolver": "~3.4|~4.0",
+        "symfony/polyfill-ctype": "~1.8",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/property-access": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/validator": "~2.2",
-        "symfony/http-foundation": "~2.2"
+        "doctrine/collections": "~1.0",
+        "symfony/validator": "~3.4|~4.0",
+        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/config": "~3.4|~4.0",
+        "symfony/console": "~3.4|~4.0",
+        "symfony/http-foundation": "~3.4|~4.0",
+        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/security-csrf": "~3.4|~4.0",
+        "symfony/translation": "~3.4|~4.0",
+        "symfony/var-dumper": "~3.4|~4.0"
+    },
+    "conflict": {
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
+        "symfony/dependency-injection": "<3.4",
+        "symfony/doctrine-bridge": "<3.4",
+        "symfony/framework-bundle": "<3.4",
+        "symfony/http-kernel": "<3.4",
+        "symfony/twig-bridge": "<3.4.5|<4.0.5,>=4.0"
     },
     "suggest": {
-        "symfony/validator": "",
-        "symfony/http-foundation": ""
+        "symfony/validator": "For form validation.",
+        "symfony/security-csrf": "For protecting forms against CSRF attacks.",
+        "symfony/twig-bridge": "For templating with Twig.",
+        "symfony/framework-bundle": "For templating with PHP."
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form\\": "" }
+        "psr-4": { "Symfony\\Component\\Form\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
-    "target-dir": "Symfony/Component/Form",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

@@ -21,105 +21,69 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
+class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {
-    private $compiler;
-    private $formatter;
-    private $sourceId;
+    private $replacements;
 
     /**
      * Process the Container to replace aliases with service definitions.
-     *
-     * @param ContainerBuilder $container
      *
      * @throws InvalidArgumentException if the service definition does not exist
      */
     public function process(ContainerBuilder $container)
     {
-        $this->compiler = $container->getCompiler();
-        $this->formatter = $this->compiler->getLoggingFormatter();
-
-        foreach ($container->getAliases() as $id => $alias) {
-            $aliasId = (string) $alias;
-
-            try {
-                $definition = $container->getDefinition($aliasId);
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with "%s".', $alias, $id), null, $e);
+        // First collect all alias targets that need to be replaced
+        $seenAliasTargets = array();
+        $replacements = array();
+        foreach ($container->getAliases() as $definitionId => $target) {
+            $targetId = (string) $target;
+            // Special case: leave this target alone
+            if ('service_container' === $targetId) {
+                continue;
             }
-
+            // Check if target needs to be replaces
+            if (isset($replacements[$targetId])) {
+                $container->setAlias($definitionId, $replacements[$targetId])->setPublic($target->isPublic())->setPrivate($target->isPrivate());
+            }
+            // No need to process the same target twice
+            if (isset($seenAliasTargets[$targetId])) {
+                continue;
+            }
+            // Process new target
+            $seenAliasTargets[$targetId] = true;
+            try {
+                $definition = $container->getDefinition($targetId);
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with actual definition "%s".', $definitionId, $targetId), null, $e);
+            }
             if ($definition->isPublic()) {
                 continue;
             }
-
-            $definition->setPublic(true);
-            $container->setDefinition($id, $definition);
-            $container->removeDefinition($aliasId);
-
-            $this->updateReferences($container, $aliasId, $id);
-
-            // we have to restart the process due to concurrent modification of
-            // the container
-            $this->process($container);
-
-            break;
+            // Remove private definition and schedule for replacement
+            $definition->setPublic(!$target->isPrivate());
+            $definition->setPrivate($target->isPrivate());
+            $container->setDefinition($definitionId, $definition);
+            $container->removeDefinition($targetId);
+            $replacements[$targetId] = $definitionId;
         }
+        $this->replacements = $replacements;
+
+        parent::process($container);
+        $this->replacements = array();
     }
 
     /**
-     * Updates references to remove aliases.
-     *
-     * @param ContainerBuilder $container The container
-     * @param string           $currentId The alias identifier being replaced
-     * @param string           $newId     The id of the service the alias points to
+     * {@inheritdoc}
      */
-    private function updateReferences($container, $currentId, $newId)
+    protected function processValue($value, $isRoot = false)
     {
-        foreach ($container->getAliases() as $id => $alias) {
-            if ($currentId === (string) $alias) {
-                $container->setAlias($id, $newId);
-            }
+        if ($value instanceof Reference && isset($this->replacements[$referenceId = (string) $value])) {
+            // Perform the replacement
+            $newId = $this->replacements[$referenceId];
+            $value = new Reference($newId, $value->getInvalidBehavior());
+            $this->container->log($this, sprintf('Changed reference of service "%s" previously pointing to "%s" to "%s".', $this->currentId, $referenceId, $newId));
         }
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            $this->sourceId = $id;
-
-            $definition->setArguments(
-                $this->updateArgumentReferences($definition->getArguments(), $currentId, $newId)
-            );
-
-            $definition->setMethodCalls(
-                $this->updateArgumentReferences($definition->getMethodCalls(), $currentId, $newId)
-            );
-
-            $definition->setProperties(
-                $this->updateArgumentReferences($definition->getProperties(), $currentId, $newId)
-            );
-        }
-    }
-
-    /**
-     * Updates argument references.
-     *
-     * @param array  $arguments An array of Arguments
-     * @param string $currentId The alias identifier
-     * @param string $newId     The identifier the alias points to
-     *
-     * @return array
-     */
-    private function updateArgumentReferences(array $arguments, $currentId, $newId)
-    {
-        foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
-                $arguments[$k] = $this->updateArgumentReferences($argument, $currentId, $newId);
-            } elseif ($argument instanceof Reference) {
-                if ($currentId === (string) $argument) {
-                    $arguments[$k] = new Reference($newId, $argument->getInvalidBehavior());
-                    $this->compiler->addLogMessage($this->formatter->formatUpdateReference($this, $this->sourceId, $currentId, $newId));
-                }
-            }
-        }
-
-        return $arguments;
+        return parent::processValue($value, $isRoot);
     }
 }

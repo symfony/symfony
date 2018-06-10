@@ -11,23 +11,51 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
+class XliffFileLoaderTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testLoad()
     {
         $loader = new XliffFileLoader();
         $resource = __DIR__.'/../fixtures/resources.xlf';
         $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+    }
+
+    public function testLoadWithInternalErrorsEnabled()
+    {
+        $internalErrors = libxml_use_internal_errors(true);
+
+        $this->assertSame(array(), libxml_get_errors());
+
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
+    }
+
+    public function testLoadWithExternalEntitiesDisabled()
+    {
+        $disableEntities = libxml_disable_entity_loader(true);
+
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        libxml_disable_entity_loader($disableEntities);
 
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
@@ -46,21 +74,26 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/resources.xlf', 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar', 'key' => '', 'test' => 'with'), $catalogue->all('domain1'));
-        $this->assertFalse($catalogue->has('extra', 'domain1'));
+        $this->assertEquals(array('foo' => 'bar', 'extra' => 'extra', 'key' => '', 'test' => 'with'), $catalogue->all('domain1'));
     }
 
     public function testEncoding()
     {
-        if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
-            $this->markTestSkipped('The iconv and mbstring extensions are not available.');
-        }
-
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
 
         $this->assertEquals(utf8_decode('föö'), $catalogue->get('bar', 'domain1'));
         $this->assertEquals(utf8_decode('bär'), $catalogue->get('foo', 'domain1'));
+        $this->assertEquals(array('notes' => array(array('content' => utf8_decode('bäz'))), 'id' => '1'), $catalogue->getMetadata('foo', 'domain1'));
+    }
+
+    public function testTargetAttributesAreStoredCorrectly()
+    {
+        $loader = new XliffFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/with-attributes.xlf', 'en', 'domain1');
+
+        $metadata = $catalogue->getMetadata('foo', 'domain1');
+        $this->assertEquals('translated', $metadata['target-attributes']['state']);
     }
 
     /**
@@ -109,5 +142,119 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new XliffFileLoader();
         $loader->load(__DIR__.'/../fixtures/withdoctype.xlf', 'en', 'domain1');
+    }
+
+    public function testParseEmptyFile()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/empty.xlf';
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+            $this->expectExceptionMessage(sprintf('Unable to load "%s":', $resource));
+        } else {
+            $this->setExpectedException('Symfony\Component\Translation\Exception\InvalidResourceException', sprintf('Unable to load "%s":', $resource));
+        }
+
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    public function testLoadNotes()
+    {
+        $loader = new XliffFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/withnote.xlf', 'en', 'domain1');
+
+        $this->assertEquals(array('notes' => array(array('priority' => 1, 'content' => 'foo')), 'id' => '1'), $catalogue->getMetadata('foo', 'domain1'));
+        // message without target
+        $this->assertEquals(array('notes' => array(array('content' => 'bar', 'from' => 'foo')), 'id' => '2'), $catalogue->getMetadata('extra', 'domain1'));
+        // message with empty target
+        $this->assertEquals(array('notes' => array(array('content' => 'baz'), array('priority' => 2, 'from' => 'bar', 'content' => 'qux')), 'id' => '123'), $catalogue->getMetadata('key', 'domain1'));
+    }
+
+    public function testLoadVersion2()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-2.0.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        $domains = $catalogue->all();
+        $this->assertCount(3, $domains['domain1']);
+        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+
+        // target attributes
+        $this->assertEquals(array('target-attributes' => array('order' => 1)), $catalogue->getMetadata('bar', 'domain1'));
+    }
+
+    public function testLoadVersion2WithNoteMeta()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-notes-meta.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        // test for "foo" metadata
+        $this->assertTrue($catalogue->defines('foo', 'domain1'));
+        $metadata = $catalogue->getMetadata('foo', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(3, $metadata['notes']);
+
+        $this->assertEquals('state', $metadata['notes'][0]['category']);
+        $this->assertEquals('new', $metadata['notes'][0]['content']);
+
+        $this->assertEquals('approved', $metadata['notes'][1]['category']);
+        $this->assertEquals('true', $metadata['notes'][1]['content']);
+
+        $this->assertEquals('section', $metadata['notes'][2]['category']);
+        $this->assertEquals('1', $metadata['notes'][2]['priority']);
+        $this->assertEquals('user login', $metadata['notes'][2]['content']);
+
+        // test for "baz" metadata
+        $this->assertTrue($catalogue->defines('baz', 'domain1'));
+        $metadata = $catalogue->getMetadata('baz', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(2, $metadata['notes']);
+
+        $this->assertEquals('x', $metadata['notes'][0]['id']);
+        $this->assertEquals('x_content', $metadata['notes'][0]['content']);
+
+        $this->assertEquals('target', $metadata['notes'][1]['appliesTo']);
+        $this->assertEquals('quality', $metadata['notes'][1]['category']);
+        $this->assertEquals('Fuzzy', $metadata['notes'][1]['content']);
+    }
+
+    public function testLoadVersion2WithMultiSegmentUnit()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-2.0-multi-segment-unit.xlf';
+        $catalog = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertSame('en', $catalog->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalog->getResources());
+        $this->assertFalse(libxml_get_last_error());
+
+        // test for "foo" metadata
+        $this->assertTrue($catalog->defines('foo', 'domain1'));
+        $metadata = $catalog->getMetadata('foo', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(1, $metadata['notes']);
+
+        $this->assertSame('processed', $metadata['notes'][0]['category']);
+        $this->assertSame('true', $metadata['notes'][0]['content']);
+
+        // test for "bar" metadata
+        $this->assertTrue($catalog->defines('bar', 'domain1'));
+        $metadata = $catalog->getMetadata('bar', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(1, $metadata['notes']);
+
+        $this->assertSame('processed', $metadata['notes'][0]['category']);
+        $this->assertSame('true', $metadata['notes'][0]['content']);
     }
 }

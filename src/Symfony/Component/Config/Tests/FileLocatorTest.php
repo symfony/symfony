@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 
-class FileLocatorTest extends \PHPUnit_Framework_TestCase
+class FileLocatorTest extends TestCase
 {
     /**
      * @dataProvider getIsAbsolutePathTests
@@ -86,7 +87,8 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Config\Exception\FileLocatorFileNotFoundException
+     * @expectedExceptionMessage The file "foobar.xml" does not exist
      */
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExists()
     {
@@ -96,12 +98,23 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Config\Exception\FileLocatorFileNotFoundException
      */
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath()
     {
         $loader = new FileLocator(array(__DIR__.'/Fixtures'));
 
         $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage An empty file name is not valid to be located.
+     */
+    public function testLocateEmpty()
+    {
+        $loader = new FileLocator(array(__DIR__.'/Fixtures'));
+
+        $loader->locate(null, __DIR__);
     }
 }

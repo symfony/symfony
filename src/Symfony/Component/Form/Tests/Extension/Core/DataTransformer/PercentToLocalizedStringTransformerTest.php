@@ -11,19 +11,17 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
+class PercentToLocalizedStringTransformerTest extends TestCase
 {
     protected function setUp()
     {
         parent::setUp();
 
-        // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
-
-        \Locale::setDefault('de_AT');
+        \Locale::setDefault('en');
     }
 
     public function testTransform()
@@ -53,8 +51,13 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals('16', $transformer->transform(15.9));
     }
 
-    public function testTransformWithPrecision()
+    public function testTransformWithScale()
     {
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_AT');
+
         $transformer = new PercentToLocalizedStringTransformer(2);
 
         $this->assertEquals('12,34', $transformer->transform(0.1234));
@@ -87,8 +90,13 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(200, $transformer->reverseTransform('200'));
     }
 
-    public function testReverseTransformWithPrecision()
+    public function testReverseTransformWithScale()
     {
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_AT');
+
         $transformer = new PercentToLocalizedStringTransformer(2);
 
         $this->assertEquals(0.1234, $transformer->reverseTransform('12,34'));
@@ -98,7 +106,7 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('foo');
     }
@@ -107,8 +115,191 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->reverseTransform(1);
+    }
+
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
+    {
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
+        \Locale::setDefault('fr');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        // completely valid format
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
+        // accept dots
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
+        // omit group separator
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
+    {
+        // Since we test against "de_DE", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
+        \Locale::setDefault('de_DE');
+
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        $transformer->reverseTransform('1.234.5');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
+    {
+        // Since we test against "de_DE", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
+        \Locale::setDefault('de_DE');
+
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        $transformer->reverseTransform('1234.5');
+    }
+
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed()
+    {
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('fr');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
+    {
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
+        \Locale::setDefault('bg');
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        // completely valid format
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
+        // accept commas
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
+        // omit group separator
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
+    {
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        $transformer->reverseTransform('1,234,5');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep()
+    {
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
+        $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
+
+        $transformer->reverseTransform('1234,5');
+    }
+
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
+    {
+        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
+        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
+        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
+
+        $transformer = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer')
+            ->setMethods(array('getNumberFormatter'))
+            ->setConstructorArgs(array(1, 'integer'))
+            ->getMock();
+        $transformer->expects($this->any())
+            ->method('getNumberFormatter')
+            ->willReturn($formatter);
+
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsLeadingExtraCharacters()
+    {
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('foo123');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo3"
+     */
+    public function testReverseTransformDisallowsCenteredExtraCharacters()
+    {
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('12foo3');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo8"
+     * @requires extension mbstring
+     */
+    public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
+    {
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('ru');
+
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform("12\xc2\xa0345,67foo8");
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo"
+     */
+    public function testReverseTransformDisallowsTrailingExtraCharacters()
+    {
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('123foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo"
+     * @requires extension mbstring
+     */
+    public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
+    {
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('ru');
+
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
 }

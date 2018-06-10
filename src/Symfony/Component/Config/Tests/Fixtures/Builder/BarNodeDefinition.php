@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Config\Tests\Definition\Builder;
+namespace Symfony\Component\Config\Tests\Fixtures\Builder;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Tests\Fixtures\BarNode;
 
 class BarNodeDefinition extends NodeDefinition
 {
     protected function createNode()
     {
+        return new BarNode($this->name);
     }
 }

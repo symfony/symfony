@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -26,14 +26,6 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
 {
     protected $container;
 
-    /**
-     * Constructor.
-     *
-     * @param TemplateNameParserInterface $parser    A TemplateNameParserInterface instance
-     * @param ContainerInterface          $container The DI container
-     * @param LoaderInterface             $loader    A loader instance
-     * @param GlobalVariables|null        $globals   A GlobalVariables instance or null
-     */
     public function __construct(TemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, GlobalVariables $globals = null)
     {
         $this->container = $container;
@@ -46,7 +38,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
     }
 
     /**
-     * @throws \InvalidArgumentException When the helper is not defined
+     * {@inheritdoc}
      */
     public function get($name)
     {
@@ -71,13 +63,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
     }
 
     /**
-     * Renders a view and returns a Response.
-     *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
+     * {@inheritdoc}
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

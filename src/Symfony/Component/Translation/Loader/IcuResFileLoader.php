@@ -36,7 +36,11 @@ class IcuResFileLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $rb = new \ResourceBundle($locale, $resource);
+        try {
+            $rb = new \ResourceBundle($locale, $resource);
+        } catch (\Exception $e) {
+            $rb = null;
+        }
 
         if (!$rb) {
             throw new InvalidResourceException(sprintf('Cannot load resource "%s"', $resource));
@@ -47,13 +51,16 @@ class IcuResFileLoader implements LoaderInterface
         $messages = $this->flatten($rb);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
-        $catalogue->addResource(new DirectoryResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\DirectoryResource')) {
+            $catalogue->addResource(new DirectoryResource($resource));
+        }
 
         return $catalogue;
     }
 
     /**
-     * Flattens an ResourceBundle
+     * Flattens an ResourceBundle.
      *
      * The scheme used is:
      *   key { key2 { key3 { "value" } } }
@@ -62,9 +69,9 @@ class IcuResFileLoader implements LoaderInterface
      *
      * This function takes an array by reference and will modify it
      *
-     * @param \ResourceBundle $rb       the ResourceBundle that will be flattened
-     * @param array           $messages used internally for recursive calls
-     * @param string          $path     current path being parsed, used internally for recursive calls
+     * @param \ResourceBundle $rb       The ResourceBundle that will be flattened
+     * @param array           $messages Used internally for recursive calls
+     * @param string          $path     Current path being parsed, used internally for recursive calls
      *
      * @return array the flattened ResourceBundle
      */

@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 class SvnRepository
 {
     /**
-     * @var string The path to the repository.
+     * @var string The path to the repository
      */
     private $path;
 
@@ -39,31 +39,31 @@ class SvnRepository
     /**
      * Downloads the ICU data for the given version.
      *
-     * @param string $url       The URL to download from.
-     * @param string $targetDir The directory in which to store the repository.
+     * @param string $url       The URL to download from
+     * @param string $targetDir The directory in which to store the repository
      *
-     * @return SvnRepository The directory where the data is stored.
+     * @return static
      *
-     * @throws RuntimeException If an error occurs during the download.
+     * @throws RuntimeException if an error occurs during the download
      */
     public static function download($url, $targetDir)
     {
         exec('which svn', $output, $result);
 
-        if ($result !== 0) {
+        if (0 !== $result) {
             throw new RuntimeException('The command "svn" is not installed.');
         }
 
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($targetDir . '/.svn')) {
+        if (!$filesystem->exists($targetDir.'/.svn')) {
             $filesystem->remove($targetDir);
             $filesystem->mkdir($targetDir);
 
-            exec('svn checkout ' . $url . ' ' . $targetDir, $output, $result);
+            exec('svn checkout '.$url.' '.$targetDir, $output, $result);
 
-            if ($result !== 0) {
-                throw new RuntimeException('The SVN checkout of ' . $url . 'failed.');
+            if (0 !== $result) {
+                throw new RuntimeException('The SVN checkout of '.$url.'failed.');
             }
         }
 
@@ -73,9 +73,9 @@ class SvnRepository
     /**
      * Reads the SVN repository at the given path.
      *
-     * @param string $path The path to the repository.
+     * @param string $path The path to the repository
      */
-    public function __construct($path)
+    public function __construct(string $path)
     {
         $this->path = $path;
     }
@@ -83,7 +83,7 @@ class SvnRepository
     /**
      * Returns the path to the repository.
      *
-     * @return string The path to the repository.
+     * @return string The path to the repository
      */
     public function getPath()
     {
@@ -93,7 +93,7 @@ class SvnRepository
     /**
      * Returns the URL of the repository.
      *
-     * @return string The URL of the repository.
+     * @return string The URL of the repository
      */
     public function getUrl()
     {
@@ -103,7 +103,7 @@ class SvnRepository
     /**
      * Returns the last commit of the repository.
      *
-     * @return SvnCommit The last commit.
+     * @return SvnCommit The last commit
      */
     public function getLastCommit()
     {
@@ -117,9 +117,9 @@ class SvnRepository
     /**
      * Returns information about the SVN repository.
      *
-     * @return \SimpleXMLElement The XML result from the "svn info" command.
+     * @return \SimpleXMLElement The XML result from the "svn info" command
      *
-     * @throws RuntimeException If the "svn info" command failed.
+     * @throws RuntimeException if the "svn info" command failed
      */
     private function getSvnInfo()
     {
@@ -128,7 +128,7 @@ class SvnRepository
 
             $svnInfo = simplexml_load_string(implode("\n", $output));
 
-            if ($result !== 0) {
+            if (0 !== $result) {
                 throw new RuntimeException('svn info failed');
             }
 
@@ -137,5 +137,4 @@ class SvnRepository
 
         return $this->svnInfo;
     }
-
 }

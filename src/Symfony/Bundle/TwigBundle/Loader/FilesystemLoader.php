@@ -11,33 +11,42 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
+use Twig\Error\LoaderError;
+use Twig\Loader\FilesystemLoader as BaseFilesystemLoader;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader
- * to work with the Symfony2 paths.
+ * to work with the Symfony paths and template references.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FilesystemLoader extends \Twig_Loader_Filesystem
+class FilesystemLoader extends BaseFilesystemLoader
 {
     protected $locator;
     protected $parser;
 
     /**
-     * Constructor.
-     *
-     * @param FileLocatorInterface        $locator A FileLocatorInterface instance
-     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
+     * @param string|null $rootPath The root path common to all relative paths (null for getcwd())
      */
-    public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
+    public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser, string $rootPath = null)
     {
-        parent::__construct(array());
+        parent::__construct(array(), $rootPath);
 
         $this->locator = $locator;
         $this->parser = $parser;
-        $this->cache = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The name parameter might also be a TemplateReferenceInterface.
+     */
+    public function exists($name)
+    {
+        return parent::exists((string) $name);
     }
 
     /**
@@ -48,12 +57,13 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      * Otherwise the template is located using the locator from the twig library.
      *
      * @param string|TemplateReferenceInterface $template The template
+     * @param bool                              $throw    When true, a LoaderError exception will be thrown if a template could not be found
      *
      * @return string The path to the template file
      *
-     * @throws \Twig_Error_Loader if the template could not be found
+     * @throws LoaderError if the template could not be found
      */
-    protected function findTemplate($template)
+    protected function findTemplate($template, $throw = true)
     {
         $logicalName = (string) $template;
 
@@ -62,27 +72,25 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         }
 
         $file = null;
-        $previous = null;
         try {
-            $file = parent::findTemplate($template);
-        } catch (\Twig_Error_Loader $e) {
-            $previous = $e;
+            $file = parent::findTemplate($logicalName);
+        } catch (LoaderError $e) {
+            $twigLoaderException = $e;
 
             // for BC
             try {
                 $template = $this->parser->parse($template);
-                try {
-                    $file = $this->locator->locate($template);
-                } catch (\InvalidArgumentException $e) {
-                    $previous = $e;
-                }
+                $file = $this->locator->locate($template);
             } catch (\Exception $e) {
-                $previous = $e;
             }
         }
 
         if (false === $file || null === $file) {
-            throw new \Twig_Error_Loader(sprintf('Unable to find template "%s".', $logicalName), -1, null, $previous);
+            if ($throw) {
+                throw $twigLoaderException;
+            }
+
+            return false;
         }
 
         return $this->cache[$logicalName] = $file;

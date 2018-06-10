@@ -1,6 +1,70 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * dropped support for using UTF-8 route patterns without using the `utf8` option
+ * dropped support for using UTF-8 route requirements without using the `utf8` option
+
+3.4.0
+-----
+
+ * Added `NoConfigurationException`.
+ * Added the possibility to define a prefix for all routes of a controller via @Route(name="prefix_")
+ * Added support for prioritized routing loaders.
+ * Add matched and default parameters to redirect responses
+ * Added support for a `controller` keyword for configuring route controllers in YAML and XML configurations.
+
+3.3.0
+-----
+
+  * [DEPRECATION] Class parameters have been deprecated and will be removed in 4.0.
+    * router.options.generator_class
+    * router.options.generator_base_class
+    * router.options.generator_dumper_class
+    * router.options.matcher_class
+    * router.options.matcher_base_class
+    * router.options.matcher_dumper_class
+    * router.options.matcher.cache_class
+    * router.options.generator.cache_class
+
+3.2.0
+-----
+
+ * Added support for `bool`, `int`, `float`, `string`, `list` and `map` defaults in XML configurations.
+ * Added support for UTF-8 requirements
+
+2.8.0
+-----
+
+ * allowed specifying a directory to recursively load all routing configuration files it contains
+ * Added ObjectRouteLoader and ServiceRouteLoader that allow routes to be loaded
+   by calling a method on an object/service.
+ * [DEPRECATION] Deprecated the hardcoded value for the `$referenceType` argument of the `UrlGeneratorInterface::generate` method.
+   Use the constants defined in the `UrlGeneratorInterface` instead.
+
+   Before:
+
+   ```php
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), true);
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), UrlGeneratorInterface::ABSOLUTE_URL);
+   ```
+
+2.5.0
+-----
+
+ * [DEPRECATION] The `ApacheMatcherDumper` and `ApacheUrlMatcher` were deprecated and
+   will be removed in Symfony 3.0, since the performance gains were minimal and
+   it's hard to replicate the behaviour of PHP implementation.
+
 2.3.0
 -----
 
@@ -16,17 +80,21 @@ CHANGELOG
 
    Before:
 
-   ```
+   ```yaml
    article_edit:
        pattern: /article/{id}
        requirements: { '_method': 'POST|PUT', '_scheme': 'https', 'id': '\d+' }
+   ```
 
+   ```xml
    <route id="article_edit" pattern="/article/{id}">
        <requirement key="_method">POST|PUT</requirement>
        <requirement key="_scheme">https</requirement>
        <requirement key="id">\d+</requirement>
    </route>
+   ```
 
+   ```php
    $route = new Route();
    $route->setPattern('/article/{id}');
    $route->setRequirement('_method', 'POST|PUT');
@@ -35,17 +103,21 @@ CHANGELOG
 
    After:
 
-   ```
+   ```yaml
    article_edit:
        path: /article/{id}
        methods: [POST, PUT]
        schemes: https
        requirements: { 'id': '\d+' }
+   ```
 
+   ```xml
    <route id="article_edit" pattern="/article/{id}" methods="POST PUT" schemes="https">
        <requirement key="id">\d+</requirement>
    </route>
+   ```
 
+   ```php
    $route = new Route();
    $route->setPath('/article/{id}');
    $route->setMethods(array('POST', 'PUT'));
@@ -59,7 +131,7 @@ CHANGELOG
 
    Before:
 
-   ```
+   ```php
    $rootCollection = new RouteCollection();
    $subCollection = new RouteCollection();
    $rootCollection->addCollection($subCollection);
@@ -68,7 +140,7 @@ CHANGELOG
 
    After:
 
-   ```
+   ```php
    $rootCollection = new RouteCollection();
    $subCollection = new RouteCollection();
    $subCollection->add('foo', new Route('/foo'));
@@ -78,8 +150,8 @@ CHANGELOG
    Also one must call `addCollection` from the bottom to the top hierarchy.
    So the correct sequence is the following (and not the reverse):
 
-   ```
-   $childCollection->->addCollection($grandchildCollection);
+   ```php
+   $childCollection->addCollection($grandchildCollection);
    $rootCollection->addCollection($childCollection);
    ```
 
@@ -105,7 +177,7 @@ CHANGELOG
    use-case instead.
    Before: `$parentCollection->addCollection($collection, '/prefix', array(...), array(...))`
    After:
-   ```
+   ```php
    $collection->addPrefix('/prefix', array(...), array(...));
    $parentCollection->addCollection($collection);
    ```
@@ -157,6 +229,6 @@ CHANGELOG
    been used anyway without creating inconsistencies
  * [BC BREAK] RouteCollection::remove also removes a route from parent
    collections (not only from its children)
- * added ConfigurableRequirementsInterface that allows to disable exceptions 
+ * added ConfigurableRequirementsInterface that allows to disable exceptions
    (and generate empty URLs instead) when generating a route with an invalid
    parameter value

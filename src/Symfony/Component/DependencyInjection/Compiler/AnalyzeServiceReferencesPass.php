@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,118 +25,127 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * retrieve the graph in other passes from the compiler.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class AnalyzeServiceReferencesPass implements RepeatablePassInterface
+class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
     private $graph;
-    private $container;
-    private $currentId;
     private $currentDefinition;
-    private $repeatedPass;
     private $onlyConstructorArguments;
+    private $lazy;
+    private $definitions;
+    private $aliases;
 
     /**
-     * Constructor.
-     *
-     * @param Boolean $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
+     * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
      */
-    public function __construct($onlyConstructorArguments = false)
+    public function __construct(bool $onlyConstructorArguments = false)
     {
-        $this->onlyConstructorArguments = (Boolean) $onlyConstructorArguments;
+        $this->onlyConstructorArguments = $onlyConstructorArguments;
+        $this->enableExpressionProcessing();
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        $this->repeatedPass = $repeatedPass;
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**
      * Processes a ContainerBuilder object to populate the service reference graph.
-     *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
-        $this->graph     = $container->getCompiler()->getServiceReferenceGraph();
+        $this->graph = $container->getCompiler()->getServiceReferenceGraph();
         $this->graph->clear();
+        $this->lazy = false;
+        $this->definitions = $container->getDefinitions();
+        $this->aliases = $container->getAliases();
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            if ($definition->isSynthetic() || $definition->isAbstract()) {
-                continue;
-            }
-
-            $this->currentId = $id;
-            $this->currentDefinition = $definition;
-            $this->processArguments($definition->getArguments());
-
-            if (!$this->onlyConstructorArguments) {
-                $this->processArguments($definition->getMethodCalls());
-                $this->processArguments($definition->getProperties());
-                if ($definition->getConfigurator()) {
-                    $this->processArguments(array($definition->getConfigurator()));
-                }
-            }
+        foreach ($this->aliases as $id => $alias) {
+            $targetId = $this->getDefinitionId((string) $alias);
+            $this->graph->connect($id, $alias, $targetId, null !== $targetId ? $this->container->getDefinition($targetId) : null, null);
         }
 
-        foreach ($container->getAliases() as $id => $alias) {
-            $this->graph->connect($id, $alias, (string) $alias, $this->getDefinition((string) $alias), null);
+        try {
+            parent::process($container);
+        } finally {
+            $this->aliases = $this->definitions = array();
         }
     }
 
-    /**
-     * Processes service definitions for arguments to find relationships for the service graph.
-     *
-     * @param array $arguments An array of Reference or Definition objects relating to service definitions
-     */
-    private function processArguments(array $arguments)
+    protected function processValue($value, $isRoot = false, bool $inExpression = false)
     {
-        foreach ($arguments as $argument) {
-            if (is_array($argument)) {
-                $this->processArguments($argument);
-            } elseif ($argument instanceof Reference) {
+        $lazy = $this->lazy;
+
+        if ($value instanceof ArgumentInterface) {
+            $this->lazy = true;
+            parent::processValue($value->getValues());
+            $this->lazy = $lazy;
+
+            return $value;
+        }
+        if ($value instanceof Reference) {
+            $targetId = $this->getDefinitionId((string) $value);
+            $targetDefinition = null !== $targetId ? $this->container->getDefinition($targetId) : null;
+
+            $this->graph->connect(
+                $this->currentId,
+                $this->currentDefinition,
+                $targetId,
+                $targetDefinition,
+                $value,
+                $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior()
+            );
+
+            if ($inExpression) {
                 $this->graph->connect(
-                    $this->currentId,
-                    $this->currentDefinition,
-                    $this->getDefinitionId((string) $argument),
-                    $this->getDefinition((string) $argument),
-                    $argument
-                );
-            } elseif ($argument instanceof Definition) {
-                $this->processArguments($argument->getArguments());
-                $this->processArguments($argument->getMethodCalls());
-                $this->processArguments($argument->getProperties());
+                    '.internal.reference_in_expression',
+                    null,
+                    $targetId,
+                    $targetDefinition,
+                    $value,
+                    $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                    true
+               );
             }
+
+            return $value;
         }
+        if (!$value instanceof Definition) {
+            return parent::processValue($value, $isRoot);
+        }
+        if ($isRoot) {
+            if ($value->isSynthetic() || $value->isAbstract()) {
+                return $value;
+            }
+            $this->currentDefinition = $value;
+        }
+        $this->lazy = false;
+
+        $this->processValue($value->getFactory());
+        $this->processValue($value->getArguments());
+
+        if (!$this->onlyConstructorArguments) {
+            $this->processValue($value->getProperties());
+            $this->processValue($value->getMethodCalls());
+            $this->processValue($value->getConfigurator());
+        }
+        $this->lazy = $lazy;
+
+        return $value;
     }
 
-    /**
-     * Returns a service definition given the full name or an alias.
-     *
-     * @param string $id A full id or alias for a service definition.
-     *
-     * @return Definition|null The definition related to the supplied id
-     */
-    private function getDefinition($id)
+    private function getDefinitionId(string $id): ?string
     {
-        $id = $this->getDefinitionId($id);
-
-        return null === $id ? null : $this->container->getDefinition($id);
-    }
-
-    private function getDefinitionId($id)
-    {
-        while ($this->container->hasAlias($id)) {
-            $id = (string) $this->container->getAlias($id);
+        while (isset($this->aliases[$id])) {
+            $id = (string) $this->aliases[$id];
         }
 
-        if (!$this->container->hasDefinition($id)) {
-            return null;
-        }
-
-        return $id;
+        return isset($this->definitions[$id]) ? $id : null;
     }
 }

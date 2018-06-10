@@ -43,13 +43,13 @@ class IcuVersion
      *     IcuVersion::compare('1', '10', '==')
      *     // => true
      *
-     * @param string       $version1  A version string.
-     * @param string       $version2  A version string to compare.
-     * @param string       $operator  The comparison operator.
-     * @param integer|null $precision The number of components to compare. Pass
-     *                                NULL to compare the versions unchanged.
+     * @param string   $version1  A version string
+     * @param string   $version2  A version string to compare
+     * @param string   $operator  The comparison operator
+     * @param int|null $precision The number of components to compare. Pass
+     *                            NULL to compare the versions unchanged.
      *
-     * @return Boolean Whether the comparison succeeded.
+     * @return bool Whether the comparison succeeded
      *
      * @see normalize()
      */
@@ -80,12 +80,12 @@ class IcuVersion
      *     IcuVersion::normalize('1.2.3.4', 2);
      *     // => '12.3'
      *
-     * @param string       $version   An ICU version string.
-     * @param integer|null $precision The number of components to include. Pass
-     *                                NULL to return the version unchanged.
+     * @param string   $version   An ICU version string
+     * @param int|null $precision The number of components to include. Pass
+     *                            NULL to return the version unchanged.
      *
-     * @return string|null The normalized ICU version or NULL if it couldn't be
-     *                     normalized.
+     * @return string|null the normalized ICU version or NULL if it couldn't be
+     *                     normalized
      */
     public static function normalize($version, $precision)
     {
@@ -101,5 +101,7 @@ class IcuVersion
     /**
      * Must not be instantiated.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 }

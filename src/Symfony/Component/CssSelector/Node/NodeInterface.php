@@ -14,31 +14,18 @@ namespace Symfony\Component\CssSelector\Node;
 /**
  * Interface for nodes.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 interface NodeInterface
 {
-    /**
-     * Returns node's name.
-     *
-     * @return string
-     */
-    public function getNodeName();
+    public function getNodeName(): string;
 
-    /**
-     * Returns node's specificity.
-     *
-     * @return Specificity
-     */
-    public function getSpecificity();
+    public function getSpecificity(): Specificity;
 
-    /**
-     * Returns node's string representation.
-     *
-     * @return string
-     */
-    public function __toString();
+    public function __toString(): string;
 }

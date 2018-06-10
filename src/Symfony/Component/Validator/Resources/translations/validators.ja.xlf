@@ -35,12 +35,12 @@
                 <target>無効な選択肢が含まれています。</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>フィールド{{ fields }}は無効です。</target>
+                <source>This field was not expected.</source>
+                <target>このフィールドは予期されていませんでした。</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>フィールド{{ fields }}は必須です。</target>
+                <source>This field is missing.</source>
+                <target>このフィールドは、欠落しています。</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -175,7 +175,7 @@
                 <target>画像の高さが小さすぎます({{ height }}ピクセル)。{{ min_height }}ピクセル以上にしてください。</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>ユーザーの現在のパスワードでなければなりません。</target>
             </trans-unit>
             <trans-unit id="48">
@@ -277,6 +277,46 @@
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>{{ compared_value_type }}としての{{ compared_value }}と等しくてはいけません。</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>画像のアスペクト比が大きすぎます({{ ratio }})。{{ max_ratio }}までにしてください。</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>画像のアスペクト比が小さすぎます({{ ratio }})。{{ min_ratio }}以上にしてください。</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>画像が正方形になっています({{ width }}x{{ height }}ピクセル)。正方形の画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>画像が横向きになっています({{ width }}x{{ height }}ピクセル)。横向きの画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>画像が縦向きになっています({{ width }}x{{ height }}ピクセル)。縦向きの画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>空のファイルは許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>ホストを解決できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>この値は予期される文字コード（{{ charset }}）と異なります。</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>有効なSWIFTコードではありません。</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>エラー</target>
             </trans-unit>
         </body>
     </file>

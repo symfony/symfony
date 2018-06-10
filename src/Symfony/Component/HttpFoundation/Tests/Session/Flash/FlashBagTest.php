@@ -11,24 +11,21 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Flash;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
- * FlashBagTest
+ * FlashBagTest.
  *
  * @author Drak <drak@zikula.org>
  */
-class FlashBagTest extends \PHPUnit_Framework_TestCase
+class FlashBagTest extends TestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface
+     * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
      */
     private $bag;
 
-    /**
-     * @var array
-     */
     protected $array = array();
 
     protected function setUp()
@@ -39,7 +36,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->bag->initialize($this->array);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->bag = null;
         parent::tearDown();
@@ -57,7 +54,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStorageKey()
     {
-        $this->assertEquals('_sf2_flashes', $this->bag->getStorageKey());
+        $this->assertEquals('_symfony_flashes', $this->bag->getStorageKey());
         $attributeBag = new FlashBag('test');
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }
@@ -91,7 +88,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->bag->set('error', 'Bar');
         $this->assertEquals(array(
             'notice' => array('Foo'),
-            'error' => array('Bar')), $this->bag->all()
+            'error' => array('Bar'), ), $this->bag->all()
         );
 
         $this->assertEquals(array(), $this->bag->all());
@@ -131,25 +128,5 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
             'error' => array('Bar'),
             ), $this->bag->peekAll()
         );
-    }
-
-    /**
-     * @covers Symfony\Component\HttpFoundation\Session\Flash\FlashBag::getIterator
-     */
-    public function testGetIterator()
-    {
-        $flashes = array('hello' => 'world', 'beep' => 'boop', 'notice' => 'nope');
-        foreach ($flashes as $key => $val) {
-            $this->bag->set($key, $val);
-        }
-
-        $i = 0;
-        foreach ($this->bag as $key => $val) {
-            $this->assertEquals(array($flashes[$key]), $val);
-            $i++;
-        }
-
-        $this->assertEquals(count($flashes), $i);
-        $this->assertEquals(0, count($this->bag->all()));
     }
 }

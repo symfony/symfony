@@ -1,7 +1,10 @@
-<comment>Usage:</comment>
- descriptor:command1
+<comment>Description:</comment>
+  command 1 description
 
-<comment>Aliases:</comment> <info>alias1, alias2</info>
+<comment>Usage:</comment>
+  descriptor:command1
+  alias1
+  alias2
 
 <comment>Help:</comment>
- command 1 help
+  command 1 help

@@ -11,23 +11,42 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
+/**
+ * @group time-sensitive
+ */
+class FragmentHandlerTest extends TestCase
 {
+    private $requestStack;
+
+    protected function setUp()
+    {
+        $this->requestStack = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $this->requestStack
+            ->expects($this->any())
+            ->method('getCurrentRequest')
+            ->will($this->returnValue(Request::create('/')))
+        ;
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
     public function testRenderWhenRendererDoesNotExist()
     {
-        $handler = new FragmentHandler();
+        $handler = new FragmentHandler($this->requestStack);
         $handler->render('/', 'foo');
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRenderWithUnknownRenderer()
     {
@@ -37,7 +56,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Error when rendering "http://localhost/" (Status code is 404).
      */
     public function testDeliverWithUnsuccessfulResponse()
@@ -56,7 +75,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function getHandler($returnValue, $arguments = array())
     {
-        $renderer = $this->getMock('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface');
+        $renderer = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface')->getMock();
         $renderer
             ->expects($this->any())
             ->method('getName')
@@ -72,9 +91,8 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
             call_user_func_array(array($e, 'with'), $arguments);
         }
 
-        $handler = new FragmentHandler();
+        $handler = new FragmentHandler($this->requestStack);
         $handler->addRenderer($renderer);
-        $handler->setRequest(Request::create('/'));
 
         return $handler;
     }

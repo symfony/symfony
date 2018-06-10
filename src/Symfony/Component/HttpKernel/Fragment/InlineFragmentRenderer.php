@@ -29,12 +29,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     private $kernel;
     private $dispatcher;
 
-    /**
-     * Constructor.
-     *
-     * @param HttpKernelInterface      $kernel     A HttpKernelInterface instance
-     * @param EventDispatcherInterface $dispatcher A EventDispatcherInterface instance
-     */
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
         $this->kernel = $kernel;
@@ -60,7 +54,16 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             // below instead)
             $attributes = $reference->attributes;
             $reference->attributes = array();
-            $uri = $this->generateFragmentUri($uri, $request, false);
+
+            // The request format and locale might have been overridden by the user
+            foreach (array('_format', '_locale') as $key) {
+                if (isset($attributes[$key])) {
+                    $reference->attributes[$key] = $attributes[$key];
+                }
+            }
+
+            $uri = $this->generateFragmentUri($uri, $request, false, false);
+
             $reference->attributes = array_merge($attributes, $reference->attributes);
         }
 
@@ -84,9 +87,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             }
 
             // let's clean up the output buffers that were created by the sub-request
-            while (ob_get_level() > $level) {
-                ob_get_clean();
-            }
+            Response::closeOutputBuffers($level, false);
 
             if (isset($options['alt'])) {
                 $alt = $options['alt'];
@@ -108,28 +109,29 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
-        // Override the arguments to emulate a sub-request.
-        // Sub-request object will point to localhost as client ip and real client ip
-        // will be included into trusted header for client ip
-        try {
-            $trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);
-            $currentXForwardedFor = $request->headers->get($trustedHeaderName, '');
+        if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
+            $currentXForwardedFor = $request->headers->get('X_FORWARDED_FOR', '');
 
-            $server['HTTP_'.$trustedHeaderName] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
-        } catch (\InvalidArgumentException $e) {
-            // Do nothing
+            $server['HTTP_X_FORWARDED_FOR'] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
         }
 
-        $server['REMOTE_ADDR'] = '127.0.0.1';
+        $trustedProxies = Request::getTrustedProxies();
+        $server['REMOTE_ADDR'] = $trustedProxies ? reset($trustedProxies) : '127.0.0.1';
 
-        $subRequest = $request::create($uri, 'get', array(), $cookies, array(), $server);
+        unset($server['HTTP_IF_MODIFIED_SINCE']);
+        unset($server['HTTP_IF_NONE_MATCH']);
+
+        $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
         if ($request->headers->has('Surrogate-Capability')) {
             $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
         }
 
-        if ($session = $request->getSession()) {
-            $subRequest->setSession($session);
+        static $setSession;
+
+        if (null === $setSession) {
+            $setSession = \Closure::bind(function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
         }
+        $setSession($subRequest, $request);
 
         return $subRequest;
     }

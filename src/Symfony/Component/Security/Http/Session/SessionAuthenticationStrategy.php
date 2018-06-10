@@ -26,19 +26,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
-    const NONE         = 'none';
-    const MIGRATE      = 'migrate';
-    const INVALIDATE   = 'invalidate';
+    const NONE = 'none';
+    const MIGRATE = 'migrate';
+    const INVALIDATE = 'invalidate';
 
     private $strategy;
 
-    public function __construct($strategy)
+    public function __construct(string $strategy)
     {
         $this->strategy = $strategy;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
@@ -47,7 +47,9 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
                 return;
 
             case self::MIGRATE:
-                $request->getSession()->migrate();
+                // Note: this logic is duplicated in several authentication listeners
+                // until Symfony 5.0 due to a security fix with BC compat
+                $request->getSession()->migrate(true);
 
                 return;
 

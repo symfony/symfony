@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
+class HttpCacheTestCase extends TestCase
 {
     protected $kernel;
     protected $cache;
@@ -29,12 +30,13 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
     protected $catch;
     protected $esi;
 
+    /**
+     * @var Store
+     */
+    protected $store;
+
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->kernel = null;
 
         $this->cache = null;
@@ -53,6 +55,9 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        if ($this->cache) {
+            $this->cache->getStore()->cleanup();
+        }
         $this->kernel = null;
         $this->cache = null;
         $this->caches = null;
@@ -107,7 +112,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->kernel->isCatchingExceptions());
     }
 
-    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false)
+    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false, $headers = array())
     {
         if (null === $this->kernel) {
             throw new \LogicException('You must call setNextResponse() before calling request().');
@@ -122,6 +127,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);
         $this->request = Request::create($uri, $method, array(), $cookies, array(), $server);
+        $this->request->headers->add($headers);
 
         $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
 

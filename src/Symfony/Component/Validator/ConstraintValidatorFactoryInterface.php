@@ -11,19 +11,15 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Constraint;
-
 /**
  * Specifies an object able to return the correct ConstraintValidatorInterface
- * instance given a Constrain object.
+ * instance given a Constraint object.
  */
 interface ConstraintValidatorFactoryInterface
 {
     /**
      * Given a Constraint, this returns the ConstraintValidatorInterface
      * object that should be used to verify its validity.
-     *
-     * @param Constraint $constraint The source constraint
      *
      * @return ConstraintValidatorInterface
      */

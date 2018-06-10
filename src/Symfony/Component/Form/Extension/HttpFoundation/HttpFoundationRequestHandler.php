@@ -12,8 +12,11 @@
 namespace Symfony\Component\Form\Extension\HttpFoundation;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\Form\Util\ServerParams;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,6 +27,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
+    private $serverParams;
+
+    public function __construct(ServerParams $serverParams = null)
+    {
+        $this->serverParams = $serverParams ?: new ServerParams();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -40,7 +50,9 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        if ('GET' === $method) {
+        // For request methods that must not have a request body we fetch data
+        // from the query string. Otherwise we look for data in the request body.
+        if ('GET' === $method || 'HEAD' === $method || 'TRACE' === $method) {
             if ('' === $name) {
                 $data = $request->query->all();
             } else {
@@ -53,13 +65,32 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $data = $request->query->get($name);
             }
         } else {
+            // Mark the form with an error if the uploaded size was too large
+            // This is done here and not in FormValidator because $_POST is
+            // empty when that error occurs. Hence the form is never submitted.
+            if ($this->serverParams->hasPostMaxSizeBeenExceeded()) {
+                // Submit the form, but don't clear the default values
+                $form->submit(null, false);
+
+                $form->addError(new FormError(
+                    call_user_func($form->getConfig()->getOption('upload_max_size_message')),
+                    null,
+                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
+                ));
+
+                return;
+            }
+
             if ('' === $name) {
                 $params = $request->request->all();
                 $files = $request->files->all();
-            } else {
+            } elseif ($request->request->has($name) || $request->files->has($name)) {
                 $default = $form->getConfig()->getCompound() ? array() : null;
                 $params = $request->request->get($name, $default);
                 $files = $request->files->get($name, $default);
+            } else {
+                // Don't submit the form if it is not present in the request
+                return;
             }
 
             if (is_array($params) && is_array($files)) {
@@ -75,5 +106,13 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $form->submit($data, 'PATCH' !== $method);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isFileUpload($data)
+    {
+        return $data instanceof File;
     }
 }

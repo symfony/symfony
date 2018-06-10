@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
-use Symfony\Component\Validator\Tests\Constraints\AbstractComparisonValidatorTestCase;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
@@ -25,33 +24,55 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return new NotEqualToValidator();
     }
 
-    protected function createConstraint(array $options)
+    protected function createConstraint(array $options = null)
     {
         return new NotEqualTo($options);
     }
 
+    protected function getErrorCode()
+    {
+        return NotEqualTo::IS_EQUAL_ERROR;
+    }
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideValidComparisons()
     {
         return array(
             array(1, 2),
             array('22', '333'),
-            array(new \DateTime('2001-01-01'), new \DateTime('2000-01-01'))
+            array(new \DateTime('2001-01-01'), new \DateTime('2000-01-01')),
+            array(new \DateTime('2001-01-01'), '2000-01-01'),
+            array(new \DateTime('2001-01-01 UTC'), '2000-01-01 UTC'),
+            array(new ComparisonTest_Class(6), new ComparisonTest_Class(5)),
+            array(null, 1),
         );
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     */
+    public function provideValidComparisonsToPropertyPath()
+    {
+        return array(
+            array(0),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function provideInvalidComparisons()
     {
         return array(
-            array(3, 3, '3', 'integer'),
-            array('2', 2, '2', 'integer'),
-            array('a', 'a', "'a'", 'string'),
-            array(new \DateTime('2000-01-01'), new \DateTime('2000-01-01'), '2000-01-01 00:00:00', 'DateTime')
+            array(3, '3', 3, '3', 'integer'),
+            array('2', '"2"', 2, '2', 'integer'),
+            array('a', '"a"', 'a', '"a"', 'string'),
+            array(new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'),
+            array(new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'),
+            array(new \DateTime('2000-01-01 UTC'), 'Jan 1, 2000, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'),
+            array(new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
         );
     }
 }

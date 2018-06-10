@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\CssSelector\Tests\Parser;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\Parser;
 use Symfony\Component\CssSelector\Parser\Token;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends TestCase
 {
     /** @dataProvider getParserTestData */
     public function testParser($source, $representation)
@@ -47,7 +48,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -60,7 +61,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -72,7 +73,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
@@ -84,11 +85,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
         Parser::parseSeries($function->getArguments());
     }
 
@@ -133,6 +134,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             array('div#foobar', array('Hash[Element[div]#foobar]')),
             array('div:not(div.foo)', array('Negation[Element[div]:not(Class[Element[div].foo])]')),
             array('td ~ th', array('CombinedSelector[Element[td] ~ Element[th]]')),
+            array('.foo[data-bar][data-baz=0]', array("Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]")),
         );
     }
 
@@ -184,6 +186,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             array('foo:after', 'Element[foo]', 'after'),
             array('foo::selection', 'Element[foo]', 'selection'),
             array('lorem#ipsum ~ a#b.c[href]:empty::selection', 'CombinedSelector[Hash[Element[lorem]#ipsum] ~ Pseudo[Attribute[Class[Hash[Element[a]#b].c][href]]:empty]]', 'selection'),
+            array('video::-webkit-media-controls', 'Element[video]', '-webkit-media-controls'),
         );
     }
 

@@ -111,5 +111,4 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $this->assertEquals(__FILE__, $field->getValue());
     }
-
 }

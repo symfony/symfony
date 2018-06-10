@@ -27,33 +27,33 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
 class RuntimeInstantiator implements InstantiatorInterface
 {
     /**
-     * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
+     * @var LazyLoadingValueHolderFactory
      */
     private $factory;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $config = new Configuration();
-
         $config->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
 
-        $this->factory = new LazyLoadingValueHolderFactory($config);
+        if (method_exists('ProxyManager\Version', 'getVersion')) {
+            $this->factory = new LazyLoadingValueHolderFactoryV2($config);
+        } else {
+            $this->factory = new LazyLoadingValueHolderFactoryV1($config);
+        }
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
     {
         return $this->factory->createProxy(
             $definition->getClass(),
             function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
-                $proxy->setProxyInitializer(null);
-
                 $wrappedInstance = call_user_func($realInstantiator);
+
+                $proxy->setProxyInitializer(null);
 
                 return true;
             }

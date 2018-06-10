@@ -1,0 +1,225 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as helper %}
+
+{% block toolbar %}
+    {% if collector.messages|length %}
+        {% set icon %}
+            {{ include('@WebProfiler/Icon/translation.svg') }}
+            {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
+            {% set error_count = collector.countMissings + collector.countFallbacks %}
+            <span class="sf-toolbar-value">{{ error_count ?: collector.countDefines }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Locale</b>
+                <span class="sf-toolbar-status">
+                    {{ collector.locale|default('-') }}
+                </span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Missing messages</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countMissings ? 'red' }}">
+                    {{ collector.countMissings }}
+                </span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Fallback messages</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countFallbacks ? 'yellow' }}">
+                    {{ collector.countFallbacks }}
+                </span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Defined messages</b>
+                <span class="sf-toolbar-status">{{ collector.countDefines }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label label-status-{{ collector.countMissings ? 'error' : collector.countFallbacks ? 'warning' }} {{ collector.messages is empty ? 'disabled' }}">
+        <span class="icon">{{ include('@WebProfiler/Icon/translation.svg') }}</span>
+        <strong>Translation</strong>
+        {% if collector.countMissings or collector.countFallbacks %}
+            {% set error_count = collector.countMissings + collector.countFallbacks %}
+            <span class="count">
+                <span>{{ error_count }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {% if collector.messages is empty %}
+        <h2>Translations</h2>
+        <div class="empty">
+            <p>No translations have been called.</p>
+        </div>
+    {% else %}
+        {{ block('panelContent') }}
+    {% endif %}
+{% endblock %}
+
+{% block panelContent %}
+
+    <h2>Translation</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.countDefines }}</span>
+            <span class="label">Defined messages</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.countFallbacks }}</span>
+            <span class="label">Fallback messages</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.countMissings }}</span>
+            <span class="label">Missing messages</span>
+        </div>
+
+        <div class="metric-divider"></div>
+
+        <div class="metric">
+            <span class="value">{{ collector.locale|default('-') }}</span>
+            <span class="label">Locale</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
+            <span class="label">Fallback locale{{ collector.fallbackLocales|length != 1 ? 's' }}</span>
+        </div>
+    </div>
+
+    <h2>Messages</h2>
+
+    {% block messages %}
+
+    {# sort translation messages in groups #}
+    {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
+    {% for message in collector.messages %}
+        {% if message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_DEFINED') %}
+            {% set messages_defined = messages_defined|merge([message]) %}
+        {% elseif message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_MISSING') %}
+            {% set messages_missing = messages_missing|merge([message]) %}
+        {% elseif message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK') %}
+            {% set messages_fallback = messages_fallback|merge([message]) %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="sf-tabs">
+        <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
+            <h3 class="tab-title">Defined <span class="badge">{{ collector.countDefines }}</span></h3>
+
+            <div class="tab-content">
+                <p class="help">
+                    These messages are correctly translated into the given locale.
+                </p>
+
+                {% if messages_defined is empty %}
+                    <div class="empty">
+                        <p>None of the used translation messages are defined for the given locale.</p>
+                    </div>
+                {% else %}
+                    {% block defined_messages %}
+                        {{ helper.render_table(messages_defined) }}
+                    {% endblock %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Fallback <span class="badge {{ collector.countFallbacks ? 'status-warning' }}">{{ collector.countFallbacks }}</span></h3>
+
+            <div class="tab-content">
+                <p class="help">
+                    These messages are not available for the given locale
+                    but Symfony found them in the fallback locale catalog.
+                </p>
+
+                {% if messages_fallback is empty %}
+                    <div class="empty">
+                        <p>No fallback translation messages were used.</p>
+                    </div>
+                {% else %}
+                    {% block fallback_messages %}
+                        {{ helper.render_table(messages_fallback) }}
+                    {% endblock %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ collector.countMissings > 0 ? 'active' }}">
+            <h3 class="tab-title">Missing <span class="badge {{ collector.countMissings ? 'status-error' }}">{{ collector.countMissings }}</span></h3>
+
+            <div class="tab-content">
+                <p class="help">
+                    These messages are not available for the given locale and cannot
+                    be found in the fallback locales. Add them to the translation
+                    catalogue to avoid Symfony outputting untranslated contents.
+                </p>
+
+                {% if messages_missing is empty %}
+                    <div class="empty">
+                        <p>There are no messages of this category.</p>
+                    </div>
+                {% else %}
+                    {% block missing_messages %}
+                        {{ helper.render_table(messages_missing) }}
+                    {% endblock %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% endblock messages %}
+
+{% endblock %}
+
+{% macro render_table(messages) %}
+    <table>
+        <thead>
+            <tr>
+                <th>Locale</th>
+                <th>Domain</th>
+                <th>Times used</th>
+                <th>Message ID</th>
+                <th>Message Preview</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for message in messages %}
+            <tr>
+                <td class="font-normal text-small nowrap">{{ message.locale }}</td>
+                <td class="font-normal text-small text-bold nowrap">{{ message.domain }}</td>
+                <td class="font-normal text-small nowrap">{{ message.count }}</td>
+                <td>
+                    <span class="nowrap">{{ message.id }}</span>
+
+                    {% if message.transChoiceNumber is not null %}
+                        <small class="newline">(pluralization is used)</small>
+                    {% endif %}
+
+                    {% if message.parameters|length > 0 %}
+                        <button class="btn-link newline text-small sf-toggle" data-toggle-selector="#parameters-{{ loop.index }}" data-toggle-alt-content="Hide parameters">Show parameters</button>
+
+                        <div id="parameters-{{ loop.index }}" class="hidden">
+                            {% for parameters in message.parameters %}
+                                {{ profiler_dump(parameters, maxDepth=1) }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="prewrap">{{ message.translation }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

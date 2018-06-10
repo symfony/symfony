@@ -1,0 +1,32 @@
+framework:
+    secret: test
+    router: { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
+    validation: { enabled: true, enable_annotations: true }
+    csrf_protection: true
+    form: true
+    test: ~
+    default_locale: en
+    session:
+        storage_id:     session.storage.mock_file
+    profiler: { only_exceptions: false }
+
+services:
+    logger: { class: Psr\Log\NullLogger }
+
+security:
+    firewalls:
+        secure:
+            pattern: ^/secure/
+            http_basic: { realm: "Secure Gateway API" }
+            entry_point: firewall_entry_point.entry_point.stub
+        default:
+            anonymous: ~
+    access_control:
+        - { path: ^/secure/, roles: ROLE_SECURE }
+    providers:
+        in_memory:
+            memory:
+                users:
+                    john: { password: doe, roles: [ROLE_SECURE] }
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext

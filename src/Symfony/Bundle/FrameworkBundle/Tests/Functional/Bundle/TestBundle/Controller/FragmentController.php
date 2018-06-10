@@ -11,27 +11,38 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-class FragmentController extends ContainerAware
+class FragmentController implements ContainerAwareInterface
 {
-    public function indexAction()
-    {
-        $actions = $this->container->get('templating')->get('actions');
+    use ContainerAwareTrait;
 
-        return new Response($actions->render($actions->controller('TestBundle:Fragment:inlined', array(
-            'options' => array(
-                'bar' => new Bar(),
-                'eleven' => 11,
-            ),
-        ))));
+    public function indexAction(Request $request)
+    {
+        return $this->container->get('templating')->renderResponse('fragment.html.php', array('bar' => new Bar()));
     }
 
     public function inlinedAction($options, $_format)
     {
         return new Response($options['bar']->getBar().' '.$_format);
+    }
+
+    public function customFormatAction($_format)
+    {
+        return new Response($_format);
+    }
+
+    public function customLocaleAction(Request $request)
+    {
+        return new Response($request->getLocale());
+    }
+
+    public function forwardLocaleAction(Request $request)
+    {
+        return new Response($request->getLocale());
     }
 }
 

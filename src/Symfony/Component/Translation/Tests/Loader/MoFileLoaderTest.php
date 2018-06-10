@@ -11,18 +11,12 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\MoFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
+class MoFileLoaderTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testLoad()
     {
         $loader = new MoFileLoader();
@@ -63,5 +57,16 @@ class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../fixtures/empty.mo';
         $loader->load($resource, 'en', 'domain1');
+    }
+
+    public function testLoadEmptyTranslation()
+    {
+        $loader = new MoFileLoader();
+        $resource = __DIR__.'/../fixtures/empty-translation.mo';
+        $catalogue = $loader->load($resource, 'en', 'message');
+
+        $this->assertEquals(array(), $catalogue->all('message'));
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 }

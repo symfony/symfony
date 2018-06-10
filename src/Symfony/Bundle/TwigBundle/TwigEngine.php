@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
+use Twig\Environment;
+use Twig\Error\Error;
 
 /**
  * This engine renders Twig templates.
@@ -27,62 +29,28 @@ class TwigEngine extends BaseEngine implements EngineInterface
 {
     protected $locator;
 
-    /**
-     * Constructor.
-     *
-     * @param \Twig_Environment           $environment A \Twig_Environment instance
-     * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
-     * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
-     */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator)
+    public function __construct(Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator)
     {
         parent::__construct($environment, $parser);
 
         $this->locator = $locator;
     }
 
-    public function setDefaultEscapingStrategy($strategy)
-    {
-        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
-    }
-
-    public function guessDefaultEscapingStrategy($filename)
-    {
-        // remove .twig
-        $filename = substr($filename, 0, -5);
-
-        // get the format
-        $format = substr($filename, strrpos($filename, '.') + 1);
-
-        if ('js' === $format) {
-            return 'js';
-        }
-
-        return 'html';
-    }
-
     /**
-     * Renders a template.
-     *
-     * @param mixed $name       A template name
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @return string The evaluated template as a string
-     *
-     * @throws \InvalidArgumentException if the template does not exist
-     * @throws \RuntimeException         if the template cannot be rendered
-     * @throws \Twig_Error
+     * {@inheritdoc}
      */
     public function render($name, array $parameters = array())
     {
         try {
             return parent::render($name, $parameters);
-        } catch (\Twig_Error $e) {
-            if ($name instanceof TemplateReference) {
+        } catch (Error $e) {
+            if ($name instanceof TemplateReference && !method_exists($e, 'setSourceContext')) {
                 try {
-                    // try to get the real file name of the template where the error occurred
-                    $e->setTemplateFile(sprintf('%s', $this->locator->locate($this->parser->parse($e->getTemplateFile()))));
-                } catch (\Exception $ex) {
+                    // try to get the real name of the template where the error occurred
+                    $name = $e->getTemplateName();
+                    $path = (string) $this->locator->locate($this->parser->parse($name));
+                    $e->setTemplateName($path);
+                } catch (\Exception $e2) {
                 }
             }
 
@@ -91,13 +59,9 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * Renders a view and returns a Response.
+     * {@inheritdoc}
      *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
+     * @throws Error if something went wrong like a thrown exception while rendering the template
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

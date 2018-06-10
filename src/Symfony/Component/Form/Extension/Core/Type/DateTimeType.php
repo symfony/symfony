@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
@@ -25,27 +26,21 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeType extends AbstractType
 {
     const DEFAULT_DATE_FORMAT = \IntlDateFormatter::MEDIUM;
-
     const DEFAULT_TIME_FORMAT = \IntlDateFormatter::MEDIUM;
 
     /**
      * This is not quite the HTML5 format yet, because ICU lacks the
-     * capability of parsing and generating RFC 3339 dates, which
-     * are like the below pattern but with a timezone suffix. The
-     * timezone suffix is
-     *
-     *  * "Z" for UTC
-     *  * "(-|+)HH:mm" for other timezones (note the colon!)
+     * capability of parsing and generating RFC 3339 dates.
      *
      * For more information see:
      *
      * http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
-     * http://www.w3.org/TR/html-markup/input.datetime.html
+     * https://www.w3.org/TR/html5/sec-forms.html#local-date-and-time-state-typedatetimelocal
      * http://tools.ietf.org/html/rfc3339
      *
      * An ICU ticket was created:
@@ -55,7 +50,7 @@ class DateTimeType extends AbstractType
      * yet. To temporarily circumvent this issue, DateTimeToRfc3339Transformer
      * is used when the format matches this constant.
      */
-    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,
@@ -114,9 +109,13 @@ class DateTimeType extends AbstractType
                 'years',
                 'months',
                 'days',
-                'empty_value',
+                'placeholder',
+                'choice_translation_domain',
                 'required',
                 'translation_domain',
+                'html5',
+                'invalid_message',
+                'invalid_message_parameters',
             )));
 
             $timeOptions = array_intersect_key($options, array_flip(array(
@@ -125,9 +124,13 @@ class DateTimeType extends AbstractType
                 'seconds',
                 'with_minutes',
                 'with_seconds',
-                'empty_value',
+                'placeholder',
+                'choice_translation_domain',
                 'required',
                 'translation_domain',
+                'html5',
+                'invalid_message',
+                'invalid_message_parameters',
             )));
 
             if (null !== $options['date_widget']) {
@@ -153,12 +156,14 @@ class DateTimeType extends AbstractType
                         'time' => $timeParts,
                     )),
                 )))
-                ->add('date', 'date', $dateOptions)
-                ->add('time', 'time', $timeOptions)
+                ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
+                ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
             ;
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime_immutable' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
             ));
@@ -180,21 +185,22 @@ class DateTimeType extends AbstractType
     {
         $view->vars['widget'] = $options['widget'];
 
-        // Change the input to a HTML5 date input if
+        // Change the input to a HTML5 datetime input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
-        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
-            $view->vars['type'] = 'datetime';
+        //  * the html5 is set to true
+        if ($options['html5'] && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+            $view->vars['type'] = 'datetime-local';
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return 'single_text' !== $options['widget'];
         };
 
         // Defaults to the value of "widget"
@@ -208,32 +214,34 @@ class DateTimeType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'input'          => 'datetime',
+            'input' => 'datetime',
             'model_timezone' => null,
-            'view_timezone'  => null,
-            'format'         => self::HTML5_FORMAT,
-            'date_format'    => null,
-            'widget'         => null,
-            'date_widget'    => $dateWidget,
-            'time_widget'    => $timeWidget,
-            'with_minutes'   => true,
-            'with_seconds'   => false,
+            'view_timezone' => null,
+            'format' => self::HTML5_FORMAT,
+            'date_format' => null,
+            'widget' => null,
+            'date_widget' => $dateWidget,
+            'time_widget' => $timeWidget,
+            'with_minutes' => true,
+            'with_seconds' => false,
+            'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
+            'by_reference' => false,
             'error_bubbling' => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
-            'compound'       => $compound,
+            'data_class' => null,
+            'compound' => $compound,
         ));
 
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
-        $resolver->setOptional(array(
-            'empty_value',
+        $resolver->setDefined(array(
+            'placeholder',
+            'choice_translation_domain',
             'years',
             'months',
             'days',
@@ -242,39 +250,38 @@ class DateTimeType extends AbstractType
             'seconds',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input'       => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'date_widget' => array(
-                null, // inherit default from DateType
-                'single_text',
-                'text',
-                'choice',
-            ),
-            'time_widget' => array(
-                null, // inherit default from TimeType
-                'single_text',
-                'text',
-                'choice',
-            ),
-            // This option will overwrite "date_widget" and "time_widget" options
-            'widget'     => array(
-                null, // default, don't overwrite options
-                'single_text',
-                'text',
-                'choice',
-            ),
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'datetime_immutable',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('date_widget', array(
+            null, // inherit default from DateType
+            'single_text',
+            'text',
+            'choice',
+        ));
+        $resolver->setAllowedValues('time_widget', array(
+            null, // inherit default from TimeType
+            'single_text',
+            'text',
+            'choice',
+        ));
+        // This option will overwrite "date_widget" and "time_widget" options
+        $resolver->setAllowedValues('widget', array(
+            null, // default, don't overwrite options
+            'single_text',
+            'text',
+            'choice',
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'datetime';
     }

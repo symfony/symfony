@@ -11,17 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\Container;
 
-class ContainerAwareEventManagerTest extends \PHPUnit_Framework_TestCase
+class ContainerAwareEventManagerTest extends TestCase
 {
+    private $container;
+    private $evm;
+
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-
         $this->container = new Container();
         $this->evm = new ContainerAwareEventManager($this->container);
     }

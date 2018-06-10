@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
 
-class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
+class ValidatorBuilderTest extends TestCase
 {
     /**
      * @var ValidatorBuilderInterface
@@ -34,7 +35,7 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
-            $this->getMock('Symfony\Component\Validator\ObjectInitializerInterface')
+            $this->getMockBuilder('Symfony\Component\Validator\ObjectInitializerInterface')->getMock()
         ));
     }
 
@@ -75,10 +76,6 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableAnnotationMapping()
     {
-        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Annotations is required for this test');
-        }
-
         $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
     }
 
@@ -90,26 +87,31 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
     public function testSetMetadataCache()
     {
         $this->assertSame($this->builder, $this->builder->setMetadataCache(
-            $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface'))
+            $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock())
         );
     }
 
     public function testSetConstraintValidatorFactory()
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
-            $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface'))
+            $this->getMockBuilder('Symfony\Component\Validator\ConstraintValidatorFactoryInterface')->getMock())
         );
     }
 
     public function testSetTranslator()
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->getMock('Symfony\Component\Translation\TranslatorInterface'))
+            $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock())
         );
     }
 
     public function testSetTranslationDomain()
     {
         $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
+    }
+
+    public function testGetValidator()
+    {
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
     }
 }

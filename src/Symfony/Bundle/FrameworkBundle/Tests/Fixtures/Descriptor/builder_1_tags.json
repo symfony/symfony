@@ -1,0 +1,38 @@
+{
+    "tag1": [
+        {
+            "class": "Full\\Qualified\\Class2",
+            "public": false,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get",
+            "calls": [
+                "setMailer"
+            ]
+        }
+    ],
+    "tag2": [
+        {
+            "class": "Full\\Qualified\\Class2",
+            "public": false,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get",
+            "calls": [
+                "setMailer"
+            ]
+        }
+    ]
+}

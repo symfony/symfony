@@ -1,0 +1,3 @@
+
+[39;49m // [39;49mThis service is an alias for the service [32m.service_2[39m                                                                  
+

@@ -1,0 +1,121 @@
+{
+    "Version": "2.1.38.73",
+    "Names": {
+        "AUD": [
+            "$",
+            "Australian Dollar"
+        ],
+        "BAM": [
+            "BAM",
+            "Bosnia-Herzegovina Convertible Marka"
+        ],
+        "BBD": [
+            "BBD",
+            "Barbados Dollar"
+        ],
+        "BMD": [
+            "BMD",
+            "Bermuda Dollar"
+        ],
+        "BOB": [
+            "BOB",
+            "Boliviano"
+        ],
+        "BRL": [
+            "BRL",
+            "Brazilian Real"
+        ],
+        "CAD": [
+            "CAD",
+            "Canadian Dollar"
+        ],
+        "CNH": [
+            "CNH",
+            "CNH"
+        ],
+        "CNY": [
+            "CNY",
+            "Chinese Yuan"
+        ],
+        "EUR": [
+            "EUR",
+            "Euro"
+        ],
+        "GBP": [
+            "GBP",
+            "British Pound"
+        ],
+        "HKD": [
+            "HKD",
+            "Hong Kong Dollar"
+        ],
+        "ILS": [
+            "ILS",
+            "Israeli Shekel"
+        ],
+        "INR": [
+            "INR",
+            "Indian Rupee"
+        ],
+        "JPY": [
+            "JPY",
+            "Japanese Yen"
+        ],
+        "KRW": [
+            "KRW",
+            "South Korean Won"
+        ],
+        "MXN": [
+            "MXN",
+            "Mexican Peso"
+        ],
+        "NZD": [
+            "NZD",
+            "New Zealand Dollar"
+        ],
+        "QAR": [
+            "QAR",
+            "Qatari Riyal"
+        ],
+        "SCR": [
+            "Rs",
+            "Seychellois Rupee"
+        ],
+        "SRD": [
+            "SRD",
+            "Suriname Dollar"
+        ],
+        "TWD": [
+            "TWD",
+            "New Taiwan Dollar"
+        ],
+        "USD": [
+            "USD",
+            "US Dollar"
+        ],
+        "UYU": [
+            "UYU",
+            "Peso Uruguayo"
+        ],
+        "VND": [
+            "VND",
+            "Vietnamese Dong"
+        ],
+        "XAF": [
+            "XAF",
+            "Central African CFA Franc"
+        ],
+        "XCD": [
+            "XCD",
+            "East Caribbean Dollar"
+        ],
+        "XOF": [
+            "XOF",
+            "West African CFA Franc"
+        ],
+        "XPF": [
+            "CFP",
+            "CFP Franc"
+        ]
+    }
+}

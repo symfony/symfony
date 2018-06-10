@@ -11,16 +11,17 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
-use Symfony\Component\Validator\Constraints\Required;
-use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CollectionTest extends \PHPUnit_Framework_TestCase
+class CollectionTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
@@ -75,16 +76,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testAcceptOptionalConstraintAsOneElementArray()
     {
         $collection1 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => array(
+            'fields' => array(
+                'alternate_email' => array(
                     new Optional(new Email()),
                 ),
             ),
         ));
 
         $collection2 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => new Optional(new Email()),
+            'fields' => array(
+                'alternate_email' => new Optional(new Email()),
             ),
         ));
 
@@ -94,16 +95,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testAcceptRequiredConstraintAsOneElementArray()
     {
         $collection1 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => array(
+            'fields' => array(
+                'alternate_email' => array(
                     new Required(new Email()),
                 ),
             ),
         ));
 
         $collection2 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => new Required(new Email()),
+            'fields' => array(
+                'alternate_email' => new Required(new Email()),
             ),
         ));
 

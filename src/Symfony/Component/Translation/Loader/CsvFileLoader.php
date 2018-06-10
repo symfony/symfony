@@ -11,38 +11,24 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * CsvFileLoader loads translations from CSV files.
  *
  * @author Saša Stamenković <umpirsky@gmail.com>
- *
- * @api
  */
-class CsvFileLoader extends ArrayLoader implements LoaderInterface
+class CsvFileLoader extends FileLoader
 {
     private $delimiter = ';';
     private $enclosure = '"';
-    private $escape    = '\\';
+    private $escape = '\\';
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
-    public function load($resource, $locale, $domain = 'messages')
+    protected function loadResource($resource)
     {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
-
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
-
         $messages = array();
 
         try {
@@ -55,38 +41,25 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
         $file->setCsvControl($this->delimiter, $this->enclosure, $this->escape);
 
         foreach ($file as $data) {
-            if (substr($data[0], 0, 1) === '#') {
-                continue;
-            }
-
-            if (!isset($data[1])) {
-                continue;
-            }
-
-            if (count($data) == 2) {
+            if ('#' !== substr($data[0], 0, 1) && isset($data[1]) && 2 === count($data)) {
                 $messages[$data[0]] = $data[1];
-            } else {
-                 continue;
             }
         }
 
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
-
-        return $catalogue;
+        return $messages;
     }
 
     /**
      * Sets the delimiter, enclosure, and escape character for CSV.
      *
-     * @param string $delimiter delimiter character
-     * @param string $enclosure enclosure character
-     * @param string $escape    escape character
+     * @param string $delimiter Delimiter character
+     * @param string $enclosure Enclosure character
+     * @param string $escape    Escape character
      */
     public function setCsvControl($delimiter = ';', $enclosure = '"', $escape = '\\')
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
-        $this->escape    = $escape;
+        $this->escape = $escape;
     }
 }

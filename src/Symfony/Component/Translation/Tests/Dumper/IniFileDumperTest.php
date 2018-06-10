@@ -11,22 +11,19 @@
 
 namespace Symfony\Component\Translation\Tests\Dumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Dumper\IniFileDumper;
 
-class IniFileDumperTest extends \PHPUnit_Framework_TestCase
+class IniFileDumperTest extends TestCase
 {
-    public function testDump()
+    public function testFormatCatalogue()
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
 
-        $tempDir = sys_get_temp_dir();
         $dumper = new IniFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.ini'), file_get_contents($tempDir.'/messages.en.ini'));
-
-        unlink($tempDir.'/messages.en.ini');
+        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.ini', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

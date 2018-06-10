@@ -1,0 +1,103 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
+    {% set icon %}
+        {{ include('@WebProfiler/Icon/twig.svg') }}
+        <span class="sf-toolbar-value">{{ time }}</span>
+        <span class="sf-toolbar-label">ms</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Render Time</b>
+            <span>{{ time }} ms</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Template Calls</b>
+            <span class="sf-toolbar-status">{{ collector.templatecount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Block Calls</b>
+            <span class="sf-toolbar-status">{{ collector.blockcount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Macro Calls</b>
+            <span class="sf-toolbar-status">{{ collector.macrocount }}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+        <strong>Twig</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {% if collector.templatecount == 0 %}
+        <h2>Twig</h2>
+
+        <div class="empty">
+            <p>No Twig templates were rendered for this request.</p>
+        </div>
+    {% else %}
+        <h2>Twig Metrics</h2>
+
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ '%0.0f'|format(collector.time) }} <span class="unit">ms</span></span>
+                <span class="label">Render time</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">{{ collector.templatecount }}</span>
+                <span class="label">Template calls</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">{{ collector.blockcount }}</span>
+                <span class="label">Block calls</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">{{ collector.macrocount }}</span>
+                <span class="label">Macro calls</span>
+            </div>
+        </div>
+
+        <p class="help">
+            Render time includes sub-requests rendering time (if any).
+        </p>
+
+        <h2>Rendered Templates</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Template Name</th>
+                    <th scope="col">Render Count</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for template, count in collector.templates %}
+                <tr>
+                    {%- set file = collector.templatePaths[template]|default(false) -%}
+                    {%- set link = file ? file|file_link(1) : false -%}
+                    <td>{% if link %}<a href="{{ link }}" title="{{ file }}">{{ template }}</a>{% else %}{{ template }}{% endif %}</td>
+                    <td class="font-normal">{{ count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Rendering Call Graph</h2>
+
+        <div id="twig-dump">
+            {{ collector.htmlcallgraph }}
+        </div>
+    {% endif %}
+{% endblock %}

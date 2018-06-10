@@ -12,25 +12,28 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * SecurityExtension exposes security context features.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SecurityExtension extends \Twig_Extension
+class SecurityExtension extends AbstractExtension
 {
-    private $context;
+    private $securityChecker;
 
-    public function __construct(SecurityContextInterface $context = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
     {
-        $this->context = $context;
+        $this->securityChecker = $securityChecker;
     }
 
     public function isGranted($role, $object = null, $field = null)
     {
-        if (null === $this->context) {
+        if (null === $this->securityChecker) {
             return false;
         }
 
@@ -38,7 +41,11 @@ class SecurityExtension extends \Twig_Extension
             $object = new FieldVote($object, $field);
         }
 
-        return $this->context->isGranted($role, $object);
+        try {
+            return $this->securityChecker->isGranted($role, $object);
+        } catch (AuthenticationCredentialsNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
@@ -47,14 +54,12 @@ class SecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'is_granted' => new \Twig_Function_Method($this, 'isGranted'),
+            new TwigFunction('is_granted', array($this, 'isGranted')),
         );
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {

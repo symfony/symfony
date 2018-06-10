@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 /**
- * Defines the interface of encoders that will normalize data themselves
+ * Defines the interface of encoders that will normalize data themselves.
  *
  * Implementing this interface essentially just tells the Serializer that the
  * data should not be pre-normalized before being passed to this Encoder.

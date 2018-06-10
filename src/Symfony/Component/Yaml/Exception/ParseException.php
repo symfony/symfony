@@ -15,8 +15,6 @@ namespace Symfony\Component\Yaml\Exception;
  * Exception class thrown when an error occurs during parsing.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ParseException extends RuntimeException
 {
@@ -26,15 +24,13 @@ class ParseException extends RuntimeException
     private $rawMessage;
 
     /**
-     * Constructor.
-     *
-     * @param string    $message    The error message
-     * @param integer   $parsedLine The line where the error occurred
-     * @param integer   $snippet    The snippet of code near the problem
-     * @param string    $parsedFile The file name where the error occurred
-     * @param Exception $previous   The previous exception
+     * @param string          $message    The error message
+     * @param int             $parsedLine The line where the error occurred
+     * @param string|null     $snippet    The snippet of code near the problem
+     * @param string|null     $parsedFile The file name where the error occurred
+     * @param \Exception|null $previous   The previous exception
      */
-    public function __construct($message, $parsedLine = -1, $snippet = null, $parsedFile = null, Exception $previous = null)
+    public function __construct(string $message, int $parsedLine = -1, string $snippet = null, string $parsedFile = null, \Exception $previous = null)
     {
         $this->parsedFile = $parsedFile;
         $this->parsedLine = $parsedLine;
@@ -95,7 +91,7 @@ class ParseException extends RuntimeException
     /**
      * Gets the line where the error occurred.
      *
-     * @return integer The file line
+     * @return int The file line
      */
     public function getParsedLine()
     {
@@ -105,7 +101,7 @@ class ParseException extends RuntimeException
     /**
      * Sets the line where the error occurred.
      *
-     * @param integer $parsedLine The file line
+     * @param int $parsedLine The file line
      */
     public function setParsedLine($parsedLine)
     {
@@ -125,7 +121,7 @@ class ParseException extends RuntimeException
         }
 
         if (null !== $this->parsedFile) {
-            $this->message .= sprintf(' in %s', json_encode($this->parsedFile));
+            $this->message .= sprintf(' in %s', json_encode($this->parsedFile, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
 
         if ($this->parsedLine >= 0) {

@@ -11,36 +11,38 @@
 
 namespace Symfony\Component\Console\Tests\Descriptor;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractDescriptorTest extends TestCase
 {
     /** @dataProvider getDescribeInputArgumentTestData */
     public function testDescribeInputArgument(InputArgument $argument, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($this->getDescriptor()->describe($argument)));
+        $this->assertDescription($expectedDescription, $argument);
     }
 
     /** @dataProvider getDescribeInputOptionTestData */
     public function testDescribeInputOption(InputOption $option, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($this->getDescriptor()->describe($option)));
+        $this->assertDescription($expectedDescription, $option);
     }
 
     /** @dataProvider getDescribeInputDefinitionTestData */
     public function testDescribeInputDefinition(InputDefinition $definition, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($this->getDescriptor()->describe($definition)));
+        $this->assertDescription($expectedDescription, $definition);
     }
 
     /** @dataProvider getDescribeCommandTestData */
     public function testDescribeCommand(Command $command, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($this->getDescriptor()->describe($command)));
+        $this->assertDescription($expectedDescription, $command);
     }
 
     /** @dataProvider getDescribeApplicationTestData */
@@ -53,7 +55,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
             $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
         }
 
-        $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $this->getDescriptor()->describe($application))));
+        $this->assertDescription($expectedDescription, $application);
     }
 
     public function getDescribeInputArgumentTestData()
@@ -82,9 +84,10 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract protected function getDescriptor();
+
     abstract protected function getFormat();
 
-    private function getDescriptionTestData(array $objects)
+    protected function getDescriptionTestData(array $objects)
     {
         $data = array();
         foreach ($objects as $name => $object) {
@@ -93,5 +96,12 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         }
 
         return $data;
+    }
+
+    protected function assertDescription($expectedDescription, $describedObject, array $options = array())
+    {
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $this->getDescriptor()->describe($output, $describedObject, $options + array('raw_output' => true));
+        $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
     }
 }

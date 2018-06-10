@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 
-class PropertyAccessorBuilderTest extends \PHPUnit_Framework_TestCase
+class PropertyAccessorBuilderTest extends TestCase
 {
     /**
      * @var PropertyAccessorBuilder
@@ -49,7 +52,15 @@ class PropertyAccessorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPropertyAccessor()
     {
-        $this->assertInstanceOf('Symfony\Component\PropertyAccess\PropertyAccessor', $this->builder->getPropertyAccessor());
-        $this->assertInstanceOf('Symfony\Component\PropertyAccess\PropertyAccessor', $this->builder->enableMagicCall()->getPropertyAccessor());
+        $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
+        $this->assertInstanceOf(PropertyAccessor::class, $this->builder->enableMagicCall()->getPropertyAccessor());
+    }
+
+    public function testUseCache()
+    {
+        $cacheItemPool = new ArrayAdapter();
+        $this->builder->setCacheItemPool($cacheItemPool);
+        $this->assertEquals($cacheItemPool, $this->builder->getCacheItemPool());
+        $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
     }
 }

@@ -1,0 +1,25 @@
+
+Symfony\Component\Form\Tests\Console\Descriptor\FooType (foo)
+=============================================================
+
+ ---------------- --------------------%s 
+  Required         true               %s 
+ ---------------- --------------------%s 
+  Default          -                  %s 
+ ---------------- --------------------%s 
+  Allowed types    [                  %s 
+                     "string"         %s 
+                   ]                  %s 
+ ---------------- --------------------%s 
+  Allowed values   [                  %s 
+                     "bar",           %s 
+                     "baz"            %s 
+                   ]                  %s 
+ ---------------- --------------------%s 
+  Normalizer       Closure {          %s 
+                     parameters: 2    %s 
+                     file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php"  
+                     line: "%s to %s" %s 
+                   }                  %s 
+ ---------------- --------------------%s 
+

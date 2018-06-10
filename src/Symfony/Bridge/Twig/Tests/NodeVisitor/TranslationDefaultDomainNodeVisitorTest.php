@@ -11,9 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\Tests\TestCase;
+use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Node;
 
 class TranslationDefaultDomainNodeVisitorTest extends TestCase
 {
@@ -21,9 +24,9 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     private static $domain = 'domain';
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
-    public function testDefaultDomainAssignment(\Twig_Node $node)
+    public function testDefaultDomainAssignment(Node $node)
     {
-        $env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
@@ -47,9 +50,9 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     }
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
-    public function testNewModuleWithoutDefaultDomainTag(\Twig_Node $node)
+    public function testNewModuleWithoutDefaultDomainTag(Node $node)
     {
-        $env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
@@ -78,6 +81,13 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
             array(TwigNodeProvider::getTransFilter(self::$message)),
             array(TwigNodeProvider::getTransChoiceFilter(self::$message)),
             array(TwigNodeProvider::getTransTag(self::$message)),
+            // with named arguments
+            array(TwigNodeProvider::getTransFilter(self::$message, null, array(
+                'arguments' => new ArrayExpression(array(), 0),
+            ))),
+            array(TwigNodeProvider::getTransChoiceFilter(self::$message), null, array(
+                'arguments' => new ArrayExpression(array(), 0),
+            )),
         );
     }
 }

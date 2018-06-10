@@ -12,60 +12,93 @@
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
  *
  * This implementation resolves the _controller attribute from the short notation
- * to the fully-qualified form (from a:b:c to class:method).
+ * to the fully-qualified form (from a:b:c to class::method).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
     protected $parser;
-    protected $logger;
+    private $loading = false;
 
     /**
-     * Constructor.
-     *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver)
     {
         $this->parser = $parser;
-        $this->logger = $logger;
 
         parent::__construct($resolver);
     }
 
     /**
-     * Loads a resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
+     * {@inheritdoc}
      */
     public function load($resource, $type = null)
     {
-        $collection = parent::load($resource, $type);
+        if ($this->loading) {
+            // This can happen if a fatal error occurs in parent::load().
+            // Here is the scenario:
+            // - while routes are being loaded by parent::load() below, a fatal error
+            //   occurs (e.g. parse error in a controller while loading annotations);
+            // - PHP abruptly empties the stack trace, bypassing all catch/finally blocks;
+            //   it then calls the registered shutdown functions;
+            // - the ErrorHandler catches the fatal error and re-injects it for rendering
+            //   thanks to HttpKernel->terminateWithException() (that calls handleException());
+            // - at this stage, if we try to load the routes again, we must prevent
+            //   the fatal error from occurring a second time,
+            //   otherwise the PHP process would be killed immediately;
+            // - while rendering the exception page, the router can be required
+            //   (by e.g. the web profiler that needs to generate an URL);
+            // - this handles the case and prevents the second fatal error
+            //   by triggering an exception beforehand.
+
+            throw new FileLoaderLoadException($resource, null, null, null, $type);
+        }
+        $this->loading = true;
+
+        try {
+            $collection = parent::load($resource, $type);
+        } finally {
+            $this->loading = false;
+        }
 
         foreach ($collection->all() as $route) {
-            if ($controller = $route->getDefault('_controller')) {
+            if (!is_string($controller = $route->getDefault('_controller'))) {
+                continue;
+            }
+
+            if (false !== strpos($controller, '::')) {
+                continue;
+            }
+
+            if (2 === substr_count($controller, ':')) {
+                $deprecatedNotation = $controller;
+
                 try {
-                    $controller = $this->parser->parse($controller);
-                } catch (\Exception $e) {
+                    $controller = $this->parser->parse($controller, false);
+
+                    @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1. Use %s instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
+                } catch (\InvalidArgumentException $e) {
                     // unable to optimize unknown notation
                 }
-
-                $route->setDefault('_controller', $controller);
             }
+
+            if (1 === substr_count($controller, ':')) {
+                $controller = str_replace(':', '::', $controller);
+                @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1. Use %s instead.', $controller), E_USER_DEPRECATED);
+            }
+
+            $route->setDefault('_controller', $controller);
         }
 
         return $collection;

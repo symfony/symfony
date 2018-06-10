@@ -11,10 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
+use Symfony\Component\HttpKernel\RebootableInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -22,27 +29,41 @@ use Symfony\Component\Finder\Finder;
  *
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class CacheClearCommand extends ContainerAwareCommand
+class CacheClearCommand extends Command
 {
+    protected static $defaultName = 'cache:clear';
+
+    private $cacheClearer;
+    private $filesystem;
+
+    public function __construct(CacheClearerInterface $cacheClearer, Filesystem $filesystem = null)
+    {
+        parent::__construct();
+
+        $this->cacheClearer = $cacheClearer;
+        $this->filesystem = $filesystem ?: new Filesystem();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
             ->setDescription('Clears the cache')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>php %command.full_name% --env=dev</info>
-<info>php %command.full_name% --env=prod --no-debug</info>
+  <info>php %command.full_name% --env=dev</info>
+  <info>php %command.full_name% --env=prod --no-debug</info>
 EOF
             )
         ;
@@ -53,140 +74,134 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $oldCacheDir  = $realCacheDir.'_old';
-        $filesystem   = $this->getContainer()->get('filesystem');
+        $fs = $this->filesystem;
+        $io = new SymfonyStyle($input, $output);
+
+        $kernel = $this->getApplication()->getKernel();
+        $realCacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
+        // the old cache dir name must not be longer than the real one to avoid exceeding
+        // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
+        $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
+        $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+            throw new RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
-        if ($filesystem->exists($oldCacheDir)) {
-            $filesystem->remove($oldCacheDir);
+        $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $this->cacheClearer->clear($realCacheDir);
+
+        // The current event dispatcher is stale, let's not use it anymore
+        $this->getApplication()->setDispatcher(new EventDispatcher());
+
+        $containerFile = (new \ReflectionObject($kernel->getContainer()))->getFileName();
+        $containerDir = basename(dirname($containerFile));
+
+        // the warmup cache dir name must have the same length as the real one
+        // to avoid the many problems in serialized resources files
+        $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
+
+        if ($output->isVerbose() && $fs->exists($warmupDir)) {
+            $io->comment('Clearing outdated warmup directory...');
         }
+        $fs->remove($warmupDir);
 
-        $kernel = $this->getContainer()->get('kernel');
-        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
-
-        if ($input->getOption('no-warmup')) {
-            $filesystem->rename($realCacheDir, $oldCacheDir);
+        if ($_SERVER['REQUEST_TIME'] <= filemtime($containerFile) && filemtime($containerFile) <= time()) {
+            if ($output->isVerbose()) {
+                $io->comment('Cache is fresh.');
+            }
+            if (!$input->getOption('no-warmup') && !$input->getOption('no-optional-warmers')) {
+                if ($output->isVerbose()) {
+                    $io->comment('Warming up optional cache...');
+                }
+                $warmer = $kernel->getContainer()->get('cache_warmer');
+                // non optional warmers already ran during container compilation
+                $warmer->enableOnlyOptionalWarmers();
+                $warmer->warmUp($realCacheDir);
+            }
         } else {
-            // the warmup cache dir name must have the same length than the real one
-            // to avoid the many problems in serialized resources files
-            $warmupDir = substr($realCacheDir, 0, -1).'_';
+            $fs->mkdir($warmupDir);
 
-            if ($filesystem->exists($warmupDir)) {
-                $filesystem->remove($warmupDir);
+            if (!$input->getOption('no-warmup')) {
+                if ($output->isVerbose()) {
+                    $io->comment('Warming up cache...');
+                }
+                $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
             }
 
-            $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
+            if (!$fs->exists($warmupDir.'/'.$containerDir)) {
+                $fs->rename($realCacheDir.'/'.$containerDir, $warmupDir.'/'.$containerDir);
+                touch($warmupDir.'/'.$containerDir.'.legacy');
+            }
 
-            $filesystem->rename($realCacheDir, $oldCacheDir);
-            $filesystem->rename($warmupDir, $realCacheDir);
+            if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
+                foreach ($mounts as $mount) {
+                    $mount = array_slice(explode(' ', $mount), 1, -3);
+                    if (!\in_array(array_pop($mount), array('vboxsf', 'nfs'))) {
+                        continue;
+                    }
+                    $mount = implode(' ', $mount).'/';
+
+                    if (0 === strpos($realCacheDir, $mount)) {
+                        $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
+                        $oldCacheDir = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($oldCacheDir) {
+                $fs->rename($realCacheDir, $oldCacheDir);
+            } else {
+                $fs->remove($realCacheDir);
+            }
+            $fs->rename($warmupDir, $realCacheDir);
+
+            if ($output->isVerbose()) {
+                $io->comment('Removing old cache directory...');
+            }
+
+            try {
+                $fs->remove($oldCacheDir);
+            } catch (IOException $e) {
+                if ($output->isVerbose()) {
+                    $io->warning($e->getMessage());
+                }
+            }
         }
 
-        $filesystem->remove($oldCacheDir);
+        if ($output->isVerbose()) {
+            $io->comment('Finished');
+        }
+
+        $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 
-    /**
-     * @param string $warmupDir
-     * @param string $realCacheDir
-     * @param bool   $enableOptionalWarmers
-     */
-    protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
+    private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true)
     {
-        $this->getContainer()->get('filesystem')->remove($warmupDir);
-
         // create a temporary kernel
-        $realKernel = $this->getContainer()->get('kernel');
-        $realKernelClass = get_class($realKernel);
-        $namespace = '';
-        if (false !== $pos = strrpos($realKernelClass, '\\')) {
-            $namespace = substr($realKernelClass, 0, $pos);
-            $realKernelClass = substr($realKernelClass, $pos + 1);
+        $kernel = $this->getApplication()->getKernel();
+        if (!$kernel instanceof RebootableInterface) {
+            throw new \LogicException('Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is not supported.');
         }
-        $tempKernel = $this->getTempKernel($realKernel, $namespace, $realKernelClass, $warmupDir);
-        $tempKernel->boot();
+        $kernel->reboot($warmupDir);
 
         // warmup temporary dir
-        $warmer = $tempKernel->getContainer()->get('cache_warmer');
         if ($enableOptionalWarmers) {
-            $warmer->enableOptionalWarmers();
-        }
-        $warmer->warmUp($warmupDir);
-
-        // fix references to the Kernel in .meta files
-        foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
-            file_put_contents($file, preg_replace(
-                '/(C\:\d+\:)"'.get_class($tempKernel).'"/',
-                sprintf('$1"%s"', $realKernelClass),
-                file_get_contents($file)
-            ));
+            $warmer = $kernel->getContainer()->get('cache_warmer');
+            // non optional warmers already ran during container compilation
+            $warmer->enableOnlyOptionalWarmers();
+            $warmer->warmUp($warmupDir);
         }
 
         // fix references to cached files with the real cache directory name
+        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $replace = str_replace('\\', '/', $realCacheDir);
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($warmupDir, $realCacheDir, file_get_contents($file));
-            file_put_contents($file, $content);
+            $content = str_replace($search, $replace, file_get_contents($file), $count);
+            if ($count) {
+                file_put_contents($file, $content);
+            }
         }
-
-        // fix references to kernel/container related classes
-        $search  = $tempKernel->getName().ucfirst($tempKernel->getEnvironment());
-        $replace = $realKernel->getName().ucfirst($realKernel->getEnvironment());
-        foreach (Finder::create()->files()->name($search.'*')->in($warmupDir) as $file) {
-            $content = str_replace($search, $replace, file_get_contents($file));
-            file_put_contents(str_replace($search, $replace, $file), $content);
-            unlink($file);
-        }
-    }
-
-    /**
-     * @param KernelInterface $parent
-     * @param string          $namespace
-     * @param string          $parentClass
-     * @param string          $warmupDir
-     *
-     * @return KernelInterface
-     */
-    protected function getTempKernel(KernelInterface $parent, $namespace, $parentClass, $warmupDir)
-    {
-        $rootDir = $parent->getRootDir();
-        // the temp kernel class name must have the same length than the real one
-        // to avoid the many problems in serialized resources files
-        $class = substr($parentClass, 0, -1).'_';
-        // the temp kernel name must be changed too
-        $name = substr($parent->getName(), 0, -1).'_';
-        $code = <<<EOF
-<?php
-
-namespace $namespace
-{
-    class $class extends $parentClass
-    {
-        public function getCacheDir()
-        {
-            return '$warmupDir';
-        }
-
-        public function getName()
-        {
-            return '$name';
-        }
-
-        public function getRootDir()
-        {
-            return '$rootDir';
-        }
-    }
-}
-EOF;
-        $this->getContainer()->get('filesystem')->mkdir($warmupDir);
-        file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
-        require_once $file;
-        @unlink($file);
-        $class = "$namespace\\$class";
-
-        return new $class($parent->getEnvironment(), $parent->isDebug());
     }
 }

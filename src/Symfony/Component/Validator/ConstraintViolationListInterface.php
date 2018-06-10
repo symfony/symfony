@@ -15,69 +15,51 @@ namespace Symfony\Component\Validator;
  * A list of constraint violations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
 {
     /**
      * Adds a constraint violation to this list.
-     *
-     * @param ConstraintViolationInterface $violation The violation to add.
-     *
-     * @api
      */
     public function add(ConstraintViolationInterface $violation);
 
     /**
      * Merges an existing violation list into this list.
-     *
-     * @param ConstraintViolationListInterface $otherList The list to merge.
-     *
-     * @api
      */
-    public function addAll(ConstraintViolationListInterface $otherList);
+    public function addAll(self $otherList);
 
     /**
      * Returns the violation at a given offset.
      *
-     * @param  integer $offset The offset of the violation.
+     * @param int $offset The offset of the violation
      *
-     * @return ConstraintViolationInterface The violation.
+     * @return ConstraintViolationInterface The violation
      *
-     * @throws \OutOfBoundsException If the offset does not exist.
-     *
-     * @api
+     * @throws \OutOfBoundsException if the offset does not exist
      */
     public function get($offset);
 
     /**
      * Returns whether the given offset exists.
      *
-     * @param  integer $offset The violation offset.
+     * @param int $offset The violation offset
      *
-     * @return Boolean Whether the offset exists.
-     *
-     * @api
+     * @return bool Whether the offset exists
      */
     public function has($offset);
 
     /**
      * Sets a violation at a given offset.
      *
-     * @param integer                      $offset    The violation offset.
-     * @param ConstraintViolationInterface $violation The violation.
-     *
-     * @api
+     * @param int                          $offset    The violation offset
+     * @param ConstraintViolationInterface $violation The violation
      */
     public function set($offset, ConstraintViolationInterface $violation);
 
     /**
      * Removes a violation at a given offset.
      *
-     * @param integer $offset The offset to remove.
-     *
-     * @api
+     * @param int $offset The offset to remove
      */
     public function remove($offset);
 }

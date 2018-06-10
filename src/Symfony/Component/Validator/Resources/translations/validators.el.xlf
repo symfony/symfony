@@ -35,12 +35,12 @@
                 <target>Μια ή περισσότερες τιμές δεν είναι έγκυρες.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Τα πεδία {{ fields }} δεν ήταν αναμενόμενα.</target>
+                <source>This field was not expected.</source>
+                <target>Αυτό το πεδίο δεν ήταν αναμενόμενο.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Τα πεδία {{ fields }} απουσιάζουν.</target>
+                <source>This field is missing.</source>
+                <target>Λείπει αυτό το πεδίο.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Αυτή η τιμή δεν είναι έκγυρη.</target>
+                <target>Αυτή η τιμή δεν είναι έγκυρη.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
@@ -136,11 +136,11 @@
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
-                <target>Αυτό δεν είναι μια έκγυρη διεύθυνση IP.</target>
+                <target>Αυτό δεν είναι μια έγκυρη διεύθυνση IP.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έκγυρη γλώσσα.</target>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έγκυρη γλώσσα.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -148,7 +148,7 @@
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έκγυρη χώρα.</target>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έγκυρη χώρα.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -175,7 +175,7 @@
                 <target>Το ύψος της εικόνας είναι πολύ μικρό ({{ height }}px). Το ελάχιστο επιτρεπτό ύψος είναι {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Αυτή η τιμή θα έπρεπε να είναι ο τρέχων κωδικός.</target>
             </trans-unit>
             <trans-unit id="48">

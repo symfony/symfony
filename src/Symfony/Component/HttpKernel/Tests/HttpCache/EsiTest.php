@@ -11,33 +11,27 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EsiTest extends \PHPUnit_Framework_TestCase
+class EsiTest extends TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testHasSurrogateEsiCapability()
     {
         $esi = new Esi();
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        $this->assertTrue($esi->hasSurrogateEsiCapability($request));
+        $this->assertTrue($esi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'foobar');
-        $this->assertFalse($esi->hasSurrogateEsiCapability($request));
+        $this->assertFalse($esi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
-        $this->assertFalse($esi->hasSurrogateEsiCapability($request));
+        $this->assertFalse($esi->hasSurrogateCapability($request));
     }
 
     public function testAddSurrogateEsiCapability()
@@ -45,11 +39,11 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $esi = new Esi();
 
         $request = Request::create('/');
-        $esi->addSurrogateEsiCapability($request);
-        $this->assertEquals('symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $esi->addSurrogateCapability($request);
+        $this->assertEquals('symfony="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
 
-        $esi->addSurrogateEsiCapability($request);
-        $this->assertEquals('symfony2="ESI/1.0", symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $esi->addSurrogateCapability($request);
+        $this->assertEquals('symfony="ESI/1.0", symfony="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
     }
 
     public function testAddSurrogateControl()
@@ -71,10 +65,10 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
         $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
-        $this->assertTrue($esi->needsEsiParsing($response));
+        $this->assertTrue($esi->needsParsing($response));
 
         $response = new Response();
-        $this->assertFalse($esi->needsEsiParsing($response));
+        $this->assertFalse($esi->needsParsing($response));
     }
 
     public function testRenderIncludeTag()
@@ -99,6 +93,28 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->headers->has('x-body-eval'));
     }
 
+    public function testMultilineEsiRemoveTagsAreRemoved()
+    {
+        $esi = new Esi();
+
+        $request = Request::create('/');
+        $response = new Response('<esi:remove> <a href="http://www.example.com">www.example.com</a> </esi:remove> Keep this'."<esi:remove>\n <a>www.example.com</a> </esi:remove> And this");
+        $esi->process($request, $response);
+
+        $this->assertEquals(' Keep this And this', $response->getContent());
+    }
+
+    public function testCommentTagsAreRemoved()
+    {
+        $esi = new Esi();
+
+        $request = Request::create('/');
+        $response = new Response('<esi:comment text="some comment &gt;" /> Keep this');
+        $esi->process($request, $response);
+
+        $this->assertEquals(' Keep this', $response->getContent());
+    }
+
     public function testProcess()
     {
         $esi = new Esi();
@@ -107,18 +123,23 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:comment text="some comment" /><esi:include src="..." alt="alt" onerror="continue" />');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
         $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
+
+        $response = new Response('foo <esi:comment text="some comment" /><esi:include src="foo\'" alt="bar\'" onerror="continue" />');
+        $esi->process($request, $response);
+
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'foo\\\'\', \'bar\\\'\', true) ?>'."\n", $response->getContent());
 
         $response = new Response('foo <esi:include src="..." />');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
 
         $response = new Response('foo <esi:include src="..."></esi:include>');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
     }
 
     public function testProcessEscapesPhpTags()
@@ -126,14 +147,14 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $esi = new Esi();
 
         $request = Request::create('/');
-        $response = new Response('foo <?php die("foo"); ?><%= "lala" %>');
+        $response = new Response('<?php <? <% <script language=php>');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo "<?"; ?>php die("foo"); ?><?php echo "<%"; ?>= "lala" %>', $response->getContent());
+        $this->assertEquals('<?php echo "<?"; ?>php <?php echo "<?"; ?> <?php echo "<%"; ?> <?php echo "<s"; ?>cript language=php>', $response->getContent());
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testProcessWhenNoSrcInAnEsi()
     {
@@ -173,7 +194,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testHandleWhenResponseIsNot200()
     {
@@ -205,7 +226,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
     protected function getCache($request, $response)
     {
-        $cache = $this->getMock('Symfony\Component\HttpKernel\HttpCache\HttpCache', array('getRequest', 'handle'), array(), '', false);
+        $cache = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\HttpCache')->setMethods(array('getRequest', 'handle'))->disableOriginalConstructor()->getMock();
         $cache->expects($this->any())
               ->method('getRequest')
               ->will($this->returnValue($request))

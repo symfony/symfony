@@ -14,41 +14,27 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Currency;
 use Symfony\Component\Validator\Constraints\CurrencyValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
+class CurrencyValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        IntlTestHelper::requireIntl($this);
-
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new CurrencyValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new CurrencyValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Currency());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Currency());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -64,10 +50,23 @@ class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCurrencies($currency)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $this->validator->validate($currency, new Currency());
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getValidCurrencies
+     **/
+    public function testValidCurrenciesWithCountrySpecificLocale($currency)
+    {
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('en_GB');
 
         $this->validator->validate($currency, new Currency());
+
+        $this->assertNoViolation();
     }
 
     public function getValidCurrencies()
@@ -87,16 +86,15 @@ class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidCurrencies($currency)
     {
         $constraint = new Currency(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $currency,
-            ));
-
         $this->validator->validate($currency, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$currency.'"')
+            ->setCode(Currency::NO_SUCH_CURRENCY_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidCurrencies()

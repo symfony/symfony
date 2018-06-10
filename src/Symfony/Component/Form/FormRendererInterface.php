@@ -21,25 +21,27 @@ interface FormRendererInterface
     /**
      * Returns the engine used by this renderer.
      *
-     * @return FormRendererEngineInterface The renderer engine.
+     * @return FormRendererEngineInterface The renderer engine
      */
     public function getEngine();
 
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
      *
-     * @param FormView $view   The view to assign the theme(s) to.
-     * @param mixed             $themes The theme(s). The type of these themes
-     *                                  is open to the implementation.
+     * @param FormView $view             The view to assign the theme(s) to
+     * @param mixed    $themes           The theme(s). The type of these themes
+     *                                   is open to the implementation.
+     * @param bool     $useDefaultThemes If true, will use default themes specified
+     *                                   in the renderer
      */
-    public function setTheme(FormView $view, $themes);
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true);
 
     /**
      * Renders a named block of the form theme.
      *
-     * @param FormView $view      The view for which to render the block.
-     * @param string   $blockName The name of the block.
-     * @param array    $variables The variables to pass to the template.
+     * @param FormView $view      The view for which to render the block
+     * @param string   $blockName The name of the block
+     * @param array    $variables The variables to pass to the template
      *
      * @return string The HTML markup
      */
@@ -55,9 +57,9 @@ interface FormRendererInterface
      * If this method is called recursively, the block search is continued
      * where a block was found before.
      *
-     * @param FormView $view            The view for which to render the block.
-     * @param string   $blockNameSuffix The suffix of the block name.
-     * @param array    $variables       The variables to pass to the template.
+     * @param FormView $view            The view for which to render the block
+     * @param string   $blockNameSuffix The suffix of the block name
+     * @param array    $variables       The variables to pass to the template
      *
      * @return string The HTML markup
      */
@@ -73,20 +75,20 @@ interface FormRendererInterface
      * <input type="hidden" name="token" value="<?php $renderer->renderCsrfToken('rm_user_'.$user->getId()) ?>">
      * </code>
      *
-     * Check the token in your action using the same intention.
+     * Check the token in your action using the same token ID.
      *
      * <code>
-     * $csrfProvider = $this->get('form.csrf_provider');
+     * // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
      * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *     throw new \RuntimeException('CSRF attack detected.');
      * }
      * </code>
      *
-     * @param string $intention The intention of the protected action
+     * @param string $tokenId The ID of the CSRF token
      *
      * @return string A CSRF token
      */
-    public function renderCsrfToken($intention);
+    public function renderCsrfToken($tokenId);
 
     /**
      * Makes a technical name human readable.
@@ -95,9 +97,9 @@ interface FormRendererInterface
      * of the resulting string is capitalized, while all other letters are
      * turned to lowercase.
      *
-     * @param string $text The text to humanize.
+     * @param string $text The text to humanize
      *
-     * @return string The humanized text.
+     * @return string The humanized text
      */
     public function humanize($text);
 }

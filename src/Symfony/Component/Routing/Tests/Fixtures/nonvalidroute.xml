@@ -6,7 +6,6 @@
 
     <route id="blog_show" path="/blog/{slug}">
         <default key="_controller">MyBundle:Blog:show</default>
-        <requirement key="_method">GET</requirement>
         <option key="compiler_class">RouteCompiler</option>
         <foo key="bar">baz</foo>
     </route>

@@ -12,27 +12,23 @@
 namespace Symfony\Component\Security\Core\Role;
 
 /**
- * Role is a simple implementation of a RoleInterface where the role is a
- * string.
+ * Role is a simple implementation representing a role identified by a string.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Role implements RoleInterface
+class Role
 {
     private $role;
 
-    /**
-     * Constructor.
-     *
-     * @param string $role The role name
-     */
-    public function __construct($role)
+    public function __construct(string $role)
     {
-        $this->role = (string) $role;
+        $this->role = $role;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a string representation of the role.
+     *
+     * @return string
      */
     public function getRole()
     {

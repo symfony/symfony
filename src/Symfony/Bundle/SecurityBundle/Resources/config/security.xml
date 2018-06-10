@@ -84,6 +84,10 @@
             <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
 
+        <service id="security.authentication.session_strategy_noop" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy" public="false">
+            <argument>none</argument>
+        </service>
+
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">
             <argument type="collection" />
         </service>

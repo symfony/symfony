@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Psr\Log\LoggerInterface;
@@ -23,6 +24,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * DigestAuthenticationListener implements Digest HTTP authentication.
@@ -36,6 +38,7 @@ class DigestAuthenticationListener implements ListenerInterface
     private $providerKey;
     private $authenticationEntryPoint;
     private $logger;
+    private $sessionStrategy;
 
     public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -117,9 +120,20 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->info('Digest authentication successful.', array('username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()));
         }
 
-        $this->migrateSession($request);
+        $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey);
+        $this->migrateSession($request, $token);
 
-        $this->tokenStorage->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
+        $this->tokenStorage->setToken($token);
+    }
+
+    /**
+     * Call this method if your authentication token is stored to a session.
+     *
+     * @final since version 2.8
+     */
+    public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
+    {
+        $this->sessionStrategy = $sessionStrategy;
     }
 
     private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
@@ -136,16 +150,13 @@ class DigestAuthenticationListener implements ListenerInterface
         $event->setResponse($this->authenticationEntryPoint->start($request, $authException));
     }
 
-    private function migrateSession(Request $request)
+    private function migrateSession(Request $request, TokenInterface $token)
     {
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
 
-        // Destroying the old session is broken in php 5.4.0 - 5.4.10
-        // See https://bugs.php.net/63379
-        $destroy = \PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411;
-        $request->getSession()->migrate($destroy);
+        $this->sessionStrategy->onAuthentication($request, $token);
     }
 }
 

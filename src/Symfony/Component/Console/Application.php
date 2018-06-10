@@ -536,7 +536,7 @@ class Application
      */
     public function getNamespaces()
     {
-        if ($this->namespaces !== null) {
+        if (null !== $this->namespaces) {
             return $this->namespaces;
         }
 

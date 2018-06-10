@@ -65,7 +65,6 @@ EOF
         return $this->createDefinition();
     }
 
-
     public function setNamespace(string $namespace): void
     {
         $this->namespace = $namespace;

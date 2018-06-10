@@ -190,7 +190,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     /**
      * Call this method if your authentication token is stored to a session.
      *
-     * @final since version 3.4
+     * @final
      */
     public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
     {

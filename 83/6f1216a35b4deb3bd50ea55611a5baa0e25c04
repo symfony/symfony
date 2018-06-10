@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by rmsint at 2018-06-06T14:52:08Z
+
+I ran into the `preg_match(): Compilation failed: ... unmatched parentheses ...` error and tried this fix. I could narrow it down to a utf8 route:
+
+```php
+/**
+ * @Route(
+ *     "/file/{filename}",
+ *     name = "file_download",
+ *     requirements = { "filename": ".+" },
+ *     options = { "utf8": true }
+ * )
+ * @Method("GET")
+ */
+public function download($filename, LocalFileSystem $localFileSystem)
+{
+  // ..
+}
+```
+Similar as https://symfony.com/blog/new-in-symfony-3-2-unicode-routing-support
+
+As soon as I remove the `options = { "utf8": true }` from the route my tests pass again and the route matcher does not throw the `preg_match(): ... unmatched parentheses` anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-06T15:05:37Z
+
+@rmsint see #27504, that's the issue you're experiencing. I'll add a fix for it here soon.
+
+---------------------------------------------------------------------------
+
+by rmsint at 2018-06-06T15:19:20Z
+
+@nicolas-grekas yes exactly, I noticed you pointed there to this fix. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-06T16:26:35Z
+
+PR is ready, sorry about the huge diff, its fixtures...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-10T09:52:41Z
+
+Status: needs review

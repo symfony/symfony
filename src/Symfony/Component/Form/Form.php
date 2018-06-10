@@ -798,6 +798,22 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
+    public function clearErrors($deep = false)
+    {
+        $this->errors = array();
+        // Clear also the errors of nested forms
+        if ($deep) {
+            foreach ($this as $child) {
+                $child->clearErrors(true);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function all()
     {
         return iterator_to_array($this->children);

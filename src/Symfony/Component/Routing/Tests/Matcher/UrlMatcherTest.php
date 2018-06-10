@@ -633,6 +633,43 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => 'a', 'id' => 'foo/bar'), $matcher->match('/foo/bar.html'));
     }
 
+    public function testHostPattern()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{app}/{action}/{unused}', array(), array(), array(), '{host}'));
+
+        $expected = array(
+            '_route' => 'a',
+            'app' => 'an_app',
+            'action' => 'an_action',
+            'unused' => 'unused',
+            'host' => 'foo',
+        );
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'foo'));
+        $this->assertEquals($expected, $matcher->match('/an_app/an_action/unused'));
+    }
+
+    public function testUtf8Prefix()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/é{foo}', array(), array(), array('utf8' => true)));
+        $coll->add('b', new Route('/è{bar}', array(), array(), array('utf8' => true)));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('a', $matcher->match('/éo')['_route']);
+    }
+
+    public function testUtf8AndMethodMatching()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/api/list/{shortClassName}/{id}.{_format}', array(), array(), array('utf8' => true), '', array(), array('PUT')));
+        $coll->add('b', new Route('/admin/api/package.{_format}', array(), array(), array(), '', array(), array('POST')));
+        $coll->add('c', new Route('/admin/api/package.{_format}', array('_format' => 'json'), array(), array(), '', array(), array('GET')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('c', $matcher->match('/admin/api/package.json')['_route']);
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

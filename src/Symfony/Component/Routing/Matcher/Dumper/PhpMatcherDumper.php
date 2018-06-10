@@ -376,10 +376,10 @@ EOF;
                     if ($hostRegex) {
                         preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $hostRegex, $rx);
                         $state->vars = array();
-                        $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')';
+                        $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')\.';
                         $state->hostVars = $state->vars;
                     } else {
-                        $hostRegex = '[^/]*+';
+                        $hostRegex = '(?:(?:[^.]*+\.)++)';
                         $state->hostVars = array();
                     }
                     $state->mark += strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");
@@ -406,6 +406,7 @@ EOF;
             $rx = ")$}{$modifiers}";
             $code .= "\n                .'{$rx}',";
             $state->regex .= $rx;
+            $state->markTail = 0;
 
             // if the regex is too large, throw a signaling exception to recompute with smaller chunk size
             set_error_handler(function ($type, $message) { throw 0 === strpos($message, $this->signalingException->getMessage()) ? $this->signalingException : new \ErrorException($message); });
@@ -427,7 +428,7 @@ EOF;
 EOF;
         }
 
-        $matchedPathinfo = $matchHost ? '$host.$pathinfo' : '$pathinfo';
+        $matchedPathinfo = $matchHost ? '$host.\'.\'.$pathinfo' : '$pathinfo';
         unset($state->getVars);
 
         return <<<EOF

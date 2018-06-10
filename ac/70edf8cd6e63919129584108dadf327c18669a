@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-30T07:33:29Z
+
+thank you @webnet-fr
+there are some failures on 5.5 that look related. I think you're using deprecated mock functions for now.
+Can you please have a look to make tests green?
+
+---------------------------------------------------------------------------
+
+by webnet-fr at 2018-05-30T11:56:57Z
+
+Thank you for your hint @nicolas-grekas (`getMockBuilder` should have been used).
+
+There are still an strange error in tests for < PHP 7.0 which I am not sure how to deal with.
+The list of arguments of `AbstractNormalizer::instantiateObject` as for Symfony 3.4 is:
+`(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, string $format = null*/)`
+But in tests it seems like `string $format = null` is uncommented which leads to errors for < PHP 7.0.
+
+Could you have a look, please?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-05-31T16:29:18Z
+
+I'm not a fan of adding such quirks in the main normalizer hierarchy... But I've no better idea right now. Maybe should we introduce a specific XML normalizer instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T22:44:18Z
+
+@dunglas: good enough as is?

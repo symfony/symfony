@@ -202,6 +202,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
+
         $this->sessionStrategy->onAuthentication($request, $token);
     }
 }

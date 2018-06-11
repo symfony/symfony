@@ -44,7 +44,7 @@ trait ArrayTrait
     {
         CacheItem::validateKey($key);
 
-        return isset($this->expiries[$key]) && ($this->expiries[$key] >= time() || !$this->deleteItem($key));
+        return isset($this->expiries[$key]) && ($this->expiries[$key] > time() || !$this->deleteItem($key));
     }
 
     /**
@@ -81,7 +81,7 @@ trait ArrayTrait
     {
         foreach ($keys as $i => $key) {
             try {
-                if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= $now || !$this->deleteItem($key))) {
+                if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > $now || !$this->deleteItem($key))) {
                     $this->values[$key] = $value = null;
                 } elseif (!$this->storeSerialized) {
                     $value = $this->values[$key];

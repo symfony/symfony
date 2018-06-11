@@ -99,6 +99,8 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
             throw new \RuntimeException("Could not find $remoteZip");
         }
         stream_copy_to_stream($remoteZipStream, fopen("$PHPUNIT_VERSION.zip", 'wb'));
+    } elseif ('\\' === DIRECTORY_SEPARATOR) {
+        passthru("certutil -urlcache -split -f \"https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip\" $PHPUNIT_VERSION.zip");
     } else {
         @unlink("$PHPUNIT_VERSION.zip");
         passthru("wget -q https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");

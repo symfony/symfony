@@ -285,7 +285,11 @@ class SecurityExtension extends Extension
             }
 
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
+            $sessionStrategyId = 'security.authentication.session_strategy';
+        } else {
+            $sessionStrategyId = 'security.authentication.session_strategy_noop';
         }
+        $container->setAlias(new Alias('security.authentication.session_strategy.'.$id, false), $sessionStrategyId);
 
         $config->replaceArgument(6, $contextKey);
 

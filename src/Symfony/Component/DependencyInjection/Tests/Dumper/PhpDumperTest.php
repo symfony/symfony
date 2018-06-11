@@ -616,6 +616,19 @@ class PhpDumperTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testDedupLazyProxy()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setLazy(true)->setPublic(true);
+        $container->register('bar', 'stdClass')->setLazy(true)->setPublic(true);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new \DummyProxyDumper());
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy_proxy.php', $dumper->dump());
+    }
+
     public function testLazyArgumentProvideGenerator()
     {
         require_once self::$fixturesPath.'/includes/classes.php';

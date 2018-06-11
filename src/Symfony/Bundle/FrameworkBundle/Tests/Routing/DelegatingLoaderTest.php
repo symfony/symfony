@@ -24,8 +24,8 @@ class DelegatingLoaderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Referencing controllers with foo:bar:baz is deprecated since Symfony 4.1, use some_parsed::controller instead.
-     * @expectedDeprecation Referencing controllers with a single colon is deprecated since Symfony 4.1, use foo::baz instead.
+     * @expectedDeprecation Referencing controllers with foo:bar:baz is deprecated since Symfony 4.1, use "some_parsed::controller" instead.
+     * @expectedDeprecation Referencing controllers with a single colon is deprecated since Symfony 4.1, use "foo::baz" instead.
      */
     public function testLoad()
     {

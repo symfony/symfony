@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T00:48:17Z
+
+There is one problem with PhpFilesAdapter - it does not use opcache till next request.
+```
+ $cache->set('key', 'value');
+ $cache->get('key'); // load directly from file, as file with timestamp >= request start time is not opcached.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T05:48:34Z
+
+> There is one problem with PhpFilesAdapter - it does not use opcache till next request.
+
+After having a deeper look, it does, but only if the file's mtime is in the past. This is now fixed. Thanks for the hint.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T05:52:24Z
+
+to pass tests it should invalidate cache on file deletion (opcache_invalidate should be called before file is unlinked)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T06:03:28Z
+
+> to pass tests it should invalidate cache on file deletion (opcache_invalidate should be called before file is unlinked)
+
+That would open race conditions (invalidating, then a concurrent request reloads the legacy file, then we write but this is ignored). ~Tests do pass so not sure what you meant~ (hum, I missed the failures on FrameworkBundle, I'll have a look.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T06:21:22Z
+
+Hum, dunno why but tests pass locally and not the CI. I added the call you suggested but still red. Any idea why?
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T06:27:11Z
+
+calls to $cache->delete() or $cache->clear() unlinks files. but opcache is still has file cached. And `list($expiresAt, $values[$id]) = include $file;` returns data. Tests pass when opcache is not working (opcache_cli = false)
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T06:38:08Z
+
+```
+Index: src/Symfony/Component/Cache/Traits/PhpFilesTrait.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Symfony/Component/Cache/Traits/PhpFilesTrait.php	(revision 3a2eb0d9514f0b322ab31a128aa48b9f89e28d50)
++++ src/Symfony/Component/Cache/Traits/PhpFilesTrait.php	(date 1528439846061)
+@@ -23,7 +23,9 @@
+  */
+ trait PhpFilesTrait
+ {
+-    use FilesystemCommonTrait;
++    use FilesystemCommonTrait {
++        doUnlink as doFsUnlink;
++    }
+
+     private $includeHandler;
+     private $zendDetectUnicode;
+@@ -155,4 +157,13 @@
+
+         return $ok;
+     }
++
++    protected function doUnlink($file)
++    {
++        $allowCompile = 'cli' !== PHP_SAPI || ini_get('opcache.enable_cli');
++        if ($allowCompile) {
++            @opcache_invalidate($file, true);
++        }
++        return $this->doFsUnlink($file);
++    }
+ }
+Index: src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php	(revision 3a2eb0d9514f0b322ab31a128aa48b9f89e28d50)
++++ src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php	(date 1528439709379)
+@@ -56,7 +56,7 @@
+         $ok = true;
+
+         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
+-            $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
++            $ok = ($file->isDir() || @$this->doUnlink($file) || !file_exists($file)) && $ok;
+         }
+
+         return $ok;
+@@ -71,7 +71,7 @@
+
+         foreach ($ids as $id) {
+             $file = $this->getFile($id);
+-            $ok = (!file_exists($file) || @unlink($file) || !file_exists($file)) && $ok;
++            $ok = (!file_exists($file) || @$this->doUnlink($file) || !file_exists($file)) && $ok;
+         }
+
+         return $ok;
+@@ -122,7 +122,12 @@
+             parent::__destruct();
+         }
+         if (null !== $this->tmp && file_exists($this->tmp)) {
+-            unlink($this->tmp);
++            $this->doUnlink($this->tmp);
+         }
+     }
++
++    protected function doUnlink($file)
++    {
++        return @unlink($file);
++    }
+ }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T06:54:31Z
+
+Thanks, patch applied.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T06:58:22Z
+
+opcache_invalidate should be called before unlink
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T07:00:14Z
+
+invalidate fails when file does not exits and opcache still contains file entry.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T11:21:15Z
+
+Thanks, now green!

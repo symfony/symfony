@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "symfony/routing": "~2.8|~3.0|~4.0",
-        "symfony/security-csrf": "^2.8.41|^3.3.17|^3.4.11|^4.0.11",
+        "symfony/security-csrf": "^2.8.41|~3.3.17|~3.4.11|^4.0.11",
         "psr/log": "~1.0"
     },
     "conflict": {

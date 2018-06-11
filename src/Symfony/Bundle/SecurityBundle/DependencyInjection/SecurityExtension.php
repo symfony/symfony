@@ -39,6 +39,7 @@ class SecurityExtension extends Extension
     private $factories = array();
     private $userProviderFactories = array();
     private $expressionLanguage;
+    private $statelessFirewallKeys = array();
 
     public function __construct()
     {
@@ -88,6 +89,9 @@ class SecurityExtension extends Extension
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
+
+        $container->getDefinition('security.authentication.guard_handler')
+            ->replaceArgument(2, $this->statelessFirewallKeys);
 
         if ($config['encoders']) {
             $this->createEncoders($config['encoders'], $container);
@@ -287,6 +291,7 @@ class SecurityExtension extends Extension
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
             $sessionStrategyId = 'security.authentication.session_strategy';
         } else {
+            $this->statelessFirewallKeys[] = $id;
             $sessionStrategyId = 'security.authentication.session_strategy_noop';
         }
         $container->setAlias(new Alias('security.authentication.session_strategy.'.$id, false), $sessionStrategyId);

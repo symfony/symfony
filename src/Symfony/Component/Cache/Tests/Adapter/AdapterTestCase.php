@@ -45,6 +45,42 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $item = $cache->getItem('foo');
         $this->assertSame($value, $item->get());
+
+        $isHit = true;
+        $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use (&$isHit) { $isHit = false; }, 0));
+        $this->assertTrue($isHit);
+
+        $this->assertNull($cache->get('foo', function (CacheItem $item) use (&$isHit, $value) {
+            $isHit = false;
+            $this->assertTrue($item->isHit());
+            $this->assertSame($value, $item->get());
+        }, INF));
+        $this->assertFalse($isHit);
+    }
+
+    public function testGetMetadata()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $cache->deleteItem('foo');
+        $cache->get('foo', function ($item) {
+            $item->expiresAfter(10);
+            sleep(1);
+
+            return 'bar';
+        });
+
+        $item = $cache->getItem('foo');
+
+        $expected = array(
+            CacheItem::METADATA_EXPIRY => 9 + time(),
+            CacheItem::METADATA_CTIME => 1000,
+        );
+        $this->assertSame($expected, $item->getMetadata());
     }
 
     public function testDefaultLifeTime()

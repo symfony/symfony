@@ -1,6 +1,11 @@
 UPGRADE FROM 4.1 to 4.2
 =======================
 
+Cache
+-----
+
+ * Deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
+
 Security
 --------
 

@@ -37,7 +37,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback)
+    public function get(string $key, callable $callback, float $beta = null)
     {
         if (!$this->pool instanceof CacheInterface) {
             throw new \BadMethodCallException(sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_class($this->pool), CacheInterface::class));
@@ -52,7 +52,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
         $event = $this->start(__FUNCTION__);
         try {
-            $value = $this->pool->get($key, $callback);
+            $value = $this->pool->get($key, $callback, $beta);
             $event->result[$key] = \is_object($value) ? \get_class($value) : gettype($value);
         } finally {
             $event->end = microtime(true);

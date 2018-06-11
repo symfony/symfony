@@ -46,9 +46,18 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
                 $item->key = $key;
-                $item->value = $value;
+                $item->value = $v = $value;
                 $item->isHit = $isHit;
                 $item->defaultLifetime = $defaultLifetime;
+                // Detect wrapped values that encode for their expiry and creation duration
+                // For compactness, these values are packed in the key of an array using
+                // magic numbers in the form 9D-..-..-..-..-00-..-..-..-5F
+                if (\is_array($v) && 1 === \count($v) && 10 === \strlen($k = \key($v)) && "\x9D" === $k[0] && "\0" === $k[5] && "\x5F" === $k[9]) {
+                    $item->value = $v[$k];
+                    $v = \unpack('Ve/Nc', \substr($k, 1, -1));
+                    $item->metadata[CacheItem::METADATA_EXPIRY] = $v['e'] + CacheItem::METADATA_EXPIRY_OFFSET;
+                    $item->metadata[CacheItem::METADATA_CTIME] = $v['c'];
+                }
 
                 return $item;
             },
@@ -64,12 +73,18 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
                 foreach ($deferred as $key => $item) {
                     if (null === $item->expiry) {
-                        $byLifetime[0 < $item->defaultLifetime ? $item->defaultLifetime : 0][$getId($key)] = $item->value;
+                        $ttl = 0 < $item->defaultLifetime ? $item->defaultLifetime : 0;
                     } elseif ($item->expiry > $now) {
-                        $byLifetime[$item->expiry - $now][$getId($key)] = $item->value;
+                        $ttl = $item->expiry - $now;
                     } else {
                         $expiredIds[] = $getId($key);
+                        continue;
                     }
+                    if (isset(($metadata = $item->newMetadata)[CacheItem::METADATA_TAGS])) {
+                        unset($metadata[CacheItem::METADATA_TAGS]);
+                    }
+                    // For compactness, expiry and creation duration are packed in the key of a array, using magic numbers as separators
+                    $byLifetime[$ttl][$getId($key)] = $metadata ? array("\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item->value) : $item->value;
                 }
 
                 return $byLifetime;

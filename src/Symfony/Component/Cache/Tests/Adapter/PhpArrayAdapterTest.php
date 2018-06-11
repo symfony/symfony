@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
@@ -68,8 +69,12 @@ class PhpArrayAdapterTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool()
+    public function createCachePool($defaultLifetime = 0, $testMethod = null)
     {
+        if ('testGetMetadata' === $testMethod) {
+            return new PhpArrayAdapter(self::$file, new FilesystemAdapter());
+        }
+
         return new PhpArrayAdapterWrapper(self::$file, new NullAdapter());
     }
 

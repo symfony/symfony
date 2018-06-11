@@ -7,6 +7,7 @@ CHANGELOG
  * added `CacheInterface`, which provides stampede protection via probabilistic early expiration and should become the preferred way to use a cache
  * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
  * deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead
+ * deprecated the `AbstractAdapter::createSystemCache()` method
 
 3.4.0
 -----

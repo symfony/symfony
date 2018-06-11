@@ -36,7 +36,6 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
     {
         $this->file = $file;
         $this->pool = $fallbackPool;
-        $this->zendDetectUnicode = ini_get('zend.detect_unicode');
     }
 
     /**

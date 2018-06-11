@@ -84,6 +84,34 @@ class ProxyDumperTest extends TestCase
     }
 
     /**
+     * @dataProvider getPrivatePublicDefinitions
+     */
+    public function testCorrectAssigning(Definition $definition, $access)
+    {
+        $definition->setLazy(true);
+
+        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
+
+        $this->assertStringMatchesFormat('%A$this->'.$access.'[\'foo\'] = %A', $code);
+    }
+
+    public function getPrivatePublicDefinitions()
+    {
+        return array(
+            array(
+                (new Definition(__CLASS__))
+                    ->setPublic(false),
+                'privates',
+            ),
+            array(
+                (new Definition(__CLASS__))
+                    ->setPublic(true),
+                'services',
+            ),
+        );
+    }
+
+    /**
      * @group legacy
      */
     public function testLegacyGetProxyFactoryCode()

@@ -90,12 +90,12 @@ class DummyProxyDumper implements ProxyDumper
 
     public function getProxyFactoryCode(Definition $definition, $id, $factoryCall = null)
     {
-        return "        // lazy factory\n\n";
+        return "        // lazy factory for {$definition->getClass()}\n\n";
     }
 
     public function getProxyCode(Definition $definition)
     {
-        return "// proxy code\n";
+        return "// proxy code for {$definition->getClass()}\n";
     }
 }
 

@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * A utility class that does much of the *work* during the guard authentication process.
@@ -34,8 +35,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 class GuardAuthenticatorHandler
 {
     private $tokenStorage;
-
     private $dispatcher;
+    private $sessionStrategy;
 
     public function __construct(TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher = null)
     {
@@ -48,7 +49,7 @@ class GuardAuthenticatorHandler
      */
     public function authenticateWithToken(TokenInterface $token, Request $request)
     {
-        $this->migrateSession($request);
+        $this->migrateSession($request, $token);
         $this->tokenStorage->setToken($token);
 
         if (null !== $this->dispatcher) {
@@ -110,11 +111,22 @@ class GuardAuthenticatorHandler
         ));
     }
 
-    private function migrateSession(Request $request)
+    /**
+     * Call this method if your authentication token is stored to a session.
+     *
+     * @final
+     */
+    public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
     {
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+        $this->sessionStrategy = $sessionStrategy;
+    }
+
+    private function migrateSession(Request $request, TokenInterface $token)
+    {
+        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
-        $request->getSession()->migrate(true);
+
+        $this->sessionStrategy->onAuthentication($request, $token);
     }
 }

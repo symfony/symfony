@@ -143,6 +143,18 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler->authenticateWithToken($this->token, $this->request);
     }
 
+    public function testSessionStrategyIsNotCalledWhenStateless()
+    {
+        $this->configurePreviousSession();
+
+        $this->sessionStrategy->expects($this->never())
+            ->method('onAuthentication');
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, array('some_provider_key'));
+        $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
+        $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
+    }
+
     protected function setUp()
     {
         $this->tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();

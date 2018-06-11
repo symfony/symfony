@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -22,6 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -37,6 +39,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     private $authenticationManager;
     private $providerKey;
     private $dispatcher;
+    private $sessionStrategy;
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, string $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -83,7 +86,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
                 $this->logger->info('Pre-authentication successful.', array('token' => (string) $token));
             }
 
-            $this->migrateSession($request);
+            $this->migrateSession($request, $token);
 
             $this->tokenStorage->setToken($token);
 
@@ -94,6 +97,16 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         } catch (AuthenticationException $e) {
             $this->clearToken($e);
         }
+    }
+
+    /**
+     * Call this method if your authentication token is stored to a session.
+     *
+     * @final
+     */
+    public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
+    {
+        $this->sessionStrategy = $sessionStrategy;
     }
 
     /**
@@ -118,11 +131,12 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      */
     abstract protected function getPreAuthenticatedData(Request $request);
 
-    private function migrateSession(Request $request)
+    private function migrateSession(Request $request, TokenInterface $token)
     {
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
-        $request->getSession()->migrate(true);
+
+        $this->sessionStrategy->onAuthentication($request, $token);
     }
 }

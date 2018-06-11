@@ -21,7 +21,7 @@ class ArrayCache extends CacheProvider
 
         $expiry = $this->data[$id][1];
 
-        return !$expiry || time() <= $expiry || !$this->doDelete($id);
+        return !$expiry || time() < $expiry || !$this->doDelete($id);
     }
 
     protected function doSave($id, $data, $lifeTime = 0)

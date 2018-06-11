@@ -81,7 +81,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                     $item["\0*\0value"] = array("\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item["\0*\0value"]);
                 }
                 $innerItem->set($item["\0*\0value"]);
-                $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U', $item["\0*\0expiry"]) : null);
+                $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', $item["\0*\0expiry"])) : null);
             },
             null,
             CacheItem::class
@@ -200,7 +200,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
         $item = (array) $item;
         if (null === $item["\0*\0expiry"] && 0 < $item["\0*\0defaultLifetime"]) {
-            $item["\0*\0expiry"] = time() + $item["\0*\0defaultLifetime"];
+            $item["\0*\0expiry"] = microtime(true) + $item["\0*\0defaultLifetime"];
         }
         $innerItem = $item["\0*\0poolHash"] === $this->poolHash ? $item["\0*\0innerItem"] : $this->pool->getItem($this->namespace.$item["\0*\0key"]);
         ($this->setInnerItem)($innerItem, $item);

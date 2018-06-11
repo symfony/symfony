@@ -68,15 +68,13 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         $this->mergeByLifetime = \Closure::bind(
             function ($deferred, $namespace, &$expiredIds) use ($getId) {
                 $byLifetime = array();
-                $now = time();
+                $now = microtime(true);
                 $expiredIds = array();
 
                 foreach ($deferred as $key => $item) {
                     if (null === $item->expiry) {
                         $ttl = 0 < $item->defaultLifetime ? $item->defaultLifetime : 0;
-                    } elseif ($item->expiry > $now) {
-                        $ttl = $item->expiry - $now;
-                    } else {
+                    } elseif (0 >= $ttl = (int) ($item->expiry - $now)) {
                         $expiredIds[] = $getId($key);
                         continue;
                     }
@@ -107,7 +105,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      */
     public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
 
         if (null === self::$apcuSupported) {
             self::$apcuSupported = ApcuAdapter::isSupported();

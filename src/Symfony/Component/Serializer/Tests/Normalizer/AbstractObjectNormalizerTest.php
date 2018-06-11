@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -118,17 +120,17 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForDummyCollection()
     {
-        $extractor = $this->getMockBuilder('Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor')->getMock();
+        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 array(
-                    new \Symfony\Component\PropertyInfo\Type(
+                    new Type(
                         'array',
                         false,
                         null,
                         true,
-                        new \Symfony\Component\PropertyInfo\Type('int'),
-                        new \Symfony\Component\PropertyInfo\Type('object', false, DummyChild::class)
+                        new Type('int'),
+                        new Type('object', false, DummyChild::class)
                     ),
                 ),
                 null
@@ -209,13 +211,12 @@ class DummyChild
     public $bar;
 }
 
-class SerializerCollectionDummy implements \Symfony\Component\Serializer\SerializerInterface, \Symfony\Component\Serializer\Normalizer\DenormalizerInterface
+class SerializerCollectionDummy implements SerializerInterface, DenormalizerInterface
 {
-    /** @var \Symfony\Component\Serializer\Normalizer\DenormalizerInterface */
     private $normalizers;
 
     /**
-     * @param $normalizers
+     * @param DenormalizerInterface[] $normalizers
      */
     public function __construct($normalizers)
     {
@@ -233,7 +234,7 @@ class SerializerCollectionDummy implements \Symfony\Component\Serializer\Seriali
     public function denormalize($data, $type, $format = null, array $context = array())
     {
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof \Symfony\Component\Serializer\Normalizer\DenormalizerInterface && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
+            if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
                 return $normalizer->denormalize($data, $type, $format, $context);
             }
         }
@@ -245,7 +246,7 @@ class SerializerCollectionDummy implements \Symfony\Component\Serializer\Seriali
     }
 }
 
-class AbstractObjectNormalizerCollectionDummy extends \Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer
+class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
 {
     protected function extractAttributes($object, $format = null, array $context = array())
     {
@@ -265,7 +266,7 @@ class AbstractObjectNormalizerCollectionDummy extends \Symfony\Component\Seriali
         return true;
     }
 
-    public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, $format = null)
+    public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
     }

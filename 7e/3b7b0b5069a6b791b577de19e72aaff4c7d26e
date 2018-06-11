@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-23T08:54:16Z
+
+ping @Nyholm FYI: here, I deprecate getPreviousTags() and replace it by getMetadata()
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-24T10:03:19Z
+
+> I don't like unclear default values. Why not 1.0 directly?
+
+I designed it this way so that the interface is generic enough. Hardcoding 1.0 as default would prevent any other implementations from providing a different default. Yes, there are no other implementations than the ones in this PR, but that's not a reason to break the abstraction provided by the interface.
+Note that PSR-6 does the same for default expiry of items.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-21T17:57:41Z
+
+Rebased, PR ready for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-28T12:36:57Z
+
+PR is ready.
+
+The protection needs storing expiry+computation time. This is done by encoding these values in the key of a wrapping array:
+`$persistedValue = array("\x9D".$expiry.$computeTime."\x5F" => $cachedValue);`
+
+by using this magic-numbered structure, we are able to persist both raw + wrapped values in the same store, providing forward/backward compat at the storage level.
+
+Stampede protection is always enabled when accessing values through the new `CacheInterface::get()` method (one should use the PSR-6 interface if they don't want the overhead of storing expiry+compute-time, thus opting out from stampede protection.)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-05-28T13:12:55Z
+
+Does the `getPreviousTags` really need to be deprecated? Wouldn't it be good to still have that? As far as I know that would make us compatible with the "soon to be"-PSR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-28T13:18:10Z
+
+That's the thing we need to discuss :)
+So, my current pov is that accessing tags is useful, but also is accessing the expiry. One use case for the expiry is the one present in this PR, another one is for HTTP caches, allowing to compute the max-age directive when serving cached values.
+Which means if we spend some effort having an updated PSR, it could be worth doing it once for all.
+This `getMetadata()` method would be my proposal: an array with keyed values, thus extensible, but still having some keys reserved by const name at least (tags, expiry - computation time could be a custom extension - or in the PSR).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-30T07:17:52Z
+
+Let's go with metadata.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-31T18:30:08Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-06T17:50:30Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-10T15:12:38Z
+
+comments addressed thanks

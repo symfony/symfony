@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
+    const DOMAIN_PATTERN = '/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/';
     private $isStrict;
 
     /**
@@ -95,10 +96,6 @@ class EmailValidator extends ConstraintValidator
 
         $host = (string) substr($value, strrpos($value, '@') + 1);
 
-        if ('.' !== substr($host, -1)) {
-            $host .= '.';
-        }
-
         // Check for host DNS resource records
         if ($constraint->checkMX) {
             if (!$this->checkMX($host)) {
@@ -134,6 +131,18 @@ class EmailValidator extends ConstraintValidator
     }
 
     /**
+     * Check if host domain is valid
+     *
+     * @param string $host Host
+     *
+     * @return bool
+     */
+    private function checkHostDomain($host)
+    {
+        return preg_match(static::DOMAIN_PATTERN, $host);
+    }
+
+    /**
      * Check DNS Records for MX type.
      *
      * @param string $host Host
@@ -142,7 +151,7 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        return '' !== $host && checkdnsrr($host, 'MX');
+        return $this->checkHostDomain($host) && checkdnsrr($host, 'MX');
     }
 
     /**
@@ -154,6 +163,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkHost($host)
     {
-        return '' !== $host && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
+        return $this->checkHostDomain($host) && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
     }
 }

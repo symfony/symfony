@@ -52,8 +52,10 @@ class GuardAuthenticatorHandler
     /**
      * Authenticates the given token in the system.
      */
-    public function authenticateWithToken(TokenInterface $token, Request $request, $providerKey = null)
+    public function authenticateWithToken(TokenInterface $token, Request $request)
     {
+        $providerKey = func_num_args() > 2 ? func_get_arg(2) : null;
+
         $this->migrateSession($request, $token, $providerKey);
         $this->tokenStorage->setToken($token);
 

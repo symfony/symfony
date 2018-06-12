@@ -131,7 +131,7 @@ class EmailValidator extends ConstraintValidator
     }
 
     /**
-     * Check if host domain is valid
+     * Check if host domain is valid.
      *
      * @param string $host Host
      *

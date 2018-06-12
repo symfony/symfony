@@ -151,14 +151,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $value = $zval[self::VALUE];
             }
         } catch (\TypeError $e) {
-            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
+            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $propertyPath);
 
             // It wasn't thrown in this class so rethrow it
             throw $e;
         }
     }
 
-    private static function throwInvalidArgumentException($message, $trace, $i)
+    private static function throwInvalidArgumentException($message, $trace, $i, $propertyPath)
     {
         if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && isset($trace[$i]['args'][0])) {
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
@@ -166,7 +166,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $type = $trace[$i]['args'][0];
             $type = is_object($type) ? get_class($type) : gettype($type);
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given.', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type));
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type, $propertyPath));
         }
     }
 

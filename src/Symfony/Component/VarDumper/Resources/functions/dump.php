@@ -54,13 +54,17 @@ if (!function_exists('dumps')) {
         $handler = function ($var) use ($cloner, $dumper) {
             $dumper->dump($cloner->cloneVar($var));
         };
-        VarDumper::setHandler($handler);
+        $originalHandler = VarDumper::setHandler($handler);
 
         VarDumper::dump($var);
 
         foreach ($moreVars as $var) {
            VarDumper::dump($var);
         }
+
+        // Make sure that any subsequent call to dump would then go to the
+        // server rather than to the previously configured handler.
+        VarDumper::setHandler($originalHandler);
 
         if (1 < func_num_args()) {
             return func_get_args();

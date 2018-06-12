@@ -62,8 +62,8 @@ if (!function_exists('dumps')) {
            VarDumper::dump($var);
         }
 
-        // Make sure that any subsequent call would go to the previously
-        // configured handler rather than to the server.
+        // Make sure that any subsequent call go to the previously configured
+        // handler rather than to the server.
         VarDumper::setHandler($originalHandler);
 
         if (1 < func_num_args()) {

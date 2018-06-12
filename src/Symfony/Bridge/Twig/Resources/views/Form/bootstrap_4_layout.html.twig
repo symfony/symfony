@@ -116,7 +116,7 @@
 
 {% block form_widget_simple -%}
     {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' ' : ' form-control'))|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' form-control-file' : ' form-control'))|trim}) -%}
     {% endif %}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}

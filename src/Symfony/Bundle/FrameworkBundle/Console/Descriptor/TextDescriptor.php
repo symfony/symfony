@@ -24,6 +24,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -32,6 +35,22 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class TextDescriptor extends Descriptor
 {
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
+     * @var URL
+     */
+    private $constraintURL;
+
+    public function __construct()
+    {
+        $this->validator = Validation::createValidatorBuilder()->getValidator();
+        $this->constraintURL = new Url();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,10 +67,10 @@ class TextDescriptor extends Descriptor
         foreach ($routes->all() as $name => $route) {
             $row = array(
                 $name,
-                $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
+                $this->describeMethods($route->getMethods()),
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
                 '' !== $route->getHost() ? $route->getHost() : 'ANY',
-                $route->getPath(),
+                $this->describePath($route->getPath()),
             );
 
             if ($showControllers) {
@@ -469,5 +488,50 @@ class TextDescriptor extends Descriptor
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
             isset($options['raw_output']) ? !$options['raw_output'] : true
         );
+    }
+
+    private function describeMethods(array $methods)
+    {
+        if (0 >= count($methods)) {
+            return 'ANY';
+        }
+
+        $knownMethods = [
+            'CONNECT' => true,
+            'DELETE' => true,
+            'GET' => true,
+            'HEAD' => true,
+            'OPTIONS' => true,
+            'PATCH' => true,
+            'POST' => true,
+            'PUT' => true,
+            'TRACE' => true,
+        ];
+
+        $methodDescription = '';
+        foreach ($methods as $method) {
+            $methodDescription .= isset($knownMethods[$method])
+                ? $method
+                : '<comment>'.$method.'</comment>'
+            ;
+
+            $methodDescription.='|';
+        }
+
+        return rtrim($methodDescription, '|');
+    }
+
+    private function describePath(string $path)
+    {
+        if (false !== strpos($path, '//')) {
+            return '<comment>'.$path.'</comment>';
+        }
+
+        $violations = $this->validator->validate('http://test.symfony.com'.preg_replace('#\{\w+\}#', 'X', $path), $this->constraintURL);
+
+        return 0 < count($violations)
+            ? '<comment>'.$path.'</comment>'
+            : $path
+        ;
     }
 }

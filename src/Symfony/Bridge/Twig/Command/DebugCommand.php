@@ -274,13 +274,13 @@ EOF
         $alternatives = array();
         $bundleNames = array();
 
-        if ($this->rootDir) {
+        if ($this->rootDir && $this->projectDir) {
             $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->rootDir.'/Resources/', \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce(
                 $folders,
                 function ($carry, $absolutePath) use ($relativePath) {
-                    if (null !== $this->projectDir && 0 === strpos($absolutePath, $this->projectDir)) {
+                    if (0 === strpos($absolutePath, $this->projectDir)) {
                         $name = basename(\dirname($absolutePath));
                         $path = $relativePath.$name;
                         $carry[$name] = $path;
@@ -292,13 +292,13 @@ EOF
             );
         }
 
-        if ($this->twigDefaultPath) {
+        if ($this->twigDefaultPath && $this->projectDir) {
             $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles', \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce(
                 $folders,
                 function ($carry, $absolutePath) use ($relativePath) {
-                    if (null !== $this->projectDir && 0 === strpos($absolutePath, $this->projectDir)) {
+                    if (0 === strpos($absolutePath, $this->projectDir)) {
                         $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
                         $name = ltrim(substr($path, \strlen($relativePath)), DIRECTORY_SEPARATOR);
                         $carry[$name] = $path;

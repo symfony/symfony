@@ -89,6 +89,7 @@ abstract class AbstractCloner implements ClonerInterface
         'AMQPEnvelope' => 'Symfony\Component\VarDumper\Caster\AmqpCaster::castEnvelope',
 
         'ArrayObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayObject',
+        'ArrayIterator' => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayIterator',
         'SplDoublyLinkedList' => 'Symfony\Component\VarDumper\Caster\SplCaster::castDoublyLinkedList',
         'SplFileInfo' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFileInfo',
         'SplFileObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFileObject',

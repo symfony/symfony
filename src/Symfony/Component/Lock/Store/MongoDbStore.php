@@ -146,6 +146,7 @@ class MongoDbStore implements StoreInterface
         );
 
         $key->reduceLifetime($this->initialTtl);
+
         try {
             $this->getCollection()->updateOne($filter, $update, $options);
         } catch (\MongoDB\Driver\Exception\WriteException $e) {

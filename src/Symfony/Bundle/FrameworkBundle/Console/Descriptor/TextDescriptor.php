@@ -504,7 +504,7 @@ class TextDescriptor extends Descriptor
 
     private function describePath(string $path)
     {
-        if ($path === '' || $path === '/') {
+        if ('' === $path || '/' === $path) {
             return $path; // cheap short cuts
         }
 

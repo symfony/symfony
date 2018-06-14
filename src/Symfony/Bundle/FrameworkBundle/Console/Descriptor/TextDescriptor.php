@@ -24,9 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Validator\Constraints\Url;
-use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -35,22 +32,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class TextDescriptor extends Descriptor
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var URL
-     */
-    private $constraintURL;
-
-    public function __construct()
-    {
-        $this->validator = Validation::createValidatorBuilder()->getValidator();
-        $this->constraintURL = new Url();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -492,8 +473,8 @@ class TextDescriptor extends Descriptor
 
     private function describeMethods(array $methods)
     {
-        if (0 >= count($methods)) {
-            return 'ANY';
+        if (0 === count($methods)) {
+            return '<info>ANY</info>';
         }
 
         $knownMethods = array(
@@ -512,10 +493,10 @@ class TextDescriptor extends Descriptor
         foreach ($methods as $method) {
             $methodDescription .= isset($knownMethods[$method])
                 ? $method
-                : '<comment>'.$method.'</comment>'
+                : '<error>'.$method.'</error>'
             ;
 
-            $methodDescription.='|';
+            $methodDescription .= '|';
         }
 
         return rtrim($methodDescription, '|');
@@ -523,15 +504,41 @@ class TextDescriptor extends Descriptor
 
     private function describePath(string $path)
     {
-        if (false !== strpos($path, '//')) {
-            return '<comment>'.$path.'</comment>';
+        if ($path === '' || $path === '/') {
+            return $path; // cheap short cuts
         }
 
-        $violations = $this->validator->validate('http://test.symfony.com'.preg_replace('#\{\w+\}#', 'X', $path), $this->constraintURL);
+        // this pattern has been derived from `Symfony\Component\Validator\Constraints\UrlValidator`
+        $pattern = '~^
+            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*      # a path
+            ((?:\? (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?) # a query (optional)
+            ((?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?) # a fragment (optional)
+        $~ixu';
 
-        return 0 < count($violations)
-            ? '<comment>'.$path.'</comment>'
-            : $path
-        ;
+        if (1 !== preg_match($pattern, preg_replace('#\{\w+\}#', 'X', $path), $matches)) {
+            return '<error>'.$path.'</error>';
+        }
+
+        if ('' !== $matches[1]) {
+            // while valid in a URL, having a query is likely a typo as routing cannot be done on those
+            $queryIndex = strpos($path, '?');
+
+            return substr($path, 0, $queryIndex).'<error>'.substr($path, $queryIndex).'</error>';
+        }
+
+        if ('' !== $matches[2]) {
+            // while valid in a URL, having a fragment is likely a typo as routing cannot be done on those
+            $fragmentIndex = strpos($path, '#');
+
+            return substr($path, 0, $fragmentIndex).'<error>'.substr($path, $fragmentIndex).'</error>';
+        }
+
+        // while a valid path it is still likely a typo
+        $doubleSlashIndex = strpos($path, '//');
+        if (false !== $doubleSlashIndex) {
+            return substr($path, 0, $doubleSlashIndex).'<error>'.substr($path, $doubleSlashIndex).'</error>';
+        }
+
+        return $path;
     }
 }

@@ -27,8 +27,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/routing": "^4.1",
-        "symfony/validator": "^4.1"
+        "symfony/routing": "^4.1"
     },
     "require-dev": {
         "doctrine/cache": "~1.0",
@@ -50,6 +49,7 @@
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
+        "symfony/validator": "^4.1",
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/workflow": "^4.1",
         "symfony/yaml": "~3.4|~4.0",

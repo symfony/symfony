@@ -22,9 +22,14 @@ class DirectoryResourceTest extends TestCase
     {
         $this->directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
-            mkdir($this->directory);
+            if (false === mkdir($this->directory)) {
+                throw new \RuntimeException(sprintf('Failed to create tmp directory to test with @ "%s".', $this->directory));
+            }
         }
-        touch($this->directory.'/tmp.xml');
+
+        if (false === touch($this->directory.'/tmp.xml')) {
+            throw new \RuntimeException(sprintf('Failed to create tmp file to test with @ "%s".', $this->directory.'/tmp.xml'));
+        }
     }
 
     protected function tearDown()

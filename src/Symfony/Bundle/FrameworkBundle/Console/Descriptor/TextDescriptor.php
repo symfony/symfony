@@ -48,10 +48,10 @@ class TextDescriptor extends Descriptor
         foreach ($routes->all() as $name => $route) {
             $row = array(
                 $name,
-                $this->describeMethods($route->getMethods()),
+                $this->describeRouteMethods($route->getMethods()),
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
                 '' !== $route->getHost() ? $route->getHost() : 'ANY',
-                $this->describePath($route->getPath()),
+                $this->describeRoutePath($route->getPath()),
             );
 
             if ($showControllers) {
@@ -471,7 +471,7 @@ class TextDescriptor extends Descriptor
         );
     }
 
-    private function describeMethods(array $methods)
+    private function describeRouteMethods(array $methods)
     {
         if (!$methods) {
             return '<info>ANY</info>';
@@ -498,7 +498,7 @@ class TextDescriptor extends Descriptor
         return rtrim($methodDescription, '|');
     }
 
-    private function describePath(string $path)
+    private function describeRoutePath(string $path)
     {
         if ('' === $path || '/' === $path) {
             return $path; // cheap short cuts

@@ -473,7 +473,7 @@ class TextDescriptor extends Descriptor
 
     private function describeMethods(array $methods)
     {
-        if (0 === count($methods)) {
+        if (!$methods) {
             return '<info>ANY</info>';
         }
 
@@ -491,11 +491,7 @@ class TextDescriptor extends Descriptor
 
         $methodDescription = '';
         foreach ($methods as $method) {
-            $methodDescription .= isset($knownMethods[$method])
-                ? $method
-                : '<error>'.$method.'</error>'
-            ;
-
+            $methodDescription .= isset($knownMethods[$method]) ? $method : '<error>'.$method.'</error>';
             $methodDescription .= '|';
         }
 
@@ -515,7 +511,7 @@ class TextDescriptor extends Descriptor
             ((?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?) # a fragment (optional)
         $~ixu';
 
-        if (1 !== preg_match($pattern, preg_replace('#\{\w+\}#', 'X', $path), $matches)) {
+        if (!preg_match($pattern, preg_replace('#\{\w+\}#', 'X', $path), $matches)) {
             return '<error>'.$path.'</error>';
         }
 
@@ -534,8 +530,7 @@ class TextDescriptor extends Descriptor
         }
 
         // while a valid path it is still likely a typo
-        $doubleSlashIndex = strpos($path, '//');
-        if (false !== $doubleSlashIndex) {
+        if (false !== $doubleSlashIndex = strpos($path, '//')) {
             return substr($path, 0, $doubleSlashIndex).'<error>'.substr($path, $doubleSlashIndex).'</error>';
         }
 

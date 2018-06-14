@@ -21,13 +21,11 @@ class DirectoryResourceTest extends TestCase
     protected function setUp()
     {
         $this->directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
-        if (!file_exists($this->directory)) {
-            if (false === mkdir($this->directory)) {
-                throw new \RuntimeException(sprintf('Failed to create tmp directory to test with @ "%s".', $this->directory));
-            }
+        if (!file_exists($this->directory) && !mkdir($this->directory)) {
+            throw new \RuntimeException(sprintf('Failed to create tmp directory to test with @ "%s".', $this->directory));
         }
 
-        if (false === touch($this->directory.'/tmp.xml')) {
+        if (!touch($this->directory.'/tmp.xml')) {
             throw new \RuntimeException(sprintf('Failed to create tmp file to test with @ "%s".', $this->directory.'/tmp.xml'));
         }
     }

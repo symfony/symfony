@@ -703,6 +703,23 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/app.php/testing#fragment', $url);
     }
 
+    /**
+     * @dataProvider provideLookAroundRequirementsInPath
+     */
+    public function testLookRoundRequirementsInPath($expected, $path, $requirement)
+    {
+        $routes = $this->getRoutes('test', new Route($path, array(), array('foo' => $requirement, 'baz' => '.+?')));
+        $this->assertSame($expected, $this->getGenerator($routes)->generate('test', array('foo' => 'a/b', 'baz' => 'c/d/e')));
+    }
+
+    public function provideLookAroundRequirementsInPath()
+    {
+        yield array('/app.php/a/b/b%28ar/c/d/e', '/{foo}/b(ar/{baz}', '.+(?=/b\\(ar/)');
+        yield array('/app.php/a/b/bar/c/d/e', '/{foo}/bar/{baz}', '.+(?!$)');
+        yield array('/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<=/bar/).+');
+        yield array('/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<!^).+');
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

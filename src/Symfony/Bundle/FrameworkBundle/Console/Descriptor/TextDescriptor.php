@@ -496,7 +496,7 @@ class TextDescriptor extends Descriptor
             return 'ANY';
         }
 
-        $knownMethods = [
+        $knownMethods = array(
             'CONNECT' => true,
             'DELETE' => true,
             'GET' => true,
@@ -506,7 +506,7 @@ class TextDescriptor extends Descriptor
             'POST' => true,
             'PUT' => true,
             'TRACE' => true,
-        ];
+        );
 
         $methodDescription = '';
         foreach ($methods as $method) {

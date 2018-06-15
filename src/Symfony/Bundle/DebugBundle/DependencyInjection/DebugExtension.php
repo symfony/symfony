@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\VarDumper\Dumper\ServerDumper;
 
 /**
  * DebugExtension.
@@ -43,20 +42,21 @@ class DebugExtension extends Extension
             ->addMethodCall('setMaxString', array($config['max_string_length']));
 
         if (null === $config['dump_destination']) {
-            //no-op
+            $container->getDefinition('var_dumper.command.server_dump')
+                ->setClass(ServerDumpPlaceholderCommand::class)
+            ;
         } elseif (0 === strpos($config['dump_destination'], 'tcp://')) {
-            $serverDumperHost = $config['dump_destination'];
             $container->getDefinition('debug.dump_listener')
-                ->replaceArgument(1, new Reference('var_dumper.server_dumper'))
+                ->replaceArgument(2, new Reference('var_dumper.server_connection'))
             ;
             $container->getDefinition('data_collector.dump')
-                ->replaceArgument(4, new Reference('var_dumper.server_dumper'))
+                ->replaceArgument(4, new Reference('var_dumper.server_connection'))
             ;
             $container->getDefinition('var_dumper.dump_server')
-                ->replaceArgument(0, $serverDumperHost)
+                ->replaceArgument(0, $config['dump_destination'])
             ;
-            $container->getDefinition('var_dumper.server_dumper')
-                ->replaceArgument(0, $serverDumperHost)
+            $container->getDefinition('var_dumper.server_connection')
+                ->replaceArgument(0, $config['dump_destination'])
             ;
         } else {
             $container->getDefinition('var_dumper.cli_dumper')
@@ -65,13 +65,9 @@ class DebugExtension extends Extension
             $container->getDefinition('data_collector.dump')
                 ->replaceArgument(4, new Reference('var_dumper.cli_dumper'))
             ;
-        }
-
-        if (!isset($serverDumperHost)) {
-            $container->getDefinition('var_dumper.command.server_dump')->setClass(ServerDumpPlaceholderCommand::class);
-            if (!class_exists(ServerDumper::class)) {
-                $container->removeDefinition('var_dumper.command.server_dump');
-            }
+            $container->getDefinition('var_dumper.command.server_dump')
+                ->setClass(ServerDumpPlaceholderCommand::class)
+            ;
         }
     }
 

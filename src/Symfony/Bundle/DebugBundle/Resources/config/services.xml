@@ -23,13 +23,14 @@
             <argument type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
             <argument>%kernel.charset%</argument>
             <argument type="service" id="request_stack" />
-            <argument>null</argument><!-- var_dumper.cli_dumper or var_dumper.server_dumper when debug.dump_destination is set -->
+            <argument>null</argument><!-- var_dumper.cli_dumper or var_dumper.server_connection when debug.dump_destination is set -->
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="var_dumper.cloner" />
             <argument type="service" id="var_dumper.cli_dumper" />
+            <argument>null</argument>
         </service>
 
         <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" public="true" />
@@ -50,9 +51,8 @@
             </call>
         </service>
 
-        <service id="var_dumper.server_dumper" class="Symfony\Component\VarDumper\Dumper\ServerDumper">
-            <argument>null</argument> <!-- server host -->
-            <argument type="service" id="var_dumper.cli_dumper" />
+        <service id="var_dumper.server_connection" class="Symfony\Component\VarDumper\Server\Connection">
+            <argument /> <!-- server host -->
             <argument type="collection">
                 <argument type="service" key="source">
                     <service class="Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider">

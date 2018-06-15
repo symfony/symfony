@@ -197,7 +197,7 @@ trait RedisTrait
     protected function doClear($namespace)
     {
         // When using a native Redis cluster, clearing the cache is done by versioning in AbstractTrait::clear().
-        // This means old keys are not really removed until they expire and may need gargage collection.
+        // This means old keys are not really removed until they expire and may need garbage collection.
 
         $cleared = true;
         $hosts = array($this->redis);

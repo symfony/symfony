@@ -9,6 +9,7 @@ CHANGELOG
    the token classes is deprecated. To use
    custom tokens extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
    or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+ * Added `Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass`
 
 4.1.0
 -----

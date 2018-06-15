@@ -6,6 +6,7 @@ CHANGELOG
 
  * Allowed configuring taggable cache pools via a new `framework.cache.pools.tags` option (bool|service-id)
  * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead
+ * Deprecated processing of services tagged `security.expression_language_provider` in favor of a new `AddExpressionLanguageProvidersPass` in SecurityBundle.
 
 4.1.0
 -----

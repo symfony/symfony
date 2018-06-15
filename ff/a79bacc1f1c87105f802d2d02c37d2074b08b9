@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T08:49:58Z
+
+Implementation updated, with logic added to the inlining pass: when a non-shared service is weak-referenced, it cannot be inlined.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T10:44:08Z
+
+(deps=high failure will be fixed when this is merged up to master.)

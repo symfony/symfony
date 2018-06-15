@@ -126,7 +126,7 @@ class GuardAuthenticationListener implements ListenerInterface
             }
 
             // sets the token on the token storage, etc
-            $this->guardHandler->authenticateWithToken($token, $request);
+            $this->guardHandler->authenticateWithToken($token, $request, $this->providerKey);
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
 

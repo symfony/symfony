@@ -163,4 +163,45 @@ EOTXT;
 
         $this->assertDumpMatchesFormat('%ADateTime%A', $var);
     }
+
+    public function testCastArrayObject()
+    {
+        $var = new \ArrayObject(array(123));
+        $var->foo = 234;
+
+        $expected = <<<EOTXT
+ArrayObject {
+  +"foo": 234
+  flag::STD_PROP_LIST: false
+  flag::ARRAY_AS_PROPS: false
+  iteratorClass: "ArrayIterator"
+  storage: array:1 [
+    0 => 123
+  ]
+}
+EOTXT;
+        $this->assertDumpEquals($expected, $var);
+    }
+
+    public function testArrayIterator()
+    {
+        $var = new MyArrayIterator(array(234));
+
+        $expected = <<<EOTXT
+Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
+  -foo: 123
+  flag::STD_PROP_LIST: false
+  flag::ARRAY_AS_PROPS: false
+  storage: array:1 [
+    0 => 234
+  ]
+}
+EOTXT;
+        $this->assertDumpEquals($expected, $var);
+    }
+}
+
+class MyArrayIterator extends \ArrayIterator
+{
+    private $foo = 123;
 }

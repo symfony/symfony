@@ -136,13 +136,11 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '^/admin',
                     'http_basic' => null,
-                    'logout_on_user_change' => true,
                 ),
                 'stateless_firewall' => array(
                     'pattern' => '/.*',
                     'stateless' => true,
                     'http_basic' => null,
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));

@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-13T15:58:01Z
+
+The issue is not the method name. It is the `!`. We want to use `privates` only on 4.0 where the method is removed
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-13T15:58:43Z
+
+And this needs to be fixed in 3.4, to account for ProxyManagerBridge and DependencyInjection being installed at different versions.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-13T16:02:25Z
+
+@nicolas-grekas can you confirm my diagnosis ?
+
+---------------------------------------------------------------------------
+
+by omnilight at 2018-06-13T19:37:41Z
+
+Ok, so probably it is better just to remove checking for method existence and look only on service public or not?
+
+---------------------------------------------------------------------------
+
+by omnilight at 2018-06-13T19:39:52Z
+
+And maybe check for the version...
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-14T08:01:11Z
+
+Well, this `method_exists` is precisely the way we detect whether we are using DI 3.4 or 4.0. We don't have a version constant in the DI component.
+
+---------------------------------------------------------------------------
+
+by omnilight at 2018-06-14T08:09:25Z
+
+Ok, @stof than we probably can check for both methods
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-14T08:20:47Z
+
+Why checking for both methods ? We only need to check for a method *removed in 4.0*.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T10:07:26Z
+
+I rebased your branch on 3.4 and pushed it on your fork.
+See adjusted patch.
+
+Status: needs review

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
@@ -20,7 +21,6 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Doctrine\Common\Util\ClassUtils;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
@@ -162,7 +162,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     protected function getMetadata($class)
     {
         // normalize class name
-        $class = ClassUtils::getRealClass(ltrim($class, '\\'));
+        $class = self::getRealClass(ltrim($class, '\\'));
 
         if (array_key_exists($class, $this->cache)) {
             return $this->cache[$class];
@@ -178,5 +178,14 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 // not an entity or mapped super class, using Doctrine ORM 2.2
             }
         }
+    }
+
+    private static function getRealClass(string $class): string
+    {
+        if (false === $pos = strrpos($class, '\\'.Proxy::MARKER.'\\')) {
+            return $class;
+        }
+
+        return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
     }
 }

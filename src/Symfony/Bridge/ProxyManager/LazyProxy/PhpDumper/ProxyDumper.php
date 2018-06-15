@@ -57,7 +57,7 @@ class ProxyDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= " \$this->services['$id'] =";
+            $instantiation .= sprintf(' $this->%s[\'%s\'] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', $id);
         }
 
         if (null === $factoryCode) {

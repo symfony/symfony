@@ -22,8 +22,10 @@ use Twig\Template;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+ *
+ * @final
  */
-final class SourceContextProvider implements ContextProviderInterface
+class SourceContextProvider implements ContextProviderInterface
 {
     private $limit;
     private $charset;

@@ -123,6 +123,35 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
+    public function testGuardHandlerIsPassedStatelessFirewalls()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '^/admin',
+                    'http_basic' => null,
+                    'logout_on_user_change' => true,
+                ),
+                'stateless_firewall' => array(
+                    'pattern' => '/.*',
+                    'stateless' => true,
+                    'http_basic' => null,
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
+        $definition = $container->getDefinition('security.authentication.guard_handler');
+        $this->assertSame(array('stateless_firewall'), $definition->getArgument(2));
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation Not setting "logout_on_user_change" to true on firewall "some_firewall" is deprecated as of 3.4, it will always be true in 4.0.

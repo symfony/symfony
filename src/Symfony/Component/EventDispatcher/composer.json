@@ -25,9 +25,6 @@
         "symfony/stopwatch": "~3.4|~4.0",
         "psr/log": "~1.0"
     },
-    "conflict": {
-        "symfony/dependency-injection": "<3.4"
-    },
     "suggest": {
         "symfony/dependency-injection": "",
         "symfony/http-kernel": ""

@@ -31,9 +31,6 @@
         "doctrine/dbal": "~2.4",
         "predis/predis": "~1.0"
     },
-    "conflict": {
-        "symfony/var-dumper": "<3.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },
         "exclude-from-classmap": [

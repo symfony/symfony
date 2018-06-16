@@ -63,14 +63,8 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.1",
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
-        "symfony/asset": "<3.4",
-        "symfony/console": "<3.4",
         "symfony/form": "<4.1",
-        "symfony/property-info": "<3.4",
         "symfony/serializer": "<4.1",
-        "symfony/stopwatch": "<3.4",
-        "symfony/translation": "<3.4",
         "symfony/validator": "<4.1",
         "symfony/workflow": "<4.1"
     },

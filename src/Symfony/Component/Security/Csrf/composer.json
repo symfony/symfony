@@ -22,9 +22,6 @@
     "require-dev": {
         "symfony/http-foundation": "~3.4|~4.0"
     },
-    "conflict": {
-        "symfony/http-foundation": "<3.4"
-    },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."
     },

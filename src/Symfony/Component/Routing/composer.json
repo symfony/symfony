@@ -28,11 +28,6 @@
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
-    "conflict": {
-        "symfony/config": "<3.4",
-        "symfony/dependency-injection": "<3.4",
-        "symfony/yaml": "<3.4"
-    },
     "suggest": {
         "symfony/http-foundation": "For using a Symfony Request object",
         "symfony/config": "For using the all-in-one router or any loader",

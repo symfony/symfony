@@ -37,11 +37,7 @@
         "egulias/email-validator": "^1.2.8|~2.0"
     },
     "conflict": {
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
-        "symfony/dependency-injection": "<3.4",
-        "symfony/http-kernel": "<3.4",
-        "symfony/intl": "<4.1",
-        "symfony/yaml": "<3.4"
+        "symfony/intl": "<4.1"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

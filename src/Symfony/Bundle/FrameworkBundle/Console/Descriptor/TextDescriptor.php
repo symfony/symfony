@@ -316,7 +316,7 @@ class TextDescriptor extends Descriptor
         }
 
         if ($definition->getFile()) {
-            $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');
+            $tableRows[] = array('Required File', $definition->getFile() ?: '-');
         }
 
         if ($factory = $definition->getFactory()) {

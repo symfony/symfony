@@ -123,7 +123,7 @@ class IntegrationTest extends TestCase
     public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings
-        $container = $mainContainer ? $mainContainer : new ContainerBuilder();
+        $container = $mainContainer ?: new ContainerBuilder();
         $container->setResourceTracking(false);
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
         $loader->load('main.yml');

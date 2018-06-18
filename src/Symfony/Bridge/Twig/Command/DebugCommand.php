@@ -89,16 +89,7 @@ EOF
             $data['tests'] = array_keys($data['tests']);
             $data['loader_paths'] = $this->getLoaderPaths();
             if ($wrongBundles = $this->findWrongBundleOverrides()) {
-                $messages = $this->buildWarningMessages($wrongBundles);
-                $data['warnings'] = array_reduce(
-                    $messages,
-                    function ($carry, $message) {
-                        $carry[] = $message;
-
-                        return $carry;
-                    },
-                    array()
-                );
+                $data['warnings'] = $this->buildWarningMessages($wrongBundles);
             }
 
             $io->writeln(json_encode($data));
@@ -143,12 +134,9 @@ EOF
         $io->section('Loader Paths');
         $io->table(array('Namespace', 'Paths'), $rows);
         $messages = $this->buildWarningMessages($this->findWrongBundleOverrides());
-        array_walk(
-            $messages,
-            function ($message) use ($io) {
-                $io->warning(trim($message));
-            }
-         );
+        foreach ($messages as $message) {
+            $io->warning($message);
+        }
 
         return 0;
     }
@@ -344,7 +332,7 @@ EOF
                     }
                 }
             }
-            $messages[] = $message;
+            $messages[] = trim($message);
         }
 
         return $messages;

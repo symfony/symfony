@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -21,7 +22,16 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 trait FilesystemTrait
 {
-    use FilesystemCommonTrait;
+    use FilesystemCommonTrait {
+        init as initFsCommon;
+    }
+    use SerializerTrait;
+
+    private function init($namespace, $directory)
+    {
+        $this->initFsCommon($namespace, $directory);
+        $this->setSerializer(new PhpSerializer());
+    }
 
     /**
      * @return bool
@@ -68,7 +78,7 @@ trait FilesystemTrait
                 $value = stream_get_contents($h);
                 fclose($h);
                 if ($i === $id) {
-                    $values[$id] = parent::unserialize($value);
+                    $values[$id] = $this->unserialize($value);
                 }
             }
         }
@@ -95,7 +105,7 @@ trait FilesystemTrait
         $expiresAt = $lifetime ? (time() + $lifetime) : 0;
 
         foreach ($values as $id => $value) {
-            $ok = $this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".serialize($value), $expiresAt) && $ok;
+            $ok = $this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".$this->serialize($value), $expiresAt) && $ok;
         }
 
         if (!$ok && !is_writable($this->directory)) {

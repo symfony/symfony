@@ -22,8 +22,8 @@ use Symfony\Component\Cache\CacheItem;
 trait ArrayTrait
 {
     use LoggerAwareTrait;
+    use SerializerTrait;
 
-    private $storeSerialized;
     private $values = array();
     private $expiries = array();
 
@@ -83,13 +83,8 @@ trait ArrayTrait
             try {
                 if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > $now || !$this->deleteItem($key))) {
                     $this->values[$key] = $value = null;
-                } elseif (!$this->storeSerialized) {
-                    $value = $this->values[$key];
-                } elseif ('b:0;' === $value = $this->values[$key]) {
-                    $value = false;
-                } elseif (false === $value = unserialize($value)) {
-                    $this->values[$key] = $value = null;
-                    $isHit = false;
+                } else {
+                    $value = $this->unserialize($this->values[$key]);
                 }
             } catch (\Exception $e) {
                 CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));

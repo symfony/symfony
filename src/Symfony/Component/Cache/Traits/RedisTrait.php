@@ -18,6 +18,7 @@ use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
@@ -27,6 +28,8 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 trait RedisTrait
 {
+    use SerializerTrait;
+
     private static $defaultConnectionOptions = array(
         'class' => null,
         'persistent' => 0,
@@ -54,6 +57,7 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redisClient) ? get_class($redisClient) : gettype($redisClient)));
         }
         $this->redis = $redisClient;
+        $this->setSerializer(new PhpSerializer());
     }
 
     /**
@@ -177,7 +181,7 @@ trait RedisTrait
             });
             foreach ($values as $id => $v) {
                 if ($v) {
-                    yield $id => parent::unserialize($v);
+                    yield $id => $this->unserialize($v);
                 }
             }
         }
@@ -278,7 +282,7 @@ trait RedisTrait
 
         foreach ($values as $id => $value) {
             try {
-                $serialized[$id] = serialize($value);
+                $serialized[$id] = $this->serialize($value);
             } catch (\Exception $e) {
                 $failed[] = $id;
             }

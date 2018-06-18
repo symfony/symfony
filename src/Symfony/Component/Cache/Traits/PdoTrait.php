@@ -12,16 +12,19 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Serializer\PhpSerializer;
 
 /**
  * @internal
  */
 trait PdoTrait
 {
+    use SerializerTrait;
+
     private $conn;
     private $dsn;
     private $driver;
@@ -66,6 +69,7 @@ trait PdoTrait
         $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
         $this->namespace = $namespace;
 
+        $this->setSerializer(new PhpSerializer());
         parent::__construct($namespace, $defaultLifetime);
     }
 
@@ -181,7 +185,7 @@ trait PdoTrait
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
-                yield $row[0] => parent::unserialize(is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $row[0] => $this->unserialize(is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
@@ -257,7 +261,7 @@ trait PdoTrait
 
         foreach ($values as $id => $value) {
             try {
-                $serialized[$id] = serialize($value);
+                $serialized[$id] = $this->serialize($value);
             } catch (\Exception $e) {
                 $failed[] = $id;
             }

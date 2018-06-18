@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-11T19:53:44Z
+
+(failure is a false-positive.)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-14T09:46:46Z
+
+@nicolas-grekas it seems to duplicate the same logic in ArrayAdapter and ArrayCache. Should part of it be moved to the ArrayTrait to be shared ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T11:26:37Z
+
+@stof done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-15T10:06:09Z
+
+PR ready

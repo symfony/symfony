@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\LockRegistry;
 
 /**
  * An implementation for CacheInterface that provides stampede protection via probabilistic early expiration.
@@ -36,6 +36,7 @@ trait GetTrait
 
     private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, float $beta)
     {
+        retry:
         $t = 0;
         $item = $pool->getItem($key);
         $recompute = !$item->isHit() || INF === $beta;
@@ -63,24 +64,11 @@ trait GetTrait
             return $item->get();
         }
 
-        static $save = null;
-
-        if (null === $save) {
-            $save = \Closure::bind(
-                function (CacheItemPoolInterface $pool, CacheItemInterface $item, $value, float $startTime) {
-                    if ($item instanceof CacheItem && $startTime && $item->expiry > $endTime = microtime(true)) {
-                        $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
-                        $item->newMetadata[CacheItem::METADATA_CTIME] = 1000 * (int) ($endTime - $startTime);
-                    }
-                    $pool->save($item->set($value));
-
-                    return $value;
-                },
-                null,
-                CacheItem::class
-            );
+        if (!LockRegistry::save($key, $pool, $item, $callback, $t, $value)) {
+            $beta = 0;
+            goto retry;
         }
 
-        return $save($pool, $item, $callback($item), $t);
+        return $value;
     }
 }

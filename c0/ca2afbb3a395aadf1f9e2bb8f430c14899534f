@@ -1,0 +1,270 @@
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T00:48:50Z
+
+> I'd be thrilled to get some benchmarks on your scenarios.
+
+https://gist.github.com/palex-fpt/82fc3deed09c2de2a9023080a9613ce3
+largeObject - it is serialized. igbinary gives 2x bust over php serialize.
+largeExportableObject - in var_export form it loads in 10x+ faster than serialized.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T01:01:19Z
+
+>Instead of using native php serialization, this uses a marshaller that represents objects in plain static arrays. Unmarshalling these arrays is faster than unserializing the corresponding PHP strings (because it works with copy-on-write, while unserialize cannot.)
+
+There is native support to var_export serialization:
+http://php.net/manual/en/language.oop5.magic.php#object.set-state
+
+Classes implemented this method should be able to restore from var_export-ed form.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T04:49:01Z
+
+> There is native support to var_export serialization:
+
+I think I can make the marshaller handle these. Let me give it a try.
+Thanks for the bench also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T06:01:29Z
+
+Here we are, the generated PHP files now use `__set_state` when possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T10:10:49Z
+
+Now green, comments addressed @stof, thanks.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-08T12:03:39Z
+
+Is any chance to have extension point to switch between php serialization and igbinary?
+IMHO it would be good to have method where inherited class would be able override mapping between variable type and used marshaling method.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T20:58:07Z
+
+I managed to remove the unmarshaller part of this PR, and leverage `__set_state` instead.
+This allows generating ultra performant code that needs no userland logic but only minimal PHP code.
+In order to not instantiate all objects in its pool for `PhpArray*` adapters, and in order to skip the wrapping logic around `include` in `PhpFiles*` adapters, this code is wrapped in closures that are called on demand.
+
+Combined with #27549, this results in a significantly faster value loader that benefits from OPcache shared memory as much as possible.
+
+> Is any chance to have extension point to switch between php serialization and igbinary?
+
+What would be the benefit? `serialize()` is now used only in specific situations: when a structure contains internal references or when objects implementing `Serializable` are found. We could use `igbinary()` instead in these situations, but I would hardcode it to make things simpler. WDYT?
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-09T02:08:41Z
+
+I wrote bench for measure object load times: https://gist.github.com/palex-fpt/121a24e53ded4a0f6bb72307fc823a50
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-09T04:02:55Z
+
+TBH I would like to have PhpFilesTrait looks like:
+```
+// doSave()
+...
+            $ok = $this->write($file, '<?php return '.var_export(array($lifetime, $this->serialize($value)), true).';') && $ok;
+...
+// doFetch()
+...
+                    list($expiresAt, $values[$id]) = $this->unserialize(include $file);
+```
+This way we would move all responsibility to prepare 'the best' serialization form to serializer. Leaving PhpFilesTrait with file handling and using opcache.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-09T05:58:45Z
+
+> I wrote bench for measure object load times: https://gist.github.com/palex-fpt/121a24e53ded4a0f6bb72307fc823a50
+
+I was surprised by the speed of `var_export` so I looked better at it: the script uses var_export on already var_exported data, which PHP just has to load a simple string. That's not what you wanted to bench or course. When removing this double var_export, you get a fatal error `Call to undefined method stdClass::__set_state() `, which is what I would have expected.
+
+That leaves us with the marshaller as the best solution, great :)
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-09T06:28:25Z
+
+Oops. My mistake. I updated gist. Igbinary looks like the winner. And it uses three times lesser space.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-09T06:37:22Z
+
+I tested with range of options. When data use a lot of object instances - it looses to igbinary. When data is composition of scalars - PhpMarshaller is winner. It'll be good have option to choose marshaller based on used data.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-09T06:45:55Z
+
+> Igbinary looks like the winner. And it uses three times lesser space.
+
+actually, it doesn't to me, because this is missing a very important property of the native php format: it leverages php shared memory. This means the php format uses zero extra memory past the first request. This also means zero memory transfer to access the data: you just manipulate pointers to shared memory under the hood.
+
+There is a pathological test case that illustrates this:
+`php -dopcache.enable_cli=1 -dapc.enable_cli=1 test.php`
+```php
+
+error_reporting(-1);
+require 'vendor/autoload.php';
+
+use Symfony\Component\Cache\Adapter as p;
+
+$cache = new p\PhpFilesAdapter();
+//$cache = new p\ApcuAdapter();
+
+$mem = memory_get_usage();
+$start = microtime(true);
+$i = 10000;
+$values = array();
+
+while (--$i) {
+    $values[] = $cache->get('foo', function ($item) {
+        return str_repeat('-', 10000);
+    });
+}
+
+echo 1000*(microtime(true) - $start), "ms\n";
+echo memory_get_peak_usage() - $mem, "\n";
+```
+
+Takes 23ms + 123MB with Apcu (~mimics serialize/igbinary)
+And 13ms + 555KB with native PHP.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-09T12:30:59Z
+
+Actually it shares opcodes and strings. Replace string with array or object and it would not be shared.
+That's way I want to have ability to override serialization method. PhpMarshaller is excellent when data has small count of objects. And it always wins vs standard php serializer. But with production data I would compare serializers and select the best one. If igbinary wins I would be forced to reimplement PhpFilesCache
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-11T21:07:13Z
+
+> Actually it shares opcodes and strings
+
+thank looks great, do you have any pointer to illustrate that?
+
+> igbinary wins I would be forced to reimplement PhpFilesCache
+
+what do you think of hardcoding this: if igbinary is enabled and the value contains at least one object or one internal reference > then use it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-11T21:12:39Z
+
+> Actually it shares opcodes and strings
+
+OK, tested: actually it does only internally, which is nice but not the same as doing shared process memory.
+
+e.g. this script consumes a lot of memory:
+```php
+$i = 10000;
+$values = array();
+$ser = igbinary_serialize(str_repeat('-', 100000));
+
+while (--$i) {
+    $values[] = igbinary_unserialize($ser);
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-12T10:03:42Z
+
+PhpMarshaller updated: now faster than igbinary and able to handle internal object references.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-13T01:31:49Z
+
+> what do you think of hardcoding this: if igbinary is enabled and the value contains at least one object or one internal reference > then use it?
+
+I`m ok with that option as default serialization method. I don't like that as only available option to use opcache. We switched to __set_state for opcache and igbinary for files two years ago. And it is still impossible to migrate to PhpFilesCache and FilesystemCache due hardcoded native serialize usage. Hardcoding another solution looks bad for me.
+
+IMHO responsibility for converting objects to php-scripts should be moved out from PhpFilesTrait, PhpArrayCache PhpArrayTrait . Now it is distributed between PhpFilesTrait, PhpArrayCache, PhpArrayTrait and PhpMarshaller. But it can be done in separate PR.
+
+Symfony Components positioned as a set of decoupled and reusable PHP libraries. Let it be decoupled and reusable :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-13T21:23:12Z
+
+PR now tested and green. Ready.
+
+@palex-fpt now that this is faster than igbinary there is no reason anymore to allow any sort of extensibility here. On the contrary, I prefer this to be closed and remain internal details.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-14T03:00:26Z
+
+Do you have benchmarks?
+
+# tree depth 3, values: 50, iterations: 1000
+
+test | store | first get | 2nd get
+---|---:|---:|---:
+ArrayCache (nonserialized) | 15210.6 | 17.9 | 5.7
+ArrayCache (serialized) | 390256.1 | 305.5 | 299.7
+FilesystemCache | 797541.0 | 391.4 | 355.8
+PhpFilesCache | 1432501.9 | 1240.0 | 83.7
+
+With my typical scenario (one access to key-value pair per request) it does not looks good.
+As I tested against your branch - it's hard to configure cache with igbinary here.
+
+https://gist.github.com/palex-fpt/913fbe1b1def170c2785d3e26ce4f77e
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-14T05:46:56Z
+
+it looks like first call to 'get' method is performed against empty opcache. 'set' method should populate opcache.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T05:54:29Z
+
+To me, this looks really good: store ~and 1st get are~ is slow call~s~, that's expected as caches have much higher read-rate than write-rate. For PhpFileAdapter, that's even more the case because since this leverages opcache, it should be used in append-only scenarios. The reason is that opcache itself is append-only: it never frees memory until its buffer is full, in which case it just empties it and starts over. Obviously, this should never happen. This means that if one plans to store data that can expire/be deleted at some non-zero rate, this is not something we should encourage/support.
+See http://blog.jpauli.tech/2015/03/05/opcache.html for details about this.
+The best use case for PhpFileAdapter is for system caches, and this is where we use it. In this scenario, data is append-only, which means per-request locality is also a great optimization with no downside.
+With this reasoning, if you want to use igbinary, then this should be done with FilesystemAdapter, which your other PR will allow. The reason is that if your data is append-only then there is no better backend than PhpFileAdapter, and if not, then opcache is not a good fit, unless you're ok with emptying its memory periodically by design, which is a scenario I wouldn't support (so that I have no incentive to add code to handle igbinary there.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T07:35:43Z
+
+>  'set' method should populate opcache.
+
+done
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-15T02:10:49Z
+
+> The reason is that opcache itself is append-only: it never frees memory until its buffer is full, in which case it just empty it and starts over. Obviously, this should never happen. This means that if one plans to store data that can expire/be deleted at some non-zero rate, this is not something we should encourage/support.
+
+Opcache is fastest available cache with node locality. We reset opcache on node on 'switch to new build' deployment. It happens at least once per day. Any frequently accessed data that has change rate lower than deployment rate is perfect candidate to be stored in opcache. Limit opcache to append only is forcing to use slower caches or to do unnecessary redeployment on data change. Ex. does use-case that allows to change title of site directory  (which happens once per year or never) should forbid use opcache for site directory attributes?
+
+Caching retrieved data adds some burden to backend services. Service that enumerates over large portion of opcached objects can go oom. But it can be handled with $cache->reset() on each iteration.
+
+I'm ok with current PR. It is big step in performance from opcaching serialized strings. Further improvements can be done in separate PRs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-15T10:05:55Z
+
+Great, PR is ready then :)
+ping @symfony/deciders

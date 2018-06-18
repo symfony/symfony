@@ -41,6 +41,7 @@
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
             <argument>%kernel.cache_dir%/pools</argument>
+            <argument>true</argument>
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>

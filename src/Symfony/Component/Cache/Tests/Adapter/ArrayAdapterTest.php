@@ -36,12 +36,12 @@ class ArrayAdapterTest extends AdapterTestCase
 
         // Hit
         $item = $cache->getItem('foo');
-        $item->set('4711');
+        $item->set('::4711');
         $cache->save($item);
 
         $fooItem = $cache->getItem('foo');
         $this->assertTrue($fooItem->isHit());
-        $this->assertEquals('4711', $fooItem->get());
+        $this->assertEquals('::4711', $fooItem->get());
 
         // Miss (should be present as NULL in $values)
         $cache->getItem('bar');
@@ -50,7 +50,7 @@ class ArrayAdapterTest extends AdapterTestCase
 
         $this->assertCount(2, $values);
         $this->assertArrayHasKey('foo', $values);
-        $this->assertSame(serialize('4711'), $values['foo']);
+        $this->assertSame(serialize('::4711'), $values['foo']);
         $this->assertArrayHasKey('bar', $values);
         $this->assertNull($values['bar']);
     }

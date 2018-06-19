@@ -24,7 +24,6 @@
         "symfony/yaml": "^2.0.5|~3.0.0",
         "symfony/expression-language": "~2.4|~3.0.0",
         "doctrine/annotations": "~1.0",
-        "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
     "conflict": {

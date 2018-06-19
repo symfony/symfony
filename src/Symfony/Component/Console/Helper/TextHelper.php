@@ -11,37 +11,15 @@
 
 namespace Symfony\Component\Console\Helper;
 
-@trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2 and will be removed in 5.0.', E_USER_DEPRECATED);
-
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
- * Helper is the base class for all helper classes.
+ * The TextHelper provides helpers for text formatting.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @deprecated since version 4.2, to be removed in 5.0.
  */
-abstract class Helper implements HelperInterface
+final class TextHelper
 {
-    protected $helperSet = null;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setHelperSet(HelperSet $helperSet = null)
-    {
-        $this->helperSet = $helperSet;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHelperSet()
-    {
-        return $this->helperSet;
-    }
-
     /**
      * Returns the length of a string, using mb_strwidth if it is available.
      *
@@ -52,7 +30,7 @@ abstract class Helper implements HelperInterface
     public static function strlen($string)
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return \strlen($string);
+            return strlen($string);
         }
 
         return mb_strwidth($string, $encoding);
@@ -93,9 +71,9 @@ abstract class Helper implements HelperInterface
         foreach ($timeFormats as $index => $format) {
             if ($secs >= $format[0]) {
                 if ((isset($timeFormats[$index + 1]) && $secs < $timeFormats[$index + 1][0])
-                    || $index == \count($timeFormats) - 1
+                    || $index == count($timeFormats) - 1
                 ) {
-                    if (2 == \count($format)) {
+                    if (2 == count($format)) {
                         return $format[1];
                     }
 

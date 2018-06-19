@@ -265,8 +265,13 @@ class Application
         return $exitCode;
     }
 
+    /**
+     * @deprecated since version 4.2, to be removed in 5.0. Use individual helpers instead.
+     */
     public function setHelperSet(HelperSet $helperSet)
     {
+        @trigger_error('setHelperSet() is deprecated since version 4.2 and will be removed in 5.0. Use individual helpers instead.', E_USER_DEPRECATED);
+
         $this->helperSet = $helperSet;
     }
 
@@ -274,9 +279,13 @@ class Application
      * Get the helper set associated with the command.
      *
      * @return HelperSet The HelperSet instance associated with this command
+     *
+     * @deprecated since version 4.2, to be removed in 5.0. Use individual helpers instead.
      */
     public function getHelperSet()
     {
+        @trigger_error('getHelperSet() is deprecated since version 4.2 and will be removed in 5.0. Use individual helpers instead.', E_USER_DEPRECATED);
+
         if (!$this->helperSet) {
             $this->helperSet = $this->getDefaultHelperSet();
         }

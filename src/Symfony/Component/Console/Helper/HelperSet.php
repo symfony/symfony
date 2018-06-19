@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
+@trigger_error('The '.__NAMESPACE__.'\HelperSet class is deprecated since version 4.2 and will be removed in 5.0. Use individual helpers instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
@@ -18,6 +20,8 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  * HelperSet represents a set of helpers to be used with a command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 4.2, to be removed in 5.0. Use individual helpers instead.
  */
 class HelperSet implements \IteratorAggregate
 {

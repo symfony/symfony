@@ -81,12 +81,12 @@ class OptionsResolver implements Options
     private $nested = array();
 
     /**
-     * A list of parent name. Use in exceptions.
+     * A list of parent names. Used in exceptions.
      */
     private $nestedLevelsName = array();
 
     /**
-     * A list of resoilve data. Needs for root access from children.
+     * A list of resolved data. Needed for root access from children.
      */
     private $resolvedData = array();
 
@@ -151,8 +151,7 @@ class OptionsResolver implements Options
      *
      * @return $this
      *
-     * @throws AccessException      If called from a lazy option or normalizer
-     * @throws \ReflectionException
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function setDefault($option, $value)
     {
@@ -163,9 +162,7 @@ class OptionsResolver implements Options
             throw new AccessException('Default values cannot be set from a lazy option or normalizer.');
         }
 
-        // If an options is array that shoul be created
-        // new nested OptionResolver
-        if ($value instanceof OptionResolverNested) {
+        if ($value instanceof NestedOption) {
             $optionsResolver = $this->nested[$option] ?? new self();
             // Specify the full path for displaying errors
             $optionsResolver->setNestedLevelsName(
@@ -174,7 +171,6 @@ class OptionsResolver implements Options
                     array($option)
                 )
             );
-            // Set parent for child OptionResolvers
             $optionsResolver->setParent($this);
 
             foreach ($value as $key => $item) {
@@ -236,8 +232,7 @@ class OptionsResolver implements Options
      *
      * @return $this
      *
-     * @throws AccessException      If called from a lazy option or normalizer
-     * @throws \ReflectionException
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function setDefaults(array $defaults)
     {
@@ -262,9 +257,7 @@ class OptionsResolver implements Options
     {
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
@@ -296,17 +289,11 @@ class OptionsResolver implements Options
         foreach ((array) $optionNames as $option) {
             if (\is_array($option) && 1 === count($option)) {
                 $option = $option[0];
-            }
-
-            if (\is_array($option)) {
+            } elseif (\is_array($option)) {
                 // Get first nested level
                 $nestedOption = array_shift($option);
                 if (!array_key_exists($nestedOption, $this->nested)) {
-                    throw new UndefinedOptionsException(sprintf(
-                        'The nested option "%s" does not exist. Defined options are: "%s".',
-                        $nestedOption,
-                        implode('", "', array_keys($this->nested))
-                    ));
+                    throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
                 }
 
                 // Call recursive
@@ -329,7 +316,7 @@ class OptionsResolver implements Options
      *
      * An option is required if it was passed to {@link setRequired()}.
      *
-     * @param string|[]string $option The name of the option
+     * @param string|string[] $option The name of the option
      *
      * @return bool Whether the option is required
      */
@@ -337,9 +324,7 @@ class OptionsResolver implements Options
     {
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
@@ -372,7 +357,7 @@ class OptionsResolver implements Options
         }
 
         foreach ($this->required as $key => $item) {
-            // If we in child OptionResolver, return array
+            // If we are in child OptionResolver, return array
             if (count($nestedLevel)) {
                 $key = array_merge($nestedLevel, array($key));
             }
@@ -401,9 +386,7 @@ class OptionsResolver implements Options
 
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
 
@@ -437,7 +420,7 @@ class OptionsResolver implements Options
                 continue;
             }
 
-            // If we in child OptionResolver, return array
+            // If we are in child OptionResolver, return array
             if (count($nestedLevel)) {
                 $key = array_merge($nestedLevel, array($key));
             }
@@ -470,17 +453,11 @@ class OptionsResolver implements Options
         foreach ((array) $optionNames as $option) {
             if (\is_array($option) && 1 === count($option)) {
                 $option = $option[0];
-            }
-
-            if (\is_array($option)) {
+            } elseif (\is_array($option)) {
                 // Get first nested level
                 $nestedOption = array_shift($option);
                 if (!array_key_exists($nestedOption, $this->nested)) {
-                    throw new UndefinedOptionsException(sprintf(
-                        'The nested option "%s" does not exist. Defined options are: "%s".',
-                        $nestedOption,
-                        implode('", "', array_keys($this->nested))
-                    ));
+                    throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
                 }
 
                 // Call recursive
@@ -511,9 +488,7 @@ class OptionsResolver implements Options
     {
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
@@ -545,7 +520,7 @@ class OptionsResolver implements Options
             }
         }
 
-        // If we in child OptionResolver, return array
+        // If we are in child OptionResolver, return array
         foreach ($this->defined as $key => $item) {
             if (count($nestedLevel)) {
                 $key = array_merge($nestedLevel, array($key));
@@ -592,17 +567,11 @@ class OptionsResolver implements Options
 
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
-                throw new UndefinedOptionsException(sprintf(
-                    'The nested option "%s" does not exist. Defined options are: "%s".',
-                    $nestedOption,
-                    implode('", "', array_keys($this->nested))
-                ));
+                throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
             }
 
             // Call recursive
@@ -617,11 +586,7 @@ class OptionsResolver implements Options
         }
 
         if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
         $this->normalizers[$option] = $normalizer;
@@ -661,36 +626,23 @@ class OptionsResolver implements Options
 
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
-                throw new UndefinedOptionsException(sprintf(
-                    'The nested option "%s" does not exist. Defined options are: "%s".',
-                    $nestedOption,
-                    implode('", "', array_keys($this->nested))
-                ));
+                throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
             }
 
             // Call recursive
             if (array_key_exists($nestedOption, $this->nested)) {
-                $this->nested[$nestedOption]->setAllowedValues(
-                    $option,
-                    $allowedValues
-                );
+                $this->nested[$nestedOption]->setAllowedValues($option, $allowedValues);
             }
 
             return $this;
         }
 
         if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
         $this->allowedValues[$option] = is_array($allowedValues) ? $allowedValues : array($allowedValues);
@@ -732,36 +684,23 @@ class OptionsResolver implements Options
 
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
-                throw new UndefinedOptionsException(sprintf(
-                    'The nested option "%s" does not exist. Defined options are: "%s".',
-                    $nestedOption,
-                    implode('", "', array_keys($this->nested))
-                ));
+                throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
             }
 
             // Call recursive
             if (array_key_exists($nestedOption, $this->nested)) {
-                $this->nested[$nestedOption]->addAllowedValues(
-                    $option,
-                    $allowedValues
-                );
+                $this->nested[$nestedOption]->addAllowedValues($option, $allowedValues);
             }
 
             return $this;
         }
 
         if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
         if (!is_array($allowedValues)) {
@@ -803,36 +742,23 @@ class OptionsResolver implements Options
 
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
-                throw new UndefinedOptionsException(sprintf(
-                    'The nested option "%s" does not exist. Defined options are: "%s".',
-                    $nestedOption,
-                    implode('", "', array_keys($this->nested))
-                ));
+                throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
             }
 
             // Call recursive
             if (array_key_exists($nestedOption, $this->nested)) {
-                $this->nested[$nestedOption]->setAllowedTypes(
-                    $option,
-                    $allowedTypes
-                );
+                $this->nested[$nestedOption]->setAllowedTypes($option, $allowedTypes);
             }
 
             return $this;
         }
 
         if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
         $this->allowedTypes[$option] = (array) $allowedTypes;
@@ -868,36 +794,23 @@ class OptionsResolver implements Options
 
         if (\is_array($option) && 1 === count($option)) {
             $option = $option[0];
-        }
-
-        if (\is_array($option)) {
+        } elseif (\is_array($option)) {
             // Get first nested level
             $nestedOption = array_shift($option);
             if (!array_key_exists($nestedOption, $this->nested)) {
-                throw new UndefinedOptionsException(sprintf(
-                    'The nested option "%s" does not exist. Defined options are: "%s".',
-                    $nestedOption,
-                    implode('", "', array_keys($this->nested))
-                ));
+                throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $nestedOption, implode('", "', array_keys($this->nested))));
             }
 
             // Call recursive
             if (array_key_exists($nestedOption, $this->nested)) {
-                $this->nested[$nestedOption]->addAllowedTypes(
-                    $option,
-                    $allowedTypes
-                );
+                $this->nested[$nestedOption]->addAllowedTypes($option, $allowedTypes);
             }
 
             return $this;
         }
 
         if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
         if (!isset($this->allowedTypes[$option])) {
@@ -920,11 +833,7 @@ class OptionsResolver implements Options
     public function getNested($option)
     {
         if (!array_key_exists($option, $this->nested)) {
-            throw new UndefinedOptionsException(sprintf(
-                'The nested option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->nested))
-            ));
+            throw new UndefinedOptionsException(sprintf('The nested option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->nested))));
         }
 
         return $this->nested[$option];
@@ -950,9 +859,7 @@ class OptionsResolver implements Options
         foreach ((array) $optionNames as $option) {
             if (\is_array($option) && 1 === count($option)) {
                 $option = $option[0];
-            }
-
-            if (\is_array($option)) {
+            } elseif (\is_array($option)) {
                 // Get first nested level
                 $nestedOption = array_shift($option);
                 if (!array_key_exists($nestedOption, $this->nested)) {
@@ -961,9 +868,7 @@ class OptionsResolver implements Options
 
                 // Call recursive
                 if (array_key_exists($nestedOption, $this->nested)) {
-                    $this->nested[$nestedOption]->remove(
-                        $option
-                    );
+                    $this->nested[$nestedOption]->remove($option);
                 }
 
                 continue;
@@ -982,7 +887,7 @@ class OptionsResolver implements Options
     /**
      * Removes all options.
      *
-     * @param string|[]string $options
+     * @param string|string[] $options
      *
      * @return $this
      *
@@ -1076,11 +981,7 @@ class OptionsResolver implements Options
                 return implode(':', $names);
             }, array_keys($diff));
 
-            throw new UndefinedOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Defined options are: "%s".',
-                implode('", "', $keys),
-                implode('", "', array_keys($clone->defined))
-            ));
+            throw new UndefinedOptionsException(sprintf((count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Defined options are: "%s".', implode('", "', $keys), implode('", "', array_keys($clone->defined))));
         }
 
         // Override options set by the user
@@ -1108,10 +1009,7 @@ class OptionsResolver implements Options
                 return implode(':', $names);
             }, array_keys($diff));
 
-            throw new MissingOptionsException(sprintf(
-                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
-                implode('", "', $keys)
-            ));
+            throw new MissingOptionsException(sprintf(count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.', implode('", "', $keys)));
         }
 
         // Lock the container
@@ -1134,7 +1032,7 @@ class OptionsResolver implements Options
         if (!$clone->parent) {
             $clone->resolvedData = $clone->resolved;
 
-            return $clone->rezolveParentAccess($clone->resolved);
+            return $clone->resolveParentAccess($clone->resolved);
         }
 
         return $clone->resolved;
@@ -1145,18 +1043,14 @@ class OptionsResolver implements Options
      * If there are closures without resolve, we tried to resolve it with finish data
      * It needs when we want need access to parents resolver from nested resolvers.
      *
-     * @param array $data
-     *
-     * @return array
-     *
-     * @throws \ReflectionException
+     * @return callable[]
      */
-    private function rezolveParentAccess(array $data)
+    private function resolveParentAccess(array $data)
     {
         foreach ($data as $key => $item) {
             // Call all arrays recursive
             if (is_array($item)) {
-                $data[$key] = $this->rezolveParentAccess($item);
+                $data[$key] = $this->resolveParentAccess($item);
             } elseif (is_callable($item)) {
                 // Callable must not be array
                 $reflClosure = new \ReflectionFunction($item);
@@ -1205,17 +1099,10 @@ class OptionsResolver implements Options
         // Check whether the option is set at all
         if (!array_key_exists($option, $this->defaults)) {
             if (!isset($this->defined[$option])) {
-                throw new NoSuchOptionException(sprintf(
-                    'The option "%s" does not exist. Defined options are: "%s".',
-                    $option,
-                    implode('", "', array_keys($this->defined))
-                ));
+                throw new NoSuchOptionException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
             }
 
-            throw new NoSuchOptionException(sprintf(
-                'The optional option "%s" has no value set. You should make sure it is set with "isset" before reading it.',
-                $option
-            ));
+            throw new NoSuchOptionException(sprintf('The optional option "%s" has no value set. You should make sure it is set with "isset" before reading it.', $option));
         }
 
         $value = $this->defaults[$option];
@@ -1232,10 +1119,7 @@ class OptionsResolver implements Options
                     return implode(':', $array);
                 }, array_keys($this->calling));
 
-                throw new OptionDefinitionException(sprintf(
-                    'The options "%s" have a cyclic dependency.',
-                    implode('", "', $options)
-                ));
+                throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', $options)));
             }
 
             // The following section must be protected from cyclic
@@ -1270,14 +1154,7 @@ class OptionsResolver implements Options
                 $options = $this->getNestedLevelsName();
                 $options[] = $option;
 
-                throw new InvalidOptionsException(sprintf(
-                    'The option "%s" with value %s is expected to be of type '.
-                    '"%s", but is of type "%s".',
-                    implode(':', $options),
-                    $this->formatValue($value),
-                    implode('" or "', $this->allowedTypes[$option]),
-                    implode('|', array_keys($invalidTypes))
-                ));
+                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', implode(':', $options), $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), implode('|', array_keys($invalidTypes))));
             }
         }
 
@@ -1336,10 +1213,7 @@ class OptionsResolver implements Options
                     return implode(':', $array);
                 }, array_keys($this->calling));
 
-                throw new OptionDefinitionException(sprintf(
-                    'The options "%s" have a cyclic dependency.',
-                    implode('", "', $options)
-                ));
+                throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', $options)));
             }
 
             $normalizer = $this->normalizers[$option];
@@ -1474,8 +1348,6 @@ class OptionsResolver implements Options
 
     /**
      * @param array $nestedLevelsName
-     *
-     * @return self
      */
     public function setNestedLevelsName(array $nestedLevelsName): self
     {
@@ -1486,8 +1358,6 @@ class OptionsResolver implements Options
 
     /**
      * @param null $parent
-     *
-     * @return self
      */
     public function setParent($parent): self
     {

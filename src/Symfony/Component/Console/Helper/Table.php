@@ -473,7 +473,7 @@ class Table
             return sprintf($style->getBorderFormat(), str_repeat($style->getBorderChars()[2], $width));
         }
 
-        $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+        $width += TextHelper::strlen($cell) - TextHelper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
         $content = sprintf($style->getCellRowContentFormat(), $cell);
 
         return sprintf($cellFormat, str_pad($content, $width, $style->getPaddingChar(), $style->getPadType()));
@@ -678,8 +678,8 @@ class Table
 
                 foreach ($row as $i => $cell) {
                     if ($cell instanceof TableCell) {
-                        $textContent = Helper::removeDecoration($this->output->getFormatter(), $cell);
-                        $textLength = Helper::strlen($textContent);
+                        $textContent = TextHelper::removeDecoration($this->output->getFormatter(), $cell);
+                        $textLength = TextHelper::strlen($textContent);
                         if ($textLength > 0) {
                             $contentColumns = str_split($textContent, ceil($textLength / $cell->getColspan()));
                             foreach ($contentColumns as $position => $content) {
@@ -707,7 +707,7 @@ class Table
 
         if (isset($row[$column])) {
             $cell = $row[$column];
-            $cellWidth = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+            $cellWidth = TextHelper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
         }
 
         $columnWidth = isset($this->columnWidths[$column]) ? $this->columnWidths[$column] : 0;

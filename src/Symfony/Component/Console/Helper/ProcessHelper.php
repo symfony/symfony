@@ -25,6 +25,13 @@ use Symfony\Component\Process\Process;
  */
 class ProcessHelper extends Helper
 {
+    private $formatter;
+
+    public function __construct()
+    {
+        $this->formatter = new DebugFormatterHelper();
+    }
+
     /**
      * Runs an external process.
      *
@@ -42,8 +49,6 @@ class ProcessHelper extends Helper
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
         }
-
-        $formatter = $this->getHelperSet()->get('debug_formatter');
 
         if ($cmd instanceof Process) {
             $cmd = array($cmd);
@@ -65,7 +70,7 @@ class ProcessHelper extends Helper
         }
 
         if ($verbosity <= $output->getVerbosity()) {
-            $output->write($formatter->start(spl_object_hash($process), $this->escapeString($process->getCommandLine())));
+            $output->write($this->formatter->start(spl_object_hash($process), $this->escapeString($process->getCommandLine())));
         }
 
         if ($output->isDebug()) {
@@ -76,7 +81,7 @@ class ProcessHelper extends Helper
 
         if ($verbosity <= $output->getVerbosity()) {
             $message = $process->isSuccessful() ? 'Command ran successfully' : sprintf('%s Command did not run successfully', $process->getExitCode());
-            $output->write($formatter->stop(spl_object_hash($process), $message, $process->isSuccessful()));
+            $output->write($this->formatter->stop(spl_object_hash($process), $message, $process->isSuccessful()));
         }
 
         if (!$process->isSuccessful() && null !== $error) {
@@ -130,10 +135,8 @@ class ProcessHelper extends Helper
             $output = $output->getErrorOutput();
         }
 
-        $formatter = $this->getHelperSet()->get('debug_formatter');
-
-        return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
-            $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
+        return function ($type, $buffer) use ($output, $process, $callback) {
+            $output->write($this->formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
                 \call_user_func($callback, $type, $buffer);

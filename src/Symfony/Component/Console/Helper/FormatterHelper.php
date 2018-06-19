@@ -54,12 +54,12 @@ class FormatterHelper extends Helper
         foreach ($messages as $message) {
             $message = OutputFormatter::escape($message);
             $lines[] = sprintf($large ? '  %s  ' : ' %s ', $message);
-            $len = max($this->strlen($message) + ($large ? 4 : 2), $len);
+            $len = max(TextHelper::strlen($message) + ($large ? 4 : 2), $len);
         }
 
         $messages = $large ? array(str_repeat(' ', $len)) : array();
         for ($i = 0; isset($lines[$i]); ++$i) {
-            $messages[] = $lines[$i].str_repeat(' ', $len - $this->strlen($lines[$i]));
+            $messages[] = $lines[$i].str_repeat(' ', $len - TextHelper::strlen($lines[$i]));
         }
         if ($large) {
             $messages[] = str_repeat(' ', $len);
@@ -83,9 +83,9 @@ class FormatterHelper extends Helper
      */
     public function truncate($message, $length, $suffix = '...')
     {
-        $computedLength = $length - $this->strlen($suffix);
+        $computedLength = $length - TextHelper::strlen($suffix);
 
-        if ($computedLength > $this->strlen($message)) {
+        if ($computedLength > TextHelper::strlen($message)) {
             return $message;
         }
 

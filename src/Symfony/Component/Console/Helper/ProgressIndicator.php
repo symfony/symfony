@@ -245,10 +245,10 @@ class ProgressIndicator
                 return $indicator->message;
             },
             'elapsed' => function (ProgressIndicator $indicator) {
-                return Helper::formatTime(time() - $indicator->startTime);
+                return TextHelper::formatTime(time() - $indicator->startTime);
             },
             'memory' => function () {
-                return Helper::formatMemory(memory_get_usage(true));
+                return TextHelper::formatMemory(memory_get_usage(true));
             },
         );
     }

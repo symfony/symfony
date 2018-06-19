@@ -300,7 +300,7 @@ final class ProgressBar
     {
         $this->format = null;
         $this->max = max(0, $max);
-        $this->stepWidth = $this->max ? Helper::strlen((string) $this->max) : 4;
+        $this->stepWidth = $this->max ? TextHelper::strlen((string) $this->max) : 4;
     }
 
     /**
@@ -378,7 +378,7 @@ final class ProgressBar
         if ($this->overwrite) {
             if (!$this->firstRun) {
                 if ($this->output instanceof ConsoleSectionOutput) {
-                    $lines = floor(Helper::strlen($message) / $this->terminal->getWidth()) + $this->formatLineCount + 1;
+                    $lines = floor(TextHelper::strlen($message) / $this->terminal->getWidth()) + $this->formatLineCount + 1;
                     $this->output->clear($lines);
                 } else {
                     // Move the cursor to the beginning of the line
@@ -424,14 +424,14 @@ final class ProgressBar
                 $completeBars = floor($bar->getMaxSteps() > 0 ? $bar->getProgressPercent() * $bar->getBarWidth() : $bar->getProgress() % $bar->getBarWidth());
                 $display = str_repeat($bar->getBarCharacter(), $completeBars);
                 if ($completeBars < $bar->getBarWidth()) {
-                    $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlenWithoutDecoration($output->getFormatter(), $bar->getProgressCharacter());
+                    $emptyBars = $bar->getBarWidth() - $completeBars - TextHelper::strlenWithoutDecoration($output->getFormatter(), $bar->getProgressCharacter());
                     $display .= $bar->getProgressCharacter().str_repeat($bar->getEmptyBarCharacter(), $emptyBars);
                 }
 
                 return $display;
             },
             'elapsed' => function (ProgressBar $bar) {
-                return Helper::formatTime(time() - $bar->getStartTime());
+                return TextHelper::formatTime(time() - $bar->getStartTime());
             },
             'remaining' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
@@ -444,7 +444,7 @@ final class ProgressBar
                     $remaining = round((time() - $bar->getStartTime()) / $bar->getProgress() * ($bar->getMaxSteps() - $bar->getProgress()));
                 }
 
-                return Helper::formatTime($remaining);
+                return TextHelper::formatTime($remaining);
             },
             'estimated' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
@@ -457,10 +457,10 @@ final class ProgressBar
                     $estimated = round((time() - $bar->getStartTime()) / $bar->getProgress() * $bar->getMaxSteps());
                 }
 
-                return Helper::formatTime($estimated);
+                return TextHelper::formatTime($estimated);
             },
             'memory' => function (ProgressBar $bar) {
-                return Helper::formatMemory(memory_get_usage(true));
+                return TextHelper::formatMemory(memory_get_usage(true));
             },
             'current' => function (ProgressBar $bar) {
                 return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
@@ -513,7 +513,7 @@ final class ProgressBar
 
         // gets string length for each sub line with multiline format
         $linesLength = array_map(function ($subLine) {
-            return Helper::strlenWithoutDecoration($this->output->getFormatter(), rtrim($subLine, "\r"));
+            return TextHelper::strlenWithoutDecoration($this->output->getFormatter(), rtrim($subLine, "\r"));
         }, explode("\n", $line));
 
         $linesWidth = max($linesLength);

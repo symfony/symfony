@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -31,9 +33,9 @@ class DebugCommand extends Command
 
     public function __construct(array $mapping)
     {
-        parent::__construct();
-
         $this->mapping = $mapping;
+
+        parent::__construct();
     }
 
     /**
@@ -42,12 +44,17 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lists messages you can dispatch using the message bus')
+            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of %s)', implode(', ', array_keys($this->mapping))), null)
+            ->setDescription('Lists messages you can dispatch using the message buses')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be
-dispatched using the message bus:
+dispatched using the message buses:
 
   <info>php %command.full_name%</info>
+
+Or for a specific bus only:
+
+  <info>php %command.full_name% command_bus</info>
 
 EOF
             )
@@ -61,21 +68,33 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Messenger');
-        $io->text('The following messages can be dispatched:');
-        $io->newLine();
 
-        $tableRows = array();
-        foreach ($this->mapping as $message => $handlers) {
-            $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $message));
-            foreach ($handlers as $handler) {
-                $tableRows[] = array(sprintf('    handled by %s', $handler));
+        $mapping = $this->mapping;
+        if ($bus = $input->getArgument('bus')) {
+            if (!isset($mapping[$bus])) {
+                throw new RuntimeException(sprintf('Bus "%s" does not exist. Known buses are %s.', $bus, implode(', ', array_keys($this->mapping))));
             }
+            $mapping = array($bus => $mapping[$bus]);
         }
 
-        if ($tableRows) {
-            $io->table(array(), $tableRows);
-        } else {
-            $io->text('No messages were found that have valid handlers.');
+        foreach ($mapping as $bus => $handlersByMessage) {
+            $io->section($bus);
+
+            $tableRows = array();
+            foreach ($handlersByMessage as $message => $handlers) {
+                $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $message));
+                foreach ($handlers as $handler) {
+                    $tableRows[] = array(sprintf('    handled by <info>%s</>', $handler));
+                }
+            }
+
+            if ($tableRows) {
+                $io->text('The following messages can be dispatched:');
+                $io->newLine();
+                $io->table(array(), $tableRows);
+            } else {
+                $io->warning(sprintf('No handled message found in bus "%s".', $bus));
+            }
         }
     }
 }

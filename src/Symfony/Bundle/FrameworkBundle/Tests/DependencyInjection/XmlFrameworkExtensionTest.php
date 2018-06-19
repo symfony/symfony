@@ -27,4 +27,9 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTest
     {
         $this->markTestSkipped('The assets key cannot be set to false using the XML configuration format.');
     }
+
+    public function testMessengerMiddlewareFactoryErroneousFormat()
+    {
+        $this->markTestSkipped('XML configuration will not allow eeroneous format.');
+    }
 }

@@ -7,18 +7,14 @@
     <services>
         <defaults public="false" />
 
-        <!-- Handlers -->
-        <service id="messenger.handler_resolver" class="Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator">
-            <argument type="service" id="service_container"/>
-        </service>
-
         <!-- Asynchronous -->
         <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Asynchronous\Routing\SenderLocator">
             <argument type="service" id="messenger.sender_locator" />
-            <argument /> <!-- Message to sender ID mapping -->
+            <argument type="collection" /> <!-- Message to sender ID mapping -->
         </service>
         <service id="messenger.middleware.route_messages" class="Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware">
             <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
+            <argument type="collection" /> <!-- Message to send and handle mapping -->
         </service>
 
         <!-- Message encoding/decoding -->
@@ -31,7 +27,7 @@
         <!-- Middleware -->
         <service id="messenger.middleware.allow_no_handler" class="Symfony\Component\Messenger\Middleware\AllowNoHandlerMiddleware" abstract="true" />
         <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
-            <argument type="service" id="messenger.handler_resolver" />
+            <argument /> <!-- Bus handler resolver -->
         </service>
 
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware" abstract="true">

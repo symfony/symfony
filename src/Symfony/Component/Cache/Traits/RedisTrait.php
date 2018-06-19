@@ -126,9 +126,12 @@ trait RedisTrait
                     throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e->getMessage(), $dsn));
                 }
 
-                if (@!$redis->isConnected()) {
-                    $e = ($e = error_get_last()) && preg_match('/^Redis::p?connect\(\): (.*)/', $e['message'], $e) ? sprintf(' (%s)', $e[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $e, $dsn));
+                set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+                $isConnected = $redis->isConnected();
+                restore_error_handler();
+                if (!$isConnected) {
+                    $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
+                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $error, $dsn));
                 }
 
                 if ((null !== $auth && !$redis->auth($auth))
@@ -194,7 +197,7 @@ trait RedisTrait
     protected function doClear($namespace)
     {
         // When using a native Redis cluster, clearing the cache is done by versioning in AbstractTrait::clear().
-        // This means old keys are not really removed until they expire and may need gargage collection.
+        // This means old keys are not really removed until they expire and may need garbage collection.
 
         $cleared = true;
         $hosts = array($this->redis);

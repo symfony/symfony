@@ -64,6 +64,9 @@ Form
    }
    ```
 
+ * Added `help` option to the form field. If you have custom Form extension for it, you should remove it.
+   Also remove it from the custom form theme.
+
 FrameworkBundle
 ---------------
 

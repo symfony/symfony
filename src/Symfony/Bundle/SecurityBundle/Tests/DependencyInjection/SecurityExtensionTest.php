@@ -123,6 +123,33 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
+    public function testGuardHandlerIsPassedStatelessFirewalls()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '^/admin',
+                    'http_basic' => null,
+                ),
+                'stateless_firewall' => array(
+                    'pattern' => '/.*',
+                    'stateless' => true,
+                    'http_basic' => null,
+                ),
+            ),
+        ));
+
+        $container->compile();
+        $definition = $container->getDefinition('security.authentication.guard_handler');
+        $this->assertSame(array('stateless_firewall'), $definition->getArgument(2));
+    }
+
     public function testSwitchUserNotStatelessOnStatelessFirewall()
     {
         $container = $this->getRawContainer();

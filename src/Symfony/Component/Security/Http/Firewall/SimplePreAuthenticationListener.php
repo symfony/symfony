@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -18,12 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * SimplePreAuthenticationListener implements simple proxying to an authenticator.
@@ -38,6 +41,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
     private $simpleAuthenticator;
     private $logger;
     private $dispatcher;
+    private $sessionStrategy;
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, string $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -51,6 +55,16 @@ class SimplePreAuthenticationListener implements ListenerInterface
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Call this method if your authentication token is stored to a session.
+     *
+     * @final
+     */
+    public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
+    {
+        $this->sessionStrategy = $sessionStrategy;
     }
 
     /**
@@ -77,6 +91,9 @@ class SimplePreAuthenticationListener implements ListenerInterface
             }
 
             $token = $this->authenticationManager->authenticate($token);
+
+            $this->migrateSession($request, $token);
+
             $this->tokenStorage->setToken($token);
 
             if (null !== $this->dispatcher) {
@@ -110,5 +127,14 @@ class SimplePreAuthenticationListener implements ListenerInterface
                 throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null or a Response object', get_class($this->simpleAuthenticator)));
             }
         }
+    }
+
+    private function migrateSession(Request $request, TokenInterface $token)
+    {
+        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
+            return;
+        }
+
+        $this->sessionStrategy->onAuthentication($request, $token);
     }
 }

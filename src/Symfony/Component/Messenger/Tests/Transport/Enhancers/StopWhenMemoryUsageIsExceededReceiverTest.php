@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Enhancers;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\CallbackReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMemoryUsageIsExceededReceiver;
@@ -25,7 +26,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
     public function testReceiverStopsWhenMemoryLimitExceeded(int $memoryUsage, int $memoryLimit, bool $shouldStop)
     {
         $callable = function ($handler) {
-            $handler(new DummyMessage('API'));
+            $handler(Envelope::wrap(new DummyMessage('API')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
@@ -58,7 +59,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
     public function testReceiverLogsMemoryExceededWhenLoggerIsGiven()
     {
         $callable = function ($handler) {
-            $handler(new DummyMessage('API'));
+            $handler(Envelope::wrap(new DummyMessage('API')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)

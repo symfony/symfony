@@ -44,10 +44,10 @@ class MessageBus implements MessageBusInterface
             throw new InvalidArgumentException(sprintf('Invalid type for message argument. Expected object, but got "%s".', \gettype($message)));
         }
 
-        return \call_user_func($this->callableForNextMiddleware(0), $message);
+        return \call_user_func($this->callableForNextMiddleware(0, Envelope::wrap($message)), $message);
     }
 
-    private function callableForNextMiddleware(int $index): callable
+    private function callableForNextMiddleware(int $index, Envelope $currentEnvelope): callable
     {
         if (null === $this->indexedMiddlewareHandlers) {
             $this->indexedMiddlewareHandlers = \is_array($this->middlewareHandlers) ? array_values($this->middlewareHandlers) : iterator_to_array($this->middlewareHandlers, false);
@@ -59,8 +59,19 @@ class MessageBus implements MessageBusInterface
 
         $middleware = $this->indexedMiddlewareHandlers[$index];
 
-        return function ($message) use ($middleware, $index) {
-            return $middleware->handle($message, $this->callableForNextMiddleware($index + 1));
+        return function ($message) use ($middleware, $index, $currentEnvelope) {
+            if ($message instanceof Envelope) {
+                $currentEnvelope = $message;
+            } else {
+                $message = $currentEnvelope->withMessage($message);
+            }
+
+            if (!$middleware instanceof EnvelopeAwareInterface) {
+                // Do not provide the envelope if the middleware cannot read it:
+                $message = $message->getMessage();
+            }
+
+            return $middleware->handle($message, $this->callableForNextMiddleware($index + 1, $currentEnvelope));
         };
     }
 }

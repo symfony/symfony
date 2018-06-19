@@ -23,7 +23,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('test.service_container')) {
+        if (!$container->hasDefinition('test.private_services_locator')) {
             return;
         }
 
@@ -31,7 +31,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {
-            if ((!$definition->isPublic() || $definition->isPrivate()) && !$definition->getErrors() && !$definition->isAbstract()) {
+            if ($id && '.' !== $id[0] && (!$definition->isPublic() || $definition->isPrivate()) && !$definition->getErrors() && !$definition->isAbstract()) {
                 $privateServices[$id] = new ServiceClosureArgument(new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE));
             }
         }
@@ -39,7 +39,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $aliases = $container->getAliases();
 
         foreach ($aliases as $id => $alias) {
-            if (!$alias->isPublic() || $alias->isPrivate()) {
+            if ($id && '.' !== $id[0] && (!$alias->isPublic() || $alias->isPrivate())) {
                 while (isset($aliases[$target = (string) $alias])) {
                     $alias = $aliases[$target];
                 }
@@ -50,7 +50,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         }
 
         if ($privateServices) {
-            $definitions[(string) $definitions['test.service_container']->getArgument(2)]->replaceArgument(0, $privateServices);
+            $definitions['test.private_services_locator']->replaceArgument(0, $privateServices);
         }
     }
 }

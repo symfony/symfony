@@ -46,7 +46,9 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     {
         $reader = new AnnotationReader();
         $this->loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot) {}
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            {
+            }
         };
         AnnotationRegistry::registerLoader('class_exists');
     }
@@ -194,7 +196,9 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             ->will($this->returnValue(array()))
         ;
         $loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot) {}
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            {
+            }
         };
 
         $routeCollection = $loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BazClass');

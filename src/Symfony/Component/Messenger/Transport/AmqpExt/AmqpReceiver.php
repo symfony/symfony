@@ -22,13 +22,13 @@ use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
  */
 class AmqpReceiver implements ReceiverInterface
 {
-    private $messageDecoder;
+    private $decoder;
     private $connection;
     private $shouldStop;
 
-    public function __construct(DecoderInterface $messageDecoder, Connection $connection)
+    public function __construct(DecoderInterface $decoder, Connection $connection)
     {
-        $this->messageDecoder = $messageDecoder;
+        $this->decoder = $decoder;
         $this->connection = $connection;
     }
 
@@ -38,8 +38,8 @@ class AmqpReceiver implements ReceiverInterface
     public function receive(callable $handler): void
     {
         while (!$this->shouldStop) {
-            $message = $this->connection->get();
-            if (null === $message) {
+            $AMQPEnvelope = $this->connection->get();
+            if (null === $AMQPEnvelope) {
                 $handler(null);
 
                 usleep($this->connection->getConnectionCredentials()['loop_sleep'] ?? 200000);
@@ -51,18 +51,18 @@ class AmqpReceiver implements ReceiverInterface
             }
 
             try {
-                $handler($this->messageDecoder->decode(array(
-                    'body' => $message->getBody(),
-                    'headers' => $message->getHeaders(),
+                $handler($this->decoder->decode(array(
+                    'body' => $AMQPEnvelope->getBody(),
+                    'headers' => $AMQPEnvelope->getHeaders(),
                 )));
 
-                $this->connection->ack($message);
+                $this->connection->ack($AMQPEnvelope);
             } catch (RejectMessageExceptionInterface $e) {
-                $this->connection->reject($message);
+                $this->connection->reject($AMQPEnvelope);
 
                 throw $e;
             } catch (\Throwable $e) {
-                $this->connection->nack($message, AMQP_REQUEUE);
+                $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
 
                 throw $e;
             } finally {

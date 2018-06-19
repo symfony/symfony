@@ -41,16 +41,12 @@ class Worker
             });
         }
 
-        $this->receiver->receive(function ($message) {
-            if (null === $message) {
+        $this->receiver->receive(function (?Envelope $envelope) {
+            if (null === $envelope) {
                 return;
             }
 
-            if (!$message instanceof ReceivedMessage) {
-                $message = new ReceivedMessage($message);
-            }
-
-            $this->bus->dispatch($message);
+            $this->bus->dispatch($envelope->with(new ReceivedMessage()));
         });
     }
 }

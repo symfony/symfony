@@ -314,6 +314,10 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>To ni veljavna identifikacijska koda podjetja (BIC).</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Napaka</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

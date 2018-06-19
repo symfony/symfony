@@ -12,11 +12,9 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -35,20 +33,17 @@ class ExceptionListener implements EventSubscriberInterface
     protected $controller;
     protected $logger;
     protected $debug;
-    private $charset;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, $charset = null)
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false)
     {
         $this->controller = $controller;
         $this->logger = $logger;
         $this->debug = $debug;
-        $this->charset = $charset;
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $request = $event->getRequest();
 
         $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
     }
@@ -94,7 +89,7 @@ class ExceptionListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::EXCEPTION => array(
-                array('logKernelException', 2048),
+                array('logKernelException', 0),
                 array('onKernelException', -128),
             ),
         );
@@ -128,12 +123,8 @@ class ExceptionListener implements EventSubscriberInterface
     protected function duplicateRequest(\Exception $exception, Request $request)
     {
         $attributes = array(
-            'exception' => $exception = FlattenException::create($exception),
-            '_controller' => $this->controller ?: function () use ($exception) {
-                $handler = new ExceptionHandler($this->debug, $this->charset);
-
-                return new Response($handler->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders());
-            },
+            '_controller' => $this->controller,
+            'exception' => FlattenException::create($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
         );
         $request = $request->duplicate(null, null, $attributes);

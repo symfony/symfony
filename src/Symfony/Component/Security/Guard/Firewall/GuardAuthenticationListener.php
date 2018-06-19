@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Guard\Firewall;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
@@ -127,7 +126,7 @@ class GuardAuthenticationListener implements ListenerInterface
             }
 
             // sets the token on the token storage, etc
-            $this->guardHandler->authenticateWithToken($token, $request);
+            $this->guardHandler->authenticateWithToken($token, $request, $this->providerKey);
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
 

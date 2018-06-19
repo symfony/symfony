@@ -169,12 +169,12 @@ trait MemcachedTrait
                 }
 
                 if ($oldServers !== $newServers) {
-                    // before resetting, ensure $servers is valid
-                    $client->addServers($servers);
                     $client->resetServerList();
+                    $client->addServers($servers);
                 }
+            } else {
+                $client->addServers($servers);
             }
-            $client->addServers($servers);
 
             if (null !== $username || null !== $password) {
                 if (!method_exists($client, 'setSaslAuthData')) {
@@ -198,7 +198,12 @@ trait MemcachedTrait
             $lifetime += time();
         }
 
-        return $this->checkResultCode($this->getClient()->setMulti($values, $lifetime));
+        $encodedValues = array();
+        foreach ($values as $key => $value) {
+            $encodedValues[rawurlencode($key)] = $value;
+        }
+
+        return $this->checkResultCode($this->getClient()->setMulti($encodedValues, $lifetime));
     }
 
     /**
@@ -208,7 +213,16 @@ trait MemcachedTrait
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
-            return $this->checkResultCode($this->getClient()->getMulti($ids));
+            $encodedIds = array_map('rawurlencode', $ids);
+
+            $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
+
+            $result = array();
+            foreach ($encodedResult as $key => $value) {
+                $result[rawurldecode($key)] = $value;
+            }
+
+            return $result;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         } finally {
@@ -221,7 +235,7 @@ trait MemcachedTrait
      */
     protected function doHave($id)
     {
-        return false !== $this->getClient()->get($id) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
+        return false !== $this->getClient()->get(rawurlencode($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
 
     /**
@@ -230,7 +244,8 @@ trait MemcachedTrait
     protected function doDelete(array $ids)
     {
         $ok = true;
-        foreach ($this->checkResultCode($this->getClient()->deleteMulti($ids)) as $result) {
+        $encodedIds = array_map('rawurlencode', $ids);
+        foreach ($this->checkResultCode($this->getClient()->deleteMulti($encodedIds)) as $result) {
             if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
                 $ok = false;
             }

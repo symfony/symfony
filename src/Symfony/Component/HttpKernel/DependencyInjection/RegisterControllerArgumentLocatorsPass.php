@@ -33,11 +33,13 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 {
     private $resolverServiceId;
     private $controllerTag;
+    private $controllerLocator;
 
-    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments')
+    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator')
     {
         $this->resolverServiceId = $resolverServiceId;
         $this->controllerTag = $controllerTag;
+        $this->controllerLocator = $controllerLocator;
     }
 
     public function process(ContainerBuilder $container)
@@ -120,7 +122,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 $args = array();
                 foreach ($parameters as $p) {
                     /** @var \ReflectionParameter $p */
-                    $type = $target = ProxyHelper::getTypeHint($r, $p, true);
+                    $type = ltrim($target = ProxyHelper::getTypeHint($r, $p), '\\');
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
 
                     if (isset($arguments[$r->name][$p->name])) {
@@ -132,7 +134,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
                             $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                         }
-                    } elseif (isset($bindings[$bindingName = '$'.$p->name]) || isset($bindings[$bindingName = $type])) {
+                    } elseif (isset($bindings[$bindingName = $type.' $'.$p->name]) || isset($bindings[$bindingName = '$'.$p->name]) || isset($bindings[$bindingName = $type])) {
                         $binding = $bindings[$bindingName];
 
                         list($bindingValue, $bindingId) = $binding->getValues();
@@ -148,7 +150,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         }
 
                         continue;
-                    } elseif (!$type || !$autowire) {
+                    } elseif (!$type || !$autowire || '\\' !== $target[0]) {
                         continue;
                     } elseif (!$p->allowsNull()) {
                         $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
@@ -169,6 +171,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         throw new InvalidArgumentException($message);
                     }
 
+                    $target = ltrim($target, '\\');
                     $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior) : new Reference($target, $invalidBehavior);
                 }
                 // register the maps as a per-method service-locators
@@ -179,6 +182,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
         }
 
         $container->getDefinition($this->resolverServiceId)
-            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $controllers));
+            ->replaceArgument(0, $controllerLocatorRef = ServiceLocatorTagPass::register($container, $controllers));
+
+        $container->setAlias($this->controllerLocator, (string) $controllerLocatorRef);
     }
 }

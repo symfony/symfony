@@ -32,21 +32,37 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         $violations = array();
         $messages = array();
         foreach ($object as $violation) {
-            $violations[] = array(
-                'propertyPath' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-                'code' => $violation->getCode(),
-            );
             $propertyPath = $violation->getPropertyPath();
+
+            $violationEntry = array(
+                'propertyPath' => $propertyPath,
+                'title' => $violation->getMessage(),
+            );
+            if (null !== $code = $violation->getCode()) {
+                $violationEntry['type'] = sprintf('urn:uuid:%s', $code);
+            }
+
+            $violations[] = $violationEntry;
+
             $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
             $messages[] = $prefix.$violation->getMessage();
         }
 
-        return array(
-            'title' => isset($context['title']) ? $context['title'] : 'An error occurred',
-            'detail' => $messages ? implode("\n", $messages) : '',
-            'violations' => $violations,
+        $result = array(
+            'type' => $context['type'] ?? 'https://symfony.com/errors/validation',
+            'title' => $context['title'] ?? 'Validation Failed',
         );
+        if (isset($context['status'])) {
+            $result['status'] = $context['status'];
+        }
+        if ($messages) {
+            $result['detail'] = implode("\n", $messages);
+        }
+        if (isset($context['instance'])) {
+            $result['instance'] = $context['instance'];
+        }
+
+        return $result + array('violations' => $violations);
     }
 
     /**

@@ -7,6 +7,47 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.11 (2018-05-25)
+
+ * bug #27364 [DI] Fix bad exception on uninitialized references to non-shared services (nicolas-grekas)
+ * bug #27359 [HttpFoundation] Fix perf issue during MimeTypeGuesser intialization (nicolas-grekas)
+ * security #cve-2018-11408 [SecurityBundle] Fail if security.http_utils cannot be configured
+ * security #cve-2018-11406 clear CSRF tokens when the user is logged out
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11385 Adding session authentication strategy to Guard to avoid session fixation
+ * security #cve-2018-11385 Adding session strategy to ALL listeners to avoid *any* possible fixation
+ * security #cve-2018-11386 [HttpFoundation] Break infinite loop in PdoSessionHandler when MySQL is in loose mode
+ * bug #27341 [WebProfilerBundle] Fixed validator/dump trace CSS (yceruto)
+ * bug #27337  [FrameworkBundle] fix typo in CacheClearCommand (emilielorenzo)
+
+* 4.0.10 (2018-05-21)
+
+ * bug #27264 [Validator] Use strict type in URL validator (mimol91)
+ * bug #27267 [DependencyInjection] resolve array env vars (jamesthomasonjr)
+ * bug #26781 [Form] Fix precision of MoneyToLocalizedStringTransformer's divisions on transform() (syastrebov)
+ * bug #27286 [Translation] Add Occitan plural rule (kylekatarnls)
+ * bug #27271 [DI] Allow defining bindings on ChildDefinition (nicolas-grekas)
+ * bug #27246 Disallow invalid characters in session.name (ostrolucky)
+ * bug #27287 [PropertyInfo] fix resolving parent|self type hints (nicolas-grekas)
+ * bug #27281 [HttpKernel] Fix dealing with self/parent in ArgumentMetadataFactory (fabpot)
+ * bug #24805 [Security] Fix logout (MatTheCat)
+ * bug #27265 [DI] Shared services should not be inlined in non-shared ones (nicolas-grekas)
+ * bug #27141 [Process] Suppress warnings when open_basedir is non-empty (cbj4074)
+ * bug #27250 [Session] limiting :key for GET_LOCK to 64 chars (oleg-andreyev)
+ * bug #27237 [Debug] Fix populating error_get_last() for handled silent errors (nicolas-grekas)
+ * bug #27232 [Cache][Lock] Fix usages of error_get_last() (nicolas-grekas)
+ * bug #27236 [Filesystem] Fix usages of error_get_last() (nicolas-grekas)
+ * bug #27191 [DI] Display previous error messages when throwing unused bindings (nicolas-grekas)
+ * bug #27231 [FrameworkBundle] Fix cache:clear on vagrant (nicolas-grekas)
+ * bug #27222 [WebProfilerBundle][Cache] Fix misses calculation when calling getItems (fsevestre)
+ * bug #27227 [HttpKernel] Handle NoConfigurationException "onKernelException()" (nicolas-grekas)
+ * bug #27152 [HttpFoundation] use brace-style regex delimiters (xabbuh)
+ * bug #27158 [Cache] fix logic for fetching tag versions on TagAwareAdapter (dmaicher)
+ * bug #27143 [Console] By default hide the short exception trace line from exception messages in Symfony's commands (yceruto)
+ * bug #27133 [Doctrine Bridge] fix priority for doctrine event listeners (dmaicher)
+ * bug #27135 [FrameworkBundle] Use the correct service id for CachePoolPruneCommand in its compiler pass (DemonTPx)
+ * feature #24896 Add CODE_OF_CONDUCT.md (egircys)
+
 * 4.0.9 (2018-04-30)
 
  * bug #27074 [Debug][WebProfilerBundle] Fix setting file link format (lyrixx, nicolas-grekas)

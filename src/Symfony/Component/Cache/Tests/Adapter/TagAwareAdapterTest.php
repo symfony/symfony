@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\CacheItem;
 
 /**
  * @group time-sensitive
@@ -138,6 +139,9 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($pool->getItem('foo')->isHit());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetPreviousTags()
     {
         $pool = $this->createCachePool();
@@ -147,6 +151,17 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $i = $pool->getItem('k');
         $this->assertSame(array('foo' => 'foo'), $i->getPreviousTags());
+    }
+
+    public function testGetMetadata()
+    {
+        $pool = $this->createCachePool();
+
+        $i = $pool->getItem('k');
+        $pool->save($i->tag('foo'));
+
+        $i = $pool->getItem('k');
+        $this->assertSame(array('foo' => 'foo'), $i->getMetadata()[CacheItem::METADATA_TAGS]);
     }
 
     public function testPrune()

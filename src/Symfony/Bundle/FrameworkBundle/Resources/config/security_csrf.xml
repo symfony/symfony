@@ -22,9 +22,13 @@
         </service>
         <service id="Symfony\Component\Security\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" />
 
+        <service id="twig.runtime.security_csrf" class="Symfony\Bridge\Twig\Extension\CsrfRuntime">
+            <tag name="twig.runtime" />
+            <argument type="service" id="security.csrf.token_manager" />
+        </service>
+
         <service id="twig.extension.security_csrf" class="Symfony\Bridge\Twig\Extension\CsrfExtension">
             <tag name="twig.extension" />
-            <argument type="service" id="security.csrf.token_manager" />
         </service>
     </services>
 </container>

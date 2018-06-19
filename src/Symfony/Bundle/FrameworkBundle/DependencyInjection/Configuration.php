@@ -21,6 +21,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -283,8 +284,8 @@ class Configuration implements ConfigurationInterface
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                             ->validate()
-                                                ->ifTrue(function ($v) { return !class_exists($v); })
-                                                ->thenInvalid('The supported class %s does not exist.')
+                                                ->ifTrue(function ($v) { return !class_exists($v) && !interface_exists($v); })
+                                                ->thenInvalid('The supported class or interface "%s" does not exist.')
                                             ->end()
                                         ->end()
                                     ->end()
@@ -370,7 +371,7 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('guard')
                                                     ->cannotBeEmpty()
                                                     ->info('An expression to block the transition')
-                                                    ->example('is_fully_authenticated() and has_role(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
+                                                    ->example('is_fully_authenticated() and is_granted(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
                                                 ->end()
                                                 ->arrayNode('from')
                                                     ->beforeNormalization()
@@ -467,7 +468,16 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
-                        ->scalarNode('name')->end()
+                        ->scalarNode('name')
+                            ->validate()
+                                ->ifTrue(function ($v) {
+                                    parse_str($v, $parsed);
+
+                                    return implode('&', array_keys($parsed)) !== (string) $v;
+                                })
+                                ->thenInvalid('Session name %s contains illegal character(s)')
+                            ->end()
+                        ->end()
                         ->scalarNode('cookie_lifetime')->end()
                         ->scalarNode('cookie_path')->end()
                         ->scalarNode('cookie_domain')->end()
@@ -824,7 +834,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && interface_exists(PropertyInfoExtractorInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end()
         ;
@@ -861,6 +871,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('adapter')->defaultValue('cache.app')->end()
+                                    ->scalarNode('tags')->defaultNull()->end()
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->integerNode('default_lifetime')->end()
                                     ->scalarNode('provider')
@@ -986,7 +997,10 @@ class Configuration implements ConfigurationInterface
                                     $newConfig = array();
                                     foreach ($config as $k => $v) {
                                         if (!\is_int($k)) {
-                                            $newConfig[$k] = array('senders' => \is_array($v) ? array_values($v) : array($v));
+                                            $newConfig[$k] = array(
+                                                'senders' => $v['senders'] ?? (\is_array($v) ? array_values($v) : array($v)),
+                                                'send_and_handle' => $v['send_and_handle'] ?? false,
+                                            );
                                         } else {
                                             $newConfig[$v['message-class']]['senders'] = array_map(
                                                 function ($a) {
@@ -994,6 +1008,7 @@ class Configuration implements ConfigurationInterface
                                                 },
                                                 array_values($v['sender'])
                                             );
+                                            $newConfig[$v['message-class']]['send-and-handle'] = $v['send-and-handle'] ?? false;
                                         }
                                     }
 
@@ -1006,6 +1021,7 @@ class Configuration implements ConfigurationInterface
                                         ->requiresAtLeastOneElement()
                                         ->prototype('scalar')->end()
                                     ->end()
+                                    ->booleanNode('send_and_handle')->defaultFalse()->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -1061,7 +1077,36 @@ class Configuration implements ConfigurationInterface
                                             })
                                         ->end()
                                         ->defaultValue(array())
-                                        ->prototype('scalar')->end()
+                                        ->prototype('array')
+                                            ->beforeNormalization()
+                                                ->always()
+                                                ->then(function ($middleware): array {
+                                                    if (!\is_array($middleware)) {
+                                                        return array('id' => $middleware);
+                                                    }
+                                                    if (isset($middleware['id'])) {
+                                                        return $middleware;
+                                                    }
+                                                    if (\count($middleware) > 1) {
+                                                        throw new \InvalidArgumentException(sprintf('There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "%s".', json_encode($middleware)));
+                                                    }
+
+                                                    return array(
+                                                        'id' => key($middleware),
+                                                        'arguments' => current($middleware),
+                                                    );
+                                                })
+                                            ->end()
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('id')->isRequired()->cannotBeEmpty()->end()
+                                                ->arrayNode('arguments')
+                                                    ->normalizeKeys(false)
+                                                    ->defaultValue(array())
+                                                    ->prototype('variable')
+                                                ->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()

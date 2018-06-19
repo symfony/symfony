@@ -30,15 +30,13 @@ class Client extends BaseClient
     private $hasPerformedRequest = false;
     private $profiler = false;
     private $reboot = true;
-    private $container;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null, ContainerInterface $container = null)
+    public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         parent::__construct($kernel, $server, $history, $cookieJar);
-        $this->container = $container;
     }
 
     /**
@@ -48,7 +46,7 @@ class Client extends BaseClient
      */
     public function getContainer()
     {
-        return $this->container ?? $this->kernel->getContainer();
+        return $this->kernel->getContainer();
     }
 
     /**

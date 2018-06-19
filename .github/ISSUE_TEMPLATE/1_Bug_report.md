@@ -4,11 +4,6 @@ about: Report errors and problems
 
 ---
 
-<!--
-    The Symfony Code of Conduct applies to all the activity on this repository.
-    See https://symfony.com/doc/current/contributing/code_of_conduct/index.html
--->
-
 **Symfony version(s) affected**: x.y.z
 
 **Description**  

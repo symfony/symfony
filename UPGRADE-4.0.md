@@ -759,6 +759,9 @@ Security
  * The `GuardAuthenticatorInterface` interface has been removed.
    Use `AuthenticatorInterface` instead.
 
+ * When extending `AbstractGuardAuthenticator` getCredentials() cannot return
+   `null` anymore, return false from `supports()` if no credentials available instead.
+
 SecurityBundle
 --------------
 

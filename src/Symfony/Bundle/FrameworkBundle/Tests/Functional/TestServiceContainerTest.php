@@ -42,6 +42,6 @@ class TestServiceContainerTest extends WebTestCase
         $this->assertTrue(static::$container->has(NonPublicService::class));
         $this->assertTrue(static::$container->has(PrivateService::class));
         $this->assertTrue(static::$container->has('private_service'));
-        $this->assertTrue(static::$container->has(UnusedPrivateService::class));
+        $this->assertFalse(static::$container->has(UnusedPrivateService::class));
     }
 }

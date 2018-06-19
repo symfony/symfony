@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-15T15:49:39Z
+
+<del>fabbot.io failure is unrelated, should I fix it here?</del> already fixed after rebased.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-05-16T08:49:47Z
+
+The "Deprecating allowed values" is kinda the same example as "Deprecating allowed types".. no?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-16T11:20:23Z
+
+> The "Deprecating allowed values" is kinda the same example as "Deprecating allowed types".. no?
+
+Yes, same approach: a closure function that returns a string or not depending on the given value. However in "Deprecating allowed values" example you aren't deprecating the value type at all but just a range.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-30T12:53:39Z
+
+@fabpot comments addressed, very appreciated your review, thanks.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-30T13:24:42Z
+
+I just changed the exception class [here](https://github.com/symfony/symfony/pull/27277/files#diff-5ec124b2f66baead89d30d56018d8241R902) `InvalidOptionsException` instead of `InvalidArgumentException`.

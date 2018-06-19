@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-18T13:57:31Z
+
+What's the return type and value now? Any link?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-06-18T13:59:53Z
+
+In my case I get `0` or `1` as an integer. I guess this comes from https://github.com/nrk/predis/commit/b02e3f491129611de1dc9cfd233bed57cb13e021
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-06-19T09:14:11Z
+
+Hoping to see this in 4.1.1 :grin:

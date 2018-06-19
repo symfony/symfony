@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,6 +26,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {
+    private $sessionUsageStack = array();
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -33,6 +36,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
         $request = $event->getRequest();
         $session = $this->getSession();
+        $this->sessionUsageStack[] = $session instanceof Session ? $session->getUsageIndex() : null;
         if (null === $session || $request->hasSession()) {
             return;
         }
@@ -50,11 +54,21 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if ($session->isStarted() || ($session instanceof Session && $session->hasBeenStarted())) {
+        if ($session instanceof Session ? $session->getUsageIndex() !== end($this->sessionUsageStack) : $session->isStarted()) {
             $event->getResponse()
                 ->setPrivate()
                 ->setMaxAge(0)
                 ->headers->addCacheControlDirective('must-revalidate');
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public function onFinishRequest(FinishRequestEvent $event)
+    {
+        if ($event->isMasterRequest()) {
+            array_pop($this->sessionUsageStack);
         }
     }
 
@@ -64,6 +78,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             KernelEvents::REQUEST => array('onKernelRequest', 128),
             // low priority to come after regular response listeners, same as SaveSessionListener
             KernelEvents::RESPONSE => array('onKernelResponse', -1000),
+            KernelEvents::FINISH_REQUEST => array('onFinishRequest'),
         );
     }
 

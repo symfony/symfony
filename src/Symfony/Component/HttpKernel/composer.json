@@ -18,7 +18,7 @@
     "require": {
         "php": "^5.5.9|>=7.0.8",
         "symfony/event-dispatcher": "~2.8|~3.0|~4.0",
-        "symfony/http-foundation": "^3.4.4|^4.0.4",
+        "symfony/http-foundation": "~3.4.12|~4.0.12|^4.1.1",
         "symfony/debug": "~2.8|~3.0|~4.0",
         "symfony/polyfill-ctype": "~1.8",
         "psr/log": "~1.0"

@@ -25,7 +25,6 @@
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",
-        "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
     "conflict": {

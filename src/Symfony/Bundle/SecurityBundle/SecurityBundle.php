@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfTokenClearingLogoutHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -57,6 +58,7 @@ class SecurityBundle extends Bundle
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RegisterCsrfTokenClearingLogoutHandlerPass());

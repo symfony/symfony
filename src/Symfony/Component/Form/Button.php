@@ -194,6 +194,14 @@ class Button implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function clearErrors($deep = false)
+    {
+        return $this;
+    }
+
+    /**
      * Unsupported method.
      *
      * This method should not be invoked.

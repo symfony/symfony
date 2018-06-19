@@ -32,6 +32,11 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been removed.
 
+Form
+----
+
+ * The method `clearErrors()` has been added to `FormInterface`.
+
 FrameworkBundle
 ---------------
 

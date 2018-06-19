@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-13T11:19:17Z
+
+It looks like this PR contains unrelated commits. Could you do a rebase against master?
+
+---------------------------------------------------------------------------
+
+by AndreiIgna at 2018-03-13T12:21:46Z
+
+Oops used GitHub desktop, which did something unexpected to the rebase. Should be ok now
+
+---------------------------------------------------------------------------
+
+by AndreiIgna at 2018-03-15T16:41:34Z
+
+Thanks noticing and letting me know about those @derrabus
+
+The added method makes it easier to check what data formats the clients accepts, ex:
+```
+if (in_array('html', $request->getAcceptableFormats())) {
+  // return html data, maybe a template
+} elseif (in_array('xml', $request->getAcceptableFormats())) {
+  // return xml
+} else {
+  // return json data
+}
+```
+
+If this is useful and included in next release, I'll make the addition in documentation repo as well
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-04T19:54:02Z
+
+@AndreiIgna would you mind rebasing and moving the line in the changelog on 4.2?
+
+---------------------------------------------------------------------------
+
+by AndreiIgna at 2018-06-05T08:53:55Z
+
+Yes sure, is updated now
+
+---------------------------------------------------------------------------
+
+by AndreiIgna at 2018-06-11T10:56:53Z
+
+Updated based on last review.
+
+While checking in more detail the similar `$acceptableContentTypes`, saw that it's assigned null on `initialize` and `duplicate` methods. Added this for `$acceptableFormats` too, hope this is ok

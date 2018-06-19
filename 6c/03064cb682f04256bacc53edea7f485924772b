@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by behnoushnorouzi at 2018-06-08T10:27:22Z
+
+Thank you for the review it's done.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Lewiscowles1986 at 2018-06-09T10:03:46Z
+
+Should this emit a notice or warning if used in production?
+
+It seems like a development pattern, and can be switched out for the extended class. Once the suggestion is implemented it seems like switching to the standard class might be more helpful.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-09T11:21:52Z
+
+@Lewiscowles1986 good idea, we could use the new class only in debug mode. Could be done in `ExtensionPass` based on the `kernel.debug` parameter. I'd also suggest marking the class `@internal`.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-14T07:54:52Z
+
+We don't even need to do it in a compiler pass. The debug parameter can be accessed in the DI extension (the `kernel.*` params can be accessed there safely, as they are set early)
+
+---------------------------------------------------------------------------
+
+by behnoushnorouzi at 2018-06-14T12:26:57Z
+
+Thank you for the review it's done.
+Status: needs review

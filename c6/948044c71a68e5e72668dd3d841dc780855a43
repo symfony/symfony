@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-06-08T08:23:57Z
+
+I like this, small but useful! I noticed your screenshots mention "**an** public/private alias", but it's already fixed in your code (in case people notice this).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-06-08T08:28:04Z
+
+> I like this, small but useful!
+
+Thank you 😄
+
+> I noticed your screenshots mention "an public/private alias", but it's already fixed in your code (in case people notice this).
+
+Yes, thats what I mean by `text has slightly changed` below the screenshots 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-08T08:40:48Z
+
+CI is failing due to some console width issue, can you update the tests to force a specific width? (there are other places doing so, can't recall right now)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-08T10:06:29Z
+
+Features are for master. The console width is forced there so rebasing and regenerating the fixture should make tests green.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-06-08T10:55:47Z
+
+> Features are for master.
+
+Indeed, you are right, but I talked to @nicolas-grekas and we think it could be also merged as patch.
+In this case we could get this from 2.8 upwards. WDYT?
+But in this case we need to force the console width in this branch, too, right?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-06-08T10:57:54Z
+
+New features are for master only.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-06-08T11:10:53Z
+
+> New features are for master only.
+
+ok I will rebase my branch 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-06-08T13:07:34Z
+
+TBH I could not get the tests running, due to whitespaces, line endings or something else.
+Tried vim and PHPStorm on a MacBook 😢
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-06-11T05:17:00Z
+
+![screenshot 2018-06-08 13 57 24](https://user-images.githubusercontent.com/995707/41213727-6b2e43c0-6d47-11e8-88d9-efde68d18a60.png)
+
+This is the problem
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-06-16T07:48:39Z
+
+Can anybody help me finishing this PR?
+
+I can give access to my fork too ofc
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T20:11:51Z
+
+Tests fixed.

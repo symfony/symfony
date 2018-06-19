@@ -145,7 +145,7 @@ class Connection extends AbstractConnection
     private function disconnect()
     {
         if ($this->connection && is_resource($this->connection)) {
-            ldap_close($this->connection);
+            ldap_unbind($this->connection);
         }
 
         $this->connection = null;

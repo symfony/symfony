@@ -90,6 +90,21 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $input);
     }
 
+    public function testTransformWithZeroWeek()
+    {
+        $transformer = new DateIntervalToArrayTransformer(array('weeks', 'minutes', 'seconds'));
+        $input = new \DateInterval('P1Y2M0WT4H5M6S');
+        $output = array(
+            'weeks' => '0',
+            'minutes' => '5',
+            'seconds' => '6',
+        );
+        $input = $transformer->transform($input);
+        ksort($input);
+        ksort($output);
+        $this->assertSame($output, $input);
+    }
+
     public function testTransformDaysToWeeks()
     {
         $transformer = new DateIntervalToArrayTransformer(array('weeks', 'minutes', 'seconds'));

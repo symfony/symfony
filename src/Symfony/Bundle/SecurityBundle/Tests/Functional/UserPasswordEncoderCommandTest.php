@@ -86,7 +86,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertContains('Password encoding succeeded', $output);
 
         $encoder = new Argon2iPasswordEncoder();
-        preg_match('#  Encoded password\s+(\$argon2id?\$[\w\d,=\$+\/]+={0,2})\s+#', $output, $matches);
+        preg_match('#  Encoded password\s+(\$argon2id?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
         $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
     }

@@ -305,7 +305,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Autoconfigured', $definition->isAutoconfigured() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
-            $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');
+            $tableRows[] = array('Required File', $definition->getFile() ?: '-');
         }
 
         if ($factory = $definition->getFactory()) {

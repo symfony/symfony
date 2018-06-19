@@ -89,7 +89,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             $result[$field] = $dateInterval->format('%'.($this->pad ? strtoupper($char) : $char));
         }
         if (in_array('weeks', $this->fields, true)) {
-            $result['weeks'] = 0;
+            $result['weeks'] = '0';
             if (isset($result['days']) && (int) $result['days'] >= 7) {
                 $result['weeks'] = (string) floor($result['days'] / 7);
                 $result['days'] = (string) ($result['days'] % 7);

@@ -171,6 +171,11 @@ class Request
     protected $format;
 
     /**
+     * @var array
+     */
+    private $acceptableFormats;
+
+    /**
      * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
     protected $session;
@@ -263,6 +268,7 @@ class Request
         $this->charsets = null;
         $this->encodings = null;
         $this->acceptableContentTypes = null;
+        $this->acceptableFormats = null;
         $this->pathInfo = null;
         $this->requestUri = null;
         $this->baseUrl = null;
@@ -450,6 +456,7 @@ class Request
         $dup->charsets = null;
         $dup->encodings = null;
         $dup->acceptableContentTypes = null;
+        $dup->acceptableFormats = null;
         $dup->pathInfo = null;
         $dup->requestUri = null;
         $dup->baseUrl = null;
@@ -1353,6 +1360,18 @@ class Request
     public function getContentType()
     {
         return $this->getFormat($this->headers->get('CONTENT_TYPE'));
+    }
+
+    /**
+     * Gets the acceptable client formats associated with the request.
+     */
+    public function getAcceptableFormats(): array
+    {
+        if (null !== $this->acceptableFormats) {
+            return $this->acceptableFormats;
+        }
+
+        return $this->acceptableFormats = array_values(array_unique(array_filter(array_map(array($this, 'getFormat'), $this->getAcceptableContentTypes()))));
     }
 
     /**

@@ -66,6 +66,7 @@ class ExceptionController
                 'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
                 'exception' => $exception,
                 'logger' => $logger,
+                'request_data' => $this->getRequestData($request),
                 'currentContent' => $currentContent,
             )
         ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
@@ -140,5 +141,25 @@ class ExceptionController
         }
 
         return false;
+    }
+
+    private function getRequestData(Request $request)
+    {
+        $data = array();
+
+        $data['headers'] = $request->headers->all();
+        $data['cookies'] = $request->cookies->all();
+        $data['get'] = $request->query->all();
+        $data['post'] = $request->request->all();
+        $data['server'] = $request->server->all();
+
+        $curlCommand = array('curl', '--compressed');
+        foreach ($request->headers->all() as $headerName => $headerValue) {
+            $curlCommand[] = sprintf('-H "%s: %s"', $headerName, addslashes($headerValue[0]));
+        }
+        $curlCommand[] = $request->getUri();
+        $data['as_curl_command'] = implode(" \\\n  ", $curlCommand);
+
+        return $data;
     }
 }

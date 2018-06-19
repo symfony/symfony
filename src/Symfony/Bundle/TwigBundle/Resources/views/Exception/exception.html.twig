@@ -1,3 +1,23 @@
+{% macro table(labels, rows) %}
+    <table>
+    <thead>
+        <tr>
+            <th scope="col" class="key">{{ labels[0] ?? 'Key' }}</th>
+            <th scope="col">{{ labels[1] ?? 'Value' }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key in rows|keys|sort %}
+            <tr>
+                <th scope="row">{{ key }}</th>
+                <td>{{ rows[key] is iterable ? rows[key]|join('<br>') : rows[key] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endmacro %}
+{% import _self as macros %}
+
 <div class="exception-summary {{ exception.message is empty ? 'exception-without-message' }}">
     <div class="exception-metadata">
         <div class="container">
@@ -72,6 +92,37 @@
             </div>
         </div>
         {% endif %}
+
+        <div class="tab">
+            <h3 class="tab-title">Request</h3>
+
+            <div class="tab-content">
+                <h3>Request as cURL command</h3>
+                <div class="highlight-terminal">
+                    <pre>{{ request_data.as_curl_command }}</pre>
+                </div>
+
+                <h3>Request Headers</h3>
+                {{ macros.table(['HTTP Header', 'Value'], request_data.headers) }}
+
+                {% if request_data.cookies is not empty %}
+                <h3>Request Cookies</h3>
+                {{ macros.table(['Name', 'Value'], request_data.cookies) }}
+                {% endif %}
+
+                {% if request_data.get is not empty %}
+                <h3>GET parameters</h3>
+                {{ macros.table(['Name', 'Value'], request_data.get) }}
+                {% endif %}
+
+                {% if request_data.post is not empty %}
+                <h3>POST parameters</h3>
+                {{ macros.table(['Name', 'Value'], request_data.post) }}
+                {% endif %}
+
+                <h3>Server parameters</h3>
+                {{ macros.table(['Name', 'Value'], request_data.server) }}
+        </div>
 
         <div class="tab">
             <h3 class="tab-title">

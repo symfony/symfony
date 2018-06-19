@@ -19,7 +19,7 @@
         "php": ">=5.3.9",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation": "~2.4|~3.0.0"
+        "symfony/translation": "~2.4|~3.0"
     },
     "require-dev": {
         "symfony/http-foundation": "~2.3|~3.0.0",

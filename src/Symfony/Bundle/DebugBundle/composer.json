@@ -18,9 +18,9 @@
     "require": {
         "php": ">=5.3.9",
         "ext-xml": "*",
-        "symfony/http-kernel": "~2.6|~3.0.0",
-        "symfony/twig-bridge": "~2.6|~3.0.0",
-        "symfony/var-dumper": "~2.6|~3.0.0"
+        "symfony/http-kernel": "~2.6|~3.0",
+        "symfony/twig-bridge": "~2.6|~3.0",
+        "symfony/var-dumper": "~2.6|~3.0"
     },
     "require-dev": {
         "symfony/config": "~2.3|~3.0.0",

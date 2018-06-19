@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Simple;
 
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 class RedisCache extends AbstractCache
@@ -22,8 +23,8 @@ class RedisCache extends AbstractCache
      * @param string                                          $namespace
      * @param int                                             $defaultLifetime
      */
-    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0)
+    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
-        $this->init($redisClient, $namespace, $defaultLifetime);
+        $this->init($redisClient, $namespace, $defaultLifetime, $marshaller);
     }
 }

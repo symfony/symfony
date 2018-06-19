@@ -51,6 +51,7 @@ trait ApcuTrait
      */
     protected function doFetch(array $ids)
     {
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
             $values = array();
             foreach (apcu_fetch($ids, $ok) ?: array() as $k => $v) {
@@ -62,6 +63,8 @@ trait ApcuTrait
             return $values;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+        } finally {
+            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
         }
     }
 

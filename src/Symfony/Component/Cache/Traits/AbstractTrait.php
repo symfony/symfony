@@ -109,14 +109,14 @@ trait AbstractTrait
         if ($cleared = $this->versioningIsEnabled) {
             $namespaceVersion = 2;
             try {
-                foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
+                foreach ($this->doFetch(array('/'.$this->namespace)) as $v) {
                     $namespaceVersion = 1 + (int) $v;
                 }
             } catch (\Exception $e) {
             }
-            $namespaceVersion .= ':';
+            $namespaceVersion .= '/';
             try {
-                $cleared = $this->doSave(array('@'.$this->namespace => $namespaceVersion), 0);
+                $cleared = $this->doSave(array('/'.$this->namespace => $namespaceVersion), 0);
             } catch (\Exception $e) {
                 $cleared = false;
             }
@@ -222,9 +222,13 @@ trait AbstractTrait
      * @return mixed
      *
      * @throws \Exception
+     *
+     * @deprecated since Symfony 4.2, use DefaultMarshaller instead.
      */
     protected static function unserialize($value)
     {
+        @trigger_error(sprintf('The "%s::unserialize()" method is deprecated since Symfony 4.2, use DefaultMarshaller instead.', __CLASS__), E_USER_DEPRECATED);
+
         if ('b:0;' === $value) {
             return false;
         }
@@ -245,9 +249,9 @@ trait AbstractTrait
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = array();
-            $this->namespaceVersion = '1:';
+            $this->namespaceVersion = '1/';
             try {
-                foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
+                foreach ($this->doFetch(array('/'.$this->namespace)) as $v) {
                     $this->namespaceVersion = $v;
                 }
             } catch (\Exception $e) {

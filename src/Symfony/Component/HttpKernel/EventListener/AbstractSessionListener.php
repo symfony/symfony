@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -37,6 +38,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
     const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
 
     protected $container;
+    private $sessionUsageStack = array();
 
     public function __construct(ContainerInterface $container = null)
     {
@@ -49,6 +51,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
+        $session = null;
         $request = $event->getRequest();
         if ($request->hasSession()) {
             // no-op
@@ -57,6 +60,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         } elseif ($session = $this->getSession()) {
             $request->setSession($session);
         }
+
+        $session = $session ?? ($this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : null);
+        $this->sessionUsageStack[] = $session instanceof Session ? $session->getUsageIndex() : null;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -71,7 +77,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
         $response = $event->getResponse();
 
-        if ($session->isStarted() || ($session instanceof Session && $session->hasBeenStarted())) {
+        if ($session instanceof Session ? $session->getUsageIndex() !== end($this->sessionUsageStack) : $session->isStarted()) {
             if (!$response->headers->has(self::NO_AUTO_CACHE_CONTROL_HEADER)) {
                 $response
                     ->setPrivate()
@@ -113,12 +119,23 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @internal
+     */
+    public function onFinishRequest(FinishRequestEvent $event)
+    {
+        if ($event->isMasterRequest()) {
+            array_pop($this->sessionUsageStack);
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array('onKernelRequest', 128),
             // low priority to come after regular response listeners, but higher than StreamedResponseListener
             KernelEvents::RESPONSE => array('onKernelResponse', -1000),
+            KernelEvents::FINISH_REQUEST => array('onFinishRequest'),
         );
     }
 

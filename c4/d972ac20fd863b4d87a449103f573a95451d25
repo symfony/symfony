@@ -1,0 +1,149 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-15T07:16:39Z
+
+Note that 3.2 is not maintained anymore so that this should be merged on 3.4 (or 2.8 if the issue exists there. Does it?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-15T07:17:08Z
+
+(please check tests and CS failures also)
+
+---------------------------------------------------------------------------
+
+by krixon at 2018-06-18T12:17:27Z
+
+> Note that 3.2 is not maintained anymore so that this should be merged on 3.4 (or 2.8 if the issue exists there. Does it?)
+
+Thanks, I've rebased onto 3.4 and updated the PR target accordingly. The problem does not exist in 2.8.
+
+> please check tests and CS failures also
+
+I am still seeing some test failures locally, however I see the same failures on the 3.4 branch itself - they are unrelated to my changes. I've included details of these errors below. I am also not sure why AppVeyor thinks it can't build this branch - could you advise on how to proceed please?
+
+    1) Symfony\Component\Ldap\Tests\AdapterTest::testLdapQuery
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/AdapterTest.php:40
+
+    2) Symfony\Component\Ldap\Tests\AdapterTest::testLdapQueryIterator
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/AdapterTest.php:60
+
+    3) Symfony\Component\Ldap\Tests\AdapterTest::testLdapQueryScopeBase
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/AdapterTest.php:86
+
+    4) Symfony\Component\Ldap\Tests\AdapterTest::testLdapQueryScopeOneLevel
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/AdapterTest.php:102
+
+    5) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapAddAndRemove
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    6) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapAddInvalidEntry
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    7) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapUpdate
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    8) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapUnboundAdd
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    9) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapUnboundRemove
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    10) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapUnboundUpdate
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    11) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapRename
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    12) Symfony\Component\Ldap\Tests\LdapManagerTest::testLdapRenameWithoutRemovingOldRdn
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/LdapManagerTest.php:31
+
+    13) Symfony\Component\Ldap\Tests\LdapClientTest::testLdapClientFunctional
+    Symfony\Component\Ldap\Exception\ConnectionException: Can't contact LDAP server
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php:54
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Ldap.php:38
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/LdapClient.php:39
+    /home/karl/code/krixon/symfony/src/Symfony/Component/Ldap/Tests/LdapClientTest.php:165
+
+    --
+
+    There were 4 failures:
+
+    1) Symfony\Component\DependencyInjection\Tests\ContainerBuilderTest::testNoClassFromNsSeparatorId
+    Failed asserting that exception message 'The definition for "\foo" has no class attribute, and appears to reference a class or interface in the global namespace. Leaving out the "class" attribute is only allowed for namespaced classes. Please specify the class attribute explicitly to get rid of this error.' contains 'The definition for "\foo" has no class.'.
+
+    2) Symfony\Component\HttpFoundation\Tests\JsonResponseTest::testConstructorWithSimpleTypes
+    Failed asserting that two strings are identical.
+    --- Expected
+    +++ Actual
+    @@ @@
+    -'0.1'
+    +'0.10000000000000001'
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/HttpFoundation/Tests/JsonResponseTest.php:46
+
+    3) Symfony\Component\HttpFoundation\Tests\JsonResponseTest::testStaticCreateWithSimpleTypes
+    Failed asserting that two strings are identical.
+    --- Expected
+    +++ Actual
+    @@ @@
+    -'0.1'
+    +'0.10000000000000001'
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/HttpFoundation/Tests/JsonResponseTest.php:134
+
+    4) Symfony\Component\HttpFoundation\Tests\ResponseFunctionalTest::testCookie with data set #0 ('cookie_max_age')
+    Failed asserting that string matches format description.
+    --- Expected
+    +++ Actual
+    @@ @@
+
+    -Warning: Expiry date cannot have a year greater than 9999 in %scookie_max_age.php on line 10
+    +Fatal error: Uncaught Error: Class 'PHPUnit\Util\ErrorHandler' not found in /home/karl/code/krixon/symfony/vendor/symfony/phpunit-bridge/DeprecationErrorHandler.php:290
+    +Stack trace:
+    +#0 [internal function]: Symfony\Bridge\PhpUnit\DeprecationErrorHandler::Symfony\Bridge\PhpUnit\{closure}(2, 'Expiry date can...', '/home/karl.rixo...', 10, Array)
+    +#1 /home/karl/code/krixon/symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/cookie_max_age.php(10): setcookie('foo2', 'bar', 253402310800, '/')
+    +#2 {main}
+    +  thrown in /home/karl/code/krixon/symfony/vendor/symfony/phpunit-bridge/DeprecationErrorHandler.php on line 290
+    @@ @@
+    -    [3] => Set-Cookie: foo=bar; expires=Sat, 01-Jan-10000 02:46:40 GMT; Max-Age=%d; path=/
+    +    [3] => Set-Cookie: foo=bar; expires=Sat, 01-Jan-10000 02:46:40 GMT; Max-Age=251872986908; path=/
+
+    /home/karl/code/krixon/symfony/src/Symfony/Component/HttpFoundation/Tests/ResponseFunctionalTest.php:49

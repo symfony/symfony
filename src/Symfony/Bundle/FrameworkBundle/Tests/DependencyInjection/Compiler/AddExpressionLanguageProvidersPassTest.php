@@ -60,7 +60,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Registering services tagged with "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
+     * @expectedDeprecation Registering services tagged "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
      */
     public function testProcessForSecurity()
     {
@@ -82,7 +82,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Registering services tagged with "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
+     * @expectedDeprecation Registering services tagged "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
      */
     public function testProcessForSecurityAlias()
     {

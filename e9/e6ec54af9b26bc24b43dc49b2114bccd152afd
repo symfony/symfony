@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-15T12:10:06Z
+
+We probably need to make SecurityBundle conflict with older versions of FrameworkBundle to ensure we don't end up with double registration
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-06-16T09:50:21Z
+
+@stof I added a BC layer in https://github.com/symfony/symfony/pull/27611/commits/50a09da0310ba4865ffab93d7ccd7eb85a7ec950. Thanks for the review.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-06-16T11:30:56Z
+
+Failures unrelated.
+
+Status: needs review

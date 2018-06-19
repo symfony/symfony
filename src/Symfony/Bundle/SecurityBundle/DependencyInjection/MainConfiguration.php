@@ -65,6 +65,21 @@ class MainConfiguration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) {
+                    return isset($v['firewalls']);
+                })
+                ->then(function ($v) {
+                    foreach ($v['firewalls'] as $firewallName => $firewallConfig) {
+                        if (isset($firewallConfig['form_login']['login_path']) && !isset($firewallConfig['form_login']['check_path'])) {
+                            $firewallConfig['form_login']['check_path'] = $firewallConfig['form_login']['login_path'];
+                            $v['firewalls'][$firewallName] = $firewallConfig;
+                        }
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')

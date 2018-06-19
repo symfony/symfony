@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-18T16:29:24Z
+
+Thank you for this PR.
+By "blank space", I suppose there was a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark) before the first `<`?
+This should be merged on branch 2.8, where the files exist also, isn't it?
+
+---------------------------------------------------------------------------
+
+by gautierderuette at 2018-06-19T07:38:56Z
+
+You are right, it must be a BOM,
+I hesitated to merge to 2.8 because I have never seen this error before.
+
+---------------------------------------------------------------------------
+
+by gautierderuette at 2018-06-19T07:40:15Z
+
+Do I have to create a new pull request ?

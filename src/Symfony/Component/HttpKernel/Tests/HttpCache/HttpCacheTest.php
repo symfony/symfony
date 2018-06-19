@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Store;
-use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -1438,8 +1437,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesOriginalRequestForSurrogate()
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $store = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\StoreInterface')->getMock();
 
         $kernel
             ->expects($this->exactly(2))

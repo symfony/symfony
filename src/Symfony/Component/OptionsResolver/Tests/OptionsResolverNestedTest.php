@@ -14,7 +14,7 @@ namespace Symfony\Component\OptionsResolver\Tests;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\OptionResolverNested;
+use Symfony\Component\OptionsResolver\NestedOption;
 use Symfony\Component\OptionsResolver\ResolveData;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,8 +41,8 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfNonExistingOption()
     {
-        $this->resolver->setDefault('z', new OptionResolverNested(array('1')));
-        $this->resolver->setDefault('a', new OptionResolverNested(array('2')));
+        $this->resolver->setDefault('z', new NestedOption(array('1')));
+        $this->resolver->setDefault('a', new NestedOption(array('2')));
 
         $this->resolver->resolve(array('foo' => 'bar'));
     }
@@ -53,8 +53,8 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfMultipleNonExistingOptions()
     {
-        $this->resolver->setDefault('z', new OptionResolverNested(array('1')));
-        $this->resolver->setDefault('a', new OptionResolverNested(array('2')));
+        $this->resolver->setDefault('z', new NestedOption(array('1')));
+        $this->resolver->setDefault('a', new NestedOption(array('2')));
 
         $this->resolver->resolve(array('ping' => 'pong', 'foo' => 'bar', 'baz' => 'bam'));
     }
@@ -74,7 +74,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => 42,
                 ))
             )
@@ -88,7 +88,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => null,
                 ))
             )
@@ -105,7 +105,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => function (Options $options) {
                         return 'lazy';
                     },
@@ -125,7 +125,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => $closure,
                 ))
             )
@@ -143,7 +143,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => $closure,
                 ))
             )
@@ -158,7 +158,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => 'baz',
                 ))
             )
@@ -184,7 +184,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => function (Options $options) {
                         return 'baz';
                     },
@@ -212,7 +212,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => function () {
                         Assert::fail('Should not be called');
                     },
@@ -224,7 +224,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => function (Options $options) {
                         return 'lazy';
                     },
@@ -240,7 +240,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => function () {
                         Assert::fail('Should not be called');
                     },
@@ -251,7 +251,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'bar' => 'baz',
                 ))
             )
@@ -267,7 +267,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'lazy1' => function (Options $options) use (&$calls) {
                         Assert::assertSame(1, ++$calls);
 
@@ -302,7 +302,7 @@ class OptionsResolverNestedTest extends TestCase
         $this
             ->resolver
             ->setDefault('foo',
-                new OptionResolverNested(array(
+                new NestedOption(array(
                     'lazy1' => function (Options $options) {
                         $options->setRequired('lazy');
                     },
@@ -329,7 +329,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
             ->setRequired(array(
                 array('foo', 'bar'),
             ))
@@ -348,7 +348,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
             ->setRequired(array(
                 array('foo', 'bar'),
             ))
@@ -362,7 +362,7 @@ class OptionsResolverNestedTest extends TestCase
         $this->assertFalse($this->resolver->isRequired(array('foo', 'bar')));
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
             ->setRequired(array(
                 array('foo', 'bar'),
             ))
@@ -375,7 +375,7 @@ class OptionsResolverNestedTest extends TestCase
         $this->assertFalse($this->resolver->isRequired(array('foo', 'bar')));
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested(array(
+            ->setDefault('foo', new NestedOption(array(
                 'bar' => 'baz',
             )))
         ;
@@ -395,7 +395,7 @@ class OptionsResolverNestedTest extends TestCase
 
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
             ->setRequired(array(
                 array('foo', 'bar'),
             ))
@@ -413,7 +413,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isRequired(array('foo', 'bar')));
         $this->resolver->setRequired(array('foo', 'bar'));
@@ -425,7 +425,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isRequired(array('foo', 'bar')));
         $this->resolver->getNested('foo')->setRequired('bar');
@@ -437,7 +437,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('any', new OptionResolverNested())
+            ->setDefault('any', new NestedOption())
         ;
         $this->resolver->setRequired(array(
             array('any', 'foo'),
@@ -457,7 +457,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isMissing(array('foo', 'bar')));
         $this->resolver->setRequired(array(
@@ -470,7 +470,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested(array(
+            ->setDefault('foo', new NestedOption(array(
                 'bar' => 'baz',
             )))
         ;
@@ -486,7 +486,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
             ->setRequired(array('foo', 'bar'))
         ;
         $this->resolver->remove(array('foo', 'bar'));
@@ -498,7 +498,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setRequired(array('foo', 'bar'));
         $this->resolver->clear();
@@ -509,7 +509,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('any', new OptionResolverNested())
+            ->setDefault('any', new NestedOption())
         ;
         $this->resolver->setRequired(array(
             array('any', 'bar'),
@@ -531,7 +531,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested(array(
+            ->setDefault('foo', new NestedOption(array(
                 'bar' => function (Options $options) {
                     $options->setDefined('baz');
                 },
@@ -545,7 +545,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this
             ->resolver
@@ -563,7 +563,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -581,7 +581,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -597,7 +597,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isDefined(array('foo', 'bar')));
         $this->resolver->setDefined(array(
@@ -609,7 +609,7 @@ class OptionsResolverNestedTest extends TestCase
     public function testLazyOptionsAreDefined()
     {
         $this->assertFalse($this->resolver->isDefined(array('foo', 'bar')));
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
             },
         )));
@@ -620,7 +620,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isDefined(array('foo', 'bar')));
         $this->resolver->setRequired(array(
@@ -633,10 +633,10 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isDefined(array('foo', 'bar')));
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->assertTrue($this->resolver->isDefined(array('foo', 'bar')));
@@ -646,7 +646,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -663,7 +663,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isDefined(array('foo', 'bar')));
         $this->resolver->setDefined(array(
@@ -678,7 +678,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->assertFalse($this->resolver->isDefined(array('foo', 'bar')));
         $this->resolver->setDefined(array(
@@ -705,7 +705,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -721,7 +721,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfSetAllowedTypesFromLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => function (Options $options) {
                 $options->setAllowedTypes('bar', 'string');
             },
@@ -739,7 +739,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -758,7 +758,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -777,7 +777,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -801,7 +801,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
@@ -826,7 +826,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $this
             ->resolver
-            ->setDefault('foo', new OptionResolverNested())
+            ->setDefault('foo', new NestedOption())
         ;
         $this->resolver->setDefined(array(
             array('foo', 'option'),
@@ -859,7 +859,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidType()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'bar',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'string');
@@ -874,7 +874,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidTypeMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 42,
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), array('string', 'bool'));
@@ -884,7 +884,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidTypeMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => true,
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), array('string', 'bool'));
@@ -894,7 +894,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfInstanceOfClass()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => new \stdClass(),
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), '\stdClass');
@@ -908,7 +908,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfNotInstanceOfClass()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'bar',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), '\stdClass');
@@ -925,7 +925,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testAddAllowedTypesFailsIfUnknownOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
         $this->resolver->addAllowedTypes(array('foo', 'baz'), 'string');
     }
 
@@ -934,7 +934,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfAddAllowedTypesFromLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => function (Options $options) {
                 $options->addAllowedTypes('bar', 'string');
             },
@@ -950,7 +950,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidAddedType()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 42,
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'string');
@@ -960,7 +960,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidAddedType()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'bar',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'string');
@@ -973,7 +973,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidAddedTypeMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 42,
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), array('string', 'bool'));
@@ -983,7 +983,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidAddedTypeMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'baz',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), array('string', 'bool'));
@@ -993,13 +993,13 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testAddAllowedTypesDoesNotOverwrite()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'baz',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'bool');
         $this->resolver->addAllowedTypes(array('foo', 'baz'), 'string');
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'baz',
         )));
 
@@ -1008,13 +1008,13 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testAddAllowedTypesDoesNotOverwrite2()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'baz',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'bool');
         $this->resolver->addAllowedTypes(array('foo', 'baz'), 'string');
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => false,
         )));
 
@@ -1027,13 +1027,13 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testExceptionAddAllowedTypesDoesNotOverwrite()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'baz',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'bool');
         $this->resolver->addAllowedTypes(array('foo', 'baz'), 'string');
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 23,
         )));
 
@@ -1046,13 +1046,13 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testExceptionAddAllowedTypesDoesNotOverwrite2()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => 'baz',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'baz'), 'array');
         $this->resolver->addAllowedTypes(array('foo', 'baz'), 'string');
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'baz' => false,
         )));
 
@@ -1068,7 +1068,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testSetAllowedValuesFailsIfUnknownOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
         $this->resolver->setAllowedValues(array('foo', 'baz'), 'bar');
     }
 
@@ -1078,7 +1078,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidValue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
         $this->resolver->setDefined(array(
             array('foo', 'bar'),
         ));
@@ -1093,7 +1093,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidValueIsNull()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => null,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), 'bar');
@@ -1106,7 +1106,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidValueStrict()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => '42',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), 42);
@@ -1116,7 +1116,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidValue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), 'baz');
@@ -1126,7 +1126,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidValueIsNull()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => null,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), null);
@@ -1140,7 +1140,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidValueMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), array('bar', false, null));
@@ -1150,7 +1150,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidValueMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), array('baz', 'bar'));
@@ -1160,7 +1160,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveFailsIfClosureReturnsFalse()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), function ($value) use (&$passedValue) {
@@ -1180,7 +1180,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfClosureReturnsTrue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), function ($value) use (&$passedValue) {
@@ -1198,7 +1198,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfAllClosuresReturnFalse()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), array(
@@ -1218,7 +1218,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfAnyClosureReturnsTrue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), array(
@@ -1245,7 +1245,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testAddAllowedValuesFailsIfUnknownOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
         $this->resolver->addAllowedValues(array('foo', 'baz'), 'bar');
     }
 
@@ -1254,7 +1254,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfAddAllowedValuesFromLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 $options->addAllowedValues('bar', 'baz');
             },
@@ -1268,7 +1268,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidAddedValue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->addAllowedValues(array('foo', 'bar'), 'baz');
@@ -1278,7 +1278,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidAddedValue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->addAllowedValues(array('foo', 'bar'), 'baz');
@@ -1288,7 +1288,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidAddedValueIsNull()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => null,
         )));
         $this->resolver->addAllowedValues(array('foo', 'bar'), null);
@@ -1301,7 +1301,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfInvalidAddedValueMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->addAllowedValues(array('foo', 'bar'), array('baz', 'bar'));
@@ -1311,7 +1311,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfValidAddedValueMultiple()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->addAllowedValues(array('foo', 'bar'), array('baz', 'bam'));
@@ -1321,7 +1321,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testAddAllowedValuesDoesNotOverwrite()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->addAllowedValues(array('foo', 'bar'), 'bam');
@@ -1332,7 +1332,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testAddAllowedValuesDoesNotOverwrite2()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), 'bam');
@@ -1346,7 +1346,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testResolveFailsIfAllAddedClosuresReturnFalse()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), function () {
@@ -1361,7 +1361,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfAnyAddedClosureReturnsTrue()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 42,
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), function () {
@@ -1376,7 +1376,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testResolveSucceedsIfAnyAddedClosureReturnsTrue2()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), function () {
@@ -1395,7 +1395,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testSetNormalizerReturnsThis()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
 
@@ -1405,7 +1405,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testSetNormalizerClosure()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setNormalizer(array('foo', 'bar'), function () {
@@ -1420,7 +1420,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testSetNormalizerFailsIfUnknownOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
         $this->resolver->setNormalizer(array('foo', 'bar'), function () {
         });
     }
@@ -1430,7 +1430,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfSetNormalizerFromLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 $options->setNormalizer('baz', function () {
                 });
@@ -1442,7 +1442,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testNormalizerReceivesSetOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setNormalizer(array('foo', 'bar'), function (Options $options, $value) {
@@ -1454,7 +1454,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testNormalizerReceivesPassedOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setNormalizer(array('foo', 'bar'), function (Options $options, $value) {
@@ -1471,7 +1471,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testValidateTypeBeforeNormalization()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
 
@@ -1489,7 +1489,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testValidateValueBeforeNormalization()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
 
@@ -1504,7 +1504,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testNormalizerCanAccessOtherOptions()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default' => 'bar',
             'norm' => 'bar',
         )));
@@ -1526,7 +1526,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testNormalizerCanAccessLazyOptions()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'lazy' => function (Options $options) {
                 return 'bar';
             },
@@ -1554,7 +1554,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfCyclicDependencyBetweenNormalizers()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
         $this->resolver->getNested('foo')->setDefault('norm1', 'bar');
         $this->resolver->getNested('foo')->setDefault('norm2', 'baz');
 
@@ -1575,13 +1575,13 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfCyclicDependencyBetweenNormalizerAndLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'lazy' => function (Options $options) {
                 $options['norm'];
             },
         )));
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'norm' => function (Options $options) {
                 $options['norm'];
             },
@@ -1598,7 +1598,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $throw = true;
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'catcher' => null,
             'thrower' => null,
         )));
@@ -1627,7 +1627,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $throw = true;
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'catcher' => function (Options $options) {
                 try {
                     return $options['thrower'];
@@ -1637,7 +1637,7 @@ class OptionsResolverNestedTest extends TestCase
             },
         )));
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'thrower' => function (Options $options) use (&$throw) {
                 if ($throw) {
                     $throw = false;
@@ -1655,7 +1655,7 @@ class OptionsResolverNestedTest extends TestCase
     {
         $calls = 0;
 
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'norm1' => 'bar',
             'norm2' => 'baz',
         )));
@@ -1676,7 +1676,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testNormalizerNotCalledForUnsetOptions()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested());
+        $this->resolver->setDefault('foo', new NestedOption());
 
         $this->resolver->setDefined(array(
             array('foo', 'norm'),
@@ -1695,20 +1695,20 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testSetDefaultsReturnsThis()
     {
-        $this->assertSame($this->resolver, $this->resolver->setDefaults(array('foo', new OptionResolverNested(array(
+        $this->assertSame($this->resolver, $this->resolver->setDefaults(array('foo', new NestedOption(array(
             'bar' => 'baz',
         )))));
     }
 
     public function testSetDefaults()
     {
-        $this->resolver->setDefaults(array('foo' => new OptionResolverNested(array(
+        $this->resolver->setDefaults(array('foo' => new NestedOption(array(
             'one' => '1',
         ))));
         $this->resolver->getNested('foo')->setDefault('two', 'bar');
 
         $this->resolver->setDefaults(array(
-            'foo' => new OptionResolverNested(array(
+            'foo' => new NestedOption(array(
                 'two' => '2',
                 'three' => '3',
             )),
@@ -1729,7 +1729,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfSetDefaultsFromLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 $options->setDefaults(array('two' => '2'));
             },
@@ -1744,7 +1744,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveReturnsThis()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
 
@@ -1754,7 +1754,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveSingleOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
             'bom' => 'bam',
         )));
@@ -1767,7 +1767,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveMultipleOptions()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
             'bom' => 'bam',
         )));
@@ -1783,7 +1783,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 return 'lazy';
             },
@@ -1797,7 +1797,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveNormalizer()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
 
@@ -1814,7 +1814,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveAllowedTypes()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
 
@@ -1829,7 +1829,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testRemoveAllowedValues()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), array('baz', 'boo'));
@@ -1847,7 +1847,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfRemoveFromLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 $options->remove('bar');
             },
@@ -1869,7 +1869,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearRemovesAllOptions()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
             'bom' => 'bam',
         )));
@@ -1881,7 +1881,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearRemovesAllOptionsInNested()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
             'bom' => 'bam',
         )));
@@ -1895,7 +1895,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearLazyOption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 return 'lazy';
             },
@@ -1909,7 +1909,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearNormalizer()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setNormalizer(array('foo', 'bar'), function (Options $options, $value) {
@@ -1923,7 +1923,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearAllowedTypes()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedTypes(array('foo', 'bar'), 'integer');
@@ -1935,7 +1935,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearAllowedValues()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setAllowedValues(array('foo', 'bar'), 'integer');
@@ -1951,7 +1951,7 @@ class OptionsResolverNestedTest extends TestCase
      */
     public function testFailIfClearFromLazyption()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => function (Options $options) {
                 $options->clear();
             },
@@ -1964,13 +1964,13 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testClearOptionAndNormalizer()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bar' => 'baz',
         )));
         $this->resolver->setNormalizer(array('foo', 'bar'), function (Options $options, $value) {
             return 'normalized';
         });
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'bam' => 'baz',
         )));
         $this->resolver->setNormalizer(array('foo', 'bam'), function (Options $options, $value) {
@@ -1983,9 +1983,9 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testNestedClear()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
-            'bar' => new OptionResolverNested(array(
-                'bam' => new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
+            'bar' => new NestedOption(array(
+                'bam' => new NestedOption(array(
                     'bom' => 'dam',
                 )),
             )),
@@ -2008,7 +2008,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testArrayAccess()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 0,
             'default2' => 1,
         )));
@@ -2018,12 +2018,12 @@ class OptionsResolverNestedTest extends TestCase
         $this->resolver->setDefined(array(
             array('foo', 'defined'),
         ));
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'lazy1' => function (Options $options) {
                 return 'lazy';
             },
         )));
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'lazy2' => function (Options $options) {
                 Assert::assertArrayHasKey('default1', $options);
                 Assert::assertArrayHasKey('default1', $options);
@@ -2107,7 +2107,7 @@ class OptionsResolverNestedTest extends TestCase
             'host' => function (Options $options) {
                 return $options['db']['host'];
             },
-            'db' => new OptionResolverNested(array(
+            'db' => new NestedOption(array(
                 'host' => 'localhost',
             )),
         ));
@@ -2131,7 +2131,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testSetRequiredArray()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 0,
             'default2' => 1,
         )));
@@ -2146,7 +2146,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testChildrenAccess()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 0,
             'default2' => 1,
         )));
@@ -2164,7 +2164,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testChildrenAccessNormalize()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 0,
             'default2' => 1,
         )));
@@ -2186,7 +2186,7 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testChildrenAccessNormalize2()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 0,
             'default2' => 1,
         )));
@@ -2208,9 +2208,9 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testParentAccess()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 1,
-            'default2' => new OptionResolverNested(array(
+            'default2' => new NestedOption(array(
                 'any' => function (ResolveData $option) {
                     return $option['foo']['default1'];
                 },
@@ -2227,9 +2227,9 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testParentAccessNormalize()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => 1,
-            'default2' => new OptionResolverNested(array(
+            'default2' => new NestedOption(array(
                 'any' => function (ResolveData $option) {
                     return $option['foo']['default1'];
                 },
@@ -2250,11 +2250,11 @@ class OptionsResolverNestedTest extends TestCase
 
     public function testParentAndChildrenAccessNormalize()
     {
-        $this->resolver->setDefault('foo', new OptionResolverNested(array(
+        $this->resolver->setDefault('foo', new NestedOption(array(
             'default1' => function (Options $options) {
                 return $options['default2']['any'];
             },
-            'default2' => new OptionResolverNested(array(
+            'default2' => new NestedOption(array(
                 'bar' => 'baz',
                 'any' => function (ResolveData $option) {
                     return $option['foo']['default2']['bar'];

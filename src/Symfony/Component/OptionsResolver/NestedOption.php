@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\OptionsResolver;
 
-class OptionResolverNested extends \ArrayObject
+class NestedOption extends \ArrayObject
 {
 }

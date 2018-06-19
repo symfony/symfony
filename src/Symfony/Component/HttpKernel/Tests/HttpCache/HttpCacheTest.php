@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -1466,6 +1468,42 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertSame('get', $this->response->getContent());
+    }
+
+    public function testUsesOriginalRequestForSurrogate()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $store = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\StoreInterface')->getMock();
+
+        $kernel
+            ->expects($this->exactly(2))
+            ->method('handle')
+            ->willReturnCallback(function (Request $request) {
+                $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
+
+                return new Response();
+            });
+
+        $cache = new HttpCache($kernel,
+            $store,
+            new Esi()
+        );
+
+        $request = Request::create('/');
+        $request->server->set('REMOTE_ADDR', '10.0.0.1');
+
+        // Main request
+        $cache->handle($request, HttpKernelInterface::MASTER_REQUEST);
+
+        // Main request was now modified by HttpCache
+        // The surrogate will ask for the request using $this->cache->getRequest()
+        // which MUST return the original request so the surrogate
+        // can actually behave like a reverse proxy like e.g. Varnish would.
+        $this->assertSame('10.0.0.1', $cache->getRequest()->getClientIp());
+        $this->assertSame('10.0.0.1', $cache->getRequest()->server->get('REMOTE_ADDR'));
+
+        // Surrogate request
+        $cache->handle($request, HttpKernelInterface::SUB_REQUEST);
     }
 }
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-06T17:49:47Z
+
+(failure will be fixed once merged up to master)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T20:05:29Z
+
+ping @symfony/deciders votes pending, this "just" fixes ESI with HttpCache, which are broken (found in training sessions by @jpauli )

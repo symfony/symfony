@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
-use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
 

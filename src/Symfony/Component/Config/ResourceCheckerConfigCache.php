@@ -168,13 +168,13 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
 
         try {
             $meta = unserialize(file_get_contents($file));
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
-        }
-        restore_error_handler();
-        ini_set('unserialize_callback_func', $prevUnserializeHandler);
-        if (null !== $e && $e !== $signalingException) {
-            throw $e;
+        } catch (\Throwable $e) {
+            if ($e !== $signalingException) {
+                throw $e;
+            }
+        } finally {
+            restore_error_handler();
+            ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
         return $meta;

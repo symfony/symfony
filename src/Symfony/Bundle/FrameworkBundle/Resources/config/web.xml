@@ -67,15 +67,6 @@
             <argument type="service" id="router" on-invalid="ignore" />
         </service>
 
-        <service id="http_exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-256"/>
-            <tag name="monolog.logger" channel="request" />
-            <argument>null</argument>
-            <argument type="service" id="logger" on-invalid="null" />
-            <argument>%kernel.debug%</argument>
-            <argument>%kernel.charset%</argument>
-        </service>
-
         <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">
             <tag name="kernel.event_subscriber" />
         </service>

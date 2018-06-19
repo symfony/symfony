@@ -52,11 +52,14 @@ trait ApcuTrait
     protected function doFetch(array $ids)
     {
         try {
+            $values = array();
             foreach (apcu_fetch($ids, $ok) ?: array() as $k => $v) {
                 if (null !== $v || $ok) {
-                    yield $k => $v;
+                    $values[$k] = $v;
                 }
             }
+
+            return $values;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         }
@@ -103,15 +106,13 @@ trait ApcuTrait
             }
 
             return array_keys($failures);
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
-        }
+        } catch (\Throwable $e) {
+            if (1 === count($values)) {
+                // Workaround https://github.com/krakjoe/apcu/issues/170
+                apcu_delete(key($values));
+            }
 
-        if (1 === count($values)) {
-            // Workaround https://github.com/krakjoe/apcu/issues/170
-            apcu_delete(key($values));
+            throw $e;
         }
-
-        throw $e;
     }
 }

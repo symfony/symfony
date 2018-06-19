@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
+
 /**
  * Builds a definition.
  *
@@ -23,6 +25,7 @@ class DefinitionBuilder
     private $places = array();
     private $transitions = array();
     private $initialPlace;
+    private $metadataStore;
 
     /**
      * @param string[]     $places
@@ -39,7 +42,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlace);
+        return new Definition($this->places, $this->transitions, $this->initialPlace, $this->metadataStore);
     }
 
     /**
@@ -52,6 +55,7 @@ class DefinitionBuilder
         $this->places = array();
         $this->transitions = array();
         $this->initialPlace = null;
+        $this->metadataStore = null;
 
         return $this;
     }
@@ -118,6 +122,16 @@ class DefinitionBuilder
     public function addTransition(Transition $transition)
     {
         $this->transitions[] = $transition;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMetadataStore(MetadataStoreInterface $metadataStore)
+    {
+        $this->metadataStore = $metadataStore;
 
         return $this;
     }

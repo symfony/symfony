@@ -123,6 +123,7 @@ abstract class KernelTestCase extends TestCase
                 $container->reset();
             }
         }
+        static::$container = null;
     }
 
     /**

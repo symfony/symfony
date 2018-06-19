@@ -27,7 +27,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceConta
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
@@ -64,9 +63,6 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
-        if (!ini_get('xdebug.file_link_format') && !get_cfg_var('xdebug.file_link_format')) {
-            ini_set('xdebug.file_link_format', $this->container->getParameter('debug.file_link_format'));
-        }
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
 
         if ($this->container->getParameter('kernel.http_method_override')) {
@@ -102,10 +98,10 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_AFTER_REMOVING, -255);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
-        $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class);
+        $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, TranslatorPass::class);
         $container->addCompilerPass(new LoggingTranslatorPass());
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
         $container->addCompilerPass(new FragmentRendererPass());
@@ -139,10 +135,5 @@ class FrameworkBundle extends Bundle
         if (class_exists($class)) {
             $container->addCompilerPass(new $class(), $type, $priority);
         }
-    }
-
-    public function registerCommands(Application $application)
-    {
-        // noop
     }
 }

@@ -419,9 +419,10 @@
                     function(xhr, el) {
 
                         /* Evaluate in global scope scripts embedded inside the toolbar */
-                        eval.call({}, ([].slice.call(el.querySelectorAll('script')).map(function (script) {
-                          return script.firstChild.nodeValue;
-                        }).join(';\n')));
+                        var i, scripts = [].slice.call(el.querySelectorAll('script'));
+                        for (i = 0; i < scripts.length; ++i) {
+                            eval.call({}, scripts[i].firstChild.nodeValue);
+                        }
 
                         el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
 
@@ -440,7 +441,7 @@
                         }
 
                         /* Handle toolbar-info position */
-                        var i, toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
+                        var toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
                         for (i = 0; i < toolbarBlocks.length; ++i) {
                             toolbarBlocks[i].onmouseover = function () {
                                 var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];

@@ -11,34 +11,22 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+ * @author Titouan Galopin <galopintitouan@gmail.com>
  */
 class CsrfExtension extends AbstractExtension
 {
-    private $csrfTokenManager;
-
-    public function __construct(CsrfTokenManagerInterface $csrfTokenManager)
-    {
-        $this->csrfTokenManager = $csrfTokenManager;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function getFunctions(): array
     {
         return array(
-            new TwigFunction('csrf_token', array($this, 'getCsrfToken')),
+            new TwigFunction('csrf_token', array(CsrfRuntime::class, 'getCsrfToken')),
         );
-    }
-
-    public function getCsrfToken(string $tokenId): string
-    {
-        return $this->csrfTokenManager->getToken($tokenId)->getValue();
     }
 }

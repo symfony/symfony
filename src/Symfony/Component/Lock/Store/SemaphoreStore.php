@@ -64,8 +64,14 @@ class SemaphoreStore implements StoreInterface
             return;
         }
 
-        $resource = sem_get(crc32($key));
-        $acquired = sem_acquire($resource, !$blocking);
+        $keyId = crc32($key);
+        $resource = sem_get($keyId);
+        $acquired = @sem_acquire($resource, !$blocking);
+
+        while ($blocking && !$acquired) {
+            $resource = sem_get($keyId);
+            $acquired = @sem_acquire($resource);
+        }
 
         if (!$acquired) {
             throw new LockConflictedException();
@@ -86,7 +92,7 @@ class SemaphoreStore implements StoreInterface
 
         $resource = $key->getState(__CLASS__);
 
-        sem_release($resource);
+        sem_remove($resource);
 
         $key->removeState(__CLASS__);
     }

@@ -29,6 +29,7 @@ Community
 * [Join the Symfony Community][11] and meet other members at the [Symfony events][12].
 * [Get Symfony support][13] on Stack Overflow, Slack, IRC, etc.
 * Follow us on [GitHub][14], [Twitter][15] and [Facebook][16].
+* Read our [Code of Conduct][24] and meet the [CARE Team][25]
 
 Contributing
 ------------
@@ -71,3 +72,5 @@ Symfony development is sponsored by [SensioLabs][21], led by the
 [21]: https://sensiolabs.com
 [22]: https://symfony.com/doc/current/contributing/code/core_team.html
 [23]: https://github.com/symfony/symfony-demo
+[24]: https://symfony.com/coc
+[25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html

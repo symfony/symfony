@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* add bundle name suggestion on wrongly overridden templates paths
+
 4.1.0
 -----
 

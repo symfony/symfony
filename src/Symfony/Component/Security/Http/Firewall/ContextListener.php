@@ -45,7 +45,6 @@ class ContextListener implements ListenerInterface
     private $trustResolver;
 
     /**
-     * @param TokenStorageInterface            $tokenStorage
      * @param iterable|UserProviderInterface[] $userProviders
      */
     public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
@@ -227,8 +226,7 @@ class ContextListener implements ListenerInterface
 
         try {
             $token = unserialize($serializedToken);
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
         restore_error_handler();
         ini_set('unserialize_callback_func', $prevUnserializeHandler);

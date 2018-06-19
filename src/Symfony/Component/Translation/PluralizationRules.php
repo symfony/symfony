@@ -107,6 +107,7 @@ class PluralizationRules
             case 'nl':
             case 'nn':
             case 'no':
+            case 'oc':
             case 'om':
             case 'or':
             case 'pa':

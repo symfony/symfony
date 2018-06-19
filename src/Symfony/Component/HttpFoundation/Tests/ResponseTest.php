@@ -300,7 +300,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Expires', -1);
-        $this->assertLessThanOrEqual(time() - 2*86400, $response->getExpires()->format('U'));
+        $this->assertLessThanOrEqual(time() - 2 * 86400, $response->getExpires()->format('U'));
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');

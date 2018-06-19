@@ -123,6 +123,16 @@ class TestSessionListenerTest extends TestCase
         $this->assertFalse(is_subclass_of(TestSessionListener::class, ServiceSubscriberInterface::class, 'Implementing ServiceSubscriberInterface would create a dep on the DI component, which eg Silex cannot afford'));
     }
 
+    public function testDoesNotThrowIfRequestDoesNotHaveASession()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, new Response());
+
+        $this->listener->onKernelResponse($event);
+
+        $this->assertTrue(true);
+    }
+
     private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)
     {
         $request->setSession($this->session);

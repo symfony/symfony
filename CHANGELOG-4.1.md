@@ -7,6 +7,79 @@ in 4.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.1.0...v4.1.1
 
+* 4.1.0 (2018-05-30)
+
+ * bug #27420 Revert "feature #26702 Mark ExceptionInterfaces throwable (ostrolucky)" (nicolas-grekas)
+ * bug #27415 Insert correct parameter_bag service in AbstractController (curry684)
+
+* 4.1.0-BETA3 (2018-05-26)
+
+ * bug #27388 [Routing] Account for greediness when merging route patterns (nicolas-grekas)
+ * bug #27344 [HttpKernel] reset kernel start time on reboot (kiler129)
+ * bug #27365 [Serializer] Check the value of enable_max_depth if defined (dunglas)
+ * bug #27358 [PhpUnitBridge] silence some stderr outputs (ostrolucky)
+ * bug #27366 [DI] never inline lazy services (nicolas-grekas)
+ * bug #27352 Remove reference to the test container after kernel shutdown (stof)
+ * bug #27350 [HttpKernel] fix deprecation in AbstractTestSessionListener (alekitto)
+ * bug #27367 [FrameworkBundle] cleanup generated test container (nicolas-grekas)
+ * bug #27379 [FrameworkBundle] Fix using test.service_container when Client is rebooted (nicolas-grekas)
+ * bug #27364 [DI] Fix bad exception on uninitialized references to non-shared services (nicolas-grekas)
+ * bug #27359 [HttpFoundation] Fix perf issue during MimeTypeGuesser intialization (nicolas-grekas)
+ * security #cve-2018-11408 [SecurityBundle] Fail if security.http_utils cannot be configured
+ * security #cve-2018-11406 clear CSRF tokens when the user is logged out
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11385 migrating session for UsernamePasswordJsonAuthenticationListener
+ * security #cve-2018-11385 Adding session authentication strategy to Guard to avoid session fixation
+ * security #cve-2018-11385 Adding session strategy to ALL listeners to avoid *any* possible fixation
+ * security #cve-2018-11386 [HttpFoundation] Break infinite loop in PdoSessionHandler when MySQL is in loose mode
+ * bug #27341 [WebProfilerBundle] Fixed validator/dump trace CSS (yceruto)
+ * bug #27337  [FrameworkBundle] fix typo in CacheClearCommand (emilielorenzo)
+ * bug #27292 [Serializer] Fix and improve constraintViolationListNormalizer's RFC7807 compliance (dunglas)
+
+* 4.1.0-BETA2 (2018-05-21)
+
+ * bug #27312 Supress deprecation notices thrown when getting private servies from container in tests (arderyp)
+ * feature #27275 [Messenger] Allow to scope handlers per bus (ogizanagi, sroze)
+ * bug #27264 [Validator] Use strict type in URL validator (mimol91)
+ * bug #27267 [DependencyInjection] resolve array env vars (jamesthomasonjr)
+ * bug #26781 [Form] Fix precision of MoneyToLocalizedStringTransformer's divisions on transform() (syastrebov)
+ * bug #27270 [Routing] Fix adding name prefix to canonical route names (ismail1432)
+ * bug #27286 [Translation] Add Occitan plural rule (kylekatarnls)
+ * bug #27271 [DI] Allow defining bindings on ChildDefinition (nicolas-grekas)
+ * bug #27246 Disallow invalid characters in session.name (ostrolucky)
+ * feature #27230 [Messenger] Select alternatives on missing receiver arg or typo (yceruto)
+ * bug #27287 [PropertyInfo] fix resolving parent|self type hints (nicolas-grekas)
+ * bug #27281 [HttpKernel] Fix dealing with self/parent in ArgumentMetadataFactory (fabpot)
+ * bug #24805 [Security] Fix logout (MatTheCat)
+ * bug #27265 [DI] Shared services should not be inlined in non-shared ones (nicolas-grekas)
+ * bug #27141 [Process] Suppress warnings when open_basedir is non-empty (cbj4074)
+ * bug #27250 [Session] limiting :key for GET_LOCK to 64 chars (oleg-andreyev)
+ * feature #27128 [Messenger] Middleware factories support in config (ogizanagi)
+ * bug #27214 [HttpKernel] Fix services are no longer injected into __invoke controllers method (ogizanagi)
+ * bug #27237 [Debug] Fix populating error_get_last() for handled silent errors (nicolas-grekas)
+ * bug #27232 [Cache][Lock] Fix usages of error_get_last() (nicolas-grekas)
+ * bug #27236 [Filesystem] Fix usages of error_get_last() (nicolas-grekas)
+ * feature #27202 [Messenger] Improve the profiler panel (ogizanagi)
+ * bug #27191 [DI] Display previous error messages when throwing unused bindings (nicolas-grekas)
+ * bug #27231 [FrameworkBundle] Fix cache:clear on vagrant (nicolas-grekas)
+ * bug #27222 [WebProfilerBundle][Cache] Fix misses calculation when calling getItems (fsevestre)
+ * bug #27227 [HttpKernel] Handle NoConfigurationException "onKernelException()" (nicolas-grekas)
+ * feature #27034 [Messenger][DX] Uses custom method names for handlers (sroze)
+ * bug #27228 [Messenger] Remove autoconfiguration for Sender/ReceiverInterface (kbond)
+ * bug #27229 [Messenger] Rename tag attribute "name" by "alias" (yceruto)
+ * bug #27224 [Messenger] Make sure default receiver name is set before command configuration (yceruto)
+ * feature #27225 [Messenger] Autoconfiguring TransportFactoryInterface classes (yceruto)
+ * bug #27220 [Messenger] Fix new AMQP Transport test with Envelope & fix contract (ogizanagi)
+ * bug #27184 [Messenger] Fix return senders based on the message parents/interfaces (yceruto)
+ * feature #27182 [Messenger] Re-introduce wrapped message configuration (with fix) (sroze, ogizanagi)
+ * bug #27209 [Workflow] add is deprecated since Symfony 4.1. Use addWorkflow() instead (xkobal)
+ * feature #26803 [Messenger] Add debug:messenger CLI command (ro0NL, sroze)
+ * bug #27189 [Profiler] Fix dump makes toolbar disappear (ogizanagi)
+ * bug #27199 [Messenger] Fix default bus name (ogizanagi)
+ * bug #27198 [Messenger] Fix the transport factory after moving it (sroze)
+ * bug #27197 [Messenger] Fix AMQP Transport factory & TransportFactoryInterface (ogizanagi)
+ * bug #27196 [Messenger] Fix AMQP Transport (yceruto)
+
 * 4.1.0-BETA1 (2018-05-07)
 
  * feature #26945 [Messenger] Support configuring messages when dispatching (ogizanagi)

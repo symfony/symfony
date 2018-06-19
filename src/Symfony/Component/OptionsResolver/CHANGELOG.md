@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `NestedOption` and support for nesting options
+ * added `setDeprecated` and `isDeprecated` methods
 
 3.4.0
 -----

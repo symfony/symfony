@@ -14,11 +14,8 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Run this pass before passes that need to know more about the relation of
@@ -28,6 +25,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * retrieve the graph in other passes from the compiler.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
@@ -35,7 +33,8 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     private $currentDefinition;
     private $onlyConstructorArguments;
     private $lazy;
-    private $expressionLanguage;
+    private $definitions;
+    private $aliases;
 
     /**
      * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
@@ -43,6 +42,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     public function __construct(bool $onlyConstructorArguments = false)
     {
         $this->onlyConstructorArguments = $onlyConstructorArguments;
+        $this->enableExpressionProcessing();
     }
 
     /**
@@ -50,7 +50,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        // no-op for BC
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**
@@ -62,16 +62,22 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         $this->graph = $container->getCompiler()->getServiceReferenceGraph();
         $this->graph->clear();
         $this->lazy = false;
+        $this->definitions = $container->getDefinitions();
+        $this->aliases = $container->getAliases();
 
-        foreach ($container->getAliases() as $id => $alias) {
+        foreach ($this->aliases as $id => $alias) {
             $targetId = $this->getDefinitionId((string) $alias);
-            $this->graph->connect($id, $alias, $targetId, $this->getDefinition($targetId), null);
+            $this->graph->connect($id, $alias, $targetId, null !== $targetId ? $this->container->getDefinition($targetId) : null, null);
         }
 
-        parent::process($container);
+        try {
+            parent::process($container);
+        } finally {
+            $this->aliases = $this->definitions = array();
+        }
     }
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, $isRoot = false, bool $inExpression = false)
     {
         $lazy = $this->lazy;
 
@@ -82,14 +88,9 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
 
             return $value;
         }
-        if ($value instanceof Expression) {
-            $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
-
-            return $value;
-        }
         if ($value instanceof Reference) {
             $targetId = $this->getDefinitionId((string) $value);
-            $targetDefinition = $this->getDefinition($targetId);
+            $targetDefinition = null !== $targetId ? $this->container->getDefinition($targetId) : null;
 
             $this->graph->connect(
                 $this->currentId,
@@ -100,6 +101,18 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                 $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
                 ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior()
             );
+
+            if ($inExpression) {
+                $this->graph->connect(
+                    '.internal.reference_in_expression',
+                    null,
+                    $targetId,
+                    $targetDefinition,
+                    $value,
+                    $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                    true
+               );
+            }
 
             return $value;
         }
@@ -127,49 +140,12 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         return $value;
     }
 
-    private function getDefinition(?string $id): ?Definition
-    {
-        return null === $id ? null : $this->container->getDefinition($id);
-    }
-
     private function getDefinitionId(string $id): ?string
     {
-        while ($this->container->hasAlias($id)) {
-            $id = (string) $this->container->getAlias($id);
+        while (isset($this->aliases[$id])) {
+            $id = (string) $this->aliases[$id];
         }
 
-        if (!$this->container->hasDefinition($id)) {
-            return null;
-        }
-
-        return $id;
-    }
-
-    private function getExpressionLanguage()
-    {
-        if (null === $this->expressionLanguage) {
-            if (!class_exists(ExpressionLanguage::class)) {
-                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
-            }
-
-            $providers = $this->container->getExpressionLanguageProviders();
-            $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
-                if ('""' === substr_replace($arg, '', 1, -1)) {
-                    $id = stripcslashes(substr($arg, 1, -1));
-                    $id = $this->getDefinitionId($id);
-
-                    $this->graph->connect(
-                        $this->currentId,
-                        $this->currentDefinition,
-                        $id,
-                        $this->getDefinition($id)
-                    );
-                }
-
-                return sprintf('$this->get(%s)', $arg);
-            });
-        }
-
-        return $this->expressionLanguage;
+        return isset($this->definitions[$id]) ? $id : null;
     }
 }

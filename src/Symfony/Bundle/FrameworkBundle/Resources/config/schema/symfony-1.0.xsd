@@ -375,6 +375,7 @@
             <xsd:element name="sender" type="messenger_routing_sender" />
         </xsd:choice>
         <xsd:attribute name="message-class" type="xsd:string" use="required"/>
+        <xsd:attribute name="send-and-handle" type="xsd:boolean" default="false"/>
     </xsd:complexType>
 
     <xsd:complexType name="messenger_routing_sender">
@@ -391,9 +392,16 @@
 
     <xsd:complexType name="messenger_bus">
         <xsd:sequence>
-            <xsd:element name="middleware" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="middleware" type="messenger_middleware" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="default-middleware" type="xsd:boolean"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_middleware">
+        <xsd:sequence>
+            <xsd:element name="argument" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
     </xsd:complexType>
 </xsd:schema>

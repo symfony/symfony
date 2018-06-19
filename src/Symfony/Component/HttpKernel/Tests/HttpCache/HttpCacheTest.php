@@ -1350,6 +1350,8 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));
 
         $this->assertEquals($expected, Request::getTrustedProxies());
+
+        Request::setTrustedProxies(array(), -1);
     }
 
     public function getTrustedProxyData()

@@ -56,7 +56,7 @@ trait FilesystemCommonTrait
         $ok = true;
 
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
+            $ok = ($file->isDir() || $this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;
@@ -71,10 +71,15 @@ trait FilesystemCommonTrait
 
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            $ok = (!file_exists($file) || @unlink($file) || !file_exists($file)) && $ok;
+            $ok = (!file_exists($file) || $this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;
+    }
+
+    protected function doUnlink($file)
+    {
+        return @unlink($file);
     }
 
     private function write($file, $data, $expiresAt = null)
@@ -98,7 +103,8 @@ trait FilesystemCommonTrait
 
     private function getFile($id, $mkdir = false)
     {
-        $hash = str_replace('/', '-', base64_encode(hash('sha256', static::class.$id, true)));
+        // Use MD5 to favor speed over security, which is not an issue here
+        $hash = str_replace('/', '-', base64_encode(hash('md5', static::class.$id, true)));
         $dir = $this->directory.strtoupper($hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR);
 
         if ($mkdir && !file_exists($dir)) {

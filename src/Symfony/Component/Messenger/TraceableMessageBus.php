@@ -29,19 +29,30 @@ class TraceableMessageBus implements MessageBusInterface
      */
     public function dispatch($message)
     {
+        $caller = $this->getCaller();
+        $callTime = microtime(true);
+        $messageToTrace = $message instanceof Envelope ? $message->getMessage() : $message;
+        $envelopeItems = $message instanceof Envelope ? array_values($message->all()) : null;
+
         try {
             $result = $this->decoratedBus->dispatch($message);
 
             $this->dispatchedMessages[] = array(
-                'message' => $message,
+                'envelopeItems' => $envelopeItems,
+                'message' => $messageToTrace,
                 'result' => $result,
+                'callTime' => $callTime,
+                'caller' => $caller,
             );
 
             return $result;
         } catch (\Throwable $e) {
             $this->dispatchedMessages[] = array(
-                'message' => $message,
+                'envelopeItems' => $envelopeItems,
+                'message' => $messageToTrace,
                 'exception' => $e,
+                'callTime' => $callTime,
+                'caller' => $caller,
             );
 
             throw $e;
@@ -56,5 +67,41 @@ class TraceableMessageBus implements MessageBusInterface
     public function reset()
     {
         $this->dispatchedMessages = array();
+    }
+
+    private function getCaller(): array
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 8);
+
+        $file = $trace[1]['file'];
+        $line = $trace[1]['line'];
+
+        for ($i = 2; $i < 8; ++$i) {
+            if (isset($trace[$i]['class'], $trace[$i]['function'])
+                && 'dispatch' === $trace[$i]['function']
+                && is_a($trace[$i]['class'], MessageBusInterface::class, true)
+            ) {
+                $file = $trace[$i]['file'];
+                $line = $trace[$i]['line'];
+
+                while (++$i < 8) {
+                    if (isset($trace[$i]['function'], $trace[$i]['file']) && empty($trace[$i]['class']) && 0 !== strpos(
+                            $trace[$i]['function'],
+                            'call_user_func'
+                        )) {
+                        $file = $trace[$i]['file'];
+                        $line = $trace[$i]['line'];
+
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        $name = str_replace('\\', '/', $file);
+        $name = substr($name, strrpos($name, '/') + 1);
+
+        return compact('name', 'file', 'line');
     }
 }

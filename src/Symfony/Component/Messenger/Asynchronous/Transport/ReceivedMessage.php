@@ -12,26 +12,26 @@
 namespace Symfony\Component\Messenger\Asynchronous\Transport;
 
 use Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\EnvelopeItemInterface;
 
 /**
- * Wraps a received message. This is mainly used by the `SendMessageMiddleware` middleware to identify
+ * Marker config for a received message.
+ * This is mainly used by the `SendMessageMiddleware` middleware to identify
  * a message should not be sent if it was just received.
  *
  * @see SendMessageMiddleware
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-final class ReceivedMessage
+final class ReceivedMessage implements EnvelopeItemInterface
 {
-    private $message;
-
-    public function __construct($message)
+    public function serialize()
     {
-        $this->message = $message;
+        return '';
     }
 
-    public function getMessage()
+    public function unserialize($serialized)
     {
-        return $this->message;
+        // noop
     }
 }

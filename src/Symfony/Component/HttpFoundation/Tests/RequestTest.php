@@ -21,7 +21,6 @@ class RequestTest extends TestCase
 {
     protected function tearDown()
     {
-        // reset
         Request::setTrustedProxies(array(), -1);
         Request::setTrustedHosts(array());
     }
@@ -1426,6 +1425,16 @@ class RequestTest extends TestCase
         $request = new Request();
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
         $this->assertEquals(array('application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'), $request->getAcceptableContentTypes());
+    }
+
+    public function testGetAcceptableFormats()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getAcceptableFormats());
+
+        $request = new Request();
+        $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*');
+        $this->assertEquals(array('html', 'xml'), $request->getAcceptableFormats());
     }
 
     public function testGetLanguages()

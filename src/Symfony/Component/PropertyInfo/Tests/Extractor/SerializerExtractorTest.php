@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\PropertyInfo\Tests\Extractors;
+namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;

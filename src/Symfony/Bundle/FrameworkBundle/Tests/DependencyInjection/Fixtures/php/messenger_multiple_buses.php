@@ -7,6 +7,7 @@ $container->loadFromExtension('framework', array(
             'messenger.bus.commands' => null,
             'messenger.bus.events' => array(
                 'middleware' => array(
+                    array('with_factory' => array('foo', true, array('bar' => 'baz'))),
                     'allow_no_handler',
                 ),
             ),

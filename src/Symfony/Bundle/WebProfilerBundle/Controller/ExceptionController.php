@@ -30,6 +30,7 @@ class ExceptionController
     protected $twig;
     protected $debug;
     protected $profiler;
+    private $fileLinkFormat;
 
     public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null)
     {

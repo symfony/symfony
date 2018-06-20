@@ -185,7 +185,7 @@ class MessengerPass implements CompilerPassInterface
         }
     }
 
-    private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId): array
+    private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId): iterable
     {
         if ($handlerClass->implementsInterface(MessageSubscriberInterface::class)) {
             if (!$handledMessages = $handlerClass->getName()::getHandledMessages()) {

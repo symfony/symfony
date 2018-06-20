@@ -274,6 +274,23 @@ class MessengerPassTest extends TestCase
         $this->assertEquals(array(AmqpSender::class => new Reference(AmqpSender::class)), $container->getDefinition('messenger.sender_locator')->getArgument(0));
     }
 
+    public function testItShouldNotThrowIfGeneratorIsReturnedInsteadOfArray()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container
+            ->register(HandlerWithGenerators::class, HandlerWithGenerators::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $handlerLocatorDefinition = $container->getDefinition($container->getDefinition("$busId.messenger.handler_resolver")->getArgument(0));
+        $handlerMapping = $handlerLocatorDefinition->getArgument(0);
+
+        $this->assertArrayHasKey('handler.'.DummyMessage::class, $handlerMapping);
+        $this->assertArrayHasKey('handler.'.SecondMessage::class, $handlerMapping);
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Invalid sender "app.messenger.sender": class "Symfony\Component\Messenger\Tests\DependencyInjection\InvalidSender" must implement interface "Symfony\Component\Messenger\Transport\SenderInterface".
@@ -681,6 +698,23 @@ class HandleNoMessageHandler implements MessageSubscriberInterface
     }
 
     public function __invoke()
+    {
+    }
+}
+
+class HandlerWithGenerators implements MessageSubscriberInterface
+{
+    public static function getHandledMessages(): iterable
+    {
+        yield DummyMessage::class => 'dummyMethod';
+        yield SecondMessage::class => 'secondMessage';
+    }
+
+    public function dummyMethod()
+    {
+    }
+
+    public function secondMessage()
     {
     }
 }

@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-15T06:54:55Z
+
+`annotations` and `cache` were not required before, is it really now?
+Looking at the deps of the new packages, it looks like so. Why?
+If these are really a split of `common`, this should not be the case, isn't it?
+
+---------------------------------------------------------------------------
+
+by Majkl578 at 2018-06-15T11:38:51Z
+
+`annotations` and `cache` were always indirectly required through `common` so they were always there.
+
+>  Looking at the deps of the new packages, it looks like so. Why?
+
+I am not sure I understand what you mean. There are no back references to `common`, only references to other requirements, otherwise these components (in their 1.0.x versions) are verbatim copy from doctrine/common.
+I suppose you mean [`persistence`](https://github.com/doctrine/persistence/blob/v1.0.0/composer.json) which has multiple dependencies:
+* event-manager - hard dependency for events
+* annotations - hard dependency in AnnotationDriver - I suppose this could be made optional, although @Ocramius is against optional dependencies
+* cache - hard dependency in AbstractClassMetadataFactory
+* reflection - hard dependency in RuntimeReflectionService
+
+Ad changes in this PR, in Bridge/Doctrine:
+* common removed
+* annotations + cache added - hard dependency in Bridge\Doctrine\Test\DoctrineTestHelper - should these be require-dev? imho not, it's not in `Tests` so it's production code...
+* collections - hard dependencies in Doctrine/Form
+* event-manager - hard dependency in ContainerAwareEventManager
+* persistence - hard dependencies on many places
+
+Root composer.json was just updated accordingly since I assumed it works as aggregate of all dependencies.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2018-06-15T12:44:21Z
+
+ > If these are really a split of `common`, this should not be the case, isn't it?
+
+We can drop them from `common` in a major release: people depending on `doctrine/common` 2.x still expect those classes to exist when just depending on `doctrine/common`, so for now the dependencies are still mandatory in there.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-15T13:45:58Z
+
+> annotations + cache added - hard dependency in Bridge\Doctrine\Test\DoctrineTestHelper - should these be require-dev? imho not, it's not in Tests so it's production code...
+
+DoctrinetestHelper is a testing utility depending on the ORM anyway (I don't even know why we expose it btw, as it seems specific to the bridge tests). The ORM itself is a require-dev only, so these should as well.
+
+> collections - hard dependencies in Doctrine/Form
+
+there is no hard dependency here. The listener says "if it is an instance of a collection, then I can clear it in a faster way". An `instanceof` check is not a hard requirement.
+
+> event-manager - hard dependency in ContainerAwareEventManager
+
+that one is true. I forgot we have this class in the bridge.
+
+---------------------------------------------------------------------------
+
+by Majkl578 at 2018-06-15T13:57:45Z
+
+> > collections - hard dependencies in Doctrine/Form
+>
+> there is no hard dependency here. The listener says "if it is an instance of a collection, then I can clear it in a faster way".
+
+I was more worried about Doctrine\Form\DataTransformer\CollectionToArrayTransformer::reverseTransform() which contains `new ArrayCollection()`. I am not sure whether this method could be called/used without Collections existing though.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-15T14:11:37Z
+
+hmm, if you manage to use a EntityType (which is used for the ODM and ORM) without having collections installed, it might still trigger this code. But I think you would have a broken code earlier in the usage anyway (and so no reach it)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T08:06:19Z
+
+> annotations and cache were always indirectly required through common so they were always there.
+
+I had missed that, thank you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-18T16:27:15Z
+
+When a feature is optional, our policy is to not list its dependencies as mandatory requirements.
+This PR is an opportunity to follow this more closely. If we can remove `cache`, `annotations`, etc. because they are needed only as optional features, we should move them to require-dev. Let's do it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-19T09:57:53Z
+
+Just checked: we should move `cache` and `annotations` to require-dev: they're only used in `Test\DoctrineTestHelper`, so totally optional.
+
+---------------------------------------------------------------------------
+
+by Majkl578 at 2018-06-19T11:44:11Z
+
+Moved `annotations` and `cache` to `dev` in DoctrineBridge & root composer.jsons.
+This leaves us with hard dependency on:
+```yaml
+        "doctrine/collections": "~1.0",
+        "doctrine/event-manager": "~1.0",
+        "doctrine/persistence": "~1.0",
+```
+Which is IMO correct. Of course you can also make some of them optional later. :)
+
+---------------------------------------------------------------------------
+
+by Majkl578 at 2018-06-19T11:49:57Z
+
+> KO src/Symfony/Bundle/SecurityBundle
+> /bin/bash: line 1: 10403 Segmentation fault      (core dumped) bash -xc "$*" 2>&1
+
+:cry:

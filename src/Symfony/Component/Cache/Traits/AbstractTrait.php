@@ -108,8 +108,11 @@ trait AbstractTrait
         try {
             if ($cleared = $this->versioningIsEnabled) {
                 $namespaceVersion = 2;
-                foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
-                    $namespaceVersion = 1 + (int) $v;
+                try {
+                    foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
+                        $namespaceVersion = 1 + (int) $v;
+                    }
+                } catch (\Exception $e) {
                 }
                 $namespaceVersion .= ':';
                 $cleared = $this->doSave(array('@'.$this->namespace => $namespaceVersion), 0);
@@ -236,8 +239,11 @@ trait AbstractTrait
 
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->namespaceVersion = '1:';
-            foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
-                $this->namespaceVersion = $v;
+            try {
+                foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
+                    $this->namespaceVersion = $v;
+                }
+            } catch (\Exception $e) {
             }
         }
 

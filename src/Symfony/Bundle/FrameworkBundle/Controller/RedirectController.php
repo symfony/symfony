@@ -64,7 +64,7 @@ class RedirectController
         if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
             $attributes = $keepQueryParams ? array_merge($request->query->all(), $attributes) : $attributes;
-            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['keepRequestMethod']);
+            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['keepRequestMethod'], $attributes['keepQueryParams']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
             }

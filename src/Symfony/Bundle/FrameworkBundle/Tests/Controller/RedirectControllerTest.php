@@ -47,7 +47,7 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $keepRequestMethod, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $keepRequestMethod, $keepQueryParams, $ignoreAttributes, $expectedCode, $expectedAttributes)
     {
         $request = new Request();
 
@@ -63,6 +63,7 @@ class RedirectControllerTest extends TestCase
                 'additional-parameter' => 'value',
                 'ignoreAttributes' => $ignoreAttributes,
                 'keepRequestMethod' => $keepRequestMethod,
+                'keepQueryParams' => $keepQueryParams,
             ),
         );
 
@@ -77,7 +78,7 @@ class RedirectControllerTest extends TestCase
 
         $controller = new RedirectController($router);
 
-        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes, $keepRequestMethod);
+        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes, $keepRequestMethod, $keepQueryParams);
 
         $this->assertRedirectUrl($returnResponse, $url);
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
@@ -86,14 +87,14 @@ class RedirectControllerTest extends TestCase
     public function provider()
     {
         return array(
-            array(true, false, false, 301, array('additional-parameter' => 'value')),
-            array(false, false, false, 302, array('additional-parameter' => 'value')),
-            array(false, false, true, 302, array()),
-            array(false, false, array('additional-parameter'), 302, array()),
-            array(true, true, false, 308, array('additional-parameter' => 'value')),
-            array(false, true, false, 307, array('additional-parameter' => 'value')),
-            array(false, true, true, 307, array()),
-            array(false, true, array('additional-parameter'), 307, array()),
+            array(true, false, false, false, 301, array('additional-parameter' => 'value')),
+            array(false, false, false, false, 302, array('additional-parameter' => 'value')),
+            array(false, false, false, true, 302, array()),
+            array(false, false, false, array('additional-parameter'), 302, array()),
+            array(true, true, false, false, 308, array('additional-parameter' => 'value')),
+            array(false, true, false, false, 307, array('additional-parameter' => 'value')),
+            array(false, true, false, true, 307, array()),
+            array(false, true, true, array('additional-parameter'), 307, array()),
         );
     }
 

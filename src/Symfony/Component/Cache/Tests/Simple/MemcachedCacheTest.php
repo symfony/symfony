@@ -23,6 +23,7 @@ class MemcachedCacheTest extends CacheTestCase
     );
 
     protected static $client;
+    protected static $enableVersioning = false;
 
     public static function setupBeforeClass()
     {
@@ -42,7 +43,23 @@ class MemcachedCacheTest extends CacheTestCase
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false)) : self::$client;
 
-        return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        $adapter = new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+
+        if (self::$enableVersioning) {
+            $adapter->enableVersioning();
+        }
+
+        return $adapter;
+    }
+
+    public function testClear()
+    {
+        self::$enableVersioning = true;
+        try {
+            parent::testClear();
+        } finally {
+            self::$enableVersioning = false;
+        }
     }
 
     public function testCreatePersistentConnectionShouldNotDupServerList()

@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by c33s at 2018-04-06T16:44:32Z
+
+is it really a bc break? looks like a bug fix for me
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-06T17:17:09Z
+
+Actually, this should not be an issue if you warmup the prod cache (and thus build the container) before building your phar (and bundling `var/cache/prod` in it). The container would be built once and won't need to discover files again, so this is never hit.
+
+As I answered @c33s on Slack, I use the following https://github.com/humbug/box config with no issue to bundle a Symfony app in a phar:
+
+```json
+{
+  "files": ["config/bundles.php"],
+  "finder": [
+    { "in": "src" },
+    { "in": "var/cache/prod" },
+    {
+      "name": ["*.php"],
+      "exclude": ["Tests", "Tester", "Test", "test", "tests"],
+      "in": "vendor"
+    }
+  ],
+  "main": "bin/phar-app",
+  "output": "legacy-importer.phar",
+  "compression": "GZ",
+  "stub": true
+}
+```
+
+where `bin/phar-app` is just a dedicated entrypoint setting the APP_ENV env var and configuring a single command application.
+
+---------------------------------------------------------------------------
+
+by vworldat at 2018-04-06T19:11:35Z
+
+@ogizanagi you are of course right, if pre-warming the cache is an option this can be used to work around the issue. Nevertheless I think the current behavior is not intended and leads to confusion as well as bad DX. And once someone might want to run a packaged app in debug mode for whatever reason, the pre-warmed cache may not be sufficient anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-07T12:52:39Z
+
+Could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by c33s at 2018-04-10T22:44:05Z
+
+[example.zip](https://github.com/symfony/symfony/files/1896689/example.zip)
+@vworldat phar fixture file for the tests containing
+```
+enc/puppet-enc/build/example.phar
+.phar
+.phar/signature.bin
+.phar/stub.php
+bin
+bin/console
+config
+config/packages
+config/packages/dev
+config/packages/dev/monolog.yaml
+config/packages/dev/routing.yaml
+config/packages/prod
+config/packages/prod/monolog.yaml
+config/packages/test
+config/packages/test/framework.yaml
+config/packages/test/monolog.yaml
+config/packages/framework.yaml
+config/packages/routing.yaml
+config/bundles.php
+config/routes.yaml
+config/services.yaml
+composer.json
+```
+
+---------------------------------------------------------------------------
+
+by theofidry at 2018-04-28T15:14:00Z
+
+Could it also be that the application is executed in the wrong environment? I.e. when booting inside the PHAR, it detects that the dumped container is outdated and tries to dump it again (which will fail)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-30T15:52:59Z
+
+@vworldat would you mind adding a test base, borrowing the fixtures phar from @c33s please?

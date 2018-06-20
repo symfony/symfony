@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Translation\Util\XliffUtils;
 
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
@@ -127,17 +128,13 @@ EOF
             }
         }
 
-        $document->schemaValidate(__DIR__.'/../Resources/schemas/xliff-core-1.2-strict.xsd');
-        foreach (libxml_get_errors() as $xmlError) {
+        foreach (XliffUtils::validateSchema($document) as $xmlError) {
             $errors[] = array(
-                    'line' => $xmlError->line,
-                    'column' => $xmlError->column,
-                    'message' => trim($xmlError->message),
+                    'line' => $xmlError['line'],
+                    'column' => $xmlError['column'],
+                    'message' => $xmlError['message'],
                 );
         }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
 
         return array('file' => $file, 'valid' => 0 === count($errors), 'messages' => $errors);
     }

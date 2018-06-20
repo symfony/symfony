@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by colinodell at 2018-06-14T16:42:21Z
+
+I have also submitted https://github.com/symfony/symfony-docs/pull/9924 to help point developers in the right direction via documentation.  **That PR does not document this change**, it just provides a different avenue to notify the developer about the potential issue.  Feel free to merge that instead of this (or merge both! :smiley:)

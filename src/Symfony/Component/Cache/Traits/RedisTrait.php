@@ -34,6 +34,8 @@ trait RedisTrait
         'timeout' => 30,
         'read_timeout' => 0,
         'retry_interval' => 0,
+        'compression' => true,
+        'tcp_keepalive' => 0,
         'lazy' => false,
     );
     private $redis;
@@ -140,6 +142,13 @@ trait RedisTrait
                 ) {
                     $e = preg_replace('/^ERR /', '', $redis->getLastError());
                     throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));
+                }
+
+                if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {
+                    $redis->setOption(\Redis::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
+                }
+                if ($params['compression'] && \defined('Redis::COMPRESSION_LZF')) {
+                    $redis->setOption(\Redis::OPT_COMPRESSION, \Redis::COMPRESSION_LZF);
                 }
 
                 return true;

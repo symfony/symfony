@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
@@ -7,7 +16,6 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 /**
  * Base class for all commands.
@@ -121,10 +129,10 @@ interface CommandInterface
     /**
      * Adds an argument.
      *
-     * @param string $name The argument name
-     * @param int $mode The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param string $name        The argument name
+     * @param int    $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
      * @param string $description A description text
-     * @param mixed $default The default value (for InputArgument::OPTIONAL mode only)
+     * @param mixed  $default     The default value (for InputArgument::OPTIONAL mode only)
      *
      * @return $this
      */
@@ -133,11 +141,11 @@ interface CommandInterface
     /**
      * Adds an option.
      *
-     * @param string $name The option name
-     * @param string $shortcut The shortcut (can be null)
-     * @param int $mode The option mode: One of the InputOption::VALUE_* constants
+     * @param string $name        The option name
+     * @param string $shortcut    The shortcut (can be null)
+     * @param int    $mode        The option mode: One of the InputOption::VALUE_* constants
      * @param string $description A description text
-     * @param mixed $default The default value (must be null for InputOption::VALUE_NONE)
+     * @param mixed  $default     The default value (must be null for InputOption::VALUE_NONE)
      *
      * @return $this
      */

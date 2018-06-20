@@ -95,16 +95,32 @@ class PhpArrayCacheTest extends CacheTestCase
 
     public function testStoredFile()
     {
-        $expected = array(
+        $data = array(
             'integer' => 42,
             'float' => 42.42,
             'boolean' => true,
             'array_simple' => array('foo', 'bar'),
             'array_associative' => array('foo' => 'bar', 'foo2' => 'bar2'),
         );
+        $expected = array(
+            array(
+                'integer' => 0,
+                'float' => 1,
+                'boolean' => 2,
+                'array_simple' => 3,
+                'array_associative' => 4,
+            ),
+            array(
+                0 => 42,
+                1 => 42.42,
+                2 => true,
+                3 => array('foo', 'bar'),
+                4 => array('foo' => 'bar', 'foo2' => 'bar2'),
+            ),
+        );
 
         $cache = new PhpArrayCache(self::$file, new NullCache());
-        $cache->warmUp($expected);
+        $cache->warmUp($data);
 
         $values = eval(substr(file_get_contents(self::$file), 6));
 
@@ -114,12 +130,14 @@ class PhpArrayCacheTest extends CacheTestCase
 
 class PhpArrayCacheWrapper extends PhpArrayCache
 {
+    protected $data = array();
+
     public function set($key, $value, $ttl = null)
     {
         call_user_func(\Closure::bind(function () use ($key, $value) {
-            $this->values[$key] = $value;
-            $this->warmUp($this->values);
-            $this->values = eval(substr(file_get_contents($this->file), 6));
+            $this->data[$key] = $value;
+            $this->warmUp($this->data);
+            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
         }, $this, PhpArrayCache::class));
 
         return true;
@@ -132,10 +150,10 @@ class PhpArrayCacheWrapper extends PhpArrayCache
         }
         call_user_func(\Closure::bind(function () use ($values) {
             foreach ($values as $key => $value) {
-                $this->values[$key] = $value;
+                $this->data[$key] = $value;
             }
-            $this->warmUp($this->values);
-            $this->values = eval(substr(file_get_contents($this->file), 6));
+            $this->warmUp($this->data);
+            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
         }, $this, PhpArrayCache::class));
 
         return true;

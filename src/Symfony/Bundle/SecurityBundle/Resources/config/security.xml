@@ -5,8 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="security.authentication.trust_resolver.anonymous_class">Symfony\Component\Security\Core\Authentication\Token\AnonymousToken</parameter>
-        <parameter key="security.authentication.trust_resolver.rememberme_class">Symfony\Component\Security\Core\Authentication\Token\RememberMeToken</parameter>
+        <parameter key="security.authentication.trust_resolver.anonymous_class">null</parameter>
+        <parameter key="security.authentication.trust_resolver.rememberme_class">null</parameter>
         <parameter key="security.role_hierarchy.roles" type="collection" />
     </parameters>
 
@@ -123,6 +123,7 @@
         <service id="security.access.expression_voter" class="Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter">
             <argument type="service" id="security.expression_language" />
             <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.authorization_checker" />
             <argument type="service" id="security.role_hierarchy" on-invalid="null" />
             <tag name="security.voter" priority="245" />
         </service>

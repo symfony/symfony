@@ -55,7 +55,8 @@
 
         .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid #B0413E; }
 
-        .message-item .sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+        .message-item tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+        td.message-bus-dispatch-caller { background: #f1f2f3; }
     </style>
 {% endblock %}
 
@@ -100,12 +101,12 @@
 
 {% macro render_bus_messages(messages, showBus = false) %}
     {% set discr = random() %}
-    {% for i, dispatchCall in messages %}
+    {% for dispatchCall in messages %}
     <table class="message-item">
         <thead>
         <tr>
             <th colspan="2" class="sf-toggle"
-                data-toggle-selector="#message-item-{{ discr }}-{{ i }}-details"
+                data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
                 data-toggle-initial="{{ loop.first ? 'display' }}"
             >
                 <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
@@ -122,7 +123,31 @@
             </th>
         </tr>
         </thead>
-        <tbody id="message-item-{{ discr }}-{{ i }}-details" class="sf-toggle-content">
+        <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" class="sf-toggle-content">
+            <tr>
+                <td colspan="2" class="message-bus-dispatch-caller">
+                    <span class="metadata">In
+                        {% set caller = dispatchCall.caller %}
+                        {% if caller.line %}
+                            {% set link = caller.file|file_link(caller.line) %}
+                            {% if link %}
+                                <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
+                                {% else %}
+                                <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
+                            {% endif %}
+                        {% else %}
+                            {{ caller.name }}
+                        {% endif %}
+                        line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}">{{ caller.line }}</a>
+                    </span>
+
+                    <div class="hidden" id="sf-trace-{{ discr }}-{{ loop.index0 }}">
+                        <div class="trace">
+                            {{ caller.file|file_excerpt(caller.line) }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
             {% if showBus %}
             <tr>
                 <td class="text-bold">Bus</td>

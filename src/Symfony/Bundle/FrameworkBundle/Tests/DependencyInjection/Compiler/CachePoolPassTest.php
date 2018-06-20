@@ -93,6 +93,28 @@ class CachePoolPassTest extends TestCase
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
+    public function testWithNameAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('cache.prefix.seed', 'foo');
+        $cachePool = new Definition();
+        $cachePool->addTag('cache.pool', array(
+            'name' => 'foobar',
+            'provider' => 'foobar',
+        ));
+        $cachePool->addArgument(null);
+        $cachePool->addArgument(null);
+        $cachePool->addArgument(null);
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $this->assertSame('9HvPgAayyh', $cachePool->getArgument(1));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are

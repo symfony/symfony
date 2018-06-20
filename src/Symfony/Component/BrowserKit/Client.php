@@ -40,6 +40,7 @@ abstract class Client
     protected $insulated = false;
     protected $redirect;
     protected $followRedirects = true;
+    protected $followMetaRefresh = false;
 
     private $maxRedirects = -1;
     private $redirectCount = 0;
@@ -66,6 +67,14 @@ abstract class Client
     public function followRedirects($followRedirect = true)
     {
         $this->followRedirects = (bool) $followRedirect;
+    }
+
+    /**
+     * Sets whether to automatically follow meta refresh redirects or not.
+     */
+    public function followMetaRefresh(bool $followMetaRefresh = true)
+    {
+        $this->followMetaRefresh = $followMetaRefresh;
     }
 
     /**
@@ -369,7 +378,16 @@ abstract class Client
             return $this->crawler = $this->followRedirect();
         }
 
-        return $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
+        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
+
+        // Check for meta refresh redirect
+        if ($this->followMetaRefresh && null !== $redirect = $this->getMetaRefreshUrl()) {
+            $this->redirect = $redirect;
+            $this->redirects[serialize($this->history->current())] = true;
+            $this->crawler = $this->followRedirect();
+        }
+
+        return $this->crawler;
     }
 
     /**
@@ -563,6 +581,21 @@ abstract class Client
         $this->isMainRequest = true;
 
         return $response;
+    }
+
+    /**
+     * @see https://dev.w3.org/html5/spec-preview/the-meta-element.html#attr-meta-http-equiv-refresh
+     */
+    private function getMetaRefreshUrl(): ?string
+    {
+        $metaRefresh = $this->getCrawler()->filter('head meta[http-equiv="refresh"]');
+        foreach ($metaRefresh->extract(array('content')) as $content) {
+            if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/i', $content, $m)) {
+                return str_replace("\t\r\n", '', rtrim($m[1]));
+            }
+        }
+
+        return null;
     }
 
     /**

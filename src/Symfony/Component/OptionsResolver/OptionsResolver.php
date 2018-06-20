@@ -12,6 +12,7 @@
 namespace Symfony\Component\OptionsResolver;
 
 use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
@@ -74,6 +75,11 @@ class OptionsResolver implements Options
      * This list helps detecting circular dependencies between lazy options.
      */
     private $calling = array();
+
+    /**
+     * A list of deprecated options.
+     */
+    private $deprecated = array();
 
     /**
      * Whether the instance is locked for reading.
@@ -349,6 +355,57 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Deprecates an option, allowed types or values.
+     *
+     * Instead of passing the message, you may also pass a closure with the
+     * following signature:
+     *
+     *     function ($value) {
+     *         // ...
+     *     }
+     *
+     * The closure receives the value as argument and should return a string.
+     * Returns an empty string to ignore the option deprecation.
+     *
+     * The closure is invoked when {@link resolve()} is called. The parameter
+     * passed to the closure is the value of the option after validating it
+     * and before normalizing it.
+     *
+     * @param string|\Closure $deprecationMessage
+     */
+    public function setDeprecated(string $option, $deprecationMessage = 'The option "%name%" is deprecated.'): self
+    {
+        if ($this->locked) {
+            throw new AccessException('Options cannot be deprecated from a lazy option or normalizer.');
+        }
+
+        if (!isset($this->defined[$option])) {
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist, defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
+        }
+
+        if (!\is_string($deprecationMessage) && !$deprecationMessage instanceof \Closure) {
+            throw new InvalidArgumentException(sprintf('Invalid type for deprecation message argument, expected string or \Closure, but got "%s".', \gettype($deprecationMessage)));
+        }
+
+        // ignore if empty string
+        if ('' === $deprecationMessage) {
+            return $this;
+        }
+
+        $this->deprecated[$option] = $deprecationMessage;
+
+        // Make sure the option is processed
+        unset($this->resolved[$option]);
+
+        return $this;
+    }
+
+    public function isDeprecated(string $option): bool
+    {
+        return isset($this->deprecated[$option]);
+    }
+
+    /**
      * Sets the normalizer for an option.
      *
      * The normalizer should be a closure with the following signature:
@@ -620,6 +677,7 @@ class OptionsResolver implements Options
         $this->normalizers = array();
         $this->allowedTypes = array();
         $this->allowedValues = array();
+        $this->deprecated = array();
 
         return $this;
     }
@@ -833,6 +891,19 @@ class OptionsResolver implements Options
                 }
 
                 throw new InvalidOptionsException($message);
+            }
+        }
+
+        // Check whether the option is deprecated
+        if (isset($this->deprecated[$option])) {
+            $deprecationMessage = $this->deprecated[$option];
+
+            if ($deprecationMessage instanceof \Closure && !\is_string($deprecationMessage = $deprecationMessage($value))) {
+                throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", returns an empty string to ignore.', \gettype($deprecationMessage)));
+            }
+
+            if ('' !== $deprecationMessage) {
+                @trigger_error(strtr($deprecationMessage, array('%name%' => $option)), E_USER_DEPRECATED);
             }
         }
 

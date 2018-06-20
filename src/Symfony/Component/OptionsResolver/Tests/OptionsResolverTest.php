@@ -451,6 +451,187 @@ class OptionsResolverTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function testFailIfSetDeprecatedFromLazyOption()
+    {
+        $this->resolver
+            ->setDefault('bar', 'baz')
+            ->setDefault('foo', function (Options $options) {
+                $options->setDeprecated('bar');
+            })
+            ->resolve()
+        ;
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     */
+    public function testSetDeprecatedFailsIfUnknownOption()
+    {
+        $this->resolver->setDeprecated('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid type for deprecation message argument, expected string or \Closure, but got "boolean".
+     */
+    public function testSetDeprecatedFailsIfInvalidDeprecationMessageType()
+    {
+        $this->resolver
+            ->setDefined('foo')
+            ->setDeprecated('foo', true)
+        ;
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid type for deprecation message, expected string but got "boolean", returns an empty string to ignore.
+     */
+    public function testLazyDeprecationFailsIfInvalidDeprecationMessageType()
+    {
+        $this->resolver
+            ->setDefault('foo', true)
+            ->setDeprecated('foo', function ($value) {
+                return false;
+            })
+        ;
+        $this->resolver->resolve();
+    }
+
+    public function testIsDeprecated()
+    {
+        $this->resolver
+            ->setDefined('foo')
+            ->setDeprecated('foo')
+        ;
+        $this->assertTrue($this->resolver->isDeprecated('foo'));
+    }
+
+    public function testIsNotDeprecatedIfEmptyString()
+    {
+        $this->resolver
+            ->setDefined('foo')
+            ->setDeprecated('foo', '')
+        ;
+        $this->assertFalse($this->resolver->isDeprecated('foo'));
+    }
+
+    /**
+     * @dataProvider provideDeprecationData
+     */
+    public function testDeprecationMessages(\Closure $configureOptions, array $options, ?array $expectedError)
+    {
+        error_clear_last();
+        set_error_handler(function () { return false; });
+        $e = error_reporting(0);
+
+        $configureOptions($this->resolver);
+        $this->resolver->resolve($options);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $this->assertSame($expectedError, $lastError);
+    }
+
+    public function provideDeprecationData()
+    {
+        yield 'It deprecates an option with default message' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefined(array('foo', 'bar'))
+                    ->setDeprecated('foo')
+                ;
+            },
+            array('foo' => 'baz'),
+            array(
+                'type' => E_USER_DEPRECATED,
+                'message' => 'The option "foo" is deprecated.',
+            ),
+        );
+
+        yield 'It deprecates an option with custom message' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefined('foo')
+                    ->setDefault('bar', function (Options $options) {
+                        return $options['foo'];
+                    })
+                    ->setDeprecated('foo', 'The option "foo" is deprecated, use "bar" option instead.')
+                ;
+            },
+            array('foo' => 'baz'),
+            array(
+                'type' => E_USER_DEPRECATED,
+                'message' => 'The option "foo" is deprecated, use "bar" option instead.',
+            ),
+        );
+
+        yield 'It deprecates a missing option with default value' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefaults(array('foo' => null, 'bar' => null))
+                    ->setDeprecated('foo')
+                ;
+            },
+            array('bar' => 'baz'),
+            array(
+                'type' => E_USER_DEPRECATED,
+                'message' => 'The option "foo" is deprecated.',
+            ),
+        );
+
+        yield 'It deprecates allowed type and value' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefault('foo', null)
+                    ->setAllowedTypes('foo', array('null', 'string', \stdClass::class))
+                    ->setDeprecated('foo', function ($value) {
+                        if ($value instanceof \stdClass) {
+                            return sprintf('Passing an instance of "%s" to option "foo" is deprecated, pass its FQCN instead.', \stdClass::class);
+                        }
+
+                        return '';
+                    })
+                ;
+            },
+            array('foo' => new \stdClass()),
+            array(
+                'type' => E_USER_DEPRECATED,
+                'message' => 'Passing an instance of "stdClass" to option "foo" is deprecated, pass its FQCN instead.',
+            ),
+        );
+
+        yield 'It ignores deprecation for missing option without default value' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefined(array('foo', 'bar'))
+                    ->setDeprecated('foo')
+                ;
+            },
+            array('bar' => 'baz'),
+            null,
+        );
+
+        yield 'It ignores deprecation if closure returns an empty string' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefault('foo', null)
+                    ->setDeprecated('foo', function ($value) {
+                        return '';
+                    })
+                ;
+            },
+            array('foo' => Bar::class),
+            null,
+        );
+    }
+
+    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
     public function testSetAllowedTypesFailsIfUnknownOption()

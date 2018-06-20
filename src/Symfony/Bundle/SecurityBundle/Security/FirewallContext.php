@@ -36,6 +36,7 @@ class FirewallContext
         $this->exceptionListener = $exceptionListener;
         if ($logoutListener instanceof FirewallConfig) {
             $this->config = $logoutListener;
+            @trigger_error(sprintf('Passing an instance of %s as 3rd argument to %s() is deprecated since Symfony 4.2. Pass a %s instance instead.', FirewallConfig::class, __METHOD__, LogoutListener::class), E_USER_DEPRECATED);
         } elseif (null === $logoutListener || $logoutListener instanceof LogoutListener) {
             $this->logoutListener = $logoutListener;
             $this->config = $config;

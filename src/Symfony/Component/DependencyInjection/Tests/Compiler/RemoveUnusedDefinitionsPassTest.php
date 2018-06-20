@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\Definition;
@@ -131,7 +129,6 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new RemoveUnusedDefinitionsPass()));
-        $repeatedPass->process($container);
+        (new RemoveUnusedDefinitionsPass())->process($container);
     }
 }

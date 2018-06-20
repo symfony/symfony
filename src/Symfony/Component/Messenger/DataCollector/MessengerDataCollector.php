@@ -97,6 +97,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
                 'type' => new ClassStub(\get_class($message)),
                 'value' => $message,
             ),
+            'caller' => $tracedMessage['caller'],
         );
 
         if (array_key_exists('result', $tracedMessage)) {

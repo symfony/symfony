@@ -21,7 +21,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition2;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberChild;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberParent;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 require_once __DIR__.'/../Fixtures/includes/classes.php';
@@ -135,5 +140,30 @@ class RegisterServiceSubscribersPassTest extends TestCase
         ;
         $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class);
         $container->compile();
+    }
+
+    public function testServiceSubscriberTrait()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberChild::class)
+            ->addMethodCall('setContainer', array(new Reference(PsrContainerInterface::class)))
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = array(
+            TestServiceSubscriberChild::class.'::invalidDefinition' => new ServiceClosureArgument(new TypedReference('Symfony\Component\DependencyInjection\Tests\Fixtures\InvalidDefinition', 'Symfony\Component\DependencyInjection\Tests\Fixtures\InvalidDefinition', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberChild::class.'::testDefinition2' => new ServiceClosureArgument(new TypedReference(TestDefinition2::class, TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberChild::class.'::testDefinition3' => new ServiceClosureArgument(new TypedReference(TestDefinition3::class, TestDefinition3::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberParent::class.'::testDefinition1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class, TestDefinition1::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+        );
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 }

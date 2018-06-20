@@ -59,6 +59,7 @@ class MessengerDataCollectorTest extends TestCase
 
     public function getHandleTestData()
     {
+        $file = __FILE__;
         $messageDump = <<<DUMP
   "bus" => "default"
   "envelopeItems" => null
@@ -68,12 +69,17 @@ class MessengerDataCollectorTest extends TestCase
       -message: "dummy message"
     }
   ]
+  "caller" => array:3 [
+    "name" => "MessengerDataCollectorTest.php"
+    "file" => "$file"
+    "line" => %d
+  ]
 DUMP;
 
         yield 'no returned value' => array(
             null,
             <<<DUMP
-array:4 [
+array:5 [
 $messageDump
   "result" => array:2 [
     "type" => "NULL"
@@ -86,7 +92,7 @@ DUMP
         yield 'scalar returned value' => array(
             'returned value',
             <<<DUMP
-array:4 [
+array:5 [
 $messageDump
   "result" => array:2 [
     "type" => "string"
@@ -99,7 +105,7 @@ DUMP
         yield 'array returned value' => array(
             array('returned value'),
             <<<DUMP
-array:4 [
+array:5 [
 $messageDump
   "result" => array:2 [
     "type" => "array"
@@ -124,6 +130,7 @@ DUMP
         $collector->registerBus('default', $bus);
 
         try {
+            $line = __LINE__ + 1;
             $bus->dispatch($message);
         } catch (\Throwable $e) {
             // Ignore.
@@ -134,8 +141,9 @@ DUMP
         $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
+        $file = __FILE__;
         $this->assertStringMatchesFormat(<<<DUMP
-array:4 [
+array:5 [
   "bus" => "default"
   "envelopeItems" => null
   "message" => array:2 [
@@ -143,6 +151,11 @@ array:4 [
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
       -message: "dummy message"
     }
+  ]
+  "caller" => array:3 [
+    "name" => "MessengerDataCollectorTest.php"
+    "file" => "$file"
+    "line" => $line
   ]
   "exception" => array:2 [
     "type" => "RuntimeException"

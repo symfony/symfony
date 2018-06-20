@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\CacheInterface;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 
@@ -22,7 +24,7 @@ use Symfony\Component\Cache\ResettableInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
+class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     protected $pool;
     private $calls = array();
@@ -30,6 +32,38 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
     public function __construct(AdapterInterface $pool)
     {
         $this->pool = $pool;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback, float $beta = null)
+    {
+        if (!$this->pool instanceof CacheInterface) {
+            throw new \BadMethodCallException(sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_class($this->pool), CacheInterface::class));
+        }
+
+        $isHit = true;
+        $callback = function (CacheItem $item) use ($callback, &$isHit) {
+            $isHit = $item->isHit();
+
+            return $callback($item);
+        };
+
+        $event = $this->start(__FUNCTION__);
+        try {
+            $value = $this->pool->get($key, $callback, $beta);
+            $event->result[$key] = \is_object($value) ? \get_class($value) : gettype($value);
+        } finally {
+            $event->end = microtime(true);
+        }
+        if ($isHit) {
+            ++$event->hits;
+        } else {
+            ++$event->misses;
+        }
+
+        return $value;
     }
 
     /**

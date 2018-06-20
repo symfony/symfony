@@ -308,16 +308,23 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
     public function provideBindings()
     {
-        return array(array(ControllerDummy::class), array('$bar'));
+        return array(
+            array(ControllerDummy::class.'$bar'),
+            array(ControllerDummy::class),
+            array('$bar'),
+        );
     }
 
-    public function testBindScalarValueToControllerArgument()
+    /**
+     * @dataProvider provideBindScalarValueToControllerArgument
+     */
+    public function testBindScalarValueToControllerArgument($bindingKey)
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
 
         $container->register('foo', ArgumentWithoutTypeController::class)
-            ->setBindings(array('$someArg' => '%foo%'))
+            ->setBindings(array($bindingKey => '%foo%'))
             ->addTag('controller.service_arguments');
 
         $container->setParameter('foo', 'foo_val');
@@ -338,6 +345,12 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         // make sure this service *does* exist and returns the correct value
         $this->assertTrue($container->has((string) $reference));
         $this->assertSame('foo_val', $container->get((string) $reference));
+    }
+
+    public function provideBindScalarValueToControllerArgument()
+    {
+        yield array('$someArg');
+        yield array('string $someArg');
     }
 }
 
@@ -396,7 +409,7 @@ class NonExistentClassOptionalController
 
 class ArgumentWithoutTypeController
 {
-    public function fooAction($someArg)
+    public function fooAction(string $someArg)
     {
     }
 }

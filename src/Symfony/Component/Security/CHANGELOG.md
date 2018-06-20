@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* added the `is_granted()` function in security expressions
+* deprecated the `has_role()` function in security expressions, use `is_granted()` instead
+* Passing custom class names to the
+  `Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver` to define
+  custom anonymous and remember me token classes is deprecated. To
+  use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
+  or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+
 4.1.0
 -----
 

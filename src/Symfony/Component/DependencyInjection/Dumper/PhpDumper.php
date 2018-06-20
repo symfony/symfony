@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -68,6 +69,8 @@ class PhpDumper extends Dumper
     private $inlineRequires;
     private $inlinedRequires = array();
     private $circularReferences = array();
+    private $singleUsePrivateIds = array();
+    private $addThrow = false;
 
     /**
      * @var ProxyDumper
@@ -123,6 +126,7 @@ class PhpDumper extends Dumper
             'build_time' => time(),
         ), $options);
 
+        $this->addThrow = false;
         $this->namespace = $options['namespace'];
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
@@ -141,10 +145,14 @@ class PhpDumper extends Dumper
 
         (new AnalyzeServiceReferencesPass())->process($this->container);
         $this->circularReferences = array();
+        $this->singleUsePrivateIds = array();
         $checkedNodes = array();
         foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
             $currentPath = array($id => $id);
             $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
+            if ($this->isSingleUsePrivateNode($node)) {
+                $this->singleUsePrivateIds[$id] = $id;
+            }
         }
         $this->container->getCompiler()->getServiceReferenceGraph()->clear();
 
@@ -531,7 +539,7 @@ EOTXT
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation = '';
 
-        if (!$isProxyCandidate && $definition->isShared()) {
+        if (!$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
             $instantiation = sprintf('$this->%s[\'%s\'] = %s', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $id, $isSimpleInstance ? '' : '$instance');
         } elseif (!$isSimpleInstance) {
             $instantiation = '$instance';
@@ -555,10 +563,13 @@ EOTXT
 
     private function isTrivialInstance(Definition $definition): bool
     {
+        if ($definition->getErrors()) {
+            return true;
+        }
         if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
             return false;
         }
-        if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < count($definition->getArguments()) || $definition->getErrors()) {
+        if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < count($definition->getArguments())) {
             return false;
         }
 
@@ -824,7 +835,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && !$this->isHotPath($definition)) {
+            if (!$definition->isSynthetic() && !$this->isHotPath($definition) && ($definition->isPublic() || !$this->isTrivialInstance($definition))) {
                 $code = $this->addService($id, $definition, $file);
 
                 if (!$definition->isShared()) {
@@ -1317,6 +1328,18 @@ EOF;
 
     private function endClass(): string
     {
+        if ($this->addThrow) {
+            return <<<'EOF'
+
+    protected function throw($message)
+    {
+        throw new RuntimeException($message);
+    }
+}
+
+EOF;
+        }
+
         return <<<'EOF'
 }
 
@@ -1524,6 +1547,11 @@ EOF;
                 list($this->definitionVariables, $this->referenceVariables, $this->variableCount) = $scope;
             }
         } elseif ($value instanceof Definition) {
+            if ($e = $value->getErrors()) {
+                $this->addThrow = true;
+
+                return sprintf('$this->throw(%s)', $this->export(reset($e)));
+            }
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables[$value], $interpolate);
             }
@@ -1669,8 +1697,13 @@ EOF;
                     return $code;
                 }
             } elseif ($this->isTrivialInstance($definition)) {
+                if ($e = $definition->getErrors()) {
+                    $this->addThrow = true;
+
+                    return sprintf('$this->throw(%s)', $this->export(reset($e)));
+                }
                 $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
-                if ($definition->isShared()) {
+                if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
                     $code = sprintf('$this->%s[\'%s\'] = %s', $definition->isPublic() ? 'services' : 'privates', $id, $code);
                 }
             } elseif ($this->asFiles && !$this->isHotPath($definition)) {
@@ -1682,7 +1715,7 @@ EOF;
             } else {
                 $code = sprintf('$this->%s()', $this->generateMethodName($id));
             }
-            if ($definition->isShared()) {
+            if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
                 $code = sprintf('($this->%s[\'%s\'] ?? %s)', $definition->isPublic() ? 'services' : 'privates', $id, $code);
             }
 
@@ -1804,6 +1837,25 @@ EOF;
     private function isHotPath(Definition $definition)
     {
         return $this->hotPathTag && $definition->hasTag($this->hotPathTag) && !$definition->isDeprecated();
+    }
+
+    private function isSingleUsePrivateNode(ServiceReferenceGraphNode $node): bool
+    {
+        if (!$node->getValue() || $node->getValue()->isPublic()) {
+            return false;
+        }
+        $ids = array();
+        foreach ($node->getInEdges() as $edge) {
+            if (!$value = $edge->getSourceNode()->getValue()) {
+                continue;
+            }
+            if ($edge->isLazy() || !$value->isShared()) {
+                return false;
+            }
+            $ids[$edge->getSourceNode()->getId()] = true;
+        }
+
+        return 1 === \count($ids);
     }
 
     private function export($value)

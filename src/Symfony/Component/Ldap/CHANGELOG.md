@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `EntryManager::applyOperations`
+
 4.1.0
 -----
 

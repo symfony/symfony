@@ -50,16 +50,24 @@
             </call>
         </service>
 
+        <service id=".var_dumper.debug_dumper" class="Symfony\Bundle\DebugBundle\VarDumper\DebugDumper">
+            <argument type="service" id="var_dumper.cli_dumper" />
+            <argument type="service" id=".var_dumper.context_provider.source" />
+            <argument>0</argument> <!-- flags -->
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id=".var_dumper.context_provider.source" class="Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider">
+            <argument>%kernel.charset%</argument>
+            <argument type="string">%kernel.project_dir%</argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
+        </service>
+
         <service id="var_dumper.server_dumper" class="Symfony\Component\VarDumper\Dumper\ServerDumper">
             <argument>null</argument> <!-- server host -->
-            <argument type="service" id="var_dumper.cli_dumper" />
+            <argument type="service" id=".var_dumper.debug_dumper" />
             <argument type="collection">
-                <argument type="service" key="source">
-                    <service class="Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider">
-                        <argument>%kernel.charset%</argument>
-                        <argument type="string">%kernel.project_dir%</argument>
-                        <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
-                    </service>
+                <argument type="service" key="source" id=".var_dumper.context_provider.source">
                 </argument>
                 <argument type="service" key="request">
                     <service class="Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider">

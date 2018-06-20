@@ -22,19 +22,21 @@ use Twig\Template;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+ *
+ * @final
  */
-final class SourceContextProvider implements ContextProviderInterface
+class SourceContextProvider implements ContextProviderInterface
 {
     private $limit;
     private $charset;
     private $projectDir;
     private $fileLinkFormatter;
 
-    public function __construct(string $charset = null, string $projectDir = null, FileLinkFormatter $fileLinkFormatter = null, int $limit = 9)
+    public function __construct(string $charset = null, string $projectDir = null, FileLinkFormatter $fileLinkFormatter = null, int $limit = 10)
     {
-        $this->charset = $charset;
+        $this->charset = $charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8';
         $this->projectDir = $projectDir;
-        $this->fileLinkFormatter = $fileLinkFormatter;
+        $this->fileLinkFormatter = $fileLinkFormatter ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->limit = $limit;
     }
 
@@ -108,6 +110,16 @@ final class SourceContextProvider implements ContextProviderInterface
         }
 
         return $context;
+    }
+
+    public function getCharset(): string
+    {
+        return $this->charset;
+    }
+
+    public function getFileLinkFormatter(): ?FileLinkFormatter
+    {
+        return $this->fileLinkFormatter;
     }
 
     private function htmlEncode(string $s): string

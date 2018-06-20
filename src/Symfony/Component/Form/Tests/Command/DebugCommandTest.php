@@ -16,8 +16,10 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\Form\Tests\Console\Descriptor\FooType;
 
 class DebugCommandTest extends TestCase
 {
@@ -28,6 +30,24 @@ class DebugCommandTest extends TestCase
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Built-in form types', $tester->getDisplay());
+    }
+
+    public function testDebugDeprecatedDefaults()
+    {
+        $tester = $this->createCommandTester(array('Symfony\Component\Form\Tests\Console\Descriptor'), array(TextType::class, FooType::class));
+        $ret = $tester->execute(array('--show-deprecated' => true), array('decorated' => false));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertSame(<<<TXT
+
+Service form types
+------------------
+
+ * Symfony\Component\Form\Tests\Console\Descriptor\FooType
+
+
+TXT
+        , $tester->getDisplay(true));
     }
 
     public function testDebugSingleFormType()
@@ -117,10 +137,10 @@ TXT
         $this->createCommandTester()->execute(array('class' => 'test'));
     }
 
-    private function createCommandTester(array $namespaces = null)
+    private function createCommandTester(array $namespaces = array('Symfony\Component\Form\Extension\Core\Type'), array $types = array())
     {
         $formRegistry = new FormRegistry(array(), new ResolvedFormTypeFactory());
-        $command = null === $namespaces ? new DebugCommand($formRegistry) : new DebugCommand($formRegistry, $namespaces);
+        $command = new DebugCommand($formRegistry, $namespaces, $types);
         $application = new Application();
         $application->add($command);
 

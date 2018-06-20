@@ -27,25 +27,39 @@ class TextDescriptor extends Descriptor
 {
     protected function describeDefaults(array $options)
     {
-        $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
-        $shortClassNames = array_map(function ($fqcn) { return \array_slice(explode('\\', $fqcn), -1)[0]; }, $options['core_types']);
-        for ($i = 0; $i * 5 < \count($shortClassNames); ++$i) {
-            $this->output->writeln(' '.implode(', ', \array_slice($shortClassNames, $i * 5, 5)));
+        if ($options['core_types']) {
+            $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
+            $shortClassNames = array_map(function ($fqcn) { return \array_slice(explode('\\', $fqcn), -1)[0]; }, $options['core_types']);
+            for ($i = 0, $loopsMax = \count($shortClassNames); $i * 5 < $loopsMax; ++$i) {
+                $this->output->writeln(' '.implode(', ', \array_slice($shortClassNames, $i * 5, 5)));
+            }
         }
 
-        $this->output->section('Service form types');
-        $this->output->listing($options['service_types']);
+        if ($options['service_types']) {
+            $this->output->section('Service form types');
+            $this->output->listing($options['service_types']);
+        }
 
-        $this->output->section('Type extensions');
-        $this->output->listing($options['extensions']);
+        if (!$options['show_deprecated']) {
+            if ($options['extensions']) {
+                $this->output->section('Type extensions');
+                $this->output->listing($options['extensions']);
+            }
 
-        $this->output->section('Type guessers');
-        $this->output->listing($options['guessers']);
+            if ($options['guessers']) {
+                $this->output->section('Type guessers');
+                $this->output->listing($options['guessers']);
+            }
+        }
     }
 
     protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array())
     {
         $this->collectOptions($resolvedFormType);
+
+        if ($options['show_deprecated']) {
+            $this->filterOptionsByDeprecated($resolvedFormType);
+        }
 
         $formOptions = $this->normalizeAndSortOptionsColumns(array_filter(array(
             'own' => $this->ownOptions,
@@ -62,28 +76,11 @@ class TextDescriptor extends Descriptor
             'extension' => 'Extension options',
         ), $formOptions);
 
-        $tableRows = array();
-        $count = \count(max($formOptions));
-        for ($i = 0; $i < $count; ++$i) {
-            $cells = array();
-            foreach (array_keys($tableHeaders) as $group) {
-                if (isset($formOptions[$group][$i])) {
-                    $option = $formOptions[$group][$i];
-
-                    if (\is_string($option) && \in_array($option, $this->requiredOptions)) {
-                        $option .= ' <info>(required)</info>';
-                    }
-
-                    $cells[] = $option;
-                } else {
-                    $cells[] = null;
-                }
-            }
-            $tableRows[] = $cells;
-        }
-
         $this->output->title(sprintf('%s (Block prefix: "%s")', \get_class($resolvedFormType->getInnerType()), $resolvedFormType->getInnerType()->getBlockPrefix()));
-        $this->output->table($tableHeaders, $tableRows);
+
+        if ($formOptions) {
+            $this->output->table($tableHeaders, $this->buildTableRows($tableHeaders, $formOptions));
+        }
 
         if ($this->parents) {
             $this->output->section('Parent types');
@@ -101,7 +98,14 @@ class TextDescriptor extends Descriptor
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
 
         $dump = $this->getDumpFunction();
-        $map = array(
+        $map = array();
+        if ($definition['deprecated']) {
+            $map = array(
+                'Deprecated' => 'deprecated',
+                'Deprecation message' => 'deprecationMessage',
+            );
+        }
+        $map += array(
             'Required' => 'required',
             'Default' => 'default',
             'Allowed types' => 'allowedTypes',
@@ -122,6 +126,25 @@ class TextDescriptor extends Descriptor
 
         $this->output->title(sprintf('%s (%s)', \get_class($options['type']), $options['option']));
         $this->output->table(array(), $rows);
+    }
+
+    private function buildTableRows(array $headers, array $options): array
+    {
+        $tableRows = array();
+        $count = \count(max($options));
+        for ($i = 0; $i < $count; ++$i) {
+            $cells = array();
+            foreach (array_keys($headers) as $group) {
+                $option = $options[$group][$i] ?? null;
+                if (\is_string($option) && \in_array($option, $this->requiredOptions, true)) {
+                    $option .= ' <info>(required)</info>';
+                }
+                $cells[] = $option;
+            }
+            $tableRows[] = $cells;
+        }
+
+        return $tableRows;
     }
 
     private function normalizeAndSortOptionsColumns(array $options)

@@ -71,7 +71,7 @@ class ExpressionLanguage
      * @param Expression|string $expression The expression to compile
      * @param array             $values     An array of values
      *
-     * @return string The result of the evaluation of the expression
+     * @return mixed The result of the evaluation of the expression
      */
     public function evaluate($expression, $values = array())
     {

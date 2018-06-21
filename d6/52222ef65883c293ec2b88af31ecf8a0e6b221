@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-20T19:57:54Z
+
+This can happen when the exception controller is registered as a private service and was removed (now that we catch every `Error` instance): https://github.com/symfony/symfony/blob/4.1/src/Symfony/Component/HttpKernel/Controller/ContainerControllerResolver.php#L48-L73
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-21T07:20:11Z
+
+Yes, I was under the false impression that the `Error` class doesn't have this property. Fixed now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-21T07:21:13Z
+
+We could also merge this into 4.0 to account for the not so likely case that an `ArgumentCountError` is thrown during resolving the exception controller.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-21T07:50:59Z
+
+Even 3.4 actually, but the check needs to be for Exception then, not Error, to account for polyfills.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-21T10:39:31Z
+
+indeed, done

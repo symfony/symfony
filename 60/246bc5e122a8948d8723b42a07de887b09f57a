@@ -1,0 +1,136 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-14T19:03:32Z
+
+Hey @deviantintegral! Thanks for the report.
+
+IIRC, this is not working because there is no metadata. `allow_extra_attribute => false` cannot work properly without metadata. Hence my fix was only fixing the case where the ObjectNormalizer was instantiated with a `ClassMetadataFactoryInterface $classMetadataFactory` argument.
+
+Right now, I'm not sure if we can do something.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-15T16:21:01Z
+
+We may throw if this flag is set but the metadata are not loaded. WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-15T16:56:34Z
+
+Could be a solution indeed. Perhaps triggering a deprecation first and throwing on 5.0 if we fear this might break some apps (that would mean the flag wasn't working anyway and they didn't noticed, but an exception at runtime would be worse I think).
+
+@deviantintegral: Would you like to work on this ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-15T16:57:49Z
+
+I would throw directly. Relying on a non-functional behavior like this one can lead to security vulnerabilities.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-15T18:08:53Z
+
+But I don't see any security vulnerability here. If the flag is set without metadata factory, no `ExtraAttributesException` is raised but extra attributes will simply be ignored. This exception is only for convenience, no security purpose implied AFAIK.
+
+Anyway, I'm fine with both.
+
+---------------------------------------------------------------------------
+
+by deviantintegral at 2018-03-16T11:07:18Z
+
+> IIRC, this is not working because there is no metadata. allow_extra_attribute => false cannot work properly without metadata.
+
+I'd expected that something was reflecting the target class, and looking for public properties or set methods. If neither of those existed for a given property in the data being deserialized, then an `ExtraAttributesException` would be thrown. I agree about the convenience factor; my aim was to use it only during early development to ensure that the data being deserialized matched the documentation provided to me.
+
+Is there any reason why we couldn't instantiate a default metadata providing this behaviour, if `allow_extra_attribute => false` is set and no factory is provided?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T14:55:19Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by deviantintegral at 2018-03-22T23:36:12Z
+
+I see I need to add the legacy annotations or methods for exception tests. I will do that tomorrow.
+
+One question; if I try to deserialize into a class that only has a private field specified, with no setter, it is not set, but no exception is thrown as it's still in the list of allowed attributes. Is there a decorator class I missed to do field access checks when reflecting the target class?
+
+---------------------------------------------------------------------------
+
+by deviantintegral at 2018-03-26T11:39:59Z
+
+Can someone rebuild the appveyor build? [It threw Failed to decode response: zlib_decode(): data error 69](https://ci.appveyor.com/project/fabpot/symfony/build/1.0.34408) during composer update.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-26T11:55:15Z
+
+@deviantintegral : Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-14T15:10:00Z
+
+ping @ogizanagi @dunglas, any decision about throwing or not?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-04-14T15:38:39Z
+
+Alright, considering https://github.com/symfony/symfony/pull/26534#discussion_r177071807, let's throw.
+I still see no security implications though, so we're able to trigger a deprecation to ensure it doesn't breaks any app thinking they're using the flag properly without metadata factory, but no strong opinion.
+
+The documentation should also benefit from a PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-04-16T06:11:43Z
+
+Perfect.
+
+---------------------------------------------------------------------------
+
+by deviantintegral at 2018-05-04T21:30:19Z
+
+The appveyor failure is in the Process component, so I'm guessing it's unrelated to this PR. This should be ready for another review.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-05-30T02:25:39Z
+
+Something went wrong here. @deviantintegral Can you rebase on current 3.4?
+
+---------------------------------------------------------------------------
+
+by deviantintegral at 2018-05-30T13:24:59Z
+
+The test failures are from `HttpKernel` and are on the 3.4 branch too:
+
+```
+1) Symfony\Component\HttpKernel\Tests\Fragment\InlineFragmentRendererTest::testRenderWithTrustedHeaderDisabled
+Expectation failed for method name is equal to "handle" when invoked 1 time(s)
+Parameter 0 for invocation Symfony\Component\HttpKernel\HttpKernelInterface::handle(Symfony\Component\HttpFoundation\Request Object (...), 2, false) does not match expected value.
+Failed asserting that two objects are equal.
+--- Expected
++++ Actual
+@@ @@
+-            'REMOTE_ADDR' => '1.1.1.1'
++            'REMOTE_ADDR' => '127.0.0.1'
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-21T11:11:26Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by deviantintegral at 2018-06-21T17:56:21Z
+
+Docs PR filed at https://github.com/symfony/symfony-docs/pull/9948

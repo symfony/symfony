@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fritzmg at 2018-06-21T09:00:25Z
+
+Should I create another PR for the `LockHandler` in `2.8` (which can be merged to `3.3`)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-21T09:10:11Z
+
+Yes please for 2.8 (3.3 is not maintained anymore so it won't get the fix)

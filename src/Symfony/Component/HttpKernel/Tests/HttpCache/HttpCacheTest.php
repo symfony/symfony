@@ -1440,11 +1440,12 @@ class HttpCacheTest extends HttpCacheTestCase
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $store = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\StoreInterface')->getMock();
 
+        $that = $this;
         $kernel
             ->expects($this->exactly(2))
             ->method('handle')
-            ->willReturnCallback(function (Request $request) {
-                $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
+            ->willReturnCallback(function (Request $request) use ($that) {
+                $that->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
 
                 return new Response();
             });

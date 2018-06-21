@@ -200,7 +200,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
-     * @throws \Symfony\Component\Serializer\Exception\LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
+     * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
      *
      * @return string[]|AttributeMetadataInterface[]|bool
      */
@@ -208,7 +208,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     {
         if (!$this->classMetadataFactory) {
             if (isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) && !$context[static::ALLOW_EXTRA_ATTRIBUTES]) {
-                throw new LogicException(sprintf("A class metadata factory must be provided in the constructor when setting '%s' to false.", static::ALLOW_EXTRA_ATTRIBUTES));
+                throw new LogicException(sprintf('A class metadata factory must be provided in the constructor when setting "%s" to false.', static::ALLOW_EXTRA_ATTRIBUTES));
             }
 
             return false;

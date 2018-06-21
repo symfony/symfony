@@ -150,10 +150,8 @@ class AbstractObjectNormalizerTest extends TestCase
     /**
      * Test that additional attributes throw an exception if no metadata factory is specified.
      *
-     * @see https://symfony.com/doc/current/components/serializer.html#deserializing-an-object
-     *
      * @expectedException \Symfony\Component\Serializer\Exception\LogicException
-     * @expectedExceptionMessage A class metadata factory must be provided in the constructor when setting 'allow_extra_attributes' to false.
+     * @expectedExceptionMessage A class metadata factory must be provided in the constructor when setting "allow_extra_attributes" to false.
      */
     public function testExtraAttributesException()
     {

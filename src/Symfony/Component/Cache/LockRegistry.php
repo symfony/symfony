@@ -64,9 +64,11 @@ class LockRegistry
         $previousFiles = self::$files;
         self::$files = $files;
 
-        foreach (self::$openedFiles as $k => $file) {
-            flock($file, LOCK_UN);
-            fclose($file);
+        foreach (self::$openedFiles as $file) {
+            if ($file) {
+                flock($file, LOCK_UN);
+                fclose($file);
+            }
         }
         self::$openedFiles = self::$lockedFiles = array();
 
@@ -112,7 +114,7 @@ class LockRegistry
             flock($lock, LOCK_SH);
         } finally {
             flock($lock, LOCK_UN);
-            self::$lockedFiles[$key] = false;
+            unset(self::$lockedFiles[$key]);
         }
 
         return false;
@@ -120,11 +122,16 @@ class LockRegistry
 
     private static function open(int $key)
     {
-        if ($h = self::$openedFiles[$key] ?? null) {
+        if (null !== $h = self::$openedFiles[$key] ?? null) {
             return $h;
         }
-        if ($h = fopen(self::$files[$key], 'rb')) {
-            return self::$openedFiles[$key] = $h;
+        set_error_handler(function () {});
+        try {
+            $h = fopen(self::$files[$key], 'r+');
+        } finally {
+            restore_error_handler();
         }
+
+        self::$openedFiles[$key] = $h ?: @fopen(self::$files[$key], 'r');
     }
 }

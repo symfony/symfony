@@ -64,7 +64,7 @@ class ExceptionListener implements EventSubscriberInterface
                 }
             }
 
-            $prev = new \ReflectionProperty('Exception', 'previous');
+            $prev = new \ReflectionProperty($wrapper instanceof \Exception ? \Exception::class : \Error::class, 'previous');
             $prev->setAccessible(true);
             $prev->setValue($wrapper, $exception);
 

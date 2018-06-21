@@ -106,22 +106,26 @@ trait AbstractTrait
     public function clear()
     {
         $this->deferred = array();
-        try {
-            if ($cleared = $this->versioningIsEnabled) {
-                $namespaceVersion = 2;
-                try {
-                    foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
-                        $namespaceVersion = 1 + (int) $v;
-                    }
-                } catch (\Exception $e) {
+        if ($cleared = $this->versioningIsEnabled) {
+            $namespaceVersion = 2;
+            try {
+                foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
+                    $namespaceVersion = 1 + (int) $v;
                 }
-                $namespaceVersion .= ':';
-                $cleared = $this->doSave(array('@'.$this->namespace => $namespaceVersion), 0);
-                if ($cleared = true === $cleared || array() === $cleared) {
-                    $this->namespaceVersion = $namespaceVersion;
-                }
+            } catch (\Exception $e) {
             }
+            $namespaceVersion .= ':';
+            try {
+                $cleared = $this->doSave(array('@'.$this->namespace => $namespaceVersion), 0);
+            } catch (\Exception $e) {
+                $cleared = false;
+            }
+            if ($cleared = true === $cleared || array() === $cleared) {
+                $this->namespaceVersion = $namespaceVersion;
+            }
+        }
 
+        try {
             return $this->doClear($this->namespace) || $cleared;
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to clear the cache', array('exception' => $e));

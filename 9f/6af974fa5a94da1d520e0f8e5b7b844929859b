@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-06-20T22:54:52Z
+
+I think this PR can be targeted against 2.8 since it's not a new feature.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-06-20T23:17:46Z
+
+@andrewnclark, looks like you have accidentally changed the base twice and now it's again 4.1 :)
+
+---------------------------------------------------------------------------
+
+by andrewnclark at 2018-06-20T23:20:12Z
+
+All the additional commits scared me so I rolled it back. Is changing the base in this way the correct way to do it?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-06-20T23:22:45Z
+
+You should also rebase it in git so that the commit starts from the tip of the 2.8 branch.
+
+---------------------------------------------------------------------------
+
+by andrewnclark at 2018-06-20T23:27:08Z
+
+@vudaltsov thank you, will fix merge conflicts from rebasing and push update in the morning.

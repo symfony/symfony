@@ -99,6 +99,12 @@ code, pre {
     {{ mixins.monospace_font|raw }}
 }
 
+{# Elements containing a long plain text
+   ------------------------------------------------------------------------- #}
+p, blockquote {
+    max-width: 50em;
+}
+
 {# Buttons
    ------------------------------------------------------------------------- #}
 button {
@@ -149,7 +155,6 @@ table, tr, th, td {
 table {
     {{ mixins.subtle_border_and_shadow|raw }};
     margin: 1em 0;
-    width: 100%;
 }
 
 table th, table td {
@@ -424,7 +429,6 @@ tr.status-warning td {
 {# Layout
    ========================================================================= #}
 .container {
-    max-width: 1300px;
     padding-right: 15px;
 }
 #header {

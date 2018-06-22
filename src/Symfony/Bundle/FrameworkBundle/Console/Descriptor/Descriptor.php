@@ -52,6 +52,9 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ParameterBag:
                 $this->describeContainerParameters($object, $options);
                 break;
+            case $object instanceof ContainerBuilder && !empty($options['env-vars']):
+                $this->describeContainerEnvVars($this->getContainerEnvVars($object), $options);
+                break;
             case $object instanceof ContainerBuilder && isset($options['group_by']) && 'tags' === $options['group_by']:
                 $this->describeContainerTags($object, $options);
                 break;
@@ -156,6 +159,11 @@ abstract class Descriptor implements DescriptorInterface
      * Describes a container parameter.
      */
     abstract protected function describeContainerParameter($parameter, array $options = []);
+
+    /**
+     * Describes container environment variables.
+     */
+    abstract protected function describeContainerEnvVars(array $envs, array $options = []);
 
     /**
      * Describes event dispatcher listeners.
@@ -310,5 +318,36 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return '';
+    }
+
+    private function getContainerEnvVars(ContainerBuilder $container): array
+    {
+        $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
+        $getEnvReflection->setAccessible(true);
+        $envs = [];
+        foreach (array_keys($container->getEnvCounters()) as $env) {
+            $processor = 'string';
+            if (false !== $i = strrpos($name = $env, ':')) {
+                $name = substr($env, $i + 1);
+                $processor = substr($env, 0, $i);
+            }
+            $defaultValue = ($hasDefault = $container->hasParameter("env($name)")) ? $container->getParameter("env($name)") : null;
+            if (false === ($runtimeValue = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name))) {
+                $runtimeValue = null;
+            }
+            $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
+            $envs[$name.$processor] = [
+                'name' => $name,
+                'processor' => $processor,
+                'default_available' => $hasDefault,
+                'default_value' => $defaultValue,
+                'runtime_available' => $hasRuntime,
+                'runtime_value' => $runtimeValue,
+                'processed_value' => $processedValue,
+            ];
+        }
+        ksort($envs);
+
+        return array_values($envs);
     }
 }

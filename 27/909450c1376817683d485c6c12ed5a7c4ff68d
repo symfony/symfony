@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by kalessil at 2018-06-21T20:47:49Z
+
+Travis 7.1.3 segfaulting (looks like https://bugs.php.net/bug.php?id=73989), while Appveyor passes with 7.1.3. Any hints?

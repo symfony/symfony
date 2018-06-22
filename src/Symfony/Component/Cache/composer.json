@@ -28,11 +28,12 @@
     "require-dev": {
         "cache/integration-tests": "dev-master",
         "doctrine/cache": "~1.6",
-        "doctrine/dbal": "~2.4",
+        "doctrine/dbal": "~2.5",
         "predis/predis": "~1.0",
         "symfony/var-dumper": "^4.1.1"
     },
     "conflict": {
+        "doctrine/dbal": "<2.5",
         "symfony/var-dumper": "<3.4"
     },
     "autoload": {

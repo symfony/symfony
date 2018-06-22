@@ -866,6 +866,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
+                        ->scalarNode('default_pdo_provider')->defaultValue('doctrine.dbal.default_connection')->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')

@@ -266,6 +266,7 @@ class ConfigurationTest extends TestCase
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
+                'default_pdo_provider' => 'doctrine.dbal.default_connection',
             ),
             'workflows' => array(
                 'enabled' => false,

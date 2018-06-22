@@ -1547,7 +1547,7 @@ class FrameworkExtension extends Extension
             // Inline any env vars referenced in the parameter
             $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
         }
-        foreach (array('doctrine', 'psr6', 'redis', 'memcached') as $name) {
+        foreach (array('doctrine', 'psr6', 'redis', 'memcached', 'pdo') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }

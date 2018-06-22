@@ -25,7 +25,7 @@ interface NormalizerInterface
     /**
      * Normalizes an object into a set of arrays/scalars.
      *
-     * @param object $object  Object to normalize
+     * @param mixed  $object  Object to normalize
      * @param string $format  Format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *

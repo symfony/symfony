@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper;
 
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 // Load the global dump() function
@@ -29,7 +30,7 @@ class VarDumper
     {
         if (null === self::$handler) {
             $cloner = new VarCloner();
-            $dumper = \in_array(PHP_SAPI, array('cli', 'phpdbg'), true) ? new CliDumper() : new HtmlDumper();
+            $dumper = self::getDefaultDumper();
             self::$handler = function ($var) use ($cloner, $dumper) {
                 $dumper->dump($cloner->cloneVar($var));
             };
@@ -38,11 +39,22 @@ class VarDumper
         return call_user_func(self::$handler, $var);
     }
 
+    /**
+     * @final since 4.1
+     */
     public static function setHandler(callable $callable = null)
     {
         $prevHandler = self::$handler;
         self::$handler = $callable;
 
         return $prevHandler;
+    }
+
+    /**
+     * @final
+     */
+    public static function getDefaultDumper(): DataDumperInterface
+    {
+        return \in_array(PHP_SAPI, array('cli', 'phpdbg'), true) ? new CliDumper() : new HtmlDumper();
     }
 }

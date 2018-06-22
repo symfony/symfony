@@ -22,6 +22,7 @@
     },
     "suggest": {
         "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader",
+        "symfony/var-dumper": "To use the VarDumperServerListener",
         "ext-zip": "Zip support is required when using bin/simple-phpunit"
     },
     "conflict": {

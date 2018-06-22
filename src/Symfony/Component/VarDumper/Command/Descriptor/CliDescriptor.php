@@ -44,7 +44,11 @@ class CliDescriptor implements DumpDescriptorInterface
         $this->lastIdentifier = $clientId;
 
         $section = "Received from client #$clientId";
-        if (isset($context['request'])) {
+        if (isset($context['phpunit'])) {
+            $phpunit = $context['phpunit'];
+            $this->lastIdentifier = $phpunit['identifier'];
+            $section = sprintf('%s::%s', $phpunit['test_class'], $phpunit['test_case']);
+        } elseif (isset($context['request'])) {
             $request = $context['request'];
             $this->lastIdentifier = $request['identifier'];
             $section = sprintf('%s %s', $request['method'], $request['uri']);

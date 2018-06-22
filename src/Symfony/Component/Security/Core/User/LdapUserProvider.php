@@ -37,10 +37,6 @@ class LdapUserProvider implements UserProviderInterface
 
     public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = array(), string $uidKey = 'sAMAccountName', string $filter = '({uid_key}={username})', string $passwordAttribute = null)
     {
-        if (null === $uidKey) {
-            $uidKey = 'sAMAccountName';
-        }
-
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
         $this->searchDn = $searchDn;

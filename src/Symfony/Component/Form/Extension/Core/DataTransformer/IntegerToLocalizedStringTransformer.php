@@ -28,10 +28,6 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
      */
     public function __construct(?int $scale = 0, ?bool $grouping = false, int $roundingMode = self::ROUND_DOWN)
     {
-        if (null === $roundingMode) {
-            $roundingMode = self::ROUND_DOWN;
-        }
-
         parent::__construct(0, $grouping, $roundingMode);
     }
 

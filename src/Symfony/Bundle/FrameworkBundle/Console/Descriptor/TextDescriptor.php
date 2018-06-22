@@ -485,6 +485,7 @@ class TextDescriptor extends Descriptor
             'OPTIONS' => true,
             'PATCH' => true,
             'POST' => true,
+            'PURGE' => true,
             'PUT' => true,
             'TRACE' => true,
         );
@@ -501,7 +502,7 @@ class TextDescriptor extends Descriptor
     private function describeRoutePath(string $path)
     {
         if ('' === $path || '/' === $path) {
-            return $path; // cheap short cuts
+            return $path;
         }
 
         // this pattern has been derived from `Symfony\Component\Validator\Constraints\UrlValidator`

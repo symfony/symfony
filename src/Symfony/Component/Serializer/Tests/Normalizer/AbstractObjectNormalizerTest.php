@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -52,7 +53,8 @@ class AbstractObjectNormalizerTest extends TestCase
      */
     public function testDenormalizeWithExtraAttributes()
     {
-        $normalizer = new AbstractObjectNormalizerDummy();
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
             array('fooFoo' => 'foo', 'fooBar' => 'bar'),
             __NAMESPACE__.'\Dummy',
@@ -143,6 +145,21 @@ class AbstractObjectNormalizerTest extends TestCase
         $denormalizer->setSerializer($serializer);
 
         return $denormalizer;
+    }
+
+    /**
+     * Test that additional attributes throw an exception if no metadata factory is specified.
+     *
+     * @expectedException \Symfony\Component\Serializer\Exception\LogicException
+     * @expectedExceptionMessage A class metadata factory must be provided in the constructor when setting "allow_extra_attributes" to false.
+     */
+    public function testExtraAttributesException()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $normalizer->denormalize(array(), \stdClass::class, 'xml', array(
+            'allow_extra_attributes' => false,
+        ));
     }
 }
 

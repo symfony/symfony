@@ -84,6 +84,8 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         } finally {
             BaseNode::resetPlaceholders();
         }
+
+        $resolvingBag->clearUnusedEnvPlaceholders();
     }
 
     private static function getType($value): string

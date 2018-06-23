@@ -123,14 +123,37 @@ class FormValidator extends ConstraintValidator
             }
         }
 
-        // Mark the form with an error if it contains extra fields
+        // Mark the form with an error if it contains non whitelisted extra fields
         if (!$config->getOption('allow_extra_fields') && count($form->getExtraData()) > 0) {
+            // Mark the form with an error, if `allow_extra_fields` is deactivated
             $this->context->setConstraint($constraint);
             $this->context->buildViolation($config->getOption('extra_fields_message'))
                 ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))
                 ->setInvalidValue($form->getExtraData())
                 ->setCode(Form::NO_SUCH_FIELD_ERROR)
                 ->addViolation();
+        } elseif (is_array($config->getOption('allow_extra_fields')) && count($form->getExtraData()) > 0) {
+            // Get array of allowed extra fields
+            $allowedExtraFields = $config->getOption('allow_extra_fields');
+            $violatedExtraFields = [];
+
+            // Check extra data to be valid
+            foreach ($form->getExtraData() as $key=>$val) {
+                if (!in_array($key, $allowedExtraFields)) {
+                    $violatedExtraFields[$key] = $val;
+                }
+            }
+
+            // Check if there is invalid extra data
+            if (count($violatedExtraFields) > 0) {
+                // Mark the form with an error, if there are fields not whitelisted by `allow_extra_fields`
+                $this->context->setConstraint($constraint);
+                $this->context->buildViolation($config->getOption('extra_fields_message'))
+                    ->setParameter('{{ extra_fields }}', implode('", "', array_keys($violatedExtraFields)))
+                    ->setInvalidValue($violatedExtraFields)
+                    ->setCode(Form::NO_SUCH_FIELD_ERROR)
+                    ->addViolation();
+            }
         }
     }
 

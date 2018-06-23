@@ -87,6 +87,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->unusedEnvPlaceholders;
     }
 
+    public function clearUnusedEnvPlaceholders()
+    {
+        $this->unusedEnvPlaceholders = array();
+    }
+
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
      */

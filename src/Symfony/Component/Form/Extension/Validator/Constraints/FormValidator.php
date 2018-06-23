@@ -136,7 +136,7 @@ class FormValidator extends ConstraintValidator
             } elseif (is_array($config->getOption('allow_extra_fields'))) {
                 // Get array of allowed extra fields
                 $allowedExtraFields = $config->getOption('allow_extra_fields');
-                $invalidExtraData = [];
+                $invalidExtraData = array();
 
                 // Check extra data to be valid
                 foreach ($form->getExtraData() as $key => $val) {

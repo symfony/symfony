@@ -124,7 +124,7 @@
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="synthetic" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
@@ -145,7 +145,7 @@
     <xsd:attribute name="id" type="xsd:string" use="required" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
   </xsd:complexType>
@@ -167,7 +167,7 @@
     <xsd:attribute name="exclude" type="xsd:string" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />

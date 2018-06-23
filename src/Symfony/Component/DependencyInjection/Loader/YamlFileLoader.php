@@ -407,7 +407,10 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['lazy'])) {
-            $definition->setLazy($service['lazy']);
+            $definition->setLazy((bool) $service['lazy']);
+            if (\is_string($service['lazy'])) {
+                $definition->addTag('proxy', array('interface' => $service['lazy']));
+            }
         }
 
         if (isset($service['public'])) {

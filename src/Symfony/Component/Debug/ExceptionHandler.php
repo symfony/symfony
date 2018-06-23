@@ -103,7 +103,7 @@ class ExceptionHandler
      * The latter takes precedence and any output from the former is cancelled,
      * if and only if nothing bad happens in this handling path.
      */
-    public function handle(\Throwable $exception)
+    public function handle(\Exception $exception)
     {
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
             $this->sendPhpResponse($exception);

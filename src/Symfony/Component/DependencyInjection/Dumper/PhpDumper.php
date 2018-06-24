@@ -186,8 +186,7 @@ class PhpDumper extends Dumper
         $code =
             $this->startClass($options['class'], $baseClass, $baseClassWithNamespace).
             $this->addServices().
-            $this->addDefaultParametersMethod().
-            $this->endClass()
+            $this->addDefaultParametersMethod()
         ;
 
         if ($this->asFiles) {
@@ -223,7 +222,7 @@ EOF;
             foreach ($this->generateProxyClasses() as $file => $c) {
                 $files[$file] = "<?php\n".$c;
             }
-            $files[$options['class'].'.php'] = $code;
+            $files[$options['class'].'.php'] = $code.$this->endClass();
             $hash = ucfirst(strtr(ContainerBuilder::hash($files), '._', 'xx'));
             $code = array();
 
@@ -261,6 +260,7 @@ return new \\Container{$hash}\\{$options['class']}(array(
 
 EOF;
         } else {
+            $code .= $this->endClass();
             foreach ($this->generateProxyClasses() as $c) {
                 $code .= $c;
             }
@@ -753,12 +753,6 @@ EOTXT
     {
 
 EOF;
-        }
-
-        if ($e = $definition->getErrors()) {
-            $e = sprintf("throw new RuntimeException(%s);\n", $this->export(reset($e)));
-
-            return $asFile ? substr($code, 8).$e : $code.'        '.$e."    }\n";
         }
 
         $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));

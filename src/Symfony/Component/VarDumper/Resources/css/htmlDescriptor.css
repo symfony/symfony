@@ -22,14 +22,6 @@ a {
 a:hover {
     text-decoration: underline;
 }
-code {
-    color: #cc2255;
-    background-color: #f7f7f9;
-    border: 1px solid #e1e1e8;
-    border-radius: 3px;
-    margin-right: 5px;
-    padding: 0 3px;
-}
 .text-small {
     font-size: 12px !important;
 }
@@ -60,6 +52,12 @@ article > header > .row > h2 {
 article > header > .row > h2 > code {
     white-space: nowrap;
     user-select: none;
+    color: #cc2255;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 3px;
+    margin-right: 5px;
+    padding: 0 3px;
 }
 article > header > .row > time.col {
     flex: 0;

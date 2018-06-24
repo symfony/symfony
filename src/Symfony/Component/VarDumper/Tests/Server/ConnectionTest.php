@@ -9,42 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarDumper\Tests\Dumper;
+namespace Symfony\Component\VarDumper\Tests\Server;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpProcess;
 use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
-use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
-use Symfony\Component\VarDumper\Dumper\ServerDumper;
+use Symfony\Component\VarDumper\Server\Connection;
 
-class ServerDumperTest extends TestCase
+class ConnectionTest extends TestCase
 {
     private const VAR_DUMPER_SERVER = 'tcp://127.0.0.1:9913';
 
-    public function testDumpForwardsToWrappedDumperWhenServerIsUnavailable()
-    {
-        $wrappedDumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
-
-        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper);
-
-        $cloner = new VarCloner();
-        $data = $cloner->cloneVar('foo');
-
-        $wrappedDumper->expects($this->once())->method('dump')->with($data);
-
-        $dumper->dump($data);
-    }
-
     public function testDump()
     {
-        $wrappedDumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
-        $wrappedDumper->expects($this->never())->method('dump'); // test wrapped dumper is not used
-
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
-        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper, array(
+        $connection = new Connection(self::VAR_DUMPER_SERVER, array(
             'foo_provider' => new class() implements ContextProviderInterface {
                 public function getContext(): ?array
                 {
@@ -55,12 +37,12 @@ class ServerDumperTest extends TestCase
 
         $dumped = null;
         $process = $this->getServerProcess();
-        $process->start(function ($type, $buffer) use ($process, &$dumped, $dumper, $data) {
+        $process->start(function ($type, $buffer) use ($process, &$dumped, $connection, $data) {
             if (Process::ERR === $type) {
                 $process->stop();
                 $this->fail();
             } elseif ("READY\n" === $buffer) {
-                $dumper->dump($data);
+                $connection->write($data);
             } else {
                 $dumped .= $buffer;
             }
@@ -78,8 +60,19 @@ class ServerDumperTest extends TestCase
   ]
 ]
 %d
+
 DUMP
         , $dumped);
+    }
+
+    public function testNoServer()
+    {
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar('foo');
+        $connection = new Connection(self::VAR_DUMPER_SERVER);
+        $start = microtime(true);
+        $this->assertFalse($connection->write($data));
+        $this->assertLessThan(1, microtime(true) - $start);
     }
 
     private function getServerProcess(): Process

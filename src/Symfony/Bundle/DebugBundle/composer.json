@@ -20,7 +20,7 @@
         "ext-xml": "*",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/twig-bridge": "~3.4|~4.0",
-        "symfony/var-dumper": "~4.1"
+        "symfony/var-dumper": "^4.1.1"
     },
     "require-dev": {
         "symfony/config": "~3.4|~4.0",

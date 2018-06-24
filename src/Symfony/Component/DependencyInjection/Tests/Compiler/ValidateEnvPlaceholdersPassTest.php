@@ -226,12 +226,27 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     public function testConfigurationWithoutRootNode(): void
     {
         $container = new ContainerBuilder();
-        $container->registerExtension($ext = new EnvExtension(new EnvConfigurationWithoutRootNode()));
+        $container->registerExtension(new EnvExtension(new EnvConfigurationWithoutRootNode()));
         $container->loadFromExtension('env_extension');
 
         $this->doProcess($container);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testDiscardedEnvInConfig(): void
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(BOOLISH)', '1');
+        $container->setParameter('boolish', '%env(BOOLISH)%');
+        $container->registerExtension(new EnvExtension());
+        $container->prependExtensionConfig('env_extension', array(
+            'array_node' => array('bool_force_cast' => '%boolish%'),
+        ));
+
+        $container->compile(true);
+
+        $this->assertSame('1', $container->getParameter('boolish'));
     }
 
     private function doProcess(ContainerBuilder $container): void
@@ -260,8 +275,19 @@ class EnvConfiguration implements ConfigurationInterface
                         ->ifTrue(function ($value) { return !is_array($value); })
                         ->then(function ($value) { return array('child_node' => $value); })
                     ->end()
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function (array $v) {
+                            if (isset($v['bool_force_cast'])) {
+                                $v['bool_force_cast'] = (bool) $v['bool_force_cast'];
+                            }
+
+                            return $v;
+                        })
+                    ->end()
                     ->children()
                         ->scalarNode('child_node')->end()
+                        ->booleanNode('bool_force_cast')->end()
                         ->integerNode('int_unset_at_zero')
                             ->validate()
                                 ->ifTrue(function ($value) { return 0 === $value; })

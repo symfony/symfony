@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T07:34:12Z
+
+PR verified on a website-skeleton, works as expected now IMHO.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-18T11:24:47Z
+
+Thanks for giving it a look :)
+
+> Writting to the server should not happen in a DumperInterface, that's not its semantics.
+
+Well, I don't agree. `DataDumperInterface` is responsible for dumping the `Data` objects. Either locally in current output, or remotely letting a server delegate then to another dumper; that's not transgressing this responsibility.
+You may keep the `Connection` object though, if you think it needs to be decoupled from the `ServerDumper` implementation, but the `ServerDumper` is legit to me. This is the one ensuring seamless usage of the server dumper when the server is not up. To me, it's a better design than requiring to set a handler with specific code for handling the connection (the changes you made in `DumpListener`). It's a solution well-integrated within the component, so better at a global level.
+Please consider the `DumpDataCollector` issue we encounter here is the edge-case from the component POV. Not the norm. Someone using the VarDumper component alone should be able to wire the `ServerDumper`, IMHO with the current API.
+
+To me, the culprit here really is the `DumpDataCollector` which has way too much responsibilities and hardcoded things.
+We'd not have this issue if we had a `DebugDumper` (similar to the one proposed in https://github.com/symfony/symfony/pull/27397) that would have been set as the wrapped dumper of the `ServerDumper`, and the `DumpDataCollector` only dealing with its role of collecting the dumps (maybe with the classic `TraceableDumper` decorator around the wired dumper, i.e the server dumper when wired or debug dumper directly otherwise).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-18T12:15:27Z
+
+`DataDumperInterface` is more for formatting than sending: `HtmlDumper`, `CliDumper`, `JsonDumper`, `SerializerDumper`, `Base64SerializerDumper` etc. these are all valid use cases for it. Since formatting needs an output medium, there is also an implicit concept of *where* the formatted `Data` should be written, by necessity. But this is a concept that is better separated from formatting. Maybe another name would have been better. The fact that the issue we're talking about exists at all is precisely the hint the interface has been misused to me. The fact also that by identifying this issue, this PR fixes it while removing lines of code is another hint.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-18T13:24:34Z
+
+> the culprit here really is the DumpDataCollector which has way too much responsibilities and hardcoded things
+
+So, I tried again keeping`ServerDumper` as done right now: this just doesn't fit, at least not without a maybe heavy refactoring. You may be right, but not in this reality :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-18T17:12:30Z
+
+> at least not without a maybe heavy refactoring
+
+Yes I also struggled with the `DumpDataCollector` (both when initially developing the feature and then with this issue). To me that's the hint it does too much.
+I'd honestly prefer keeping the current API and work on #27397 to add the missing code from `DumpDataColector` even if it means duplicating code, until we can consider refactoring the DumpDataCollector in 4.2 according to https://github.com/symfony/symfony/pull/27614#issuecomment-398023101 last paragraph. So no BC break and the feature keeps being part of the classic VarDumper API.
+
+> You may be right, but not in this reality
+
+Hope you're wrong ^^'
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-20T12:05:28Z
+
+I reverted the big BC break (there are still some minor on the edges, but this is required for the bugfix and OK for a `.0` release IMHO.)
+
+(failure will be fixed by a merge up to master)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-21T18:46:10Z
+
+@ogizanagi I don't reproduce this behavior :(
+Can you try this patch?
+```diff
+                 stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
++                fclose($this->socket);
++                $this->socket = false;
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-21T18:54:41Z
+
+It works 👍
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-21T19:01:02Z
+
+It works, but only on second request after re-uping the server. Note that commenting the `createSocket` in the constructor is fixing it (just an hint of course).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-22T19:36:17Z
+
+I removed the async flag + constructor connection, does it fix it?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-23T07:47:12Z
+
+No, it doesn't work at all now, unless you restore a timeout in `stream_socket_client` too (`"stream_socket_client(): unable to connect to tcp://127.0.0.1:9912 (Operation timed out)"`).
+
+But honestly, if you want to give a try to async with previous version + patch above, I won't personally mind because I didn't reproduced on a different machine but with very similar env. We may reconsider if we have other reports. Or create another PR for async.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-23T08:17:26Z
+
+Pushed again, with your patch and the connection in the constructor removed.

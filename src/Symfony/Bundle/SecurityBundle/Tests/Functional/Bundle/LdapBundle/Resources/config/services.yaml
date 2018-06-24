@@ -1,0 +1,4 @@
+services:
+    ldap_role_provider:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\LdapBundle\LdapUserRoleProvider
+        public: true

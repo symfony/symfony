@@ -18,6 +18,8 @@ use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\User\LdapUserProvider;
+use Symfony\Component\Security\Core\User\LdapUserRoleProviderInterface;
+use Symfony\Component\Security\Core\User\User;
 
 /**
  * @requires extension ldap
@@ -358,5 +360,32 @@ class LdapUserProviderTest extends TestCase
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')
         );
+    }
+
+    public function testWithLdapRolesProvider()
+    {
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
+        $rolesProvider = $this->getMockBuilder(LdapUserRoleProviderInterface::class)->setMethods(array('getRoles'))->getMock();
+        $rolesProvider->method('getRoles')->willReturn(array('ROLE_GROUP1', 'ROLE_GROUP2'));
+
+        $provider = new LdapUserProvider(
+            $ldap,
+            'ou=users,dc=onfroy,dc=net',
+            null,
+            null,
+            array('ROLE_DEFAULT'),
+            'sAMAccountName',
+            '({uid_key}={username})',
+            'password',
+            $rolesProvider
+        );
+
+        $method = new \ReflectionMethod(LdapUserProvider::class, 'loadUser');
+        $method->setAccessible(true);
+
+        /** @var User $user */
+        $user = $method->invoke($provider, 'username', new Entry('rudy', array('password' => array('password'))));
+
+        $this->assertEquals(array('ROLE_DEFAULT', 'ROLE_GROUP1', 'ROLE_GROUP2'), $user->getRoles());
     }
 }

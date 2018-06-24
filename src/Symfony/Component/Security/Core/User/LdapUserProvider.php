@@ -34,8 +34,9 @@ class LdapUserProvider implements UserProviderInterface
     private $uidKey;
     private $defaultSearch;
     private $passwordAttribute;
+    private $userRoleProvider;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = array(), string $uidKey = null, string $filter = null, string $passwordAttribute = null)
+    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = array(), string $uidKey = null, string $filter = null, string $passwordAttribute = null, LdapUserRoleProviderInterface $userRoleProvider = null)
     {
         if (null === $uidKey) {
             $uidKey = 'sAMAccountName';
@@ -53,6 +54,7 @@ class LdapUserProvider implements UserProviderInterface
         $this->uidKey = $uidKey;
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
         $this->passwordAttribute = $passwordAttribute;
+        $this->userRoleProvider = $userRoleProvider;
     }
 
     /**
@@ -128,7 +130,13 @@ class LdapUserProvider implements UserProviderInterface
             $password = $this->getAttributeValue($entry, $this->passwordAttribute);
         }
 
-        return new User($username, $password, $this->defaultRoles);
+        $roles = $this->defaultRoles;
+
+        if (null !== $this->userRoleProvider) {
+            $roles = array_merge($roles, $this->userRoleProvider->getRoles($entry));
+        }
+
+        return new User($username, $password, $roles);
     }
 
     /**
@@ -136,6 +144,8 @@ class LdapUserProvider implements UserProviderInterface
      *
      * @param null|Entry $entry
      * @param string     $attribute
+     *
+     * @return array|null
      */
     private function getAttributeValue(Entry $entry, $attribute)
     {

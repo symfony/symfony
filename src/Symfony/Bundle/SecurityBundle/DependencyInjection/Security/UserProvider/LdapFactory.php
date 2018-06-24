@@ -36,6 +36,7 @@ class LdapFactory implements UserProviderFactoryInterface
             ->replaceArgument(5, $config['uid_key'])
             ->replaceArgument(6, $config['filter'])
             ->replaceArgument(7, $config['password_attribute'])
+            ->replaceArgument(8, isset($config['roles_provider']) ? new Reference($config['roles_provider']) : null)
         ;
     }
 
@@ -60,6 +61,7 @@ class LdapFactory implements UserProviderFactoryInterface
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
                 ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
                 ->scalarNode('password_attribute')->defaultNull()->end()
+                ->scalarNode('roles_provider')->defaultNull()->end()
             ->end()
         ;
     }

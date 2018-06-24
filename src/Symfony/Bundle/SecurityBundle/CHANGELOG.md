@@ -11,7 +11,9 @@ CHANGELOG
    or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
  * Added `Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass`
  * Added `json_login_ldap` authentication provider to use LDAP authentication with a REST API.
- 
+ * Added `roles_provider` in the `ldap_provider` to provide roles to ldap users
+   the value is a service implementing `Symfony\Component\Security\Core\User\LdapUserRoleProviderInterface 
+
 4.1.0
 -----
 

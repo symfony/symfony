@@ -19,29 +19,29 @@
         "php": "^7.1.3",
         "symfony/config": "~3.4|~4.0",
         "symfony/twig-bridge": "^3.4.3|^4.0.3",
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/http-foundation": "~4.1",
+        "symfony/http-kernel": "~4.1",
         "symfony/polyfill-ctype": "~1.8",
         "twig/twig": "~1.34|~2.4"
     },
     "require-dev": {
         "symfony/asset": "~3.4|~4.0",
         "symfony/stopwatch": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/dependency-injection": "~4.1",
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
         "symfony/form": "~3.4|~4.0",
         "symfony/routing": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
-        "symfony/framework-bundle": "~3.4|~4.0",
+        "symfony/framework-bundle": "~4.1",
         "symfony/web-link": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<3.4",
-        "symfony/event-dispatcher": "<3.4"
+        "symfony/dependency-injection": "<4.1",
+        "symfony/framework-bundle": "<4.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },

@@ -1,7 +1,7 @@
 SVN information
 ===============
 
-URL: http://source.icu-project.org/repos/icu/tags/release-61-1/icu4c/source
-Revision: 41146
-Author: heninger
-Date: 2018-03-23T22:14:04.032868Z
+URL: http://source.icu-project.org/repos/icu/tags/release-62-1/icu4c/source
+Revision: 41542
+Author: yoshito
+Date: 2018-06-20T05:34:56.496986Z

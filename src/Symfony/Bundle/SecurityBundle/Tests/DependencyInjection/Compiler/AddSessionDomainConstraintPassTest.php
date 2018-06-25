@@ -96,19 +96,6 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://pirate.com/foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "security.http_utils".
-     */
-    public function testNoHttpUtils()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('session.storage.options', array());
-
-        $pass = new AddSessionDomainConstraintPass();
-        $pass->process($container);
-    }
-
     private function createContainer($sessionStorageOptions)
     {
         $container = new ContainerBuilder();

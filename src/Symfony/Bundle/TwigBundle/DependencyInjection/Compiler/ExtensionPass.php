@@ -82,6 +82,10 @@ class ExtensionPass implements CompilerPassInterface
             }
         }
 
+        if ($container->has('web_link.add_link_header_listener')) {
+            $container->getDefinition('twig.extension.weblink')->addTag('twig.extension');
+        }
+
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
         if ($container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.filesystem');

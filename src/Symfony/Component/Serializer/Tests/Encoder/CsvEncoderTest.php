@@ -324,7 +324,7 @@ foo
 a
 
 CSV
-            , 'csv', array('as_collection' => true)));
+            , 'csv', array(CsvEncoder::AS_COLLECTION_KEY => true)));
     }
 
     public function testDecodeToManyRelation()

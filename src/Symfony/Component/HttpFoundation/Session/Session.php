@@ -54,8 +54,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function start()
     {
-        ++$this->usageIndex;
-
         return $this->storage->start();
     }
 

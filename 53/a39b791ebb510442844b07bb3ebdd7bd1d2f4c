@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by TerjeBr at 2018-06-12T08:11:42Z
+
+I have now thought about this, what about adding a `FormExtendedInterface` that extends both `FormInterface` and `ClearableErrorInterface`? The use case for the interface after all is to have a way to pass around form objects to functions and methods, and then you want an all inclusive interface that can cover all the methods implemented in the `Form` class. What do you think?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-06-14T23:52:50Z
+
+If the method is `clearErrors` than probably the interface might be `ClearableErrorsInterface`?
+
+---------------------------------------------------------------------------
+
+by colinodell at 2018-06-14T23:57:13Z
+
+Good idea @vudaltsov, I like that better! I have made that change.
+
+---------------------------------------------------------------------------
+
+by colinodell at 2018-06-20T20:11:34Z
+
+Tests are failing, but I don't think it's because of my changes.  All tests under `src/Symfony/Component/Form` are passing locally.

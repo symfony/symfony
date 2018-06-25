@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-20T14:35:43Z
+
+In a FrameworkBundle-based project, the file name format must always be `<domain>.<locale>.<format>`. Anything else is unsupported (because the bundle needs to be able to extract the domain and the locale from the file name). So having the convention configurable in the command (using a constructor argument) would be better to me than supporting having the locale anywhere in the file name (which would not report all issues for Symfony projects)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-20T14:51:27Z
+
+@stof I've made some changes. Please tell me if that's what you were proposing. Thanks.

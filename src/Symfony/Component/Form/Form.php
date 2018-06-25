@@ -58,7 +58,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Form implements \IteratorAggregate, FormInterface
+class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
     /**
      * The form's configuration.
@@ -793,6 +793,27 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return new FormErrorIterator($this, $errors);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function clearErrors(bool $deep = false): self
+    {
+        $this->errors = array();
+
+        if ($deep) {
+            // Clear errors from children
+            foreach ($this as $child) {
+                if ($child instanceof ClearableErrorsInterface) {
+                    $child->clearErrors(true);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**

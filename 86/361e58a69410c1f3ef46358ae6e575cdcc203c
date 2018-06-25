@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-13T11:38:21Z
+
+That'd be for 4.2 now.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-13T12:45:23Z
+
+This isn't new feature so shouldn't be affected by feature freeze. But understood.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-13T15:38:46Z
+
+Semver defines that deprecations should follow the same process as features.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-15T09:06:31Z
+
+Changed the base. Should I create UPGRADE-4.2.md in root now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-15T09:07:46Z
+
+> Changed the base. Should I create UPGRADE-4.2.md in root now?
+
+yes please
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-21T23:57:26Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-06-20T23:21:18Z
+
+Rebased. Failures unrelated
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-06-22T12:27:27Z
+
+status: needs review

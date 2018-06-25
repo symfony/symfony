@@ -26,7 +26,7 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasParameter('session.storage.options')) {
+        if (!$container->hasParameter('session.storage.options') || !$container->has('security.http_utils')) {
             return;
         }
 
@@ -34,7 +34,6 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
         $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%s' : sprintf('(?:%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
         $domainRegexp = (empty($sessionOptions['cookie_secure']) ? 'https?://' : 'https://').$domainRegexp;
 
-        // if the service doesn't exist, an exception must be thrown - ignoring would put security at risk
         $container->findDefinition('security.http_utils')->addArgument(sprintf('{^%s$}i', $domainRegexp));
     }
 }

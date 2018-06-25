@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-22T09:44:48Z
+
+New scripts added in `en` but not in any other locales ? Do we have a bug in our importer, or are they shipping en-only data in the ICU release now ?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-06-22T13:44:37Z
+
+@stof indeed only `en` locale seems to be updated in ICU. Example: http://source.icu-project.org/repos/icu/tags/release-62-1/icu4c/source/data/lang/pl.txt
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-22T14:44:16Z
+
+Too bad that the ICU data were not sent to translators before the release...

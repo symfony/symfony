@@ -7,6 +7,20 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.42 (2018-06-25)
+
+ * bug #27669 [Filesystem] fix file lock on SunOS (fritzmg)
+ * bug #27309 Fix surrogate not using original request (Toflar)
+ * bug #27630 [Validator][Form] Remove BOM in some xlf files (gautierderuette)
+ * bug #27591 [VarDumper] Fix dumping ArrayObject and ArrayIterator instances (nicolas-grekas)
+ * bug #27581 Fix bad method call with guard authentication + session migration (weaverryan)
+ * bug #27452 Avoid migration on stateless firewalls (weaverryan)
+ * bug #27514 [Debug] Pass previous exception to FatalErrorException (pmontoya)
+ * bug #26973 [HttpKernel] Set first trusted proxy as REMOTE_ADDR in InlineFragmentRenderer. (kmadejski)
+ * bug #27303 [Process] Consider "executable" suffixes first on Windows (sanmai)
+ * bug #27297 Triggering RememberMe's loginFail() when token cannot be created (weaverryan)
+ * bug #27366 [DI] never inline lazy services (nicolas-grekas)
+
 * 2.8.41 (2018-05-25)
 
  * bug #27359 [HttpFoundation] Fix perf issue during MimeTypeGuesser intialization (nicolas-grekas)

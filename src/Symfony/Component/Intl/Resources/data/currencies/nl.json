@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -271,7 +271,7 @@
         ],
         "CNY": [
             "CN¥",
-            "Chinese Yuan"
+            "Chinese yuan"
         ],
         "COP": [
             "COP",

@@ -18,9 +18,7 @@
     "require": {
         "php": "^7.1.3",
         "ext-xml": "*",
-        "doctrine/collections": "~1.0",
-        "doctrine/event-manager": "~1.0",
-        "doctrine/persistence": "~1.0",
+        "doctrine/common": "~2.4@stable",
         "fig/link-util": "^1.0",
         "twig/twig": "^1.35|^2.4.4",
         "psr/cache": "~1.0",
@@ -93,7 +91,6 @@
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",
-        "doctrine/reflection": "~1.0",
         "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",

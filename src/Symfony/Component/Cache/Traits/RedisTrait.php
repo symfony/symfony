@@ -35,7 +35,9 @@ trait RedisTrait
         'read_timeout' => 0,
         'retry_interval' => 0,
         'lazy' => false,
+        'serializer' => 0,
     );
+
     private $redis;
 
     /**
@@ -65,6 +67,7 @@ trait RedisTrait
      *   - redis://secret@example.com/13
      *   - redis:///var/run/redis.sock
      *   - redis://secret@/var/run/redis.sock/13
+     *   - redis://localhost?serializer=igbinary
      *
      * @param string $dsn
      * @param array  $options See self::$defaultConnectionOptions
@@ -116,6 +119,13 @@ trait RedisTrait
         $class = null === $params['class'] ? (extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
 
         if (is_a($class, \Redis::class, true)) {
+            if (isset($params['serializer']) && array_key_exists($params['serializer'], $serializers = [
+                    'none' => \Redis::SERIALIZER_NONE,
+                    'php' => \Redis::SERIALIZER_PHP,
+                    'igbinary' => \Redis::SERIALIZER_IGBINARY,
+                ])) {
+                $params['serializer'] = $serializers[$params['serializer']];
+            }
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
             $redis = new $class();
 
@@ -137,6 +147,7 @@ trait RedisTrait
                 if ((null !== $auth && !$redis->auth($auth))
                     || ($params['dbindex'] && !$redis->select($params['dbindex']))
                     || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
+                    || ($params['serializer'] && !$redis->setOption(\Redis::OPT_SERIALIZER, $params['serializer']))
                 ) {
                     $e = preg_replace('/^ERR /', '', $redis->getLastError());
                     throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));

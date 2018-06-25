@@ -39,6 +39,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         $this->assertInstanceOf(\Redis::class, $redis);
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
+        $this->assertEquals(0, $redis->getOption(\Redis::OPT_SERIALIZER));
 
         $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/2');
         $this->assertSame(2, $redis->getDbNum());
@@ -51,6 +52,9 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
         $redis = RedisAdapter::createConnection('redis://'.$redisHost, array('read_timeout' => 5));
         $this->assertEquals(5, $redis->getReadTimeout());
+
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost, array('serializer' => 2));
+        $this->assertEquals(2, $redis->getOption(\Redis::OPT_SERIALIZER));
     }
 
     /**

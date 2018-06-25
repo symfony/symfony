@@ -25,6 +25,12 @@ Form
       {{ form_widget(field) }}
    {% endfor %}
    ```
+
+Config
+------
+
+ * Deprecated constructing a `TreeBuilder` without passing root node information.
+
 Security
 --------
 

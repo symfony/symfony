@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated constructing a `TreeBuilder` without passing root node information
+
 4.1.0
 -----
 

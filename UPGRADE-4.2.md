@@ -6,6 +6,25 @@ Cache
 
  * Deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
 
+Form
+----
+
+ * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered. 
+   Instead of expecting such calls to return empty strings, check if the field has already been rendered.
+ 
+   Before:
+   ```twig
+   {% for field in fieldsWithPotentialDuplicates %}
+      {{ form_widget(field) }}
+   {% endfor %}
+   ```
+   
+   After:
+   ```twig
+   {% for field in fieldsWithPotentialDuplicates if not field.rendered %}
+      {{ form_widget(field) }}
+   {% endfor %}
+   ```
 Security
 --------
 

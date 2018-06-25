@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+
 4.1.0
 -----
 

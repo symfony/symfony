@@ -18,7 +18,7 @@
     "require": {
         "php": "^5.5.9|>=7.0.8",
         "ext-xml": "*",
-        "doctrine/common": "~2.4",
+        "doctrine/common": "~2.4@stable",
         "fig/link-util": "^1.0",
         "twig/twig": "^1.35|^2.4.4",
         "psr/cache": "~1.0",

@@ -496,7 +496,7 @@ EOTXT
             // $b = new ServiceB();
             // $a = new ServiceA(ServiceB $b);
             // $b->setServiceA(ServiceA $a);
-            if (isset($inlinedDefinition[$definition]) && $this->hasReference($id, array($def->getArguments(), $def->getFactory()))) {
+            if (isset($inlinedDefinitions[$definition]) && $this->hasReference($id, array($def->getArguments(), $def->getFactory()))) {
                 throw new ServiceCircularReferenceException($id, array($id));
             }
 

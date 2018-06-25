@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by chapterjason at 2018-04-21T19:12:18Z
+
+Looks awesome, as I watched in the `UploadedFile` I saw the `
+getError()` and `getErrorMessage()` methods, what happens if there is just an error with one file?

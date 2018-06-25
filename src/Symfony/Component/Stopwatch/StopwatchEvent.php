@@ -15,6 +15,7 @@ namespace Symfony\Component\Stopwatch;
  * Represents an Event managed by Stopwatch.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Adamo Crespi <hello@aerendir.me>
  */
 class StopwatchEvent
 {
@@ -194,7 +195,9 @@ class StopwatchEvent
     }
 
     /**
-     * Gets the max memory usage of all periods.
+     * Of all periods, gets the max memory amount assigned to PHP.
+     *
+     * Very similar to StopwatchEvent::getMemoryPeak().
      *
      * @return int The memory usage (in bytes)
      */
@@ -208,6 +211,59 @@ class StopwatchEvent
         }
 
         return $memory;
+    }
+
+    /**
+     * Of all periods, gets the max amount of memory used by the script.
+     *
+     * Very similar to StopwatchEvent::getMemoryPeakEmalloc().
+     *
+     * @return int The memory usage (in bytes)
+     */
+    public function getMemoryCurrent()
+    {
+        $memoryCurrent = 0;
+        foreach ($this->periods as $period) {
+            if ($period->getMemoryCurrent() > $memoryCurrent) {
+                $memoryCurrent = $period->getMemoryCurrent();
+            }
+        }
+
+        return $memoryCurrent;
+    }
+
+    /**
+     * Of all periods, gets the max amount of memory assigned to PHP.
+     *
+     * @return int The memory usage (in bytes)
+     */
+    public function getMemoryPeak()
+    {
+        $memoryPeak = 0;
+        foreach ($this->periods as $period) {
+            if ($period->getMemoryPeak() > $memoryPeak) {
+                $memoryPeak = $period->getMemoryPeak();
+            }
+        }
+
+        return $memoryPeak;
+    }
+
+    /**
+     * Of all periods, gets the max amount of memory assigned to PHP and used by emalloc().
+     *
+     * @return int The memory usage (in bytes)
+     */
+    public function getMemoryPeakEmalloc()
+    {
+        $memoryPeakCurrent = 0;
+        foreach ($this->periods as $period) {
+            if ($period->getMemoryPeakEmalloc() > $memoryPeakCurrent) {
+                $memoryPeakCurrent = $period->getMemoryPeakEmalloc();
+            }
+        }
+
+        return $memoryPeakCurrent;
     }
 
     /**

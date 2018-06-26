@@ -151,19 +151,27 @@ EOF
         }
 
         $rows = array();
+        $firstNamespace = true;
+        $prevHasSeparator = false;
         foreach ($this->getLoaderPaths() as $namespace => $paths) {
-            if (count($paths) > 1) {
+            if (!$firstNamespace && !$prevHasSeparator && count($paths) > 1) {
                 $rows[] = array('', '');
             }
+            $firstNamespace = false;
             foreach ($paths as $path) {
-                $rows[] = array($namespace, '- '.$path);
+                $rows[] = array($namespace, $path.DIRECTORY_SEPARATOR);
                 $namespace = '';
             }
             if (count($paths) > 1) {
                 $rows[] = array('', '');
+                $prevHasSeparator = true;
+            } else {
+                $prevHasSeparator = false;
             }
         }
-        array_pop($rows);
+        if ($prevHasSeparator) {
+            array_pop($rows);
+        }
         $io->section('Loader Paths');
         $io->table(array('Namespace', 'Paths'), $rows);
 

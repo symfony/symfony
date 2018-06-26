@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-25T08:40:40Z
+
+It seems that the broken tests are linked to this change, could you please check why ?
+
+---------------------------------------------------------------------------
+
+by popy-dev at 2018-02-25T08:55:38Z
+
+My bad : the added properties in the Fixture made ReflectionExtractor->getProperties test fail (obviously), and i didn't notice as I didn't run tests on the whole component. Lesson learned.
+
+Strange enougth, the travis check on php 7.1 didn't fail.
+
+---------------------------------------------------------------------------
+
+by popy-dev at 2018-02-25T09:21:11Z
+
+Damn. I don't reproduce the issue on php 7.2
+What I understand from the output is that somehow, one of these 2 lines retruns an array instead of a null
+```
+    $key = 1 === \count($key) ? $key[0] : null;
+    $value = 1 === \count($value) ? $value[0] : null;
+```
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-25T11:19:27Z
+
+Its maybe because of the deps =high ill try to look when a get a computer ;)
+Le dim. 25 févr. 2018 à 10:21, Popy <notifications@github.com> a écrit :
+
+> Damn. I don't reproduce the issue on php 7.2
+> What I understand from the output is that somehow, one of these 2 lines
+> retruns an array instead of a null
+>
+>     $key = 1 === \count($key) ? $key[0] : null;
+>     $value = 1 === \count($value) ? $value[0] : null;
+>
+> —
+> You are receiving this because you commented.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/26300#issuecomment-368294959>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8jaCjByDgkLOr3yaCSr4WgrAVsU3ks5tYSYSgaJpZM4SR-Qa>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by popy-dev at 2018-02-25T12:51:42Z
+
+Indeed : the 7.2 is checked with "deps=low". I tested after loading lowest dependencies, and I reproduced.
+
+---------------------------------------------------------------------------
+
+by popy-dev at 2018-02-25T13:14:43Z
+
+There's a "fix" : I updated the "conflicts" section, forcing  ```phpdocumentor/type-resolver``` to, at least, version 0.5.0 where the Collection have been included.
+
+The issue is now that it bumps ```phpdocumentor/reflection-docblock``` version to dev-master, as each version of it depends on a fixed version (^0.4.0 for instance) of ```phpdocumentor/type-resolver```.
+
+![](http://www.reactiongifs.com/wp-content/uploads/2012/11/crying-man.gif)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T12:32:03Z
+
+@popy-dev would you mind taking care of the remaining comments please? I also invite you to squash your commit if possible. If you can't, please advise, we'll take over. Thanks.
+
+---------------------------------------------------------------------------
+
+by popy-dev at 2018-04-26T12:47:07Z
+
+Sorry, I'll fix that ASAP.
+
+---------------------------------------------------------------------------
+
+by popy-dev at 2018-05-30T16:11:37Z
+
+github warned about conflicts, so I rebased on upstream/master. That also fixed the Travis check (which was probably unrelated to the code)

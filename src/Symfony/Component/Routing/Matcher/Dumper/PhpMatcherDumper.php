@@ -746,6 +746,10 @@ EOF;
             return 'null';
         }
         if (!\is_array($value)) {
+            if (\is_object($value)) {
+                throw new \InvalidArgumentException('Symfony\Component\Routing\Route cannot contain objects.');
+            }
+
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {

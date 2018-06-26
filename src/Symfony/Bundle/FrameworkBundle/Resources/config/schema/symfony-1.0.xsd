@@ -190,6 +190,7 @@
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="static-method" type="xsd:string" />
             <xsd:element name="mapping" type="file_mapping" />
+            <xsd:element name="auto-mapping" type="auto_mapping" />
         </xsd:choice>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
@@ -205,6 +206,13 @@
         <xsd:sequence>
             <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="auto_mapping">
+        <xsd:sequence>
+            <xsd:element name="service" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="namespace" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:simpleType name="email-validation-mode">

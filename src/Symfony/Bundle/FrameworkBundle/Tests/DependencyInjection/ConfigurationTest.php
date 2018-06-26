@@ -232,6 +232,7 @@ class ConfigurationTest extends TestCase
                 'mapping' => [
                     'paths' => [],
                 ],
+                'auto_mapping' => [],
             ],
             'annotations' => [
                 'cache' => 'php_array',

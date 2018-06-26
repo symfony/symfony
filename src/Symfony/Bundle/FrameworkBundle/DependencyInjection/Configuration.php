@@ -792,6 +792,45 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->arrayNode('auto_mapping')
+                            ->useAttributeAsKey('namespace')
+                            ->normalizeKeys(false)
+                            ->beforeNormalization()
+                                ->ifArray()
+                                ->then(function (array $values): array {
+                                    foreach ($values as $k => $v) {
+                                        if (isset($v['service'])) {
+                                            continue;
+                                        }
+
+                                        if (isset($v['namespace'])) {
+                                            $values[$k]['services'] = [];
+                                            continue;
+                                        }
+
+                                        if (!\is_array($v)) {
+                                            $values[$v]['services'] = [];
+                                            unset($values[$k]);
+                                            continue;
+                                        }
+
+                                        $tmp = $v;
+                                        unset($values[$k]);
+                                        $values[$k]['services'] = $tmp;
+                                    }
+
+                                    return $values;
+                                })
+                            ->end()
+                            ->arrayPrototype()
+                                ->fixXmlConfig('service')
+                                ->children()
+                                    ->arrayNode('services')
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

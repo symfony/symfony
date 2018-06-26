@@ -107,6 +107,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
@@ -280,7 +281,8 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_debug');
         }
 
-        $this->registerValidationConfiguration($config['validation'], $container, $loader);
+        $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
+        $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
@@ -301,7 +303,7 @@ class FrameworkExtension extends Extension
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['property_info'])) {
+        if ($propertyInfoEnabled) {
             $this->registerPropertyInfoConfiguration($container, $loader);
         }
 
@@ -1152,7 +1154,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, bool $propertyInfoEnabled)
     {
         if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
             return;
@@ -1202,6 +1204,11 @@ class FrameworkExtension extends Extension
 
         if (!$container->getParameter('kernel.debug')) {
             $validatorBuilder->addMethodCall('setMetadataCache', [new Reference('validator.mapping.cache.symfony')]);
+        }
+
+        $container->setParameter('validator.auto_mapping', $config['auto_mapping']);
+        if (!$propertyInfoEnabled || !$config['auto_mapping'] || !class_exists(PropertyInfoLoader::class)) {
+            $container->removeDefinition('validator.property_info_loader');
         }
     }
 

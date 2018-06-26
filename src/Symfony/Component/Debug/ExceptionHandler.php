@@ -208,48 +208,54 @@ class ExceptionHandler
                 $title = 'Whoops, looks like something went wrong.';
         }
 
-        $content = '';
-        if ($this->debug) {
-            try {
-                $count = count($exception->getAllPrevious());
-                $total = $count + 1;
-                foreach ($exception->toArray() as $position => $e) {
-                    $ind = $count - $position + 1;
-                    $class = $this->formatClass($e['class']);
-                    $message = nl2br($this->escapeHtml($e['message']));
-                    $content .= sprintf(<<<'EOF'
-                        <div class="trace trace-as-html">
-                            <table class="trace-details">
-                                <thead class="trace-head"><tr><th>
-                                    <h3 class="trace-class">
-                                        <span class="text-muted">(%d/%d)</span>
-                                        <span class="exception_title">%s</span>
-                                    </h3>
-                                    <p class="break-long-words trace-message">%s</p>
-                                </th></tr></thead>
-                                <tbody>
-EOF
-                        , $ind, $total, $class, $message);
-                    foreach ($e['trace'] as $trace) {
-                        $content .= '<tr><td>';
-                        if ($trace['function']) {
-                            $content .= sprintf('at <span class="trace-class">%s</span><span class="trace-type">%s</span><span class="trace-method">%s</span>(<span class="trace-arguments">%s</span>)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
-                        }
-                        if (isset($trace['file']) && isset($trace['line'])) {
-                            $content .= $this->formatPath($trace['file'], $trace['line']);
-                        }
-                        $content .= "</td></tr>\n";
-                    }
+        if (!$this->debug) {
+            return <<<EOF
+                <div class="container">
+                    <h1>$title</h1>
+                </div>
+EOF;
+        }
 
-                    $content .= "</tbody>\n</table>\n</div>\n";
+        $content = '';
+        try {
+            $count = count($exception->getAllPrevious());
+            $total = $count + 1;
+            foreach ($exception->toArray() as $position => $e) {
+                $ind = $count - $position + 1;
+                $class = $this->formatClass($e['class']);
+                $message = nl2br($this->escapeHtml($e['message']));
+                $content .= sprintf(<<<'EOF'
+                    <div class="trace trace-as-html">
+                        <table class="trace-details">
+                            <thead class="trace-head"><tr><th>
+                                <h3 class="trace-class">
+                                    <span class="text-muted">(%d/%d)</span>
+                                    <span class="exception_title">%s</span>
+                                </h3>
+                                <p class="break-long-words trace-message">%s</p>
+                            </th></tr></thead>
+                            <tbody>
+EOF
+                    , $ind, $total, $class, $message);
+                foreach ($e['trace'] as $trace) {
+                    $content .= '<tr><td>';
+                    if ($trace['function']) {
+                        $content .= sprintf('at <span class="trace-class">%s</span><span class="trace-type">%s</span><span class="trace-method">%s</span>(<span class="trace-arguments">%s</span>)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
+                    }
+                    if (isset($trace['file']) && isset($trace['line'])) {
+                        $content .= $this->formatPath($trace['file'], $trace['line']);
+                    }
+                    $content .= "</td></tr>\n";
                 }
-            } catch (\Exception $e) {
-                // something nasty happened and we cannot throw an exception anymore
-                if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $this->escapeHtml($e->getMessage()));
-                } else {
-                    $title = 'Whoops, looks like something went wrong.';
-                }
+
+                $content .= "</tbody>\n</table>\n</div>\n";
+            }
+        } catch (\Exception $e) {
+            // something nasty happened and we cannot throw an exception anymore
+            if ($this->debug) {
+                $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $this->escapeHtml($e->getMessage()));
+            } else {
+                $title = 'Whoops, looks like something went wrong.';
             }
         }
 
@@ -278,6 +284,14 @@ EOF;
      */
     public function getStylesheet(FlattenException $exception)
     {
+        if (!$this->debug) {
+            return <<<'EOF'
+                body { background-color: #fff; color: #222; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; }
+                .container { margin: 30px; max-width: 600px; }
+                h1 { color: #dc3545; font-size: 24px; }
+EOF;
+        }
+
         return <<<'EOF'
             body { background-color: #F9F9F9; color: #222; font: 14px/1.4 Helvetica, Arial, sans-serif; margin: 0; padding-bottom: 45px; }
 

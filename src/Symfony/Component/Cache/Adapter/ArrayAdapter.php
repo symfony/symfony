@@ -17,7 +17,6 @@ use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
-use Symfony\Component\Cache\Traits\GetTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -25,7 +24,6 @@ use Symfony\Component\Cache\Traits\GetTrait;
 class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use ArrayTrait;
-    use GetTrait;
 
     private $createCacheItem;
 
@@ -49,6 +47,21 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             null,
             CacheItem::class
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback, float $beta = null)
+    {
+        $item = $this->getItem($key);
+
+        // ArrayAdapter works in memory, we don't care about stampede protection
+        if (INF === $beta || !$item->isHit()) {
+            $this->save($item->set($callback($item)));
+        }
+
+        return $item->get();
     }
 
     /**

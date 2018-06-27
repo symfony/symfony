@@ -407,7 +407,7 @@ class Process implements \IteratorAggregate
         if (null !== $callback) {
             if (!$this->processPipes->haveReadSupport()) {
                 $this->stop(0);
-                throw new \LogicException('Pass the callback to the Process::start method or enableOutput to use a callback with Process::wait');
+                throw new \LogicException('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::wait"');
             }
             $this->callback = $this->buildCallback($callback);
         }
@@ -427,6 +427,45 @@ class Process implements \IteratorAggregate
         }
 
         return $this->exitcode;
+    }
+
+    /**
+     * Waits until the callback returns true.
+     *
+     * The callback receives the type of output (out or err) and some bytes
+     * from the output in real-time while writing the standard input to the process.
+     * It allows to have feedback from the independent process during execution.
+     *
+     * @param callable $callback
+     *
+     * @throws RuntimeException When process timed out
+     * @throws LogicException   When process is not yet started
+     */
+    public function waitUntil(callable $callback)
+    {
+        $this->requireProcessIsStarted(__FUNCTION__);
+        $this->updateStatus(false);
+
+        if (!$this->processPipes->haveReadSupport()) {
+            $this->stop(0);
+            throw new \LogicException('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::waitUntil".');
+        }
+        $callback = $this->buildCallback($callback);
+
+        $wait = true;
+        do {
+            $this->checkTimeout();
+            $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
+            $output = $this->processPipes->readAndWrite($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+
+            foreach ($output as $type => $data) {
+                if (3 !== $type) {
+                    $wait = !$callback(self::STDOUT === $type ? self::OUT : self::ERR, $data);
+                } elseif (!isset($this->fallbackStatus['signaled'])) {
+                    $this->fallbackStatus['exitcode'] = (int) $data;
+                }
+            }
+        } while ($wait);
     }
 
     /**
@@ -1264,7 +1303,7 @@ class Process implements \IteratorAggregate
         if ($this->outputDisabled) {
             return function ($type, $data) use ($callback) {
                 if (null !== $callback) {
-                    \call_user_func($callback, $type, $data);
+                    return \call_user_func($callback, $type, $data);
                 }
             };
         }
@@ -1279,7 +1318,7 @@ class Process implements \IteratorAggregate
             }
 
             if (null !== $callback) {
-                \call_user_func($callback, $type, $data);
+                return \call_user_func($callback, $type, $data);
             }
         };
     }

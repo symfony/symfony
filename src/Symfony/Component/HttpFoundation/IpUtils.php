@@ -78,7 +78,8 @@ class IpUtils
             if ('0' === $netmask) {
                 return self::$checkedIps[$cacheKey] = filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
             }
-
+            
+            $netmask = (int) $netmask;
             if ($netmask < 0 || $netmask > 32) {
                 return self::$checkedIps[$cacheKey] = false;
             }

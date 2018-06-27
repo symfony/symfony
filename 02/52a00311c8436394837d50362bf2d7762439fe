@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by ScullWM at 2018-06-05T07:10:56Z
+
+Great for newcomers!
+Just guessing, expect giving bad habbit to newcomers, why don't Symfony create a Response with this given string ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-05T07:14:29Z
+
+@ScullWM allowing to return strings was discussed in the past (specially because "some frameworks" allow to do that). But it was decided to keep requiring `Response` objects. At first it might be like a bad decision, but it helps newcomers realize that Symfony apps are always about HTTP Request/Response workflow. No matter if it's a silly "Hello World" app or the most complex app ever created. It's always the same: you are given a Request object and you must return a Response object.
+
+That's why I think we should keep the current behaviour: if people learn about Request/Response soon, they will understand Symfony easier.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-06-05T07:24:27Z
+
+@javiereguiluz Is your master branch a bit outdated ? Because I made a patch recently that display a "better" trace that highlight the controller. And I can not see it on your screenshot.
+
+Anyway, :+1: with this PR.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-05T07:32:49Z
+
+@lyrixx the code change and the screenshot were done in a Symfony 4.1 app and then I copied the code to the master branch 🙈
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-06-05T08:02:47Z
+
+You can always create your own listener that transforms the string into a response. The SensioFrameworkExtraBundle does this for arrays with the `@Template` annotation.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-26T14:52:37Z
+
+I've updated this feature to trim long strings.
+
+Before:
+
+![before](https://user-images.githubusercontent.com/73419/41920523-35a5237e-7961-11e8-823a-174d326919ea.png)
+
+After:
+
+![after](https://user-images.githubusercontent.com/73419/41920529-38534100-7961-11e8-85c5-90dff62451d1.png)
+
+-----
+
+About this other comment from Fabien (https://github.com/symfony/symfony/pull/27499#discussion_r196375525) I'm not sure how to solve it. Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-27T06:45:26Z
+
+Thanks to Twig's automatic escaping, I think we're good here. I've tested with some of the examples given by OWASP to prevent XSS (https://www.owasp.org/index.php/Testing_for_Reflected_Cross_site_scripting_(OTG-INPVAL-001)) and it looks like it's working:
+
+![xss-error-page](https://user-images.githubusercontent.com/73419/41957154-4d71d9c2-79e6-11e8-89f3-7f60f238b081.png)
+
+Can anyone spot other "attack vectors" in this code? Thanks"

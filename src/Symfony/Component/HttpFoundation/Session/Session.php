@@ -160,7 +160,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function isEmpty()
     {
-        ++$this->usageIndex;
+        if ($this->isStarted()) {
+            ++$this->usageIndex;
+        }
         foreach ($this->data as &$data) {
             if (!empty($data)) {
                 return false;
@@ -185,8 +187,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function migrate($destroy = false, $lifetime = null)
     {
-        ++$this->usageIndex;
-
         return $this->storage->regenerate($destroy, $lifetime);
     }
 
@@ -195,8 +195,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function save()
     {
-        ++$this->usageIndex;
-
         $this->storage->save();
     }
 

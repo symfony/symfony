@@ -379,7 +379,7 @@ EOF;
                         $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')\.';
                         $state->hostVars = $state->vars;
                     } else {
-                        $hostRegex = '(?:(?:[^.]*+\.)++)';
+                        $hostRegex = '(?:(?:[^./]*+\.)++)';
                         $state->hostVars = array();
                     }
                     $state->mark += strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");

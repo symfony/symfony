@@ -670,6 +670,16 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('c', $matcher->match('/admin/api/package.json')['_route']);
     }
 
+    public function testHostWithDot()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo', array(), array(), array(), 'foo.example.com'));
+        $coll->add('b', new Route('/bar/{baz}'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

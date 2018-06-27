@@ -28,6 +28,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     const KEY_SEPARATOR_KEY = 'csv_key_separator';
     const HEADERS_KEY = 'csv_headers';
     const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
+    const AS_COLLECTION_KEY = 'as_collection';
 
     private $delimiter;
     private $enclosure;
@@ -157,7 +158,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         fclose($handle);
 
-        if ($context['as_collection'] ?? false) {
+        if ($context[self::AS_COLLECTION_KEY] ?? false) {
             return $result;
         }
 

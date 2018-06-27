@@ -411,8 +411,6 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         if ($this->saveHandler instanceof SessionHandlerProxy) {
-            session_set_save_handler($this->saveHandler->getHandler(), false);
-        } elseif ($this->saveHandler instanceof \SessionHandlerInterface) {
             session_set_save_handler($this->saveHandler, false);
         }
     }

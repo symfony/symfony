@@ -149,7 +149,7 @@ before_install:
 
           tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
           tfold ext.libsodium tpecl libsodium sodium.so $INI
-          tfold ext.mongodb tpecl mongodb-1.4.0RC1 mongodb.so $INI
+          tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
           tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
       fi
 

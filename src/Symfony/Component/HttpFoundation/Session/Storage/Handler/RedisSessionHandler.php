@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Predis\Response\ErrorInterface;
+use Symfony\Component\Cache\Traits\RedisProxy;
 
 /**
  * Redis based session storage handler based on the Redis class

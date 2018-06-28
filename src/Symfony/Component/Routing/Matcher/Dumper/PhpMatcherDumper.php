@@ -379,7 +379,7 @@ EOF;
                         $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')\.';
                         $state->hostVars = $state->vars;
                     } else {
-                        $hostRegex = '(?:(?:[^.]*+\.)++)';
+                        $hostRegex = '(?:(?:[^./]*+\.)++)';
                         $state->hostVars = array();
                     }
                     $state->mark += strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");
@@ -746,6 +746,10 @@ EOF;
             return 'null';
         }
         if (!\is_array($value)) {
+            if (\is_object($value)) {
+                throw new \InvalidArgumentException('Symfony\Component\Routing\Route cannot contain objects.');
+            }
+
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {

@@ -2,6 +2,10 @@ session_welcome:
     path:     /session
     defaults: { _controller: TestBundle:Session:welcome }
 
+session_cacheable:
+    path:     /cacheable
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::cacheableAction }
+
 session_welcome_name:
     path:     /session/{name}
     defaults: { _controller: TestBundle:Session:welcome }

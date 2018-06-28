@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-27T11:50:47Z
+
+Thanks @dmaicher, I pushed the fix here also.
+
+PR ready. The session tracker was too eager.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-06-27T15:09:31Z
+
+Unfortunately the tests added in this PR are still failing...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-27T15:25:33Z
+
+Don't be sad, that happens all the time.
+Yet in this specific case, the failure is a false-positive that will be fixed by a merge up to master.

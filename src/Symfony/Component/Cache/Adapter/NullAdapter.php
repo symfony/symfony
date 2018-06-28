@@ -14,15 +14,12 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Cache\Traits\GetTrait;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
 class NullAdapter implements AdapterInterface, CacheInterface
 {
-    use GetTrait;
-
     private $createCacheItem;
 
     public function __construct()
@@ -38,6 +35,14 @@ class NullAdapter implements AdapterInterface, CacheInterface
             $this,
             CacheItem::class
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback, float $beta = null)
+    {
+        return $callback(($this->createCacheItem)());
     }
 
     /**

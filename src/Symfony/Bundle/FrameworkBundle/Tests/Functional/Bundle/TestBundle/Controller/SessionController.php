@@ -43,6 +43,14 @@ class SessionController implements ContainerAwareInterface
         return new Response(sprintf('Welcome back %s, nice to meet you.', $name));
     }
 
+    public function cacheableAction()
+    {
+        $response = new Response('all good');
+        $response->setSharedMaxAge(100);
+
+        return $response;
+    }
+
     public function logoutAction(Request $request)
     {
         $request->getSession()->invalidate();

@@ -52,3 +52,9 @@ SecurityBundle
    `security.authentication.trust_resolver.rememberme_class` parameters to define
    the token classes is deprecated. To use
    custom tokens extend the existing AnonymousToken and RememberMeToken.
+
+DoctrineBridge
+--------------
+
+ * The `lazy` attribute on `doctrine.event_listener` tags was removed. 
+   Listeners are now lazy by default. So any `lazy` attributes can safely be removed from those tags.

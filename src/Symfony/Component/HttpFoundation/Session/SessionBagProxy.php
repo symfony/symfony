@@ -44,6 +44,9 @@ final class SessionBagProxy implements SessionBagInterface
      */
     public function isEmpty()
     {
+        if (!isset($this->data[$this->bag->getStorageKey()])) {
+            return true;
+        }
         ++$this->usageIndex;
 
         return empty($this->data[$this->bag->getStorageKey()]);
@@ -81,8 +84,6 @@ final class SessionBagProxy implements SessionBagInterface
      */
     public function clear()
     {
-        ++$this->usageIndex;
-
         return $this->bag->clear();
     }
 }

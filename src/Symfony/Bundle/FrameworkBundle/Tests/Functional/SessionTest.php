@@ -126,6 +126,22 @@ class SessionTest extends WebTestCase
         $this->assertContains('Welcome back client2, nice to meet you.', $crawler2->text());
     }
 
+    /**
+     * @dataProvider getConfigs
+     */
+    public function testCorrectCacheControlHeadersForCacheableAction($config, $insulate)
+    {
+        $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        $client->request('GET', '/cacheable');
+
+        $response = $client->getResponse();
+        $this->assertSame('public, s-maxage=100', $response->headers->get('cache-control'));
+    }
+
     public function getConfigs()
     {
         return array(

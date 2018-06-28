@@ -128,7 +128,7 @@
 
             var nbOfAjaxRequest = tbody.rows.length;
             if (nbOfAjaxRequest >= 100) {
-                tbody.deleteRow(nbOfAjaxRequest - 1);
+                tbody.deleteRow(0);
             }
 
             var request = requestStack[index];
@@ -177,7 +177,10 @@
             }, 100);
 
             row.className = 'sf-ajax-request sf-ajax-request-loading';
-            tbody.insertBefore(row, tbody.firstChild);
+            tbody.insertBefore(row, null);
+
+            var toolbarInfo = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+            toolbarInfo.scrollTop = toolbarInfo.scrollHeight;
 
             renderAjaxRequests();
         };
@@ -492,6 +495,10 @@
                             setPreference('toolbar/displayState', 'block');
                         });
                         renderAjaxRequests();
+                        addEventListener(document.querySelector('.sf-toolbar-block-ajax'), 'mouseenter', function (event) {
+                            var elem = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+                            elem.scrollTop = elem.scrollHeight;
+                        });
                         addEventListener(document.querySelector('.sf-toolbar-block-ajax > .sf-toolbar-icon'), 'click', function (event) {
                             event.preventDefault();
 

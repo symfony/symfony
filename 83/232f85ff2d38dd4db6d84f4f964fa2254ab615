@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-25T13:01:07Z
+
+I really think there is no downside - this pattern is followed in many other places in Symfony. The lazy flag was added SO long ago, I think it was basically an old work around before we had the proper service locator solution.
+
+I’d say, move forward with the deprecation and upgrade log stuff. Then we’ll probably need Nicolas to double check the implementation (it makes sense to me - but this is his area).
+
+And thanks for making a PR - what an awesome surprise!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-25T23:16:57Z
+
+deprecation notice for the `lazy` attribute sounds good to me.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-06-26T06:21:18Z
+
+@weaverryan @chalasr but technically I removed the usage of the flag already :smile: So is a deprecation still correct? It should say something like `The "lazy" attribute was removed in Symfony 4.2. Listeners are now always lazy by default.`?
+
+Or should we keep using the flag and remove it completely in 5.0? Although I think it does not have any BC breaks. Unless someone is weirdly relying on the fact that a service is eagerly instantiated :yum:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-26T09:07:06Z
+
+I think going always lazy now is fine, the deprecation notice would only allow people to remove a dead tag attribute, and stop being triggered in 5.0. Not sure we had a similar case in the past so having an additional opinion would be good
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T17:22:58Z
+
+By not triggering any depreciation for the unused "lazy" attribute, we're making it easier for e.g. bundles to support several major versions, isn't it? So should stay as is then IMHO.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-06-26T17:24:16Z
+
+@nicolas-grekas haha ok. I just added the deprecation :smile: But I can remove it again if needed. No problem.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-26T19:56:35Z
+
+So, would we keep that lazy flag (after it does nothing) forever? You’re right about compat, but keeping it forever seems odd.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T20:03:19Z
+
+We should just ignore it.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-06-27T19:19:09Z
+
+Documentation PR added, deprecation notice removed, tested with a real Symfony app.
+
+Ready for a last round of reviews :blush:

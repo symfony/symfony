@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\VarDumper\Cloner\Stub;
+
 /**
  * Represents a PHP class identifier.
  *
@@ -58,6 +60,20 @@ class ClassStub extends ConstStub
                     $r = new \ReflectionClass($r[0]);
                 }
             }
+
+            if (null !== $callable && $r instanceof \ReflectionFunctionAbstract) {
+                $s = ReflectionCaster::castFunctionAbstract($r, array(), new Stub(), true);
+                $s = ReflectionCaster::getSignature($s);
+
+                if ('()' === substr($identifier, -2)) {
+                    $this->value = substr_replace($identifier, $s, -2);
+                } else {
+                    $this->value .= $s;
+                }
+                if (isset($this->attr['ellipsis'])) {
+                    $this->attr['ellipsis'] += \strlen($this->value) - \strlen($identifier);
+                }
+            }
         } catch (\ReflectionException $e) {
             return;
         }
@@ -75,9 +91,9 @@ class ClassStub extends ConstStub
         }
 
         if (!is_array($callable)) {
-            $callable = new static($callable);
+            $callable = new static($callable, $callable);
         } elseif (is_string($callable[0])) {
-            $callable[0] = new static($callable[0]);
+            $callable[0] = new static($callable[0], $callable);
         } else {
             $callable[1] = new static($callable[1], $callable);
         }

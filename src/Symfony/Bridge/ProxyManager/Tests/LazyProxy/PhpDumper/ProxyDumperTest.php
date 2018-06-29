@@ -13,6 +13,7 @@ namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -101,7 +102,7 @@ class ProxyDumperTest extends TestCase
             array(
                 (new Definition(__CLASS__))
                     ->setPublic(false),
-                'privates',
+                \method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates',
             ),
             array(
                 (new Definition(__CLASS__))

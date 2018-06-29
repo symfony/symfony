@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `ServiceSubscriberTrait`
  * added `ServiceLocatorArgument` for creating optimized service-locators
+ * added `CheckTypeHintsPass` to check injected parameters type during compilation
 
 4.1.0
 -----

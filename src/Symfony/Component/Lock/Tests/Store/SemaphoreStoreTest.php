@@ -46,7 +46,7 @@ class SemaphoreStoreTest extends AbstractStoreTest
 
     private function getOpenedSemaphores()
     {
-        $lines = explode(PHP_EOL, trim(`ipcs -su`));
+        $lines = explode(PHP_EOL, trim(`LC_ALL=C ipcs -su`));
         if ('------ Semaphore Status --------' !== $lines[0]) {
             throw new \Exception('Failed to extract list of opend semaphores. Expect a Semaphore status, got '.implode(PHP_EOL, $lines));
         }

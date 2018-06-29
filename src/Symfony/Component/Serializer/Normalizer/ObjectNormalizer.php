@@ -16,6 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -130,5 +131,25 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         } catch (NoSuchPropertyException $exception) {
             // Properties not found are ignored
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    {
+        if (false === $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString)) {
+            return false;
+        }
+
+        if (null !== $this->classDiscriminatorResolver && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForMappedObject($classOrObject)) {
+            $allowedAttributes[] = $attributesAsString ? $discriminatorMapping->getTypeProperty() : new AttributeMetadata($discriminatorMapping->getTypeProperty());
+
+            foreach ($discriminatorMapping->getTypesMapping() as $class) {
+                $allowedAttributes = array_merge($allowedAttributes, parent::getAllowedAttributes($class, $context, $attributesAsString));
+            }
+        }
+
+        return $allowedAttributes;
     }
 }

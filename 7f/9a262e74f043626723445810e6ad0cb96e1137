@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-28T09:52:26Z
+
+should be fixed by an OSX user : )
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-29T15:44:00Z
+
+On OS X, `ipcs -s` output looks like:
+
+```sh
+IPC status from <running system> as of Fri Jun 29 17:43:01 CEST 2018
+T     ID     KEY        MODE       OWNER    GROUP
+Semaphores:
+```
+
+followed by a list of active semaphores.
+
+So a patch for OS X could be:
+
+```diff
+diff --git a/src/Symfony/Component/Lock/Tests/Store/SemaphoreStoreTest.php b/src/Symfony/Component/Lock/Tests/Store/SemaphoreStoreTest.php
+index 7057505..fb42e5a 100644
+--- a/src/Symfony/Component/Lock/Tests/Store/SemaphoreStoreTest.php
++++ b/src/Symfony/Component/Lock/Tests/Store/SemaphoreStoreTest.php
+@@ -50,6 +50,14 @@ class SemaphoreStoreTest extends AbstractStoreTest
+
+     private function getOpenedSemaphores()
+     {
++        if ('Darwin' === PHP_OS) {
++            $lines = explode(PHP_EOL, trim(`ipcs -s`));
++            if (-1 === $start = array_search('Semaphores:', $lines)) {
++                throw new \Exception('Failed to extract list of opend semaphores. Expect a Semaphore list, got '.implode(PHP_EOL, $lines));
++            }
++            return \count(\array_slice($lines, ++$start));
++        }
++
+         $lines = explode(PHP_EOL, trim(`LC_ALL=C ipcs -su`));
+         if ('------ Semaphore Status --------' !== $lines[0]) {
+             throw new \Exception('Failed to extract list of opend semaphores. Expect a Semaphore status, got '.implode(PHP_EOL, $lines));
+```

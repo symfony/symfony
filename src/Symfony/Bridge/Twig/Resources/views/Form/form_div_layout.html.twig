@@ -279,7 +279,7 @@
             {%- if translation_domain is same as(false) -%}
                 {{- label -}}
             {%- else -%}
-                {{- label|trans({}, translation_domain) -}}
+                {{- label|trans(translation_parameters, translation_domain) -}}
             {%- endif -%}
         </{{ element|default('label') }}>
     {%- endif -%}
@@ -295,7 +295,7 @@
             {%- if translation_domain is same as(false) -%}
                 {{- help -}}
             {%- else -%}
-                {{- help|trans({}, translation_domain) -}}
+                {{- help|trans(translation_parameters, translation_domain) -}}
             {%- endif -%}
         </p>
     {%- endif -%}

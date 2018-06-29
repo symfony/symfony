@@ -74,6 +74,18 @@ class FlashBagTest extends TestCase
         $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
     }
 
+    public function testAdd()
+    {
+        $tab = array('bar' => 'baz');
+        $this->bag->add('string_message', 'lorem');
+        $this->bag->add('object_message', new \stdClass());
+        $this->bag->add('array_message', $tab);
+
+        $this->assertEquals(array('lorem'), $this->bag->get('string_message'));
+        $this->assertEquals(array(new \stdClass()), $this->bag->get('object_message'));
+        $this->assertEquals(array($tab), $this->bag->get('array_message'));
+    }
+
     public function testGet()
     {
         $this->assertEquals(array(), $this->bag->get('non_existing'));

@@ -65,7 +65,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             $processor = new Processor();
 
             foreach ($extensions as $name => $extension) {
-                if (!$extension instanceof ConfigurationExtensionInterface || !$config = $container->getExtensionConfig($name)) {
+                if (!$extension instanceof ConfigurationExtensionInterface || !$config = array_filter($container->getExtensionConfig($name))) {
                     // this extension has no semantic configuration or was not called
                     continue;
                 }

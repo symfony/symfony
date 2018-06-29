@@ -687,6 +687,9 @@ class FrameworkExtension extends Extension
 
         $loader->load('routing.xml');
 
+        if ($config['utf8']) {
+            $container->getDefinition('routing.loader')->replaceArgument(2, array('utf8' => true));
+        }
         if (!interface_exists(ContainerBagInterface::class)) {
             $container->getDefinition('router.default')
                 ->replaceArgument(0, new Reference('service_container'))

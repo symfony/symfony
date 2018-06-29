@@ -452,6 +452,7 @@ class Configuration implements ConfigurationInterface
                             )
                             ->defaultTrue()
                         ->end()
+                        ->booleanNode('utf8')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

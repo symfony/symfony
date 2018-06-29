@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-25T15:37:53Z
+
+This will fix the issue reported in #27707. However, I am not sure if it is really a good idea to process all the `Configuration` classes that we can reach through extensions. It could trigger the same wrong behaviour in other packages too.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-06-25T15:48:18Z
+
+lets skip those extensions / apply array_filter here:
+
+https://github.com/symfony/symfony/blob/5fe78a33d8f225ae142887a3dde0eeb036948e0f/src/Symfony/Component/DependencyInjection/Compiler/ValidateEnvPlaceholdersPass.php#L68-L70
+
+it only validates env placeholders which are not present in empty configs anyway.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-26T07:49:34Z
+
+@ro0NL done

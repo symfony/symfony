@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-29T10:12:41Z
+
+I like this a lot! Just a minor comment: I wonder if instead of `App\Foo@proxy` we should display it as `App\Foo proxy` or `Proxy of App\Foo class` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-29T10:15:56Z
+
+There is one technical constraint: the last `\` controls what's dumped (everything after it - `Foo@proxy` in the example) vs what's displayed on hover (the full string - `Foo_9991422 - App\Foo@proxy`). I'm not sure this proposal would fit.

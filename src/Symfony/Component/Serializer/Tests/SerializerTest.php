@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -398,16 +401,33 @@ class SerializerTest extends TestCase
         $example = new DummyMessageNumberOne();
         $example->one = 1;
 
-        $jsonData = '{"message-type":"one","one":1}';
+        $jsonData = '{"type":"one","one":1,"two":null}';
 
-        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($this->metadataFactoryMockForDummyInterface());
-        $serializer = new Serializer(array(new ObjectNormalizer(null, null, null, null, $discriminatorResolver)), array('json' => new JsonEncoder()));
-
+        $serializer = $this->serializerWithClassDiscriminator();
         $deserialized = $serializer->deserialize($jsonData, DummyMessageInterface::class, 'json');
         $this->assertEquals($example, $deserialized);
 
         $serialized = $serializer->serialize($deserialized, 'json');
         $this->assertEquals($jsonData, $serialized);
+    }
+
+    public function testDeserializeAndSerializeInterfacedObjectsWithTheClassMetadataDiscriminatorResolverAndGroups()
+    {
+        $example = new DummyMessageNumberOne();
+        $example->two = 2;
+
+        $serializer = $this->serializerWithClassDiscriminator();
+        $deserialized = $serializer->deserialize('{"type":"one","one":1,"two":2}', DummyMessageInterface::class, 'json', array(
+            'groups' => array('two'),
+        ));
+
+        $this->assertEquals($example, $deserialized);
+
+        $serialized = $serializer->serialize($deserialized, 'json', array(
+            'groups' => array('two'),
+        ));
+
+        $this->assertEquals('{"two":2,"type":"one"}', $serialized);
     }
 
     /**
@@ -416,45 +436,23 @@ class SerializerTest extends TestCase
      */
     public function testExceptionWhenTypeIsNotKnownInDiscriminator()
     {
-        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($this->metadataFactoryMockForDummyInterface());
-        $serializer = new Serializer(array(new ObjectNormalizer(null, null, null, null, $discriminatorResolver)), array('json' => new JsonEncoder()));
-        $serializer->deserialize('{"message-type":"second","one":1}', DummyMessageInterface::class, 'json');
+        $this->serializerWithClassDiscriminator()->deserialize('{"type":"second","one":1}', DummyMessageInterface::class, 'json');
     }
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     * @expectedExceptionMessage Type property "message-type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"
+     * @expectedExceptionMessage Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"
      */
     public function testExceptionWhenTypeIsNotInTheBodyToDeserialiaze()
     {
-        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($this->metadataFactoryMockForDummyInterface());
-        $serializer = new Serializer(array(new ObjectNormalizer(null, null, null, null, $discriminatorResolver)), array('json' => new JsonEncoder()));
-        $serializer->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
+        $this->serializerWithClassDiscriminator()->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
     }
 
-    private function metadataFactoryMockForDummyInterface()
+    private function serializerWithClassDiscriminator()
     {
-        $factoryMock = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
-        $factoryMock->method('hasMetadataFor')->will($this->returnValueMap(array(
-            array(
-                DummyMessageInterface::class,
-                true,
-            ),
-        )));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        $factoryMock->method('getMetadataFor')->will($this->returnValueMap(array(
-            array(
-                DummyMessageInterface::class,
-                new ClassMetadata(
-                    DummyMessageInterface::class,
-                    new ClassDiscriminatorMapping('message-type', array(
-                        'one' => DummyMessageNumberOne::class,
-                    ))
-                ),
-            ),
-        )));
-
-        return $factoryMock;
+        return new Serializer(array(new ObjectNormalizer($classMetadataFactory, null, null, null, new ClassDiscriminatorFromClassMetadata($classMetadataFactory))), array('json' => new JsonEncoder()));
     }
 }
 

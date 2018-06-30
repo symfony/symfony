@@ -12,11 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Argument;
 
 /**
- * Represents a collection of values to lazily iterate over.
+ * Represents a closure acting as a service locator.
  *
- * @author Titouan Galopin <galopintitouan@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class IteratorArgument implements ArgumentInterface
+class ServiceLocatorArgument implements ArgumentInterface
 {
     use ReferenceSetArgumentTrait;
 }

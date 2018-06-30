@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -32,7 +32,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
 
         foreach ($definitions as $id => $definition) {
             if ($id && '.' !== $id[0] && (!$definition->isPublic() || $definition->isPrivate()) && !$definition->getErrors() && !$definition->isAbstract()) {
-                $privateServices[$id] = new ServiceClosureArgument(new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE));
+                $privateServices[$id] = new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE);
             }
         }
 
@@ -44,13 +44,15 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
                     $alias = $aliases[$target];
                 }
                 if (isset($definitions[$target]) && !$definitions[$target]->getErrors() && !$definitions[$target]->isAbstract()) {
-                    $privateServices[$id] = new ServiceClosureArgument(new Reference($target, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE));
+                    $privateServices[$id] = new Reference($target, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE);
                 }
             }
         }
 
         if ($privateServices) {
-            $definitions['test.private_services_locator']->replaceArgument(0, $privateServices);
+            $id = (string) ServiceLocatorTagPass::register($container, $privateServices);
+            $container->setDefinition('test.private_services_locator', $container->getDefinition($id))->setPublic(true);
+            $container->removeDefinition($id);
         }
     }
 }

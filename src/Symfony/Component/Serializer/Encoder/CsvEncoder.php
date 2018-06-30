@@ -166,6 +166,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             return $result;
         }
 
+        if (!isset($context['as_collection'])) {
+            @trigger_error('Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.', E_USER_DEPRECATED);
+        }
+
         // If there is only one data line in the document, return it (the line), the result is not considered as a collection
         return $result[0];
     }

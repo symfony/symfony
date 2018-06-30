@@ -53,6 +53,12 @@ SecurityBundle
    the token classes is deprecated. To use
    custom tokens extend the existing AnonymousToken and RememberMeToken.
 
+Serializer
+----------
+
+ * Relying on the default value (false) of the "as_collection" option is deprecated since 4.2.
+   You should set it to false explicitly instead as true will be the default value in 5.0.
+
 DoctrineBridge
 --------------
 

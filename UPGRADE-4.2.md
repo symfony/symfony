@@ -6,10 +6,21 @@ Cache
 
  * Deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
 
+Config
+------
+
+ * Deprecated constructing a `TreeBuilder` without passing root node information.
+
+DoctrineBridge
+--------------
+
+ * The `lazy` attribute on `doctrine.event_listener` tags was removed.
+   Listeners are now lazy by default. So any `lazy` attributes can safely be removed from those tags.
+
 Form
 ----
 
- * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered. 
+ * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered.
    Instead of expecting such calls to return empty strings, check if the field has already been rendered.
  
    Before:
@@ -25,11 +36,6 @@ Form
       {{ form_widget(field) }}
    {% endfor %}
    ```
-
-Config
-------
-
- * Deprecated constructing a `TreeBuilder` without passing root node information.
 
 Security
 --------
@@ -58,9 +64,3 @@ Serializer
 
  * Relying on the default value (false) of the "as_collection" option is deprecated since 4.2.
    You should set it to false explicitly instead as true will be the default value in 5.0.
-
-DoctrineBridge
---------------
-
- * The `lazy` attribute on `doctrine.event_listener` tags was removed. 
-   Listeners are now lazy by default. So any `lazy` attributes can safely be removed from those tags.

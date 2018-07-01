@@ -53,6 +53,8 @@ abstract class Bundle implements BundleInterface
      *
      * This method can be overridden to register compilation passes,
      * other extensions, ...
+     *
+     * @param ContainerBuilder $container
      */
     public function build(ContainerBuilder $container)
     {

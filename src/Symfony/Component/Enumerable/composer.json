@@ -1,0 +1,33 @@
+{
+    "name": "symfony/enumerable",
+    "type": "library",
+    "description": "Use  enumerable",
+    "keywords": ["enumerable", "enum"],
+    "homepage": "https://symfony.com",
+    "license" : "MIT",
+    "authors": [
+        {
+            "name": "Rudy Onfroy",
+            "email": "rudy@onfroy.net"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Enumerable\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    }
+}

@@ -55,7 +55,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
             $previousHandler = defined('PHPUNIT_COMPOSER_INSTALL');
             $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                 if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
-                    return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
+                    return is_callable($previousHandler) ? $previousHandler($type, $message, $file, $line) : false;
                 }
 
                 if (isset($collectedLogs[$message])) {

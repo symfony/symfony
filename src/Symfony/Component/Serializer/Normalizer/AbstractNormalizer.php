@@ -227,8 +227,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         $groups = false;
-        if (isset($context[static::GROUPS]) && \is_array($context[static::GROUPS])) {
-            $groups = $context[static::GROUPS];
+        if (isset($context[static::GROUPS]) && (\is_array($context[static::GROUPS]) || is_scalar($context[static::GROUPS]))) {
+            $groups = (array) $context[static::GROUPS];
         } elseif (!isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) || $context[static::ALLOW_EXTRA_ATTRIBUTES]) {
             return false;
         }

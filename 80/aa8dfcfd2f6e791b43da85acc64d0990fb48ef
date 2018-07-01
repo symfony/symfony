@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-06-05T11:32:02Z
+
+Huge :+1: because the previous `&& \is_array($context[static::GROUPS]` is really a time killer
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-05T14:53:09Z
+
+Travis failure not related.

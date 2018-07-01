@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by kiler129 at 2018-05-19T23:12:22Z
+
+TravisCI failure seems unrelated (segfault in bash).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-20T09:11:16Z
+
+Thanks for starting this. I'm wondering two things:
+- the Ctrl chars already have a different color, which happens to be the same as the surrounding chars ("default" style). This already makes them visually different. I'm not sure they need more differentiation, especially since this adds another color to themes.
+- shouldn't the non-selectable behavior be applicable *only* to \r and to \n? They are the only chars that are duplicated in the dumps (once as visually \n and second as real char). e.g. \0 should be selectable to make copy-paste best.
+WDYT?
+
+---------------------------------------------------------------------------
+
+by kiler129 at 2018-05-21T16:40:12Z
+
+- I was thinking about leaving them in the same color, but for me this is leads to worse DX, since I select and copy something and I don't get some characters which have the same color as the surrounding `"`. Is there any major problem I am not aware of with adding another color?
+- Hm... this seems logical. I would also include `\t` as non-selectable - even thou it's not duplicated it's a white character which I wouldn't select. In the other hand aren't we making this confusing by excluding only some characters?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-21T17:31:12Z
+
+> dump("a\tb");
+
+ displays: `"a\tb"` - I'd expect the full string to be selectable.
+
+> dump("a\nb")
+
+displays:
+```
+"""
+a\n
+b
+"""
+```
+
+this time, the LF char is printed twice: once explicitly, and twice as a new line.
+Selecting this string one would expect to get either
+
+```
+a\nb
+```
+ or (best)
+```
+a
+b
+```
+but not
+```
+a\n
+b
+```
+as done right now.
+
+That's basic expectation to me, which means I think we don't need colored help. Also `\t` should be selectable to me (as illustrated above).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-04T19:57:56Z
+
+@kiler129 friendly up :)
+
+---------------------------------------------------------------------------
+
+by kiler129 at 2018-06-10T03:02:07Z
+
+@nicolas-grekas Uff... I finally found some time to give some love to this PR ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-19T13:02:18Z
+
+Status: needs work

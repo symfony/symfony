@@ -840,7 +840,7 @@ EOHTML
         $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
-            if ($ns = "\r" === $c[$i] || "\n" === $c[$i])) {
+            if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
                 $s .= ' sf-dump-ns';
             }
             $s .= '">';

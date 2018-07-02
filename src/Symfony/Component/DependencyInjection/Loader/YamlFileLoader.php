@@ -93,6 +93,7 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'bind' => 'bind',
     );
 
     private static $defaultsKeywords = array(

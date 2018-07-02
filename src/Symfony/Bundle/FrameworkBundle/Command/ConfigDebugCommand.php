@@ -84,7 +84,7 @@ EOF
 
         $this->validateConfiguration($extension, $configuration);
 
-        $configs = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($configs));
+        $configs = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($configs), true);
 
         $processor = new Processor();
         $config = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($processor->processConfiguration($configuration, $configs)));

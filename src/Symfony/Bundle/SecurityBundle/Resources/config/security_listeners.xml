@@ -132,6 +132,7 @@
             <argument /> <!-- Authenticator -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
+            <argument type="service" id="security.authentication.trust_resolver" />
         </service>
 
         <service id="security.authentication.listener.x509" class="Symfony\Component\Security\Http\Firewall\X509AuthenticationListener" abstract="true">

@@ -25,12 +25,18 @@ use Symfony\Contracts\Service\ResetInterface;
 class TokenStorage implements TokenStorageInterface, ResetInterface
 {
     private $token;
+    private $initializer;
 
     /**
      * {@inheritdoc}
      */
     public function getToken()
     {
+        if ($initializer = $this->initializer) {
+            $this->initializer = null;
+            $initializer();
+        }
+
         return $this->token;
     }
 
@@ -43,7 +49,13 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
             @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), E_USER_DEPRECATED);
         }
 
+        $this->initializer = null;
         $this->token = $token;
+    }
+
+    public function setInitializer(?callable $initializer): void
+    {
+        $this->initializer = $initializer;
     }
 
     public function reset()

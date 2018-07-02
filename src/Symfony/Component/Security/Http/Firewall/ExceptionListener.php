@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
@@ -92,6 +93,8 @@ class ExceptionListener
                 return $this->handleAuthenticationException($event, $exception);
             } elseif ($exception instanceof AccessDeniedException) {
                 return $this->handleAccessDeniedException($event, $exception);
+            } elseif ($exception instanceof LazyResponseException) {
+                return $event->setResponse($exception->getResponse());
             } elseif ($exception instanceof LogoutException) {
                 return $this->handleLogoutException($exception);
             }

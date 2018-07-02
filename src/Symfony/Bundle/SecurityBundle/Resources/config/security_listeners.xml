@@ -242,5 +242,13 @@
             <argument type="service" id="security.access_map" />
             <argument type="service" id="security.authentication.manager" />
         </service>
+
+        <service id="security.lazy_access_listener" class="Symfony\Component\Security\Http\Firewall\LazyAccessListener">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.access.decision_manager" />
+            <argument type="service" id="security.access_map" />
+            <argument type="service" id="security.authentication.manager" />
+        </service>
     </services>
 </container>

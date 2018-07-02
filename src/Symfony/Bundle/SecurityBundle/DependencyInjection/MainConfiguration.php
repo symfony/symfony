@@ -196,6 +196,7 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('entry_point')->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
+            ->booleanNode('lazy_authentication')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
             ->booleanNode('logout_on_user_change')
                 ->defaultTrue()

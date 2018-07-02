@@ -30,10 +30,10 @@ class Event extends BaseEvent
     private $workflowName;
 
     /**
-     * @param object     $subject
-     * @param Marking    $marking
-     * @param Transition $transition
-     * @param Workflow   $workflow
+     * @param object            $subject
+     * @param Marking           $marking
+     * @param Transition        $transition
+     * @param WorkflowInterface $workflow
      */
     public function __construct($subject, Marking $marking, Transition $transition, $workflow = null)
     {

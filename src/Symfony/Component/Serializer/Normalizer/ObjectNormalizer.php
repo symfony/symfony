@@ -142,14 +142,24 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        if (null !== $this->classDiscriminatorResolver && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForMappedObject($classOrObject)) {
-            $allowedAttributes[] = $attributesAsString ? $discriminatorMapping->getTypeProperty() : new AttributeMetadata($discriminatorMapping->getTypeProperty());
+        $discriminatorMapping = $this->classDiscriminatorResolver ? $this->classDiscriminatorResolver->getMappingForMappedObject($classOrObject) : null;
 
-            foreach ($discriminatorMapping->getTypesMapping() as $class) {
-                $allowedAttributes = array_merge($allowedAttributes, parent::getAllowedAttributes($class, $context, $attributesAsString));
-            }
+        if (!$discriminatorMapping) {
+            return $allowedAttributes;
         }
 
-        return $allowedAttributes;
+        $allowedAttributes[] = $attributesAsString ? $discriminatorMapping->getTypeProperty() : new AttributeMetadata($discriminatorMapping->getTypeProperty());
+
+        $reflectionClass = new \ReflectionClass($classOrObject);
+
+        if (!$reflectionClass->isAbstract() && !$reflectionClass->isInterface()) {
+            return $allowedAttributes;
+        }
+
+        foreach ($discriminatorMapping->getTypesMapping() as $class) {
+            $allowedAttributes = \array_merge($allowedAttributes, parent::getAllowedAttributes($class, $context, $attributesAsString));
+        }
+
+        return \array_unique($allowedAttributes);
     }
 }

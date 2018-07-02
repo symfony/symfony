@@ -291,6 +291,20 @@ abstract class Client
     }
 
     /**
+     * Finds link by given text and then clicks on it.
+     *
+     * @param string $value The link text
+     *
+     * @return Crawler
+     */
+    public function clickLink($value)
+    {
+        $link = $this->getCrawler()->selectLink($value)->link();
+
+        return $this->click($link);
+    }
+
+    /**
      * Submits a form.
      *
      * @param Form  $form             A Form instance
@@ -305,6 +319,23 @@ abstract class Client
         $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
 
         return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $serverParameters);
+    }
+
+    /**
+     * Finds a form by submit button text and then submits it.
+     *
+     * @param string $button The button text
+     * @param array  $values An array of form field values
+     * @param string $method The method for the form
+     *
+     * @return Crawler
+     */
+    public function submitForm($button, $values, $method)
+    {
+        $buttonNode = $this->getCrawler()->selectButton($button);
+        $form = $buttonNode->form($values, $method);
+
+        return $this->submit($form);
     }
 
     /**

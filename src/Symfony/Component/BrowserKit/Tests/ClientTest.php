@@ -322,6 +322,30 @@ class ClientTest extends TestCase
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
+    public function testClickLink()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->clickLink('foo');
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
+    }
+
+    public function testClickLinkNotFound()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><a href="/foo">foobar</a></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        try {
+            $client->clickLink('foo');
+            $this->fail('->clickLink() throws a \InvalidArgumentException if the link could not be found');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->clickLink() throws a \InvalidArgumentException if the link could not be found');
+        }
+    }
+
     public function testClickForm()
     {
         $client = new TestClient();
@@ -342,6 +366,37 @@ class ClientTest extends TestCase
         $client->submit($crawler->filter('input')->form());
 
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+    }
+
+    public function testSubmitForm()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" /><input type="password" name="password" /><input type="submit" value="Register" /></form></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->submitForm('Register', array(
+            'username' => 'username',
+            'password' => 'password',
+        ), 'POST');
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+    }
+
+    public function testSubmitFormNotFound()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        try {
+            $client->submitForm('Register', array(
+                'username' => 'username',
+                'password' => 'password',
+            ), 'POST');
+            $this->fail('->submitForm() throws a \InvalidArgumentException if the form could not be found');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
+        }
     }
 
     public function testSubmitPreserveAuth()

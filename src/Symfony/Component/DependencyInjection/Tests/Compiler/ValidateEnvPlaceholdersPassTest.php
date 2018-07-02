@@ -27,13 +27,14 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
-        $container->setParameter('env(FLOATISH)', 3.2);
+        $container->setParameter('env(FLOATISH)', '3.2');
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = [
             'scalar_node' => '%env(NULLED)%',
             'scalar_node_not_empty' => '%env(FLOATISH)%',
             'int_node' => '%env(int:FOO)%',
             'float_node' => '%env(float:BAR)%',
+            'string_node' => '%env(UNDEFINED)%',
         ]);
 
         $this->doProcess($container);
@@ -41,6 +42,26 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Invalid configuration for path "env_extension.string_node": "fail" is not a valid string
+     */
+    public function testDefaultEnvIsValidatedInConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(STRING)', 'fail');
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = [
+            'string_node' => '%env(STRING)%',
+        ]);
+
+        $this->doProcess($container);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation A non-string default value of an env() parameter is deprecated since 4.3, cast "env(FLOATISH)" to string instead.
+     */
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
         $container = new ContainerBuilder();
@@ -48,7 +69,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = [
             'float_node' => '%env(FLOATISH)%',
-            'string_node' => '%env(UNDEFINED)%',
         ]);
 
         $this->doProcess($container);
@@ -357,9 +377,9 @@ class EnvConfiguration implements ConfigurationInterface
                 ->scalarNode('string_node')
                     ->validate()
                         ->ifTrue(function ($value) {
-                            return !\is_string($value);
+                            return !\is_string($value) || 'fail' === $value;
                         })
-                        ->thenInvalid('%s is not a string')
+                        ->thenInvalid('%s is not a valid string')
                     ->end()
                 ->end()
             ->end();

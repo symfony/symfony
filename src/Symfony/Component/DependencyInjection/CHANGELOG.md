@@ -13,6 +13,7 @@ CHANGELOG
  * added `ReverseContainer`: a container that turns services back to their ids
  * added ability to define an index for a tagged collection
  * added ability to define an index for services in an injected service locator argument
+ * deprecated support for non-string default env() parameters
 
 4.2.0
 -----

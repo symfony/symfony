@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Util;
 use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Null_;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -27,12 +28,17 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      *
-     * @return Type
+     * @return Type[]
      */
     public function getTypes(DocType $varType)
     {
         $types = array();
         $nullable = false;
+
+        if ($varType instanceof Nullable) {
+            $nullable = true;
+            $varType = $varType->getActualType();
+        }
 
         if (!$varType instanceof Compound) {
             if ($varType instanceof Null_) {
@@ -54,10 +60,10 @@ final class PhpDocTypeHelper
 
         // If null is present, all types are nullable
         $nullKey = array_search(Type::BUILTIN_TYPE_NULL, $varTypes);
-        $nullable = false !== $nullKey;
+        $nullable = $nullable || false !== $nullKey;
 
         // Remove the null type from the type if other types are defined
-        if ($nullable && count($varTypes) > 1) {
+        if ($nullable && false !== $nullKey && count($varTypes) > 1) {
             unset($varTypes[$nullKey]);
         }
 

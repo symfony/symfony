@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by oxan at 2018-06-17T10:40:42Z
+
+Okay, so the tests fail because `phpdocumentor/typeresolver` only parses nullable types from v0.3.0 onwards, and we require v0.2.1+. Should I bump the dependency or make the tests conditional?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T19:20:36Z
+
+Given 0.3 supports 5.5, which is the minimum version of Symfony 3.4, I think it's fine bumping.
+
+---------------------------------------------------------------------------
+
+by oxan at 2018-07-01T21:46:14Z
+
+@nicolas-grekas I fixed the dependency (& tests are working now) :)

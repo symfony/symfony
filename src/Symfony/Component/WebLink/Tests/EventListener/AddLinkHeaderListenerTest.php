@@ -50,6 +50,36 @@ class AddLinkHeaderListenerTest extends TestCase
         $this->assertEquals($expected, $response->headers->get('Link', null, false));
     }
 
+    public function testNoLinksAreAddedOnXHR()
+    {
+        $request = new Request(array(), array(), array('_links' => new GenericLinkProvider(array(new Link('preload', '/foo')))));
+        $request->headers->add(array('X-Requested-With' => 'XMLHttpRequest'));
+        $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
+
+        $subscriber = new AddLinkHeaderListener();
+
+        $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event->method('isMasterRequest')->willReturn(true);
+        $event->method('getRequest')->willReturn($request);
+        $event->method('getResponse')->willReturn($response);
+
+        $subscriber->onKernelResponse($event);
+
+        $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
+
+        $expected = array(
+            '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"',
+        );
+
+        $this->assertContains($expected, $response->headers->all(), 'Should contain the given Link header');
+
+        $absent = array(
+            '</foo>; rel="preload"',
+        );
+
+        $this->assertNotContains($absent, $response->headers->all(), 'Should not contain the preload hint');
+    }
+
     public function testSubscribedEvents()
     {
         $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), AddLinkHeaderListener::getSubscribedEvents());

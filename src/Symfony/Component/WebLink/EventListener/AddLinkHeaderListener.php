@@ -35,7 +35,7 @@ class AddLinkHeaderListener implements EventSubscriberInterface
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMasterRequest() || $event->getRequest()->isXmlHttpRequest()) {
             return;
         }
 

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Monolog\Processor\ProcessorInterface;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -324,6 +325,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(ResettableInterface::class)
             ->addTag('kernel.reset', array('method' => 'reset'));
+        $container->registerForAutoconfiguration(ProcessorInterface::class)
+            ->addTag('monolog.processor');
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)

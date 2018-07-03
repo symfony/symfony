@@ -64,7 +64,12 @@ class Response
     const HTTP_UNPROCESSABLE_ENTITY = 422;                                        // RFC4918
     const HTTP_LOCKED = 423;                                                      // RFC4918
     const HTTP_FAILED_DEPENDENCY = 424;                                           // RFC4918
+
+    /**
+     * @deprecated
+     */
     const HTTP_RESERVED_FOR_WEBDAV_ADVANCED_COLLECTIONS_EXPIRED_PROPOSAL = 425;   // RFC2817
+    const HTTP_TOO_EARLY = 425;                                                   // RFC-ietf-httpbis-replay-04
     const HTTP_UPGRADE_REQUIRED = 426;                                            // RFC2817
     const HTTP_PRECONDITION_REQUIRED = 428;                                       // RFC6585
     const HTTP_TOO_MANY_REQUESTS = 429;                                           // RFC6585
@@ -169,7 +174,7 @@ class Response
         422 => 'Unprocessable Entity',                                        // RFC4918
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
-        425 => 'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
+        425 => 'Too Early',                                                   // RFC-ietf-httpbis-replay-04
         426 => 'Upgrade Required',                                            // RFC2817
         428 => 'Precondition Required',                                       // RFC6585
         429 => 'Too Many Requests',                                           // RFC6585

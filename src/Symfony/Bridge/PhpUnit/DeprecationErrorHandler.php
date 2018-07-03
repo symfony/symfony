@@ -310,6 +310,10 @@ class DeprecationErrorHandler
         if (!defined('STDOUT')) {
             return false;
         }
+        
+        if ('Hyper' === getenv('TERM_PROGRAM')) {
+            return true;   
+        }
 
         if (DIRECTORY_SEPARATOR === '\\') {
             return (function_exists('sapi_windows_vt100_support')

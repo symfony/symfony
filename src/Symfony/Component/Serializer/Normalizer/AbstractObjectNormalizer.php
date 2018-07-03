@@ -294,7 +294,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
     {
-        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+        if (null === $types = $this->getTypes($currentClass, $attribute)) {
             return $data;
         }
 
@@ -355,6 +355,36 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), gettype($data)));
+    }
+
+    /**
+     * @return Type[]|null
+     */
+    private function getTypes(string $currentClass, string $attribute)
+    {
+        if (null === $this->propertyTypeExtractor) {
+            return null;
+        }
+
+        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+            return $types;
+        }
+
+        if (null !== $this->classDiscriminatorResolver && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($currentClass)) {
+            if ($discriminatorMapping->getTypeProperty() === $attribute) {
+                return array(
+                    new Type(Type::BUILTIN_TYPE_STRING),
+                );
+            }
+
+            foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
+                if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute)) {
+                    return $types;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

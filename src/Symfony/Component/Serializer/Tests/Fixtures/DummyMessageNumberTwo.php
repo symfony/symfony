@@ -22,4 +22,19 @@ class DummyMessageNumberTwo implements DummyMessageInterface
      * @Groups({"two"})
      */
     public $three;
+
+    /**
+     * @var DummyMessageNumberOne
+     */
+    private $nested;
+
+    public function setNested(DummyMessageNumberOne $nested)
+    {
+        $this->nested = $nested;
+    }
+
+    public function getNested(): DummyMessageNumberOne
+    {
+        return $this->nested;
+    }
 }

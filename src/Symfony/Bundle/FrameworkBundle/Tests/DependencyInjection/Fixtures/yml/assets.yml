@@ -19,3 +19,6 @@ framework:
                 version_strategy: assets.custom_version_strategy
             json_manifest_strategy:
                 json_manifest_path: '/path/to/manifest.json'
+            strict_protocol:
+                base_urls: ["http://www.example.com", "https://www.example.net"]
+                is_strict_protocol: true

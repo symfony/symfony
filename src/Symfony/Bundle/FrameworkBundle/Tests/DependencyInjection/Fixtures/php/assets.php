@@ -27,6 +27,10 @@ $container->loadFromExtension('framework', array(
             'json_manifest_strategy' => array(
                 'json_manifest_path' => '/path/to/manifest.json',
             ),
+            'strict_protocol' => array(
+                'is_strict_protocol' => true,
+                'base_urls' => array('http://www.example.com', 'https://www.example.net'),
+            ),
         ),
     ),
 ));

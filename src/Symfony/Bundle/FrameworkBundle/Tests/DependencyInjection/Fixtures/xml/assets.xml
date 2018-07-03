@@ -22,6 +22,10 @@
                 <framework:base-url>https://bar_version_strategy.example.com</framework:base-url>
             </framework:package>
             <framework:package name="json_manifest_strategy" json-manifest-path="/path/to/manifest.json" />
+            <framework:package name="strict_protocol" is-strict-protocol="true">
+                <framework:base-url>http://www.example.com</framework:base-url>
+                <framework:base-url>https://www.example.net</framework:base-url>
+            </framework:package>
         </framework:assets>
     </framework:config>
 </container>

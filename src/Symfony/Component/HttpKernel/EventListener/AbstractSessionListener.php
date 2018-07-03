@@ -27,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {
     private $sessionUsageStack = array();
+    const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
 
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -55,10 +56,15 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
 
         if ($session instanceof Session ? $session->getUsageIndex() !== end($this->sessionUsageStack) : $session->isStarted()) {
-            $event->getResponse()
-                ->setPrivate()
-                ->setMaxAge(0)
-                ->headers->addCacheControlDirective('must-revalidate');
+            $response = $event->getResponse();
+            if (!$response->headers->has(self::NO_AUTO_CACHE_CONTROL_HEADER)) {
+                $event->getResponse()
+                    ->setPrivate()
+                    ->setMaxAge(0)
+                    ->headers->addCacheControlDirective('must-revalidate');
+            } else {
+                $response->headers->remove(self::NO_AUTO_CACHE_CONTROL_HEADER);
+            }
         }
     }
 

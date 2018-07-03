@@ -76,5 +76,6 @@ class AutowireRequiredMethodsPassTest extends TestCase
             array_column($methodCalls, 0)
         );
         $this->assertEquals(array(), $methodCalls[0][1]);
+        $this->assertEquals(array($container->get(Foo::class)), $methodCalls[1][1]);
     }
 }

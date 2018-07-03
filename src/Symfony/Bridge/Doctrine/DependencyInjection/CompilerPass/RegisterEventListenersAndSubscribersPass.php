@@ -69,7 +69,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             $connections = isset($tag['connection']) ? array($tag['connection']) : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
-                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $taggedSubscriber, implode(', ', array_keys($this->connections))));
+                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
                 }
 
                 $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', array(new Reference($id)));

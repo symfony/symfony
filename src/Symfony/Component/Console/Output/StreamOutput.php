@@ -98,7 +98,8 @@ class StreamOutput extends Output
                 && @sapi_windows_vt100_support($this->stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
+                || 'xterm' === getenv('TERM')
+                || 'Hyper' === getenv('TERM_PROGRAM');
         }
 
         if (function_exists('stream_isatty')) {

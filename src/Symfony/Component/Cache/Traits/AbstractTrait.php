@@ -122,6 +122,7 @@ trait AbstractTrait
             }
             if ($cleared = true === $cleared || array() === $cleared) {
                 $this->namespaceVersion = $namespaceVersion;
+                $this->ids = array();
             }
         }
 
@@ -196,6 +197,7 @@ trait AbstractTrait
         $wasEnabled = $this->versioningIsEnabled;
         $this->versioningIsEnabled = (bool) $enable;
         $this->namespaceVersion = '';
+        $this->ids = array();
 
         return $wasEnabled;
     }
@@ -242,6 +244,7 @@ trait AbstractTrait
     private function getId($key)
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
+            $this->ids = array();
             $this->namespaceVersion = '1:';
             try {
                 foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
@@ -262,7 +265,7 @@ trait AbstractTrait
         }
         if (\strlen($id = $this->namespace.$this->namespaceVersion.$key) > $this->maxIdLength) {
             // Use MD5 to favor speed over security, which is not an issue here
-            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), ':', -2);
+            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), ':', -(\strlen($this->namespaceVersion) + 2));
             $id = $this->namespace.$this->namespaceVersion.$id;
         }
 

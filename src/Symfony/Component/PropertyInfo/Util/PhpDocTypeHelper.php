@@ -15,6 +15,7 @@ use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Null_;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -34,6 +35,11 @@ final class PhpDocTypeHelper
     {
         $types = array();
         $nullable = false;
+
+        if ($varType instanceof Nullable) {
+            $nullable = true;
+            $varType = $varType->getActualType();
+        }
 
         if (!$varType instanceof Compound) {
             if ($varType instanceof Null_) {

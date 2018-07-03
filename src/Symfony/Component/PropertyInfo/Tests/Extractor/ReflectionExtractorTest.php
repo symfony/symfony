@@ -40,7 +40,10 @@ class ReflectionExtractorTest extends TestCase
                 'collection',
                 'B',
                 'Guid',
-                'array',
+                'g',
+                'h',
+                'i',
+                'j',
                 'emptyVar',
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
@@ -61,7 +64,6 @@ class ReflectionExtractorTest extends TestCase
                 'd',
                 'e',
                 'f',
-                'g',
             ),
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
@@ -80,7 +82,10 @@ class ReflectionExtractorTest extends TestCase
                 'collection',
                 'B',
                 'Guid',
-                'array',
+                'g',
+                'h',
+                'i',
+                'j',
                 'emptyVar',
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
@@ -111,7 +116,10 @@ class ReflectionExtractorTest extends TestCase
                 'collection',
                 'B',
                 'Guid',
-                'array',
+                'g',
+                'h',
+                'i',
+                'j',
                 'emptyVar',
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
@@ -124,24 +132,6 @@ class ReflectionExtractorTest extends TestCase
                 'files',
             ),
             $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
-        );
-    }
-
-    public function testGetPropertiesPhp71()
-    {
-        $noPrefixExtractor = new ReflectionExtractor();
-
-        $this->assertSame(
-            array(
-                'string',
-                'stringOrNull',
-                'foo',
-                'buz',
-                'bar',
-                'baz',
-                'intWithAccessor',
-            ),
-            $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy')
         );
     }
 
@@ -206,20 +196,7 @@ class ReflectionExtractorTest extends TestCase
             array('bar', array(new Type(Type::BUILTIN_TYPE_INT, true))),
             array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
             array('donotexist', null),
-            array('string', array(new Type(Type::BUILTIN_TYPE_STRING, false))),
-            array('stringOrNull', array(new Type(Type::BUILTIN_TYPE_STRING, true))),
-            array('intPrivate', array(new Type(Type::BUILTIN_TYPE_INT, false))),
-            array('intWithAccessor', array(new Type(Type::BUILTIN_TYPE_INT, false))),
         );
-    }
-
-    public function testExtractPhp71TypeWithParentConstructor()
-    {
-        $property = 'string';
-        $type = array(new Type(Type::BUILTIN_TYPE_STRING, false));
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild', $property, array()));
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild2', $property, array()));
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild3', $property, array()));
     }
 
     /**
@@ -245,11 +222,9 @@ class ReflectionExtractorTest extends TestCase
             array('d', true),
             array('e', false),
             array('f', false),
-            array('g', true),
             array('Id', true),
             array('id', true),
             array('Guid', true),
-            array('guid', false),
             array('guid', false),
         );
     }
@@ -277,7 +252,6 @@ class ReflectionExtractorTest extends TestCase
             array('d', false),
             array('e', true),
             array('f', true),
-            array('g', false),
             array('Id', false),
             array('Guid', true),
             array('guid', false),

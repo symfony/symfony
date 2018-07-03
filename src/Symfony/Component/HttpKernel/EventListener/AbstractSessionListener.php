@@ -28,7 +28,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 {
     private $sessionUsageStack = array();
     const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
-    
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -62,7 +62,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
                     ->setPrivate()
                     ->setMaxAge(0)
                     ->headers->addCacheControlDirective('must-revalidate');
-            }else{
+            } else {
                 $response->headers->remove(self::NO_AUTO_CACHE_CONTROL_HEADER);
             }
         }

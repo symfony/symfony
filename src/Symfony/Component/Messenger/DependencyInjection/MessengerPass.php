@@ -128,11 +128,13 @@ class MessengerPass implements CompilerPassInterface
                     if ('__invoke' !== $method) {
                         $wrapperDefinition = (new Definition('callable'))->addArgument(array(new Reference($serviceId), $method))->setFactory('Closure::fromCallable');
 
-                        $definitions[$serviceId = '.messenger.method_on_object_wrapper.'.ContainerBuilder::hash($messageClass.':'.$messagePriority.':'.$serviceId.':'.$method)] = $wrapperDefinition;
+                        $definitions[$definitionId = '.messenger.method_on_object_wrapper.'.ContainerBuilder::hash($messageClass.':'.$messagePriority.':'.$serviceId.':'.$method)] = $wrapperDefinition;
+                    } else {
+                        $definitionId = $serviceId;
                     }
 
                     foreach ($handlerBuses as $handlerBus) {
-                        $handlersByBusAndMessage[$handlerBus][$messageClass][$messagePriority][] = $serviceId;
+                        $handlersByBusAndMessage[$handlerBus][$messageClass][$messagePriority][] = $definitionId;
                     }
                 }
             }

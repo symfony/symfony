@@ -21,6 +21,21 @@ Console
  * Removed the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
  * Removed the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
  * Removed the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
+ * The `ProcessHelper::run()` method takes the command as an array of arguments.
+
+   Before:
+   ```php
+   $processHelper->run($output, 'ls -l');
+   ```
+
+   After:
+   ```php
+   $processHelper->run($output, array('ls', '-l'));
+
+   // alternatively, when a shell wrapper is required
+   $processHelper->run($output, Process::fromShellCommandline('ls -l'));
+   ```
+
 
 DependencyInjection
 -------------------
@@ -77,6 +92,25 @@ HttpFoundation
  * The `$size` argument of the `UploadedFile` constructor has been removed.
  * The `getClientSize()` method of the `UploadedFile` class has been removed.
  * The `getSession()` method of the `Request` class throws an exception when session is null.
+
+Process
+-------
+
+ * Removed the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
+ * Commands must be defined as arrays when creating a `Process` instance.
+
+   Before:
+   ```php
+   $process = new Process('ls -l');
+   ```
+
+   After:
+   ```php
+   $process = new Process(array('ls', '-l'));
+
+   // alternatively, when a shell wrapper is required
+   $process = Process::fromShellCommandline('ls -l');
+   ```
 
 Security
 --------

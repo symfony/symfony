@@ -256,7 +256,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $value = $this->validateAndDenormalize(\get_class($class), $attribute, $value, $format, $context);
+            $value = $this->validateAndDenormalize(\get_class($object), $attribute, $value, $format, $context);
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {

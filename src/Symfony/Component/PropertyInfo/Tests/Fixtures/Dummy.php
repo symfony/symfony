@@ -66,7 +66,22 @@ class Dummy extends ParentDummy
      *
      * @var array|null
      */
-    public $array;
+    public $g;
+
+    /**
+     * @var ?string
+     */
+    public $h;
+
+    /**
+     * @var ?string|int
+     */
+    public $i;
+
+    /**
+     * @var ?\DateTime
+     */
+    public $j;
 
     /**
      * This should not be removed.

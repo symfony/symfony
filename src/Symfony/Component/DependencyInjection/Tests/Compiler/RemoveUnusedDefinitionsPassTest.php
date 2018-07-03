@@ -127,6 +127,21 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertSame(1, $envCounters['FOOBAR']);
     }
 
+    public function testProcessDoesNotErrorOnServicesThatDoNotHaveDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('defined')
+            ->addArgument(new Reference('not.defined'))
+            ->setPublic(true);
+
+        $container->set('not.defined', new \StdClass());
+
+        $this->process($container);
+
+        $this->assertFalse($container->hasDefinition('not.defined'));
+    }
+
     protected function process(ContainerBuilder $container)
     {
         (new RemoveUnusedDefinitionsPass())->process($container);

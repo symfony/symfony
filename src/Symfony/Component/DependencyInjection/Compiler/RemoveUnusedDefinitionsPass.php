@@ -60,7 +60,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
                 $ids = $this->connectedIds;
                 $this->connectedIds = array();
                 foreach ($ids as $id) {
-                    if (!isset($connectedIds[$id]) && $container->has($id)) {
+                    if (!isset($connectedIds[$id]) && $container->hasDefinition($id)) {
                         $connectedIds[$id] = true;
                         $this->processValue($container->getDefinition($id));
                     }

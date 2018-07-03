@@ -484,7 +484,8 @@ class CliDumper extends AbstractDumper
                 && @sapi_windows_vt100_support($stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
+                || 'xterm' === getenv('TERM')
+                || 'Hyper' === getenv('TERM_PROGRAM');
         }
 
         if (function_exists('stream_isatty')) {
@@ -513,7 +514,8 @@ class CliDumper extends AbstractDumper
     {
         $result = 183 <= getenv('ANSICON_VER')
             || 'ON' === getenv('ConEmuANSI')
-            || 'xterm' === getenv('TERM');
+            || 'xterm' === getenv('TERM')
+            || 'Hyper' === getenv('TERM_PROGRAM');
 
         if (!$result && PHP_VERSION_ID >= 70200) {
             $version = sprintf(

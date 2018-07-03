@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-01T15:12:21Z
+
+Interesting. We consider these as bug fixes so it should be fixed on 2.8.
+I think there are more places in the code that do these kind of checks, can you update them all?
+Could you also please send a PR to update https://github.com/symfony/polyfill/blob/master/src/Php72/Php72.php?
+Thanks!
+
+---------------------------------------------------------------------------
+
+by azjezz at 2018-07-01T15:26:16Z
+
+i have made 2 other PRs at [`symfony/thanks`](https://github.com/symfony/thanks/pull/59) and [`symfony/polyfill`](https://github.com/symfony/polyfill/pull/129).
+
+---------------------------------------------------------------------------
+
+by azjezz at 2018-07-01T15:36:23Z
+
+@nicolas-grekas i think that's all, i have search the repository for similar code and i found these checks in `Symfony\Component\VarDumper\Dumper\CliDumper` and `Symfony\Bridge\PhpUnit\DeprecationErrorHandler`

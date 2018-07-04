@@ -288,7 +288,12 @@ class MessengerPassTest extends TestCase
         $handlerMapping = $handlerLocatorDefinition->getArgument(0);
 
         $this->assertArrayHasKey('handler.'.DummyMessage::class, $handlerMapping);
+        $firstReference = $handlerMapping['handler.'.DummyMessage::class]->getValues()[0];
+        $this->assertEquals(array(new Reference(HandlerWithGenerators::class), 'dummyMethod'), $container->getDefinition($firstReference)->getArgument(0));
+
         $this->assertArrayHasKey('handler.'.SecondMessage::class, $handlerMapping);
+        $secondReference = $handlerMapping['handler.'.SecondMessage::class]->getValues()[0];
+        $this->assertEquals(array(new Reference(HandlerWithGenerators::class), 'secondMessage'), $container->getDefinition($secondReference)->getArgument(0));
     }
 
     /**

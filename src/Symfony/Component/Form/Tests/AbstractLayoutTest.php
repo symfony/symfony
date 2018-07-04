@@ -2581,7 +2581,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'help' => 'for company %company%',
             'translation_parameters' => array(
                 '%company%' => 'ACME Ltd.',
-            )
+            ),
         ));
         $html = $this->renderHelp($form->createView());
 

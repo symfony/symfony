@@ -1366,6 +1366,64 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($view['child']->vars['translation_domain']);
     }
 
+    public function testPassTranslationParametersToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'translation_parameters' => array('%param%' => 'value'),
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+        ))
+            ->createView();
+
+        $this->assertSame(array('%param%' => 'value'), $view->vars['translation_parameters']);
+    }
+
+    public function testInheritTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+                'translation_parameters' => array('%param%' => 'value'),
+            ))
+            ->add('child', static::TESTED_TYPE, array(
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(array('%param%' => 'value'), $view['child']->vars['translation_parameters']);
+    }
+
+    public function testPreferOwnTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+                'translation_parameters' => array('%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'),
+            ))
+            ->add('child', static::TESTED_TYPE, array(
+                'translation_parameters' => array('%override_param%' => 'child_value'),
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(array('%parent_param%' => 'parent_value', '%override_param%' => 'child_value'), $view['child']->vars['translation_parameters']);
+    }
+
+    public function testDefaultTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, array(
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(array(), $view['child']->vars['translation_parameters']);
+    }
+
     public function testPassLabelToView()
     {
         $view = $this->factory->createNamed('__test___field', static::TESTED_TYPE, null, array(

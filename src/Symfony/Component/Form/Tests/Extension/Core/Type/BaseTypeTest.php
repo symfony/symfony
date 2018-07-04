@@ -122,39 +122,39 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testPassTranslationParametersToView()
     {
         $view = $this->factory->create($this->getTestedType(), null, array(
-            'translation_parameters' => ['%param%' => 'value'],
+            'translation_parameters' => array('%param%' => 'value'),
         ))
             ->createView();
 
-        $this->assertSame(['%param%' => 'value'], $view->vars['translation_parameters']);
+        $this->assertSame(array('%param%' => 'value'), $view->vars['translation_parameters']);
     }
 
     public function testInheritTranslationParametersFromParent()
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
-                'translation_parameters' => ['%param%' => 'value'],
+                'translation_parameters' => array('%param%' => 'value'),
             ))
             ->add('child', $this->getTestedType())
             ->getForm()
             ->createView();
 
-        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['translation_parameters']);
+        $this->assertEquals(array('%param%' => 'value'), $view['child']->vars['translation_parameters']);
     }
 
     public function testPreferOwnTranslationParameters()
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
-                'translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+                'translation_parameters' => array('%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'),
             ))
             ->add('child', $this->getTestedType(), array(
-                'translation_parameters' => ['%override_param%' => 'child_value'],
+                'translation_parameters' => array('%override_param%' => 'child_value'),
             ))
             ->getForm()
             ->createView();
 
-        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['translation_parameters']);
+        $this->assertEquals(array('%parent_param%' => 'parent_value', '%override_param%' => 'child_value'), $view['child']->vars['translation_parameters']);
     }
 
     public function testDefaultTranslationParameters()
@@ -164,7 +164,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals([], $view['child']->vars['translation_parameters']);
+        $this->assertEquals(array(), $view['child']->vars['translation_parameters']);
     }
 
     public function testPassLabelToView()

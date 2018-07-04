@@ -1,13 +1,13 @@
 --TEST--
-Test DeprecationErrorHandler in weak vendors mode on eval()'d deprecation
+Test DeprecationErrorHandler in forced color mode
 --FILE--
 <?php
 
-putenv('SYMFONY_DEPRECATIONS_HELPER=weak_vendors');
+putenv('SYMFONY_DEPRECATIONS_HELPER');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
-putenv('ANSI');
+putenv('ANSI=1');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
@@ -16,11 +16,11 @@ while (!file_exists($vendor.'/vendor')) {
 define('PHPUNIT_COMPOSER_INSTALL', $vendor.'/vendor/autoload.php');
 require PHPUNIT_COMPOSER_INSTALL;
 require_once __DIR__.'/../../bootstrap.php';
-eval("@trigger_error('who knows where I come from?', E_USER_DEPRECATED);");
+
+trigger_error('root deprecation', E_USER_DEPRECATED);
 
 ?>
---EXPECTF--
+--EXPECTREGEX--
+.\[[0-9;]+mOther deprecation notices \(1\).\[0m
 
-Other deprecation notices (1)
-
-  1x: who knows where I come from?
+  1x: root deprecation

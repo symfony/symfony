@@ -7,6 +7,7 @@ putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
+putenv('ANSI');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {

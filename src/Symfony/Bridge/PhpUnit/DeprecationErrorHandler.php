@@ -307,6 +307,11 @@ class DeprecationErrorHandler
      */
     private static function hasColorSupport()
     {
+        $colorEnv = getenv('ANSI');
+        if (in_array($colorEnv, array('0', '1'))) {
+            return '1' === $colorEnv;
+        }
+
         if (!defined('STDOUT')) {
             return false;
         }

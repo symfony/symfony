@@ -93,6 +93,11 @@ class StreamOutput extends Output
      */
     protected function hasColorSupport()
     {
+        $colorEnv = getenv('ANSI');
+        if (in_array($colorEnv, array('0', '1'))) {
+            return '1' === $colorEnv;
+        }
+
         if (DIRECTORY_SEPARATOR === '\\') {
             return (function_exists('sapi_windows_vt100_support')
                 && @sapi_windows_vt100_support($this->stream))

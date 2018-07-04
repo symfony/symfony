@@ -58,4 +58,28 @@ class StreamOutputTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals('foo'.PHP_EOL, stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
     }
+
+    public function testSetDecoratedFromEnv()
+    {
+        try {
+            putenv('ANSI=1');
+            $output = new StreamOutput(STDOUT);
+
+            $this->assertTrue($output->isDecorated());
+        } finally {
+            putenv('ANSI');
+        }
+    }
+
+    public function testDisableDecoratedFromEnv()
+    {
+        try {
+            putenv('ANSI=0');
+            $output = new StreamOutput(STDOUT);
+
+            $this->assertFalse($output->isDecorated());
+        } finally {
+            putenv('ANSI');
+        }
+    }
 }

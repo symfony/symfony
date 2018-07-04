@@ -2557,4 +2557,39 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '
         );
     }
+
+    public function testLabelWithTranslationLabel()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $html = $this->renderLabel($form->createView(), 'Address is %address%', array(
+            'translation_parameters' => array(
+                '%address%' => 'Paris, rue de la Paix',
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+            '/label
+    [@for="name"]
+    [.="[trans]Address is Paris, rue de la Paix[/trans]"]
+'
+        );
+    }
+
+    public function testHelpWithTranslationLabel()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'for company %company%',
+            'translation_parameters' => array(
+                '%company%' => 'ACME Ltd.',
+            )
+        ));
+        $html = $this->renderHelp($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/*
+    [@id="name_help"]
+    [.="[trans]for company ACME Ltd.[/trans]"]
+'
+        );
+    }
 }

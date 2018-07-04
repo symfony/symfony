@@ -71,6 +71,7 @@
         "symfony/serializer": "<4.1",
         "symfony/stopwatch": "<3.4",
         "symfony/translation": "<3.4",
+        "symfony/twig-bridge": "<4.1.1",
         "symfony/validator": "<4.1",
         "symfony/workflow": "<4.1"
     },

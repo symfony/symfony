@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T11:47:52Z
+
+There have been similar reports on other deps recently. I feel like we will not be able to catch up with all combinations of versions and we should instead tell people how to update. Many did update only framework-bundle, which is wrong. Doing `composer update "symfony/*"` fixes the issue for everyone.
+
+I'd be :-1: here to not create a precedent.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-30T08:21:32Z
+
+I tend to disagree. We have conflict rules "everywhere" to prevent such issues. The only reason we didn't have one here is that we don't have tests that perform some assertions on the container for this part (might be a good opportunity to add some which would also prevent further regressions).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-30T12:59:23Z
+
+Tend to agree with @xabbuh. Recommending to update `symfony/*` is a thing, having invalid version constraints between components is another. You taught me it @nicolas-grekas: symfony components/bundles are used in the wild, we can't assume that everyone hear and apply our recommendations, here perhaps because of their own technical constraints leading them to try updating a component and not another.
+I think we should keep up improving our cross-package test coverage and maintain proper conflict rules when possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-01T07:11:23Z
+
+But framework-bundle doesn't know about twig-bridge.
+All the other conflicts are legit because they target lower level package that framework-bundle is built on.
+twig-bridge is just foreign to it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-01T07:29:31Z
+
+but [it does](https://github.com/symfony/symfony/blob/8c1e29995418e4eeed417c66ccf62e7bdd92711d/src/Symfony/Bundle/FrameworkBundle/Resources/config/security_csrf.xml#L25)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-01T07:34:45Z
+
+that's not obvious reading the composer.json file ;)
+you were suggesting adding a test case, possible?

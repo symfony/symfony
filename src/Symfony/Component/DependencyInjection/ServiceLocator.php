@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection;
 
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -62,6 +63,22 @@ class ServiceLocator implements PsrContainerInterface
         $this->loading[$id] = $id;
         try {
             return $this->factories[$id]();
+        } catch (RuntimeException $e) {
+            if (!$this->externalId) {
+                throw $e;
+            }
+            $what = sprintf('service "%s" required by "%s"', $id, $this->externalId);
+            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
+
+            if ($e->getMessage() === $message) {
+                $message = sprintf('Cannot resolve %s: %s', $what, $message);
+            }
+
+            $r = new \ReflectionProperty($e, 'message');
+            $r->setAccessible(true);
+            $r->setValue($e, $message);
+
+            throw $e;
         } finally {
             unset($this->loading[$id]);
         }

@@ -116,7 +116,7 @@ class ErrorHandler
     {
         if (null === self::$reservedMemory) {
             self::$reservedMemory = str_repeat('x', 10240);
-            register_shutdown_function(__CLASS__.'::handleFatalError');
+            register_shutdown_function(self::class.'::handleFatalError');
         }
 
         if ($handlerIsNew = null === $handler) {

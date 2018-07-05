@@ -134,7 +134,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private $propertyPathCache = array();
 
     private static $previousErrorHandler = false;
-    private static $errorHandler = array(__CLASS__, 'handleError');
+    private static $errorHandler = array(self::class, 'handleError');
     private static $resultProto = array(self::VALUE => null);
 
     /**

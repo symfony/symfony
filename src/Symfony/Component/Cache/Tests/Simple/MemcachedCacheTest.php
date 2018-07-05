@@ -42,7 +42,7 @@ class MemcachedCacheTest extends CacheTestCase
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false)) : self::$client;
 
-        return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new MemcachedCache($client, str_replace('\\', '.', self::class), $defaultLifetime);
     }
 
     public function testCreatePersistentConnectionShouldNotDupServerList()

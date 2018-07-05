@@ -143,7 +143,7 @@ class RedirectController implements ContainerAwareInterface
                 if ('http' === $request->getScheme()) {
                     $httpPort = $request->getPort();
                 } elseif ($this->container && $this->container->hasParameter('request_listener.http_port')) {
-                    @trigger_error(sprintf('Passing the http port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', __CLASS__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Passing the http port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', self::class), E_USER_DEPRECATED);
                     $httpPort = $this->container->getParameter('request_listener.http_port');
                 } else {
                     $httpPort = $this->httpPort;
@@ -158,7 +158,7 @@ class RedirectController implements ContainerAwareInterface
                 if ('https' === $request->getScheme()) {
                     $httpsPort = $request->getPort();
                 } elseif ($this->container && $this->container->hasParameter('request_listener.https_port')) {
-                    @trigger_error(sprintf('Passing the https port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', __CLASS__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Passing the https port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', self::class), E_USER_DEPRECATED);
                     $httpsPort = $this->container->getParameter('request_listener.https_port');
                 } else {
                     $httpsPort = $this->httpsPort;

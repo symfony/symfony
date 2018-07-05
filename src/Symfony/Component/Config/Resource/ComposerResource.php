@@ -38,7 +38,7 @@ class ComposerResource implements SelfCheckingResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return __CLASS__;
+        return self::class;
     }
 
     /**

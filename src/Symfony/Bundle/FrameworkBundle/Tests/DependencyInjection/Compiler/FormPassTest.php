@@ -50,16 +50,16 @@ class FormPassTest extends TestCase
         ));
 
         $container->setDefinition('form.extension', $extDefinition);
-        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
-        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
+        $container->register('my.type1', self::class.'_Type1')->addTag('form.type')->setPublic(true);
+        $container->register('my.type2', self::class.'_Type2')->addTag('form.type')->setPublic(true);
 
         $container->compile();
 
         $extDefinition = $container->getDefinition('form.extension');
 
         $this->assertEquals(array(
-            __CLASS__.'_Type1' => 'my.type1',
-            __CLASS__.'_Type2' => 'my.type2',
+            self::class.'_Type1' => 'my.type1',
+            self::class.'_Type2' => 'my.type2',
         ), $extDefinition->getArgument(1));
     }
 

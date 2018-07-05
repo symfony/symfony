@@ -50,8 +50,8 @@ class FormPassTest extends TestCase
         $container = $this->createContainerBuilder();
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
-        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
-        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
+        $container->register('my.type1', self::class.'_Type1')->addTag('form.type')->setPublic(true);
+        $container->register('my.type2', self::class.'_Type2')->addTag('form.type')->setPublic(true);
 
         $container->compile();
 
@@ -59,8 +59,8 @@ class FormPassTest extends TestCase
 
         $this->assertEquals(
             (new Definition(ServiceLocator::class, array(array(
-                __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
-                __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
+                self::class.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
+                self::class.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
             ))))->addTag('container.service_locator')->setPublic(false),
             $extDefinition->getArgument(0)
         );
@@ -72,8 +72,8 @@ class FormPassTest extends TestCase
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
         $container->setDefinition('console.command.form_debug', $this->createDebugCommandDefinition());
-        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
-        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
+        $container->register('my.type1', self::class.'_Type1')->addTag('form.type')->setPublic(true);
+        $container->register('my.type2', self::class.'_Type2')->addTag('form.type')->setPublic(true);
 
         $container->compile();
 

@@ -219,7 +219,7 @@ class ContextListener implements ListenerInterface
     private function safelyUnserialize($serializedToken)
     {
         $e = $token = null;
-        $prevUnserializeHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+        $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$prevErrorHandler) {
             if (__FILE__ === $file) {
                 throw new \UnexpectedValueException($msg, 0x37313bc);

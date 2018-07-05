@@ -36,7 +36,7 @@ class ApcuAdapterTest extends AdapterTestCase
             $this->markTestSkipped('Fails transiently on Windows.');
         }
 
-        return new ApcuAdapter(str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new ApcuAdapter(str_replace('\\', '.', self::class), $defaultLifetime);
     }
 
     public function testUnserializable()
@@ -110,7 +110,7 @@ class ApcuAdapterTest extends AdapterTestCase
             set_error_handler(function () use (&$isCalled) {
                 $isCalled = true;
             });
-            $pool = new ApcuAdapter(str_replace('\\', '.', __CLASS__));
+            $pool = new ApcuAdapter(str_replace('\\', '.', self::class));
             $pool->setLogger(new NullLogger());
 
             $item = $pool->getItem('foo');

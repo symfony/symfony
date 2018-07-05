@@ -26,7 +26,7 @@ class StubCasterTest extends TestCase
 
     public function testArgsStubWithDefaults($foo = 234, $bar = 456)
     {
-        $args = array(new ArgsStub(array(123), __FUNCTION__, __CLASS__));
+        $args = array(new ArgsStub(array(123), __FUNCTION__, self::class));
 
         $expectedDump = <<<'EODUMP'
 array:1 [
@@ -41,7 +41,7 @@ EODUMP;
 
     public function testArgsStubWithExtraArgs($foo = 234)
     {
-        $args = array(new ArgsStub(array(123, 456), __FUNCTION__, __CLASS__));
+        $args = array(new ArgsStub(array(123, 456), __FUNCTION__, self::class));
 
         $expectedDump = <<<'EODUMP'
 array:1 [
@@ -59,7 +59,7 @@ EODUMP;
 
     public function testArgsStubNoParamWithExtraArgs()
     {
-        $args = array(new ArgsStub(array(123), __FUNCTION__, __CLASS__));
+        $args = array(new ArgsStub(array(123), __FUNCTION__, self::class));
 
         $expectedDump = <<<'EODUMP'
 array:1 [
@@ -89,7 +89,7 @@ EODUMP;
 
     public function testLinkStub()
     {
-        $var = array(new LinkStub(__CLASS__, 0, __FILE__));
+        $var = array(new LinkStub(self::class, 0, __FILE__));
 
         $cloner = new VarCloner();
         $dumper = new HtmlDumper();

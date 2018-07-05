@@ -211,7 +211,7 @@ trait MemcachedTrait
      */
     protected function doFetch(array $ids)
     {
-        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         try {
             $encodedIds = array_map('rawurlencode', $ids);
 

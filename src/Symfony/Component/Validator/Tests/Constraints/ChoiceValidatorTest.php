@@ -118,7 +118,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidChoiceCallbackStaticMethod()
     {
-        $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback'), 'strict' => true));
+        $constraint = new Choice(array('callback' => array(self::class, 'staticCallback'), 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 

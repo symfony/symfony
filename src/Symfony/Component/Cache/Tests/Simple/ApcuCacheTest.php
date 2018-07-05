@@ -30,6 +30,6 @@ class ApcuCacheTest extends CacheTestCase
             $this->markTestSkipped('Fails transiently on Windows.');
         }
 
-        return new ApcuCache(str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new ApcuCache(str_replace('\\', '.', self::class), $defaultLifetime);
     }
 }

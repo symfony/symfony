@@ -25,7 +25,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new RedisAdapter(self::$redis, str_replace('\\', '.', self::class), $defaultLifetime);
     }
 
     public static function setupBeforeClass()

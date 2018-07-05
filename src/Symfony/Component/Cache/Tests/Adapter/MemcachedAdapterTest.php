@@ -41,7 +41,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 
-        return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new MemcachedAdapter($client, str_replace('\\', '.', self::class), $defaultLifetime);
     }
 
     public function testOptions()

@@ -38,7 +38,7 @@ class ReflectionClassResourceTest extends TestCase
 
     public function testIsFresh()
     {
-        $res = new ReflectionClassResource(new \ReflectionClass(__CLASS__));
+        $res = new ReflectionClassResource(new \ReflectionClass(self::class));
         $mtime = filemtime(__FILE__);
 
         $this->assertTrue($res->isFresh($mtime), '->isFresh() returns true if the resource has not changed in same second');

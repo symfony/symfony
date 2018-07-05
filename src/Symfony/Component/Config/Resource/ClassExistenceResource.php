@@ -69,7 +69,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
             $exists = $exists || $loaded;
         } elseif (!$exists = $loaded) {
             if (!self::$autoloadLevel++) {
-                spl_autoload_register(__CLASS__.'::throwOnRequiredClass');
+                spl_autoload_register(self::class.'::throwOnRequiredClass');
             }
             $autoloadedClass = self::$autoloadedClass;
             self::$autoloadedClass = $this->resource;
@@ -84,7 +84,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
             } finally {
                 self::$autoloadedClass = $autoloadedClass;
                 if (!--self::$autoloadLevel) {
-                    spl_autoload_unregister(__CLASS__.'::throwOnRequiredClass');
+                    spl_autoload_unregister(self::class.'::throwOnRequiredClass');
                 }
             }
         }

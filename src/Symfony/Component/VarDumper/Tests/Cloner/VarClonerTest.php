@@ -385,7 +385,7 @@ EOTXT;
             '*' => function ($obj, $array) {
                 return array('foo' => 123);
             },
-            __CLASS__ => function ($obj, $array) {
+            self::class => function ($obj, $array) {
                 ++$array['foo'];
 
                 return $array;

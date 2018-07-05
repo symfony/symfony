@@ -138,7 +138,7 @@ abstract class Constraint
 
             if (null === $option) {
                 throw new ConstraintDefinitionException(
-                    sprintf('No default option is configured for constraint %s', get_class($this))
+                    sprintf('No default option is configured for constraint %s', static::class)
                 );
             }
 
@@ -152,14 +152,14 @@ abstract class Constraint
 
         if (count($invalidOptions) > 0) {
             throw new InvalidOptionsException(
-                sprintf('The options "%s" do not exist in constraint %s', implode('", "', $invalidOptions), get_class($this)),
+                sprintf('The options "%s" do not exist in constraint %s', implode('", "', $invalidOptions), static::class),
                 $invalidOptions
             );
         }
 
         if (count($missingOptions) > 0) {
             throw new MissingOptionsException(
-                sprintf('The options "%s" must be set for constraint %s', implode('", "', array_keys($missingOptions)), get_class($this)),
+                sprintf('The options "%s" must be set for constraint %s', implode('", "', array_keys($missingOptions)), static::class),
                 array_keys($missingOptions)
             );
         }
@@ -185,7 +185,7 @@ abstract class Constraint
             return;
         }
 
-        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, get_class($this)), array($option));
+        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, static::class), array($option));
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class Constraint
             return $this->groups;
         }
 
-        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, get_class($this)), array($option));
+        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, static::class), array($option));
     }
 
     /**
@@ -274,7 +274,7 @@ abstract class Constraint
      */
     public function validatedBy()
     {
-        return get_class($this).'Validator';
+        return static::class.'Validator';
     }
 
     /**

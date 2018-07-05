@@ -73,7 +73,7 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
      */
     public function onBind(FormEvent $event)
     {
-        if (self::class === get_class($this)) {
+        if (self::class === static::class) {
             $this->bc = false;
         } else {
             // parent::onBind() has been called

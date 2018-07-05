@@ -71,11 +71,11 @@ abstract class Composite extends Constraint
                     $constraint = get_class($constraint);
                 }
 
-                throw new ConstraintDefinitionException(sprintf('The value %s is not an instance of Constraint in constraint %s', $constraint, get_class($this)));
+                throw new ConstraintDefinitionException(sprintf('The value %s is not an instance of Constraint in constraint %s', $constraint, static::class));
             }
 
             if ($constraint instanceof Valid) {
-                throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', get_class($this)));
+                throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', static::class));
             }
         }
 
@@ -104,7 +104,7 @@ abstract class Composite extends Constraint
                         'should also be passed to its containing constraint %s',
                         implode('", "', $excessGroups),
                         get_class($constraint),
-                        get_class($this)
+                        static::class
                     ));
                 }
             } else {

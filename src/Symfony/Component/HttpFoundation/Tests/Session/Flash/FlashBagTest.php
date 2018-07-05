@@ -124,6 +124,19 @@ class FlashBagTest extends TestCase
         $this->assertEquals(array('notice'), $this->bag->keys());
     }
 
+    public function testSetAll()
+    {
+        $this->bag->add('one_flash', 'Foo');
+        $this->bag->add('another_flash', 'Bar');
+        $this->assertTrue($this->bag->has('one_flash'));
+        $this->assertTrue($this->bag->has('another_flash'));
+        $this->bag->setAll(array('unique_flash' => 'FooBar'));
+        $this->assertFalse($this->bag->has('one_flash'));
+        $this->assertFalse($this->bag->has('another_flash'));
+        $this->assertSame(array('unique_flash' => 'FooBar'), $this->bag->all());
+        $this->assertSame(array(), $this->bag->all());
+    }
+
     public function testPeekAll()
     {
         $this->bag->set('notice', 'Foo');

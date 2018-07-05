@@ -123,10 +123,11 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             }
 
             $definition->setMethodCalls(array_merge($instanceofCalls, $definition->getMethodCalls()));
+            $definition->setBindings($bindings);
 
             // reset fields with "merge" behavior
             $abstract
-                ->setBindings($bindings)
+                ->setBindings(array())
                 ->setArguments(array())
                 ->setMethodCalls(array())
                 ->setDecoratedService(null)

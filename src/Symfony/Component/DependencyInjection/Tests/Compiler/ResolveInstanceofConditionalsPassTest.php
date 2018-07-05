@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -267,5 +268,19 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertNull($abstract->getDecoratedService());
         $this->assertEmpty($abstract->getTags());
         $this->assertTrue($abstract->isAbstract());
+    }
+
+    public function testBindings()
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('foo', self::class)->setBindings(array('$toto' => 123));
+        $def->setInstanceofConditionals(array(parent::class => new ChildDefinition('')));
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $bindings = $container->getDefinition('foo')->getBindings();
+        $this->assertSame(array('$toto'), array_keys($bindings));
+        $this->assertInstanceOf(BoundArgument::class, $bindings['$toto']);
+        $this->assertSame(123, $bindings['$toto']->getValues()[0]);
     }
 }

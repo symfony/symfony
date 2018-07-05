@@ -86,7 +86,31 @@ class BinaryFileResponse extends Response
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         if (!$file instanceof File) {
-            if ($file instanceof \SplFileInfo) {
+            if ($file instanceof \SplTempFileObject) {
+                static $method = null;
+                static $params = null;
+                if (null === $method) {
+                    $method = 'fread';
+                    $params = array(1024);
+                    if (!method_exists('SplTempFileObject', $method)) {
+                        $method = 'fgets';
+                        $params = array();
+                    }
+                }
+                $file->fflush();
+                $file->rewind();
+                $path = tempnam(sys_get_temp_dir(), 'symfony-temp-file-object');
+                $tmpFile = new \SplFileObject($path, 'wb');
+                while ($file->valid()) {
+                    $tmpFile->fwrite(call_user_func_array(array($file, $method), $params));
+                }
+                $tmpFile->fflush();
+                $tmpFile = null;
+                $file = new File($path);
+                $this->maxlen = -1;
+                $this->offset = 0;
+                $this->deleteFileAfterSend = true;
+            } elseif ($file instanceof \SplFileInfo) {
                 $file = new File($file->getPathname());
             } else {
                 $file = new File((string) $file);

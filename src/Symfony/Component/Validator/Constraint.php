@@ -73,7 +73,7 @@ abstract class Constraint
             throw new InvalidArgumentException(sprintf(
                 'The error code "%s" does not exist for constraint of type "%s".',
                 $errorCode,
-                get_called_class()
+                static::class
             ));
         }
 

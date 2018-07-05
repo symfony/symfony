@@ -55,7 +55,7 @@ class Command
      */
     public static function getDefaultName()
     {
-        $class = get_called_class();
+        $class = static::class;
         $r = new \ReflectionProperty($class, 'defaultName');
 
         return $class === $r->class ? static::$defaultName : null;

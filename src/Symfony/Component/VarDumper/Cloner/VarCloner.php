@@ -78,7 +78,7 @@ class VarCloner extends AbstractCloner
                     if ($zval['zval_isref'] = $vals[$k] === $cookie) {
                         $zval['zval_hash'] = $v instanceof Stub ? spl_object_hash($v) : null;
                     }
-                    $zval['type'] = gettype($v);
+                    $zval['type'] = \gettype($v);
                 }
                 if ($zval['zval_isref']) {
                     $vals[$k] = &$stub;         // Break hard references to make $queue completely
@@ -100,7 +100,7 @@ class VarCloner extends AbstractCloner
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
                             $stub->class = Stub::STRING_BINARY;
-                            if (0 <= $maxString && 0 < $cut = strlen($v) - $maxString) {
+                            if (0 <= $maxString && 0 < $cut = \strlen($v) - $maxString) {
                                 $stub->cut = $cut;
                                 $stub->value = substr($v, 0, -$cut);
                             } else {
@@ -140,7 +140,7 @@ class VarCloner extends AbstractCloner
                                 $a = $v;
                             }
 
-                            $stub->value = $zval['array_count'] ?: count($a);
+                            $stub->value = $zval['array_count'] ?: \count($a);
                         }
                         break;
 
@@ -148,7 +148,7 @@ class VarCloner extends AbstractCloner
                         if (empty($objRefs[$h = $zval['object_handle'] ?: ($hashMask ^ hexdec(substr(spl_object_hash($v), $hashOffset, PHP_INT_SIZE)))])) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_OBJECT;
-                            $stub->class = $zval['object_class'] ?: get_class($v);
+                            $stub->class = $zval['object_class'] ?: \get_class($v);
                             $stub->value = $v;
                             $stub->handle = $h;
                             $a = $this->castObject($stub, 0 < $i);
@@ -167,7 +167,7 @@ class VarCloner extends AbstractCloner
                             }
                             $stub->value = null;
                             if (0 <= $maxItems && $maxItems <= $pos) {
-                                $stub->cut = count($a);
+                                $stub->cut = \count($a);
                                 $a = null;
                             }
                         }
@@ -194,7 +194,7 @@ class VarCloner extends AbstractCloner
                             $a = $this->castResource($stub, 0 < $i);
                             $stub->value = null;
                             if (0 <= $maxItems && $maxItems <= $pos) {
-                                $stub->cut = count($a);
+                                $stub->cut = \count($a);
                                 $a = null;
                             }
                         }
@@ -227,10 +227,10 @@ class VarCloner extends AbstractCloner
 
                     if ($a) {
                         if ($i && 0 <= $maxItems) {
-                            $k = count($a);
+                            $k = \count($a);
                             if ($pos < $maxItems) {
                                 if ($maxItems < $pos += $k) {
-                                    $a = array_slice($a, 0, $maxItems - $pos);
+                                    $a = \array_slice($a, 0, $maxItems - $pos);
                                     if ($stub->cut >= 0) {
                                         $stub->cut += $pos - $maxItems;
                                     }
@@ -303,13 +303,13 @@ class VarCloner extends AbstractCloner
         self::$hashOffset = 16 - PHP_INT_SIZE;
         self::$hashMask = -1;
 
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             self::$hashOffset += 16;
         } else {
             // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
             $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
             foreach (debug_backtrace(\PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
-                if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
+                if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && \in_array($frame['function'], $obFuncs)) {
                     $frame['line'] = 0;
                     break;
                 }

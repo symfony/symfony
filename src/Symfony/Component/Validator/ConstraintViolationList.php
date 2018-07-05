@@ -120,7 +120,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      */
     public function count()
     {
-        return count($this->violations);
+        return \count($this->violations);
     }
 
     /**

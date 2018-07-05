@@ -820,7 +820,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
         $upperCaseMethod = strtoupper($method);
 
-        if (!in_array($upperCaseMethod, self::$allowedMethods)) {
+        if (!\in_array($upperCaseMethod, self::$allowedMethods)) {
             throw new InvalidArgumentException(sprintf(
                 'The form method is "%s", but should be one of "%s".',
                 $method,
@@ -887,7 +887,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public static function validateName($name)
     {
-        if (null !== $name && !is_string($name) && !is_int($name)) {
+        if (null !== $name && !\is_string($name) && !\is_int($name)) {
             throw new UnexpectedTypeException($name, 'string, integer or null');
         }
 

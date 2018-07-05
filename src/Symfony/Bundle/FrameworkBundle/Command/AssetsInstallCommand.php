@@ -227,7 +227,7 @@ EOT
     private function symlink($originDir, $targetDir, $relative = false)
     {
         if ($relative) {
-            $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
+            $originDir = $this->filesystem->makePathRelative($originDir, realpath(\dirname($targetDir)));
         }
         $this->filesystem->symlink($originDir, $targetDir);
         if (!file_exists($targetDir)) {

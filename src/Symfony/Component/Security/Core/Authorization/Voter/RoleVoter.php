@@ -36,7 +36,7 @@ class RoleVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
-        return is_string($attribute) && 0 === strpos($attribute, $this->prefix);
+        return \is_string($attribute) && 0 === strpos($attribute, $this->prefix);
     }
 
     /**

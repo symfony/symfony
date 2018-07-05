@@ -177,7 +177,7 @@ class CliDumper extends AbstractDumper
                 unset($str[1]);
                 $str[0] .= "\n";
             }
-            $m = count($str) - 1;
+            $m = \count($str) - 1;
             $i = $lineCut = 0;
 
             if ($bin) {
@@ -317,7 +317,7 @@ class CliDumper extends AbstractDumper
                     $style = 'index';
                     // no break
                 case Cursor::HASH_ASSOC:
-                    if (is_int($key)) {
+                    if (\is_int($key)) {
                         $this->line .= $this->style($style, $key).' => ';
                     } else {
                         $this->line .= $bin.'"'.$this->style($style, $key).'" => ';
@@ -390,7 +390,7 @@ class CliDumper extends AbstractDumper
             $s = $startCchr;
             $c = $c[$i = 0];
             do {
-                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
+                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', \ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.$endCchr;
@@ -398,12 +398,12 @@ class CliDumper extends AbstractDumper
 
         if ($this->colors) {
             if ($cchrCount && "\033" === $value[0]) {
-                $value = substr($value, strlen($startCchr));
+                $value = substr($value, \strlen($startCchr));
             } else {
                 $value = "\033[{$style}m".$value;
             }
-            if ($cchrCount && $endCchr === substr($value, -strlen($endCchr))) {
-                $value = substr($value, 0, -strlen($endCchr));
+            if ($cchrCount && $endCchr === substr($value, -\strlen($endCchr))) {
+                $value = substr($value, 0, -\strlen($endCchr));
             } else {
                 $value .= "\033[{$this->styles['default']}m";
             }
@@ -425,7 +425,7 @@ class CliDumper extends AbstractDumper
         }
         if (isset($_SERVER['argv'][1])) {
             $colors = $_SERVER['argv'];
-            $i = count($colors);
+            $i = \count($colors);
             while (--$i > 0) {
                 if (isset($colors[$i][5])) {
                     switch ($colors[$i]) {
@@ -475,7 +475,7 @@ class CliDumper extends AbstractDumper
      */
     private function hasColorSupport($stream)
     {
-        if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
+        if (!\is_resource($stream) || 'stream' !== get_resource_type($stream)) {
             return false;
         }
 
@@ -484,18 +484,18 @@ class CliDumper extends AbstractDumper
         }
 
         if (DIRECTORY_SEPARATOR === '\\') {
-            return (function_exists('sapi_windows_vt100_support')
+            return (\function_exists('sapi_windows_vt100_support')
                 && @sapi_windows_vt100_support($stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
         }
 
-        if (function_exists('stream_isatty')) {
+        if (\function_exists('stream_isatty')) {
             return @stream_isatty($stream);
         }
 
-        if (function_exists('posix_isatty')) {
+        if (\function_exists('posix_isatty')) {
             return @posix_isatty($stream);
         }
 

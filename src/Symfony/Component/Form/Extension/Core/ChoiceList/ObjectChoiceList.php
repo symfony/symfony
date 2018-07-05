@@ -118,7 +118,7 @@ class ObjectChoiceList extends ChoiceList
             $groupedChoices = array();
 
             foreach ($choices as $i => $choice) {
-                if (is_array($choice)) {
+                if (\is_array($choice)) {
                     throw new InvalidArgumentException('You should pass a plain object array (without groups) when using the "groupPath" option.');
                 }
 
@@ -168,7 +168,7 @@ class ObjectChoiceList extends ChoiceList
 
         foreach ($choices as $i => $givenChoice) {
             // Ignore non-readable choices
-            if (!is_object($givenChoice) && !is_array($givenChoice)) {
+            if (!\is_object($givenChoice) && !\is_array($givenChoice)) {
                 continue;
             }
 
@@ -179,7 +179,7 @@ class ObjectChoiceList extends ChoiceList
                     $values[$i] = $value;
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (0 === \count($choices)) {
                         break 2;
                     }
                 }
@@ -208,7 +208,7 @@ class ObjectChoiceList extends ChoiceList
 
         foreach ($choices as $i => $givenChoice) {
             // Ignore non-readable choices
-            if (!is_object($givenChoice) && !is_array($givenChoice)) {
+            if (!\is_object($givenChoice) && !\is_array($givenChoice)) {
                 continue;
             }
 
@@ -219,7 +219,7 @@ class ObjectChoiceList extends ChoiceList
                     $indices[$i] = $j;
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (0 === \count($choices)) {
                         break 2;
                     }
                 }
@@ -252,7 +252,7 @@ class ObjectChoiceList extends ChoiceList
     private function extractLabels($choices, array &$labels)
     {
         foreach ($choices as $i => $choice) {
-            if (is_array($choice)) {
+            if (\is_array($choice)) {
                 $labels[$i] = array();
                 $this->extractLabels($choice, $labels[$i]);
             } elseif ($this->labelPath) {
@@ -260,7 +260,7 @@ class ObjectChoiceList extends ChoiceList
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {
-                throw new StringCastException(sprintf('A "__toString()" method was not found on the objects of type "%s" passed to the choice field. To read a custom getter instead, set the argument $labelPath to the desired property path.', get_class($choice)));
+                throw new StringCastException(sprintf('A "__toString()" method was not found on the objects of type "%s" passed to the choice field. To read a custom getter instead, set the argument $labelPath to the desired property path.', \get_class($choice)));
             }
         }
     }

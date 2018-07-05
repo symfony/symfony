@@ -109,7 +109,7 @@ class CollectionType extends AbstractType
             return __NAMESPACE__.'\TextType';
         };
         $entryOptions = function (Options $options) {
-            if (1 === count($options['options']) && isset($options['block_name'])) {
+            if (1 === \count($options['options']) && isset($options['block_name'])) {
                 return array();
             }
 

@@ -225,7 +225,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getBundle($name, $first = true)
     {
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, get_class($this)));
+            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, \get_class($this)));
         }
 
         if (true === $first) {
@@ -287,7 +287,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             }
         }
 
-        if (count($files) > 0) {
+        if (\count($files) > 0) {
             return $first && $isResource ? $files[0] : $files;
         }
 
@@ -332,7 +332,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         if (null === $this->rootDir) {
             $r = new \ReflectionObject($this);
-            $this->rootDir = dirname($r->getFileName());
+            $this->rootDir = \dirname($r->getFileName());
         }
 
         return $this->rootDir;
@@ -449,7 +449,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         // look for orphans
-        if (!empty($directChildren) && count($diff = array_diff_key($directChildren, $this->bundles))) {
+        if (!empty($directChildren) && \count($diff = array_diff_key($directChildren, $this->bundles))) {
             $diff = array_keys($diff);
 
             throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
@@ -536,7 +536,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $bundlesMetadata = array();
 
         foreach ($this->bundles as $name => $bundle) {
-            $bundles[$name] = get_class($bundle);
+            $bundles[$name] = \get_class($bundle);
             $bundlesMetadata[$name] = array(
                 'parent' => $bundle->getParent(),
                 'path' => $bundle->getPath(),
@@ -707,7 +707,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public static function stripComments($source)
     {
-        if (!function_exists('token_get_all')) {
+        if (!\function_exists('token_get_all')) {
             return $source;
         }
 
@@ -735,7 +735,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
                 // replace multiple new lines with a single newline
                 $rawChunk .= preg_replace(array('/\n{2,}/S'), "\n", $token[1]);
-            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+            } elseif (\in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 $ignoreSpace = true;
             } else {
                 $rawChunk .= $token[1];

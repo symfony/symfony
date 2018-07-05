@@ -30,7 +30,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
-        return in_array($attribute, $this->getSupportedAttributes(), true);
+        return \in_array($attribute, $this->getSupportedAttributes(), true);
     }
 
     /**
@@ -62,7 +62,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        if (!$object || !$this->supportsClass(get_class($object))) {
+        if (!$object || !$this->supportsClass(\get_class($object))) {
             return self::ACCESS_ABSTAIN;
         }
 

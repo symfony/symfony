@@ -41,7 +41,7 @@ class XmlUtils
      */
     public static function loadFile($file, $schemaOrCallable = null)
     {
-        if (!extension_loaded('dom')) {
+        if (!\extension_loaded('dom')) {
             throw new \RuntimeException('Extension DOM is required.');
         }
 
@@ -56,7 +56,7 @@ class XmlUtils
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+        if (!$dom->loadXML($content, LIBXML_NONET | (\defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
             throw new \InvalidArgumentException(implode("\n", static::getXmlErrors($internalErrors)));
@@ -78,13 +78,13 @@ class XmlUtils
             libxml_clear_errors();
 
             $e = null;
-            if (is_callable($schemaOrCallable)) {
+            if (\is_callable($schemaOrCallable)) {
                 try {
-                    $valid = call_user_func($schemaOrCallable, $dom, $internalErrors);
+                    $valid = \call_user_func($schemaOrCallable, $dom, $internalErrors);
                 } catch (\Exception $e) {
                     $valid = false;
                 }
-            } elseif (!is_array($schemaOrCallable) && is_file((string) $schemaOrCallable)) {
+            } elseif (!\is_array($schemaOrCallable) && is_file((string) $schemaOrCallable)) {
                 $schemaSource = file_get_contents((string) $schemaOrCallable);
                 $valid = @$dom->schemaValidateSource($schemaSource);
             } else {
@@ -134,7 +134,7 @@ class XmlUtils
         $empty = true;
         $config = array();
         foreach ($element->attributes as $name => $node) {
-            if ($checkPrefix && !in_array((string) $node->prefix, array('', $prefix), true)) {
+            if ($checkPrefix && !\in_array((string) $node->prefix, array('', $prefix), true)) {
                 continue;
             }
             $config[$name] = static::phpize($node->value);
@@ -155,7 +155,7 @@ class XmlUtils
 
                 $key = $node->localName;
                 if (isset($config[$key])) {
-                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
+                    if (!\is_array($config[$key]) || !\is_int(key($config[$key]))) {
                         $config[$key] = array($config[$key]);
                     }
                     $config[$key][] = $value;
@@ -169,7 +169,7 @@ class XmlUtils
 
         if (false !== $nodeValue) {
             $value = static::phpize($nodeValue);
-            if (count($config)) {
+            if (\count($config)) {
                 $config['value'] = $value;
             } else {
                 $config = $value;

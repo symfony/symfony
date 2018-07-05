@@ -57,7 +57,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
         // Constraint should always be converted to an array
         $constraintsNormalizer = function (Options $options, $constraints) {
-            return is_object($constraints) ? array($constraints) : (array) $constraints;
+            return \is_object($constraints) ? array($constraints) : (array) $constraints;
         };
 
         $cascadeValidationNormalizer = function (Options $options, $cascadeValidation) {

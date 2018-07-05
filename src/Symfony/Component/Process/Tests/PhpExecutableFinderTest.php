@@ -24,7 +24,7 @@ class PhpExecutableFinderTest extends TestCase
      */
     public function testFindWithPhpPath()
     {
-        if (defined('PHP_BINARY')) {
+        if (\defined('PHP_BINARY')) {
             $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');
         }
 
@@ -50,7 +50,7 @@ class PhpExecutableFinderTest extends TestCase
      */
     public function testFind()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('Should not be executed in HHVM context.');
         }
 
@@ -68,7 +68,7 @@ class PhpExecutableFinderTest extends TestCase
      */
     public function testFindWithHHVM()
     {
-        if (!defined('HHVM_VERSION')) {
+        if (!\defined('HHVM_VERSION')) {
             $this->markTestSkipped('Should be executed in HHVM context.');
         }
 
@@ -87,7 +87,7 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->assertEquals($f->findArguments(), array('--php'), '::findArguments() returns HHVM arguments');
         } elseif ('phpdbg' === PHP_SAPI) {
             $this->assertEquals($f->findArguments(), array('-qrr'), '::findArguments() returns phpdbg arguments');
@@ -101,7 +101,7 @@ class PhpExecutableFinderTest extends TestCase
      */
     public function testFindWithSuffix()
     {
-        if (defined('PHP_BINARY')) {
+        if (\defined('PHP_BINARY')) {
             $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');
         }
 

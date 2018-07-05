@@ -399,7 +399,7 @@ EOHTML;
             $s = '</span>';
             $c = $c[$i = 0];
             do {
-                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
+                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', \ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.$style;
@@ -411,7 +411,7 @@ EOHTML;
             $v = $style.$v;
         }
         if ($cchrCount && '>' === substr($v, -1)) {
-            $v = substr($v, 0, -strlen($style));
+            $v = substr($v, 0, -\strlen($style));
         } else {
             $v .= '</span>';
         }

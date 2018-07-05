@@ -41,7 +41,7 @@ class CallbackValidator extends ConstraintValidator
 
         // has to be an array so that we can differentiate between callables
         // and method names
-        if (null !== $constraint->methods && !is_array($constraint->methods)) {
+        if (null !== $constraint->methods && !\is_array($constraint->methods)) {
             throw new UnexpectedTypeException($constraint->methods, 'array');
         }
 
@@ -50,18 +50,18 @@ class CallbackValidator extends ConstraintValidator
         foreach ($methods as $method) {
             if ($method instanceof \Closure) {
                 $method($object, $this->context);
-            } elseif (is_array($method)) {
-                if (!is_callable($method)) {
-                    if (isset($method[0]) && is_object($method[0])) {
-                        $method[0] = get_class($method[0]);
+            } elseif (\is_array($method)) {
+                if (!\is_callable($method)) {
+                    if (isset($method[0]) && \is_object($method[0])) {
+                        $method[0] = \get_class($method[0]);
                     }
                     throw new ConstraintDefinitionException(sprintf('%s targeted by Callback constraint is not a valid callable', json_encode($method)));
                 }
 
-                call_user_func($method, $object, $this->context);
+                \call_user_func($method, $object, $this->context);
             } elseif (null !== $object) {
                 if (!method_exists($object, $method)) {
-                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist in class %s', $method, get_class($object)));
+                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist in class %s', $method, \get_class($object)));
                 }
 
                 $reflMethod = new \ReflectionMethod($object, $method);

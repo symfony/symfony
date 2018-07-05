@@ -52,7 +52,7 @@ class ProfilerListener implements EventSubscriberInterface
             $onlyMasterRequests = $onlyException;
             $onlyException = $matcher;
             $matcher = $requestStack;
-            $requestStack = func_num_args() < 5 ? null : $tmp;
+            $requestStack = \func_num_args() < 5 ? null : $tmp;
 
             @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as second argument as '.__CLASS__.'::onKernelRequest method will be removed in 3.0.', E_USER_DEPRECATED);
         } elseif (!$requestStack instanceof RequestStack) {

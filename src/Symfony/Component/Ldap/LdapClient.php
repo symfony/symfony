@@ -41,7 +41,7 @@ class LdapClient implements LdapClientInterface
      */
     public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false)
     {
-        if (!extension_loaded('ldap')) {
+        if (!\extension_loaded('ldap')) {
             throw new LdapException('The ldap module is needed.');
         }
 
@@ -77,7 +77,7 @@ class LdapClient implements LdapClientInterface
      */
     public function find($dn, $query, $filter = '*')
     {
-        if (!is_array($filter)) {
+        if (!\is_array($filter)) {
             $filter = array($filter);
         }
 
@@ -112,7 +112,7 @@ class LdapClient implements LdapClientInterface
             if (!empty($value) && ' ' === $value[0]) {
                 $value = '\\20'.substr($value, 1);
             }
-            if (!empty($value) && ' ' === $value[strlen($value) - 1]) {
+            if (!empty($value) && ' ' === $value[\strlen($value) - 1]) {
                 $value = substr($value, 0, -1).'\\20';
             }
             $value = str_replace("\r", '\0d', $value);
@@ -143,7 +143,7 @@ class LdapClient implements LdapClientInterface
 
     private function disconnect()
     {
-        if ($this->connection && is_resource($this->connection)) {
+        if ($this->connection && \is_resource($this->connection)) {
             ldap_unbind($this->connection);
         }
 

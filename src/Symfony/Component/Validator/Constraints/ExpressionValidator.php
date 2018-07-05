@@ -58,7 +58,7 @@ class ExpressionValidator extends ConstraintValidator
             $root = $this->context->getRoot();
             $variables['value'] = $value;
 
-            if (is_object($root)) {
+            if (\is_object($root)) {
                 // Extract the object that the property belongs to from the object
                 // graph
                 $path = new PropertyPath($this->context->getPropertyPath());

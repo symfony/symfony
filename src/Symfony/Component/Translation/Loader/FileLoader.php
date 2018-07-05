@@ -41,7 +41,7 @@ abstract class FileLoader extends ArrayLoader
         }
 
         // not an array
-        if (!is_array($messages)) {
+        if (!\is_array($messages)) {
             throw new InvalidResourceException(sprintf('Unable to load file "%s".', $resource));
         }
 

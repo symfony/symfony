@@ -85,7 +85,7 @@ class ExpressionLanguage
         $cacheKeyItems = array();
 
         foreach ($names as $nameKey => $name) {
-            $cacheKeyItems[] = is_int($nameKey) ? $name : $nameKey.':'.$name;
+            $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey.':'.$name;
         }
 
         $key = $expression.'//'.implode('|', $cacheKeyItems);
@@ -137,7 +137,7 @@ class ExpressionLanguage
         $this->register('constant', function ($constant) {
             return sprintf('constant(%s)', $constant);
         }, function (array $values, $constant) {
-            return constant($constant);
+            return \constant($constant);
         });
     }
 

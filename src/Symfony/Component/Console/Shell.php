@@ -44,7 +44,7 @@ class Shell
     {
         @trigger_error('The '.__CLASS__.' class is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-        $this->hasReadline = function_exists('readline');
+        $this->hasReadline = \function_exists('readline');
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();

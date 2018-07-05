@@ -207,7 +207,7 @@ class TranslationExtensionTest extends TestCase
             $translator = new Translator('en', new MessageSelector());
         }
 
-        if (is_array($template)) {
+        if (\is_array($template)) {
             $loader = new TwigArrayLoader($template);
         } else {
             $loader = new TwigArrayLoader(array('index' => $template));

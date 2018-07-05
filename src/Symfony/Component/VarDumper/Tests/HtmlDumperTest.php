@@ -47,7 +47,7 @@ class HtmlDumperTest extends TestCase
         $dumpId = $dumpId[0];
         $res = (int) $var['res'];
         $closure54 = '';
-        $r = defined('HHVM_VERSION') ? '' : '<a class=sf-dump-ref>#%d</a>';
+        $r = \defined('HHVM_VERSION') ? '' : '<a class=sf-dump-ref>#%d</a>';
 
         if (\PHP_VERSION_ID >= 50400) {
             $closure54 = <<<EOTXT

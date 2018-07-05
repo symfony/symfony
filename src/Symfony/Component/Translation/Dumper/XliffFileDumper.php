@@ -188,6 +188,6 @@ class XliffFileDumper extends FileDumper
      */
     private function hasMetadataArrayInfo($key, $metadata = null)
     {
-        return null !== $metadata && array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || is_array($metadata[$key]));
+        return null !== $metadata && array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || \is_array($metadata[$key]));
     }
 }

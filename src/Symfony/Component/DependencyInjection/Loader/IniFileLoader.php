@@ -35,7 +35,7 @@ class IniFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $resource));
         }
 
-        if (isset($result['parameters']) && is_array($result['parameters'])) {
+        if (isset($result['parameters']) && \is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
                 $this->container->setParameter($key, $value);
             }
@@ -47,6 +47,6 @@ class IniFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'ini' === pathinfo($resource, PATHINFO_EXTENSION);
+        return \is_string($resource) && 'ini' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 }

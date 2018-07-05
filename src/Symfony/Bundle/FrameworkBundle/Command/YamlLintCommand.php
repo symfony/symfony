@@ -143,9 +143,9 @@ EOF
         }
 
         if (0 === $errors) {
-            $io->success(sprintf('All %d YAML files contain valid syntax.', count($filesInfo)));
+            $io->success(sprintf('All %d YAML files contain valid syntax.', \count($filesInfo)));
         } else {
-            $io->warning(sprintf('%d YAML files have valid syntax and %d contain errors.', count($filesInfo) - $errors, $errors));
+            $io->warning(sprintf('%d YAML files have valid syntax and %d contain errors.', \count($filesInfo) - $errors, $errors));
         }
 
         return min($errors, 1);
@@ -162,7 +162,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
+        $output->writeln(json_encode($filesInfo, \defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
 
         return min($errors, 1);
     }

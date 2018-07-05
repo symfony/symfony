@@ -56,10 +56,10 @@ class ArrayNodeTest extends TestCase
     {
         if ($expected instanceof \Exception) {
             if (method_exists($this, 'expectException')) {
-                $this->expectException(get_class($expected));
+                $this->expectException(\get_class($expected));
                 $this->expectExceptionMessage($expected->getMessage());
             } else {
-                $this->setExpectedException(get_class($expected), $expected->getMessage());
+                $this->setExpectedException(\get_class($expected), $expected->getMessage());
             }
         }
         $node = new ArrayNode('root');

@@ -127,17 +127,17 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
         $this->assertSame($routeData['path'], $route->getPath(), '->load preserves path annotation');
         $this->assertCount(
-            count($routeData['requirements']),
+            \count($routeData['requirements']),
             array_intersect_assoc($routeData['requirements'], $route->getRequirements()),
             '->load preserves requirements annotation'
         );
         $this->assertCount(
-            count($routeData['options']),
+            \count($routeData['options']),
             array_intersect_assoc($routeData['options'], $route->getOptions()),
             '->load preserves options annotation'
         );
         $this->assertCount(
-            count($routeData['defaults']),
+            \count($routeData['defaults']),
             $route->getDefaults(),
             '->load preserves defaults annotation'
         );

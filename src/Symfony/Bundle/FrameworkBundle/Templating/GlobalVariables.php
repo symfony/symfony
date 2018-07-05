@@ -66,7 +66,7 @@ class GlobalVariables
         }
 
         $user = $token->getUser();
-        if (!is_object($user)) {
+        if (!\is_object($user)) {
             return;
         }
 

@@ -41,7 +41,7 @@ class PreloadedExtension implements FormExtensionInterface
             $this->types[$type->getName()] = $type;
 
             // Since Symfony 2.8, types are identified by their FQCN
-            $this->types[get_class($type)] = $type;
+            $this->types[\get_class($type)] = $type;
         }
     }
 

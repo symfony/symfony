@@ -35,7 +35,7 @@ class PhpFileLoader extends FileLoader
     public function load($file, $type = null)
     {
         $path = $this->locator->locate($file);
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
 
         $collection = self::includeFile($path, $this);
         $collection->addResource(new FileResource($path));
@@ -48,7 +48,7 @@ class PhpFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
+        return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
     }
 
     /**

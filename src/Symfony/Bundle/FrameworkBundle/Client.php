@@ -166,7 +166,7 @@ class Client extends BaseClient
 
         $r = new \ReflectionObject($this->kernel);
 
-        $autoloader = dirname($r->getFileName()).'/autoload.php';
+        $autoloader = \dirname($r->getFileName()).'/autoload.php';
         if (is_file($autoloader)) {
             $autoloader = str_replace("'", "\\'", $autoloader);
         } else {

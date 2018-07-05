@@ -34,7 +34,7 @@ class GnuFinderTest extends FinderTest
         $adapter = new GnuFindAdapter();
 
         if (!$adapter->isSupported()) {
-            $this->markTestSkipped(get_class($adapter).' is not supported.');
+            $this->markTestSkipped(\get_class($adapter).' is not supported.');
         }
 
         return Finder::create()

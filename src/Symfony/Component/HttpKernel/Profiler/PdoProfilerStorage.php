@@ -160,7 +160,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $stmt = $this->prepareStatement($db, $query);
 
         foreach ($args as $arg => $val) {
-            $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+            $stmt->bindValue($arg, $val, \is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
         }
         $success = $stmt->execute();
         if (!$success) {
@@ -188,7 +188,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $stmt = $this->prepareStatement($db, $query);
 
         foreach ($args as $arg => $val) {
-            $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+            $stmt->bindValue($arg, $val, \is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
         }
         $stmt->execute();
 

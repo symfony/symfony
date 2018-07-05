@@ -98,7 +98,7 @@ abstract class AbstractExtension implements FormExtensionInterface
             $this->initTypeExtensions();
         }
 
-        return isset($this->typeExtensions[$name]) && count($this->typeExtensions[$name]) > 0;
+        return isset($this->typeExtensions[$name]) && \count($this->typeExtensions[$name]) > 0;
     }
 
     /**
@@ -157,7 +157,7 @@ abstract class AbstractExtension implements FormExtensionInterface
             }
 
             // Since Symfony 3.0 types are identified by their FQCN
-            $fqcn = get_class($type);
+            $fqcn = \get_class($type);
             $legacyName = $type->getName();
 
             $this->types[$fqcn] = $type;

@@ -99,7 +99,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
         if (!$metadata instanceof PropertyMetadataContainerInterface) {
             $valueAsString = is_scalar($containingValue)
                 ? '"'.$containingValue.'"'
-                : 'the value of type '.gettype($containingValue);
+                : 'the value of type '.\gettype($containingValue);
 
             throw new ValidatorException(sprintf('The metadata for %s does not support properties.', $valueAsString));
         }
@@ -124,20 +124,20 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null)
     {
-        $visitor = $this->createVisitor(is_object($containingValue) ? $containingValue : $value);
+        $visitor = $this->createVisitor(\is_object($containingValue) ? $containingValue : $value);
         $metadata = $this->metadataFactory->getMetadataFor($containingValue);
 
         if (!$metadata instanceof PropertyMetadataContainerInterface) {
             $valueAsString = is_scalar($containingValue)
                 ? '"'.$containingValue.'"'
-                : 'the value of type '.gettype($containingValue);
+                : 'the value of type '.\gettype($containingValue);
 
             throw new ValidatorException(sprintf('The metadata for %s does not support properties.', $valueAsString));
         }
 
         // If $containingValue is passed as class name, take $value as root
         // and start the traversal with an empty property path
-        $propertyPath = is_object($containingValue) ? $property : '';
+        $propertyPath = \is_object($containingValue) ? $property : '';
 
         foreach ($this->resolveGroups($groups) as $group) {
             if (!$metadata->hasPropertyMetadata($property)) {
@@ -159,7 +159,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     {
         $context = new ExecutionContext($this->createVisitor($value), $this->translator, $this->translationDomain);
 
-        $constraints = is_array($constraints) ? $constraints : array($constraints);
+        $constraints = \is_array($constraints) ? $constraints : array($constraints);
 
         foreach ($constraints as $constraint) {
             if ($constraint instanceof Valid) {
@@ -178,7 +178,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
                 throw new ValidatorException(
                     sprintf(
                         'The constraint %s cannot be validated. Use the method validate() instead.',
-                        get_class($constraint)
+                        \get_class($constraint)
                     )
                 );
             }

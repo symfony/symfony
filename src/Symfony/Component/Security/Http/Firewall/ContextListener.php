@@ -47,7 +47,7 @@ class ContextListener implements ListenerInterface
 
         foreach ($userProviders as $userProvider) {
             if (!$userProvider instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', \get_class($userProvider)));
             }
         }
 
@@ -150,7 +150,7 @@ class ContextListener implements ListenerInterface
                 $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
-                    $this->logger->debug('User was reloaded from a user provider.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
+                    $this->logger->debug('User was reloaded from a user provider.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
                 }
 
                 return $token;
@@ -158,7 +158,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $e) {
                 if (null !== $this->logger) {
-                    $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $e->getUsername(), 'provider' => get_class($provider)));
+                    $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $e->getUsername(), 'provider' => \get_class($provider)));
                 }
 
                 $userNotFoundByProvider = true;
@@ -169,7 +169,7 @@ class ContextListener implements ListenerInterface
             return null;
         }
 
-        throw new \RuntimeException(sprintf('There is no user provider for user "%s".', get_class($user)));
+        throw new \RuntimeException(sprintf('There is no user provider for user "%s".', \get_class($user)));
     }
 
     private function safelyUnserialize($serializedToken)

@@ -126,7 +126,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, array $requiredSchemes = array())
     {
-        if (is_bool($referenceType) || is_string($referenceType)) {
+        if (\is_bool($referenceType) || \is_string($referenceType)) {
             @trigger_error('The hardcoded value you are using for the $referenceType argument of the '.__CLASS__.'::generate method is deprecated since Symfony 2.8 and will not be supported anymore in 3.0. Use the constants defined in the UrlGeneratorInterface instead.', E_USER_DEPRECATED);
 
             if (true === $referenceType) {
@@ -199,7 +199,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $scheme = $this->context->getScheme();
 
         if ($requiredSchemes) {
-            if (!in_array($scheme, $requiredSchemes, true)) {
+            if (!\in_array($scheme, $requiredSchemes, true)) {
                 $referenceType = self::ABSOLUTE_URL;
                 $scheme = current($requiredSchemes);
             }
@@ -313,7 +313,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $targetDirs[] = $targetFile;
-        $path = str_repeat('../', count($sourceDirs)).implode('/', $targetDirs);
+        $path = str_repeat('../', \count($sourceDirs)).implode('/', $targetDirs);
 
         // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used

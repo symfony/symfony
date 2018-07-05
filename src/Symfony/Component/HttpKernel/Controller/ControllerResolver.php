@@ -65,29 +65,29 @@ class ControllerResolver implements ControllerResolverInterface
             return false;
         }
 
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             return $controller;
         }
 
-        if (is_object($controller)) {
+        if (\is_object($controller)) {
             if (method_exists($controller, '__invoke')) {
                 return $controller;
             }
 
-            throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', get_class($controller), $request->getPathInfo()));
+            throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', \get_class($controller), $request->getPathInfo()));
         }
 
         if (false === strpos($controller, ':')) {
             if (method_exists($controller, '__invoke')) {
                 return $this->instantiateController($controller);
-            } elseif (function_exists($controller)) {
+            } elseif (\function_exists($controller)) {
                 return $controller;
             }
         }
 
         $callable = $this->createController($controller);
 
-        if (!is_callable($callable)) {
+        if (!\is_callable($callable)) {
             throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', $controller, $request->getPathInfo()));
         }
 
@@ -99,9 +99,9 @@ class ControllerResolver implements ControllerResolverInterface
      */
     public function getArguments(Request $request, $controller)
     {
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             $r = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller) && !$controller instanceof \Closure) {
+        } elseif (\is_object($controller) && !$controller instanceof \Closure) {
             $r = new \ReflectionObject($controller);
             $r = $r->getMethod('__invoke');
         } else {
@@ -124,7 +124,7 @@ class ControllerResolver implements ControllerResolverInterface
         $arguments = array();
         foreach ($parameters as $param) {
             if (array_key_exists($param->name, $attributes)) {
-                if ($this->supportsVariadic && $param->isVariadic() && is_array($attributes[$param->name])) {
+                if ($this->supportsVariadic && $param->isVariadic() && \is_array($attributes[$param->name])) {
                     $arguments = array_merge($arguments, array_values($attributes[$param->name]));
                 } else {
                     $arguments[] = $attributes[$param->name];
@@ -136,10 +136,10 @@ class ControllerResolver implements ControllerResolverInterface
             } elseif ($this->supportsScalarTypes && $param->hasType() && $param->allowsNull()) {
                 $arguments[] = null;
             } else {
-                if (is_array($controller)) {
-                    $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
-                } elseif (is_object($controller)) {
-                    $repr = get_class($controller);
+                if (\is_array($controller)) {
+                    $repr = sprintf('%s::%s()', \get_class($controller[0]), $controller[1]);
+                } elseif (\is_object($controller)) {
+                    $repr = \get_class($controller);
                 } else {
                     $repr = $controller;
                 }

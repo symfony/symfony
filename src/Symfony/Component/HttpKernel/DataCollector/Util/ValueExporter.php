@@ -31,15 +31,15 @@ class ValueExporter
             return sprintf('__PHP_Incomplete_Class(%s)', $this->getClassNameFromIncomplete($value));
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
-                return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ATOM));
+                return sprintf('Object(%s) - %s', \get_class($value), $value->format(\DateTime::ATOM));
             }
 
-            return sprintf('Object(%s)', get_class($value));
+            return sprintf('Object(%s)', \get_class($value));
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             if (empty($value)) {
                 return '[]';
             }
@@ -48,7 +48,7 @@ class ValueExporter
 
             $a = array();
             foreach ($value as $k => $v) {
-                if (is_array($v)) {
+                if (\is_array($v)) {
                     $deep = true;
                 }
                 $a[] = sprintf('%s => %s', $k, $this->exportValue($v, $depth + 1, $deep));
@@ -61,7 +61,7 @@ class ValueExporter
             return sprintf('[%s]', implode(', ', $a));
         }
 
-        if (is_resource($value)) {
+        if (\is_resource($value)) {
             return sprintf('Resource(%s#%d)', get_resource_type($value), $value);
         }
 

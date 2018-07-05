@@ -65,7 +65,7 @@ class ExceptionHandler
         $handler = new static($debug, $charset, $fileLinkFormat);
 
         $prev = set_exception_handler(array($handler, 'handle'));
-        if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
+        if (\is_array($prev) && $prev[0] instanceof ErrorHandler) {
             restore_exception_handler();
             $prev[0]->setExceptionHandler(array($handler, 'handle'));
         }
@@ -82,7 +82,7 @@ class ExceptionHandler
      */
     public function setHandler($handler)
     {
-        if (null !== $handler && !is_callable($handler)) {
+        if (null !== $handler && !\is_callable($handler)) {
             throw new \LogicException('The exception handler must be a valid PHP callable.');
         }
         $old = $this->handler;
@@ -137,7 +137,7 @@ class ExceptionHandler
         $this->caughtBuffer = null;
 
         try {
-            call_user_func($this->handler, $exception);
+            \call_user_func($this->handler, $exception);
             $this->caughtLength = $caughtLength;
         } catch (\Exception $e) {
             if (!$caughtLength) {
@@ -157,7 +157,7 @@ class ExceptionHandler
     private function failSafeHandle(\Exception $exception)
     {
         if (class_exists('Symfony\Component\HttpFoundation\Response', false)
-            && __CLASS__ !== get_class($this)
+            && __CLASS__ !== \get_class($this)
             && ($reflector = new \ReflectionMethod($this, 'createResponse'))
             && __CLASS__ !== $reflector->class
         ) {
@@ -251,7 +251,7 @@ class ExceptionHandler
         $content = '';
         if ($this->debug) {
             try {
-                $count = count($exception->getAllPrevious());
+                $count = \count($exception->getAllPrevious());
                 $total = $count + 1;
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
@@ -284,7 +284,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $this->escapeHtml($e->getMessage()));
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', \get_class($e), $this->escapeHtml($e->getMessage()));
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }
@@ -423,7 +423,7 @@ EOF;
             if ('object' === $item[0]) {
                 $formattedValue = sprintf('<em>object</em>(%s)', $this->formatClass($item[1]));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", $this->escapeHtml($item[1]));
             } elseif ('null' === $item[0]) {
@@ -436,7 +436,7 @@ EOF;
                 $formattedValue = str_replace("\n", '', var_export($this->escapeHtml((string) $item[1]), true));
             }
 
-            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $this->escapeHtml($key), $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", $this->escapeHtml($key), $formattedValue);
         }
 
         return implode(', ', $result);

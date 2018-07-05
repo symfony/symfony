@@ -45,7 +45,7 @@ function foo()
 $handler = ErrorHandler::register();
 $handler->setExceptionHandler('print_r');
 
-if (function_exists('xdebug_disable')) {
+if (\function_exists('xdebug_disable')) {
     xdebug_disable();
 }
 

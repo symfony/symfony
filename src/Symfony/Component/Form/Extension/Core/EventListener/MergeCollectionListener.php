@@ -50,11 +50,11 @@ class MergeCollectionListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+        if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        if (null !== $dataToMergeInto && !is_array($dataToMergeInto) && !($dataToMergeInto instanceof \Traversable && $dataToMergeInto instanceof \ArrayAccess)) {
+        if (null !== $dataToMergeInto && !\is_array($dataToMergeInto) && !($dataToMergeInto instanceof \Traversable && $dataToMergeInto instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($dataToMergeInto, 'array or (\Traversable and \ArrayAccess)');
         }
 
@@ -72,7 +72,7 @@ class MergeCollectionListener implements EventSubscriberInterface
             }
         } else {
             // Calculate delta
-            $itemsToAdd = is_object($data) ? clone $data : $data;
+            $itemsToAdd = \is_object($data) ? clone $data : $data;
             $itemsToDelete = array();
 
             foreach ($dataToMergeInto as $beforeKey => $beforeItem) {

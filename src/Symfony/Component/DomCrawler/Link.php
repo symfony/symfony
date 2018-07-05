@@ -42,7 +42,7 @@ class Link
      */
     public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
     {
-        if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
+        if (!\in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
@@ -114,7 +114,7 @@ class Link
         }
 
         // relative path
-        $path = parse_url(substr($this->currentUri, strlen($baseUri)), PHP_URL_PATH);
+        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), PHP_URL_PATH);
         $path = $this->canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
 
         return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;

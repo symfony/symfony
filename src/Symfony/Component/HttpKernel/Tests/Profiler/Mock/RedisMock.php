@@ -148,7 +148,7 @@ class RedisMock
         if (isset($this->storage[$key])) {
             $this->storeData($key, $this->getData($key).$value);
 
-            return strlen($this->storage[$key]);
+            return \strlen($this->storage[$key]);
         }
 
         return false;
@@ -167,7 +167,7 @@ class RedisMock
             return false;
         }
 
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $result = 0;
             foreach ($key as $k) {
                 if (isset($this->storage[$k])) {

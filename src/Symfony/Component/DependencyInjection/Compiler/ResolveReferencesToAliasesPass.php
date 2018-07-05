@@ -62,7 +62,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     private function processArguments(array $arguments)
     {
         foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
+            if (\is_array($argument)) {
                 $arguments[$k] = $this->processArguments($argument);
             } elseif ($argument instanceof Reference) {
                 $defId = $this->getDefinitionId($id = (string) $argument);
@@ -87,7 +87,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
     private function processFactory($factory)
     {
-        if (null === $factory || !is_array($factory) || !$factory[0] instanceof Reference) {
+        if (null === $factory || !\is_array($factory) || !$factory[0] instanceof Reference) {
             return $factory;
         }
 

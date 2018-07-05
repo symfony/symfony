@@ -76,7 +76,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $cliOutput = $output);
 
-        if (!extension_loaded('pcntl')) {
+        if (!\extension_loaded('pcntl')) {
             $io->error(array(
                 'This command needs the pcntl extension to run.',
                 'You can either install it or use the "server:run" command instead to run the built-in web server.',

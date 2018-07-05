@@ -172,7 +172,7 @@ class MemcacheMock
             return false;
         }
 
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $result = array();
             foreach ($key as $k) {
                 if (isset($this->storage[$k])) {

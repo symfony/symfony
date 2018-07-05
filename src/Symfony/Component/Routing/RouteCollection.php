@@ -63,7 +63,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->routes);
+        return \count($this->routes);
     }
 
     /**

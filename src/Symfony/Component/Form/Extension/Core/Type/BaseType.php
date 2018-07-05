@@ -81,9 +81,9 @@ abstract class BaseType extends AbstractType
             if (method_exists($type, 'getBlockPrefix')) {
                 array_unshift($blockPrefixes, $type->getBlockPrefix());
             } else {
-                @trigger_error(get_class($type).': The ResolvedFormTypeInterface::getBlockPrefix() method will be added in version 3.0. You should add it to your implementation.', E_USER_DEPRECATED);
+                @trigger_error(\get_class($type).': The ResolvedFormTypeInterface::getBlockPrefix() method will be added in version 3.0. You should add it to your implementation.', E_USER_DEPRECATED);
 
-                $fqcn = get_class($type->getInnerType());
+                $fqcn = \get_class($type->getInnerType());
                 $name = $type->getName();
                 $hasCustomName = $name !== $fqcn;
 

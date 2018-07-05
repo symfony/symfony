@@ -33,12 +33,12 @@ class SqliteProfilerStorage extends PdoProfilerStorage
                 throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Sqlite with an invalid dsn "%s". The expected format is "sqlite:/path/to/the/db/file".', $this->dsn));
             }
             if (class_exists('SQLite3')) {
-                $db = new \SQLite3(substr($this->dsn, 7, strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
+                $db = new \SQLite3(substr($this->dsn, 7, \strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
                 if (method_exists($db, 'busyTimeout')) {
                     // busyTimeout only exists for PHP >= 5.3.3
                     $db->busyTimeout(1000);
                 }
-            } elseif (class_exists('PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+            } elseif (class_exists('PDO') && \in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
                 $db = new \PDO($this->dsn);
             } else {
                 throw new \RuntimeException('You need to enable either the SQLite3 or PDO_SQLite extension for the profiler to run properly.');
@@ -64,7 +64,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         if ($db instanceof \SQLite3) {
             $stmt = $this->prepareStatement($db, $query);
             foreach ($args as $arg => $val) {
-                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
+                $stmt->bindValue($arg, $val, \is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
             }
 
             $res = $stmt->execute();
@@ -84,7 +84,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         if ($db instanceof \SQLite3) {
             $stmt = $this->prepareStatement($db, $query);
             foreach ($args as $arg => $val) {
-                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
+                $stmt->bindValue($arg, $val, \is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
             }
             $res = $stmt->execute();
             while ($row = $res->fetchArray(\SQLITE3_ASSOC)) {

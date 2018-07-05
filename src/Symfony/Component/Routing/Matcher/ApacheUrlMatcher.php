@@ -91,7 +91,7 @@ class ApacheUrlMatcher extends UrlMatcher
             $parameters['_route'] = $route;
 
             return $this->mergeDefaults($parameters, $defaults);
-        } elseif (0 < count($allow)) {
+        } elseif (0 < \count($allow)) {
             throw new MethodNotAllowedException($allow);
         } else {
             return parent::match($pathinfo);

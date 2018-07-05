@@ -27,7 +27,7 @@ class TemplateNameParserTest extends TestCase
             ->expects($this->any())
             ->method('getBundle')
             ->will($this->returnCallback(function ($bundle) {
-                if (in_array($bundle, array('SensioFooBundle', 'SensioCmsFooBundle', 'FooBundle'))) {
+                if (\in_array($bundle, array('SensioFooBundle', 'SensioCmsFooBundle', 'FooBundle'))) {
                     return true;
                 }
 

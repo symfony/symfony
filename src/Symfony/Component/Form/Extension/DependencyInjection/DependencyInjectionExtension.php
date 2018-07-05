@@ -42,7 +42,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
         $type = $this->container->get($this->typeServiceIds[$name]);
 
         // BC: validate result of getName() for legacy names (non-FQCN)
-        if ($name !== get_class($type) && $type->getName() !== $name) {
+        if ($name !== \get_class($type) && $type->getName() !== $name) {
             throw new InvalidArgumentException(
                 sprintf('The type name specified for the service "%s" does not match the actual name. Expected "%s", given "%s"',
                     $this->typeServiceIds[$name],
@@ -99,7 +99,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
                 $guessers[] = $this->container->get($serviceId);
             }
 
-            if (count($guessers) > 0) {
+            if (\count($guessers) > 0) {
                 $this->guesser = new FormTypeGuesserChain($guessers);
             }
         }

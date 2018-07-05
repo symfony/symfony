@@ -152,8 +152,8 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function isSelectedChoice(ChoiceView $choice, $selectedValue)
     {
-        if (is_array($selectedValue)) {
-            return in_array($choice->value, $selectedValue, true);
+        if (\is_array($selectedValue)) {
+            return \in_array($choice->value, $selectedValue, true);
         }
 
         return $choice->value === $selectedValue;

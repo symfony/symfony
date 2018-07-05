@@ -44,7 +44,7 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->setPath(dirname(PHP_BINARY));
+        $this->setPath(\dirname(PHP_BINARY));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
@@ -79,7 +79,7 @@ class ExecutableFinderTest extends TestCase
 
         $this->setPath('');
 
-        $extraDirs = array(dirname(PHP_BINARY));
+        $extraDirs = array(\dirname(PHP_BINARY));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), null, $extraDirs);
@@ -100,7 +100,7 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->iniSet('open_basedir', dirname(PHP_BINARY).(!defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
+        $this->iniSet('open_basedir', \dirname(PHP_BINARY).(!\defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
@@ -121,7 +121,7 @@ class ExecutableFinderTest extends TestCase
         }
 
         $this->setPath('');
-        $this->iniSet('open_basedir', PHP_BINARY.(!defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
+        $this->iniSet('open_basedir', PHP_BINARY.(!\defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);

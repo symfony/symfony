@@ -74,11 +74,11 @@ class ArrayKeyChoiceList extends ArrayChoiceList
         if (!is_scalar($choice) && null !== $choice) {
             throw new InvalidArgumentException(sprintf(
                 'The value of type "%s" cannot be converted to a valid array key.',
-                gettype($choice)
+                \gettype($choice)
             ));
         }
 
-        if (is_bool($choice) || (string) (int) $choice === (string) $choice) {
+        if (\is_bool($choice) || (string) (int) $choice === (string) $choice) {
             return (int) $choice;
         }
 
@@ -176,13 +176,13 @@ class ArrayKeyChoiceList extends ArrayChoiceList
         }
 
         foreach ($choices as $choice => $key) {
-            if (is_array($key)) {
+            if (\is_array($key)) {
                 $this->flatten($key, $value, $choicesByValues, $keysByValues, $structuredValues[$choice]);
 
                 continue;
             }
 
-            $choiceValue = (string) call_user_func($value, $choice);
+            $choiceValue = (string) \call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
             $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;

@@ -155,7 +155,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
-            $i = count($matcherIds);
+            $i = \count($matcherIds);
             if (1 === $i) {
                 $this->assertEquals(array('ROLE_USER'), $attributes);
                 $this->assertEquals('https', $channel);

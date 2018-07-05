@@ -93,7 +93,7 @@ class XmlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
+        return \is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
     }
 
     /**
@@ -128,7 +128,7 @@ class XmlFileLoader extends FileLoader
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
         if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
+            if (0 === \count($methods)) {
                 $methods = explode('|', $requirements['_method']);
             }
 
@@ -137,7 +137,7 @@ class XmlFileLoader extends FileLoader
         }
 
         if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
+            if (0 === \count($schemes)) {
                 $schemes = explode('|', $requirements['_scheme']);
             }
 
@@ -173,7 +173,7 @@ class XmlFileLoader extends FileLoader
 
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
 
         $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
         /* @var $subCollection RouteCollection */

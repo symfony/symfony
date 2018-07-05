@@ -39,7 +39,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         krsort($voters);
-        $voters = call_user_func_array('array_merge', $voters);
+        $voters = \call_user_func_array('array_merge', $voters);
 
         if (!$voters) {
             throw new LogicException('No security voters found. You need to tag at least one with "security.voter"');

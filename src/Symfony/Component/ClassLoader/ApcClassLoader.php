@@ -65,7 +65,7 @@ class ApcClassLoader
      */
     public function __construct($prefix, $decorated)
     {
-        if (!function_exists('apcu_fetch')) {
+        if (!\function_exists('apcu_fetch')) {
             throw new \RuntimeException('Unable to use ApcClassLoader as APC is not installed.');
         }
 
@@ -134,6 +134,6 @@ class ApcClassLoader
      */
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->decorated, $method), $args);
+        return \call_user_func_array(array($this->decorated, $method), $args);
     }
 }

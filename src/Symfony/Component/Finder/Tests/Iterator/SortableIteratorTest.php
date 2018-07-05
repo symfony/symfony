@@ -30,7 +30,7 @@ class SortableIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($mode, $expected)
     {
-        if (!is_callable($mode)) {
+        if (!\is_callable($mode)) {
             switch ($mode) {
                 case SortableIterator::SORT_BY_ACCESSED_TIME:
                     if ('\\' === DIRECTORY_SEPARATOR) {

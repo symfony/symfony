@@ -30,7 +30,7 @@ class ServiceNotFoundException extends InvalidArgumentException
         }
 
         if ($alternatives) {
-            if (1 == count($alternatives)) {
+            if (1 == \count($alternatives)) {
                 $msg .= ' Did you mean this: "';
             } else {
                 $msg .= ' Did you mean one of these: "';

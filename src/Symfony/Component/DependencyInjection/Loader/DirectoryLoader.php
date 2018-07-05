@@ -51,6 +51,6 @@ class DirectoryLoader extends FileLoader
             return true;
         }
 
-        return null === $type && is_string($resource) && '/' === substr($resource, -1);
+        return null === $type && \is_string($resource) && '/' === substr($resource, -1);
     }
 }

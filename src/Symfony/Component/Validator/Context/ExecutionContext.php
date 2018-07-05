@@ -186,7 +186,7 @@ class ExecutionContext implements ExecutionContextInterface
         // The parameters $invalidValue and following are ignored by the new
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
-        if (func_num_args() > 2) {
+        if (\func_num_args() > 2) {
             @trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since Symfony 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
 
             $this
@@ -323,7 +323,7 @@ class ExecutionContext implements ExecutionContextInterface
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
 
-        if (func_num_args() > 2) {
+        if (\func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
                 ->atPath($subPath)
@@ -350,7 +350,7 @@ class ExecutionContext implements ExecutionContextInterface
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator() method instead.', E_USER_DEPRECATED);
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             // The $traverse flag is ignored for arrays
             $constraint = new Valid(array('traverse' => true, 'deep' => $deep));
 

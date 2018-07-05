@@ -135,7 +135,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
             if (mb_strlen($string, $encoding) > $length) {
                 return mb_substr($string, 0, $length - 3, $encoding).'...';
             }
-        } elseif (strlen($string) > $length) {
+        } elseif (\strlen($string) > $length) {
             return substr($string, 0, $length - 3).'...';
         }
 

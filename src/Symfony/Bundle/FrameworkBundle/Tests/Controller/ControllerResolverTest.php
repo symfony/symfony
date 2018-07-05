@@ -81,7 +81,7 @@ class ControllerResolverTest extends BaseControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(get_class($this), $controller[0]);
+        $this->assertInstanceOf(\get_class($this), $controller[0]);
         $this->assertSame('controllerMethod1', $controller[1]);
     }
 

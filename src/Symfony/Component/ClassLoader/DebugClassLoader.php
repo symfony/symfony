@@ -53,7 +53,7 @@ class DebugClassLoader
      */
     public static function enable()
     {
-        if (!is_array($functions = spl_autoload_functions())) {
+        if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
 
@@ -62,7 +62,7 @@ class DebugClassLoader
         }
 
         foreach ($functions as $function) {
-            if (is_array($function) && !$function[0] instanceof self && method_exists($function[0], 'findFile')) {
+            if (\is_array($function) && !$function[0] instanceof self && method_exists($function[0], 'findFile')) {
                 $function = array(new static($function[0]), 'loadClass');
             }
 
@@ -104,7 +104,7 @@ class DebugClassLoader
         if ($file = $this->classFinder->findFile($class)) {
             require $file;
 
-            if (!class_exists($class, false) && !interface_exists($class, false) && (!function_exists('trait_exists') || !trait_exists($class, false))) {
+            if (!class_exists($class, false) && !interface_exists($class, false) && (!\function_exists('trait_exists') || !trait_exists($class, false))) {
                 if (false !== strpos($class, '/')) {
                     throw new \RuntimeException(sprintf('Trying to autoload a class with an invalid name "%s". Be careful that the namespace separator is "\" in PHP, not "/".', $class));
                 }

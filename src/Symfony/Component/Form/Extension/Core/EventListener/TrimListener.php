@@ -27,7 +27,7 @@ class TrimListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if (!is_string($data)) {
+        if (!\is_string($data)) {
             return;
         }
 

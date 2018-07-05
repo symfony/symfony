@@ -104,7 +104,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
             }
         } catch (RuntimeException $e) {
             $this->errorMessages[] = $e->getMessage();
-            $this->container->getDefinition($this->currentId)->addError($e->getMessage());
+            $value->addError($e->getMessage());
 
             return parent::processValue($value, $isRoot);
         }

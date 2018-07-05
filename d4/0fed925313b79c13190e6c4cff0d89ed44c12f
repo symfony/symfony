@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-04T16:29:36Z
+
+Looking at the breaking commit, this means the parameter will be mandatory in 5.0? Should the deprecation message tell something about it? If not, null is not allowed right now.
+
+https://github.com/symfony/symfony/commit/bd1f2c858385bca965cb6e8d32b1a21085029981#diff-7ced8e5ceace060a06472087086f06eaR49
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-07-04T16:35:49Z
+
+When not passing a fouth parameter (which used to be valid), the deprecation message is now odd because it tells me not to pass a string (which is not what I did).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-05T08:54:11Z
+
+What do you suggest ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-07-05T10:52:28Z
+
+Would that work?
+
+```php
+public function __construct($subject, Marking $marking, Transition $transition, $workflow = null)
+{
+    // …
+    if (null === $workflow) {
+        @trigger_error(sprintf('Passing only three parameters to "%s" is deprecated since Symfony 4.1. Pass a %s instance as fourth parameter instead.', __METHOD__, WorkflowInterface::class), E_USER_DEPRECATED);
+        $this->workflowName = 'unnamed';
+    } elseif (is_string($workflow)) {
+        // …
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-05T11:35:22Z
+
+@derrabus :+1: I updated the PR

@@ -541,13 +541,16 @@ class CliDumper extends AbstractDumper
             return false;
         }
 
+        if ('Hyper' === getenv('TERM_PROGRAM')) {
+            return true;
+        }
+
         if (DIRECTORY_SEPARATOR === '\\') {
             return (function_exists('sapi_windows_vt100_support')
                 && @sapi_windows_vt100_support($stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM')
-                || 'Hyper' === getenv('TERM_PROGRAM');
+                || 'xterm' === getenv('TERM');
         }
 
         if (function_exists('stream_isatty')) {

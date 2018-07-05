@@ -117,9 +117,11 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 }
             }
 
+            $definition->setBindings($bindings);
+
             // reset fields with "merge" behavior
             $abstract
-                ->setBindings($bindings)
+                ->setBindings(array())
                 ->setArguments(array())
                 ->setMethodCalls(array())
                 ->setDecoratedService(null)

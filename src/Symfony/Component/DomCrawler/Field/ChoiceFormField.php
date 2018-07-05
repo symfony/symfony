@@ -75,7 +75,7 @@ class ChoiceFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @param string $value The value of the field
+     * @param string|array $value The value of the field
      */
     public function select($value)
     {

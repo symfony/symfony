@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfTokenClearingLogoutHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginLdapFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -47,6 +48,7 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new FormLoginFactory());
         $extension->addSecurityListenerFactory(new FormLoginLdapFactory());
         $extension->addSecurityListenerFactory(new JsonLoginFactory());
+        $extension->addSecurityListenerFactory(new JsonLoginLdapFactory());
         $extension->addSecurityListenerFactory(new HttpBasicFactory());
         $extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
         $extension->addSecurityListenerFactory(new RememberMeFactory());

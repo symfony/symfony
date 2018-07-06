@@ -16,6 +16,7 @@ CHANGELOG
 * added optional `int[] $ignoredNodeTypes` argument to `XmlEncoder::__construct`. XML decoding now
   ignores comment node types by default.
 * added `ConstraintViolationListNormalizer`
+* removed redundant `@requires PHP 7.1` from `AbstractNormalizerTest.php`
 
 4.0.0
 -----

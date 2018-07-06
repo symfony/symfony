@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-20T09:08:54Z
+
+This needs some tests, at least a unit one for the factory, at best a functional one.
+
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-06-20T09:23:28Z
+
+@chalasr others LDAP SecurityListenerFactory are not tested, it's a bit difficult and it's just an improvement of existing behavior. (json + ldap)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-06-20T13:16:27Z
+
+> others LDAP SecurityListenerFactory are not tested
+
+@ronfroy that's too bad but still, new code should be tested, at least ensuring that the container can compile with your addition in order to prevent regressions. That should not be hard, adding a `json_login_ldap` listener to https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/Fixtures/yml/container1.yml (and xml + php) and updating the expected config in the corresponding tests that will fail should be enough.
+
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-06-20T14:32:49Z
+
+@chalasr done
+
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-07-01T10:07:28Z
+
+@nicolas-grekas done
+https://github.com/symfony/symfony-docs/pull/9987/files
+
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-07-06T12:46:49Z
+
+@chalasr done

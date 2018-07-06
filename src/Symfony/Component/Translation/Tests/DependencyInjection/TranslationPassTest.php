@@ -57,7 +57,7 @@ class TranslationPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The default value for $readerServiceId will change in 4.0 to "translation.reader".
+     * @expectedDeprecation The default value for $readerServiceId in "Symfony\Component\Translation\DependencyInjection\TranslatorPass::__construct()" will change in 4.0 to "translation.reader".
      *
      * A test that verifies the deprecated "translation.loader" gets the LoaderInterfaces added.
      *

@@ -43,7 +43,7 @@ class LintCommand extends Command
     public function __construct($twig = null)
     {
         if (!$twig instanceof Environment) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since Symfony 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
             parent::__construct($twig);
 
@@ -57,7 +57,7 @@ class LintCommand extends Command
 
     public function setTwigEnvironment(Environment $twig)
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
 
         $this->twig = $twig;
     }
@@ -67,7 +67,7 @@ class LintCommand extends Command
      */
     protected function getTwigEnvironment()
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->twig;
     }

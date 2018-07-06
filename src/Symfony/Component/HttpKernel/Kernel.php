@@ -232,7 +232,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (!$first && !$noDeprecation) {
-            @trigger_error(sprintf('Passing "false" as the second argument to %s() is deprecated as of 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing "false" as the second argument to "%s()" is deprecated as of 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
         }
 
         if (!isset($this->bundleMap[$name])) {
@@ -734,7 +734,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected function getEnvParameters()
     {
         if (0 === func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $parameters = array();

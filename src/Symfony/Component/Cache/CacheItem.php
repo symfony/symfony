@@ -162,7 +162,7 @@ final class CacheItem implements CacheItemInterface
      */
     public function getPreviousTags()
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->metadata[self::METADATA_TAGS] ?? array();
     }

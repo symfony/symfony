@@ -50,7 +50,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**

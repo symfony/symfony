@@ -31,7 +31,7 @@ class RegistryTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Symfony\Component\Workflow\Registry::add is deprecated since Symfony 4.1. Use addWorkflow() instead.
+     * @expectedDeprecation The "Symfony\Component\Workflow\Registry::add()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.
      */
     public function testAddIsDeprecated()
     {

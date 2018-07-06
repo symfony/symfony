@@ -186,7 +186,7 @@ class FlattenException
      */
     public function setTraceFromException(\Exception $exception)
     {
-        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1, use "setTraceFromThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use "setTraceFromThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
 
         $this->setTraceFromThrowable($exception);
     }

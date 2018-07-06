@@ -87,22 +87,12 @@ class BinaryFileResponse extends Response
     {
         if (!$file instanceof File) {
             if ($file instanceof \SplTempFileObject) {
-                static $method = null;
-                static $params = null;
-                if (null === $method) {
-                    $method = 'fread';
-                    $params = array(1024);
-                    if (!method_exists('SplTempFileObject', $method)) {
-                        $method = 'fgets';
-                        $params = array();
-                    }
-                }
                 $file->fflush();
                 $file->rewind();
                 $path = tempnam(sys_get_temp_dir(), 'symfony-temp-file-object');
                 $tmpFile = new \SplFileObject($path, 'wb');
                 while ($file->valid()) {
-                    $tmpFile->fwrite(call_user_func_array(array($file, $method), $params));
+                    $tmpFile->fwrite($file->fgets());
                 }
                 $tmpFile->fflush();
                 $tmpFile = null;

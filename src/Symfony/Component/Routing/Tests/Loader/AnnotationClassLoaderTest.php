@@ -33,6 +33,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\MissingRouteName
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\NothingButNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RouteWithPrefixController;
 
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
@@ -85,6 +86,18 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $routes = $this->loader->load(ActionPathController::class);
         $this->assertCount(1, $routes);
         $this->assertEquals('/path', $routes->get('action')->getPath());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController"?
+     * @expectedDeprecation A placeholder name must be a string (1 given). Did you forget to specify the placeholder key for the requirement "\d+" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController"?
+     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo" of route "foo" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController::foo()"?
+     * @expectedDeprecation A placeholder name must be a string (1 given). Did you forget to specify the placeholder key for the requirement "\d+" of route "foo" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController::foo()"?
+     */
+    public function testRequirementsWithoutPlaceholderName()
+    {
+        $this->loader->load(RequirementsWithoutPlaceholderNameController::class);
     }
 
     public function testInvokableControllerLoader()

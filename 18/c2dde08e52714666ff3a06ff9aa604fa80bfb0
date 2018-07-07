@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-06T17:43:40Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2018-06-27T20:31:40Z
+
+@nicolas-grekas thanks, would be cool if you would backport this to all affected versions (3.4, 4.x)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-27T20:41:11Z
+
+comments addressed thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-01T06:56:17Z
+
+more comments @symfony/deciders ?

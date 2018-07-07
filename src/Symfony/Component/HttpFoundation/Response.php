@@ -329,10 +329,15 @@ class Response
         }
 
         // headers
-        foreach ($this->headers->allPreserveCase() as $name => $values) {
+        foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
             foreach ($values as $value) {
                 header($name.': '.$value, false, $this->statusCode);
             }
+        }
+
+        // cookies
+        foreach ($this->headers->getCookies() as $cookie) {
+            header('Set-Cookie: '.$cookie->getName().strstr($cookie, '='), false, $this->statusCode);
         }
 
         // status

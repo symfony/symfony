@@ -1399,6 +1399,21 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame('via-bindings', $container->get('foo')->class2->identifier);
     }
 
+    public function testUninitializedSyntheticReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setPublic(true)->setSynthetic(true);
+        $container->register('bar', 'stdClass')->setPublic(true)->setShared(false)
+            ->setProperty('foo', new Reference('foo', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE));
+
+        $container->compile();
+
+        $this->assertEquals((object) array('foo' => null), $container->get('bar'));
+
+        $container->set('foo', (object) array(123));
+        $this->assertEquals((object) array('foo' => (object) array(123)), $container->get('bar'));
+    }
+
     public function testIdCanBeAnObjectAsLongAsItCanBeCastToString()
     {
         $id = new Reference('another_service');

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by Doctrs at 2018-05-31T17:49:03Z
+
+@nicolas-grekas hm.... you are right. I created new method `getInvalidValues` with foreach instead of array_filter
+
+---------------------------------------------------------------------------
+
+by Doctrs at 2018-06-16T09:49:51Z
+
+@nicolas-grekas Thanks for comments. I fixed it
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-20T21:11:05Z
+
+Maybe a test more with mixed nested types?
+```php
+$resolver->setAllowedTypes('foo', 'int[][]');
+$resolver->resolve(array(
+    'foo' => array(
+        array(1, true, 'str', array(2, 3)),
+    ),
+));
+```
+How will this look in the exception message?
+
+---------------------------------------------------------------------------
+
+by Doctrs at 2018-06-21T19:18:24Z
+
+@yceruto, Of course, you are right :+1:
+
+Your example here - https://github.com/symfony/symfony/pull/27435/commits/f2b8682dfaeea6033eaf365374ec29100dbc7769#diff-b9a7faded6c8bfc8c16c92999cc982f2R1728
+
+And I added new message in exception. If system found first invalid argument in array. we get exception
+```
+The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".
+```
+instead of
+```
+The option "%s" with value %s is expected to be of type "%s", but is of type "%s".
+```

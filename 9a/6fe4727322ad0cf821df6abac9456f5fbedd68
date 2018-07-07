@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-04T15:30:38Z
+
+Thanks for the PR and the clear description. Could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by DerManoMann at 2018-07-04T21:00:29Z
+
+Ah, looks like i rebased on master, not 4.1 ... is there an easy fix for this or is it better to create a new PR, I wonder?

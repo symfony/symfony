@@ -490,7 +490,7 @@ class OptionsResolver implements Options
             ));
         }
 
-        $this->allowedValues[$option] = is_array($allowedValues) ? $allowedValues : array($allowedValues);
+        $this->allowedValues[$option] = \is_array($allowedValues) ? $allowedValues : array($allowedValues);
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -843,14 +843,13 @@ class OptionsResolver implements Options
             }
 
             if (!$valid) {
-                throw new InvalidOptionsException(sprintf(
-                    'The option "%s" with value %s is expected to be of type '.
-                    '"%s", but is of type "%s".',
-                    $option,
-                    $this->formatValue($value),
-                    implode('" or "', $this->allowedTypes[$option]),
-                    implode('|', array_keys($invalidTypes))
-                ));
+                $keys = array_keys($invalidTypes);
+
+                if (1 === \count($keys) && '[]' === substr($keys[0], -2)) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $option, $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), $keys[0]));
+                }
+
+                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', $option, $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), implode('|', array_keys($invalidTypes))));
             }
         }
 
@@ -939,32 +938,10 @@ class OptionsResolver implements Options
         return $value;
     }
 
-    /**
-     * @param string $type
-     * @param mixed  $value
-     * @param array  &$invalidTypes
-     *
-     * @return bool
-     */
-    private function verifyTypes($type, $value, array &$invalidTypes)
+    private function verifyTypes(string $type, $value, array &$invalidTypes): bool
     {
-        if ('[]' === substr($type, -2) && is_array($value)) {
-            $originalType = $type;
-            $type = substr($type, 0, -2);
-            $invalidValues = array_filter( // Filter out valid values, keeping invalid values in the resulting array
-                $value,
-                function ($value) use ($type) {
-                    return !self::isValueValidType($type, $value);
-                }
-            );
-
-            if (!$invalidValues) {
-                return true;
-            }
-
-            $invalidTypes[$this->formatTypeOf($value, $originalType)] = true;
-
-            return false;
+        if (\is_array($value) && '[]' === substr($type, -2)) {
+            return $this->verifyArrayType($type, $value, $invalidTypes);
         }
 
         if (self::isValueValidType($type, $value)) {
@@ -976,6 +953,43 @@ class OptionsResolver implements Options
         }
 
         return false;
+    }
+
+    private function verifyArrayType(string $type, array $value, array &$invalidTypes, int $level = 0): bool
+    {
+        $type = substr($type, 0, -2);
+
+        $suffix = '[]';
+        while (\strlen($suffix) <= $level * 2) {
+            $suffix .= '[]';
+        }
+
+        if ('[]' === substr($type, -2)) {
+            $success = true;
+            foreach ($value as $item) {
+                if (!\is_array($item)) {
+                    $invalidTypes[$this->formatTypeOf($item, null).$suffix] = true;
+
+                    return false;
+                }
+
+                if (!$this->verifyArrayType($type, $item, $invalidTypes, $level + 1)) {
+                    $success = false;
+                }
+            }
+
+            return $success;
+        }
+
+        foreach ($value as $item) {
+            if (!self::isValueValidType($type, $item)) {
+                $invalidTypes[$this->formatTypeOf($item, $type).$suffix] = $value;
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -1058,13 +1072,13 @@ class OptionsResolver implements Options
             while ('[]' === substr($type, -2)) {
                 $type = substr($type, 0, -2);
                 $value = array_shift($value);
-                if (!is_array($value)) {
+                if (!\is_array($value)) {
                     break;
                 }
                 $suffix .= '[]';
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $subTypes = array();
                 foreach ($value as $val) {
                     $subTypes[$this->formatTypeOf($val, null)] = true;
@@ -1074,7 +1088,7 @@ class OptionsResolver implements Options
             }
         }
 
-        return (is_object($value) ? get_class($value) : gettype($value)).$suffix;
+        return (\is_object($value) ? get_class($value) : gettype($value)).$suffix;
     }
 
     /**
@@ -1088,19 +1102,19 @@ class OptionsResolver implements Options
      */
     private function formatValue($value): string
     {
-        if (is_object($value)) {
+        if (\is_object($value)) {
             return get_class($value);
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return 'array';
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return '"'.$value.'"';
         }
 
-        if (is_resource($value)) {
+        if (\is_resource($value)) {
             return 'resource';
         }
 
@@ -1136,8 +1150,21 @@ class OptionsResolver implements Options
         return implode(', ', $values);
     }
 
-    private static function isValueValidType($type, $value)
+    private static function isValueValidType(string $type, $value): bool
     {
         return (function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
+    }
+
+    private function getInvalidValues(array $arrayValues, string $type): array
+    {
+        $invalidValues = array();
+
+        foreach ($arrayValues as $key => $value) {
+            if (!self::isValueValidType($type, $value)) {
+                $invalidValues[$key] = $value;
+            }
+        }
+
+        return $invalidValues;
     }
 }

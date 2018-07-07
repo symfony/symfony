@@ -218,6 +218,29 @@ class PhpDocExtractorTest extends TestCase
     {
         $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
     }
+
+    public function dockBlockFallbackTypesProvider()
+    {
+        return array(
+            'pub' => array(
+                'pub', array(new Type(Type::BUILTIN_TYPE_STRING)),
+            ),
+            'protAcc' => array(
+                'protAcc', array(new Type(Type::BUILTIN_TYPE_INT)),
+            ),
+            'protMut' => array(
+                'protMut', array(new Type(Type::BUILTIN_TYPE_BOOL)),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider dockBlockFallbackTypesProvider
+     */
+    public function testDocBlockFallback($property, $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
+    }
 }
 
 class EmptyDocBlock

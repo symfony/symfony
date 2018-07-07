@@ -960,6 +960,29 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf('stdClass', $container->get('bar'));
     }
 
+    public function testUninitializedSyntheticReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setPublic(true)->setSynthetic(true);
+        $container->register('bar', 'stdClass')->setPublic(true)->setShared(false)
+            ->setProperty('foo', new Reference('foo', ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array(
+            'class' => 'Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference',
+            'inline_class_loader_parameter' => 'inline_requires',
+        )));
+
+        $container = new \Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference();
+
+        $this->assertEquals((object) array('foo' => null), $container->get('bar'));
+
+        $container->set('foo', (object) array(123));
+        $this->assertEquals((object) array('foo' => (object) array(123)), $container->get('bar'));
+    }
+
     /**
      * This test checks the trigger of a deprecation note and should not be removed in major releases.
      *

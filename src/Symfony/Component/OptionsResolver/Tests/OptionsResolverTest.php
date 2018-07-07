@@ -664,7 +664,7 @@ class OptionsResolverTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "DateTime[]".
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime[]".
      */
     public function testResolveFailsIfInvalidTypedArray()
     {
@@ -688,7 +688,7 @@ class OptionsResolverTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "integer|stdClass|array|DateTime[]".
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass[]".
      */
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()
     {
@@ -705,7 +705,7 @@ class OptionsResolverTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but is of type "double[][]".
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "double[][]".
      */
     public function testResolveFailsWithCorrectLevelsButWrongScalar()
     {
@@ -1766,5 +1766,152 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefault('lazy1', function () {});
 
         count($this->resolver);
+    }
+
+    public function testNestedArrays()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+
+        $this->assertEquals(array(
+            'foo' => array(
+                array(
+                    1, 2,
+                ),
+            ),
+        ), $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(1, 2),
+                ),
+            )
+        ));
+    }
+
+    public function testNested2Arrays()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][][][]');
+
+        $this->assertEquals(array(
+            'foo' => array(
+                array(
+                    array(
+                        array(
+                            1, 2,
+                        ),
+                    ),
+                ),
+            ),
+        ), $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(
+                        array(
+                            array(1, 2),
+                        ),
+                    ),
+                ),
+            )
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "float[][][][]", but one of the elements is of type "integer[][][][]".
+     */
+    public function testNestedArraysException()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'float[][][][]');
+
+        $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(
+                        array(
+                            array(1, 2),
+                        ),
+                    ),
+                ),
+            )
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".
+     */
+    public function testNestedArrayException1()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+        $this->resolver->resolve(array(
+            'foo' => array(
+                array(1, true, 'str', array(2, 3)),
+            ),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".
+     */
+    public function testNestedArrayException2()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+        $this->resolver->resolve(array(
+            'foo' => array(
+                array(true, 'str', array(2, 3)),
+            ),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "string[][]".
+     */
+    public function testNestedArrayException3()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string[][][]');
+        $this->resolver->resolve(array(
+            'foo' => array(
+                array('str', array(1, 2)),
+            ),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "integer[][][]".
+     */
+    public function testNestedArrayException4()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string[][][]');
+        $this->resolver->resolve(array(
+            'foo' => array(
+                array(
+                    array('str'), array(1, 2), ),
+            ),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "string[]", but one of the elements is of type "array[]".
+     */
+    public function testNestedArrayException5()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string[]');
+        $this->resolver->resolve(array(
+            'foo' => array(
+                array(
+                    array('str'), array(1, 2), ),
+            ),
+        ));
     }
 }

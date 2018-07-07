@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-26T13:15:39Z
+
+(Travis failures unrelated)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-06-27T07:20:56Z
+
+I have a hard time (and I know that this is not really related to this PR) figuring out why/when we have empty lines. Can someone explain that to me?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-27T11:48:09Z
+
+@fabpot empty lines (or namespace separator) was proposed in the original PR https://github.com/symfony/symfony/pull/24064#issuecomment-326671020 **to solve** some kind of cluttering in the original design of the table  **when** there is more than one path per namespace https://github.com/symfony/symfony/pull/24064#issuecomment-326674916, but still we can reopen that discussion if you prefer remove these empty lines or another variant from https://github.com/symfony/symfony/pull/24064#issuecomment-326671020.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-28T15:09:32Z
+
+I don't mind the new lines (I think it makes this more readable) but I'd like to propose two tweaks for your consideration:
+
+1. Remove the leading `-` before each path
+2. Add a trailing `/` to all paths to clearly show that they are directories.
+
+This is how it'd look:
+
+**Before**
+
+```rst
+ --------------- ------------------------------------------------------
+  Namespace       Paths
+ --------------- ------------------------------------------------------
+  @Framework      - vendor/symfony/framework-bundle/Resources/views
+  @!Framework     - vendor/symfony/framework-bundle/Resources/views
+  @Security       - vendor/symfony/security-bundle/Resources/views
+  @!Security      - vendor/symfony/security-bundle/Resources/views
+  ...             ...
+ --------------- ------------------------------------------------------
+```
+
+**After**
+
+```rst
+ --------------- ------------------------------------------------------
+  Namespace       Paths
+ --------------- ------------------------------------------------------
+  @Framework      vendor/symfony/framework-bundle/Resources/views/
+  @!Framework     vendor/symfony/framework-bundle/Resources/views/
+  @Security       vendor/symfony/security-bundle/Resources/views/
+  @!Security      vendor/symfony/security-bundle/Resources/views/
+  ...             ...
+ --------------- ------------------------------------------------------
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-28T16:32:28Z
+
+Javier about:
+> 1. Remove the leading - before each path
+> 2. Add a trailing / to all paths to clearly show that they are directories.
+
+Look good to me.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-07T12:26:51Z
+
+Any update about this? We are all good with the empty lines as namespace separator? thanks.

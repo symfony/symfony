@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -233,6 +234,8 @@ class YamlDumper extends Dumper
             }
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
+            } elseif ($value instanceof ServiceLocatorArgument) {
+                $tag = 'service_locator';
             } else {
                 throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_class($value)));
             }

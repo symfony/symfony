@@ -20,7 +20,7 @@
         "ext-xml": "*",
         "symfony/config": "^4.2",
         "symfony/security": "~4.2",
-        "symfony/dependency-injection": "^3.4.3|^4.0.3",
+        "symfony/dependency-injection": "^4.2",
         "symfony/http-kernel": "^4.1"
     },
     "require-dev": {

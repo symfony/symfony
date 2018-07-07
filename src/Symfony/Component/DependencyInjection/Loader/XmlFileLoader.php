@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -510,7 +511,15 @@ class XmlFileLoader extends FileLoader
                     try {
                         $arguments[$key] = new IteratorArgument($arg);
                     } catch (InvalidArgumentException $e) {
-                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="iterator" only accepts collections of type="service" references in "%s".', $name, $file));
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="%s" only accepts collections of type="service" references in "%s".', $name, $file));
+                    }
+                    break;
+                case 'service_locator':
+                    $arg = $this->getArgumentsAsPhp($arg, $name, $file, false);
+                    try {
+                        $arguments[$key] = new ServiceLocatorArgument($arg);
+                    } catch (InvalidArgumentException $e) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="%s" only accepts maps of type="service" references in "%s".', $name, $file));
                     }
                     break;
                 case 'tagged':

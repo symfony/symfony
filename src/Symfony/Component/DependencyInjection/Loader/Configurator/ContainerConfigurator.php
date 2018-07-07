@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -90,6 +91,16 @@ function ref(string $id): ReferenceConfigurator
 function inline(string $class = null): InlineServiceConfigurator
 {
     return new InlineServiceConfigurator(new Definition($class));
+}
+
+/**
+ * Creates a service locator.
+ *
+ * @param ReferenceConfigurator[] $values
+ */
+function service_locator(array $values): ServiceLocatorArgument
+{
+    return new ServiceLocatorArgument(AbstractConfigurator::processValue($values, true));
 }
 
 /**

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -399,6 +400,30 @@ class Container implements ResettableContainerInterface
         } finally {
             unset($this->resolving[$envName]);
         }
+    }
+
+    /**
+     * @internal
+     */
+    final protected function getService($registry, $id, $method, $load)
+    {
+        if ('service_container' === $id) {
+            return $this;
+        }
+        if (\is_string($load)) {
+            throw new RuntimeException($load);
+        }
+        if (null === $method) {
+            return false !== $registry ? $this->{$registry}[$id] ?? null : null;
+        }
+        if (false !== $registry) {
+            return $this->{$registry}[$id] ?? $this->{$registry}[$id] = $load ? $this->load($method) : $this->{$method}();
+        }
+        if (!$load) {
+            return $this->{$method}();
+        }
+
+        return ($factory = $this->factories[$id] ?? $this->factories['service_container'][$id] ?? null) ? $factory() : $this->load($method);
     }
 
     private function __clone()

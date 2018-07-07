@@ -38,8 +38,6 @@ class ActionsExtension extends AbstractExtension
         if ($handler instanceof FragmentHandler) {
             $this->handler = $handler;
         } elseif ($handler instanceof ContainerInterface) {
-            @trigger_error('The ability to pass a ContainerInterface instance as a first argument to '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0. Pass a FragmentHandler instance instead.', E_USER_DEPRECATED);
-
             $this->handler = $handler->get('fragment.handler');
         } else {
             throw new \BadFunctionCallException(sprintf('%s takes a FragmentHandler or a ContainerInterface object as its first argument.', __METHOD__));

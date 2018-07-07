@@ -79,13 +79,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object);
+            return $this->handleCircularReference($object, $format, $context);
         }
 
         $data = array();
         $stack = array();
         $attributes = $this->getAttributes($object, $format, $context);
-        $class = get_class($object);
+        $class = \get_class($object);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
 
         foreach ($attributes as $attribute) {
@@ -154,7 +154,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes($object, $format = null, array $context)
     {
-        $class = get_class($object);
+        $class = \get_class($object);
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
@@ -248,7 +248,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            if ((false !== $allowedAttributes && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
+            if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
                 if (isset($context[self::ALLOW_EXTRA_ATTRIBUTES]) && !$context[self::ALLOW_EXTRA_ATTRIBUTES]) {
                     $extraAttributes[] = $attribute;
                 }
@@ -345,7 +345,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return (float) $data;
             }
 
-            if (call_user_func('is_'.$builtinType, $data)) {
+            if (\call_user_func('is_'.$builtinType, $data)) {
                 return $data;
             }
         }

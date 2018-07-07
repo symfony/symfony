@@ -187,7 +187,7 @@
             {%- set element = 'legend' -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
         {%- else -%}
-            {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
+            {%- set label_attr = label_attr|merge({for: id}) -%}
         {%- endif -%}
         {% if required -%}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}

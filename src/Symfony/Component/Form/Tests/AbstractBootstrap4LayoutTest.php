@@ -81,7 +81,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="form-control-label required"]
+    [@class="required"]
 '
         );
     }
@@ -98,7 +98,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="my&class form-control-label required"]
+    [@class="my&class required"]
 '
         );
     }
@@ -115,7 +115,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="my&class form-control-label required"]
+    [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
 '
         );
@@ -135,7 +135,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="my&class form-control-label required"]
+    [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
 '
         );

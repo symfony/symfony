@@ -31,15 +31,15 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
             '/div
     [
         ./label[@for="name"]
-        [
-            ./span[@class="alert alert-danger d-block"]
+        /following-sibling::div[
+            ./input[@id="name"]
+            /following-sibling::span[@class="alert alert-danger d-block"]
                 [./span[@class="d-block"]
                     [./span[.="[trans]Error[/trans]"]]
                     [./span[.="[trans]Error![/trans]"]]
                 ]
                 [count(./span)=1]
         ]
-        /following-sibling::div[./input[@id="name"]]
     ]
 '
         );
@@ -213,5 +213,12 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $html = $this->renderRow($view, array('label' => 'foo'));
 
         $this->assertMatchesXpath($html, '/div[@class="form-group row"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
+    }
+
+    public function testErrorWithNoLabel()
+    {
+        // This test doesn't apply to the horizontal form, as here the errors are rendered inside the widget
+        // and the widget can't be empty.
+        $this->assertTrue(true);
     }
 }

@@ -38,7 +38,7 @@ class FactoryReturnTypePassTest extends TestCase
         $foo = $container->register('foo');
         $foo->setFactory(array(new Reference('alias_factory'), 'create'));
 
-        $bar = $container->register('bar', __CLASS__);
+        $bar = $container->register('bar', self::class);
         $bar->setFactory(array(new Reference('factory'), 'create'));
 
         $pass = new FactoryReturnTypePass();
@@ -51,7 +51,7 @@ class FactoryReturnTypePassTest extends TestCase
             $this->assertNull($factory->getClass());
             $this->assertNull($foo->getClass());
         }
-        $this->assertEquals(__CLASS__, $bar->getClass());
+        $this->assertEquals(self::class, $bar->getClass());
     }
 
     /**

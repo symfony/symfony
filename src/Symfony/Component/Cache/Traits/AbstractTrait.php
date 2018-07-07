@@ -224,7 +224,7 @@ trait AbstractTrait
         if ('b:0;' === $value) {
             return false;
         }
-        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         try {
             if (false !== $value = unserialize($value)) {
                 return $value;

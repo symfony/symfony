@@ -41,7 +41,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
         if ($renderer instanceof TwigRendererInterface) {
             @trigger_error(sprintf('Passing a Twig Form Renderer to the "%s" constructor is deprecated since Symfony 3.2 and won\'t be possible in 4.0. Pass the Twig\Environment to the TwigRendererEngine constructor instead.', static::class), E_USER_DEPRECATED);
         } elseif (null !== $renderer && !(is_array($renderer) && isset($renderer[0], $renderer[1]) && $renderer[0] instanceof ContainerInterface)) {
-            throw new \InvalidArgumentException(sprintf('Passing any arguments the constructor of %s is reserved for internal use.', __CLASS__));
+            throw new \InvalidArgumentException(sprintf('Passing any arguments the constructor of %s is reserved for internal use.', self::class));
         }
         $this->renderer = $renderer;
     }
@@ -117,7 +117,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function __get($name)
     {
         if ('renderer' === $name) {
-            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', self::class), E_USER_DEPRECATED);
 
             if (is_array($this->renderer)) {
                 $renderer = $this->renderer[0]->get($this->renderer[1]);
@@ -137,7 +137,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function __set($name, $value)
     {
         if ('renderer' === $name) {
-            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', self::class), E_USER_DEPRECATED);
         }
 
         $this->$name = $value;
@@ -149,7 +149,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function __isset($name)
     {
         if ('renderer' === $name) {
-            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', self::class), E_USER_DEPRECATED);
         }
 
         return isset($this->$name);
@@ -161,7 +161,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function __unset($name)
     {
         if ('renderer' === $name) {
-            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the "%s::$renderer" property is deprecated since Symfony 3.2 as it will be removed in 4.0.', self::class), E_USER_DEPRECATED);
         }
 
         unset($this->$name);

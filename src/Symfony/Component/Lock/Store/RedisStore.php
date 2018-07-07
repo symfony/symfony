@@ -71,7 +71,7 @@ class RedisStore implements StoreInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
+        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', static::class));
     }
 
     /**
@@ -156,11 +156,11 @@ class RedisStore implements StoreInterface
      */
     private function getToken(Key $key)
     {
-        if (!$key->hasState(__CLASS__)) {
+        if (!$key->hasState(self::class)) {
             $token = base64_encode(random_bytes(32));
-            $key->setState(__CLASS__, $token);
+            $key->setState(self::class, $token);
         }
 
-        return $key->getState(__CLASS__);
+        return $key->getState(self::class);
     }
 }

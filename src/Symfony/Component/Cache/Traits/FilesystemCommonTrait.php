@@ -79,7 +79,7 @@ trait FilesystemCommonTrait
 
     private function write($file, $data, $expiresAt = null)
     {
-        set_error_handler(__CLASS__.'::throwError');
+        set_error_handler(self::class.'::throwError');
         try {
             if (null === $this->tmp) {
                 $this->tmp = $this->directory.uniqid('', true);

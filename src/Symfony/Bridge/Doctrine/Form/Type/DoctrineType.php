@@ -167,7 +167,7 @@ abstract class DoctrineType extends AbstractType
             // field name. We can only use numeric IDs as names, as we cannot
             // guarantee that a non-numeric ID contains a valid form name
             if ($idReader->isIntId()) {
-                return array(__CLASS__, 'createChoiceName');
+                return array(self::class, 'createChoiceName');
             }
 
             // Otherwise, an incrementing integer is used as name automatically
@@ -249,7 +249,7 @@ abstract class DoctrineType extends AbstractType
             'query_builder' => null,
             'choices' => null,
             'choice_loader' => $choiceLoader,
-            'choice_label' => array(__CLASS__, 'createChoiceLabel'),
+            'choice_label' => array(self::class, 'createChoiceLabel'),
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
             'id_reader' => null, // internal

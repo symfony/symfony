@@ -146,7 +146,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     public function testArrayCallable()
     {
         $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array(__CLASS__.'_Class', 'validateCallback'));
+        $constraint = new Callback(array(self::class.'_Class', 'validateCallback'));
 
         $this->validator->validate($object, $constraint);
 
@@ -157,7 +157,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testArrayCallableNullObject()
     {
-        $constraint = new Callback(array(__CLASS__.'_Class', 'validateCallback'));
+        $constraint = new Callback(array(self::class.'_Class', 'validateCallback'));
 
         $this->validator->validate(null, $constraint);
 
@@ -170,7 +170,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array(
-            'callback' => array(__CLASS__.'_Class', 'validateCallback'),
+            'callback' => array(self::class.'_Class', 'validateCallback'),
         ));
 
         $this->validator->validate($object, $constraint);
@@ -225,9 +225,9 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testAnnotationInvocationMultiValued()
     {
-        $constraint = new Callback(array('value' => array(__CLASS__.'_Class', 'validateCallback')));
+        $constraint = new Callback(array('value' => array(self::class.'_Class', 'validateCallback')));
 
-        $this->assertEquals(new Callback(array(__CLASS__.'_Class', 'validateCallback')), $constraint);
+        $this->assertEquals(new Callback(array(self::class.'_Class', 'validateCallback')), $constraint);
     }
 
     public function testPayloadIsPassedToCallback()

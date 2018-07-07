@@ -28,7 +28,7 @@ class Traverse extends Constraint
         if (is_array($options) && array_key_exists('groups', $options)) {
             throw new ConstraintDefinitionException(sprintf(
                 'The option "groups" is not supported by the constraint %s',
-                __CLASS__
+                self::class
             ));
         }
 

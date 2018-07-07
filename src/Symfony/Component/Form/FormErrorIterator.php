@@ -54,7 +54,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
                 throw new InvalidArgumentException(sprintf(
                     'The errors must be instances of '.
                     '"\Symfony\Component\Form\FormError" or "%s". Got: "%s".',
-                    __CLASS__,
+                    self::class,
                     is_object($error) ? get_class($error) : gettype($error)
                 ));
             }

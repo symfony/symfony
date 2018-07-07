@@ -71,7 +71,7 @@ class SemaphoreStore implements StoreInterface
 
     private function lock(Key $key, $blocking)
     {
-        if ($key->hasState(__CLASS__)) {
+        if ($key->hasState(self::class)) {
             return;
         }
 
@@ -81,7 +81,7 @@ class SemaphoreStore implements StoreInterface
         if (\PHP_VERSION_ID >= 50601) {
             $acquired = @sem_acquire($resource, !$blocking);
         } elseif (!$blocking) {
-            throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', get_class($this)));
+            throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', static::class));
         } else {
             $acquired = @sem_acquire($resource);
         }
@@ -95,7 +95,7 @@ class SemaphoreStore implements StoreInterface
             throw new LockConflictedException();
         }
 
-        $key->setState(__CLASS__, $resource);
+        $key->setState(self::class, $resource);
     }
 
     /**
@@ -104,15 +104,15 @@ class SemaphoreStore implements StoreInterface
     public function delete(Key $key)
     {
         // The lock is maybe not acquired.
-        if (!$key->hasState(__CLASS__)) {
+        if (!$key->hasState(self::class)) {
             return;
         }
 
-        $resource = $key->getState(__CLASS__);
+        $resource = $key->getState(self::class);
 
         sem_remove($resource);
 
-        $key->removeState(__CLASS__);
+        $key->removeState(self::class);
     }
 
     /**
@@ -128,6 +128,6 @@ class SemaphoreStore implements StoreInterface
      */
     public function exists(Key $key)
     {
-        return $key->hasState(__CLASS__);
+        return $key->hasState(self::class);
     }
 }

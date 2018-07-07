@@ -121,8 +121,8 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_CompositeCar')->getMock();
-        $structure = $this->getMockBuilder(__CLASS__.'_CarStructure')->getMock();
+        $car = $this->getMockBuilder(self::class.'_CompositeCar')->getMock();
+        $structure = $this->getMockBuilder(self::class.'_CarStructure')->getMock();
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -152,7 +152,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
      */
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_CarNoAdderAndRemover')->getMock();
+        $car = $this->getMockBuilder(self::class.'_CarNoAdderAndRemover')->getMock();
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -165,25 +165,25 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_Car')->getMock();
+        $car = $this->getMockBuilder(self::class.'_Car')->getMock();
         $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfOnlyAdderExists()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_CarOnlyAdder')->getMock();
+        $car = $this->getMockBuilder(self::class.'_CarOnlyAdder')->getMock();
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfOnlyRemoverExists()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_CarOnlyRemover')->getMock();
+        $car = $this->getMockBuilder(self::class.'_CarOnlyRemover')->getMock();
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_CarNoAdderAndRemover')->getMock();
+        $car = $this->getMockBuilder(self::class.'_CarNoAdderAndRemover')->getMock();
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
@@ -193,7 +193,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
      */
     public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_Car')->getMock();
+        $car = $this->getMockBuilder(self::class.'_Car')->getMock();
 
         $this->propertyAccessor->setValue($car, 'axes', 'Not an array or Traversable');
     }

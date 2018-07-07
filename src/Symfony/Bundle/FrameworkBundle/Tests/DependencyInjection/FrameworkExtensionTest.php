@@ -884,7 +884,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testSerializerCacheDisabled()
     {
-        $container = $this->createContainerFromFile('serializer_enabled', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
+        $container = $this->createContainerFromFile('serializer_enabled', array('kernel.debug' => true, 'kernel.container_class' => self::class));
         $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
     }
 
@@ -894,7 +894,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testDeprecatedSerializerCacheOption()
     {
-        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
+        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => self::class));
 
         $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
         $this->assertTrue($container->hasDefinition('serializer.mapping.class_metadata_factory'));
@@ -1074,7 +1074,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file, $data = array(), $resetCompilerPasses = true, $compile = true)
     {
-        $cacheKey = md5(get_class($this).$file.serialize($data));
+        $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }

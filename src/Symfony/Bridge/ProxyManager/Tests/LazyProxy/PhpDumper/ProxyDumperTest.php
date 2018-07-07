@@ -49,7 +49,7 @@ class ProxyDumperTest extends TestCase
 
     public function testGetProxyCode()
     {
-        $definition = new Definition(__CLASS__);
+        $definition = new Definition(self::class);
 
         $definition->setLazy(true);
 
@@ -64,7 +64,7 @@ class ProxyDumperTest extends TestCase
 
     public function testDeterministicProxyCode()
     {
-        $definition = new Definition(__CLASS__);
+        $definition = new Definition(self::class);
         $definition->setLazy(true);
 
         $this->assertSame($this->dumper->getProxyCode($definition), $this->dumper->getProxyCode($definition));
@@ -72,7 +72,7 @@ class ProxyDumperTest extends TestCase
 
     public function testGetProxyFactoryCode()
     {
-        $definition = new Definition(__CLASS__);
+        $definition = new Definition(self::class);
 
         $definition->setLazy(true);
 
@@ -100,12 +100,12 @@ class ProxyDumperTest extends TestCase
     {
         return array(
             array(
-                (new Definition(__CLASS__))
+                (new Definition(self::class))
                     ->setPublic(false),
                 \method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates',
             ),
             array(
-                (new Definition(__CLASS__))
+                (new Definition(self::class))
                     ->setPublic(true),
                 'services',
             ),
@@ -117,7 +117,7 @@ class ProxyDumperTest extends TestCase
      */
     public function testLegacyGetProxyFactoryCode()
     {
-        $definition = new Definition(__CLASS__);
+        $definition = new Definition(self::class);
 
         $definition->setLazy(true);
 
@@ -135,7 +135,7 @@ class ProxyDumperTest extends TestCase
     public function getProxyCandidates()
     {
         $definitions = array(
-            array(new Definition(__CLASS__), true),
+            array(new Definition(self::class), true),
             array(new Definition('stdClass'), true),
             array(new Definition(uniqid('foo', true)), false),
             array(new Definition(), false),

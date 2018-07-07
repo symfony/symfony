@@ -105,12 +105,12 @@ class ErrorHandlerTest extends TestCase
             $trace = $exception->getTrace();
 
             $this->assertEquals(__FILE__, $trace[0]['file']);
-            $this->assertEquals(__CLASS__, $trace[0]['class']);
+            $this->assertEquals(self::class, $trace[0]['class']);
             $this->assertEquals('triggerNotice', $trace[0]['function']);
             $this->assertEquals('::', $trace[0]['type']);
 
             $this->assertEquals(__FILE__, $trace[0]['file']);
-            $this->assertEquals(__CLASS__, $trace[1]['class']);
+            $this->assertEquals(self::class, $trace[1]['class']);
             $this->assertEquals(__FUNCTION__, $trace[1]['function']);
             $this->assertEquals('->', $trace[1]['type']);
         } finally {

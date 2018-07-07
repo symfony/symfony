@@ -67,7 +67,7 @@ class FlockStore implements StoreInterface
     private function lock(Key $key, $blocking)
     {
         // The lock is maybe already acquired.
-        if ($key->hasState(__CLASS__)) {
+        if ($key->hasState(self::class)) {
             return;
         }
 
@@ -100,7 +100,7 @@ class FlockStore implements StoreInterface
             throw new LockConflictedException();
         }
 
-        $key->setState(__CLASS__, $handle);
+        $key->setState(self::class, $handle);
     }
 
     /**
@@ -117,16 +117,16 @@ class FlockStore implements StoreInterface
     public function delete(Key $key)
     {
         // The lock is maybe not acquired.
-        if (!$key->hasState(__CLASS__)) {
+        if (!$key->hasState(self::class)) {
             return;
         }
 
-        $handle = $key->getState(__CLASS__);
+        $handle = $key->getState(self::class);
 
         flock($handle, LOCK_UN | LOCK_NB);
         fclose($handle);
 
-        $key->removeState(__CLASS__);
+        $key->removeState(self::class);
     }
 
     /**
@@ -134,6 +134,6 @@ class FlockStore implements StoreInterface
      */
     public function exists(Key $key)
     {
-        return $key->hasState(__CLASS__);
+        return $key->hasState(self::class);
     }
 }

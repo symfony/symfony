@@ -145,6 +145,6 @@ class NotUnserializable implements \Serializable
 
     public function unserialize($ser)
     {
-        throw new \Exception(__CLASS__);
+        throw new \Exception(self::class);
     }
 }

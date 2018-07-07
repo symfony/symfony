@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-03T06:49:39Z
+
+@evertharmeling thanks for fixing this. Just asking: if the label is even longer, would this make the circle larger, without limits? Is there an option to force breaking the label into several lines? I ask this because it looks like `very_long_ \n named_place` would fit the original circle. Thanks!
+
+---------------------------------------------------------------------------
+
+by evertharmeling at 2018-07-03T08:02:03Z
+
+It will indeed make the circle larger (without limits)...
+
+![Autofit large label](https://cdn.pbrd.co/images/HsIjb9l.png)
+
+Then again if that would be a problem probably a solution would be to
+- Rename the `label` to a shorter one
+- Or you should still be able to overrule the `$attributes` and give the `fixedsize` attribute a specific value that suits your implementation.
+
+Probably the only solution for limiting the `autofit` is to change the shape of in this case `circle` to `ellipse`. We could change that (circle vs ellipse) 'on the fly' based on the number of characters for example... But is that allowed from a modelling point of view?
+
+![Autofit ellipse](https://cdn.pbrd.co/images/HsImmHW.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-03T08:27:05Z
+
+I agree with you ... if this is a problem for someone, they just need to make labels shorter. Thanks!

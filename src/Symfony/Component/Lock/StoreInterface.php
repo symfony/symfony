@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Lock;
 
+use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 
 /**
@@ -24,6 +26,7 @@ interface StoreInterface
     /**
      * Stores the resource if it's not locked by someone else.
      *
+     * @throws LockAcquiringException
      * @throws LockConflictedException
      */
     public function save(Key $key);
@@ -52,6 +55,8 @@ interface StoreInterface
 
     /**
      * Removes a resource from the storage.
+     *
+     * @throws LockReleasingException
      */
     public function delete(Key $key);
 

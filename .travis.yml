@@ -13,6 +13,8 @@ addons:
         - ldap-utils
         - slapd
         - librabbitmq-dev
+        - zookeeperd
+        - libzookeeper-mt-dev
 
 env:
     global:
@@ -161,6 +163,7 @@ before_install:
           tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
           tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
           tfold ext.igbinary tpecl igbinary-2.0.6 igbinary.so $INI
+          tfold ext.zookeeper tpecl zookeeper-0.5.0 zookeeper.so $INI
       done
 
     - |

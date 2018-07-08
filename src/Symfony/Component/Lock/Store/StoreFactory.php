@@ -22,9 +22,9 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached $connection
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper $connection
      *
-     * @return RedisStore|MemcachedStore
+     * @return RedisStore|MemcachedStore|ZookeeperStore
      */
     public static function createStore($connection)
     {
@@ -33,6 +33,9 @@ class StoreFactory
         }
         if ($connection instanceof \Memcached) {
             return new MemcachedStore($connection);
+        }
+        if ($connection instanceof \Zookeeper) {
+            return new ZookeeperStore($connection);
         }
 
         throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));

@@ -19,6 +19,7 @@
         <env name="LDAP_PORT" value="3389" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
+        <env name="ZOOKEEPER_HOST" value="localhost" />
     </php>
 
     <testsuites>

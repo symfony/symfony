@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-05-30T08:55:47Z
+
+How would someone use it? Manually, as in registers a service that `decorates` the generated middleware?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-30T10:50:20Z
+
+@sroze : Exactly. It'll just leverage DI capabilities.

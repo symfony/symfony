@@ -30,3 +30,8 @@ HttpFoundation
    use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
  * The `FileinfoMimeTypeGuesser` class has been deprecated,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
+
+Yaml
+----
+
+ * Using a mapping inside a multi-line string is deprecated and will throw a `ParseException` in 5.0.

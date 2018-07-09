@@ -18,7 +18,12 @@ use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeHintExce
 
 /**
  * Checks whether injected parameters types are compatible with type hints.
- * This pass should be added before removing (PassConfig::TYPE_BEFORE_REMOVING).
+ * This pass should be run after all optimization passes.
+ * So it can be added either:
+ *    * before removing (PassConfig::TYPE_BEFORE_REMOVING) so that it will check
+ *          all services, even if they are not currently used,
+ *    * after removing (PassConfig::TYPE_AFTER_REMOVING) so that it will check
+ *          only services you are using.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Julien Maulny <jmaulny@darkmira.fr>

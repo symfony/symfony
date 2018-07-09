@@ -33,7 +33,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         ./label[@for="name"]
         [
             ./span[@class="alert alert-danger d-block"]
-                [./span[@class="mb-0 d-block"]
+                [./span[@class="d-block"]
                     [./span[.="[trans]Error[/trans]"]]
                     [./span[.="[trans]Error![/trans]"]]
                 ]
@@ -72,7 +72,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="col-form-label col-sm-2 form-control-label required"]
+    [@class="col-form-label col-sm-2 required"]
 '
         );
     }
@@ -89,7 +89,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="my&class col-form-label col-sm-2 form-control-label required"]
+    [@class="my&class col-form-label col-sm-2 required"]
 '
         );
     }
@@ -106,7 +106,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="my&class col-form-label col-sm-2 form-control-label required"]
+    [@class="my&class col-form-label col-sm-2 required"]
     [.="[trans]Custom label[/trans]"]
 '
         );
@@ -126,7 +126,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [@class="my&class col-form-label col-sm-2 form-control-label required"]
+    [@class="my&class col-form-label col-sm-2 required"]
     [.="[trans]Custom label[/trans]"]
 '
         );

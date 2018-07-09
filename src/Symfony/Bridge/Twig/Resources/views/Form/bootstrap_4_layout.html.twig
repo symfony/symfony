@@ -189,7 +189,7 @@
         {% elseif type is defined and type == 'file' %}
             {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' custom-file-label')|trim}) -%}
         {%- else -%}
-            {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
+            {%- set label_attr = label_attr|merge({for: id}) -%}
         {%- endif -%}
         {% if required -%}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
@@ -284,8 +284,8 @@
     {%- if errors|length > 0 -%}
         <span class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block">
             {%- for error in errors -%}
-                <span class="mb-0 d-block">
-                    <span class="initialism form-error-icon badge badge-danger">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span>
+                <span class="d-block">
+                    <span class="form-error-icon badge badge-danger text-uppercase">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span>
                 </span>
             {%- endfor -%}
         </span>

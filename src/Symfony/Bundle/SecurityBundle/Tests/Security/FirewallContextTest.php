@@ -41,7 +41,7 @@ class FirewallContextTest extends TestCase
     }
 
     /**
-     * @expectedDeprecation Method Symfony\Bundle\SecurityBundle\Security\FirewallContext::getContext() is deprecated since Symfony 3.3 and will be removed in 4.0. Use Symfony\Bundle\SecurityBundle\Security\FirewallContext::getListeners/getExceptionListener() instead.
+     * @expectedDeprecation The "Symfony\Bundle\SecurityBundle\Security\FirewallContext::getContext()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Use Symfony\Bundle\SecurityBundle\Security\FirewallContext::getListeners/getExceptionListener() instead.
      * @group legacy
      */
     public function testGetContext()

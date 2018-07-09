@@ -70,7 +70,7 @@ class LintCommandTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bridge\Twig\Command\LintCommand::__construct" is deprecated since Symfony 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bridge\Twig\Command\LintCommand::__construct()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.
      * @expectedException \RuntimeException
      * @expectedExceptionMessage The Twig environment needs to be set.
      */

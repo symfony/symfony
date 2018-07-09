@@ -101,7 +101,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
      */
     public function getArguments(Request $request, $controller)
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.1 and will be removed in 4.0. Implement the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
 
         if (is_array($controller)) {
             $r = new \ReflectionMethod($controller[0], $controller[1]);
@@ -126,7 +126,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
      */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated as of 3.1 and will be removed in 4.0. Implement the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
 
         $attributes = $request->attributes->all();
         $arguments = array();

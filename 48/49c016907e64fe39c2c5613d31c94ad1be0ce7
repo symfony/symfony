@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-07T14:29:25Z
+
+Why on 3.4 and not on master btw?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-07-07T17:57:20Z
+
+> Why on 3.4 and not on master btw?
+
+PSR-3 should be the recommended way to interact with the logger in Monolog 1 already. Also, the tests don't differ much between 3.4 and master yet, so I thought it might be easier for the maintenance if I apply the change here.
+
+But I can rebase to master, if you want me to.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-08T08:46:51Z
+
+Let's go on master, these tests are fine for 3.4 IMHO.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-07-09T06:05:36Z
+
+✅ Rebased to master.

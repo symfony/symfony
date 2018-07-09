@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-07-03T13:37:07Z
+
+Test failures are un-related.
+
+---------------------------------------------------------------------------
+
+by voodoo-dn at 2018-07-03T13:40:37Z
+
+This PR works well and fix my problem, thanks.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-07-05T10:58:36Z
+
+@nicolas-grekas the fixture update covers the use-cases I think about so I'd say no 🤔

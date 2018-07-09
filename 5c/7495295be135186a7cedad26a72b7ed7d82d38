@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-07T16:26:45Z
+
+lowest deps need a bump so that tests pass
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-07-08T13:03:51Z
+
+Isn't it strange that we have templates in one library and abstract tests for these templates in another?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-07-09T11:06:39Z
+
+@xabbuh , now all tests pass except for `deps=high`.

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-29T12:59:36Z
+
+what is the impact of enabling `utf8` for all routes ? Would they match different things ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-29T13:09:13Z
+
+A URL containing above-ASCII chars presented in a non-UTF8 charset by a browser would be 404 where it would not necessarily today. But when the app is configured with `kernel.charset=UTF-8`, I fail to see any practical use case since nobody can know in which charset it is really. As such it would be hard to map to any actual content/resource...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-03T06:56:37Z
+
+I agree with @stof. This looks absolutely reasonable and the right thing to do 👍 ... but I can't imagine the consequences (if any): would any route matching change? would routing performance be lower? etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T14:23:35Z
+
+To be extra safe, I added a new config option to enable utf8 mode, off by default, with a note in UPGRADE-4.2 to invite to turn it on.

@@ -42,7 +42,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         ./label[@for="name"]
         [
             ./span[@class="alert alert-danger d-block"]
-                [./span[@class="mb-0 d-block"]
+                [./span[@class="d-block"]
                     [./span[.="[trans]Error[/trans]"]]
                     [./span[.="[trans]Error![/trans]"]]
                 ]
@@ -172,11 +172,11 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 '/span
     [@class="alert alert-danger d-block"]
     [
-        ./span[@class="mb-0 d-block"]
+        ./span[@class="d-block"]
             [./span[.="[trans]Error[/trans]"]]
             [./span[.="[trans]Error 1[/trans]"]]
 
-        /following-sibling::span[@class="mb-0 d-block"]
+        /following-sibling::span[@class="d-block"]
             [./span[.="[trans]Error[/trans]"]]
             [./span[.="[trans]Error 2[/trans]"]]
     ]

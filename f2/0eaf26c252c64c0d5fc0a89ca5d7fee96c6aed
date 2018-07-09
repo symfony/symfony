@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-20T07:18:28Z
+
+Opps. I'm late with review.
+
+Just checked our issue board: there was tickets when we was forced to revert igbinary serialization for some components. Having ability to select serialization method without rebuilding operation environment is critical.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-20T07:56:50Z
+
+> Having ability to select serialization method without rebuilding operation environment is critical
+
+:100:  that's exactly what is provided here: when data is read from the backend, we adaptatively unserialize it using igbinary or native-serialize depending on the payload. Of course, if igbinary is not loaded but the data had been serializing with it, we report a cache miss - there is no other way around.
+This allows seamless migration from native-serialize to igbinary-serialize, with data preservation in this direction and without in the other direction. Do you see something else?
+
+> memcache API allows to store plain PHP vars. Do we need double serialization here?
+
+That's actually required to provide the auto-adaptative behavior just described above. I'd recommend to *not* use igbinary at the extension level for this reason also. Maybe even deprecate having it enabled?
+
+> not OK to force settings for components.
+
+What's the downside? If there is none, better keep this as an internal detail. If you have igbinary, there is no downside to using it, and since this extension is opt-in, you can always remove it.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-20T23:46:20Z
+
+> This allows seamless migration from native-serialize to igbinary-serialize, with data preservation in this direction and without in the other direction.
+
+This fallback is required due fact that from application point 'nothing' changed. When I reconfigure application cache (change file to memcache, change directory or change serialization mode) I'm pretty OK with repopulating cache. And I prefer fast fail when igbinary is configured for application but is not available on deployment node, than slow running application with hard to detect reasons.
+
+> What's the downside? If there is none, better keep this as an internal detail. If you have igbinary, there is no downside to using it, and since this extension is opt-in, you can always remove it.
+
+It is now igbinary is faster. It can be changed. When some other component `requires` igbinary you would not be able to disable it for cache. Moreover - it can not be easy tested cause enabling/disabling extension is hard.
+
+Well, can we have selectable modes: adaptive, igbinary_only, php_only?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-21T12:14:41Z
+
+> I prefer fast fail when igbinary is configured for application but is not available
+
+No way: that explicitly conflicts with PSR-6 spirit and wordings (for good reasons IMHO.)
+
+> Well, can we have selectable modes?
+
+Done with a new constructor argument: `$allowIgbinarySerialize`, set to true by default, and forcing native-serialize() when set to false.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-22T10:08:09Z
+
+Now with marshaller injection instead of boolean option.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-06-25T08:33:51Z
+
+Just a general question: I haven't checked out the code in depth but it seems to me like the `Marshaller` could be used outside of the `Cache` component to dump stuff in a performant way, no? Wouldn't it make more sense to have that somewhere else?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-25T10:02:29Z
+
+@Toflar I suppose you're talking about `PhpMarshaller`? That's possible, but it would need a reason as that's a significant effort. I would first wait for a use case that isn't covered by the access layer provided here. There are also things that make `PhpMarshaller` really internal for now, especially the fact that it's not self-consistent and requires extra checks before being used (I have [this one](https://github.com/symfony/symfony/blob/866420e2eb1f5295760c10adafdc051adb87545a/src/Symfony/Component/Cache/Traits/PhpArrayTrait.php#L87) in mind.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-28T05:16:02Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2018-06-28T09:20:24Z
+
+What will happen if someone install the igbinary extension on their server but already have a lot of cache ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-28T09:21:21Z
+
+@joelwurtz see test cases: native `unserialize()` will be used.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-01T06:54:58Z
+
+Any other comment here?
+Time to vote @symfony/deciders :)

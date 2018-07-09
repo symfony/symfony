@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-24T22:41:09Z
+
+> The generated proxies are always lazy, so that lazy=true/false makes no difference.
+
+Maybe throw exception for `lazy: false` then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-25T06:30:03Z
+
+> throw exception for lazy: false
+
+I'm going to do this good idea. I'm also wondering about allowing lazy: Some\Interface at the loader level. Would be equivalent to lazy: true + adding the tag. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-25T15:50:01Z
+
+Waiting for a resolution of https://github.com/Ocramius/ProxyManager/pull/419
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T11:16:32Z
+
+> Waiting for a resolution of Ocramius/ProxyManager#419
+
+Not needed actually, and won't be fixed in ProxyManager v2.1 which is in security-only fixes mode, but is the version compatible with PHP 7.1, thus Symfony 4.
+
+This PR deals with the issue on its own. Ready.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-26T11:45:30Z
+
+Do we still need LazyLoadingValueHolderFactoryV1 in master ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T17:48:48Z
+
+@stof comments addressed, thanks.

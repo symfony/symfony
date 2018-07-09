@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-06-24T09:29:11Z
+
+Hmm I can imagine some scenarios where this automatic table creation could have some side-effects.
+
+For example:
+
+- the caching table does not exist yet
+- I start a transaction somewhere in my user-land code
+- I perform some updates/inserts to the database (other tables, unrelated to cache)
+- during this transaction I perform some cache saves
+- I want to roll-back my transaction ==> this fails because my transaction was committed implicitly because of the table creation query?
+
+Not sure how likely a scenario like this is :smile: But it could happen I guess
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-24T09:52:44Z
+
+@dmaicher sure that's possible. Is this any different than the same scenario with the table already created before, and items not saved for the same reason (a rollback?)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-06-24T09:56:19Z
+
+> Is this any different than the same scenario with the table already created before, and items not saved for the same reason (a rollback?)
+
+I added one point above: `I perform some updates/inserts to the database (other tables, unrelated to cache)` . So then we have a difference, right? Those changes cannot be rolled back anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-24T10:03:34Z
+
+Oh sorry I missed that part. Here are some docs on the topic:
+https://wiki.postgresql.org/wiki/Transactional_DDL_in_PostgreSQL:_A_Competitive_Analysis
+https://stackoverflow.com/questions/4692690/is-it-possible-to-roll-back-create-table-and-alter-table-statements-in-major-sql
+
+We may prefer disabling auto-creation when in the middle of a transaction...
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-25T13:59:08Z
+
+@dmaicher fixed.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-28T15:16:04Z
+
+I'm all in for easing the usage of features ... but *"database table auto-creation when the PDO cache needs it"* makes me nervous. Not sure if it's a real scenario, but imagine this: I enable PDO cache in production without preparing the database for it:
+
+1) Without table auto-creation I see an error and I'm aware that I need to do some things in the database.
+2) With table auto-creation, everything works ... but maybe I'm using a cloud server, the cache grows a lot ... and I end up with a huge bill from my cloud provider because of the database usage.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-28T15:24:43Z
+
+> Without table auto-creation I see an error and I'm aware that I need to do some things in the database.
+
+no you don't, as explained [in a comment above](https://github.com/symfony/symfony/pull/27694#discussion_r198233693), PSR-6 allows no error to be reported, so this is silent - or at best logged. That's why this is an improvement over the current situation.

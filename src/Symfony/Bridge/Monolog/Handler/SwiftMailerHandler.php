@@ -52,7 +52,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     /**
      * {@inheritdoc}
      */
-    protected function send($content, array $records)
+    protected function send($content, array $records): void
     {
         parent::send($content, $records);
 

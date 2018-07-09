@@ -75,6 +75,14 @@ Process
    $process = Process::fromShellCommandline('ls -l');
    ```
 
+FrameworkBundle
+---------------
+
+ * The `framework.router.utf8` configuration option has been added. If your app's charset
+   is UTF-8 (see kernel's `getCharset()` method), it is recommended to set it to `true`:
+   this will generate 404s for non-UTF-8 URLs, which are incompatible with you app anyway,
+   and will allow dumping optimized routers and using Unicode classes in requirements.
+
 Security
 --------
 

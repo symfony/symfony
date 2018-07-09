@@ -226,6 +226,7 @@ class ConfigurationTest extends TestCase
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
+                'utf8' => false,
             ),
             'session' => array(
                 'enabled' => false,

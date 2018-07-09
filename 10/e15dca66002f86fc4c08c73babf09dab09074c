@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-07-03T14:09:56Z
+
+this does not running things like `git fetch origin && git checkout v1.2.1` anymore, right ? What is the expected way to run any chaining (`&&`, `||`, `|`, etc...) ?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-03T14:11:08Z
+
+and for anyone asking, `&&` can be used for cross-platform commands, so this does not even contradicts the cross-platform support (and composer uses that a lot if you need an example)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-03T16:26:28Z
+
+> git fetch origin && git checkout v1.2.1
+
+`$process = Process::withShell('git fetch origin && git checkout v1.2.1');`
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-07-04T07:47:00Z
+
+Cool, thanks for working on that! I think it clearly reduces the chance of an accidental mistake. Now you can only pass an array and you have to explicitly ask the `Process` component for shell command lines using `wihtShell()`. In my opinion this is way better DX than the current "I accept both, array or string" interface.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-05T09:22:09Z
+
+I don't like the `::withShell()` name much. It's not easy to understand or explain. Even the proposed explanation doesn't say much: *"::withShell() defines shell command-lines"*
+
+Also, what's the reasoning behind the deprecation of Process::setCommandline() and PhpProcess::setPhpBinary()? Thanks!
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-07-05T09:48:26Z
+
+> I don't like the ::withShell() name much. It's not easy to understand or explain. Even the proposed explanation doesn't say much: "::withShell() defines shell command-lines"
+
+I agree with @javiereguiluz here. If you're not into processes that much it's hard to understand. Not sure how to name it though. Maybe we should start by trying to define the difference in 1 sentence. That could help us to come up with a good name?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T10:20:03Z
+
+Maybe take some inspiration from https://github.com/symfony/symfony-docs/pull/9988 recently?
+
+> what's the reasoning behind the deprecation of Process::setCommandline() and PhpProcess::setPhpBinary
+
+They are abstraction leaks.  A process should not be mutable for these settings. They completely defeat the as `array()` argument (`new Process([])->setCommandline('...')` as a workaround is not go)
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-07-05T10:22:28Z
+
+`Process::createShellSpecific()`?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-05T11:30:29Z
+
+If we don't want to explain all the internal details of using these "shell commands", maybe we can rename `::withShell()` as `::asString()` (or `::fromString()`, etc.) ?
+
+```php
+$result = (new Process(['ls', '-al']))->getOutput();
+
+$result = (Process::asString('ls -al'))->getOutput();
+```
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-07-05T11:33:06Z
+
+This would render the whole idea kind of useless. Because then we can also just keep everything as is and accept both, an array and a string. People will just update and ask themselves why the constructor is now an array and just modify and use `::asString()` to get rid of the deprecation message. Then we still did not achieve that the devs understand the difference and choose the right thing for the right purpose.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-05T11:38:00Z
+
+@Toflar can you please explain to me the difference between them, or the consequences of using this shell things vs the other thing? Imagine that I'm not a tech person, so the explanation is a simple as possible. That way we'll be able to find the right name. Thanks!
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-07-05T11:48:44Z
+
+I'm struggling with finding a good name myself. I basically raised this issue because @nicolas-grekas tweetet about the difference saying something like "did you know you can pass process arguments as an array?". I checked his linked docs PR (https://github.com/symfony/symfony-docs/pull/9988) and I just noticed that the docs are nice but there's room for improvement code-wise. Right now, the Process component does just happily accept both, an array or a string as constructor argument. When you pass it as a string, the arguments are not escaped and passed on to the shell as is. This means **you** as a developer can benefit from additional features such as stream redirections but you are also responsible to use the correct syntax and escape everything needed yourself which is dependent on the underlying OS. So e.g. if you develop on Windows and deploy to Linux, your command might fail.
+If you pass it as an array though, the Process component escapes everything correctly according to the OS you are currently working on.
+
+And my argument was that in 90% of all cases, the commands are likely rather simple and don't need any special shell feature. Or in other words: 90% of all our devs want to pass an array not a string. I just feel like that with this PR we can protect devs from some unforeseen compatibility issues which is something worth working towards imho 😄
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T12:39:23Z
+
+@javiereguiluz `asString` is a very confusing name because it hides the fact that there are major differences between the array definition and the "withShell" one: we do not want to hide the fact that there is a shell in between. "string" is only the tip of the iceberg, there is a world of differences.
+
+The fact that the shell is there is the reason why we can use e.g. `>` in these strings to express stream redirection, but it's a regular argument in the array syntax. That's also the reason why signaling doesn't work as one would expect most of the time. Doc PR https://github.com/symfony/symfony-docs/pull/9988 removes sentences stating "Due to some limitations in PHP [...] you may have to prefix your commands with `exec`". That's a very misleading statement: it has nothing to do to PHP but related to the fact that commands are run by a shell. Most comments on http://php.net/proc_open also are about how confusing it is to run commands via a shell.
+
+So, when using the array syntax, conceptually, you do *not* use a shell. Escaping becomes a foreign concept (and thus saying is "there is no need to escape" builds on no ground - there is nothing to escape for or against.)
+As soon as you use a shell, you enter *another world*, where it becomes your responsibility to write the command in a language the shell understands. Since this is a language, it has a grammar, and thus a way to escape strings so that their content cannot be confused with any meaningful tokens in this language. That's where escaping comes into play.
+
+PS: even when defining command in the shell's language, people should still *NOT* escape strings themselves. This is very very similar to prepared statements: you do *NOT* want to escape your SQL parameters yourself because that's actually impossible to achieve in a portable and secure way. Instead, you use placeholders in prepared statements and bind the values when executing. That's exactly what ppl should do for commands also, and what https://github.com/symfony/symfony-docs/pull/9988/files#diff-2e6951f193acece85d23e18380939b51R122 explains.
+
+I hope this help understand the reasons for this PR.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-05T12:48:41Z
+
+@Toflar @nicolas-grekas your comments were perfectly clear. Thanks! I propose other names then:
+
+```php
+$result = (new Process(['ls', '-al']))->getOutput();
+
+$result = (Process::raw('ls -al'))->getOutput();
+$result = (Process::rawCommand('ls -al'))->getOutput();
+$result = (Process::unescaped('ls -al'))->getOutput();
+$result = (Process::unescapedCommand('ls -al'))->getOutput();
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T13:00:24Z
+
+`Process::fromShellCommandline('...')`: we don't care if it's longer when it's not the recommended way, and telling there is a shell there is the missing hint that creates so much confusion right now.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-07-05T13:17:13Z
+
+It's not really about escaping then, so I'd go with `Process::fromShellCommandline('...')` and for the docs I think there should be some more examples probably.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-05T13:57:46Z
+
+I don't care about the method name length. My concern is that `::fromShellCommandline()` is not self-explanatory. You need to know a lot about this to be able o understand it without reading some doc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T14:04:03Z
+
+IMHO, `fromShellCommandline` is the most self-explanatory proposal so far. And yes, we don't want ppl to jump using this without reading some docs. That's not the recommended way for many reasons (see above).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-06T18:36:27Z
+
+Thanks @fabpot, comments addressed.

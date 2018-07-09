@@ -110,7 +110,7 @@ class TableStyle
      */
     public function setHorizontalBorderChar($horizontalBorderChar)
     {
-        @trigger_error(sprintf('Method %s() is deprecated since Symfony 4.1, use setHorizontalBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use setHorizontalBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->setHorizontalBorderChars($horizontalBorderChar, $horizontalBorderChar);
     }
@@ -124,7 +124,7 @@ class TableStyle
      */
     public function getHorizontalBorderChar()
     {
-        @trigger_error(sprintf('Method %s() is deprecated since Symfony 4.1, use getBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use getBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->horizontalOutsideBorderChar;
     }
@@ -166,7 +166,7 @@ class TableStyle
      */
     public function setVerticalBorderChar($verticalBorderChar)
     {
-        @trigger_error(sprintf('Method %s() is deprecated since Symfony 4.1, use setVerticalBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use setVerticalBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->setVerticalBorderChars($verticalBorderChar, $verticalBorderChar);
     }
@@ -180,7 +180,7 @@ class TableStyle
      */
     public function getVerticalBorderChar()
     {
-        @trigger_error(sprintf('Method %s() is deprecated since Symfony 4.1, use getBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use getBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->verticalOutsideBorderChar;
     }
@@ -268,7 +268,7 @@ class TableStyle
      */
     public function setCrossingChar($crossingChar)
     {
-        @trigger_error(sprintf('Method %s() is deprecated since Symfony 4.1. Use setDefaultCrossingChar() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use setDefaultCrossingChar() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->setDefaultCrossingChar($crossingChar);
     }

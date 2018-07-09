@@ -76,12 +76,12 @@ class DefaultMarshaller implements MarshallerInterface
                     return $value;
                 }
             } elseif (false === $igbinaryNull) {
-                throw new \RuntimeException('Failed to unserialize cached value, did you forget to install the "igbinary" extension?');
+                throw new \RuntimeException('Failed to unserialize values, did you forget to install the "igbinary" extension?');
             } elseif (null !== $value = igbinary_unserialize($value)) {
                 return $value;
             }
 
-            throw new \DomainException(error_get_last() ? error_get_last()['message'] : 'Failed to unserialize cached value');
+            throw new \DomainException(error_get_last() ? error_get_last()['message'] : 'Failed to unserialize values.');
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         } finally {

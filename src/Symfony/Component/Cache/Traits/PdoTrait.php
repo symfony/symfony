@@ -17,12 +17,15 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @internal
  */
 trait PdoTrait
 {
+    private $marshaller;
     private $conn;
     private $dsn;
     private $driver;
@@ -37,7 +40,7 @@ trait PdoTrait
     private $connectionOptions = array();
     private $namespace;
 
-    private function init($connOrDsn, $namespace, $defaultLifetime, array $options)
+    private function init($connOrDsn, $namespace, $defaultLifetime, array $options, ?MarshallerInterface $marshaller)
     {
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
@@ -66,6 +69,7 @@ trait PdoTrait
         $this->password = isset($options['db_password']) ? $options['db_password'] : $this->password;
         $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
         $this->namespace = $namespace;
+        $this->marshaller = $marshaller ?? new DefaultMarshaller();
 
         parent::__construct($namespace, $defaultLifetime);
     }
@@ -186,7 +190,7 @@ trait PdoTrait
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
-                yield $row[0] => parent::unserialize(is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $row[0] => $this->marshaller->unmarshall(is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
@@ -263,18 +267,7 @@ trait PdoTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        $serialized = array();
-        $failed = array();
-
-        foreach ($values as $id => $value) {
-            try {
-                $serialized[$id] = serialize($value);
-            } catch (\Exception $e) {
-                $failed[] = $id;
-            }
-        }
-
-        if (!$serialized) {
+        if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
         }
 
@@ -346,7 +339,7 @@ trait PdoTrait
             $insertStmt->bindValue(':time', $now, \PDO::PARAM_INT);
         }
 
-        foreach ($serialized as $id => $data) {
+        foreach ($values as $id => $data) {
             $stmt->execute();
 
             if (null === $driver && !$stmt->rowCount()) {

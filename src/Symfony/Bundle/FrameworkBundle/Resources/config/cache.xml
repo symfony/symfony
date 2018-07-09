@@ -75,6 +75,7 @@
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
             <argument>%kernel.cache_dir%/pools</argument>
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -93,6 +94,7 @@
             <argument /> <!-- Redis connection service -->
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -104,6 +106,7 @@
             <argument /> <!-- Memcached connection service -->
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -129,6 +132,10 @@
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
+        </service>
+
+        <service id="cache.default_marshaller" class="Symfony\Component\Cache\Marshaller\DefaultMarshaller">
+            <argument>null</argument> <!-- use igbinary_serialize() when available -->
         </service>
 
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">

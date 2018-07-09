@@ -81,7 +81,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                     if (isset(($metadata = $item->newMetadata)[CacheItem::METADATA_TAGS])) {
                         unset($metadata[CacheItem::METADATA_TAGS]);
                     }
-                    // For compactness, expiry and creation duration are packed in the key of a array, using magic numbers as separators
+                    // For compactness, expiry and creation duration are packed in the key of an array, using magic numbers as separators
                     $byLifetime[$ttl][$getId($key)] = $metadata ? array("\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item->value) : $item->value;
                 }
 

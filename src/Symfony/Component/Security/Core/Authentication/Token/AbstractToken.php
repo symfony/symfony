@@ -261,7 +261,7 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user instanceof AdvancedUserInterface && $user instanceof AdvancedUserInterface) {
-            @trigger_error(sprintf('Checking for the AdvancedUserInterface in %s has been deprecated in 4.1. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
             if ($this->user->isAccountNonExpired() !== $user->isAccountNonExpired()) {
                 return true;
             }
@@ -278,7 +278,7 @@ abstract class AbstractToken implements TokenInterface
                 return true;
             }
         } elseif ($this->user instanceof AdvancedUserInterface xor $user instanceof AdvancedUserInterface) {
-            @trigger_error(sprintf('Checking for the AdvancedUserInterface in %s has been deprecated in 4.1. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
 
             return true;
         }

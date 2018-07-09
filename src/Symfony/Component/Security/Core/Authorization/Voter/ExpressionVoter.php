@@ -42,7 +42,7 @@ class ExpressionVoter implements VoterInterface
      */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1, register the provider directly on the injected ExpressionLanguage instance instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, register the provider directly on the injected ExpressionLanguage instance instead.', __METHOD__), E_USER_DEPRECATED);
 
         $this->expressionLanguage->registerProvider($provider);
     }

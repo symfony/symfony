@@ -55,13 +55,13 @@ class ProcessTest extends TestCase
     {
         try {
             // Check that it works fine if the CWD exists
-            $cmd = new Process('echo test', __DIR__);
+            $cmd = new Process(array('echo', 'test'), __DIR__);
             $cmd->run();
         } catch (\Exception $e) {
             $this->fail($e);
         }
 
-        $cmd = new Process('echo test', __DIR__.'/notfound/');
+        $cmd = new Process(array('echo', 'test'), __DIR__.'/notfound/');
         $cmd->run();
     }
 
@@ -1447,7 +1447,7 @@ class ProcessTest extends TestCase
 
     public function testRawCommandLine()
     {
-        $p = new Process(sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
+        $p = Process::fromShellCommandline(sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
         $p->run();
 
         $expected = <<<EOTXT
@@ -1478,26 +1478,20 @@ EOTXT;
     {
         $env = array('FOO' => 'Foo', 'BAR' => 'Bar');
         $cmd = '\\' === DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
-        $p = new Process($cmd, null, $env);
+        $p = Process::fromShellCommandline($cmd, null, $env);
         $p->run(null, array('BAR' => 'baR', 'BAZ' => 'baZ'));
 
         $this->assertSame('Foo baR baZ', rtrim($p->getOutput()));
         $this->assertSame($env, $p->getEnv());
     }
 
-    /**
-     * @param string      $commandline
-     * @param null|string $cwd
-     * @param null|array  $env
-     * @param null|string $input
-     * @param int         $timeout
-     * @param array       $options
-     *
-     * @return Process
-     */
-    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
+    private function getProcess($commandline, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
     {
-        $process = new Process($commandline, $cwd, $env, $input, $timeout);
+        if (\is_string($commandline)) {
+            $process = Process::fromShellCommandline($commandline, $cwd, $env, $input, $timeout);
+        } else {
+            $process = new Process($commandline, $cwd, $env, $input, $timeout);
+        }
         $process->inheritEnvironmentVariables();
 
         if (self::$process) {
@@ -1507,10 +1501,7 @@ EOTXT;
         return self::$process = $process;
     }
 
-    /**
-     * @return Process
-     */
-    private function getProcessForCode($code, $cwd = null, array $env = null, $input = null, $timeout = 60)
+    private function getProcessForCode(string $code, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
     {
         return $this->getProcess(array(self::$phpBin, '-r', $code), $cwd, $env, $input, $timeout);
     }

@@ -11,6 +11,25 @@ Config
 
  * Deprecated constructing a `TreeBuilder` without passing root node information.
 
+Console
+-------
+
+ * Deprecated passing a command as a string to `ProcessHelper::run()`,
+   pass the command as an array of arguments instead.
+
+   Before:
+   ```php
+   $processHelper->run($output, 'ls -l');
+   ```
+
+   After:
+   ```php
+   $processHelper->run($output, array('ls', '-l'));
+
+   // alternatively, when a shell wrapper is required
+   $processHelper->run($output, Process::fromShellCommandline('ls -l'));
+   ```
+
 DoctrineBridge
 --------------
 
@@ -35,6 +54,25 @@ Form
    {% for field in fieldsWithPotentialDuplicates if not field.rendered %}
       {{ form_widget(field) }}
    {% endfor %}
+   ```
+
+Process
+-------
+
+ * Deprecated the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
+ * Deprecated passing commands as strings when creating a `Process` instance.
+
+   Before:
+   ```php
+   $process = new Process('ls -l');
+   ```
+
+   After:
+   ```php
+   $process = new Process(array('ls', '-l'));
+
+   // alternatively, when a shell wrapper is required
+   $process = Process::fromShellCommandline('ls -l');
    ```
 
 Security

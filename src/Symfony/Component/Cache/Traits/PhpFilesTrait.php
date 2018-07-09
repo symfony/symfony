@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\PhpMarshaller;
 
 /**
@@ -29,6 +30,7 @@ trait PhpFilesTrait
         doDelete as private doCommonDelete;
     }
 
+    private $marshaller;
     private $includeHandler;
     private $appendOnly;
     private $values = array();
@@ -91,7 +93,7 @@ trait PhpFilesTrait
             } elseif ($value instanceof \Closure) {
                 $values[$id] = $value();
             } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                $values[$id] = parent::unserialize($value);
+                $values[$id] = ($this->marshaller ?? $this->marshaller = new DefaultMarshaller())->unmarshall($value);
             } else {
                 $values[$id] = $value;
             }

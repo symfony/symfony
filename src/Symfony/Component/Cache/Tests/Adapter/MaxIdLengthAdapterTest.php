@@ -56,7 +56,7 @@ class MaxIdLengthAdapterTest extends TestCase
         $reflectionProperty->setValue($cache, true);
 
         // Versioning enabled
-        $this->assertEquals('--------------------------:1:------------', $reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12))));
+        $this->assertEquals('--------------------------:1/------------', $reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12))));
         $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12)))));
         $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 23)))));
         $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 40)))));

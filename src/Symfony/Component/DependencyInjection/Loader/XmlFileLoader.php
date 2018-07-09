@@ -265,10 +265,17 @@ class XmlFileLoader extends FileLoader
             $definition->setChanges(array());
         }
 
-        foreach (array('class', 'public', 'shared', 'synthetic', 'lazy', 'abstract') as $key) {
+        foreach (array('class', 'public', 'shared', 'synthetic', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 $method = 'set'.$key;
-                $definition->$method(XmlUtils::phpize($value));
+                $definition->$method($value = XmlUtils::phpize($value));
+            }
+        }
+
+        if ($value = $service->getAttribute('lazy')) {
+            $definition->setLazy((bool) $value = XmlUtils::phpize($value));
+            if (\is_string($value)) {
+                $definition->addTag('proxy', array('interface' => $value));
             }
         }
 

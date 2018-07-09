@@ -816,4 +816,14 @@ class XmlFileLoaderTest extends TestCase
             '$factory' => 'factory',
         ), array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
     }
+
+    public function testFqcnLazyProxy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_lazy_fqcn.xml');
+
+        $definition = $container->getDefinition('foo');
+        $this->assertSame(array(array('interface' => 'SomeInterface')), $definition->getTag('proxy'));
+    }
 }

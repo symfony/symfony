@@ -81,7 +81,7 @@ class FlockStore implements StoreInterface
         set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
         if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
             if ($handle = fopen($fileName, 'x')) {
-                chmod($fileName, 0644);
+                chmod($fileName, 0666);
             } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
                 usleep(100); // Give some time for chmod() to complete
                 $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');

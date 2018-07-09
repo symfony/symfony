@@ -28,4 +28,8 @@ class BarMethodCall
     public function setArray(array $array)
     {
     }
+
+    public function setIterable(iterable $iterable)
+    {
+    }
 }

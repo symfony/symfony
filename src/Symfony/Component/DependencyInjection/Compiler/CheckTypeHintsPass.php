@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeHintException;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 
 /**
  * Checks whether injected parameters types are compatible with type hints.
@@ -134,6 +135,10 @@ class CheckTypeHintsPass extends AbstractRecursivePass
             }
 
             if ($parameter->getType()->isBuiltin() && is_scalar($configurationArgument)) {
+                return;
+            }
+
+            if ('iterable' === $parameter->getType()->getName() && $configurationArgument instanceof IteratorArgument) {
                 return;
             }
 

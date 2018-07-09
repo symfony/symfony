@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeHintsPass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeHintsPass\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeHintsPass\BarOptionalArgument;
@@ -392,6 +393,20 @@ class CheckTypeHintsPassTest extends TestCase
         $container->register('bar', BarMethodCall::class)
             ->addMethodCall('setArray', array(
                 1,
+            ));
+
+        (new CheckTypeHintsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingAnIteratorArgumentToIterable()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', BarMethodCall::class)
+            ->addMethodCall('setIterable', array(
+                new IteratorArgument(array()),
             ));
 
         (new CheckTypeHintsPass(true))->process($container);

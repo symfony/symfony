@@ -109,6 +109,19 @@
             </call>
         </service>
 
+        <service id="cache.adapter.pdo" class="Symfony\Component\Cache\Adapter\PdoAdapter" abstract="true">
+            <tag name="cache.pool" provider="cache.default_pdo_provider" clearer="cache.default_clearer" reset="reset" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- PDO connection service -->
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <argument type="collection" /> <!-- table options -->
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
         <service id="cache.adapter.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" abstract="true">
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />

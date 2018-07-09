@@ -33,7 +33,6 @@ class PdoDbalAdapterTest extends AdapterTestCase
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
 
         $pool = new PdoAdapter(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)));
-        $pool->createTable();
     }
 
     public static function tearDownAfterClass()

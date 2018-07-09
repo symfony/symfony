@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Traits;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
@@ -150,7 +151,11 @@ trait PdoTrait
             $deleteSql .= " AND $this->idCol LIKE :namespace";
         }
 
-        $delete = $this->getConnection()->prepare($deleteSql);
+        try {
+            $delete = $this->getConnection()->prepare($deleteSql);
+        } catch (TableNotFoundException $e) {
+            return true;
+        }
         $delete->bindValue(':time', time(), \PDO::PARAM_INT);
 
         if ('' !== $this->namespace) {
@@ -229,7 +234,10 @@ trait PdoTrait
             $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%'";
         }
 
-        $conn->exec($sql);
+        try {
+            $conn->exec($sql);
+        } catch (TableNotFoundException $e) {
+        }
 
         return true;
     }
@@ -241,8 +249,11 @@ trait PdoTrait
     {
         $sql = str_pad('', (count($ids) << 1) - 1, '?,');
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute(array_values($ids));
+        try {
+            $stmt = $this->getConnection()->prepare($sql);
+            $stmt->execute(array_values($ids));
+        } catch (TableNotFoundException $e) {
+        }
 
         return true;
     }
@@ -302,7 +313,14 @@ trait PdoTrait
 
         $now = time();
         $lifetime = $lifetime ?: null;
-        $stmt = $conn->prepare($sql);
+        try {
+            $stmt = $conn->prepare($sql);
+        } catch (TableNotFoundException $e) {
+            if (!$conn->isTransactionActive() || \in_array($this->driver, array('pgsql', 'sqlite', 'sqlsrv'), true)) {
+                $this->createTable();
+            }
+            $stmt = $conn->prepare($sql);
+        }
 
         if ('sqlsrv' === $driver || 'oci' === $driver) {
             $stmt->bindParam(1, $id);

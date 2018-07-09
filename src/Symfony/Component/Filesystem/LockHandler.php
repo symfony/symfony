@@ -83,7 +83,7 @@ class LockHandler
 
         if (!$this->handle = fopen($this->file, 'r+') ?: fopen($this->file, 'r')) {
             if ($this->handle = fopen($this->file, 'x')) {
-                chmod($this->file, 0444);
+                chmod($this->file, 0644);
             } elseif (!$this->handle = fopen($this->file, 'r+') ?: fopen($this->file, 'r')) {
                 usleep(100); // Give some time for chmod() to complete
                 $this->handle = fopen($this->file, 'r+') ?: fopen($this->file, 'r');

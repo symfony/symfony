@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-07T16:26:50Z
+
+lowest deps need a bump so that tests pass
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-07-08T14:55:28Z
+
+@nicolas-grekas , is it now correct? Or high should also pass?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-09T07:35:41Z
+
+@vudaltsov The `deps=high` build is allowed to fail on PRs if the failure is related to a bump in cross-component dependencies (like in this PR).

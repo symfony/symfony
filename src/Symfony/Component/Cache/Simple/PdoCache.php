@@ -25,6 +25,9 @@ class PdoCache extends AbstractCache implements PruneableInterface
      * a Doctrine DBAL Connection or a DSN string that will be used to
      * lazy-connect to the database when the cache is actually used.
      *
+     * When a Doctrine DBAL Connection is passed, the cache table is created
+     * automatically when possible. Otherwise, use the createTable() method.
+     *
      * List of available options:
      *  * db_table: The name of the table [default: cache_items]
      *  * db_id_col: The column where to store the cache id [default: item_id]

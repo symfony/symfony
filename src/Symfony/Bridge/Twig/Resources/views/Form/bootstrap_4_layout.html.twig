@@ -114,6 +114,16 @@
     </div>
 {%- endblock percent_widget %}
 
+{% block file_widget -%}
+    <div class="form-group">
+        <{{ element|default('div') }} class="custom-file">
+            {%- set type = type|default('file') -%}
+            {{- block('form_widget_simple') -}}
+            <label for="{{ form.vars.id }}" class="custom-file-label">Choose File</label>
+        </{{ element|default('div') }}>
+    </div>
+{% endblock %}
+
 {% block form_widget_simple -%}
     {% if type is not defined or type != 'hidden' %}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
@@ -186,8 +196,6 @@
         {%- if compound is defined and compound -%}
             {%- set element = 'legend' -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
-        {% elseif type is defined and type == 'file' %}
-            {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' custom-file-label')|trim}) -%}
         {%- else -%}
             {%- set label_attr = label_attr|merge({for: id}) -%}
         {%- endif -%}
@@ -268,15 +276,6 @@
         {{- form_help(form) -}}
     </{{ element|default('div') }}>
 {%- endblock form_row %}
-
-{% block file_row -%}
-    <div class="form-group">
-        <{{ element|default('div') }} class="custom-file">
-            {{- form_widget(form) -}}
-            {{- form_label(form) -}}
-        </{{ element|default('div') }}>
-    </div>
-{% endblock %}
 
 {# Errors #}
 

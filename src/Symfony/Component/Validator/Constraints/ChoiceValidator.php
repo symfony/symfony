@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * ChoiceValidator validates that the value is one of the expected values.
@@ -43,7 +44,7 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if ($constraint->multiple && !\is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
+            throw new UnexpectedValueException($value, 'array');
         }
 
         if ($constraint->callback) {

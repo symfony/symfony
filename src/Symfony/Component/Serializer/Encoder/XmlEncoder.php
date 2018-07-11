@@ -38,19 +38,22 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     private $context;
     private $rootNodeName = 'response';
     private $loadOptions;
-    private $ignoredNodeTypes;
+    private $decoderIgnoredNodeTypes;
+    private $encoderIgnoredNodeTypes;
 
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param int|null $loadOptions      A bit field of LIBXML_* constants
-     * @param int[]    $ignoredNodeTypes an array of ignored XML node types, each one of the DOM Predefined XML_* Constants
+     * @param int|null $loadOptions             A bit field of LIBXML_* constants
+     * @param int[]    $decoderIgnoredNodeTypes an array of ignored XML node types while decoding, each one of the DOM Predefined XML_* Constants
+     * @param int[]    $encoderIgnoredNodeTypes an array of ignored XML node types while encoding, each one of the DOM Predefined XML_* Constants
      */
-    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = array(XML_PI_NODE, XML_COMMENT_NODE))
+    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $decoderIgnoredNodeTypes = array(XML_PI_NODE, XML_COMMENT_NODE), array $encoderIgnoredNodeTypes = array())
     {
         $this->rootNodeName = $rootNodeName;
         $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
-        $this->ignoredNodeTypes = $ignoredNodeTypes;
+        $this->decoderIgnoredNodeTypes = $decoderIgnoredNodeTypes;
+        $this->encoderIgnoredNodeTypes = $encoderIgnoredNodeTypes;
     }
 
     /**
@@ -59,7 +62,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public function encode($data, $format, array $context = array())
     {
         if ($data instanceof \DOMDocument) {
-            return $data->saveXML();
+            return $data->saveXML(\in_array(XML_PI_NODE, $this->encoderIgnoredNodeTypes, true) ? $data->documentElement : null);
         }
 
         $xmlRootNodeName = $this->resolveXmlRootName($context);
@@ -76,7 +79,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $this->appendNode($this->dom, $data, $xmlRootNodeName);
         }
 
-        return $this->dom->saveXML();
+        return $this->dom->saveXML(\in_array(XML_PI_NODE, $this->encoderIgnoredNodeTypes, true) ? $this->dom->documentElement : null);
     }
 
     /**
@@ -109,7 +112,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new NotEncodableValueException('Document types are not allowed.');
             }
-            if (!$rootNode && !\in_array($child->nodeType, $this->ignoredNodeTypes, true)) {
+            if (!$rootNode && !\in_array($child->nodeType, $this->decoderIgnoredNodeTypes, true)) {
                 $rootNode = $child;
             }
         }
@@ -327,7 +330,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $value = array();
 
         foreach ($node->childNodes as $subnode) {
-            if (\in_array($subnode->nodeType, $this->ignoredNodeTypes, true)) {
+            if (\in_array($subnode->nodeType, $this->decoderIgnoredNodeTypes, true)) {
                 continue;
             }
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-06T12:16:35Z
+
+An alternative solution could be to catch such cases in the annotation loader and provide a meaningful error/warning message.

@@ -27,7 +27,10 @@ class ProcessHelper extends Helper
 {
     private $formatter;
 
-    public function __construct()
+    /**
+     * @param object $formatter A helper that formats output of the external process
+     */
+    public function __construct($formatter = null)
     {
         $this->formatter = new DebugFormatterHelper();
     }

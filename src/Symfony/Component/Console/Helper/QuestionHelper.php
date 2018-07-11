@@ -29,8 +29,17 @@ use Symfony\Component\Console\Question\Question;
 class QuestionHelper extends Helper
 {
     private $inputStream;
+    private $errorFormatter;
     private static $shell;
     private static $stty;
+
+    /**
+     * @param object $errorFormatter A helper that formats the output of error messages
+     */
+    public function __construct($errorFormatter = null)
+    {
+        $this->errorFormatter = new FormatterHelper();
+    }
 
     /**
      * Asks a question to the user.
@@ -161,9 +170,7 @@ class QuestionHelper extends Helper
      */
     protected function writeError(OutputInterface $output, \Exception $error)
     {
-        $formatter = new FormatterHelper();
-
-        $message = $formatter->formatBlock($error->getMessage(), 'error');
+        $message = $this->errorFormatter->formatBlock($error->getMessage(), 'error');
 
         $output->writeln($message);
     }

@@ -27,7 +27,7 @@ final class TextHelper
      *
      * @return int The length of the string
      */
-    public static function strlen($string)
+    public static function strlen(string $string): int
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return strlen($string);
@@ -45,7 +45,7 @@ final class TextHelper
      *
      * @return string The string subset
      */
-    public static function substr($string, $from, $length = null)
+    public static function substr(string $string, int $from, int $length = null): string
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
@@ -54,7 +54,14 @@ final class TextHelper
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
+    /**
+     * Returns a time difference in a human-readable format.
+     *
+     * @param int $secs Amount of seconds
+     *
+     * @return string The time difference
+     */
+    public static function formatTime(int $secs): string
     {
         static $timeFormats = array(
             array(0, '< 1 sec'),
@@ -83,7 +90,14 @@ final class TextHelper
         }
     }
 
-    public static function formatMemory($memory)
+    /**
+     * Returns an amount of memory bytes in a human-readable format.
+     *
+     * @param int $memory Amount of bytes
+     *
+     * @return string The amount of memory
+     */
+    public static function formatMemory(int $memory): string
     {
         if ($memory >= 1024 * 1024 * 1024) {
             return sprintf('%.1f GiB', $memory / 1024 / 1024 / 1024);
@@ -100,12 +114,27 @@ final class TextHelper
         return sprintf('%d B', $memory);
     }
 
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string)
+    /**
+     * Returns the length of a string, stripped of its console decoration characters.
+     *
+     * @param string $string The string to check its length
+     *
+     * @return int The length of the string
+     */
+    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, string $string): string
     {
         return self::strlen(self::removeDecoration($formatter, $string));
     }
 
-    public static function removeDecoration(OutputFormatterInterface $formatter, $string)
+    /**
+     * Returns a string, stripped of its console decoration characters.
+     *
+     * @param OutputFormatterInterface $formatter
+     * @param string                   $string
+     *
+     * @return string The string without console decoration characters
+     */
+    public static function removeDecoration(OutputFormatterInterface $formatter, string $string): string
     {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);

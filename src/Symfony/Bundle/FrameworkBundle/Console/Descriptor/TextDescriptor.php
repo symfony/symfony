@@ -49,10 +49,10 @@ class TextDescriptor extends Descriptor
         foreach ($routes->all() as $name => $route) {
             $row = array(
                 $name,
-                $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
+                $this->describeRouteMethods($route->getMethods()),
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
                 '' !== $route->getHost() ? $route->getHost() : 'ANY',
-                $route->getPath(),
+                $this->describeRoutePath($route->getPath()),
             );
 
             if ($showControllers) {
@@ -476,5 +476,72 @@ class TextDescriptor extends Descriptor
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
             isset($options['raw_output']) ? !$options['raw_output'] : true
         );
+    }
+
+    private function describeRouteMethods(array $methods)
+    {
+        if (!$methods) {
+            return '<info>ANY</info>';
+        }
+
+        $knownMethods = array(
+            'CONNECT' => true,
+            'DELETE' => true,
+            'GET' => true,
+            'HEAD' => true,
+            'OPTIONS' => true,
+            'PATCH' => true,
+            'POST' => true,
+            'PURGE' => true,
+            'PUT' => true,
+            'TRACE' => true,
+        );
+
+        $methodDescription = '';
+        foreach ($methods as $method) {
+            $methodDescription .= isset($knownMethods[$method]) ? $method : '<error>'.$method.'</error>';
+            $methodDescription .= '|';
+        }
+
+        return rtrim($methodDescription, '|');
+    }
+
+    private function describeRoutePath(string $path)
+    {
+        if ('' === $path || '/' === $path) {
+            return $path;
+        }
+
+        // this pattern has been derived from `Symfony\Component\Validator\Constraints\UrlValidator`
+        $pattern = '~^
+            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*      # a path
+            ((?:\? (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?) # a query (optional)
+            ((?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?) # a fragment (optional)
+        $~ixu';
+
+        if (!preg_match($pattern, preg_replace('#\{\w+\}#', 'X', $path), $matches)) {
+            return '<error>'.$path.'</error>';
+        }
+
+        if ('' !== $matches[1]) {
+            // while valid in a URL, having a query is likely a typo as routing cannot be done on those
+            $queryIndex = strpos($path, '?');
+
+            return substr($path, 0, $queryIndex).'<error>'.substr($path, $queryIndex).'</error>';
+        }
+
+        if ('' !== $matches[2]) {
+            // while valid in a URL, having a fragment is likely a typo as routing cannot be done on those
+            $fragmentIndex = strpos($path, '#');
+
+            return substr($path, 0, $fragmentIndex).'<error>'.substr($path, $fragmentIndex).'</error>';
+        }
+
+        // while a valid path it is still likely a typo
+        if (false !== $doubleSlashIndex = strpos($path, '//')) {
+            return substr($path, 0, $doubleSlashIndex).'<error>'.substr($path, $doubleSlashIndex).'</error>';
+        }
+
+        return $path;
     }
 }

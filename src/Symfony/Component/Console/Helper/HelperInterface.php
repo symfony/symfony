@@ -11,21 +11,21 @@
 
 namespace Symfony\Component\Console\Helper;
 
-@trigger_error('The '.__NAMESPACE__.'\HelperInterface class is deprecated since version 4.2 and will be removed in 5.0.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\HelperInterface class is deprecated since version 4.2.', E_USER_DEPRECATED);
 
 /**
  * HelperInterface is the interface all helpers must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since version 4.2, to be removed in 5.0.
+ * @deprecated since version 4.2
  */
 interface HelperInterface
 {
     /**
      * Sets the helper set associated with this helper.
      *
-     * @deprecated since version 4.2, to be removed in 5.0.
+     * @deprecated since version 4.2
      */
     public function setHelperSet(HelperSet $helperSet = null);
 
@@ -34,7 +34,7 @@ interface HelperInterface
      *
      * @return HelperSet A HelperSet instance
      *
-     * @deprecated since version 4.2, to be removed in 5.0.
+     * @deprecated since version 4.2
      */
     public function getHelperSet();
 
@@ -43,7 +43,7 @@ interface HelperInterface
      *
      * @return string The canonical name
      *
-     * @deprecated since version 4.2, to be removed in 5.0.
+     * @deprecated since version 4.2
      */
     public function getName();
 }

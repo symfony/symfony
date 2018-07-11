@@ -98,11 +98,11 @@ class Command
     }
 
     /**
-     * @deprecated since version 4.2, to be removed in 5.0. Use individual helpers instead.
+     * @deprecated since version 4.2. Use individual helpers instead.
      */
     public function setHelperSet(HelperSet $helperSet)
     {
-        @trigger_error('setHelperSet() is deprecated since version 4.2 and will be removed in 5.0. Use individual helpers instead.', E_USER_DEPRECATED);
+        @trigger_error(__METHOD__.'() is deprecated since version 4.2. Use individual helpers instead.', E_USER_DEPRECATED);
 
         $this->helperSet = $helperSet;
     }
@@ -112,11 +112,11 @@ class Command
      *
      * @return HelperSet A HelperSet instance
      *
-     * @deprecated since version 4.2, to be removed in 5.0. Use individual helpers instead.
+     * @deprecated since version 4.2. Use individual helpers instead.
      */
     public function getHelperSet()
     {
-        @trigger_error('getHelperSet() is deprecated since version 4.2 and will be removed in 5.0. Use individual helpers instead.', E_USER_DEPRECATED);
+        @trigger_error(__METHOD__.'() is deprecated since version 4.2. Use individual helpers instead.', E_USER_DEPRECATED);
 
         return $this->helperSet;
     }
@@ -630,11 +630,11 @@ class Command
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined
      *
-     * @deprecated since version 4.2, to be removed in 5.0. Use individual helpers instead.
+     * @deprecated since version 4.2. Use individual helpers instead.
      */
     public function getHelper($name)
     {
-        @trigger_error('getHelper() is deprecated since version 4.2 and will be removed in 5.0. Use individual helpers instead.', E_USER_DEPRECATED);
+        @trigger_error(__METHOD__.'() is deprecated since version 4.2. Use individual helpers instead.', E_USER_DEPRECATED);
 
         if (null === $this->helperSet) {
             throw new LogicException(sprintf('Cannot retrieve helper "%s" because there is no HelperSet defined. Did you forget to add your command to the application or to set the application on the command using the setApplication() method? You can also set the HelperSet directly using the setHelperSet() method.', $name));

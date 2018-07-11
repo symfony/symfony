@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-@trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2 and will be removed in 5.0.', E_USER_DEPRECATED);
-
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
@@ -20,7 +18,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since version 4.2, to be removed in 5.0.
+ * @deprecated since version 4.2
  */
 abstract class Helper implements HelperInterface
 {
@@ -31,6 +29,8 @@ abstract class Helper implements HelperInterface
      */
     public function setHelperSet(HelperSet $helperSet = null)
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2.', E_USER_DEPRECATED);
+
         $this->helperSet = $helperSet;
     }
 
@@ -39,6 +39,8 @@ abstract class Helper implements HelperInterface
      */
     public function getHelperSet()
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2.', E_USER_DEPRECATED);
+
         return $this->helperSet;
     }
 
@@ -51,6 +53,8 @@ abstract class Helper implements HelperInterface
      */
     public static function strlen($string)
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2. Use TextHelper instead.', E_USER_DEPRECATED);
+
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return \strlen($string);
         }
@@ -69,6 +73,8 @@ abstract class Helper implements HelperInterface
      */
     public static function substr($string, $from, $length = null)
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2. Use TextHelper instead.', E_USER_DEPRECATED);
+
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
         }
@@ -78,6 +84,8 @@ abstract class Helper implements HelperInterface
 
     public static function formatTime($secs)
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2. Use TextHelper instead.', E_USER_DEPRECATED);
+
         static $timeFormats = array(
             array(0, '< 1 sec'),
             array(1, '1 sec'),
@@ -107,6 +115,8 @@ abstract class Helper implements HelperInterface
 
     public static function formatMemory($memory)
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2. Use TextHelper instead.', E_USER_DEPRECATED);
+
         if ($memory >= 1024 * 1024 * 1024) {
             return sprintf('%.1f GiB', $memory / 1024 / 1024 / 1024);
         }
@@ -129,6 +139,8 @@ abstract class Helper implements HelperInterface
 
     public static function removeDecoration(OutputFormatterInterface $formatter, $string)
     {
+        @trigger_error('The '.__NAMESPACE__.'\Helper class is deprecated since version 4.2. Use TextHelper instead.', E_USER_DEPRECATED);
+
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);
         // remove <...> formatting

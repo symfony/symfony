@@ -60,6 +60,10 @@
             <tag name="console.command" command="debug:container" />
         </service>
 
+        <service id="console.command.container_lint" class="Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand">
+            <tag name="console.command" command="lint:container" />
+        </service>
+
         <service id="console.command.debug_autowiring" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
             <tag name="console.command" command="debug:autowiring" />
         </service>

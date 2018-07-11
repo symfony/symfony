@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-16T14:19:18Z
+
+Would it make sense to allow the title to be at the bottom as well?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-04-16T14:34:08Z
+
+@fabpot What do you mean by "at the bottom"? The second line of the header or the very last line of the table?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-16T15:17:26Z
+
+I was thinking about the last line of the table.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-04-18T03:21:45Z
+
+IMO, shown the title only in the first line is enough.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-04-19T05:33:13Z
+
+Not sure I understand the "enough" part. I was thinking about letting the user choose between displaying the title at the top or at the bottom (depending on what you want to achieve, doing one or the other might make more sense).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-19T17:44:25Z
+
+What about `setHeaderTitle` + `setFooterTitle`? Agree a title at the bottom might be useful, e.g. pagination info  or some resultset status text.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-04-19T19:42:43Z
+
+Also sometimes the table is too big, showing the title in both places (top/bottom) would be nice, avoids scrolling.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-04-24T09:11:45Z
+
+As suggested, I added `setHeaderTitle()` and `setFooterTitle()` methods:
+
+![screenshot from 2018-04-24 10-21-30](https://user-images.githubusercontent.com/4578773/39174996-799bf74a-47a9-11e8-9338-2e1c02293b46.png)

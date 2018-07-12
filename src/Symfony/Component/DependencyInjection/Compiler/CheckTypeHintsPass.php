@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeHintException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -55,6 +56,10 @@ class CheckTypeHintsPass extends AbstractRecursivePass
         }
 
         if (!$this->autoload && !class_exists($className = $this->getClassName($value), false) && !interface_exists($className, false)) {
+            return parent::processValue($value, $isRoot);
+        }
+
+        if ($value->getClass() === ServiceLocator::class) {
             return parent::processValue($value, $isRoot);
         }
 
@@ -139,6 +144,10 @@ class CheckTypeHintsPass extends AbstractRecursivePass
             }
 
             if ('iterable' === $parameter->getType()->getName() && $configurationArgument instanceof IteratorArgument) {
+                return;
+            }
+
+            if ('Traversable' === $parameter->getType()->getName() && $configurationArgument instanceof IteratorArgument) {
                 return;
             }
 

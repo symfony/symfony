@@ -2596,10 +2596,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testAttributesWithTranslationParameters()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
-            'attr' => [
+            'attr' => array(
                 'title' => 'Message to %company%',
                 'placeholder' => 'Enter a message to %company%',
-            ],
+            ),
             'translation_parameters' => array(
                 '%company%' => 'ACME Ltd.',
             ),

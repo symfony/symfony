@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-10T14:42:38Z
+
+Looks good to me.
+Change introduced in https://github.com/symfony/symfony/pull/11431, maybe @Seldaek could confirm?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2018-07-11T21:53:50Z
+
+I think it looks fine yes

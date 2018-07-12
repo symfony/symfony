@@ -217,6 +217,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     public function reset()
     {
         $this->called = array();
+        $this->orphanedEvents = array();
     }
 
     /**

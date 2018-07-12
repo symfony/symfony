@@ -271,6 +271,17 @@ class TraceableEventDispatcherTest extends TestCase
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
+
+    public function testClearOrphanedEvents()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->dispatch('foo');
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertCount(1, $events);
+        $tdispatcher->reset();
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertCount(0, $events);
+    }
 }
 
 class EventSubscriber implements EventSubscriberInterface

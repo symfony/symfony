@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-11T11:51:19Z
+
+For 2.8?
+
+---------------------------------------------------------------------------
+
+by VincentChalnot at 2018-07-11T12:25:29Z
+
+@xabbuh I never had this problem in Symfony 2.8 so I created this PR on the 3.4 branch but I can rebase on the 2.8 version if it can be backported to 3.4 after that.
+I don't have any project in 4+ to test it.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-07-11T13:28:25Z
+
+Great first contribution!
+I think this cannot go as is in 2.8 anyway, as we don't use the VarDumper component in profiler yet (only since 3.x). So this PR targeting 3.4 is fine.

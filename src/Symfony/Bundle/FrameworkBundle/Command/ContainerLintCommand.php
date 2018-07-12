@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -35,6 +37,8 @@ class ContainerLintCommand extends Command
     {
         $this
             ->setDescription('Lints container for services arguments type hints')
+            ->setHelp('This command will parse all your defined services and check that you are injecting service without type error based on type hints.')
+            ->addOption('only-used-services', 'o', InputOption::VALUE_NONE, 'Check only services that are used in your application')
         ;
     }
 
@@ -47,7 +51,10 @@ class ContainerLintCommand extends Command
 
         $container->setParameter('container.build_id', 'lint_container');
 
-        $container->addCompilerPass(new CheckTypeHintsPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(
+            new CheckTypeHintsPass(),
+            $input->getOption('only-used-services') ? PassConfig::TYPE_AFTER_REMOVING : PassConfig::TYPE_BEFORE_OPTIMIZATION
+        );
 
         $container->compile();
     }

@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\VarDumper\Caster\CutStub;
 
 /**
  * Default implementation of {@link FormDataExtractorInterface}.
@@ -155,6 +156,10 @@ class FormDataExtractor implements FormDataExtractorInterface
         );
 
         foreach ($view->vars as $varName => $value) {
+            // Removing redundant variable from view variables
+            if ('form' === $varName) {
+                $value = new CutStub($value);
+            }
             $data['view_vars'][$varName] = $value;
         }
 

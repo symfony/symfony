@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nowiko at 2018-07-02T18:54:42Z
+
+@iltar Please review that applied changes are suitable.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-07-02T21:02:15Z
+
+Added test looks good to me 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-03T06:51:25Z
+
+I think we also tests for when the link/form is not found.
+
+---------------------------------------------------------------------------
+
+by nowiko at 2018-07-03T17:57:39Z
+
+@fabpot
+I have added test cases if link or form cannot be found. Please, let me know if this should be modified, or additional check for form/link existence should be performed on the method level.

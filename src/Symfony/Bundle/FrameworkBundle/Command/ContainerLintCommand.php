@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;

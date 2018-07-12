@@ -59,7 +59,7 @@ class CheckTypeHintsPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        if ($value->getClass() === ServiceLocator::class) {
+        if (ServiceLocator::class === $value->getClass()) {
             return parent::processValue($value, $isRoot);
         }
 

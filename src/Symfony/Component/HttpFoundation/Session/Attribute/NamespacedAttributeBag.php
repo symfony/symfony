@@ -124,7 +124,13 @@ class NamespacedAttributeBag extends AttributeBag
 
         foreach ($parts as $part) {
             if (null !== $array && !array_key_exists($part, $array)) {
-                $array[$part] = $writeContext ? array() : null;
+                if (!$writeContext) {
+                    $null = null;
+
+                    return $null;
+                }
+
+                $array[$part] = array();
             }
 
             $array = &$array[$part];

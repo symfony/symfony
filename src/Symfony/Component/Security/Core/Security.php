@@ -20,10 +20,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class Security
 {
-    const ACCESS_DENIED_ERROR = '_security.403_error';
-    const AUTHENTICATION_ERROR = '_security.last_error';
-    const LAST_USERNAME = '_security.last_username';
-    const MAX_USERNAME_LENGTH = 4096;
+    public const ACCESS_DENIED_ERROR = '_security.403_error';
+    public const AUTHENTICATION_ERROR = '_security.last_error';
+    public const LAST_USERNAME = '_security.last_username';
+    public const MAX_USERNAME_LENGTH = 4096;
 
     private $container;
 
@@ -32,10 +32,7 @@ final class Security
         $this->container = $container;
     }
 
-    /**
-     * @return UserInterface|null
-     */
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
         if (!$token = $this->getToken()) {
             return null;
@@ -51,22 +48,14 @@ final class Security
 
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
-     *
-     * @param mixed $attributes
-     * @param mixed $subject
-     *
-     * @return bool
      */
-    public function isGranted($attributes, $subject = null)
+    public function isGranted($attributes, $subject = null): bool
     {
         return $this->container->get('security.authorization_checker')
             ->isGranted($attributes, $subject);
     }
 
-    /**
-     * @return TokenInterface|null
-     */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->container->get('security.token_storage')->getToken();
     }

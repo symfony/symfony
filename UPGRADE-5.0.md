@@ -36,12 +36,17 @@ Console
    $processHelper->run($output, Process::fromShellCommandline('ls -l'));
    ```
 
-
 DependencyInjection
 -------------------
 
  * Removed the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods.
  * Removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`.
+
+DoctrineBridge
+--------------
+
+ * Deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`, an instance of `EntityManagerInterface` should be
+   injected instead
 
 EventDispatcher
 ---------------

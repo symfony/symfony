@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`,
+   an instance of `EntityManagerInterface` should be injected instead
+
 4.1.0
 -----
 

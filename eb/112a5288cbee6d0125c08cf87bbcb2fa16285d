@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-06T09:14:01Z
+
+How will this behave when you have more than one entity manager configured? Right now the entity manager just forwards the call so there is no difference. But is this assumption future proof?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-06T09:17:28Z
+
+There is a different metadata factory for every entity manager, so I don't think it can be an issue.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-09T18:48:34Z
+
+UPGRADE files need to be updated

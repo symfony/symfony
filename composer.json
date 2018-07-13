@@ -120,7 +120,7 @@
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/",
-            "Symfony\\Contract\\": "src/Symfony/Contract/"
+            "Symfony\\Contracts\\": "src/Symfony/Contracts/"
         },
         "classmap": [
             "src/Symfony/Component/Intl/Resources/stubs"

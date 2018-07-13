@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Compiles a node to PHP code.

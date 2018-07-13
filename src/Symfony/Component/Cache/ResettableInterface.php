@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache;
 
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Resets a pool's local state.

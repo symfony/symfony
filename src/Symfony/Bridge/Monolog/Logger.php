@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Monolog;
 use Monolog\Logger as BaseLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Logger.

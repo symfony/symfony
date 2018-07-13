@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * ResettableContainerInterface defines additional resetting functionality

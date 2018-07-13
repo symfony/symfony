@@ -1,0 +1,484 @@
+---------------------------------------------------------------------------
+
+by sstok at 2018-04-30T14:42:01Z
+
+This would only work if the used terms have an equal purpose and meaning, Resettable has a different purpose in Cache than OutputFormatterStyleStack or Compiler in the Expression-Language.
+
+Basically this would make the interfaces extreme generic in purpose and less about their specific situation. A Trait can be easily re-used as it's simple code-level copy-paste but doesn't enforce an interface contract.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-30T14:58:17Z
+
+> This would only work if the used terms have an equal purpose and meaning
+
+Correct, and that's actually the exact purpose of the proposed interface. I don't know why you state that they have a different purpose in your list, because AFAIK, they have the exact same one: resetting an object to its initial state. This is even more apparent when considering that all (most) these existing "reset" methods are bound to "kernel.reset" tags.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-04-30T20:14:16Z
+
+Maybe we should use the discussion of PR to assemble a list of classes, interfaces and traits that could possibly be moved into the abstractions package, to get an idea of where we would be heading to with this idea.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-30T22:10:53Z
+
+@derrabus why not. Here is my short list (I would really try hard to *not* add any classes here, even abstract ones):
+- `CacheInterface`, as derivated from #26929, which will require also a `CacheItemInterface`
+- `ServiceSubscriberInterface` from DI component, `ServiceProviderInterface` from #25707 and a `ServiceLocatorTrait` derivated from our `ServiceLocator` class
+
+There might be more abstractions that we could extract from other components (Console, EventDispatcher, Lock, Messenger, Routing, Translation, HttpKernel, etc.?)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-05-01T10:17:33Z
+
+I really like the idea of separating abstractions from implementations.
+
+> I would really try hard to _not_ add any classes here
+
+Regarding EventDispatcher, a (dead-simple) class would be among the candidates for me:
+
+- `EventDispatcherInterface`
+- `EventSubscriberInterface`
+- `Event`
+
+`Event` could be split into an interface + a trait, but I don't see much benefit here.
+
+Moving those to interfaces into an abstraction package would allow components to define optional event subscribers without depending on the actual event dispatcher. We could also simplify [code like this](https://github.com/symfony/symfony/blob/4fb673677eecd0a65e887a5bdb7bcc991d244c87/src/Symfony/Component/Config/Resource/ReflectionClassResource.php#L155).
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-01T10:32:26Z
+
+This PR is weird, seeing https://github.com/symfony/symfony/issues/6129 was voted down on. What has changed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T02:43:20Z
+
+Thanks for the link @ostrolucky. About  your question, re-reading my own downvote, I then stated:
+
+> Symfony didn't embrace the mission of providing generic interfaces on their own
+
+that's exactly what I'm proposing here: have the Symfony project broaden its missions a bit, and allow itself to publish interfaces on their own for genericity. The benefits are well discussed and presented in the issue. Why did I change my mind? Because I feel like not having this package is preventing us from some kind of innovation we'd like to do. E.g. taggable cache items, this linked cache interface, the attached reset method, etc. It comes also as a realization that the FIG is not the right place for all of these: I don't expect everyone in the FIG to agree on all things we'd still like to do. And this is fine, we don't have the exact same goals obviously. We need our own freedom on the "abstractions" topic, so that we're able to contribute to this space also. Some topics *could* be of interest to the FIG (e.g. taggable cache items), still that shouldn't prevent us from being able to move forward at our own pace.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-05-02T08:47:59Z
+
+I like the idea of creating standards by extracting or defining interfaces out of established and working solutions. This is what PSRs are missing in many cases.
+
+However, how do you see the `symfony/abstractions` package to be consumed by others?
+
+My main issue with this idea is that the package wouldn't be cohesive, as a lot of unrelated interfaces would be packaged together. If I only need the `ResettableInterface` I shouldn't be forced to bring in the `ServiceSubscriberInterface`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-02T09:38:38Z
+
+@nicolas-grekas to better understand the purpose (and limits) of this new package, which of the following packages fits the idea of symfony/abstractions better?
+
+* Laravel Contracts (https://github.com/illuminate/contracts): it only contains the interfaces of the framework. No traits or shared code.
+* Doctrine Common (https://github.com/doctrine/common): it's the usual "common" package found in lots of software projects and contains both interfaces/contracts and commonly shared code.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-02T18:53:26Z
+
+> a lot of unrelated interfaces would be packaged together
+
+That's a desired property of the package IMHO: it will ease discoverability and dependency maintenance (there are some comments in #6129 on the topic). We might reconsider later if the number of interfaces grows out of control, but I don't expect this to happen anytime soon. Meanwhile, we could/should group domains in subnamespaces, when cohesiveness is desired (not the case for ResettableInterface, but could be for the mentioned Cache interfaces.) The fact that you get potentially unused interfaces poses no issues IMHO.
+
+@javiereguiluz certainly not like doctrine/common, which is not an abstraction at all. What I presented above: this would contain interfaces (=abstractions), related documentation defining their semantics (in docblocks), generic traits (=type-less behaviors) and reference test suites when applicable (of primary importance, see eg https://github.com/php-cache/integration-tests/ for what I mean).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-15T10:06:27Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-15T11:36:10Z
+
+This seems like a simple optimization: by moving some interfaces to this component, the only practical difference is that you're allowing a library that wants to use that interface (but *not* use our implementation) to depend on the smaller `abstractions` component instead of needed to require the entire component (but then only use the interface). A real-world example would is `http-kernel`, which is used in several libraries that don't use its implementation (e.g. Laravel who only references `HttpKernelInterface` & `HttpExceptionInterface `).
+
+Are there any big downsides?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-06-15T12:17:07Z
+
+Downside is more complicated dependency resolution. If packages A and B require different versions of symfony/abstractions, these packages won't be able to coexist. Since this package will contain lot of unrelated interfaces and will be used by lot of different packages, this effect will be amplified a lot, since version bump of symfony/abstractions for package A might be for totally unrelated interface to package B, so conflict will be pretty  artificial but still necessary, as there isn't a way to apply constraint for just a part of this package.
+
+Still worth it IMHO, though.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-16T17:15:12Z
+
+>  WDYT?
+
+> The purpose of abstraction is not to be vague, but to create a new semantic level in which one can be absolutely precise
+
+Putting `ResettableInterface` into the common package is like considering `Mapper::map($something): mixed` as abstraction.
+
+It looks like attempt to follow DRY principle, but the last one makes sense within bounded context only. When context doesn't have explicit bounds, "abstraction" becomes a vague mess.
+
+> this would contain interfaces (=abstractions)
+
+Abstraction doesn't mean to be an interface or abstract class: https://martinfowler.com/articles/dipInTheWild.html#WhatDoesThatAllMean (obsession of having separate interface for every class is incorrect interpretation of the DIP):
+
+> Where the DIP refers to abstractions, I've noticed many people confuse abstraction with:
+> An interface
+> An abstract base class
+
+For me, #6129 has clearer goals.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T09:23:32Z
+
+@weaverryan you've got it right, thanks for hinting about `HttpKernelInterface` and `HttpExceptionInterface` also, we could maybe move them (or a subset of them) here also.
+
+@ostrolucky that's something to consider, thanks for raising it. The BC + deprecation policy would limit the issue a lot I believe. We will also be able to split the package later if this becomes a real issue. For these two reasons, I think we can still move forward as proposed here. Maybe we'll never have to deal with these concerns. And if we do, we already have plans. Of course, this also means we should be extra careful when adding code there: the pace of change should be as low as possible so that we'd need to think twice before adding anything there. Maybe we could create some policy like: no code should enter this package until it has been first implemented and released in another non-abstract package. WDYT?
+
+@unkind I'm sorry if I didn't read your comment right, but I feel like it is mostly dismissive ("like [...] as abstraction", "vague mess", "obsession", "incorrect interpretation", "clearer goals"). I understand you might be skeptical about this proposal. Let me try answering what I understood so far:
+
+First of all, I think many here are able to grasp what an abstraction is. When I wrote "PHP interface = abstraction" it was obviously (for me at least) a shortcut. On the contrary, if we think the Symfony community of contributors is not able to grasp what the concept is, we'd better close this PR immediately I agree. On my side, I believe we can do it. Your help included if you're up to!
+
+There are two sides to this PR:
+- `ResettableInterface`: I do think and observe that "setting an object back to its original state" is a well defined and bounded context. It is also a cross-cutting concern, and that's why we need a generic "reset" method that gathers this semantics, allowing one to recycle objects (think services).
+- the `symfony/abstraction` package itself: on this side, I don't know how to explain the goals of this PR without rephrasing what I already wrote before. If you think #6129 has clearer goals, maybe explaining why could be a start? I'd happily also accept help from other reviewers to formulate the goals more clearly.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-17T11:03:16Z
+
+@nicolas-grekas
+
+> setting an object back to its original state
+
+This is a very generic definition, and it blurs semantics of the object.
+For example, "the reset button can be pressed instead of saving, and start from a point before the mistake occurred". This "reset" and and your "reset" are semantically different concepts.
+
+What's the problem to simply copy-paste them? DRY is not about code duplication. I don't know why do you need an interface in the first place, tbh. When do you need to "reset" something without knowing what exactly do you reset? `foo(Resettable $something) { $something->reset(); }`
+
+> First of all, I think many here are able to grasp what an abstraction is. When I wrote "PHP interface = abstraction" it was obviously (for me at least) a shortcut.
+
+So what do you do with `Event` class from https://github.com/symfony/symfony/pull/27093#issuecomment-385640605: would you make separate interface of a completed abstraction called `Event`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T11:26:29Z
+
+> When do you need to "reset" something without knowing what exactly do you reset?
+
+Not all interfaces are meant to be type-hinted for. Take e.g. [`LoggerAwareInterface`](https://github.com/php-fig/log/blob/master/Psr/Log/LoggerAwareInterface.php): you'll similarly never type-hint for it. Yet, it provides a useful info on the object that implements it and enables some interesting use cases (e.g. autoconfiguration.)
+
+The proposed interface belongs to the same group: it's a labeling interface that allows a piece of code to know how to put back an object to its initial state without knowing anything else about it. The use case for Symfony is enabling seamless integration with PHP-PM-like workers: these do need a way to reset some objects between each iteration. By implementing `ResettableInterface`, a library or userland code could make this easier. That's why I'm proposing this personally.
+
+> So what do you do with Event class: would you make separate interface of a completed abstraction called Event?
+
+I didn't think about it, so I don't know. We'll be able to decide this on a dedicated PR together.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-17T12:16:25Z
+
+`LoggerAwareInterface` is weird too. How exactly it helps to autoconfigure object in comparison with constructor injection? Constructor also "provides a useful info on the object".
+
+> The use case for Symfony is enabling seamless integration with PHP-PM-like workers: these do need a way to reset some objects between each iteration.
+
+This sounds like more or less explicit BC ("SeamlessIntegrationWithProcessManager", "ProcessManager", etc.), but `Symfony\Abstraction\ResettableInterface` pretends to be solution for all possible domains (at least, among `Symfony` packages).
+
+It seems like we have too different views on these things, sadly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T12:43:07Z
+
+> Constructor also "provides a useful info on the object".
+
+Constructor provides info for autowiring, but none for autoconfig. Only a labelling interface does it.
+
+> ResettableInterface pretends to be solution for all possible domains
+
+That's correct: this interface could be useful and help achieve decoupling to any php-pm/reactphp/amphp-like loops on the consumer side, and to any package on the service provider side, Symfony or anything else.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-17T13:26:12Z
+
+> That's correct: this interface could be useful and help achieve decoupling to any php-pm/reactphp/amphp-like loops on the consumer side, and to any package on the service provider side, Symfony or anything else.
+
+Domains are different. Console game domains could have different meaning of "resetting" concept as I said above: "the reset button can be pressed instead of saving, and start from a point before the mistake occurred": https://en.wikipedia.org/wiki/Reset_button
+That's totally different from your concept. You're aware of technical domains with processes, loops, etc., but you completely ignore others and simply put your `ResettableInterface` into `Symfony/Abstractions` package. Probably, `Symfony/ProcessesAndLoops` is even better, isn't it?
+
+This is not solution for all possible domains.
+
+Furthermore, it encourages stateful services. Which services you do want to mark with this interface exactly? Is is possible to avoid `reset()` method at all and simply create new instance of a service?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-17T13:40:33Z
+
+> "the reset button can be pressed instead of saving, and start from a point before the mistake occurred" That's totally different from your concept
+
+Yes it is, so I don't understand why you're focusing your argumentation on it. The only thing in common is the word "reset". But as you know words can have different meanings, esp. in our domain where "naming is hard". So here, implementing this interface means you're exposing a "reset" method whose semantics is "to put back the instance in its initial state". The initial state may need a definition for sure: it's the state where the object has been instantiated first and is ready to use, including all its potential setters/properties being set if any. This may deserve some clarifications in the docblocks of the PR I suppose?
+
+I believe this semantics is useful and universal enough to be put in a package providing some abstraction level. No need to bind it by words to any specific use cases, people are creative, let just give them clear semantics and let them build useful things out of them.
+
+> it encourages stateful services.
+
+It doesn't: instead, it accounts for the fact that there *are* services that cannot be stateless by design. See PR for examples. You can maybe wonder about them one by one and figure out some should be redesigned, but some are just fine as is, e.g. `RequestStack` or even the profiler.
+
+> Which services you do want to mark with this interface exactly?
+
+See attached patch.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-17T21:46:19Z
+
+> but some are just fine as is, e.g. RequestStack
+
+In my perfect world, `RequestStack` is immutable and every time you pass immutable `Context` value object that could be different while passing through the call stack (`$context->withRequest($request))` (creates new instance of `$context` with added `$request` to the stack). This `$context` should be passed even with commands/events as second argument. The following posts are about this approach to some degree:
+https://igor.io/2013/03/31/stateless-services.html (implicitly, but I'm sure @igorw was meaning something similar)
+https://matthiasnoback.nl/2018/04/context-passing/ (ping @matthiasnoback)
+https://beberlei.de/2017/03/12/explicit_global_state_with_context_objects.html (ping @beberlei).
+
+But that's way too far from Symfony's architecture, so I think I have no real arguments against your stateful approach.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-06-20T01:47:05Z
+
+> If you think #6129 has clearer goals, maybe explaining why could be a start? I'd happily also accept help from other reviewers to formulate the goals more clearly.
+
+Public API of Symfony, contracts. Interfaces and even concrete classes. Similar to Laravel/Contracts, but without fearing of concrete classes (once again: it's widespread fallacy that "abstraction" means "interface" or "abstract class" [language artifacts]).
+
+For example, `Symfony/DateTime/UtcDateTime` could be a final class with more convenient than native PHP's `DateTimeImmutable` methods. It is still a contract and a concrete class in the same time.
+
+Also, it's OK to put in Symfony/Contracts some contracts of services which are not directly implemented in the Symfony (e.g. `Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface` is a perfect example as it is implemented only in the Bridge with ProxyManager library; Symfony has this contract, but implementation is external).
+
+Such package will form Symfony API and your own DSL within Symfony.
+In my opinion, it's a good practice for every big vendor.
+
+`ResettableInterface` is my opinion is just very weird example. And naming "abstractions" is a slippery slope.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-20T16:14:17Z
+
+Thank you all for the comments, I added an extensive README and docblock on the interface, to hopefully sum up the discussion for next readers.
+
+(comments addressed @weaverryan than you)
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-06-20T18:19:12Z
+
+When I read this issue and all the comments, I think we should move it out of the symfony namespace.
+
+Then we can do it like symfony using a monorepo abstractions/abstractions and split it in small readonly components / parts.
+
+Later each symfony conponent can extend the needed abstraction components.
+
+For bc readons, we can move the interfaces of the symfony namespace by extending the abstraction ones.
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-21T06:50:47Z
+
+Can we have use-case for ResettableInterface when its use is the most suitable?
+
+If it is part of chatty interface like:`
+while(true) {
+  $obj->doFirst();
+  $obj->doSecond();
+  $obj->reset();
+}
+` - I don't see reason to extract interface here.
+
+IMHO when object is somehow 'spoiled' it is better to create new one.
+If instances of some class is prone to be spoiled - it's better to fix class or class usage scenario.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-21T10:04:09Z
+
+> move it out of the symfony namespace.
+
+I would not actually, Symfony is the vendor name that gives scope to the abstractions.
+
+> split it in small readonly components / parts
+
+Right now, this feels like unneeded process overhead to me. See FAQ in README on the topic.
+
+> Later each symfony conponent can extend the needed abstraction components.
+> For bc readons, we can move the interfaces of the symfony namespace by extending the abstraction ones.
+
+sooner than later, that's exactly the plan I have in mind :)
+
+> Can we have use-case for ResettableInterface when its use is the most suitable?
+
+See docblock on the interface, does it answer this well enough?
+
+> IMHO when object is somehow 'spoiled' it is better to create new one.
+
+Sure, but "better" doesn't mean "rules them all". The attached patch shows where this is used in real life.
+The interface is useful if we want to embrace php-pm like workflows. It's just pragmatic as it doesn't assume that people know how to write 100% stateless services (which is the root "non-assumption" that made and still makes PHP successful by the way.)
+
+---------------------------------------------------------------------------
+
+by palex-fpt at 2018-06-22T00:04:02Z
+
+Example: I use Psr\SimpleCache\CacheInterface in 70 classes. I know most cache implementations implements ResettableInterface. But I did not call to `reset()` and still does not know when to call it and should I call it. I did not found any call to `reset()` in Symfony code outside another `reset()`.
+
+According to interface docblock it looks like I should implement `ResettableInterface` for every class that has dependencies. Cause its dependency may implement `ResettableInterface` and should be resetted on request.
+
+Let looks at real implementation (Cache\Traits\AbstractTraits).
+Object do some uncontrolled internal caching and forces it`s client to call for `reset()` in cases it starts harm. From my POV internal cache should be limited or be configurable or be delegated. That's way we would not be put in situation like: Oh, OOM in FilesystemCache. I should call to reset() every 1000 calls.
+
+At this moment `ResettableInterface` looks like indulgence to write not a good code: Is my class goes OOM? Just call `reset()` more frequently!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-22T16:25:52Z
+
+@palex-fpt I may need to reformulate the purpose of `ResettableInterface`. This PR is not about inventing resettable services: they already exist since always. Nobody needs anyone's permission nor any interface to create them. Given this as a fact, #23984 asked for a way to better deal with them for the purpose of recycling kernels/containers in a loop. #24155 did that by introducing a `kernel.reset` tag, which found its way to many core services. You may argue this is bad design/breaks rules/kills kitten/whatever: refactoring the codebase to fit this idea would fit no business purpose IMHO. "Fixing" this would just divert us from doing anything useful for our users (if it really needs any fix.)
+
+This PR is about generalizing the knowledge that is currently scattered behind the `kernel.reset` tag on service definitions: many services provide and need a reset if one wants to use them in long-running loops. Now the issue: if anyone wonders which services, they'll have to do guesswork, or dig in the source to know. While we tell components are decoupled, this knowledge is only found in bundles. This hurts interoperability and makes registering resettable services harder than required.
+
+By adding this interface, we fix both issues: "Symfony" wouldn't be the only one able to recycle services (interoperability), and by labeling services we would allow e.g. autoconfiguring this behavior when applicable (discoverability.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-22T16:53:55Z
+
+added in the docblock on the interface: `note that we advise making your services stateless instead of implementing this interface when possible.`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-22T17:14:26Z
+
+@unkind I missed answering your comment:
+
+> even concrete classes [...] It is still a contract and a concrete class in the same time.
+
+if in the future someone submits code in this package that contains classes, we will have a PR to discuss it. I'm not seeing a concrete need for this right now, but I won't object solely on the technical "class" keyword of course.
+
+> OK to put in Symfony/Contracts some contracts of services which are not directly implemented
+> (e.g. Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface)
+
+I agree. I would still expect some relationship to the codebase (like your example has.)
+
+> Such package will form Symfony API and your own DSL within Symfony.
+
+I'd like a bit broader scope actually: Symfony is organized enough (e.g. process wise) to publish and promote standards in its domains. Decoupling and interoperability are in the target to me.
+
+For this reason, symfony/contracts may limit a bit too much the scope I want we'd have here (it perfectly fits the API/DSL definition.) Another name that came to me is `symfony/standards`. I like it more than `symfony/abstractions` right now: it's a common word (less ... abstract ... than `abstractions`), and has the right scope: first "symfony", then "standards". What do you all think about this name?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-06-22T17:56:38Z
+
+I like this idea (and I also like the `symfony/standards` name). I don't practically see the downside. If we don't create a separate repo for some interfaces, those interfaces WILL still exist, but they'll be "stuck" in packages with their implementation. That's not the end of the world, but this seems to help alleviate that a little bit.
+
+---------------------------------------------------------------------------
+
+by Wirone at 2018-06-25T08:51:24Z
+
+I see downside pointed by @ostrolucky - this would deny installing theoretically decoupled (not related) components in different versions, which now is possible. You can now use components from 3.* branch and others from 4.* branch in one project, if these components are not dependent on themselves (if Composer resolves it correctly). If all abstractions/contracts were moved to one package, it would force applications to use components with the same version because of common abstractions package.
+
+It could be problematic and could narrow use cases (components meant to be flexible and decoupled).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T13:13:32Z
+
+After talking on Slack with other core-team members, we settled on the name `symfony/contracts`.
+This PR is now updated accordingly.
+
+@michaelcullum thanks for the review, comments addressed.
+@Wirone this should be addressed with proper processes: no components should lock a specific version of the package, and the package should not break compatibility in any hard way. I think we can adapt our current policies to that without much trouble.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T13:14:03Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-26T16:42:03Z
+
+thanks @fabpot, comments addressed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-28T05:15:02Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-06-29T12:28:17Z
+
+I like the idea as well.
+
+> Maybe we could create some policy like: no code should enter this package until it has been first implemented and released in another non-abstract package. WDYT?
+
+Shall we add a note in the README about the practices on how we add things into these contracts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-29T12:46:00Z
+
+> Shall we add a note in the README about the practices on how we add things into these contracts?
+
+it's there already ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-09T15:08:31Z
+
+The `contracts` should have a different versioning than Symfony. As we won't break BC for instance, we just have to increase the minor version. Having a 5.0 version next years does not really make sense. So, here is the plan: we keep the code under `symfony/symfony` to make it easier to move interfaces from the actual code to the contracts ones, but the release cycle is going to be different and done directly via the subtree-split.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-09T16:31:04Z
+
+Here we are, the interface is now `ResetInterface`. PR green.
+
+> we keep the code under symfony/symfony to make it easier to move interfaces from the actual code to the contracts ones, but the release cycle is going to be different and done directly via the subtree-split.
+
+Makes perfect sense to me, everything ready to put it into practice :)
+I've updated the branch-alias and the composer.json to reference v1.0.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-07-09T16:50:52Z
+
+> The `contracts` should have a different versioning than Symfony.
+
+I absolutely agree.
+
+> the release cycle is going to be different and done directly via the subtree-split
+
+I see how keeping the contracts inside the monorepo would ease the extraction of more interfaces, but I must admit that the detached versioning confuses me already, thinking about branching tagging of releases. A separate repository would be easier to maintain and understand in the long run, I guess.
+
+How about this: We could start with the contracts in the monorepo to ease the extraction for now and right before the feature freeze of Symfony 4.2 (which would be 1.0 of the contracts), the subtree split becomes an independant repository like the polyfills or the monolog bundle.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-11T04:17:20Z
+
+@derrabus we'll have some time to figure out what works best. For now, we anticipate that the easiest to maintain could be a subtree-splitted repository.
+
+Status: needs review

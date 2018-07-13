@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\GetTrait;
+use Symfony\Contract\Service\ResetInterface;
 
 /**
  * Chains several adapters together.
@@ -301,7 +302,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     public function reset()
     {
         foreach ($this->adapters as $adapter) {
-            if ($adapter instanceof ResettableInterface) {
+            if ($adapter instanceof ResetInterface) {
                 $adapter->reset();
             }
         }

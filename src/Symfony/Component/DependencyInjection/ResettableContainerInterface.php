@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Contract\Service\ResetInterface;
+
 /**
  * ResettableContainerInterface defines additional resetting functionality
  * for containers, allowing to release shared services when the container is
@@ -18,7 +20,7 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-interface ResettableContainerInterface extends ContainerInterface
+interface ResettableContainerInterface extends ContainerInterface, ResetInterface
 {
     /**
      * Resets shared services from the container.

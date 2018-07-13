@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\PruneableInterface;
-use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Contract\Service\ResetInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -36,7 +36,7 @@ trait ProxyTrait
      */
     public function reset()
     {
-        if ($this->pool instanceof ResettableInterface) {
+        if ($this->pool instanceof ResetInterface) {
             $this->pool->reset();
         }
     }

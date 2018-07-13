@@ -19,7 +19,7 @@
         "php": "^7.1.3"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Contract\\": "" },
+        "psr-4": { "Symfony\\Contracts\\": "" },
         "exclude-from-classmap": [
             "**/Tests/"
         ]

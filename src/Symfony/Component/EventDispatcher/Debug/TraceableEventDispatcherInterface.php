@@ -12,7 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Debug;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @deprecated since Symfony 4.1

@@ -15,7 +15,7 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Chains several caches together.

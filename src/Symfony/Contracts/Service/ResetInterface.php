@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Contract\Service;
+namespace Symfony\Contracts\Service;
 
 /**
  * Provides a way to reset an object to its initial state.

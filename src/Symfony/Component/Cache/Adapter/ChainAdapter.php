@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\GetTrait;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Chains several adapters together.

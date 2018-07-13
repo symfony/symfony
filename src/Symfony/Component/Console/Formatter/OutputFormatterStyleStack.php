@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Formatter;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>

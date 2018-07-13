@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Stopwatch;
 
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Stopwatch provides a way to profile code.

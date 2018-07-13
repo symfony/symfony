@@ -15,7 +15,7 @@ use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {

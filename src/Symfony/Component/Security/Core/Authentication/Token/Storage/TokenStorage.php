@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token\Storage;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * TokenStorage contains a TokenInterface.

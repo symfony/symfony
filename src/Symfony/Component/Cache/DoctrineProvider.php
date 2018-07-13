@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\PruneableInterface;
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

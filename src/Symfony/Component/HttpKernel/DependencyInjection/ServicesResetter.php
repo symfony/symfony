@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Contract\Service\ResetInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Resets provided services.

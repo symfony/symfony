@@ -126,6 +126,7 @@ Security
  * The `FirewallMapInterface::getListeners()` method must return an array of 3 elements,
    the 3rd one must be either a `LogoutListener` instance or `null`.
  * The `AuthenticationTrustResolver` constructor arguments have been removed.
+ * A user object that is not an instance of `UserInterface` cannot be accessed from `Security::getUser()` anymore and returns `null` instead.
 
 SecurityBundle
 --------------

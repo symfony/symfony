@@ -1769,52 +1769,8 @@ class RequestTest extends TestCase
     {
         return array(
             array(
-                array(
-                    'X_ORIGINAL_URL' => '/foo/bar',
-                ),
-                array(),
-                '/foo/bar',
-            ),
-            array(
-                array(
-                    'X_REWRITE_URL' => '/foo/bar',
-                ),
-                array(),
-                '/foo/bar',
-            ),
-            array(
                 array(),
                 array(
-                    'IIS_WasUrlRewritten' => '1',
-                    'UNENCODED_URL' => '/foo/bar',
-                ),
-                '/foo/bar',
-            ),
-            array(
-                array(
-                    'X_ORIGINAL_URL' => '/foo/bar',
-                ),
-                array(
-                    'HTTP_X_ORIGINAL_URL' => '/foo/bar',
-                ),
-                '/foo/bar',
-            ),
-            array(
-                array(
-                    'X_ORIGINAL_URL' => '/foo/bar',
-                ),
-                array(
-                    'IIS_WasUrlRewritten' => '1',
-                    'UNENCODED_URL' => '/foo/bar',
-                ),
-                '/foo/bar',
-            ),
-            array(
-                array(
-                    'X_ORIGINAL_URL' => '/foo/bar',
-                ),
-                array(
-                    'HTTP_X_ORIGINAL_URL' => '/foo/bar',
                     'IIS_WasUrlRewritten' => '1',
                     'UNENCODED_URL' => '/foo/bar',
                 ),

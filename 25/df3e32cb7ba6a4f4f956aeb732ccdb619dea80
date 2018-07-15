@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-11T11:39:41Z
+
+WIll this fix #27477?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-11T13:11:38Z
+
+@xabbuh unfortunately not ... that doesn't even work in their own docs in the examples: https://getbootstrap.com/docs/4.0/components/forms/#file-browser
+
+So imo we have two choices regarding #27477
+
+### 1. Say that the user has to do it themselves
+
+Just like they need to load the CSS by themselves, they would need to write some JS as integration code here. We can maybe make it easier for them by adding a hint in the docs with example code.
+
+### 2. add the JS functionality with a possibility to opt-out
+
+Opt-out because inline JS and CSP don't mix and because somebody doesn't want custom JS in their app (not sure whether Symfony 2+ ever injected JS somewhere else besides the toolbar).
+
+Would look something like this:
+
+```twig
+{% block file_widget -%}
+    <div class="form-group">
+        ...
+    </div>
+    <script type="text/javascript">
+        (function (document) {
+            var input = document.getElementById("{{form.vars.id}}");
+            var placeholder = input.parentElement.querySelector("custom-file-label.");
+
+            input.addEventListener(
+                "change",
+                function ()
+                {
+                    var value = input.value.replace('C:\\fakepath\\', '').trim();
+                    placeholder.textContent = "" !== value ? value : (input.getAttribute('placeholder') || '');
+                }
+            );
+        })(document);
+    </script>
+{% endblock %}
+```
+
+if we want to set it directly on each field or add some JS at the end of the form that does the same thing.
+I can send a PR for it either way, we just need to decide.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-11T13:12:25Z
+
+This issue right here is only for fixing the styling of the form row containing the file field.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-07-12T12:23:14Z
+
+This should be for 3.4 since it's a bug, I guess?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-12T12:32:20Z
+
+@vudaltsov the file field in the bootstrap 4 Theme was added in 4.1.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-12T12:46:42Z
+
+@vudaltsov I am afraid that you read the StackOverflow answer wrong..
+
+Here is what I read there:
+
+>  Each LABEL element is associated with exactly one form control.
+
+One label can only have one input.
+
+> [...]  each form control can be referenced by multiple labels [...]
+
+One input can have multiple labels.
+
+We fall in the second category.
+Using a `<label>` is quite important here, as we need the functionality, that a click on the label focuses the input field and therefore opens the browser file selector. That automatic focusing is key and doesn't work with a `<legend>`.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-07-12T12:49:39Z
+
+Great! I was wrong. Thank you for explanations 👍

@@ -112,13 +112,21 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
+        $route = null;
         $locale = $parameters['_locale']
             ?? $this->context->getParameter('_locale')
             ?: $this->defaultLocale;
 
-        if (null !== $locale && null !== ($route = $this->routes->get($name.'.'.$locale)) && $route->getDefault('_canonical_route') === $name) {
-            unset($parameters['_locale']);
-        } elseif (null === $route = $this->routes->get($name)) {
+        if (null !== $locale) {
+            do {
+                if (null !== ($route = $this->routes->get($name.'.'.$locale)) && $route->getDefault('_canonical_route') === $name) {
+                    unset($parameters['_locale']);
+                    break;
+                }
+            } while (false !== $locale = strstr($locale, '_', true));
+        }
+
+        if (null === $route = $route ?? $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 

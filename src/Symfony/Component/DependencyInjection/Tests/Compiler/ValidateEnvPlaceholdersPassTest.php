@@ -237,6 +237,18 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testEmptyConfigFromMoreThanOneSource()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new EnvExtension(new ConfigurationWithArrayNodeRequiringOneElement()));
+        $container->loadFromExtension('env_extension', array());
+        $container->loadFromExtension('env_extension', array());
+
+        $this->doProcess($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testDiscardedEnvInConfig(): void
     {
         $container = new ContainerBuilder();
@@ -315,6 +327,24 @@ class EnvConfigurationWithoutRootNode implements ConfigurationInterface
     }
 }
 
+class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder();
+        $treeBuilder->root('env_extension')
+            ->children()
+                ->arrayNode('nodes')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->scalarPrototype()->end()
+                ->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
 class EnvExtension extends Extension
 {
     private $configuration;
@@ -337,6 +367,10 @@ class EnvExtension extends Extension
 
     public function load(array $configs, ContainerBuilder $container)
     {
+        if (!array_filter($configs)) {
+            return;
+        }
+
         try {
             $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
         } catch (TreeWithoutRootNodeException $e) {

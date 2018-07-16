@@ -608,10 +608,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * the parameters passed to the container constructor to have precedence
      * over the loaded ones.
      *
-     * $container = new ContainerBuilder(array('foo' => 'bar'));
+     * $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
      * $loader = new LoaderXXX($container);
      * $loader->load('resource_name');
-     * $container->register('foo', new stdClass());
+     * $container->register('foo', 'stdClass');
      *
      * In the above example, even if the loaded resource defines a foo
      * parameter, the value will still be 'bar' as defined in the ContainerBuilder

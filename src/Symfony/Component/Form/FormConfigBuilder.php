@@ -138,7 +138,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $data;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $dataClass;
 
@@ -181,7 +181,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Creates an empty form configuration.
      *
      * @param string|int               $name       The form name
-     * @param string                   $dataClass  The class of the form's data
+     * @param string|null              $dataClass  The class of the form's data
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *

@@ -611,6 +611,30 @@ class FinderTest extends Iterator\RealIteratorTestCase
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testReverseSorting()
+    {
+        $finder = $this->buildFinder();
+        $this->assertSame($finder, $finder->sortByName());
+        $this->assertSame($finder, $finder->reverseSorting());
+        $this->assertOrderedIteratorInForeach($this->toAbsolute(array(
+            'toto',
+            'test.py',
+            'test.php',
+            'qux_2_0.php',
+            'qux_12_0.php',
+            'qux_10_2.php',
+            'qux_1002_0.php',
+            'qux_1000_1.php',
+            'qux_0_1.php',
+            'qux/baz_1_2.py',
+            'qux/baz_100_1.py',
+            'qux',
+            'foo/bar.tmp',
+            'foo bar',
+            'foo',
+        )), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testSortByNameNatural()
     {
         $finder = $this->buildFinder();

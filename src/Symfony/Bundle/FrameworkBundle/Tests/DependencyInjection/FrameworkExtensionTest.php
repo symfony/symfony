@@ -268,7 +268,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(Reference::class, $markingStoreRef);
         $this->assertEquals('workflow_service', (string) $markingStoreRef);
 
-        $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.registry'), 'Workflow registry is registered as a service');
         $registryDefinition = $container->getDefinition('workflow.registry');
         $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
     }
@@ -313,8 +313,8 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('workflow_with_multiple_transitions_with_same_name');
 
-        $this->assertTrue($container->hasDefinition('workflow.article', 'Workflow is registered as a service'));
-        $this->assertTrue($container->hasDefinition('workflow.article.definition', 'Workflow definition is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
+        $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
 

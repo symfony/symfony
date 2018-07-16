@@ -286,8 +286,8 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('workflow_with_multiple_transitions_with_same_name');
 
-        $this->assertTrue($container->hasDefinition('workflow.article', 'Workflow is registered as a service'));
-        $this->assertTrue($container->hasDefinition('workflow.article.definition', 'Workflow definition is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
+        $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
 

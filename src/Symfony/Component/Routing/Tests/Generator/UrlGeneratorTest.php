@@ -349,6 +349,25 @@ class UrlGeneratorTest extends TestCase
         )));
     }
 
+    public function testRfc1738UrlEncoding()
+    {
+        // The difference between this and the default encoding will be that spaces in the query string are encoded as
+        // plus signs (+) and tildes (~) are percent-encoded
+        $expectedPath = '/app.php/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
+            .'/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
+            .'?query=%40%3A%5B%5D/%28%29%2A%27%22+%2B%2C%3B-._%7E%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21%3Ffoo%3Dbar%23id';
+
+        $chars = '@:[]/()*\'" +,;-._~&$<>|{}%\\^`!?foo=bar#id';
+        $routes = $this->getRoutes('test', new Route("/$chars/{varpath}", array(), array('varpath' => '.+')));
+
+        $generator = $this->getGenerator($routes, array(), null, PHP_QUERY_RFC1738);
+
+        $this->assertSame($expectedPath, $generator->generate('test', array(
+            'varpath' => $chars,
+            'query' => $chars,
+        )));
+    }
+
     public function testEncodingOfRelativePathSegments()
     {
         $routes = $this->getRoutes('test', new Route('/dir/../dir/..'));
@@ -703,7 +722,7 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/app.php/testing#fragment', $url);
     }
 
-    protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
+    protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null, $queryEncodingType = PHP_QUERY_RFC3986)
     {
         $context = new RequestContext('/app.php');
         foreach ($parameters as $key => $value) {
@@ -711,7 +730,7 @@ class UrlGeneratorTest extends TestCase
             $context->$method($value);
         }
 
-        return new UrlGenerator($routes, $context, $logger);
+        return new UrlGenerator($routes, $context, $logger, null, $queryEncodingType);
     }
 
     protected function getRoutes($name, Route $route)

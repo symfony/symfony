@@ -253,4 +253,32 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('https://localhost/app.php/testing', $absoluteUrl);
         $this->assertEquals('/app.php/testing', $relativeUrl);
     }
+
+    public function testDumpWithDefaultQueryEncoding()
+    {
+        $this->routeCollection->add('Test1', new Route('/with space'));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'Rfc3986UrlGenerator')));
+        include $this->testTmpFilepath;
+
+        $rfc3986UrlGenerator = new \Rfc3986UrlGenerator(new RequestContext());
+
+        $url = $rfc3986UrlGenerator->generate('Test1', array('query' => 'with space', '_fragment' => 'with space'));
+
+        $this->assertEquals('/with%20space?query=with%20space#with%20space', $url);
+    }
+
+    public function testDumpWithRfc1738QueryEncoding()
+    {
+        $this->routeCollection->add('Test1', new Route('/with space'));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'Rfc1738UrlGenerator')));
+        include $this->testTmpFilepath;
+
+        $rfc1738UrlGenerator = new \Rfc1738UrlGenerator(new RequestContext(), null, null, PHP_QUERY_RFC1738);
+
+        $url = $rfc1738UrlGenerator->generate('Test1', array('query' => 'with space', '_fragment' => 'with space'));
+
+        $this->assertEquals('/with%20space?query=with+space#with%20space', $url);
+    }
 }

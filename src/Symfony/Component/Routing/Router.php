@@ -117,6 +117,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *   * resource_type:          Type hint for the main resource (optional)
      *   * strict_requirements:    Configure strict requirement checking for generators
      *                             implementing ConfigurableRequirementsInterface (default is true)
+     *   * query_encoding_type:    Configure the encoding type passed by generators to http_build_query
      *
      * @param array $options An array of options
      *
@@ -137,6 +138,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             'matcher_cache_class' => 'ProjectUrlMatcher',
             'resource_type' => null,
             'strict_requirements' => true,
+            'query_encoding_type' => PHP_QUERY_RFC3986,
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown
@@ -321,7 +323,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger, null, $this->options['query_encoding_type']);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
                 function (ConfigCacheInterface $cache) {
@@ -340,7 +342,7 @@ class Router implements RouterInterface, RequestMatcherInterface
                 require_once $cache->getPath();
             }
 
-            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger, null, $this->options['query_encoding_type']);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

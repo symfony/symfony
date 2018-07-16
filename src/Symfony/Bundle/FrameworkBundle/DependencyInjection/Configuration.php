@@ -468,6 +468,21 @@ class Configuration implements ConfigurationInterface
                             ->defaultTrue()
                         ->end()
                         ->booleanNode('utf8')->defaultFalse()->end()
+                        ->scalarNode('query_encoding_type')
+                            ->validate()
+                                ->ifNotInArray(array(PHP_QUERY_RFC1738, PHP_QUERY_RFC3986))
+                                ->thenInvalid(
+                                    'The value %s is not allowed for path "framework.router.query_encoding_type". '.
+                                    "Permissible values are PHP_QUERY_RFC1738 and PHP_QUERY_RFC3986, entered as a constant: '!php/const PHP_QUERY_RFC1738'"
+                                )
+                            ->end()
+                            ->info(
+                                "This value defaults to PHP_QUERY_RFC3986, which makes the UrlGenerator percent-encode spaces (%20) when building query strings.\n".
+                                "It can be set to PHP_QUERY_RFC1738 to make the UrlGenerator encode spaces as plus signs (+) instead.\n".
+                                "It should be declared as a constant, like '!php/const PHP_QUERY_RFC1738'"
+                            )
+                            ->defaultValue(PHP_QUERY_RFC3986)
+                        ->end()
                     ->end()
                 ->end()
             ->end()

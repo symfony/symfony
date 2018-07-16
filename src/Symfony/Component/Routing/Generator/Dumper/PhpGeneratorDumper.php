@@ -55,12 +55,14 @@ class {$options['class']} extends {$options['base_class']}
 {
     private static \$declaredRoutes;
     private \$defaultLocale;
-
-    public function __construct(RequestContext \$context, LoggerInterface \$logger = null, string \$defaultLocale = null)
+    protected \$queryEncodingType;
+    
+    public function __construct(RequestContext \$context, LoggerInterface \$logger = null, string \$defaultLocale = null, int \$queryEncodingType = PHP_QUERY_RFC3986)
     {
         \$this->context = \$context;
         \$this->logger = \$logger;
         \$this->defaultLocale = \$defaultLocale;
+        \$this->queryEncodingType = \$queryEncodingType;
         if (null === self::\$declaredRoutes) {
             self::\$declaredRoutes = {$this->generateDeclaredRoutes()};
         }

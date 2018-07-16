@@ -158,6 +158,58 @@ class ConfigurationTest extends TestCase
         yield array($createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.');
     }
 
+    public function testQueryEncodingTypeDefaultValue()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), array(array()));
+
+        $this->assertEquals(PHP_QUERY_RFC3986, $config['router']['query_encoding_type']);
+    }
+
+    public function getTestValidQueryEncodingTypes()
+    {
+        return array(
+            'PHP_QUERY_RFC1738' => array(PHP_QUERY_RFC1738),
+            'PHP_QUERY_RFC3986' => array(PHP_QUERY_RFC3986),
+        );
+    }
+
+    /**
+     * @dataProvider getTestValidQueryEncodingTypes
+     */
+    public function testValidQueryEncodingType($encodingType)
+    {
+        $processor = new Processor();
+
+        $config = $processor->processConfiguration(
+            new Configuration(true),
+            array(array('router' => array('query_encoding_type' => $encodingType, 'resource' => '.')))
+        );
+
+        $this->assertEquals($encodingType, $config['router']['query_encoding_type']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testInvalidQueryEncodingType()
+    {
+        $expectedMessage = 'Invalid configuration for path "framework.router.query_encoding_type": The value '.PHP_INT_MAX." is not allowed for path \"framework.router.query_encoding_type\". Permissible values are PHP_QUERY_RFC1738 and PHP_QUERY_RFC3986, entered as a constant: '!php/const PHP_QUERY_RFC1738'";
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expectedMessage);
+        } else {
+            $this->setExpectedException(InvalidConfigurationException::class, $expectedMessage);
+        }
+
+        $processor = new Processor();
+        $processor->processConfiguration(
+            new Configuration(true),
+            array(array('router' => array('query_encoding_type' => PHP_INT_MAX, 'resource' => '.')))
+        );
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return array(
@@ -228,6 +280,7 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => false,
+                'query_encoding_type' => PHP_QUERY_RFC3986,
             ),
             'session' => array(
                 'enabled' => false,

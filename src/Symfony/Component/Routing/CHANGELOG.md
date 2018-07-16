@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Added a `query_encoding_type` configuration option for `UrlGenerator` to allow encoding query strings according to RFC 1738. 
+
 4.2.0
 -----
 

@@ -743,6 +743,9 @@ class FrameworkExtension extends Extension
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
         }
+        if (isset($config['query_encoding_type'])) {
+            $argument['query_encoding_type'] = $config['query_encoding_type'];
+        }
         $router->replaceArgument(2, $argument);
 
         $container->setParameter('request_listener.http_port', $config['http_port']);

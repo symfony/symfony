@@ -35,6 +35,15 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     protected $strictRequirements = true;
 
+    /**
+     * By default, http_build_query() uses PHP_QUERY_RFC1738 as its fourth
+     * parameter. This implementation passes PHP_QUERY_RFC3986 as its preferred
+     * encoding type, but it can be configured to use PHP_QUERY_RFC1738.
+     *
+     * @var int
+     */
+    protected $queryEncodingType = PHP_QUERY_RFC3986;
+
     protected $logger;
 
     private $defaultLocale;
@@ -67,12 +76,13 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     );
 
-    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, string $defaultLocale = null, int $queryEncodingType = PHP_QUERY_RFC3986)
     {
         $this->routes = $routes;
         $this->context = $context;
         $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
+        $this->queryEncodingType = $queryEncodingType;
     }
 
     /**
@@ -269,7 +279,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             unset($extra['_fragment']);
         }
 
-        if ($extra && $query = http_build_query($extra, '', '&', PHP_QUERY_RFC3986)) {
+        if ($extra && $query = http_build_query($extra, '', '&', $this->queryEncodingType)) {
             // "/" and "?" can be left decoded for better user experience, see
             // http://tools.ietf.org/html/rfc3986#section-3.4
             $url .= '?'.strtr($query, array('%2F' => '/'));

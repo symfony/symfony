@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Allowed configuring query encoding type passed to `http_build_query` in `Symfony\Component\Routing\Generator\UrlGenerator` via a new `framework.router.query_encoding_type` option
+
 4.2.0
 -----
 

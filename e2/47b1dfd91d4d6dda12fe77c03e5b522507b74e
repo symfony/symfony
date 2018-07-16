@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-15T15:55:57Z
+
+Also I changed the previous fake-id from `"nope"` to a more readable `"n/a"`
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-16T09:42:02Z
+
+@ro0NL
+
+> also it should be translatable i guess 🤔
+
+I want to answer it here, as this is an important point and I don't want to discuss it in a collapsed code comment.
+
+I thought about that as well, but as the default placeholder (`{attr: { placeholder: "..." } }`) is both visible to the user and not translated by default as well, I didn't want to make this inconsistent here.
+It would be weird if this field works differently from all other fields. WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-16T09:52:25Z
+
+@apfelbox  AFAIK we're already translating placeholders, ... and title attributes for that matter:
+
+https://github.com/symfony/symfony/blob/4ee48988682f77b777b806e1825ae6900d54d88e/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig#L426-L427
+
+https://github.com/symfony/symfony/blob/4ee48988682f77b777b806e1825ae6900d54d88e/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig#L63-L65
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-16T09:57:24Z
+
+WELL… updated. 😅
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-16T11:47:22Z
+
+im guessing some composer constraint needs a bump for tests to pass :)
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-16T12:49:41Z
+
+The `symfony/form` constraint already points to the next, not yet released version. What do we need to bump?

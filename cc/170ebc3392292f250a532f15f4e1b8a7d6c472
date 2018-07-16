@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by jfredon at 2018-07-09T11:14:49Z
+
+@nicolas-grekas I'm not very familiar with the travis-ci build system yet.
+Does it happen that the build fails because of other reasons than the code?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-09T11:36:54Z
+
+AFAIK the classical `KO src/Symfony/Bundle/SecurityBundle` failure is unrelated yes :)

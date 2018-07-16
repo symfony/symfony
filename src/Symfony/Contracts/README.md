@@ -22,7 +22,7 @@ FAQ
 
 The abstractions in this package are useful to achieve loose coupling and
 interoperability. By using the provided interfaces as type hints, you are able
-to reuse any implementations that match their contracts. It could be a Symfony
+to reuse any implementation that matches their contracts. It could be a Symfony
 component, or another one provided by the PHP community at large.
 
 Depending on their semantics, some interfaces can be combined with autowiring to
@@ -34,12 +34,12 @@ any other means provided by your framework.)
 
 ### How is this different from PHP-FIG's PSRs?
 
-When applicable, the provided contracts are built on top of PHP-FIG's PSR. We
+When applicable, the provided contracts are built on top of PHP-FIG's PSRs. We
 encourage relying on them and won't duplicate the effort. Still, the FIG has
 different goals and different processes. Here, we don't need to seek universal
 standards. Instead, we're providing abstractions that are compatible with the
 implementations provided by Symfony. This should actually also contribute
-positively to the PHP-FIG (from which Symfony is a member), by hinting the group
+positively to the PHP-FIG (of which Symfony is a member), by hinting the group
 at some abstractions the PHP world might like to take inspiration from.
 
 ### Why isn't this package split into several packages?

@@ -25,6 +25,8 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -326,6 +328,12 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(ResetInterface::class)
             ->addTag('kernel.reset', array('method' => 'reset'));
+
+        if (!interface_exists(MarshallerInterface::class)) {
+            $container->registerForAutoconfiguration(ResettableInterface::class)
+                ->addTag('kernel.reset', array('method' => 'reset'));
+        }
+
         $container->registerForAutoconfiguration(ProcessorInterface::class)
             ->addTag('monolog.processor');
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)

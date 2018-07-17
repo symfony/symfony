@@ -186,6 +186,11 @@ table tbody ul {
     padding: 0 0 0 1em;
 }
 
+table thead th.num-col,
+table tbody td.num-col {
+    text-align: center;
+}
+
 {# Utility classes
    ========================================================================= #}
 .block {
@@ -852,6 +857,10 @@ tr.status-warning td {
 #twig-dump pre {
     font-size: 12px;
     line-height: 1.7;
+    background-color: #fff;
+    border: 1px solid #E0E0E0;
+    padding: 15px;
+    box-shadow: 0 0 1px rgba(128, 128, 128, .2);
 }
 #twig-dump span {
     border-radius: 2px;
@@ -860,6 +869,23 @@ tr.status-warning td {
 #twig-dump .status-error   { background: transparent; color: #B0413E; }
 #twig-dump .status-warning { background: rgba(240, 181, 24, 0.3);     }
 #twig-dump .status-success { background: rgba(100, 189, 99, 0.2);     }
+
+#twig-table tbody td {
+    vertical-align: middle;
+}
+#twig-table tbody td > a {
+    margin-left: -5px;
+}
+#twig-table tbody td div {
+    margin: 0;
+}
+
+.icon-twig {
+    vertical-align: text-bottom;
+}
+.icon-twig svg path {
+    fill: #7eea12;
+}
 
 {# Logger panel
    ========================================================================= #}

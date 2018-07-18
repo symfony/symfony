@@ -25,17 +25,19 @@ class CodeExtension extends AbstractExtension
     private $fileLinkFormat;
     private $rootDir;
     private $charset;
+    private $projectDir;
 
     /**
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
      * @param string                   $rootDir        The project root directory
      * @param string                   $charset        The charset
      */
-    public function __construct($fileLinkFormat, string $rootDir, string $charset)
+    public function __construct($fileLinkFormat, string $rootDir, string $charset, string $projectDir = null)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
         $this->charset = $charset;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -53,6 +55,7 @@ class CodeExtension extends AbstractExtension
             new TwigFilter('format_file_from_text', array($this, 'formatFileFromText'), array('is_safe' => array('html'))),
             new TwigFilter('format_log_message', array($this, 'formatLogMessage'), array('is_safe' => array('html'))),
             new TwigFilter('file_link', array($this, 'getFileLink')),
+            new TwigFilter('file_relative', array($this, 'getFileRelative')),
         );
     }
 
@@ -207,6 +210,15 @@ class CodeExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    public function getFileRelative(string $file): ?string
+    {
+        if (null !== $this->projectDir && 0 === strpos($file, $this->projectDir)) {
+            return ltrim(substr($file, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+        }
+
+        return null;
     }
 
     public function formatFileFromText($text)

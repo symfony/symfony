@@ -387,7 +387,7 @@ class ClientTest extends TestCase
         $this->assertEquals('new username', $client->getRequest()->getParameters()['username'], '->submitForm() allows to override the form values');
         $this->assertEquals('new password', $client->getRequest()->getParameters()['password'], '->submitForm() allows to override the form values');
         $this->assertEquals('Symfony User Agent', $client->getRequest()->getServer()['HTTP_USER_AGENT'], '->submitForm() allows to change the $_SERVER parameters');
-        $this->assertEquals(true, $client->getRequest()->getServer()['HTTPS'], '->submitForm() allows to change the $_SERVER parameters');
+        $this->assertTrue($client->getRequest()->getServer()['HTTPS'], '->submitForm() allows to change the $_SERVER parameters');
     }
 
     public function testSubmitFormNotFound()

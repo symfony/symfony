@@ -371,15 +371,23 @@ class ClientTest extends TestCase
     public function testSubmitForm()
     {
         $client = new TestClient();
-        $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" /><input type="password" name="password" /><input type="submit" value="Register" /></form></html>'));
+        $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" value="the username" /><input type="password" name="password" value="the password" /><input type="submit" value="Register" /></form></html>'));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $client->submitForm('Register', array(
-            'username' => 'username',
-            'password' => 'password',
-        ), 'POST');
+            'username' => 'new username',
+            'password' => 'new password',
+        ), 'PUT', array(
+            'HTTP_USER_AGENT' => 'Symfony User Agent',
+            'HTTPS' => true,
+        ));
 
-        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+        $this->assertEquals('https://www.example.com/foo', $client->getRequest()->getUri(), '->submitForm() submit forms');
+        $this->assertEquals('PUT', $client->getRequest()->getMethod(), '->submitForm() allows to change the method');
+        $this->assertEquals('new username', $client->getRequest()->getParameters()['username'], '->submitForm() allows to override the form values');
+        $this->assertEquals('new password', $client->getRequest()->getParameters()['password'], '->submitForm() allows to override the form values');
+        $this->assertEquals('Symfony User Agent', $client->getRequest()->getServer()['HTTP_USER_AGENT'], '->submitForm() allows to change the $_SERVER parameters');
+        $this->assertEquals(true, $client->getRequest()->getServer()['HTTPS'], '->submitForm() allows to change the $_SERVER parameters');
     }
 
     public function testSubmitFormNotFound()

@@ -291,17 +291,13 @@ abstract class Client
     }
 
     /**
-     * Finds link by given text and then clicks on it.
+     * Clicks the first link (or clickable image) that contains the given text.
      *
-     * @param string $value The link text
-     *
-     * @return Crawler
+     * @param string $linkText The text of the link or the alt attribute of the clickable image
      */
-    public function clickLink($value)
+    public function clickLink(string $linkText): Crawler
     {
-        $link = $this->getCrawler()->selectLink($value)->link();
-
-        return $this->click($link);
+        return $this->click($this->getCrawler()->selectLink($linkText)->link());
     }
 
     /**
@@ -322,20 +318,20 @@ abstract class Client
     }
 
     /**
-     * Finds a form by submit button text and then submits it.
+     * Finds the first form that contains a button with the given content and
+     * uses it to submit the given form field values.
      *
-     * @param string $button The button text
-     * @param array  $values An array of form field values
-     * @param string $method The method for the form
-     *
-     * @return Crawler
+     * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
+     * @param array  $fieldValues      Use this syntax: array('my_form[name]' => '...', 'my_form[email]' => '...')
+     * @param string $method           The HTTP method used to submit the form
+     * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
      */
-    public function submitForm($button, $values, $method)
+    public function submitForm(string $button, array $fieldValues = array(), string $method = 'POST', array $serverParameters = array()): Crawler
     {
         $buttonNode = $this->getCrawler()->selectButton($button);
-        $form = $buttonNode->form($values, $method);
+        $form = $buttonNode->form($fieldValues, $method);
 
-        return $this->submit($form);
+        return $this->submit($form, array(), $serverParameters);
     }
 
     /**

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-15T08:55:31Z
+
+Should we add to `submitForm()` a fourth optional argument called `array $serverParameters = array()` like in `submit()`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-15T09:07:46Z
+
+Might be nice.

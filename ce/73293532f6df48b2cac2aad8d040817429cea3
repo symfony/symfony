@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-22T08:54:12Z
+
+IE 11 doesn't handle CSS `var()` - not a blocker, just worth noting.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2018-06-22T09:03:20Z
+
+This however does mean we have to keep the existing styles, to have a fallback color for non-supporting browsers
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-22T09:08:21Z
+
+@wouterj in the past we've made similar decisions (for example when we switched to using Flexbox in some parts of the profiler). Probably all of our developers use a compatible browser (https://caniuse.com/#feat=css-variables).
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-22T09:59:34Z
+
+@nicolas-grekas for the webprofiler UI itself, I'm fine if it does not work in IE 11. Devs will hopefully still have a modern browser where the can open the profiler (the WDT is a different topic, as that's injecting in the page so being incompatible would hurt the dev debugging their own page in IE)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-22T10:16:32Z
+
+Having the dark theme switch as easy as that is great IMO. The maintenance cost of the feature is very low, so +1 from me on the idea.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-22T10:17:19Z
+
+Regarding the wide mode, #25761 had a few rules to avoid some elements becoming too wide. Do we need them here ?
+
+---------------------------------------------------------------------------
+
+by jkufner at 2018-06-22T10:30:29Z
+
+The "Wide" option does not make much sense. Elements which are meant to be wide, like tables or plots, should be always wide. Other elements should keep some reasonable width anyway.
+
+Simple wide/not-wide switch will cause some elements to be too narrow or some to be too wide. It won't be perfect either way. Please take a look at CSS rules in #25761; they set optimal width to most elements (not perfect yet — few more rules may be required, but close enough).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-22T10:50:10Z
+
+@jkufner I won't repeat the arguments given in the #25761 discussion ... but some people wanted to have a full-page width profiler, so that's what we're giving them here. I consider confusing to provide an "hybrid mode" where some elements are normal and others wide.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-06-23T11:37:37Z
+
+in dark mode the grey scale of the menu looks off IMHO
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-29T10:10:06Z
+
+I've made a lot of change according to the first comments. This is now ready to start reviewing all the details about design and code. Thanks!

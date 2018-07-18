@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-13T16:19:31Z
+
+Im also wondering if it's better to throw, rather then silently ignoring "non users" by returning null. To clarify the intend here.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-13T18:16:29Z
+
+well, throwing for anonymous token would be a big BC break, and would make this API much less developer-friendly
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-13T18:25:35Z
+
+You're right. On 2nd thought i think the null default is fine indeed. There's no UserInterface available which is what we asked for, but it doesn't mean you're "logged out" per se in case of null.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-07-13T20:03:13Z
+
+I’m following the logic. But, was this to solve some specific issue?
+
+It’s looks like a BC break to me, unfortunately.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-13T20:13:30Z
+
+We had some discussion on slack about the inconsistency between the documented `@return` and the actual return (any object). Basically it causes confusion about the intend...
+
+But no real issue :) it will just crash if this class is (ever) updated to have type declarations (#27944). To me that smells a violation.
+
+And yes, we can do an upgrade path with deprecations but i also think it qualifies a bugfix (otherwise the bugfix would be to update to `@return object|null`, which AFAIK was not the intend here ...)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-07-14T14:40:23Z
+
+Bug fix: that’s a good argument for the behavior change. I’d still prefer a deprecation and a merge into 4.2... after all, the bug isn’t currently hurting any functionality. So, waiting until 4.2 does not cause any issues.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-14T19:07:17Z
+
++1 for a BC layer
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-15T09:14:23Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-16T14:38:31Z
+
+I like the idea :+1:

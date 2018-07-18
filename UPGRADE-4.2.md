@@ -94,6 +94,7 @@ Security
    custom anonymous and remember me token classes is deprecated. To
    use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
    or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+ * Accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated.
 
 SecurityBundle
 --------------

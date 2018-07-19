@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
@@ -19,9 +21,9 @@ namespace Symfony\Component\Messenger\Middleware;
 interface MiddlewareInterface
 {
     /**
-     * @param object $message
+     * @param Envelope $envelope
      *
      * @return mixed
      */
-    public function handle($message, callable $next);
+    public function handle(Envelope $envelope, callable $next);
 }

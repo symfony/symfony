@@ -23,7 +23,7 @@ class ValidationMiddlewareTest extends TestCase
 {
     public function testValidateAndNextMiddleware()
     {
-        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message = new DummyMessage('Hey'));
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
@@ -36,18 +36,18 @@ class ValidationMiddlewareTest extends TestCase
         $next
             ->expects($this->once())
             ->method('__invoke')
-            ->with($message)
+            ->with($envelope)
             ->willReturn('Hello')
         ;
 
-        $result = (new ValidationMiddleware($validator))->handle($message, $next);
+        $result = (new ValidationMiddleware($validator))->handle($envelope, $next);
 
         $this->assertSame('Hello', $result);
     }
 
     public function testValidateWithConfigurationAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
+        $envelope = (new Envelope($message = new DummyMessage('Hey')))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
@@ -75,7 +75,7 @@ class ValidationMiddlewareTest extends TestCase
      */
     public function testValidationFailedException()
     {
-        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message = new DummyMessage('Hey'));
 
         $violationList = $this->createMock(ConstraintViolationListInterface::class);
         $violationList
@@ -96,6 +96,6 @@ class ValidationMiddlewareTest extends TestCase
             ->method('__invoke')
         ;
 
-        (new ValidationMiddleware($validator))->handle($message, $next);
+        (new ValidationMiddleware($validator))->handle($envelope, $next);
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Exception\InvalidTokenConfigurationException;
+use Symfony\Component\Workflow\TransitionBlocker;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -32,7 +33,7 @@ class GuardListener
     private $roleHierarchy;
     private $validator;
 
-    public function __construct($configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
+    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
@@ -49,13 +50,29 @@ class GuardListener
             return;
         }
 
-        if (!$this->expressionLanguage->evaluate($this->configuration[$eventName], $this->getVariables($event))) {
-            $event->setBlocked(true);
+        $eventConfiguration = (array) $this->configuration[$eventName];
+        foreach ($eventConfiguration as $guard) {
+            if ($guard instanceof GuardExpression) {
+                if ($guard->getTransition() !== $event->getTransition()) {
+                    continue;
+                }
+                $this->validateGuardExpression($event, $guard->getExpression());
+            } else {
+                $this->validateGuardExpression($event, $guard);
+            }
+        }
+    }
+
+    private function validateGuardExpression(GuardEvent $event, string $expression)
+    {
+        if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
+            $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);
+            $event->addTransitionBlocker($blocker);
         }
     }
 
     // code should be sync with Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter
-    private function getVariables(GuardEvent $event)
+    private function getVariables(GuardEvent $event): array
     {
         $token = $this->tokenStorage->getToken();
 

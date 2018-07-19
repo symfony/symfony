@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\EventListener\ExpressionLanguage;
+use Symfony\Component\Workflow\EventListener\GuardExpression;
 use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
@@ -20,12 +21,17 @@ class GuardListenerTest extends TestCase
     private $authenticationChecker;
     private $validator;
     private $listener;
+    private $transition;
 
     protected function setUp()
     {
         $configuration = array(
             'test_is_granted' => 'is_granted("something")',
             'test_is_valid' => 'is_valid(subject)',
+            'test_expression' => array(
+                new GuardExpression($this->getTransition(true), '!is_valid(subject)'),
+                new GuardExpression($this->getTransition(true), 'is_valid(subject)'),
+            ),
         );
         $expressionLanguage = new ExpressionLanguage();
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -96,11 +102,38 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    private function createEvent()
+    public function testWithGuardExpressionWithNotSupportedTransition()
+    {
+        $event = $this->createEvent(true);
+        $this->configureValidator(false, false);
+        $this->listener->onTransition($event, 'test_expression');
+
+        $this->assertFalse($event->isBlocked());
+    }
+
+    public function testWithGuardExpressionWithSupportedTransition()
+    {
+        $event = $this->createEvent();
+        $this->configureValidator(true, true);
+        $this->listener->onTransition($event, 'test_expression');
+
+        $this->assertFalse($event->isBlocked());
+    }
+
+    public function testGuardExpressionBlocks()
+    {
+        $event = $this->createEvent();
+        $this->configureValidator(true, false);
+        $this->listener->onTransition($event, 'test_expression');
+
+        $this->assertTrue($event->isBlocked());
+    }
+
+    private function createEvent($newTransition = false)
     {
         $subject = new \stdClass();
         $subject->marking = new Marking();
-        $transition = new Transition('name', 'from', 'to');
+        $transition = $this->getTransition($newTransition);
 
         return new GuardEvent($subject, $subject->marking, $transition);
     }
@@ -139,5 +172,14 @@ class GuardListenerTest extends TestCase
             ->method('validate')
             ->willReturn($valid ? array() : array('a violation'))
         ;
+    }
+
+    private function getTransition($new = false)
+    {
+        if ($new || !$this->transition) {
+            $this->transition = new Transition('name', 'from', 'to');
+        }
+
+        return $this->transition;
     }
 }

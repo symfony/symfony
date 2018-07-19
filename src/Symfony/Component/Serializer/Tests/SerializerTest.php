@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -35,6 +36,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -430,6 +432,22 @@ class SerializerTest extends TestCase
         $this->assertEquals('{"two":2,"type":"one"}', $serialized);
     }
 
+    public function testDeserializeAndSerializeNestedInterfacedObjectsWithTheClassMetadataDiscriminator()
+    {
+        $nested = new DummyMessageNumberOne();
+        $nested->one = 'foo';
+
+        $example = new DummyMessageNumberTwo();
+        $example->setNested($nested);
+
+        $serializer = $this->serializerWithClassDiscriminator();
+
+        $serialized = $serializer->serialize($example, 'json');
+        $deserialized = $serializer->deserialize($serialized, DummyMessageInterface::class, 'json');
+
+        $this->assertEquals($example, $deserialized);
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
      * @expectedExceptionMessage The type "second" has no mapped class for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"
@@ -452,7 +470,7 @@ class SerializerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        return new Serializer(array(new ObjectNormalizer($classMetadataFactory, null, null, null, new ClassDiscriminatorFromClassMetadata($classMetadataFactory))), array('json' => new JsonEncoder()));
+        return new Serializer(array(new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))), array('json' => new JsonEncoder()));
     }
 }
 

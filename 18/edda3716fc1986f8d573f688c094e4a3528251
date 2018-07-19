@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-02-16T09:22:57Z
+
+if we want to make code loading definitions of all services happy, we would have to avoid such deprecation everywhere in the codebase.
+
+A better solution would be to have your code checking services to skip services marked as deprecated (these services are properly deprecated).
+And even better would be to use the autoconfiguration system of Symfony to achieve this instead of rebuilding your own btw.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-16T10:36:19Z
+
+I agree with @stof here.
+
+---------------------------------------------------------------------------
+
+by iquito at 2018-02-16T14:40:34Z
+
+Only these two classes trigger the deprecation notices - that is the whole point of this change. No other parts are affected.
+
+How could the autoconfiguration of Symfony be used to avoid this problem? Because in this case, we check each service for a specific parent class. Is there really an autoconfiguration for that?
+
+And the example is not super exotic: I took it from a library, and this kind of iterating over service definitions is not too special. In the original issue somebody referenced https://github.com/schmittjoh/JMSAopBundle/blob/master/DependencyInjection/Compiler/PointcutMatchingPass.php#L116 as an example. I suspect there are many more. Sure, you can just tell all the libraries that their iterating over service definitions is not optimal - good luck with that.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-16T15:02:34Z
+
+@iquito autoconfiguration is opt-in. This means that only services configured to be autoconfigured would be checked (and core services are not enabling autoconfiguration on themselves as we configure them explicitly).
+And applying a tag (to then add the method call for each of these tagged services in your compiler pass) based on a parent class or interface is the most common usage of the autoconfiguration feature.
+
+---------------------------------------------------------------------------
+
+by iquito at 2018-02-18T09:44:57Z
+
+In this example I am not using a tag - I am basically doing automatic setter injection for all services implementing a certain abstract class. I looked into autoconfiguration, but it does not do the same thing - the only workaround with autoconfiguration would be to define an extra tag which is only used to then get the services using that tag, which seems more nasty / confusing than just using a compiler pass, because you are using a public tag for an essentially "internal" usage.
+
+Going through the service definitions of the container to do something extra to some of the definitions seems like a valid use case to me, adding a tag is only one of those use cases - there are other use cases for decorating the services, which mostly require loading the classes of these services to analyze them.
+
+For me it was confusing and unexpected that deprecation warnings were generated in this case, because the classes emitting the warnings were never used - after container compilation the classes were never even loaded anymore, yet the warnings were displayed on every single page. I suggested these changes because I don't think I will be the last one to encounter these problems. Avoiding these specific type of false-positives would therefore help other people who use compiler passes in this way, or who use a library which uses such compiler passes, to not waste a lot of time analyzing deprecation problems that do not actually exist. You are not doing me a favor by changing the deprecation warnings - I have already over-analyzed this extensively and will probably ignore these kinds of deprecation warnings in the future, because I now know that such false positives can happen. I would suggest though that where and how deprecation warnings are emitted should be an ongoing discussion to specifically avoid showing such warnings when they are not warranted.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-14T15:23:28Z
+
+@stof do you anticipate any downside merging this?
+On my side I'd be :+1:
+Yes, this is adhoc and not generic. But it looks pragmatic and the use case is legitimate (matching AOP cutpoints)
+
+---------------------------------------------------------------------------
+
+by nurtext at 2018-05-14T09:34:28Z
+
+Trying to find the source of this weird deprecation message for hours until I found this PR.
+Is there any other way to overcome this false-positive away from waiting for this to get merged?
+
+---------------------------------------------------------------------------
+
+by iquito at 2018-05-14T13:13:14Z
+
+@nurtext There is no clean way of avoiding the deprecations. If you are iterating over the container definitions in your own code, you can check if the service is deprecated and ignore it if it is - in my code this currently looks like this:
+
+    foreach ($containerBuilder->getDefinitions() as $definition) {
+      if (!$definition->isDeprecated() && is_subclass_of($definition->getClass(), AbstractRouteCollectionProvider::class)) {
+        $definition->addMethodCall('setLoaderResolver', [new Reference('routing.resolver')]);
+      }
+    }
+
+If you are using a library which iterates over the container definitions for you, then there is probably nothing you can do, as the isDeprecated check is just a hack and not a solution. You also need to keep in mind that it prevents you from decorating deprecated services - so if you yourself deprecate services, or you are using library services which you want to decorate yet they are set as deprecated, then you are out of luck and might experience unexpected consequences.
+
+Another option, if that is available to you, is to upgrade to Symfony 4.0, which has removed these classes, so the deprecation notices will disappear as soon as you use Symfony 4.0.

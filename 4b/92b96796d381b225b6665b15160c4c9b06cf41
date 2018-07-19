@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2018-07-04T12:41:01Z
+
+@sroze Comments addressed. I think failures on Appveyor are not related to this PR.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-07-04T22:40:55Z
+
+Just to be sure: this is not fixing a bug at all, just removing support of a message in `EnvelopeAwareInterface` middlewares, right?
+
+Our bus implementation ensures it always receives the Envelope, it's true, but nothing in the design really allows a stronger enforcement here. See https://github.com/symfony/symfony-docs/pull/9757#discussion_r187367461 discussion and https://github.com/symfony/symfony/pull/27322 already mentioned above.
+(Note I'm not against this PR, but still proves to me https://github.com/symfony/symfony/pull/27322 would be a better design).
+
+Also, the `ValidationMiddleware` could benefit from similar changes.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-07-08T09:32:25Z
+
+> Just to be sure: this is not fixing a bug at all, just removing support of a message in EnvelopeAwareInterface middlewares, right?
+
+You are right actually. Maybe we should keep it that way to ensure the middlewares could be used with another bus implementation that does not support the `EnvelopeAwareInterface`. My 👍 is for this change, so we clarify that this handling of `EnvelopeAwareInterface` is part of the `MessageBusInterface` (we could add a comment to it).
+
+@Cydonia7 As per @ogizanagi's comment, can you update the `ValidationMiddleware` file as well?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-07-08T20:51:29Z
+
+So, this cannot be merged in 4.1 as not acceptable in a patch release to me. PR should target and be rebased on master and removal of the support of messages not wrapped in an Envelope be mentioned in the UPGRADE file. Also I'd suggest to remove `Envelope::wrap` as in b3a67688e2bc3bd1c0c1ba0df406a49c71a7d548 as the only reason it exists in core was for this (I'll cherry-pick the commit later).
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2018-07-09T11:44:47Z
+
+@ogizanagi @sroze I've rebased on master and adapted the `ValidationMiddleware` in the same way.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-19T06:53:30Z
+
+@ogizanagi Can you review this PR please?
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2018-07-19T08:18:55Z
+
+@ogizanagi I just added a note in the UPGRADE file for 4.2
+
+@fabpot I see you've changed the milestone to 4.1 and next, does this mean this will be inside the next patch or next minor? (If it's patch, then I should move the UPGRADE note)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-07-19T08:23:11Z
+
+@Cydonia7 it means it goes to the next release. So 4.2.

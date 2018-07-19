@@ -16,8 +16,11 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -42,8 +45,9 @@ class SimplePreAuthenticationListener implements ListenerInterface
     private $logger;
     private $dispatcher;
     private $sessionStrategy;
+    private $trustResolver;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, string $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, string $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -55,6 +59,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
     }
 
     /**
@@ -78,7 +83,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             $this->logger->info('Attempting SimplePreAuthentication.', array('key' => $this->providerKey, 'authenticator' => get_class($this->simpleAuthenticator)));
         }
 
-        if (null !== $this->tokenStorage->getToken() && !$this->tokenStorage->getToken() instanceof AnonymousToken) {
+        if ((null !== $token = $this->tokenStorage->getToken()) && !$this->trustResolver->isAnonymous($token)) {
             return;
         }
 

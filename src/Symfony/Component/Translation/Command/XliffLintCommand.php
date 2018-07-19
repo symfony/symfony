@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Translation\Util\XliffUtils;
 
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
@@ -33,13 +34,15 @@ class XliffLintCommand extends Command
     private $displayCorrectFiles;
     private $directoryIteratorProvider;
     private $isReadableProvider;
+    private $requireStrictFileNames;
 
-    public function __construct(string $name = null, callable $directoryIteratorProvider = null, callable $isReadableProvider = null)
+    public function __construct(string $name = null, callable $directoryIteratorProvider = null, callable $isReadableProvider = null, bool $requireStrictFileNames = true)
     {
         parent::__construct($name);
 
         $this->directoryIteratorProvider = $directoryIteratorProvider;
         $this->isReadableProvider = $isReadableProvider;
+        $this->requireStrictFileNames = $requireStrictFileNames;
     }
 
     /**
@@ -115,29 +118,27 @@ EOF
         $document->loadXML($content);
 
         if (null !== $targetLanguage = $this->getTargetLanguageFromFile($document)) {
-            $expectedFileExtension = sprintf('%s.xlf', str_replace('-', '_', $targetLanguage));
-            $realFileExtension = explode('.', basename($file), 2)[1] ?? '';
+            $normalizedLocale = preg_quote(str_replace('-', '_', $targetLanguage), '/');
+            // strict file names require translation files to be named '____.locale.xlf'
+            // otherwise, both '____.locale.xlf' and 'locale.____.xlf' are allowed
+            $expectedFilenamePattern = $this->requireStrictFileNames ? sprintf('/^.*\.%s\.xlf/', $normalizedLocale) : sprintf('/^(.*\.%s\.xlf|%s\..*\.xlf)/', $normalizedLocale, $normalizedLocale);
 
-            if ($expectedFileExtension !== $realFileExtension) {
+            if (0 === preg_match($expectedFilenamePattern, basename($file))) {
                 $errors[] = array(
                     'line' => -1,
                     'column' => -1,
-                    'message' => sprintf('There is a mismatch between the file extension ("%s") and the "%s" value used in the "target-language" attribute of the file.', $realFileExtension, $targetLanguage),
+                    'message' => sprintf('There is a mismatch between the language included in the file name ("%s") and the "%s" value used in the "target-language" attribute of the file.', basename($file), $targetLanguage),
                 );
             }
         }
 
-        $document->schemaValidate(__DIR__.'/../Resources/schemas/xliff-core-1.2-strict.xsd');
-        foreach (libxml_get_errors() as $xmlError) {
+        foreach (XliffUtils::validateSchema($document) as $xmlError) {
             $errors[] = array(
-                    'line' => $xmlError->line,
-                    'column' => $xmlError->column,
-                    'message' => trim($xmlError->message),
+                    'line' => $xmlError['line'],
+                    'column' => $xmlError['column'],
+                    'message' => $xmlError['message'],
                 );
         }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
 
         return array('file' => $file, 'valid' => 0 === count($errors), 'messages' => $errors);
     }

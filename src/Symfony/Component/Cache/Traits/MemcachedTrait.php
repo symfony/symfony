@@ -13,6 +13,8 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
@@ -29,6 +31,7 @@ trait MemcachedTrait
         'serializer' => 'php',
     );
 
+    private $marshaller;
     private $client;
     private $lazyClient;
 
@@ -37,7 +40,7 @@ trait MemcachedTrait
         return extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
     }
 
-    private function init(\Memcached $client, $namespace, $defaultLifetime)
+    private function init(\Memcached $client, $namespace, $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required');
@@ -55,6 +58,7 @@ trait MemcachedTrait
 
         parent::__construct($namespace, $defaultLifetime);
         $this->enableVersioning();
+        $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
     /**
@@ -194,6 +198,10 @@ trait MemcachedTrait
      */
     protected function doSave(array $values, $lifetime)
     {
+        if (!$values = $this->marshaller->marshall($values, $failed)) {
+            return $failed;
+        }
+
         if ($lifetime && $lifetime > 30 * 86400) {
             $lifetime += time();
         }
@@ -203,7 +211,7 @@ trait MemcachedTrait
             $encodedValues[rawurlencode($key)] = $value;
         }
 
-        return $this->checkResultCode($this->getClient()->setMulti($encodedValues, $lifetime));
+        return $this->checkResultCode($this->getClient()->setMulti($encodedValues, $lifetime)) ? $failed : false;
     }
 
     /**
@@ -211,7 +219,6 @@ trait MemcachedTrait
      */
     protected function doFetch(array $ids)
     {
-        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
             $encodedIds = array_map('rawurlencode', $ids);
 
@@ -219,14 +226,12 @@ trait MemcachedTrait
 
             $result = array();
             foreach ($encodedResult as $key => $value) {
-                $result[rawurldecode($key)] = $value;
+                $result[rawurldecode($key)] = $this->marshaller->unmarshall($value);
             }
 
             return $result;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
-        } finally {
-            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
         }
     }
 

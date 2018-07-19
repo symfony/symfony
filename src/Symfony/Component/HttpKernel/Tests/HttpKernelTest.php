@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -211,15 +212,23 @@ class HttpKernelTest extends TestCase
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testHandleWhenTheControllerDoesNotReturnAResponse()
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getHttpKernel($dispatcher, function () { return 'foo'; });
 
-        $kernel->handle(new Request());
+        try {
+            $kernel->handle(new Request());
+
+            $this->fail('The kernel should throw an exception.');
+        } catch (ControllerDoesNotReturnResponseException $e) {
+        }
+
+        $first = $e->getTrace()[0];
+
+        // `file` index the array starting at 0, and __FILE__ starts at 1
+        $line = file($first['file'])[$first['line'] - 1];
+        $this->assertContains('call_user_func_array', $line);
     }
 
     public function testHandleWhenTheControllerDoesNotReturnAResponseButAViewIsRegistered()

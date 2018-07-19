@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  */
-class TokenProcessor
+class TokenProcessor implements ProcessorInterface
 {
     private $tokenStorage;
 

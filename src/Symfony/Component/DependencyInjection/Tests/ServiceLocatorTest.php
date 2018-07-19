@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
@@ -125,6 +126,20 @@ class ServiceLocatorTest extends TestCase
         $this->assertSame('bar', $locator('foo'));
         $this->assertSame('baz', $locator('bar'));
         $this->assertNull($locator('dummy'), '->__invoke() should return null on invalid service');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid service "foo" required by "external-id".
+     */
+    public function testRuntimeException()
+    {
+        $locator = new ServiceLocator(array(
+            'foo' => function () { throw new RuntimeException('Invalid service ".service_locator.abcdef".'); },
+        ));
+
+        $locator = $locator->withContext('external-id', new Container());
+        $locator->get('foo');
     }
 }
 

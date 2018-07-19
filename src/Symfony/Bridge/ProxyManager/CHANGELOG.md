@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * allowed creating lazy-proxies from interfaces
+
 3.3.0
 -----
 

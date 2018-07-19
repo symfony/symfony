@@ -15,6 +15,8 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -1215,6 +1217,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
                 return $count;
             });
+        } elseif ($value instanceof ServiceLocatorArgument) {
+            $refs = array();
+            foreach ($value->getValues() as $k => $v) {
+                if ($v) {
+                    $refs[$k] = array($v);
+                }
+            }
+            $value = new ServiceLocator(\Closure::fromCallable(array($this, 'resolveServices')), $refs);
         } elseif ($value instanceof Reference) {
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices);
         } elseif ($value instanceof Definition) {

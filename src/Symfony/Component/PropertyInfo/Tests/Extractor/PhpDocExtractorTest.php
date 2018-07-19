@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Tests\PhpDocExtractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use phpDocumentor\Reflection\Types\Collection;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -43,16 +44,6 @@ class PhpDocExtractorTest extends TestCase
     public function testParamTagTypeIsOmitted()
     {
         $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
-    }
-
-    /**
-     * @dataProvider typesWithCustomPrefixesProvider
-     */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
-    {
-        $customExtractor = new PhpDocExtractor(null, array('add', 'remove'), array('is', 'can'));
-
-        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     /**
@@ -102,6 +93,49 @@ class PhpDocExtractorTest extends TestCase
             array('staticSetter', null, null, null),
             array('emptyVar', null, null, null),
         );
+    }
+
+    /**
+     * @dataProvider provideCollectionTypes
+     */
+    public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
+    {
+        if (!class_exists(Collection::class)) {
+            $this->markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');
+        }
+
+        $this->testExtract($property, $type, $shortDescription, $longDescription);
+    }
+
+    public function provideCollectionTypes()
+    {
+        return array(
+            array('iteratorCollection', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Iterator', true, null, new Type(Type::BUILTIN_TYPE_STRING))), null, null),
+            array('iteratorCollectionWithKey', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Iterator', true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))), null, null),
+            array(
+                'nestedIterators',
+                array(new Type(
+                    Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    'Iterator',
+                    true,
+                    new Type(Type::BUILTIN_TYPE_INT),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Iterator', true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))
+                )),
+                null,
+                null,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider typesWithCustomPrefixesProvider
+     */
+    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    {
+        $customExtractor = new PhpDocExtractor(null, array('add', 'remove'), array('is', 'can'));
+
+        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function typesWithCustomPrefixesProvider()

@@ -44,6 +44,7 @@ class HtmlDumper extends CliDumper
         'key' => 'color:#56DB3A',
         'index' => 'color:#1299DA',
         'ellipsis' => 'color:#FF8400',
+        'ns' => 'user-select:none;',
     );
 
     private $displayOptions = array(
@@ -837,9 +838,21 @@ EOHTML
         }
 
         $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
-            $s = '<span class=sf-dump-default>';
+            $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
+            if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
+                $s .= ' sf-dump-ns';
+            }
+            $s .= '">';
             do {
+                if (("\r" === $c[$i] || "\n" === $c[$i]) !== $ns) {
+                    $s .= '</span>'.$b;
+                    if ($ns = !$ns) {
+                        $s .= ' sf-dump-ns';
+                    }
+                    $s .= '">';
+                }
+
                 $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
             } while (isset($c[++$i]));
 

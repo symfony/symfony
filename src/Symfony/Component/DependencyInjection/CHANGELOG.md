@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `ServiceSubscriberTrait`
+ * added `ServiceLocatorArgument` for creating optimized service-locators
+
 4.1.0
 -----
 

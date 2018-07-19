@@ -24,8 +24,9 @@ use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Service\ResetInterface;
 
-abstract class DoctrineType extends AbstractType
+abstract class DoctrineType extends AbstractType implements ResetInterface
 {
     /**
      * @var ManagerRegistry

@@ -37,6 +37,7 @@
         "symfony/cache": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
+        "symfony/contracts": "1.0.0",
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",
         "symfony/debug": "self.version",
@@ -118,7 +119,8 @@
             "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
-            "Symfony\\Component\\": "src/Symfony/Component/"
+            "Symfony\\Component\\": "src/Symfony/Component/",
+            "Symfony\\Contracts\\": "src/Symfony/Contracts/"
         },
         "classmap": [
             "src/Symfony/Component/Intl/Resources/stubs"
@@ -133,7 +135,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

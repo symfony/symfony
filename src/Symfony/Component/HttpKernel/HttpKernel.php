@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -156,13 +157,14 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             if ($event->hasResponse()) {
                 $response = $event->getResponse();
             } else {
-                $msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
+                $msg = sprintf('The controller must return a "Symfony\Component\HttpFoundation\Response" object but it returned %s.', $this->varToString($response));
 
                 // the user may have forgotten to return something
                 if (null === $response) {
                     $msg .= ' Did you forget to add a return statement somewhere in your controller?';
                 }
-                throw new \LogicException($msg);
+
+                throw new ControllerDoesNotReturnResponseException($msg, $controller, __FILE__, __LINE__ - 17);
             }
         }
 
@@ -251,20 +253,20 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     private function varToString($var): string
     {
         if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+            return sprintf('an object of type %s', get_class($var));
         }
 
         if (is_array($var)) {
             $a = array();
             foreach ($var as $k => $v) {
-                $a[] = sprintf('%s => %s', $k, $this->varToString($v));
+                $a[] = sprintf('%s => ...', $k);
             }
 
-            return sprintf('Array(%s)', implode(', ', $a));
+            return sprintf('an array ([%s])', mb_substr(implode(', ', $a), 0, 255));
         }
 
         if (is_resource($var)) {
-            return sprintf('Resource(%s)', get_resource_type($var));
+            return sprintf('a resource (%s)', get_resource_type($var));
         }
 
         if (null === $var) {
@@ -272,11 +274,19 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         }
 
         if (false === $var) {
-            return 'false';
+            return 'a boolean value (false)';
         }
 
         if (true === $var) {
-            return 'true';
+            return 'a boolean value (true)';
+        }
+
+        if (is_string($var)) {
+            return sprintf('a string ("%s%s")', mb_substr($var, 0, 255), mb_strlen($var) > 255 ? '...' : '');
+        }
+
+        if (is_numeric($var)) {
+            return sprintf('a number (%s)', (string) $var);
         }
 
         return (string) $var;

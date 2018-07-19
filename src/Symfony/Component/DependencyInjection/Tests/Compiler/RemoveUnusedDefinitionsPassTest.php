@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\Definition;
@@ -129,9 +127,23 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertSame(1, $envCounters['FOOBAR']);
     }
 
+    public function testProcessDoesNotErrorOnServicesThatDoNotHaveDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('defined')
+            ->addArgument(new Reference('not.defined'))
+            ->setPublic(true);
+
+        $container->set('not.defined', new \StdClass());
+
+        $this->process($container);
+
+        $this->assertFalse($container->hasDefinition('not.defined'));
+    }
+
     protected function process(ContainerBuilder $container)
     {
-        $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new RemoveUnusedDefinitionsPass()));
-        $repeatedPass->process($container);
+        (new RemoveUnusedDefinitionsPass())->process($container);
     }
 }

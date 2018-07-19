@@ -56,6 +56,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     public function getRemovedIds()
     {
         return array(
+            '.service_locator.GU08LT9' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         );
@@ -78,9 +79,9 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      */
     protected function getContainer_EnvVarProcessorsLocatorService()
     {
-        return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('rot13' => function () {
-            return ($this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] ?? $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor());
-        }));
+        return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator(\Closure::fromCallable(array($this, 'getService')), array(
+            'rot13' => array('services', 'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor', 'getRot13EnvVarProcessorService', false),
+        ));
     }
 
     public function getParameter($name)

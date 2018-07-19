@@ -129,21 +129,25 @@ class Process implements \IteratorAggregate
     );
 
     /**
-     * @param string|array   $commandline The command line to run
-     * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process
-     * @param mixed|null     $input       The input as stream resource, scalar or \Traversable, or null for no input
-     * @param int|float|null $timeout     The timeout in seconds or null to disable
+     * @param array          $command The command to run and its arguments listed as separate entries
+     * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param mixed|null     $input   The input as stream resource, scalar or \Traversable, or null for no input
+     * @param int|float|null $timeout The timeout in seconds or null to disable
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($commandline, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    public function __construct($command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
         if (!function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
-        $this->commandline = $commandline;
+        if (!\is_array($command)) {
+            @trigger_error(sprintf('Passing a command as string when creating a "%s" instance is deprecated since Symfony 4.2, pass it as an array of its arguments instead, or use the "Process::fromShellCommandline()" constructor if you need features provided by the shell.', __CLASS__), E_USER_DEPRECATED);
+        }
+
+        $this->commandline = $command;
         $this->cwd = $cwd;
 
         // on Windows, if the cwd changed via chdir(), proc_open defaults to the dir where PHP was started
@@ -161,6 +165,35 @@ class Process implements \IteratorAggregate
         $this->setTimeout($timeout);
         $this->useFileHandles = '\\' === DIRECTORY_SEPARATOR;
         $this->pty = false;
+    }
+
+    /**
+     * Creates a Process instance as a command-line to be run in a shell wrapper.
+     *
+     * Command-lines are parsed by the shell of your OS (/bin/sh on Unix-like, cmd.exe on Windows.)
+     * This allows using e.g. pipes or conditional execution. In this mode, signals are sent to the
+     * shell wrapper and not to your commands.
+     *
+     * In order to inject dynamic values into command-lines, we strongly recommend using placeholders.
+     * This will save escaping values, which is not portable nor secure anyway:
+     *
+     *   $process = Process::fromShellCommandline('my_command "$MY_VAR"');
+     *   $process->run(null, ['MY_VAR' => $theValue]);
+     *
+     * @param string         $command The command line to pass to the shell of the OS
+     * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param mixed|null     $input   The input as stream resource, scalar or \Traversable, or null for no input
+     * @param int|float|null $timeout The timeout in seconds or null to disable
+     *
+     * @throws RuntimeException When proc_open is not installed
+     */
+    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    {
+        $process = new static(array(), $cwd, $env, $input, $timeout);
+        $process->commandline = $command;
+
+        return $process;
     }
 
     public function __destruct()
@@ -892,9 +925,13 @@ class Process implements \IteratorAggregate
      * @param string|array $commandline The command to execute
      *
      * @return self The current Process instance
+     *
+     * @deprecated since Symfony 4.2.
      */
     public function setCommandLine($commandline)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+
         $this->commandline = $commandline;
 
         return $this;

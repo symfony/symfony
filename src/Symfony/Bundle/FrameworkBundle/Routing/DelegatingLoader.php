@@ -28,14 +28,16 @@ class DelegatingLoader extends BaseDelegatingLoader
 {
     protected $parser;
     private $loading = false;
+    private $defaultOptions;
 
     /**
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver)
+    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver, array $defaultOptions = array())
     {
         $this->parser = $parser;
+        $this->defaultOptions = $defaultOptions;
 
         parent::__construct($resolver);
     }
@@ -73,6 +75,9 @@ class DelegatingLoader extends BaseDelegatingLoader
         }
 
         foreach ($collection->all() as $route) {
+            if ($this->defaultOptions) {
+                $route->setOptions($route->getOptions() + $this->defaultOptions);
+            }
             if (!is_string($controller = $route->getDefault('_controller'))) {
                 continue;
             }

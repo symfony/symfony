@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,7 +24,7 @@ use Psr\Log\LoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Profiler
+class Profiler implements ResetInterface
 {
     private $storage;
 

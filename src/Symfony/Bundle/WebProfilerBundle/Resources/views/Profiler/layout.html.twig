@@ -126,6 +126,8 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+
+                {{ include('@WebProfiler/Profiler/settings.html.twig') }}
             </div>
 
             <div id="collector-wrapper">
@@ -142,6 +144,6 @@
                 event.preventDefault();
                 Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded');
             })
-        }())
+        }());
     </script>
 {% endblock %}

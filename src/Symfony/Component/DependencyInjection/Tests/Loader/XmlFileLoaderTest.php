@@ -617,6 +617,26 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
+    public function testPrototypeExcludeWithArray()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_prototype_array.xml');
+
+        $ids = array_keys($container->getDefinitions());
+        sort($ids);
+        $this->assertSame(array(Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'), $ids);
+
+        $resources = $container->getResources();
+
+        $fixturesDir = dirname(__DIR__).DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR;
+        $this->assertTrue(false !== array_search(new FileResource($fixturesDir.'xml'.DIRECTORY_SEPARATOR.'services_prototype_array.xml'), $resources));
+        $this->assertTrue(false !== array_search(new GlobResource($fixturesDir.'Prototype', '/*', true), $resources));
+        $resources = array_map('strval', $resources);
+        $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
+        $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid attribute "class" defined for alias "bar" in
@@ -795,5 +815,15 @@ class XmlFileLoaderTest extends TestCase
             '$quz' => 'quz',
             '$factory' => 'factory',
         ), array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
+    }
+
+    public function testFqcnLazyProxy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_lazy_fqcn.xml');
+
+        $definition = $container->getDefinition('foo');
+        $this->assertSame(array(array('interface' => 'SomeInterface')), $definition->getTag('proxy'));
     }
 }

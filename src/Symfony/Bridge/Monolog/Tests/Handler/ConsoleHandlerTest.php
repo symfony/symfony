@@ -180,19 +180,19 @@ class ConsoleHandlerTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
-            $logger->addInfo('Before command message.');
+            $logger->info('Before command message.');
         });
         $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
-            $logger->addInfo('Before terminate message.');
+            $logger->info('Before terminate message.');
         });
 
         $dispatcher->addSubscriber($handler);
 
         $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
-            $logger->addInfo('After command message.');
+            $logger->info('After command message.');
         });
         $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
-            $logger->addInfo('After terminate message.');
+            $logger->info('After terminate message.');
         });
 
         $event = new ConsoleCommandEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output);

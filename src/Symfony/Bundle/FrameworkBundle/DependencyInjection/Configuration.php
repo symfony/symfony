@@ -21,6 +21,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -53,8 +54,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('framework');
+        $treeBuilder = new TreeBuilder('framework');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->beforeNormalization()
@@ -370,7 +371,7 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('guard')
                                                     ->cannotBeEmpty()
                                                     ->info('An expression to block the transition')
-                                                    ->example('is_fully_authenticated() and has_role(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
+                                                    ->example('is_fully_authenticated() and is_granted(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
                                                 ->end()
                                                 ->arrayNode('from')
                                                     ->beforeNormalization()
@@ -451,6 +452,7 @@ class Configuration implements ConfigurationInterface
                             )
                             ->defaultTrue()
                         ->end()
+                        ->booleanNode('utf8')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()
@@ -833,7 +835,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && interface_exists(PropertyInfoExtractorInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end()
         ;
@@ -865,11 +867,13 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
+                        ->scalarNode('default_pdo_provider')->defaultValue('doctrine.dbal.default_connection')->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('adapter')->defaultValue('cache.app')->end()
+                                    ->scalarNode('tags')->defaultNull()->end()
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->integerNode('default_lifetime')->end()
                                     ->scalarNode('provider')

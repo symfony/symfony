@@ -12,13 +12,14 @@
 namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Collects some data about validator calls.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class TraceableValidator implements ValidatorInterface
+class TraceableValidator implements ValidatorInterface, ResetInterface
 {
     private $validator;
     private $collectedData = array();

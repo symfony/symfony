@@ -14,13 +14,14 @@ namespace Symfony\Bridge\Monolog;
 use Monolog\Logger as BaseLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Logger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Logger extends BaseLogger implements DebugLoggerInterface
+class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 {
     /**
      * {@inheritdoc}
@@ -54,6 +55,14 @@ class Logger extends BaseLogger implements DebugLoggerInterface
         if ($logger = $this->getDebugLogger()) {
             $logger->clear();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->clear();
     }
 
     /**

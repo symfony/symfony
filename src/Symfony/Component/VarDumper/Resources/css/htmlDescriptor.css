@@ -127,3 +127,4 @@ pre.sf-dump {
 .dumped-tag > .sf-dump .sf-dump-ref { color: #6E6E6E; }
 .dumped-tag > .sf-dump .sf-dump-ellipsis { color: #CC7832; max-width: 100em; }
 .dumped-tag > .sf-dump .sf-dump-ellipsis-path { max-width: 5em; }
+.dumped-tag > .sf-dump .sf-dump-ns { user-select: none; }

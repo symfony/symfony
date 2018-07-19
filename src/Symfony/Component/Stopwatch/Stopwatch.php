@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Stopwatch;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Stopwatch provides a way to profile code.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Stopwatch
+class Stopwatch implements ResetInterface
 {
     /**
      * @var bool

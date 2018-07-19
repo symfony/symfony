@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -74,6 +75,23 @@ class RangeValidator extends ConstraintValidator
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
                 ->setCode(Range::TOO_LOW_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        if (null === ($step = $constraint->step) && ($step < $min || $step > $max)) {
+            throw new InvalidArgumentException('Step should not be inferior to max and should be superior to min.');
+        }
+
+        // This feature does not work with DateTime so we check that the value is not a DateTime.
+        if (!$value instanceof \DateTimeInterface && !\in_array($value, range($min, $max, $step), false)) {
+            $this->context->buildViolation($constraint->stepMessage)
+                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE))
+                ->setParameter('{{ max }}', $this->formatValue($max, self::PRETTY_DATE))
+                ->setParameter('{{ step }}', $this->formatValue($step, self::PRETTY_DATE))
+                ->setCode(Range::INVALID_STEP_ERROR)
                 ->addViolation();
         }
     }

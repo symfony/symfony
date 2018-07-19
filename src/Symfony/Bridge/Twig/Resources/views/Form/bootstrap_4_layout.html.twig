@@ -115,8 +115,12 @@
 {%- endblock percent_widget %}
 
 {% block form_widget_simple -%}
+    {% if use_bootstrap_custom is not defined %}
+        {% set use_bootstrap_custom = true %}
+    {% endif %}
+
     {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' and use_bootstrap_custom ? ' custom-file-input' : ' form-control'))|trim}) -%}
     {% endif %}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}
@@ -138,8 +142,12 @@
 {%- endblock button_widget %}
 
 {% block checkbox_widget -%}
+    {% if use_bootstrap_custom is not defined %}
+        {% set use_bootstrap_custom = true %}
+    {% endif %}
+
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- if 'checkbox-custom' in parent_label_class -%}
+    {%- if 'checkbox-custom' in parent_label_class and use_bootstrap_custom -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
         <div class="custom-control custom-checkbox{{ 'checkbox-inline' in parent_label_class ? ' custom-control-inline' }}">
             {{- form_label(form, null, { widget: parent() }) -}}
@@ -153,8 +161,12 @@
 {%- endblock checkbox_widget %}
 
 {% block radio_widget -%}
+    {% if use_bootstrap_custom is not defined %}
+        {% set use_bootstrap_custom = true %}
+    {% endif %}
+
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- if 'radio-custom' in parent_label_class -%}
+    {%- if 'radio-custom' in parent_label_class and use_bootstrap_custom -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
         <div class="custom-control custom-radio{{ 'radio-inline' in parent_label_class ? ' custom-control-inline' }}">
             {{- form_label(form, null, { widget: parent() }) -}}
@@ -182,11 +194,15 @@
 {# Labels #}
 
 {% block form_label -%}
+    {% if use_bootstrap_custom is not defined %}
+        {% set use_bootstrap_custom = true %}
+    {% endif %}
+
     {% if label is not same as(false) -%}
         {%- if compound is defined and compound -%}
             {%- set element = 'legend' -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
-        {% elseif type is defined and type == 'file' %}
+        {% elseif type is defined and type == 'file' and use_bootstrap_custom %}
             {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' custom-file-label')|trim}) -%}
         {%- else -%}
             {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
@@ -215,11 +231,15 @@
 {%- endblock form_label %}
 
 {% block checkbox_radio_label -%}
+    {% if use_bootstrap_custom is not defined %}
+        {% set use_bootstrap_custom = true %}
+    {% endif %}
+
     {#- Do not display the label if widget is not defined in order to prevent double label rendering -#}
     {%- if widget is defined -%}
         {% set is_parent_custom = parent_label_class is defined and ('checkbox-custom' in parent_label_class or 'radio-custom' in parent_label_class) %}
         {% set is_custom = label_attr.class is defined and ('checkbox-custom' in label_attr.class or 'radio-custom' in label_attr.class) %}
-        {%- if is_parent_custom or is_custom -%}
+        {%- if (is_parent_custom or is_custom) and use_bootstrap_custom -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' custom-control-label')|trim}) -%}
         {%- else %}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-check-label')|trim}) -%}
@@ -271,10 +291,10 @@
 
 {% block file_row -%}
     <div class="form-group">
-        <{{ element|default('div') }} class="custom-file">
-            {{- form_widget(form) -}}
-            {{- form_label(form) -}}
-        </{{ element|default('div') }}>
+    <{{ element|default('div') }} class="custom-file">
+    {{- form_widget(form) -}}
+    {{- form_label(form) -}}
+    </{{ element|default('div') }}>
     </div>
 {% endblock %}
 

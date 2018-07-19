@@ -1,0 +1,35 @@
+{% use "bootstrap_4_layout.html.twig" %}
+
+{% block form_widget_simple -%}
+    {% set use_bootstrap_custom = false %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{% block form_label -%}
+    {% set use_bootstrap_custom = false %}
+    {{- parent() -}}
+{% endblock %}
+
+{% block checkbox_radio_label -%}
+    {% set use_bootstrap_custom = false %}
+    {{- parent() -}}
+{% endblock %}
+
+{% block checkbox_widget -%}
+    {% set use_bootstrap_custom = false %}
+    {{- parent() -}}
+{%- endblock checkbox_widget %}
+
+{% block radio_widget -%}
+    {% set use_bootstrap_custom = false %}
+    {{- parent() -}}
+{% endblock %}
+
+{% block file_row -%}
+    <div class="form-group">
+        <{{ element|default('div') }}>
+            {{- form_label(form) -}}
+            {{- form_widget(form) -}}
+        </{{ element|default('div') }}>
+    </div>
+{% endblock %}

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
-@trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Implement `SessionUpdateTimestampHandlerInterface` or extend `AbstractSessionHandler` instead.', WriteCheckSessionHandler::class), E_USER_DEPRECATED);
-
 /**
  * Wraps another SessionHandlerInterface to only write the session when it has been modified.
  *
@@ -31,6 +29,8 @@ class WriteCheckSessionHandler implements \SessionHandlerInterface
 
     public function __construct(\SessionHandlerInterface $wrappedSessionHandler)
     {
+        @trigger_error(sprintf('The %s class is deprecated since Symfony 3.4 and will be removed in 4.0. Implement `SessionUpdateTimestampHandlerInterface` or extend `AbstractSessionHandler` instead.', self::class), E_USER_DEPRECATED);
+
         $this->wrappedSessionHandler = $wrappedSessionHandler;
     }
 

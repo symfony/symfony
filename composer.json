@@ -91,7 +91,7 @@
         "doctrine/cache": "~1.6",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
-        "doctrine/orm": "~2.4,>=2.4.5",
+        "doctrine/orm": "~2.4,>=2.4.5,<=2.7.0",
         "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",

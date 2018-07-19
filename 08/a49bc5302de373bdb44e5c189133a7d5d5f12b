@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-19T09:11:14Z
+
+for `nl` it's
+
+```
+Deze waarde is geen geldige UUID waarde.
+```
+
+**Side note:**
+The form could also be `Deze waarde is geen geldig UUID.`, but i chose to be consistent with the message for ISSN values :)
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-07-19T09:50:00Z
+
+for `de`:
+
+> Dies ist keine gültige UUID.
+
+**Side note:**
+Actually in German it is pretty mixed whether the validator uses something like `this value` ("dieser Wert") and `this` ("dies") in the translations.
+On the other hand, the original texts are inconsistent here as well:
+
+* `This value should be a valid number.`
+* `This is not a valid IP address.`
+* `This is not a valid International Bank Account Number (IBAN).`
+* `This value is not a valid ISBN-10.`
+* ...
+
+So, I would just use the my text above for German.
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2018-07-19T09:54:37Z
+
+For `fr`:
+`Ceci n'est pas un UUID valide.`
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-19T10:00:30Z
+
+For `es`:
+
+```
+Este valor no es un UUID válido.
+```
+
+For `eu`:
+
+```
+Balio hau ez da onartutako UUID bat.
+```
+
+For `ca`:
+
+```
+Aquest valor no és un UUID vàlid.
+```
+
+---------------------------------------------------------------------------
+
+by 1ed at 2018-07-19T10:20:52Z
+
+en: https://github.com/symfony/symfony/pull/27993
+hu: https://github.com/symfony/symfony/pull/27994

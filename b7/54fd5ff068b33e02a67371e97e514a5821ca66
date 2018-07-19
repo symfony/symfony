@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by voodoo-dn at 2018-07-03T13:40:09Z
+
+This PR works well and fix my problem, thanks.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-07-08T09:26:17Z
+
+@fabpot made the change you were asking for. Can you review again?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-09T13:40:56Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-07-12T08:13:13Z
+
+Updated. No need to add a protected method in the end, it's all private 💃
+
+Status: Needs Review

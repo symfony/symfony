@@ -1201,6 +1201,31 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($filename, 'bar');
     }
 
+    public function testDumpFileWithArray()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, array('bar'));
+
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'bar');
+    }
+
+    public function testDumpFileWithResource()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
+
+        $resource = fopen('php://memory', 'rw');
+        fwrite($resource, 'bar');
+        fseek($resource, 0);
+
+        $this->filesystem->dumpFile($filename, $resource);
+
+        fclose($resource);
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'bar');
+    }
+
     /**
      * @group legacy
      */

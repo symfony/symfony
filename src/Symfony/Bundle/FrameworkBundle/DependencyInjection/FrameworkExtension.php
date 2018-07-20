@@ -510,6 +510,7 @@ class FrameworkExtension extends Extension
 
             // Create transitions
             $transitions = array();
+            $guardsConfiguration = array();
             $transitionsMetadataDefinition = new Definition(\SplObjectStorage::class);
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
@@ -521,6 +522,16 @@ class FrameworkExtension extends Extension
                             $transition['metadata'],
                         ));
                     }
+                    if (isset($transition['guard'])) {
+                        $configuration =  new Definition(Workflow\EventListener\GuardExpression::class);
+                        $configuration->addArgument($transitionDefinition);
+                        $configuration->addArgument($transition['guard']);
+                        $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                        if (!isset($guardsConfiguration[$eventName])) {
+                            $guardsConfiguration[$eventName] = array();
+                        }
+                        $guardsConfiguration[$eventName][] = $configuration;
+                    }
                 } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
@@ -531,6 +542,16 @@ class FrameworkExtension extends Extension
                                     $transitionDefinition,
                                     $transition['metadata'],
                                 ));
+                            }
+                            if (isset($transition['guard'])) {
+                                $configuration =  new Definition(Workflow\EventListener\GuardExpression::class);
+                                $configuration->addArgument($transitionDefinition);
+                                $configuration->addArgument($transition['guard']);
+                                $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                                if (!isset($guardsConfiguration[$eventName])) {
+                                    $guardsConfiguration[$eventName] = array();
+                                }
+                                $guardsConfiguration[$eventName][] = $configuration;
                             }
                         }
                     }
@@ -605,14 +626,8 @@ class FrameworkExtension extends Extension
             // Add Guard Listener
             $guard = new Definition(Workflow\EventListener\GuardListener::class);
             $guard->setPrivate(true);
-            $configuration = array();
-            foreach ($workflow['transitions'] as $config) {
-                $transitionName = $config['name'];
 
-                if (!isset($config['guard'])) {
-                    continue;
-                }
-
+            if ($guardsConfiguration) {
                 if (!class_exists(ExpressionLanguage::class)) {
                     throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed.');
                 }
@@ -621,13 +636,8 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the Security component is not installed.');
                 }
 
-                $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
-                $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
-                $configuration[$eventName] = $config['guard'];
-            }
-            if ($configuration) {
                 $guard->setArguments(array(
-                    $configuration,
+                    $guardsConfiguration,
                     new Reference('workflow.security.expression_language'),
                     new Reference('security.token_storage'),
                     new Reference('security.authorization_checker'),
@@ -635,6 +645,10 @@ class FrameworkExtension extends Extension
                     new Reference('security.role_hierarchy'),
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ));
+
+                foreach ($guardsConfiguration as $eventName => $config) {
+                    $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
+                }
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);

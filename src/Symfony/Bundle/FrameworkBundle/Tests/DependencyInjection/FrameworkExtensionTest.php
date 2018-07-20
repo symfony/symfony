@@ -332,6 +332,31 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('draft'), $transitions[4]->getArgument(1));
     }
 
+    public function testGuardExpressions()
+    {
+        $container = $this->createContainerFromFile('workflow_with_guard_expression');
+
+        $this->assertTrue($container->hasDefinition('workflow.article.listener.guard'), 'Workflow guard listener is registered as a service');
+        $this->assertTrue($container->hasParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter exists');
+        $this->assertTrue(true === $container->getParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter is enabled');
+        $guardDefinition = $container->getDefinition('workflow.article.listener.guard');
+        $this->assertSame(array(
+            array(
+                'event' => 'workflow.article.guard.publish',
+                'method' => 'onTransition'
+            )
+        ), $guardDefinition->getTag('kernel.event_listener'));
+        $guardsConfiguration = $guardDefinition->getArgument(0);
+        $this->assertTrue(1 === count($guardsConfiguration), 'Workflow guard configuration contains one element per transition name');
+        $transitionGuardExpressions = $guardsConfiguration['workflow.article.guard.publish'];
+        $workflowDefinition = $container->getDefinition('workflow.article.definition');
+        $transitions = $workflowDefinition->getArgument(1);
+        $this->assertSame($transitions[3], $transitionGuardExpressions[0]->getArgument(0));
+        $this->assertSame("!!true", $transitionGuardExpressions[0]->getArgument(1));
+        $this->assertSame($transitions[4], $transitionGuardExpressions[1]->getArgument(0));
+        $this->assertSame("!!false", $transitionGuardExpressions[1]->getArgument(1));
+    }
+
     public function testWorkflowServicesCanBeEnabled()
     {
         $container = $this->createContainerFromFile('workflows_enabled');

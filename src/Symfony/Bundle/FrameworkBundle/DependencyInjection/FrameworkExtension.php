@@ -1495,6 +1495,22 @@ class FrameworkExtension extends Extension
             throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
         }
 
+        $senderAliases = array();
+        foreach ($config['transports'] as $name => $transport) {
+            if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
+                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
+            }
+
+            $transportDefinition = (new Definition(TransportInterface::class))
+                ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
+                ->setArguments(array($transport['dsn'], $transport['options']))
+                ->addTag('messenger.receiver', array('alias' => $name))
+                ->addTag('messenger.sender', array('alias' => $name))
+            ;
+            $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
+            $senderAliases[$name] = $transportId;
+        }
+
         $messageToSenderIdMapping = array();
         $messageToSendAndHandleMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
@@ -1503,8 +1519,11 @@ class FrameworkExtension extends Extension
             }
 
             if (1 < \count($messageConfiguration['senders'])) {
-                $senders = array_map(function ($sender) { return new Reference($sender); }, $messageConfiguration['senders']);
+                $senders = array_map(function ($sender) use ($senderAliases) {
+                    return new Reference($senderAliases[$sender] ?? $sender);
+                }, $messageConfiguration['senders']);
                 $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
+                $chainSenderDefinition->addTag('messenger.sender');
                 $chainSenderId = '.messenger.chain_sender.'.$message;
                 $container->setDefinition($chainSenderId, $chainSenderDefinition);
                 $messageToSenderIdMapping[$message] = $chainSenderId;
@@ -1517,20 +1536,6 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
         $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
-
-        foreach ($config['transports'] as $name => $transport) {
-            if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
-                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
-            }
-
-            $transportDefinition = (new Definition(TransportInterface::class))
-                ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
-                ->setArguments(array($transport['dsn'], $transport['options']))
-                ->addTag('messenger.receiver', array('alias' => $name))
-                ->addTag('messenger.sender', array('alias' => $name))
-            ;
-            $container->setDefinition('messenger.transport.'.$name, $transportDefinition);
-        }
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

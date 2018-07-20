@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * @author Tobias Schultze <http://tobion.de>
  */
@@ -29,7 +31,7 @@ class ChainSender implements SenderInterface
     /**
      * {@inheritdoc}
      */
-    public function send($message): void
+    public function send(Envelope $message): void
     {
         foreach ($this->senders as $sender) {
             $sender->send($message);

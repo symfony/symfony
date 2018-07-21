@@ -16,7 +16,7 @@ use Symfony\Component\Console\Helper\TextHelper;
 
 class TextHelperTest extends TestCase
 {
-    public function formatTimeProvider()
+    public function formatTimeProvider(): array
     {
         return array(
             array(0,      '< 1 sec'),
@@ -44,11 +44,8 @@ class TextHelperTest extends TestCase
 
     /**
      * @dataProvider formatTimeProvider
-     *
-     * @param int    $secs
-     * @param string $expectedFormat
      */
-    public function testFormatTime($secs, $expectedFormat)
+    public function testFormatTime(int $secs, string $expectedFormat)
     {
         $this->assertEquals($expectedFormat, TextHelper::formatTime($secs));
     }

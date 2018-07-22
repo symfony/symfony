@@ -12,6 +12,7 @@ Config
  * Dropped support for constructing a `TreeBuilder` without passing root node information.
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
  * The `Processor` class has been made final
+ * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead.
 
 Console
 -------

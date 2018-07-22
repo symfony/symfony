@@ -10,6 +10,7 @@ Config
 ------
 
  * Deprecated constructing a `TreeBuilder` without passing root node information.
+ * Deprecated `FileLoaderLoadException`, use `LoaderLoadException` instead.
 
 Console
 -------

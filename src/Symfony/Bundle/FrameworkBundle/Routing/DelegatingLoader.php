@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
@@ -64,7 +64,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             // - this handles the case and prevents the second fatal error
             //   by triggering an exception beforehand.
 
-            throw new FileLoaderLoadException($resource, null, null, null, $type);
+            throw new LoaderLoadException($resource, null, null, null, $type);
         }
         $this->loading = true;
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-19T18:24:29Z
+
+The Twig error "malformed template name" on `$loader->exists(template)` should be fixed in https://github.com/twigphp/Twig/pull/2721

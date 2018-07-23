@@ -282,6 +282,10 @@
                 <source>Error</source>
                 <target>Errore</target>
             </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Balio hau ez da onartutako UUID bat.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

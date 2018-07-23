@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Caster\StubCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
@@ -261,6 +262,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
                     Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
                 );
             },
+            FormView::class => array(StubCaster::class, 'cutInternals'),
             ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
                 return array(
                     Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),

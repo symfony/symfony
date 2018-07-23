@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests;
+namespace Symfony\Bridge\Twig\Tests\Extension;
 
 abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3LayoutTest
 {

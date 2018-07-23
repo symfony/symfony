@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T13:00:03Z
+
+@VincentChalnot can you please confirm this patch also fixes the memory issue?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-23T13:50:07Z
+
+I can confirm, this change solve the issue as well.
+
+---------------------------------------------------------------------------
+
+by VincentChalnot at 2018-07-23T14:33:40Z
+
+@nicolas-grekas I confirm this patch also fix the memory issue, thanks!

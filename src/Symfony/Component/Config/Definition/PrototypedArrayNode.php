@@ -102,9 +102,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Checks if the node has a default value.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasDefaultValue()
     {
@@ -126,12 +124,10 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Retrieves the default value.
+     * {@inheritdoc}
      *
      * The default value could be either explicited or derived from the prototype
      * default value.
-     *
-     * @return array The default value
      */
     public function getDefaultValue()
     {
@@ -150,8 +146,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Sets the node prototype.
-     *
-     * @param PrototypeNodeInterface $node
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {
@@ -170,8 +164,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Disable adding concrete children for prototyped nodes.
-     *
-     * @param NodeInterface $node The child node to add
      *
      * @throws Exception
      */
@@ -375,11 +367,9 @@ class PrototypedArrayNode extends ArrayNode
      * Now, the key becomes 'name001' and the child node becomes 'value001' and
      * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.
      *
-     * @param string $key The key of the child node
-     *
      * @return mixed The prototype instance
      */
-    private function getPrototypeForChild($key)
+    private function getPrototypeForChild(string $key)
     {
         $prototype = isset($this->valuePrototypes[$key]) ? $this->valuePrototypes[$key] : $this->prototype;
         $prototype->setName($key);

@@ -1,0 +1,8 @@
+services:
+    foo_bar:
+        class: FooBarClass
+        configurator: foo_bar_configurator:configure
+
+    foo_bar_with_static_call:
+        class: FooBarClass
+        configurator: FooBarConfigurator::configureFooBar

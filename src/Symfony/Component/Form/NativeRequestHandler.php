@@ -21,23 +21,10 @@ use Symfony\Component\Form\Util\ServerParams;
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {
-    /**
-     * @var ServerParams
-     */
     private $serverParams;
 
     /**
-     * {@inheritdoc}
-     */
-    public function __construct(ServerParams $params = null)
-    {
-        $this->serverParams = $params ?: new ServerParams();
-    }
-
-    /**
      * The allowed keys of the $_FILES array.
-     *
-     * @var array
      */
     private static $fileKeys = array(
         'error',
@@ -46,6 +33,11 @@ class NativeRequestHandler implements RequestHandlerInterface
         'tmp_name',
         'type',
     );
+
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
 
     /**
      * {@inheritdoc}
@@ -127,6 +119,17 @@ class NativeRequestHandler implements RequestHandlerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isFileUpload($data)
+    {
+        // POST data will always be strings or arrays of strings. Thus, we can be sure
+        // that the submitted data is a file upload if the "error" value is an integer
+        // (this value must have been injected by PHP itself).
+        return is_array($data) && isset($data['error']) && is_int($data['error']);
+    }
+
+    /**
      * Returns the method used to submit the request to the server.
      *
      * @return string The request method
@@ -158,8 +161,6 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
-     *
-     * @param array $data
      *
      * @return array
      */

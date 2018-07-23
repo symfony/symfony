@@ -25,7 +25,7 @@ class StopwatchTokenParser extends AbstractTokenParser
 {
     protected $stopwatchIsAvailable;
 
-    public function __construct($stopwatchIsAvailable)
+    public function __construct(bool $stopwatchIsAvailable)
     {
         $this->stopwatchIsAvailable = $stopwatchIsAvailable;
     }

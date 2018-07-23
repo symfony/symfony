@@ -13,15 +13,10 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\CardScheme;
 use Symfony\Component\Validator\Constraints\CardSchemeValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
+class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new CardSchemeValidator();
@@ -111,6 +106,7 @@ class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
             array('VISA', '4111111111111111'),
             array('VISA', '4012888888881881'),
             array('VISA', '4222222222222'),
+            array('VISA', '4917610000000000003'),
             array(array('AMEX', 'VISA'), '4111111111111111'),
             array(array('AMEX', 'VISA'), '378282246310005'),
             array(array('JCB', 'MASTERCARD'), '5105105105105100'),

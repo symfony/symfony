@@ -20,9 +20,6 @@ use Symfony\Component\Templating\EngineInterface;
  */
 class TemplatingRendererEngine extends AbstractRendererEngine
 {
-    /**
-     * @var EngineInterface
-     */
     private $engine;
 
     public function __construct(EngineInterface $engine, array $defaultThemes = array())
@@ -72,9 +69,11 @@ class TemplatingRendererEngine extends AbstractRendererEngine
 
         // Check the default themes once we reach the root form without success
         if (!$view->parent) {
-            for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
-                if ($this->loadResourceFromTheme($cacheKey, $blockName, $this->defaultThemes[$i])) {
-                    return true;
+            if (!isset($this->useDefaultThemes[$cacheKey]) || $this->useDefaultThemes[$cacheKey]) {
+                for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
+                    if ($this->loadResourceFromTheme($cacheKey, $blockName, $this->defaultThemes[$i])) {
+                        return true;
+                    }
                 }
             }
         }

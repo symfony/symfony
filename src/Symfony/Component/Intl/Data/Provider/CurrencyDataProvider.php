@@ -25,21 +25,11 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 class CurrencyDataProvider
 {
     const INDEX_SYMBOL = 0;
-
     const INDEX_NAME = 1;
-
     const INDEX_FRACTION_DIGITS = 0;
-
     const INDEX_ROUNDING_INCREMENT = 1;
 
-    /**
-     * @var string
-     */
     private $path;
-
-    /**
-     * @var BundleEntryReaderInterface
-     */
     private $reader;
 
     /**
@@ -49,7 +39,7 @@ class CurrencyDataProvider
      * @param string                     $path   The path to the resource bundle
      * @param BundleEntryReaderInterface $reader The reader for reading the resource bundle
      */
-    public function __construct($path, BundleEntryReaderInterface $reader)
+    public function __construct(string $path, BundleEntryReaderInterface $reader)
     {
         $this->path = $path;
         $this->reader = $reader;

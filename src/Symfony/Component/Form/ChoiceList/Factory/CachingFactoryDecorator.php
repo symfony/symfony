@@ -22,9 +22,6 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface
 {
-    /**
-     * @var ChoiceListFactoryInterface
-     */
     private $decoratedFactory;
 
     /**
@@ -48,7 +45,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @return string The SHA-256 hash
      *
-     * @internal Should not be used by user-land code.
+     * @internal
      */
     public static function generateHash($value, $namespace = '')
     {
@@ -71,7 +68,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      * @param array $array  The array to flatten
      * @param array $output The flattened output
      *
-     * @internal Should not be used by user-land code
+     * @internal
      */
     private static function flatten(array $array, &$output)
     {
@@ -89,11 +86,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         }
     }
 
-    /**
-     * Decorates the given factory.
-     *
-     * @param ChoiceListFactoryInterface $decoratedFactory The decorated factory
-     */
     public function __construct(ChoiceListFactoryInterface $decoratedFactory)
     {
         $this->decoratedFactory = $decoratedFactory;
@@ -130,35 +122,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value);
-        }
-
-        return $this->lists[$hash];
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Added for backwards compatibility in Symfony 2.7, to be
-     *             removed in Symfony 3.0.
-     */
-    public function createListFromFlippedChoices($choices, $value = null, $triggerDeprecationNotice = true)
-    {
-        if ($choices instanceof \Traversable) {
-            $choices = iterator_to_array($choices);
-        }
-
-        // The value is not validated on purpose. The decorated factory may
-        // decide which values to accept and which not.
-
-        // We ignore the choice groups for caching. If two choice lists are
-        // requested with the same choices, but a different grouping, the same
-        // choice list is returned.
-        self::flatten($choices, $flatChoices);
-
-        $hash = self::generateHash(array($flatChoices, $value), 'fromFlippedChoices');
-
-        if (!isset($this->lists[$hash])) {
-            $this->lists[$hash] = $this->decoratedFactory->createListFromFlippedChoices($choices, $value, $triggerDeprecationNotice);
         }
 
         return $this->lists[$hash];

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "aa": "afar",
         "ab": "abjasio",
@@ -25,6 +25,7 @@
         "arc": "arameo",
         "arn": "mapuche",
         "arp": "arapaho",
+        "ars": "árabe najdí",
         "arw": "arahuaco",
         "as": "asamés",
         "asa": "asu",
@@ -148,6 +149,7 @@
         "fr": "francés",
         "fr_CA": "francés canadiense",
         "fr_CH": "francés suizo",
+        "frc": "francés cajún",
         "frm": "francés medio",
         "fro": "francés antiguo",
         "frr": "frisón septentrional",
@@ -274,6 +276,7 @@
         "ln": "lingala",
         "lo": "lao",
         "lol": "mongo",
+        "lou": "criollo de Luisiana",
         "loz": "lozi",
         "lrc": "lorí septentrional",
         "lt": "lituano",

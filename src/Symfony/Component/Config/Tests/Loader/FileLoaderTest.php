@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
@@ -65,6 +66,29 @@ class FileLoaderTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException', $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         }
+    }
+
+    public function testImportWithGlobLikeResource()
+    {
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $loader = new TestFileLoader($locatorMock);
+
+        $this->assertSame('[foo]', $loader->import('[foo]'));
+    }
+
+    public function testImportWithNoGlobMatch()
+    {
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $loader = new TestFileLoader($locatorMock);
+
+        $this->assertNull($loader->import('./*.abc'));
+    }
+
+    public function testImportWithSimpleGlob()
+    {
+        $loader = new TestFileLoader(new FileLocator(__DIR__));
+
+        $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', DIRECTORY_SEPARATOR));
     }
 }
 

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -256,6 +256,10 @@
         "CLP": [
             "CLP",
             "Peso Cile"
+        ],
+        "CNH": [
+            "CNH",
+            "Yuan Tiongkok (luar negeri)"
         ],
         "CNY": [
             "CN¥",
@@ -671,6 +675,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ouguiya Mauritania (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ouguiya Mauritania"
         ],
         "MTL": [
@@ -903,6 +911,10 @@
         ],
         "STD": [
             "STD",
+            "Dobra Sao Tome dan Principe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobra Sao Tome dan Principe"
         ],
         "SUR": [

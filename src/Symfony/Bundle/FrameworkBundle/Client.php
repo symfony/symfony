@@ -62,7 +62,7 @@ class Client extends BaseClient
     /**
      * Gets the profile associated with the current Response.
      *
-     * @return HttpProfile A Profile instance
+     * @return HttpProfile|false A Profile instance
      */
     public function getProfile()
     {
@@ -163,34 +163,36 @@ class Client extends BaseClient
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
+        $errorReporting = error_reporting();
 
-        $r = new \ReflectionObject($this->kernel);
-
-        $autoloader = dirname($r->getFileName()).'/autoload.php';
-        if (is_file($autoloader)) {
-            $autoloader = str_replace("'", "\\'", $autoloader);
-        } else {
-            $autoloader = '';
+        $requires = '';
+        foreach (get_declared_classes() as $class) {
+            if (0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $file = dirname(dirname($r->getFileName())).'/autoload.php';
+                if (file_exists($file)) {
+                    $requires .= "require_once '".str_replace("'", "\\'", $file)."';\n";
+                }
+            }
         }
 
-        $path = str_replace("'", "\\'", $r->getFileName());
+        if (!$requires) {
+            throw new \RuntimeException('Composer autoloader not found.');
+        }
+
+        $requires .= "require_once '".str_replace("'", "\\'", (new \ReflectionObject($this->kernel))->getFileName())."';\n";
 
         $profilerCode = '';
         if ($this->profiler) {
             $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
         }
 
-        $errorReporting = error_reporting();
-
         $code = <<<EOF
 <?php
 
 error_reporting($errorReporting);
 
-if ('$autoloader') {
-    require_once '$autoloader';
-}
-require_once '$path';
+$requires
 
 \$kernel = unserialize('$kernel');
 \$kernel->boot();

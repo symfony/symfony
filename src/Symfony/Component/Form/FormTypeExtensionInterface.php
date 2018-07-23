@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -25,9 +25,6 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @see FormTypeInterface::buildForm()
-     *
-     * @param FormBuilderInterface $builder The form builder
-     * @param array                $options The options
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
 
@@ -38,10 +35,6 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @see FormTypeInterface::buildView()
-     *
-     * @param FormView      $view    The view
-     * @param FormInterface $form    The form
-     * @param array         $options The options
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
@@ -52,23 +45,15 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @see FormTypeInterface::finishView()
-     *
-     * @param FormView      $view    The view
-     * @param FormInterface $form    The form
-     * @param array         $options The options
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
     /**
-     * Overrides the default options from the extended type.
+     * Configures the options for this type.
      *
-     * @param OptionsResolverInterface $resolver The resolver for the options
-     *
-     * @deprecated since version 2.7, to be removed in 3.0.
-     *             Use the method configureOptions instead. This method will be
-     *             added to the FormTypeExtensionInterface with Symfony 3.0
+     * @param OptionsResolver $resolver The resolver for the options
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver);
+    public function configureOptions(OptionsResolver $resolver);
 
     /**
      * Returns the name of the type being extended.

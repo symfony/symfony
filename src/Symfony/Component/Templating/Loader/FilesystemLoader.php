@@ -25,9 +25,7 @@ class FilesystemLoader extends Loader
     protected $templatePathPatterns;
 
     /**
-     * Constructor.
-     *
-     * @param array $templatePathPatterns An array of path patterns to look for templates
+     * @param string|string[] $templatePathPatterns An array of path patterns to look for templates
      */
     public function __construct($templatePathPatterns)
     {
@@ -36,8 +34,6 @@ class FilesystemLoader extends Loader
 
     /**
      * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      */
@@ -59,15 +55,12 @@ class FilesystemLoader extends Loader
             if (is_file($file = strtr($templatePathPattern, $replacements)) && is_readable($file)) {
                 if (null !== $this->logger) {
                     $this->logger->debug('Loaded template file.', array('file' => $file));
-                } elseif (null !== $this->debugger) {
-                    // just for BC, to be removed in 3.0
-                    $this->debugger->log(sprintf('Loaded template file "%s".', $file));
                 }
 
                 return new FileStorage($file);
             }
 
-            if (null !== $this->logger || null !== $this->debugger) {
+            if (null !== $this->logger) {
                 $fileFailures[] = $file;
             }
         }
@@ -76,9 +69,6 @@ class FilesystemLoader extends Loader
         foreach ($fileFailures as $file) {
             if (null !== $this->logger) {
                 $this->logger->debug('Failed loading template file.', array('file' => $file));
-            } elseif (null !== $this->debugger) {
-                // just for BC, to be removed in 3.0
-                $this->debugger->log(sprintf('Failed loading template file "%s".', $file));
             }
         }
 
@@ -111,10 +101,10 @@ class FilesystemLoader extends Loader
      */
     protected static function isAbsolutePath($file)
     {
-        if ($file[0] == '/' || $file[0] == '\\'
+        if ('/' == $file[0] || '\\' == $file[0]
             || (strlen($file) > 3 && ctype_alpha($file[0])
-                && $file[1] == ':'
-                && ($file[2] == '\\' || $file[2] == '/')
+                && ':' == $file[1]
+                && ('\\' == $file[2] || '/' == $file[2])
             )
             || null !== parse_url($file, PHP_URL_SCHEME)
         ) {

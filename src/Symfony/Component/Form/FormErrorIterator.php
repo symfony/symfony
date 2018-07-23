@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Iterates over the errors of a form.
@@ -32,26 +33,17 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 {
     /**
      * The prefix used for indenting nested error messages.
-     *
-     * @var string
      */
     const INDENTATION = '    ';
 
-    /**
-     * @var FormInterface
-     */
     private $form;
-
-    /**
-     * @var FormError[]|FormErrorIterator[]
-     */
     private $errors;
 
     /**
      * Creates a new iterator.
      *
-     * @param FormInterface $form   The erroneous form
-     * @param array         $errors The form errors
+     * @param FormInterface                   $form   The erroneous form
+     * @param FormError[]|FormErrorIterator[] $errors The form errors
      *
      * @throws InvalidArgumentException If the errors are invalid
      */
@@ -107,8 +99,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current element of the iterator.
      *
-     * @return FormError|FormErrorIterator An error or an iterator containing
-     *                                     nested errors.
+     * @return FormError|FormErrorIterator an error or an iterator containing
+     *                                     nested errors
      */
     public function current()
     {
@@ -263,6 +255,27 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
         while ($position !== key($this->errors)) {
             next($this->errors);
         }
+    }
+
+    /**
+     * Creates iterator for errors with specific codes.
+     *
+     * @param string|string[] $codes The codes to find
+     *
+     * @return static new instance which contains only specific errors
+     */
+    public function findByCodes($codes)
+    {
+        $codes = (array) $codes;
+        $errors = array();
+        foreach ($this as $error) {
+            $cause = $error->getCause();
+            if ($cause instanceof ConstraintViolation && in_array($cause->getCode(), $codes, true)) {
+                $errors[] = $error;
+            }
+        }
+
+        return new static($this->form, $errors);
     }
 
     /**

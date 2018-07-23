@@ -1,7 +1,6 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.38.73",
     "Names": {
-        "bn": "Bengali",
-        "or": "Oriya"
+        "bn": "Bengali"
     }
 }

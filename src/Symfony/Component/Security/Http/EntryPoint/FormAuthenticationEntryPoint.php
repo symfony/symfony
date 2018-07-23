@@ -29,19 +29,17 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     private $httpUtils;
 
     /**
-     * Constructor.
-     *
      * @param HttpKernelInterface $kernel
      * @param HttpUtils           $httpUtils  An HttpUtils instance
      * @param string              $loginPath  The path to the login form
      * @param bool                $useForward Whether to forward or redirect to the login form
      */
-    public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, $loginPath, $useForward = false)
+    public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, string $loginPath, bool $useForward = false)
     {
         $this->httpKernel = $kernel;
         $this->httpUtils = $httpUtils;
         $this->loginPath = $loginPath;
-        $this->useForward = (bool) $useForward;
+        $this->useForward = $useForward;
     }
 
     /**
@@ -54,7 +52,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
             $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
             if (200 === $response->getStatusCode()) {
-                $response->headers->set('X-Status-Code', 401);
+                $response->setStatusCode(401);
             }
 
             return $response;

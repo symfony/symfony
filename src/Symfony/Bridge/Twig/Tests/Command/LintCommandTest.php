@@ -31,7 +31,7 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertRegExp('/^\/\/ OK in /', trim($tester->getDisplay()));
+        $this->assertContains('OK in', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectFile()
@@ -73,10 +73,7 @@ class LintCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $twig = new Environment(new FilesystemLoader());
-
-        $command = new LintCommand();
-        $command->setTwigEnvironment($twig);
+        $command = new LintCommand(new Environment(new FilesystemLoader()));
 
         $application = new Application();
         $application->add($command);

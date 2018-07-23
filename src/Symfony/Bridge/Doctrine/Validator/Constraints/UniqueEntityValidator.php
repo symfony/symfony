@@ -12,7 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -25,9 +26,6 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class UniqueEntityValidator extends ConstraintValidator
 {
-    /**
-     * @var ManagerRegistry
-     */
     private $registry;
 
     public function __construct(ManagerRegistry $registry)
@@ -123,7 +121,21 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
-        $repository = $em->getRepository(get_class($entity));
+        if (null !== $constraint->entityClass) {
+            /* Retrieve repository from given entity name.
+             * We ensure the retrieved repository can handle the entity
+             * by checking the entity is the same, or subclass of the supported entity.
+             */
+            $repository = $em->getRepository($constraint->entityClass);
+            $supportedClass = $repository->getClassName();
+
+            if (!$entity instanceof $supportedClass) {
+                throw new ConstraintDefinitionException(sprintf('The "%s" entity repository does not support the "%s" entity. The entity should be an instance of or extend "%s".', $constraint->entityClass, $class->getName(), $supportedClass));
+            }
+        } else {
+            $repository = $em->getRepository(get_class($entity));
+        }
+
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         if ($result instanceof \IteratorAggregate) {
@@ -136,33 +148,71 @@ class UniqueEntityValidator extends ConstraintValidator
          */
         if ($result instanceof \Iterator) {
             $result->rewind();
-        } elseif (is_array($result)) {
+            if ($result instanceof \Countable && 1 < \count($result)) {
+                $result = array($result->current(), $result->current());
+            } else {
+                $result = $result->current();
+                $result = null === $result ? array() : array($result);
+            }
+        } elseif (\is_array($result)) {
             reset($result);
+        } else {
+            $result = null === $result ? array() : array($result);
         }
 
         /* If no entity matched the query criteria or a single entity matched,
          * which is the same as the entity being validated, the criteria is
          * unique.
          */
-        if (0 === count($result) || (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result)))) {
+        if (!$result || (1 === \count($result) && current($result) === $entity)) {
             return;
         }
 
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
-        if ($this->context instanceof ExecutionContextInterface) {
-            $this->context->buildViolation($constraint->message)
-                ->atPath($errorPath)
-                ->setInvalidValue($invalidValue)
-                ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
-                ->addViolation();
-        } else {
-            $this->buildViolation($constraint->message)
-                ->atPath($errorPath)
-                ->setInvalidValue($invalidValue)
-                ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
-                ->addViolation();
+        $this->context->buildViolation($constraint->message)
+            ->atPath($errorPath)
+            ->setParameter('{{ value }}', $this->formatWithIdentifiers($em, $class, $invalidValue))
+            ->setInvalidValue($invalidValue)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->setCause($result)
+            ->addViolation();
+    }
+
+    private function formatWithIdentifiers(ObjectManager $em, ClassMetadata $class, $value)
+    {
+        if (!is_object($value) || $value instanceof \DateTimeInterface) {
+            return $this->formatValue($value, self::PRETTY_DATE);
         }
+
+        if ($class->getName() !== $idClass = get_class($value)) {
+            // non unique value might be a composite PK that consists of other entity objects
+            if ($em->getMetadataFactory()->hasMetadataFor($idClass)) {
+                $identifiers = $em->getClassMetadata($idClass)->getIdentifierValues($value);
+            } else {
+                // this case might happen if the non unique column has a custom doctrine type and its value is an object
+                // in which case we cannot get any identifiers for it
+                $identifiers = array();
+            }
+        } else {
+            $identifiers = $class->getIdentifierValues($value);
+        }
+
+        if (!$identifiers) {
+            return sprintf('object("%s")', $idClass);
+        }
+
+        array_walk($identifiers, function (&$id, $field) {
+            if (!is_object($id) || $id instanceof \DateTimeInterface) {
+                $idAsString = $this->formatValue($id, self::PRETTY_DATE);
+            } else {
+                $idAsString = sprintf('object("%s")', get_class($id));
+            }
+
+            $id = sprintf('%s => %s', $field, $idAsString);
+        });
+
+        return sprintf('object("%s") identified by (%s)', $idClass, implode(', ', $identifiers));
     }
 }

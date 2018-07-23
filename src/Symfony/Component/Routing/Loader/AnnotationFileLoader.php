@@ -27,11 +27,6 @@ class AnnotationFileLoader extends FileLoader
     protected $loader;
 
     /**
-     * Constructor.
-     *
-     * @param FileLocatorInterface  $locator A FileLocator instance
-     * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
-     *
      * @throws \RuntimeException
      */
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
@@ -64,10 +59,9 @@ class AnnotationFileLoader extends FileLoader
             $collection->addResource(new FileResource($path));
             $collection->addCollection($this->loader->load($class, $type));
         }
-        if (\PHP_VERSION_ID >= 70000) {
-            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
-            gc_mem_caches();
-        }
+
+        // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+        gc_mem_caches();
 
         return $collection;
     }
@@ -92,6 +86,11 @@ class AnnotationFileLoader extends FileLoader
         $class = false;
         $namespace = false;
         $tokens = token_get_all(file_get_contents($file));
+
+        if (1 === count($tokens) && T_INLINE_HTML === $tokens[0][0]) {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain PHP code. Did you forgot to add the "<?php" start tag at the beginning of the file?', $file));
+        }
+
         for ($i = 0; isset($tokens[$i]); ++$i) {
             $token = $tokens[$i];
 
@@ -112,22 +111,22 @@ class AnnotationFileLoader extends FileLoader
             }
 
             if (T_CLASS === $token[0]) {
-                // Skip usage of ::class constant
-                $isClassConstant = false;
+                // Skip usage of ::class constant and anonymous classes
+                $skipClassToken = false;
                 for ($j = $i - 1; $j > 0; --$j) {
                     if (!isset($tokens[$j][1])) {
                         break;
                     }
 
-                    if (T_DOUBLE_COLON === $tokens[$j][0]) {
-                        $isClassConstant = true;
+                    if (T_DOUBLE_COLON === $tokens[$j][0] || T_NEW === $tokens[$j][0]) {
+                        $skipClassToken = true;
                         break;
                     } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
                         break;
                     }
                 }
 
-                if (!$isClassConstant) {
+                if (!$skipClassToken) {
                     $class = true;
                 }
             }

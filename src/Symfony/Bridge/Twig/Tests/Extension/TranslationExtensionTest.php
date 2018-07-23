@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader as TwigArrayLoader;
@@ -37,7 +36,7 @@ class TranslationExtensionTest extends TestCase
             echo $template."\n";
             $loader = new TwigArrayLoader(array('index' => $template));
             $twig = new Environment($loader, array('debug' => true, 'cache' => false));
-            $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
+            $twig->addExtension(new TranslationExtension(new Translator('en')));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index'))))."\n\n";
             $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
@@ -89,18 +88,35 @@ class TranslationExtensionTest extends TestCase
             array('{% trans into "fr"%}Hello{% endtrans %}', 'Hello'),
 
             // transchoice
-            array('{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is no apples', array('count' => 0)),
-            array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is 5 apples', array('count' => 5)),
-            array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony)', array('count' => 5, 'name' => 'Symfony')),
-            array('{% transchoice count with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony)', array('count' => 5)),
-            array('{% transchoice count into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is no apples', array('count' => 0)),
-            array('{% transchoice 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is 5 apples'),
+            array(
+                '{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                'There is no apples',
+                array('count' => 0),
+            ),
+            array(
+                '{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                'There is 5 apples',
+                array('count' => 5),
+            ),
+            array(
+                '{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
+                'There is 5 apples (Symfony)',
+                array('count' => 5, 'name' => 'Symfony'),
+            ),
+            array(
+                '{% transchoice count with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
+                'There is 5 apples (Symfony)',
+                array('count' => 5),
+            ),
+            array(
+                '{% transchoice count into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                'There is no apples',
+                array('count' => 0),
+            ),
+            array(
+                '{% transchoice 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                'There is 5 apples',
+            ),
 
             // trans filter
             array('{{ "Hello"|trans }}', 'Hello'),
@@ -139,7 +155,7 @@ class TranslationExtensionTest extends TestCase
             ',
         );
 
-        $translator = new Translator('en', new MessageSelector());
+        $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
         $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
@@ -172,7 +188,7 @@ class TranslationExtensionTest extends TestCase
             ',
         );
 
-        $translator = new Translator('en', new MessageSelector());
+        $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
         $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
@@ -187,7 +203,7 @@ class TranslationExtensionTest extends TestCase
     protected function getTemplate($template, $translator = null)
     {
         if (null === $translator) {
-            $translator = new Translator('en', new MessageSelector());
+            $translator = new Translator('en');
         }
 
         if (is_array($template)) {

@@ -27,11 +27,8 @@ interface SessionAuthenticationStrategyInterface
     /**
      * This performs any necessary changes to the session.
      *
-     * This method is called before the TokenStorage is populated with a
-     * Token, and only by classes inheriting from AbstractAuthenticationListener.
-     *
-     * @param Request        $request
-     * @param TokenInterface $token
+     * This method should be called before the TokenStorage is populated with a
+     * Token. It should be used by authentication listeners when a session is used.
      */
     public function onAuthentication(Request $request, TokenInterface $token);
 }

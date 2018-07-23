@@ -15,6 +15,7 @@ $container
     ->register('foo', 'Foo')
     ->setFactory(array($fooFactory, 'createFoo'))
     ->setConfigurator(array($bar, 'configureFoo'))
+    ->setPublic(true)
 ;
 
 return $container;

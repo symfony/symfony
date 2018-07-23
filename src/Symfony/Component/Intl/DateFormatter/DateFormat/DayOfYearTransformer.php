@@ -23,7 +23,7 @@ class DayOfYearTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         $dayOfYear = $dateTime->format('z') + 1;
 
@@ -33,7 +33,7 @@ class DayOfYearTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         return '\d{'.$length.'}';
     }
@@ -41,7 +41,7 @@ class DayOfYearTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array();
     }

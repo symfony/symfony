@@ -15,16 +15,6 @@ class UrlTypeTest extends TextTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('url');
-
-        $this->assertSame('url', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
         $form = $this->factory->create(static::TESTED_TYPE, 'name');
@@ -91,5 +81,13 @@ class UrlTypeTest extends TextTypeTest
         $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => array(),
         ));
+    }
+
+    public function testSubmitWithNonStringDataDoesNotBreakTheFixUrlProtocolListener()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit(array('domain.com', 'www.domain.com'));
+
+        $this->assertSame(array('domain.com', 'www.domain.com'), $form->getData());
     }
 }

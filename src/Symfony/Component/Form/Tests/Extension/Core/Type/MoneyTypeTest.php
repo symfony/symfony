@@ -26,16 +26,6 @@ class MoneyTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('money');
-
-        $this->assertSame('money', $form->getConfig()->getType()->getName());
-    }
-
     public function testPassMoneyPatternToView()
     {
         \Locale::setDefault('de_DE');
@@ -53,7 +43,7 @@ class MoneyTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null, array('currency' => 'JPY'))
             ->createView();
 
-        $this->assertTrue((bool) strstr($view->vars['money_pattern'], '¥'));
+        $this->assertSame('¥ {{ widget }}', $view->vars['money_pattern']);
     }
 
     // https://github.com/symfony/symfony/issues/5458
@@ -71,5 +61,29 @@ class MoneyTypeTest extends BaseTypeTest
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');
+    }
+
+    public function testMoneyPatternWithoutCurrency()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array('currency' => false))
+            ->createView();
+
+        $this->assertSame('{{ widget }}', $view->vars['money_pattern']);
+    }
+
+    public function testDefaultFormattingWithDefaultRounding()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 0));
+        $form->setData('12345.54321');
+
+        $this->assertSame('12346', $form->createView()->vars['value']);
+    }
+
+    public function testDefaultFormattingWithSpecifiedRounding()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_DOWN));
+        $form->setData('12345.54321');
+
+        $this->assertSame('12345', $form->createView()->vars['value']);
     }
 }

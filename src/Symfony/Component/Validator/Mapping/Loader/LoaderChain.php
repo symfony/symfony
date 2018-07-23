@@ -25,9 +25,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class LoaderChain implements LoaderInterface
 {
-    /**
-     * @var LoaderInterface[]
-     */
     protected $loaders;
 
     /**
@@ -58,5 +55,13 @@ class LoaderChain implements LoaderInterface
         }
 
         return $success;
+    }
+
+    /**
+     * @return LoaderInterface[]
+     */
+    public function getLoaders()
+    {
+        return $this->loaders;
     }
 }

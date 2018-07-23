@@ -46,7 +46,7 @@ interface ConstraintViolationInterface
      * Returns the raw violation message.
      *
      * The raw violation message contains placeholders for the parameters
-     * returned by {@link getMessageParameters}. Typically you'll pass the
+     * returned by {@link getParameters}. Typically you'll pass the
      * message template and parameters to a translation engine.
      *
      * @return string The raw violation message
@@ -56,13 +56,12 @@ interface ConstraintViolationInterface
     /**
      * Returns the parameters to be inserted into the raw violation message.
      *
-     * @return array A possibly empty list of parameters indexed by the names
-     *               that appear in the message template.
+     * @return array a possibly empty list of parameters indexed by the names
+     *               that appear in the message template
      *
      * @see getMessageTemplate()
-     * @deprecated since version 2.7, to be replaced by getParameters() in 3.0.
      */
-    public function getMessageParameters();
+    public function getParameters();
 
     /**
      * Returns a number for pluralizing the violation message.
@@ -79,10 +78,8 @@ interface ConstraintViolationInterface
      * pluralization form (in this case "choices").
      *
      * @return int|null The number to use to pluralize of the message
-     *
-     * @deprecated since version 2.7, to be replaced by getPlural() in 3.0.
      */
-    public function getMessagePluralization();
+    public function getPlural();
 
     /**
      * Returns the root element of the validation.
@@ -111,8 +108,8 @@ interface ConstraintViolationInterface
     /**
      * Returns the value that caused the violation.
      *
-     * @return mixed The invalid value that caused the validated constraint to
-     *               fail.
+     * @return mixed the invalid value that caused the validated constraint to
+     *               fail
      */
     public function getInvalidValue();
 

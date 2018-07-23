@@ -1,0 +1,11 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    _defaults: { public: true }
+    test.autowiring_types.autowired_services:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\AutowiringTypes\AutowiredServices
+        autowire: true
+framework:
+    templating:
+        engines: ['php']

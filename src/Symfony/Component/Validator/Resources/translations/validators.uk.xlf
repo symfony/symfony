@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" datatype="plaintext" original="file.ext">
         <body>
@@ -313,6 +313,9 @@
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Це не дійсний банківський код (BIC).</target>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Помилка</target>
             </trans-unit>
         </body>
     </file>

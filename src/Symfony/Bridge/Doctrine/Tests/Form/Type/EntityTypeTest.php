@@ -31,7 +31,6 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 
@@ -112,19 +111,6 @@ class EntityTypeTest extends BaseTypeTest
         $this->em->flush();
         // no clear, because entities managed by the choice field must
         // be managed!
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-        ));
-
-        $this->assertSame('entity', $field->getConfig()->getType()->getName());
     }
 
     /**
@@ -1133,10 +1119,7 @@ class EntityTypeTest extends BaseTypeTest
 
         $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $entityType = new EntityType(
-            $this->emRegistry,
-            PropertyAccess::createPropertyAccessor()
-        );
+        $entityType = new EntityType($this->emRegistry);
 
         $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
 
@@ -1196,10 +1179,7 @@ class EntityTypeTest extends BaseTypeTest
 
         $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $entityType = new EntityType(
-            $this->emRegistry,
-            PropertyAccess::createPropertyAccessor()
-        );
+        $entityType = new EntityType($this->emRegistry);
 
         $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
 
@@ -1247,54 +1227,6 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
         $this->assertSame($choiceLoader1, $choiceLoader2);
         $this->assertSame($choiceLoader1, $choiceLoader3);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCacheChoiceLists()
-    {
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-
-        $this->persist(array($entity1));
-
-        $field1 = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'choice_label' => 'name',
-        ));
-
-        $field2 = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'choice_label' => 'name',
-        ));
-
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $field1->getConfig()->getOption('choice_loader'));
-        $this->assertSame($field1->getConfig()->getOption('choice_loader'), $field2->getConfig()->getOption('choice_loader'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPropertyOption()
-    {
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-        $entity2 = new SingleIntIdEntity(2, 'Bar');
-
-        $this->persist(array($entity1, $entity2));
-
-        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'property' => 'name',
-        ))
-            ->createView();
-
-        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $view->vars['choices']);
     }
 
     protected function createRegistryMock($name, $em)
@@ -1514,6 +1446,40 @@ class EntityTypeTest extends BaseTypeTest
 
         $this->assertEquals($collection, $form->getData());
         $this->assertEquals($collection, $form->getNormData());
+        $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
+    }
+
+    public function testSetDataEmptyArraySubmitNullMultiple()
+    {
+        $emptyArray = array();
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'multiple' => true,
+        ));
+        $form->setData($emptyArray);
+        $form->submit(null);
+        $this->assertInternalType('array', $form->getData());
+        $this->assertEquals(array(), $form->getData());
+        $this->assertEquals(array(), $form->getNormData());
+        $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
+    }
+
+    public function testSetDataNonEmptyArraySubmitNullMultiple()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $this->persist(array($entity1));
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'multiple' => true,
+        ));
+        $existing = array(0 => $entity1);
+        $form->setData($existing);
+        $form->submit(null);
+        $this->assertInternalType('array', $form->getData());
+        $this->assertEquals(array(), $form->getData());
+        $this->assertEquals(array(), $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
 }

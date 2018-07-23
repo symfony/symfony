@@ -12,6 +12,14 @@
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
+use Symfony\Component\HttpFoundation\File\Exception\ExtensionFileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FormSizeFileException;
+use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoTmpDirFileException;
+use Symfony\Component\HttpFoundation\File\Exception\PartialFileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileTest extends TestCase
@@ -40,7 +48,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
             UPLOAD_ERR_OK
         );
 
@@ -57,7 +64,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/.unknownextension',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/.unknownextension'),
             UPLOAD_ERR_OK
         );
 
@@ -70,7 +76,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
@@ -83,7 +88,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/jpeg',
-            filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
@@ -96,7 +100,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
@@ -109,7 +112,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
@@ -122,7 +124,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
@@ -138,11 +139,58 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
             UPLOAD_ERR_OK
         );
 
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
+    }
+
+    public function failedUploadedFile()
+    {
+        foreach (array(UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_EXTENSION, -1) as $error) {
+            yield array(new UploadedFile(
+                __DIR__.'/Fixtures/test.gif',
+                'original.gif',
+                'image/gif',
+                $error
+            ));
+        }
+    }
+
+    /**
+     * @dataProvider failedUploadedFile
+     */
+    public function testMoveFailed(UploadedFile $file)
+    {
+        switch ($file->getError()) {
+            case UPLOAD_ERR_INI_SIZE:
+                $exceptionClass = IniSizeFileException::class;
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                $exceptionClass = FormSizeFileException::class;
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $exceptionClass = PartialFileException::class;
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $exceptionClass = NoFileException::class;
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                $exceptionClass = CannotWriteFileException::class;
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                $exceptionClass = NoTmpDirFileException::class;
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                $exceptionClass = ExtensionFileException::class;
+                break;
+            default:
+                $exceptionClass = FileException::class;
+        }
+
+        $this->expectException($exceptionClass);
+
+        $file->move(__DIR__.'/Fixtures/directory');
     }
 
     public function testMoveLocalFileIsAllowedInTestMode()
@@ -158,7 +206,6 @@ class UploadedFileTest extends TestCase
             $path,
             'original.gif',
             'image/gif',
-            filesize($path),
             UPLOAD_ERR_OK,
             true
         );
@@ -177,9 +224,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             '../../original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
-            null
+            'image/gif'
         );
 
         $this->assertEquals('original.gif', $file->getClientOriginalName());
@@ -190,9 +235,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
-            null
+            'image/gif'
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
@@ -206,12 +249,45 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
     }
 
-    public function testGetExtension()
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
+     */
+    public function testConstructDeprecatedSize()
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            null
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            UPLOAD_ERR_OK,
+            false
+        );
+
+        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
+     */
+    public function testConstructDeprecatedSizeWhenPassingOnlyThe4Needed()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif')
+        );
+
+        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
+    }
+
+    public function testGetExtension()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif'
         );
 
         $this->assertEquals('gif', $file->getExtension());
@@ -223,7 +299,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
             UPLOAD_ERR_OK,
             true
         );
@@ -240,7 +315,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
             $error
         );
 
@@ -264,7 +338,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
             UPLOAD_ERR_OK
         );
 

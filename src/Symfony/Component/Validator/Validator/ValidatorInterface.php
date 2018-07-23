@@ -91,8 +91,6 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * The returned validator adds all generated violations to the given
      * context.
      *
-     * @param ExecutionContextInterface $context The execution context
-     *
      * @return ContextualValidatorInterface The validator for that context
      */
     public function inContext(ExecutionContextInterface $context);

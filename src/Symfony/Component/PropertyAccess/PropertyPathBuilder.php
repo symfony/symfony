@@ -18,14 +18,7 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
  */
 class PropertyPathBuilder
 {
-    /**
-     * @var array
-     */
     private $elements = array();
-
-    /**
-     * @var array
-     */
     private $isIndex = array();
 
     /**
@@ -46,9 +39,9 @@ class PropertyPathBuilder
      *
      * @param PropertyPathInterface|string $path   The path to append
      * @param int                          $offset The offset where the appended
-     *                                             piece starts in $path.
+     *                                             piece starts in $path
      * @param int                          $length The length of the appended piece
-     *                                             If 0, the full path is appended.
+     *                                             If 0, the full path is appended
      */
     public function append($path, $offset = 0, $length = 0)
     {
@@ -114,9 +107,9 @@ class PropertyPathBuilder
      * @param int                          $length     The length of the piece to replace
      * @param PropertyPathInterface|string $path       The path to insert
      * @param int                          $pathOffset The offset where the inserted piece
-     *                                                 starts in $path.
+     *                                                 starts in $path
      * @param int                          $pathLength The length of the inserted piece
-     *                                                 If 0, the full path is inserted.
+     *                                                 If 0, the full path is inserted
      *
      * @throws OutOfBoundsException If the offset is invalid
      */

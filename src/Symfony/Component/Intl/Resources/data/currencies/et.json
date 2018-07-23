@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -232,6 +232,10 @@
         "CLP": [
             "CLP",
             "Tšiili peeso"
+        ],
+        "CNH": [
+            "CNH",
+            "Hiina jüaan (välismaine turg)"
         ],
         "CNY": [
             "CN¥",
@@ -604,6 +608,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaania ugia (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaania ugia"
         ],
         "MTL": [
@@ -832,6 +840,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé ja Príncipe dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé ja Príncipe dobra"
         ],
         "SUR": [
@@ -896,7 +908,7 @@
         ],
         "TWD": [
             "NT$",
-            "Taiwani dollar"
+            "uus Taiwani dollar"
         ],
         "TZS": [
             "TZS",

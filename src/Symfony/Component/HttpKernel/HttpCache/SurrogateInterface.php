@@ -33,16 +33,12 @@ interface SurrogateInterface
     /**
      * Checks that at least one surrogate has Surrogate capability.
      *
-     * @param Request $request A Request instance
-     *
      * @return bool true if one surrogate has Surrogate capability, false otherwise
      */
     public function hasSurrogateCapability(Request $request);
 
     /**
      * Adds Surrogate-capability to the given Request.
-     *
-     * @param Request $request A Request instance
      */
     public function addSurrogateCapability(Request $request);
 
@@ -50,15 +46,11 @@ interface SurrogateInterface
      * Adds HTTP headers to specify that the Response needs to be parsed for Surrogate.
      *
      * This method only adds an Surrogate HTTP header if the Response has some Surrogate tags.
-     *
-     * @param Response $response A Response instance
      */
     public function addSurrogateControl(Response $response);
 
     /**
      * Checks that the Response needs to be parsed for Surrogate tags.
-     *
-     * @param Response $response A Response instance
      *
      * @return bool true if the Response needs to be parsed, false otherwise
      */
@@ -78,9 +70,6 @@ interface SurrogateInterface
 
     /**
      * Replaces a Response Surrogate tags with the included resource content.
-     *
-     * @param Request  $request  A Request instance
-     * @param Response $response A Response instance
      *
      * @return Response
      */

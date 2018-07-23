@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -160,6 +160,10 @@
         "CLP": [
             "CLP",
             "síleskur pesi"
+        ],
+        "CNH": [
+            "CNH",
+            "kínverskt júan (utan heimalands)"
         ],
         "CNY": [
             "CN¥",
@@ -495,6 +499,10 @@
         ],
         "MRO": [
             "MRO",
+            "márítönsk úgía (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "márítönsk úgía"
         ],
         "MTL": [
@@ -703,6 +711,10 @@
         ],
         "STD": [
             "STD",
+            "Saó Tóme og Prinsípe-dóbra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Saó Tóme og Prinsípe-dóbra"
         ],
         "SUR": [

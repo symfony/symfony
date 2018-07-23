@@ -5,6 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="_wdt" path="/{token}">
-        <default key="_controller">web_profiler.controller.profiler:toolbarAction</default>
+        <default key="_controller">web_profiler.controller.profiler::toolbarAction</default>
     </route>
 </routes>

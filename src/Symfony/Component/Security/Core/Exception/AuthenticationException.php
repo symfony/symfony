@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
  */
-class AuthenticationException extends \RuntimeException implements \Serializable
+class AuthenticationException extends RuntimeException implements \Serializable
 {
     private $token;
 
@@ -33,11 +33,6 @@ class AuthenticationException extends \RuntimeException implements \Serializable
         return $this->token;
     }
 
-    /**
-     * Set the token.
-     *
-     * @param TokenInterface $token
-     */
     public function setToken(TokenInterface $token)
     {
         $this->token = $token;

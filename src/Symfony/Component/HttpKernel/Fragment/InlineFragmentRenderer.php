@@ -29,12 +29,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     private $kernel;
     private $dispatcher;
 
-    /**
-     * Constructor.
-     *
-     * @param HttpKernelInterface      $kernel     A HttpKernelInterface instance
-     * @param EventDispatcherInterface $dispatcher A EventDispatcherInterface instance
-     */
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
         $this->kernel = $kernel;
@@ -115,20 +109,15 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
-        // Override the arguments to emulate a sub-request.
-        // Sub-request object will point to localhost as client ip and real client ip
-        // will be included into trusted header for client ip
-        try {
-            if ($trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP)) {
-                $currentXForwardedFor = $request->headers->get($trustedHeaderName, '');
+        if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
+            $currentXForwardedFor = $request->headers->get('X_FORWARDED_FOR', '');
 
-                $server['HTTP_'.$trustedHeaderName] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
-            }
-        } catch (\InvalidArgumentException $e) {
-            // Do nothing
+            $server['HTTP_X_FORWARDED_FOR'] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
         }
 
-        $server['REMOTE_ADDR'] = '127.0.0.1';
+        $trustedProxies = Request::getTrustedProxies();
+        $server['REMOTE_ADDR'] = $trustedProxies ? reset($trustedProxies) : '127.0.0.1';
+
         unset($server['HTTP_IF_MODIFIED_SINCE']);
         unset($server['HTTP_IF_NONE_MATCH']);
 
@@ -137,9 +126,12 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
         }
 
-        if ($session = $request->getSession()) {
-            $subRequest->setSession($session);
+        static $setSession;
+
+        if (null === $setSession) {
+            $setSession = \Closure::bind(function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
         }
+        $setSession($subRequest, $request);
 
         return $subRequest;
     }

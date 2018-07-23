@@ -313,11 +313,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
-    public function testNotValidIfNotSubmitted()
-    {
-        $this->assertFalse($this->form->isValid());
-    }
-
     public function testNotValidIfErrors()
     {
         $form = $this->getBuilder()->getForm();
@@ -670,12 +665,11 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyDataFromClosure()
     {
-        $test = $this;
         $form = $this->getBuilder()
-            ->setEmptyData(function ($form) use ($test) {
+            ->setEmptyData(function ($form) {
                 // the form instance is passed to the closure to allow use
                 // of form data when creating the empty value
-                $test->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+                $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
 
                 return 'foo';
             })
@@ -747,16 +741,6 @@ class SimpleFormTest extends AbstractFormTest
             ->will($this->returnValue($view));
 
         $this->assertSame($view, $form->createView($parentView));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetErrorsAsString()
-    {
-        $this->form->addError(new FormError('Error!'));
-
-        $this->assertEquals("ERROR: Error!\n", $this->form->getErrorsAsString());
     }
 
     public function testFormCanHaveEmptyName()
@@ -1025,10 +1009,9 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testPostSubmitDataIsNullIfInheritData()
     {
-        $test = $this;
         $form = $this->getBuilder()
-            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($test) {
-                $test->assertNull($event->getData());
+            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $this->assertNull($event->getData());
             })
             ->setInheritData(true)
             ->getForm();
@@ -1075,17 +1058,6 @@ class SimpleFormTest extends AbstractFormTest
         $child->setParent($parent);
 
         $child->initialize();
-    }
-
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Custom resolver "Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver" must extend "Symfony\Component\OptionsResolver\OptionsResolver".
-     */
-    public function testCustomOptionsResolver()
-    {
-        $fooType = new Fixtures\LegacyFooType();
-        $resolver = new Fixtures\CustomOptionsResolver();
-        $fooType->setDefaultOptions($resolver);
     }
 
     /**

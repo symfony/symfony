@@ -71,7 +71,7 @@ class MimeTypeTest extends TestCase
         touch($path);
         @chmod($path, 0333);
 
-        if (substr(sprintf('%o', fileperms($path)), -4) == '0333') {
+        if ('0333' == substr(sprintf('%o', fileperms($path)), -4)) {
             $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
             MimeTypeGuesser::getInstance()->guess($path);
         } else {

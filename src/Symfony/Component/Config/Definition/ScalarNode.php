@@ -52,6 +52,18 @@ class ScalarNode extends VariableNode
      */
     protected function isValueEmpty($value)
     {
+        if ($this->isHandlingPlaceholder()) {
+            return false;
+        }
+
         return null === $value || '' === $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getValidPlaceholderTypes(): array
+    {
+        return array('bool', 'int', 'float', 'string');
     }
 }

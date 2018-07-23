@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added priority to Twig extensions 
+ * deprecated relying on the default value (`false`) of the `twig.strict_variables` configuration option. The `%kernel.debug%` parameter will be the new default in 5.0
+
+4.0.0
+-----
+
+ * removed `ContainerAwareRuntimeLoader`
+
+3.4.0
+-----
+
+ * added exclusive Twig namespace only for root bundles
+ * deprecated `Symfony\Bundle\TwigBundle\Command\DebugCommand`, use `Symfony\Bridge\Twig\Command\DebugCommand` instead
+ * deprecated relying on the `ContainerAwareInterface` implementation for `Symfony\Bundle\TwigBundle\Command\LintCommand`
+ * added option to configure default path templates (via `default_path`)
+
+3.3.0
+-----
+
+ * Deprecated `ContainerAwareRuntimeLoader`
+
 2.7.0
 -----
 

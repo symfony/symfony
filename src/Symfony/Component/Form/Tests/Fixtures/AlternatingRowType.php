@@ -15,7 +15,7 @@ class AlternatingRowType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formFactory) {
             $form = $event->getForm();
-            $type = $form->getName() % 2 === 0
+            $type = 0 === $form->getName() % 2
                 ? 'Symfony\Component\Form\Extension\Core\Type\TextType'
                 : 'Symfony\Component\Form\Extension\Core\Type\TextareaType';
             $form->add('title', $type);

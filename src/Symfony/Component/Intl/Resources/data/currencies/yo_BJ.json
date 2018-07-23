@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -119,6 +119,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ouguiya ti Orílɛ́ède Maritania (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ouguiya ti Orílɛ́ède Maritania"
         ],
         "MUR": [
@@ -171,6 +175,10 @@
         ],
         "STD": [
             "STD",
+            "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe"
         ],
         "TND": [

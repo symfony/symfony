@@ -1,0 +1,6 @@
+framework:
+    messenger:
+        serializer: false
+        routing:
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage': ['sender.bar', 'sender.biz']
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage': 'sender.foo'

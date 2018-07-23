@@ -1,0 +1,9 @@
+services:
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStubParent:
+            calls:
+                - [setSunshine, [warm]]
+    main_service:
+        class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        autoconfigure: true
+        public: true

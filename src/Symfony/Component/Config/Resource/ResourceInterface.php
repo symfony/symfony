@@ -30,29 +30,4 @@ interface ResourceInterface
      * @return string A string representation unique to the underlying Resource
      */
     public function __toString();
-
-    /**
-     * Returns true if the resource has not been updated since the given timestamp.
-     *
-     * @param int $timestamp The last time the resource was loaded
-     *
-     * @return bool True if the resource has not been updated, false otherwise
-     *
-     * @deprecated since 2.8, to be removed in 3.0. If your resource can check itself for
-     *             freshness implement the SelfCheckingResourceInterface instead.
-     */
-    public function isFresh($timestamp);
-
-    /**
-     * Returns the tied resource.
-     *
-     * @return mixed The resource
-     *
-     * @deprecated since 2.8, to be removed in 3.0. As there are many different kinds of resource,
-     *             a single getResource() method does not make sense at the interface level. You
-     *             can still call getResource() on implementing classes, probably after performing
-     *             a type check. If you know the concrete type of Resource at hand, the return value
-     *             of this method may make sense to you.
-     */
-    public function getResource();
 }

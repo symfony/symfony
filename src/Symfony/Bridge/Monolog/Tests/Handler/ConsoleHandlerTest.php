@@ -56,12 +56,41 @@ class ConsoleHandlerTest extends TestCase
         $this->assertSame($isHandling, $handler->isHandling(array('level' => $level)),
             '->isHandling returns correct value depending on console verbosity and log level'
         );
+
+        // check that the handler actually outputs the record if it handles it
+        $levelName = Logger::getLevelName($level);
+        $levelName = sprintf('%-9s', $levelName);
+
+        $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\Output')->setMethods(array('doWrite'))->getMock();
+        $realOutput->setVerbosity($verbosity);
+        if ($realOutput->isDebug()) {
+            $log = "16:21:54 $levelName [app] My info message\n[]\n[]\n";
+        } else {
+            $log = "16:21:54 $levelName [app] My info message [] []\n";
+        }
+        $realOutput
+            ->expects($isHandling ? $this->once() : $this->never())
+            ->method('doWrite')
+            ->with($log, false);
+        $handler = new ConsoleHandler($realOutput, true, $map);
+
+        $infoRecord = array(
+            'message' => 'My info message',
+            'context' => array(),
+            'level' => $level,
+            'level_name' => Logger::getLevelName($level),
+            'channel' => 'app',
+            'datetime' => new \DateTime('2013-05-29 16:21:54'),
+            'extra' => array(),
+        );
+        $this->assertFalse($handler->handle($infoRecord), 'The handler finished handling the log.');
     }
 
     public function provideVerbosityMappingTests()
     {
         return array(
-            array(OutputInterface::VERBOSITY_QUIET, Logger::ERROR, false),
+            array(OutputInterface::VERBOSITY_QUIET, Logger::ERROR, true),
+            array(OutputInterface::VERBOSITY_QUIET, Logger::WARNING, false),
             array(OutputInterface::VERBOSITY_NORMAL, Logger::WARNING, true),
             array(OutputInterface::VERBOSITY_NORMAL, Logger::NOTICE, false),
             array(OutputInterface::VERBOSITY_VERBOSE, Logger::NOTICE, true),
@@ -120,7 +149,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->once())
             ->method('write')
-            ->with('<info>[2013-05-29 16:21:54] app.INFO:</info> My info message  '."\n")
+            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n[]\n[]\n")
         ;
 
         $handler = new ConsoleHandler(null, false);
@@ -151,19 +180,19 @@ class ConsoleHandlerTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
-            $logger->addInfo('Before command message.');
+            $logger->info('Before command message.');
         });
         $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
-            $logger->addInfo('Before terminate message.');
+            $logger->info('Before terminate message.');
         });
 
         $dispatcher->addSubscriber($handler);
 
         $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
-            $logger->addInfo('After command message.');
+            $logger->info('After command message.');
         });
         $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
-            $logger->addInfo('After terminate message.');
+            $logger->info('After terminate message.');
         });
 
         $event = new ConsoleCommandEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output);

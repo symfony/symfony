@@ -22,18 +22,15 @@ use Symfony\Component\Process\Process;
  */
 class UnixPipes extends AbstractPipes
 {
-    /** @var bool */
     private $ttyMode;
-    /** @var bool */
     private $ptyMode;
-    /** @var bool */
-    private $disableOutput;
+    private $haveReadSupport;
 
-    public function __construct($ttyMode, $ptyMode, $input, $disableOutput)
+    public function __construct(?bool $ttyMode, bool $ptyMode, $input, bool $haveReadSupport)
     {
-        $this->ttyMode = (bool) $ttyMode;
-        $this->ptyMode = (bool) $ptyMode;
-        $this->disableOutput = (bool) $disableOutput;
+        $this->ttyMode = $ttyMode;
+        $this->ptyMode = $ptyMode;
+        $this->haveReadSupport = $haveReadSupport;
 
         parent::__construct($input);
     }
@@ -48,7 +45,7 @@ class UnixPipes extends AbstractPipes
      */
     public function getDescriptors()
     {
-        if ($this->disableOutput) {
+        if (!$this->haveReadSupport) {
             $nullstream = fopen('/dev/null', 'c');
 
             return array(
@@ -102,7 +99,9 @@ class UnixPipes extends AbstractPipes
         unset($r[0]);
 
         // let's have a look if something changed in streams
-        if (($r || $w) && false === $n = @stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
+        set_error_handler(array($this, 'handleError'));
+        if (($r || $w) && false === stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
+            restore_error_handler();
             // if a system call has been interrupted, forget about it, let's try again
             // otherwise, an error occurred, let's reset pipes
             if (!$this->hasSystemCallBeenInterrupted()) {
@@ -111,6 +110,7 @@ class UnixPipes extends AbstractPipes
 
             return $read;
         }
+        restore_error_handler();
 
         foreach ($r as $pipe) {
             // prior PHP 5.4 the array passed to stream_select is modified and
@@ -138,21 +138,16 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function areOpen()
+    public function haveReadSupport()
     {
-        return (bool) $this->pipes;
+        return $this->haveReadSupport;
     }
 
     /**
-     * Creates a new UnixPipes instance.
-     *
-     * @param Process         $process
-     * @param string|resource $input
-     *
-     * @return static
+     * {@inheritdoc}
      */
-    public static function create(Process $process, $input)
+    public function areOpen()
     {
-        return new static($process->isTty(), $process->isPty(), $input, $process->isOutputDisabled());
+        return (bool) $this->pipes;
     }
 }

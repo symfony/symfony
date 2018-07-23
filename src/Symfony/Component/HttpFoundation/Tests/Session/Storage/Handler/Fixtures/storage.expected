@@ -1,0 +1,20 @@
+open
+validateId
+read
+doRead: 
+read
+Array
+(
+    [0] => bar
+)
+$_SESSION is not empty
+write
+destroy
+close
+$_SESSION is not empty
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=0, private, must-revalidate
+)
+shutdown

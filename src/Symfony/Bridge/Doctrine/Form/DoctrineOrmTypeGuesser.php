@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
@@ -20,7 +21,6 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Doctrine\Common\Util\ClassUtils;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
@@ -60,10 +60,19 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case Type::DATETIMETZ:
             case 'vardatetime':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array(), Guess::HIGH_CONFIDENCE);
+            case 'datetime_immutable':
+            case 'datetimetz_immutable':
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
+            case 'dateinterval':
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateIntervalType', array(), Guess::HIGH_CONFIDENCE);
             case Type::DATE:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', array(), Guess::HIGH_CONFIDENCE);
+            case 'date_immutable':
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case Type::TIME:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array(), Guess::HIGH_CONFIDENCE);
+            case 'time_immutable':
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case Type::DECIMAL:
             case Type::FLOAT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\NumberType', array(), Guess::MEDIUM_CONFIDENCE);
@@ -95,7 +104,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         $classMetadata = $classMetadatas[0];
 
         // Check whether the field exists and is nullable or not
-        if ($classMetadata->hasField($property)) {
+        if (isset($classMetadata->fieldMappings[$property])) {
             if (!$classMetadata->isNullable($property) && Type::BOOLEAN !== $classMetadata->getTypeOfField($property)) {
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
             }
@@ -124,7 +133,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessMaxLength($class, $property)
     {
         $ret = $this->getMetadata($class);
-        if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
+        if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
 
             if (isset($mapping['length'])) {
@@ -143,7 +152,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessPattern($class, $property)
     {
         $ret = $this->getMetadata($class);
-        if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
+        if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
             if (in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
@@ -153,7 +162,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     protected function getMetadata($class)
     {
         // normalize class name
-        $class = ClassUtils::getRealClass(ltrim($class, '\\'));
+        $class = self::getRealClass(ltrim($class, '\\'));
 
         if (array_key_exists($class, $this->cache)) {
             return $this->cache[$class];
@@ -169,5 +178,14 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 // not an entity or mapped super class, using Doctrine ORM 2.2
             }
         }
+    }
+
+    private static function getRealClass(string $class): string
+    {
+        if (false === $pos = strrpos($class, '\\'.Proxy::MARKER.'\\')) {
+            return $class;
+        }
+
+        return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
     }
 }

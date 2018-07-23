@@ -12,76 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Compiler\CheckReferenceValidityPass;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CheckReferenceValidityPassTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testProcessIgnoresScopeWideningIfNonStrictReference()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a')->addArgument(new Reference('b', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
-        $container->register('b')->setScope('prototype');
-
-        $this->process($container);
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @group legacy
-     */
-    public function testProcessDetectsScopeWidening()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a')->addArgument(new Reference('b'));
-        $container->register('b')->setScope('prototype');
-
-        $this->process($container);
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testProcessIgnoresCrossScopeHierarchyReferenceIfNotStrict()
-    {
-        $container = new ContainerBuilder();
-        $container->addScope(new Scope('a'));
-        $container->addScope(new Scope('b'));
-
-        $container->register('a')->setScope('a')->addArgument(new Reference('b', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
-        $container->register('b')->setScope('b');
-
-        $this->process($container);
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @group legacy
-     */
-    public function testProcessDetectsCrossScopeHierarchyReference()
-    {
-        $container = new ContainerBuilder();
-        $container->addScope(new Scope('a'));
-        $container->addScope(new Scope('b'));
-
-        $container->register('a')->setScope('a')->addArgument(new Reference('b'));
-        $container->register('b')->setScope('b');
-
-        $this->process($container);
-    }
-
     /**
      * @expectedException \RuntimeException
      */

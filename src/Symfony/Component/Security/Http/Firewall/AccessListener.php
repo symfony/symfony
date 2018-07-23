@@ -42,8 +42,6 @@ class AccessListener implements ListenerInterface
     /**
      * Handles access authorization.
      *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     *
      * @throws AccessDeniedException
      * @throws AuthenticationCredentialsNotFoundException
      */
@@ -67,7 +65,11 @@ class AccessListener implements ListenerInterface
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {
-            throw new AccessDeniedException();
+            $exception = new AccessDeniedException();
+            $exception->setAttributes($attributes);
+            $exception->setSubject($request);
+
+            throw $exception;
         }
     }
 }

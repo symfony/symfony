@@ -278,6 +278,10 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Această valoare nu trebuie să fie identică cu {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Eroare</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

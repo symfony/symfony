@@ -1,25 +1,10 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% set messages = {
-    'purge' : {
-        status:  'success',
-        title:   'The profiler database was purged successfully',
-        message: 'Now you need to browse some pages with the Symfony Profiler enabled to collect data.'
-    },
     'no_token' : {
         status:  'error',
         title:   (token|default('') == 'latest') ? 'There are no profiles' : 'Token not found',
         message: (token|default('') == 'latest') ? 'No profiles found in the database.' : 'Token "' ~ token|default('') ~ '" was not found in the database.'
-    },
-    'upload_error' : {
-        status:  'error',
-        title:   'A problem occurred when uploading the data',
-        message: 'No file given or the file was not uploaded successfully.'
-    },
-    'already_exists' : {
-        status:  'error',
-        title:   'A problem occurred when uploading the data',
-        message: 'The token already exists in the database.'
     }
 } %}
 

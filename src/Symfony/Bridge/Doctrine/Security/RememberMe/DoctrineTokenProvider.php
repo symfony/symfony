@@ -37,19 +37,8 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
  */
 class DoctrineTokenProvider implements TokenProviderInterface
 {
-    /**
-     * Doctrine DBAL database connection
-     * F.ex. service id: doctrine.dbal.default_connection.
-     *
-     * @var Connection
-     */
     private $conn;
 
-    /**
-     * new DoctrineTokenProvider for the RememberMe authentication service.
-     *
-     * @param Connection $conn
-     */
     public function __construct(Connection $conn)
     {
         $this->conn = $conn;

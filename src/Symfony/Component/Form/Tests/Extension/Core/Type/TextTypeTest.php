@@ -20,16 +20,6 @@ class TextTypeTest extends BaseTypeTest
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('text');
-
-        $this->assertSame('text', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitNullReturnsNullWithEmptyDataAsString()
     {
         $form = $this->factory->create(static::TESTED_TYPE, 'name', array(
@@ -37,8 +27,9 @@ class TextTypeTest extends BaseTypeTest
         ));
 
         $form->submit(null);
-
-        $this->assertNull($form->getData());
+        $this->assertSame('', $form->getData());
+        $this->assertSame('', $form->getNormData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function provideZeros()

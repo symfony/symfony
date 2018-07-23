@@ -29,8 +29,6 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     private $signer;
 
     /**
-     * Constructor.
-     *
      * The "fallback" strategy when surrogate is not available should always be an
      * instance of InlineFragmentRenderer.
      *
@@ -64,6 +62,10 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     public function render($uri, Request $request, array $options = array())
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
+            if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
+                throw new \InvalidArgumentException('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is not supported. Use a different rendering strategy or pass scalar values.');
+            }
+
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 
@@ -81,7 +83,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         return new Response($tag);
     }
 
-    private function generateSignedFragmentUri($uri, Request $request)
+    private function generateSignedFragmentUri($uri, Request $request): string
     {
         if (null === $this->signer) {
             throw new \LogicException('You must use a URI when using the ESI rendering strategy or set a URL signer.');
@@ -91,5 +93,18 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         $fragmentUri = $this->signer->sign($this->generateFragmentUri($uri, $request, true));
 
         return substr($fragmentUri, strlen($request->getSchemeAndHttpHost()));
+    }
+
+    private function containsNonScalars(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (is_array($value)) {
+                return $this->containsNonScalars($value);
+            } elseif (!is_scalar($value) && null !== $value) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

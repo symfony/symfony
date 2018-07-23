@@ -104,20 +104,16 @@ interface MessageCatalogueInterface
      * Merges translations from the given Catalogue into the current one.
      *
      * The two catalogues must have the same locale.
-     *
-     * @param self $catalogue
      */
-    public function addCatalogue(MessageCatalogueInterface $catalogue);
+    public function addCatalogue(self $catalogue);
 
     /**
      * Merges translations from the given Catalogue into the current one
      * only when the translation does not exist.
      *
      * This is used to provide default translations when they do not exist for the current locale.
-     *
-     * @param self $catalogue
      */
-    public function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
+    public function addFallbackCatalogue(self $catalogue);
 
     /**
      * Gets the fallback catalogue.
@@ -135,8 +131,6 @@ interface MessageCatalogueInterface
 
     /**
      * Adds a resource for this collection.
-     *
-     * @param ResourceInterface $resource A resource instance
      */
     public function addResource(ResourceInterface $resource);
 }

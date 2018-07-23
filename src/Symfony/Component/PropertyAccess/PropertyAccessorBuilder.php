@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * A configurable builder to create a PropertyAccessor.
  *
@@ -18,15 +20,13 @@ namespace Symfony\Component\PropertyAccess;
  */
 class PropertyAccessorBuilder
 {
-    /**
-     * @var bool
-     */
     private $magicCall = false;
+    private $throwExceptionOnInvalidIndex = false;
 
     /**
-     * @var bool
+     * @var CacheItemPoolInterface|null
      */
-    private $throwExceptionOnInvalidIndex = false;
+    private $cacheItemPool;
 
     /**
      * Enables the use of "__call" by the PropertyAccessor.
@@ -98,12 +98,36 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Sets a cache system.
+     *
+     * @param CacheItemPoolInterface|null $cacheItemPool
+     *
+     * @return PropertyAccessorBuilder The builder object
+     */
+    public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null)
+    {
+        $this->cacheItemPool = $cacheItemPool;
+
+        return $this;
+    }
+
+    /**
+     * Gets the used cache system.
+     *
+     * @return CacheItemPoolInterface|null
+     */
+    public function getCacheItemPool()
+    {
+        return $this->cacheItemPool;
+    }
+
+    /**
      * Builds and returns a new PropertyAccessor object.
      *
      * @return PropertyAccessorInterface The built PropertyAccessor
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex);
+        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool);
     }
 }

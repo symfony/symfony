@@ -13,75 +13,69 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class LoggingTranslatorPassTest extends TestCase
 {
     public function testProcess()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
-        $parameterBag = $this->getMockBuilder('Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface')->getMock();
-
-        $container->expects($this->exactly(2))
-            ->method('hasAlias')
-            ->will($this->returnValue(true));
-
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->will($this->returnValue(true));
-
-        $container->expects($this->once())
-            ->method('getAlias')
-            ->will($this->returnValue('translation.default'));
-
-        $container->expects($this->exactly(3))
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
-
-        $container->expects($this->once())
-            ->method('hasParameter')
-            ->with('translator.logging')
-            ->will($this->returnValue(true));
-
-        $definition->expects($this->once())
-            ->method('getClass')
-            ->will($this->returnValue('%translator.class%'));
-
-        $parameterBag->expects($this->once())
-            ->method('resolveValue')
-            ->will($this->returnValue("Symfony\Bundle\FrameworkBundle\Translation\Translator"));
-
-        $container->expects($this->once())
-            ->method('getParameterBag')
-            ->will($this->returnValue($parameterBag));
+        $container = new ContainerBuilder();
+        $container->setParameter('translator.logging', true);
+        $container->setParameter('translator.class', 'Symfony\Component\Translation\Translator');
+        $container->register('monolog.logger');
+        $container->setAlias('logger', 'monolog.logger');
+        $container->register('translator.default', '%translator.class%');
+        $container->register('translator.logging', '%translator.class%');
+        $container->setAlias('translator', 'translator.default');
+        $translationWarmerDefinition = $container->register('translation.warmer')
+            ->addArgument(new Reference('translator'))
+            ->addTag('container.service_subscriber', array('id' => 'translator'))
+            ->addTag('container.service_subscriber', array('id' => 'foo'));
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
+
+        $this->assertEquals(
+            array('container.service_subscriber' => array(
+                array('id' => 'foo'),
+                array('key' => 'translator', 'id' => 'translator.logging.inner'),
+            )),
+            $translationWarmerDefinition->getTags()
+        );
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
-        $container->expects($this->once())
-            ->method('hasAlias')
-            ->will($this->returnValue(false));
+        $container = new ContainerBuilder();
+        $container->register('identity_translator');
+        $container->setAlias('translator', 'identity_translator');
+
+        $definitionsBefore = count($container->getDefinitions());
+        $aliasesBefore = count($container->getAliases());
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
+
+        // the container is untouched (i.e. no new definitions or aliases)
+        $this->assertCount($definitionsBefore, $container->getDefinitions());
+        $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
-        $container->expects($this->at(0))
-            ->method('hasAlias')
-            ->will($this->returnValue(true));
+        $container = new ContainerBuilder();
+        $container->register('monolog.logger');
+        $container->setAlias('logger', 'monolog.logger');
 
-        $container->expects($this->at(0))
-            ->method('hasAlias')
-            ->will($this->returnValue(false));
+        $definitionsBefore = count($container->getDefinitions());
+        $aliasesBefore = count($container->getAliases());
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
+
+        // the container is untouched (i.e. no new definitions or aliases)
+        $this->assertCount($definitionsBefore, $container->getDefinitions());
+        $this->assertCount($aliasesBefore, $container->getAliases());
     }
 }

@@ -26,20 +26,12 @@ use Twig\Node\SetNode;
 use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
- * TranslationDefaultDomainNodeVisitor.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {
-    /**
-     * @var Scope
-     */
     private $scope;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->scope = new Scope();

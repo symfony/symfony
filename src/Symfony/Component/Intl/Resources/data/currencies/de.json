@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -155,7 +155,7 @@
         ],
         "BOB": [
             "BOB",
-            "Bolivanischer Boliviano"
+            "Bolivianischer Boliviano"
         ],
         "BOL": [
             "BOL",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Chilenischer Peso"
+        ],
+        "CNH": [
+            "CNH",
+            "Renminbi Yuan (Off–Shore)"
         ],
         "CNX": [
             "CNX",
@@ -679,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauretanischer Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauretanischer Ouguiya"
         ],
         "MTL": [
@@ -911,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "São-toméischer Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São-toméischer Dobra"
         ],
         "SUR": [

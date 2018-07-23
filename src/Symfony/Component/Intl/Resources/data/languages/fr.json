@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "aa": "afar",
         "ab": "abkhaze",
@@ -30,6 +30,7 @@
         "aro": "araona",
         "arp": "arapaho",
         "arq": "arabe algérien",
+        "ars": "arabe najdi",
         "arw": "arawak",
         "ary": "arabe marocain",
         "arz": "arabe égyptien",
@@ -315,6 +316,7 @@
         "ln": "lingala",
         "lo": "lao",
         "lol": "mongo",
+        "lou": "créole louisianais",
         "loz": "lozi",
         "lrc": "lori du Nord",
         "lt": "lituanien",
@@ -558,8 +560,8 @@
         "tw": "twi",
         "twq": "tasawaq",
         "ty": "tahitien",
-        "tyv": "touva",
-        "tzm": "tamazight du Maroc central",
+        "tyv": "touvain",
+        "tzm": "amazighe de l’Atlas central",
         "udm": "oudmourte",
         "ug": "ouïghour",
         "uga": "ougaritique",

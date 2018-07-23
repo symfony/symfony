@@ -38,8 +38,6 @@ class ArrayNode extends Node
 
     /**
      * Compiles the node to PHP.
-     *
-     * @param Compiler $compiler A Compiler instance
      */
     public function compile(Compiler $compiler)
     {
@@ -56,6 +54,36 @@ class ArrayNode extends Node
         }
 
         return $result;
+    }
+
+    public function toArray()
+    {
+        $value = array();
+        foreach ($this->getKeyValuePairs() as $pair) {
+            $value[$pair['key']->attributes['value']] = $pair['value'];
+        }
+
+        $array = array();
+
+        if ($this->isHash($value)) {
+            foreach ($value as $k => $v) {
+                $array[] = ', ';
+                $array[] = new ConstantNode($k);
+                $array[] = ': ';
+                $array[] = $v;
+            }
+            $array[0] = '{';
+            $array[] = '}';
+        } else {
+            foreach ($value as $v) {
+                $array[] = ', ';
+                $array[] = $v;
+            }
+            $array[0] = '[';
+            $array[] = ']';
+        }
+
+        return $array;
     }
 
     protected function getKeyValuePairs()

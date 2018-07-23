@@ -23,11 +23,6 @@ use Symfony\Component\Validator\Exception\MappingException;
  */
 abstract class FileLoader extends AbstractLoader
 {
-    /**
-     * The file to load.
-     *
-     * @var string
-     */
     protected $file;
 
     /**
@@ -37,7 +32,7 @@ abstract class FileLoader extends AbstractLoader
      *
      * @throws MappingException If the file does not exist or is not readable
      */
-    public function __construct($file)
+    public function __construct(string $file)
     {
         if (!is_file($file)) {
             throw new MappingException(sprintf('The mapping file "%s" does not exist', $file));

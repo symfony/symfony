@@ -22,9 +22,6 @@ abstract class Dumper implements DumperInterface
 {
     protected $container;
 
-    /**
-     * @param ContainerBuilder $container The service container to dump
-     */
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;

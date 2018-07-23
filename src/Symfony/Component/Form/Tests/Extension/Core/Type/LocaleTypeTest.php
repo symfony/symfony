@@ -25,16 +25,6 @@ class LocaleTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('locale');
-
-        $this->assertSame('locale', $form->getConfig()->getType()->getName());
-    }
-
     public function testLocalesAreSelectable()
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
@@ -43,6 +33,23 @@ class LocaleTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'English (United Kingdom)'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'), $choices, '', false, false);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testChoiceTranslationLocaleOption()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, array(
+                'choice_translation_locale' => 'uk',
+            ))
+            ->createView()->vars['choices'];
+
+        // Don't check objects for identity
+        $this->assertContains(new ChoiceView('en', 'en', 'англійська'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'англійська (Велика Британія)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'китайська (традиційна, Макао, О.А.Р Китаю)'), $choices, '', false, false);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

@@ -9,59 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Exception;
-
-use Symfony\Component\Debug\Exception\FlattenException as DebugFlattenException;
-
-/**
- * FlattenException wraps a PHP Exception to be able to serialize it.
- *
- * Basically, this class removes all objects from the trace.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
- */
-class FlattenException
-{
-    private $handler;
-
-    public static function __callStatic($method, $args)
-    {
-        if (!method_exists('Symfony\Component\Debug\Exception\FlattenException', $method)) {
-            throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_called_class(), $method));
-        }
-
-        return call_user_func_array(array('Symfony\Component\Debug\Exception\FlattenException', $method), $args);
-    }
-
-    public function __call($method, $args)
-    {
-        if (!isset($this->handler)) {
-            $this->handler = new DebugFlattenException();
-        }
-
-        if (!method_exists($this->handler, $method)) {
-            throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method));
-        }
-
-        return call_user_func_array(array($this->handler, $method), $args);
-    }
-}
-
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\HttpKernel\Exception\FlattenException as LegacyFlattenException;
+use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
- * FlattenException wraps a PHP Exception to be able to serialize it.
+ * FlattenException wraps a PHP Error or Exception to be able to serialize it.
  *
  * Basically, this class removes all objects from the trace.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FlattenException extends LegacyFlattenException
+class FlattenException
 {
     private $message;
     private $code;
@@ -75,6 +35,11 @@ class FlattenException extends LegacyFlattenException
 
     public static function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
+        return static::createFromThrowable($exception, $statusCode, $headers);
+    }
+
+    public static function createFromThrowable(\Throwable $exception, ?int $statusCode = null, array $headers = array()): self
+    {
         $e = new static();
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
@@ -82,6 +47,8 @@ class FlattenException extends LegacyFlattenException
         if ($exception instanceof HttpExceptionInterface) {
             $statusCode = $exception->getStatusCode();
             $headers = array_merge($headers, $exception->getHeaders());
+        } elseif ($exception instanceof RequestExceptionInterface) {
+            $statusCode = 400;
         }
 
         if (null === $statusCode) {
@@ -90,17 +57,15 @@ class FlattenException extends LegacyFlattenException
 
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
-        $e->setTraceFromException($exception);
-        $e->setClass(get_class($exception));
+        $e->setTraceFromThrowable($exception);
+        $e->setClass($exception instanceof FatalThrowableError ? $exception->getOriginalClassName() : \get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
 
         $previous = $exception->getPrevious();
 
-        if ($previous instanceof \Exception) {
-            $e->setPrevious(static::create($previous));
-        } elseif ($previous instanceof \Throwable) {
-            $e->setPrevious(static::create(new FatalThrowableError($previous)));
+        if ($previous instanceof \Throwable) {
+            $e->setPrevious(static::createFromThrowable($previous));
         }
 
         return $e;
@@ -195,7 +160,7 @@ class FlattenException extends LegacyFlattenException
         return $this->previous;
     }
 
-    public function setPrevious(FlattenException $previous)
+    public function setPrevious(self $previous)
     {
         $this->previous = $previous;
     }
@@ -216,9 +181,19 @@ class FlattenException extends LegacyFlattenException
         return $this->trace;
     }
 
+    /**
+     * @deprecated since 4.1, use {@see setTraceFromThrowable()} instead.
+     */
     public function setTraceFromException(\Exception $exception)
     {
-        $this->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use "setTraceFromThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->setTraceFromThrowable($exception);
+    }
+
+    public function setTraceFromThrowable(\Throwable $throwable): void
+    {
+        $this->setTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
     }
 
     public function setTrace($trace, $file, $line)
@@ -278,6 +253,10 @@ class FlattenException extends LegacyFlattenException
                 $result[$key] = array('null', null);
             } elseif (is_bool($value)) {
                 $result[$key] = array('boolean', $value);
+            } elseif (is_int($value)) {
+                $result[$key] = array('integer', $value);
+            } elseif (is_float($value)) {
+                $result[$key] = array('float', $value);
             } elseif (is_resource($value)) {
                 $result[$key] = array('resource', get_resource_type($value));
             } else {

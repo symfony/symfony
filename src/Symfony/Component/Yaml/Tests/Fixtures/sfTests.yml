@@ -96,15 +96,6 @@ yaml: |
 php: |
   array('foo', array('bar' => array('bar' => 'foo')))
 ---
-test: A sequence with an unordered array
-brief: >
-  A sequence with an unordered array
-yaml: |
-  1: foo
-  0: bar
-php: |
-  array(1 => 'foo', 0 => 'bar')
----
 test: Octal
 brief: as in spec example 2.19, octal value is converted
 yaml: |

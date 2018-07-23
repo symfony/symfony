@@ -27,10 +27,12 @@ use Twig\TwigFunction;
 class DumpExtension extends AbstractExtension
 {
     private $cloner;
+    private $dumper;
 
-    public function __construct(ClonerInterface $cloner)
+    public function __construct(ClonerInterface $cloner, HtmlDumper $dumper = null)
     {
         $this->cloner = $cloner;
+        $this->dumper = $dumper;
     }
 
     public function getFunctions()
@@ -71,13 +73,13 @@ class DumpExtension extends AbstractExtension
         }
 
         $dump = fopen('php://memory', 'r+b');
-        $dumper = new HtmlDumper($dump, $env->getCharset());
+        $this->dumper = $this->dumper ?: new HtmlDumper();
+        $this->dumper->setCharset($env->getCharset());
 
         foreach ($vars as $value) {
-            $dumper->dump($this->cloner->cloneVar($value));
+            $this->dumper->dump($this->cloner->cloneVar($value), $dump);
         }
-        rewind($dump);
 
-        return stream_get_contents($dump);
+        return stream_get_contents($dump, -1, 0);
     }
 }

@@ -103,31 +103,20 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
         return 0;
     }
 
-    /**
-     * @param Node $arguments
-     * @param int  $index
-     *
-     * @return string|null
-     */
-    private function getReadDomainFromArguments(Node $arguments, $index)
+    private function getReadDomainFromArguments(Node $arguments, int $index): ?string
     {
         if ($arguments->hasNode('domain')) {
             $argument = $arguments->getNode('domain');
         } elseif ($arguments->hasNode($index)) {
             $argument = $arguments->getNode($index);
         } else {
-            return;
+            return null;
         }
 
         return $this->getReadDomainFromNode($argument);
     }
 
-    /**
-     * @param Node $node
-     *
-     * @return string|null
-     */
-    private function getReadDomainFromNode(Node $node)
+    private function getReadDomainFromNode(Node $node): ?string
     {
         if ($node instanceof ConstantExpression) {
             return $node->getAttribute('value');

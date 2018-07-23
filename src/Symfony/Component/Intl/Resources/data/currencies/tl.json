@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.86",
+    "Version": "2.1.41.97",
     "Names": {
         "AED": [
             "AED",
@@ -120,6 +120,10 @@
         "CLP": [
             "CLP",
             "Piso ng Chile"
+        ],
+        "CNH": [
+            "CNH",
+            "CNH"
         ],
         "CNY": [
             "CN¥",
@@ -387,6 +391,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanian Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanian Ouguiya"
         ],
         "MUR": [
@@ -543,6 +551,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé & Príncipe Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé & Príncipe Dobra"
         ],
         "SYP": [

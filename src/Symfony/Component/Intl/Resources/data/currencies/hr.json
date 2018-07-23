@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "čileanski pezo"
+        ],
+        "CNH": [
+            "CNH",
+            "kineski juan (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -679,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "mauritanijska ouguja (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mauritanijska ouguja"
         ],
         "MTL": [
@@ -911,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "dobra Svetog Tome i Principa (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra Svetog Tome i Principa"
         ],
         "SUR": [

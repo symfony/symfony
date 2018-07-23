@@ -23,13 +23,9 @@ use Twig\Extension\AbstractExtension;
 class StopwatchExtension extends AbstractExtension
 {
     private $stopwatch;
-
-    /**
-     * @var bool
-     */
     private $enabled;
 
-    public function __construct(Stopwatch $stopwatch = null, $enabled = true)
+    public function __construct(Stopwatch $stopwatch = null, bool $enabled = true)
     {
         $this->stopwatch = $stopwatch;
         $this->enabled = $enabled;
@@ -48,7 +44,7 @@ class StopwatchExtension extends AbstractExtension
              * Some stuff which will be recorded on the timeline
              * {% endstopwatch %}
              */
-            new StopwatchTokenParser($this->stopwatch !== null && $this->enabled),
+            new StopwatchTokenParser(null !== $this->stopwatch && $this->enabled),
         );
     }
 

@@ -314,6 +314,14 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Ce n'est pas un code universel d'identification des banques (BIC) valide.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Erreur</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Ceci n'est pas un UUID valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

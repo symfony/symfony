@@ -1,0 +1,98 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.violationsCount > 0 or collector.calls|length %}
+        {% set status_color = collector.violationsCount ? 'red' : '' %}
+        {% set icon %}
+            {{ include('@WebProfiler/Icon/validator.svg') }}
+            <span class="sf-toolbar-value">
+                {{ collector.violationsCount ?: collector.calls|length }}
+            </span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Validator calls</b>
+                <span class="sf-toolbar-status">{{ collector.calls|length }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Number of violations</b>
+                <span class="sf-toolbar-status {{- collector.violationsCount > 0 ? ' sf-toolbar-status-red' }}">{{ collector.violationsCount }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{- collector.violationsCount ? ' label-status-error' }} {{ collector.calls is empty ? 'disabled' }}">
+        <span class="icon">{{ include('@WebProfiler/Icon/validator.svg') }}</span>
+        <strong>Validator</strong>
+        {% if collector.violationsCount > 0 %}
+            <span class="count">
+                <span>{{ collector.violationsCount }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Validator calls</h2>
+
+    {% for call in collector.calls %}
+        <div class="sf-validator sf-reset">
+            <span class="metadata">In
+                {% set caller = call.caller %}
+                {% if caller.line %}
+                    {% set link = caller.file|file_link(caller.line) %}
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
+                    {% else %}
+                        <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
+                    {% endif %}
+                {% else %}
+                    {{ caller.name }}
+                {% endif %}
+                line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}">{{ caller.line }}</a> (<a class="text-small sf-toggle" data-toggle-selector="#sf-context-{{ loop.index0 }}">context</a>):
+            </span>
+
+            <div class="sf-validator-compact hidden" id="sf-trace-{{ loop.index0 }}">
+                <div class="trace">
+                    {{ caller.file|file_excerpt(caller.line) }}
+                </div>
+            </div>
+
+            <div class="sf-validator-compact hidden sf-validator-context" id="sf-context-{{ loop.index0 }}">
+                {{ profiler_dump(call.context, maxDepth=1) }}
+            </div>
+
+            {% if call.violations|length %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Path</th>
+                            <th>Message</th>
+                            <th>Invalid value</th>
+                            <th>Violation</th>
+                        </tr>
+                    </thead>
+                    {% for violation in call.violations %}
+                        <tr>
+                            <td>{{ violation.propertyPath }}</td>
+                            <td>{{ violation.message }}</td>
+                            <td>{{ profiler_dump(violation.seek('invalidValue')) }}</td>
+                            <td>{{ profiler_dump(violation) }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                No violations
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <p>No calls to the validator were collected during this request.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -220,6 +220,10 @@
         "CLP": [
             "CLP",
             "peso chilijskie"
+        ],
+        "CNH": [
+            "CNH",
+            "juan chiński (rynek zewnętrzny)"
         ],
         "CNY": [
             "CNY",
@@ -591,6 +595,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya mauretańska (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya mauretańska"
         ],
         "MTL": [
@@ -815,6 +823,10 @@
         ],
         "STD": [
             "STD",
+            "dobra Wysp Świętego Tomasza i Książęcej (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra Wysp Świętego Tomasza i Książęcej"
         ],
         "SUR": [

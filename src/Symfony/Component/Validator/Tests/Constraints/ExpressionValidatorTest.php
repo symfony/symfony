@@ -11,22 +11,17 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Tests\Fixtures\ToString;
 
-class ExpressionValidatorTest extends AbstractConstraintValidatorTest
+class ExpressionValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
-        return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
+        return new ExpressionValidator();
     }
 
     public function testExpressionIsEvaluatedWithNullValue()
@@ -89,6 +84,40 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'object')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
+            ->assertRaised();
+    }
+
+    public function testSucceedingExpressionAtObjectLevelWithToString()
+    {
+        $constraint = new Expression('this.data == 1');
+
+        $object = new ToString();
+        $object->data = '1';
+
+        $this->setObject($object);
+
+        $this->validator->validate($object, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testFailingExpressionAtObjectLevelWithToString()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'this.data == 1',
+            'message' => 'myMessage',
+        ));
+
+        $object = new ToString();
+        $object->data = '2';
+
+        $this->setObject($object);
+
+        $this->validator->validate($object, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'toString')
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
@@ -240,5 +269,19 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $validator->validate(null, $constraint);
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
+    }
+
+    public function testPassingCustomValues()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'value + custom == 2',
+            'values' => array(
+                'custom' => 1,
+            ),
+        ));
+
+        $this->validator->validate(1, $constraint);
+
+        $this->assertNoViolation();
     }
 }

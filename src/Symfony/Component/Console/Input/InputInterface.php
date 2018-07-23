@@ -24,7 +24,7 @@ interface InputInterface
     /**
      * Returns the first argument from the raw parameters (not parsed).
      *
-     * @return string The value of the first argument or null otherwise
+     * @return string|null The value of the first argument or null otherwise
      */
     public function getFirstArgument();
 
@@ -33,30 +33,34 @@ interface InputInterface
      *
      * This method is to be used to introspect the input parameters
      * before they have been validated. It must be used carefully.
+     * Does not necessarily return the correct result for short options
+     * when multiple flags are combined in the same option.
      *
-     * @param string|array $values The values to look for in the raw parameters (can be an array)
+     * @param string|array $values     The values to look for in the raw parameters (can be an array)
+     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values);
+    public function hasParameterOption($values, $onlyParams = false);
 
     /**
      * Returns the value of a raw option (not parsed).
      *
      * This method is to be used to introspect the input parameters
      * before they have been validated. It must be used carefully.
+     * Does not necessarily return the correct result for short options
+     * when multiple flags are combined in the same option.
      *
-     * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed        $default The default value to return if no result is found
+     * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed        $default    The default value to return if no result is found
+     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false);
+    public function getParameterOption($values, $default = false, $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
-     *
-     * @param InputDefinition $definition A InputDefinition instance
      */
     public function bind(InputDefinition $definition);
 

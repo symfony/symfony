@@ -37,8 +37,6 @@ class Form extends Link implements \ArrayAccess
     private $baseHref;
 
     /**
-     * Constructor.
-     *
      * @param \DOMElement $node       A \DOMElement instance
      * @param string      $currentUri The URI of the page where the form is embedded
      * @param string      $method     The method to use for the link (if null, it defaults to the method defined by the form)
@@ -46,7 +44,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
-    public function __construct(\DOMElement $node, $currentUri, $method = null, $baseHref = null)
+    public function __construct(\DOMElement $node, string $currentUri, string $method = null, string $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
         $this->baseHref = $baseHref;
@@ -172,6 +170,18 @@ class Form extends Link implements \ArrayAccess
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, strlen(key($expandedValue)));
+
+                array_walk_recursive(
+                    $expandedValue,
+                    function (&$value, $key) {
+                        if (ctype_digit($value) && ('size' === $key || 'error' === $key)) {
+                            $value = (int) $value;
+                        }
+                    }
+                );
+
+                reset($expandedValue);
+
                 $values = array_replace_recursive($values, array($varName => current($expandedValue)));
             }
         }
@@ -199,7 +209,7 @@ class Form extends Link implements \ArrayAccess
                 parse_str($query, $currentParameters);
             }
 
-            $queryString = http_build_query(array_merge($currentParameters, $this->getValues()), null, '&');
+            $queryString = http_build_query(array_merge($currentParameters, $this->getValues()), '', '&');
 
             $pos = strpos($uri, '?');
             $base = false === $pos ? $uri : substr($uri, 0, $pos);
@@ -211,6 +221,11 @@ class Form extends Link implements \ArrayAccess
 
     protected function getRawUri()
     {
+        // If the form was created from a button rather than the form node, check for HTML5 action overrides
+        if ($this->button !== $this->node && $this->button->getAttribute('formaction')) {
+            return $this->button->getAttribute('formaction');
+        }
+
         return $this->node->getAttribute('action');
     }
 
@@ -225,6 +240,11 @@ class Form extends Link implements \ArrayAccess
     {
         if (null !== $this->method) {
             return $this->method;
+        }
+
+        // If the form was created from a button rather than the form node, check for HTML5 method override
+        if ($this->button !== $this->node && $this->button->getAttribute('formmethod')) {
+            return strtoupper($this->button->getAttribute('formmethod'));
         }
 
         return $this->node->getAttribute('method') ? strtoupper($this->node->getAttribute('method')) : 'GET';
@@ -268,8 +288,6 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets a named field.
-     *
-     * @param FormField $field The field
      */
     public function set(FormField $field)
     {
@@ -356,8 +374,6 @@ class Form extends Link implements \ArrayAccess
      *
      * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
      *
-     * @param \DOMElement $node A \DOMElement instance
-     *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
     protected function setNode(\DOMElement $node)
@@ -427,7 +443,7 @@ class Form extends Link implements \ArrayAccess
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
 
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId));
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)]', $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }

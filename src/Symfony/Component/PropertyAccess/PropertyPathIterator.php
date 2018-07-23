@@ -19,16 +19,9 @@ namespace Symfony\Component\PropertyAccess;
  */
 class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {
-    /**
-     * The traversed property path.
-     *
-     * @var PropertyPathInterface
-     */
     protected $path;
 
     /**
-     * Constructor.
-     *
      * @param PropertyPathInterface $path The property path to traverse
      */
     public function __construct(PropertyPathInterface $path)

@@ -1,2 +1,2 @@
 imports:
-    - foo.yml
+    - { resource: ~ }

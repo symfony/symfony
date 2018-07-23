@@ -12,10 +12,12 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Server\Connection;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -35,7 +37,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertSame(1, $collector->getDumpsCount());
 
         $dump = $collector->getDumps('html');
-        $this->assertTrue(isset($dump[0]['data']));
+        $this->assertArrayHasKey('data', $dump[0]);
         $dump[0]['data'] = preg_replace('/^.*?<pre/', '<pre', $dump[0]['data']);
         $dump[0]['data'] = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump[0]['data']);
 
@@ -48,11 +50,29 @@ class DumpDataCollectorTest extends TestCase
                 'fileExcerpt' => false,
             ),
         );
-        $this->assertSame($xDump, $dump);
+        $this->assertEquals($xDump, $dump);
 
-        $this->assertStringMatchesFormat('a:3:{i:0;a:5:{s:4:"data";O:39:"Symfony\Component\VarDumper\Cloner\Data":%a', $collector->serialize());
+        $this->assertStringMatchesFormat('a:3:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', $collector->serialize());
         $this->assertSame(0, $collector->getDumpsCount());
         $this->assertSame('a:2:{i:0;b:0;i:1;s:5:"UTF-8";}', $collector->serialize());
+    }
+
+    public function testDumpWithServerConnection()
+    {
+        $data = new Data(array(array(123)));
+
+        // Server is up, server dumper is used
+        $serverDumper = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $serverDumper->expects($this->once())->method('write')->willReturn(true);
+
+        $collector = new DumpDataCollector(null, null, null, null, $serverDumper);
+        $collector->dump($data);
+
+        // Collect doesn't re-trigger dump
+        ob_start();
+        $collector->collect(new Request(), new Response());
+        $this->assertEmpty(ob_get_clean());
+        $this->assertStringMatchesFormat('a:3:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', $collector->serialize());
     }
 
     public function testCollectDefault()
@@ -66,13 +86,9 @@ class DumpDataCollectorTest extends TestCase
 
         ob_start();
         $collector->collect(new Request(), new Response());
-        $output = ob_get_clean();
+        $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
 
-        if (\PHP_VERSION_ID >= 50400) {
-            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
-        } else {
-            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n123\n", $output);
-        }
+        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
         $this->assertSame(1, $collector->getDumpsCount());
         $collector->serialize();
     }
@@ -86,21 +102,11 @@ class DumpDataCollectorTest extends TestCase
         $collector->dump($data);
         $line = __LINE__ - 1;
         $file = __FILE__;
-        if (\PHP_VERSION_ID >= 50400) {
-            $xOutput = <<<EOTXT
+        $xOutput = <<<EOTXT
 <pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
 <span class=sf-dump-num>123</span>
 </pre>
 EOTXT;
-        } else {
-            $len = strlen("DumpDataCollectorTest.php on line {$line}:");
-            $xOutput = <<<EOTXT
-<pre class=sf-dump id=sf-dump data-indent-pad="  ">"<span class=sf-dump-str title="{$len} characters">DumpDataCollectorTest.php on line {$line}:</span>"
-</pre>
-<pre class=sf-dump id=sf-dump data-indent-pad="  "><span class=sf-dump-num>123</span>
-</pre>
-EOTXT;
-        }
 
         ob_start();
         $response = new Response();
@@ -124,10 +130,28 @@ EOTXT;
 
         ob_start();
         $collector->__destruct();
+        $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
+        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", $output);
+    }
+
+    public function testFlushNothingWhenDataDumperIsProvided()
+    {
+        $data = new Data(array(array(456)));
+        $dumper = new CliDumper('php://output');
+        $collector = new DumpDataCollector(null, null, null, null, $dumper);
+
+        ob_start();
+        $collector->dump($data);
+        $line = __LINE__ - 1;
+        $output = preg_replace("/\033\[[^m]*m/", '', ob_get_clean());
         if (\PHP_VERSION_ID >= 50400) {
-            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", $output);
         } else {
-            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", ob_get_clean());
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", $output);
         }
+
+        ob_start();
+        $collector->__destruct();
+        $this->assertEmpty(ob_get_clean());
     }
 }

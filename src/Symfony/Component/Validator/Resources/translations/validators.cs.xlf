@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Toto pole nebyla očekávána.</target>
+                <target>Toto pole nebylo očekáváno.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
@@ -313,6 +313,10 @@
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Tato hodnota není platný identifikační kód podniku (BIC).</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Chyba</target>
             </trans-unit>
         </body>
     </file>

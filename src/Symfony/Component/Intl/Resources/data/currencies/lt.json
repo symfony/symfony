@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Čilės pesas"
+        ],
+        "CNH": [
+            "CNH",
+            "Kinijos Užsienio juanis"
         ],
         "CNX": [
             "CNX",
@@ -679,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanijos ugija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanijos ugija"
         ],
         "MTL": [
@@ -911,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "San Tomės ir Principės dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "San Tomės ir Principės dobra"
         ],
         "SUR": [

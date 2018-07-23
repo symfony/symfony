@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -31,9 +30,7 @@ abstract class AbstractToken implements TokenInterface
     private $attributes = array();
 
     /**
-     * Constructor.
-     *
-     * @param (RoleInterface|string)[] $roles An array of roles
+     * @param (Role|string)[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
@@ -42,8 +39,8 @@ abstract class AbstractToken implements TokenInterface
         foreach ($roles as $role) {
             if (is_string($role)) {
                 $role = new Role($role);
-            } elseif (!$role instanceof RoleInterface) {
-                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or RoleInterface instances, but got %s.', gettype($role)));
+            } elseif (!$role instanceof Role) {
+                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or Role instances, but got %s.', gettype($role)));
             }
 
             $this->roles[] = $role;
@@ -79,14 +76,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Sets the user in the token.
-     *
-     * The user can be a UserInterface instance, or an object implementing
-     * a __toString method or the username as a regular string.
-     *
-     * @param string|object $user The user
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function setUser($user)
     {
@@ -264,6 +254,7 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user instanceof AdvancedUserInterface && $user instanceof AdvancedUserInterface) {
+            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
             if ($this->user->isAccountNonExpired() !== $user->isAccountNonExpired()) {
                 return true;
             }
@@ -280,6 +271,8 @@ abstract class AbstractToken implements TokenInterface
                 return true;
             }
         } elseif ($this->user instanceof AdvancedUserInterface xor $user instanceof AdvancedUserInterface) {
+            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
+
             return true;
         }
 

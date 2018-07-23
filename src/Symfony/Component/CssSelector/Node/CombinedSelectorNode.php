@@ -23,53 +23,28 @@ namespace Symfony\Component\CssSelector\Node;
  */
 class CombinedSelectorNode extends AbstractNode
 {
-    /**
-     * @var NodeInterface
-     */
     private $selector;
-
-    /**
-     * @var string
-     */
     private $combinator;
-
-    /**
-     * @var NodeInterface
-     */
     private $subSelector;
 
-    /**
-     * @param NodeInterface $selector
-     * @param string        $combinator
-     * @param NodeInterface $subSelector
-     */
-    public function __construct(NodeInterface $selector, $combinator, NodeInterface $subSelector)
+    public function __construct(NodeInterface $selector, string $combinator, NodeInterface $subSelector)
     {
         $this->selector = $selector;
         $this->combinator = $combinator;
         $this->subSelector = $subSelector;
     }
 
-    /**
-     * @return NodeInterface
-     */
-    public function getSelector()
+    public function getSelector(): NodeInterface
     {
         return $this->selector;
     }
 
-    /**
-     * @return string
-     */
-    public function getCombinator()
+    public function getCombinator(): string
     {
         return $this->combinator;
     }
 
-    /**
-     * @return NodeInterface
-     */
-    public function getSubSelector()
+    public function getSubSelector(): NodeInterface
     {
         return $this->subSelector;
     }
@@ -77,7 +52,7 @@ class CombinedSelectorNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function getSpecificity()
+    public function getSpecificity(): Specificity
     {
         return $this->selector->getSpecificity()->plus($this->subSelector->getSpecificity());
     }
@@ -85,7 +60,7 @@ class CombinedSelectorNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         $combinator = ' ' === $this->combinator ? '<followed>' : $this->combinator;
 

@@ -27,16 +27,6 @@ class NumberTypeTest extends BaseTypeTest
         \Locale::setDefault('de_DE');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('number');
-
-        $this->assertSame('number', $form->getConfig()->getType()->getName());
-    }
-
     public function testDefaultFormatting()
     {
         $form = $this->factory->create(static::TESTED_TYPE);

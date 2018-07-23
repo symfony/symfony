@@ -1,5 +1,5 @@
-Public services
-===============
+Services
+========
 
 Definitions
 -----------
@@ -7,16 +7,26 @@ Definitions
 ### definition_1
 
 - Class: `Full\Qualified\Class1`
-- Scope: `container`
 - Public: yes
 - Synthetic: no
 - Lazy: yes
 - Shared: yes
-- Synchronized: no
 - Abstract: yes
 - Autowired: no
+- Autoconfigured: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+
+### service_container
+
+- Class: `Symfony\Component\DependencyInjection\ContainerInterface`
+- Public: yes
+- Synthetic: yes
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
 
 
 Aliases
@@ -27,13 +37,3 @@ Aliases
 - Service: `service_1`
 - Public: yes
 
-### alias_2
-
-- Service: `service_2`
-- Public: no
-
-
-Services
---------
-
-- `service_container`: `Symfony\Component\DependencyInjection\ContainerBuilder`

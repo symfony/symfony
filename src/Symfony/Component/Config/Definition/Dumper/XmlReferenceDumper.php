@@ -41,13 +41,7 @@ class XmlReferenceDumper
         return $ref;
     }
 
-    /**
-     * @param NodeInterface $node
-     * @param int           $depth
-     * @param bool          $root      If the node is the root node
-     * @param string        $namespace The namespace of the node
-     */
-    private function writeNode(NodeInterface $node, $depth = 0, $root = false, $namespace = null)
+    private function writeNode(NodeInterface $node, int $depth = 0, bool $root = false, string $namespace = null)
     {
         $rootName = ($root ? 'config' : $node->getName());
         $rootNamespace = ($namespace ?: ($root ? 'http://example.org/schema/dic/'.$node->getName() : null));
@@ -96,7 +90,10 @@ class XmlReferenceDumper
                     $rootAttributes[$key] = str_replace('-', ' ', $rootName).' '.$key;
                 }
 
-                if ($prototype instanceof ArrayNode) {
+                if ($prototype instanceof PrototypedArrayNode) {
+                    $prototype->setName($key);
+                    $children = array($key => $prototype);
+                } elseif ($prototype instanceof ArrayNode) {
                     $children = $prototype->getChildren();
                 } else {
                     if ($prototype->hasDefaultValue()) {
@@ -148,6 +145,10 @@ class XmlReferenceDumper
 
                     if ($child->isRequired()) {
                         $comments[] = 'Required';
+                    }
+
+                    if ($child->isDeprecated()) {
+                        $comments[] = sprintf('Deprecated (%s)', $child->getDeprecationMessage($child->getName(), $node->getPath()));
                     }
 
                     if ($child instanceof EnumNode) {
@@ -252,11 +253,8 @@ class XmlReferenceDumper
 
     /**
      * Outputs a single config reference line.
-     *
-     * @param string $text
-     * @param int    $indent
      */
-    private function writeLine($text, $indent = 0)
+    private function writeLine(string $text, int $indent = 0)
     {
         $indent = strlen($text) + $indent;
         $format = '%'.$indent.'s';
@@ -268,10 +266,8 @@ class XmlReferenceDumper
      * Renders the string conversion of the value.
      *
      * @param mixed $value
-     *
-     * @return string
      */
-    private function writeValue($value)
+    private function writeValue($value): string
     {
         if ('%%%%not_defined%%%%' === $value) {
             return '';

@@ -38,18 +38,7 @@ class RememberMeListener implements ListenerInterface
     private $catchExceptions = true;
     private $sessionStrategy;
 
-    /**
-     * Constructor.
-     *
-     * @param TokenStorageInterface                       $tokenStorage
-     * @param RememberMeServicesInterface                 $rememberMeServices
-     * @param AuthenticationManagerInterface              $authenticationManager
-     * @param LoggerInterface|null                        $logger
-     * @param EventDispatcherInterface|null               $dispatcher
-     * @param bool                                        $catchExceptions
-     * @param SessionAuthenticationStrategyInterface|null $sessionStrategy
-     */
-    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $catchExceptions = true, SessionAuthenticationStrategyInterface $sessionStrategy = null)
+    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, bool $catchExceptions = true, SessionAuthenticationStrategyInterface $sessionStrategy = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->rememberMeServices = $rememberMeServices;
@@ -62,8 +51,6 @@ class RememberMeListener implements ListenerInterface
 
     /**
      * Handles remember-me cookie based authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {
@@ -72,7 +59,25 @@ class RememberMeListener implements ListenerInterface
         }
 
         $request = $event->getRequest();
-        if (null === $token = $this->rememberMeServices->autoLogin($request)) {
+        try {
+            if (null === $token = $this->rememberMeServices->autoLogin($request)) {
+                return;
+            }
+        } catch (AuthenticationException $e) {
+            if (null !== $this->logger) {
+                $this->logger->warning(
+                    'The token storage was not populated with remember-me token as the'
+                   .' RememberMeServices was not able to create a token from the remember'
+                   .' me information.', array('exception' => $e)
+                );
+            }
+
+            $this->rememberMeServices->loginFail($request);
+
+            if (!$this->catchExceptions) {
+                throw $e;
+            }
+
             return;
         }
 
@@ -100,7 +105,7 @@ class RememberMeListener implements ListenerInterface
                 );
             }
 
-            $this->rememberMeServices->loginFail($request);
+            $this->rememberMeServices->loginFail($request, $e);
 
             if (!$this->catchExceptions) {
                 throw $e;

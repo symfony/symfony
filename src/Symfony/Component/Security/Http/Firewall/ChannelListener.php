@@ -37,8 +37,6 @@ class ChannelListener implements ListenerInterface
 
     /**
      * Handles channel management.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {
@@ -48,7 +46,13 @@ class ChannelListener implements ListenerInterface
 
         if ('https' === $channel && !$request->isSecure()) {
             if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTPS.');
+                if ('https' === $request->headers->get('X-Forwarded-Proto')) {
+                    $this->logger->info('Redirecting to HTTPS. ("X-Forwarded-Proto" header is set to "https" - did you set "trusted_proxies" correctly?)');
+                } elseif (false !== strpos($request->headers->get('Forwarded'), 'proto=https')) {
+                    $this->logger->info('Redirecting to HTTPS. ("Forwarded" header is set to "proto=https" - did you set "trusted_proxies" correctly?)');
+                } else {
+                    $this->logger->info('Redirecting to HTTPS.');
+                }
             }
 
             $response = $this->authenticationEntryPoint->start($request);

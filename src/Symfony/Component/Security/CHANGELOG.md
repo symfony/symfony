@@ -1,6 +1,78 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* added the `is_granted()` function in security expressions
+* deprecated the `has_role()` function in security expressions, use `is_granted()` instead
+* Passing custom class names to the
+  `Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver` to define
+  custom anonymous and remember me token classes is deprecated. To
+  use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
+  or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+* allow passing null as $filter in LdapUserProvider to get the default filter
+* accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated
+
+4.1.0
+-----
+
+ * The `ContextListener::setLogoutOnUserChange()` method is deprecated.
+ * added `UserValueResolver`.
+ * Using the AdvancedUserInterface is now deprecated. To use the existing
+   functionality, create a custom user-checker based on the
+   `Symfony\Component\Security\Core\User\UserChecker`.
+ * `AuthenticationUtils::getLastUsername()` now always returns a string.
+
+4.0.0
+-----
+
+ * The `AbstractFormLoginAuthenticator::onAuthenticationSuccess()` was removed.
+   You should implement this method yourself in your concrete authenticator.
+ * removed the `AccessDecisionManager::setVoters()` method
+ * removed the `RoleInterface`
+ * removed support for voters that don't implement the `VoterInterface`
+ * added a sixth `string $context` argument to `LogoutUrlGenerator::registerListener()`
+ * removed HTTP digest authentication
+ * removed `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * removed `AbstractGuardAuthenticator::supports()`
+ * added target user to `SwitchUserListener`
+
+3.4.0
+-----
+
+ * Added `getUser`, `getToken` and `isGranted` methods to `Security`.
+ * added a `setToken()` method to the `SwitchUserEvent` class to allow to replace the created token while switching users
+   when custom token generation is required by application.
+ * Using voters that do not implement the `VoterInterface`is now deprecated in
+   the `AccessDecisionManager` and this functionality will be removed in 4.0.
+ * Using the `ContextListener` without setting the `logoutOnUserChange`
+   property will trigger a deprecation when the user has changed. As of 4.0
+   the user will always be logged out when the user has changed between
+   requests.
+ * deprecated HTTP digest authentication
+ * Added a new password encoder for the Argon2i hashing algorithm
+ * deprecated `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * deprecated to return `null` from `getCredentials()` in classes that extend
+   `AbstractGuardAuthenticator`. Return `false` from `supports()` instead.
+
+3.3.0
+-----
+
+ * deprecated `AccessDecisionManager::setVoters()` in favor of passing the
+   voters to the constructor.
+ * [EXPERIMENTAL] added a `json_login` listener for stateless authentication
+
+3.2.0
+-----
+
+ * added `$attributes` and `$subject` with getters/setters to `Symfony\Component\Security\Core\Exception\AccessDeniedException`
+
+3.0.0
+-----
+
+ * removed all deprecated code
+
 2.8.0
 -----
 

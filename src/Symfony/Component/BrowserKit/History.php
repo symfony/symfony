@@ -32,8 +32,6 @@ class History
 
     /**
      * Adds a Request to the history.
-     *
-     * @param Request $request A Request instance
      */
     public function add(Request $request)
     {
@@ -49,7 +47,7 @@ class History
      */
     public function isEmpty()
     {
-        return count($this->stack) == 0;
+        return 0 == count($this->stack);
     }
 
     /**

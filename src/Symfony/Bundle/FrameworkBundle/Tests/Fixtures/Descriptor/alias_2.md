@@ -1,2 +1,2 @@
-- Service: `service_2`
+- Service: `.service_2`
 - Public: no

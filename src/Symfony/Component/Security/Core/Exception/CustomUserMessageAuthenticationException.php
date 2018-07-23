@@ -26,7 +26,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
 
     private $messageData = array();
 
-    public function __construct($message = '', array $messageData = array(), $code = 0, \Exception $previous = null)
+    public function __construct(string $message = '', array $messageData = array(), int $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

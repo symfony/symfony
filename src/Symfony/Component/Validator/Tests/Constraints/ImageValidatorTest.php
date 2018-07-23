@@ -13,12 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @requires extension fileinfo
  */
-class ImageValidatorTest extends AbstractConstraintValidatorTest
+class ImageValidatorTest extends ConstraintValidatorTestCase
 {
     protected $context;
 
@@ -32,11 +32,7 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
     protected $imageLandscape;
     protected $imagePortrait;
     protected $image4By3;
-
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
+    protected $imageCorrupted;
 
     protected function createValidator()
     {
@@ -51,6 +47,7 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
         $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';
         $this->imagePortrait = __DIR__.'/Fixtures/test_portrait.gif';
         $this->image4By3 = __DIR__.'/Fixtures/test_4by3.gif';
+        $this->imageCorrupted = __DIR__.'/Fixtures/test_corrupted.gif';
     }
 
     public function testNullIsValid()
@@ -167,6 +164,42 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
+    public function testPixelsTooFew()
+    {
+        $constraint = new Image(array(
+            'minPixels' => 5,
+            'minPixelsMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ pixels }}', '4')
+            ->setParameter('{{ min_pixels }}', '5')
+            ->setParameter('{{ height }}', '2')
+            ->setParameter('{{ width }}', '2')
+            ->setCode(Image::TOO_FEW_PIXEL_ERROR)
+            ->assertRaised();
+    }
+
+    public function testPixelsTooMany()
+    {
+        $constraint = new Image(array(
+            'maxPixels' => 3,
+            'maxPixelsMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ pixels }}', '4')
+            ->setParameter('{{ max_pixels }}', '3')
+            ->setParameter('{{ height }}', '2')
+            ->setParameter('{{ width }}', '2')
+            ->setCode(Image::TOO_MANY_PIXEL_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
@@ -210,6 +243,30 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Image(array(
             'maxHeight' => '1abc',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testInvalidMinPixels()
+    {
+        $constraint = new Image(array(
+            'minPixels' => '1abc',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testInvalidMaxPixels()
+    {
+        $constraint = new Image(array(
+            'maxPixels' => '1abc',
         ));
 
         $this->validator->validate($this->image, $constraint);
@@ -327,6 +384,28 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ width }}', 1)
             ->setParameter('{{ height }}', 2)
             ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
+            ->assertRaised();
+    }
+
+    public function testCorrupted()
+    {
+        if (!function_exists('imagecreatefromstring')) {
+            $this->markTestSkipped('This test require GD extension');
+        }
+
+        $constraint = new Image(array(
+            'detectCorrupted' => true,
+            'corruptedMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($this->imageCorrupted, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setCode(Image::CORRUPTED_IMAGE_ERROR)
             ->assertRaised();
     }
 }

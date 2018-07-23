@@ -83,6 +83,16 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
                 array(),
                 '/',
             ),
+            'target path as referer when referer not set' => array(
+                Request::create('/'),
+                array('use_referer' => true),
+                '/',
+            ),
+            'target path as referer when referer is ?' => array(
+                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => '?')),
+                array('use_referer' => true),
+                '/',
+            ),
             'target path should be different than login URL' => array(
                 Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login')),
                 array('use_referer' => true, 'login_path' => '/login'),

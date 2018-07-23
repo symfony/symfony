@@ -8,7 +8,7 @@
     <xsd:annotation>
         <xsd:documentation><![CDATA[
       Symfony Serializer Mapping Schema, version 1.0
-      Authors: Kévin Dunglas
+      Authors: Kévin Dunglas, Samuel Roze
 
       A serializer mapping connects attributes with serialization groups.
     ]]></xsd:documentation>
@@ -37,20 +37,40 @@
         </xsd:annotation>
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="attribute" type="attribute" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="discriminator-map" type="discriminator-map" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="discriminator-map">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="mapping" type="discriminator-map-mapping" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="type-property" type="xsd:string" use="required" />
+    </xsd:complexType>
+    
+    <xsd:complexType name="discriminator-map-mapping">
+        <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="class" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="attribute">
         <xsd:annotation>
             <xsd:documentation><![CDATA[
-        Contains serialization groups for a attributes. The name of the attribute should be given in the "name" option.
+        Contains serialization groups and max depth for attributes. The name of the attribute should be given in the "name" option.
       ]]></xsd:documentation>
         </xsd:annotation>
-        <xsd:sequence>
+        <xsd:sequence minOccurs="0">
             <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="max-depth">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:integer">
+                    <xsd:minInclusive value="0" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:complexType>
 
 </xsd:schema>

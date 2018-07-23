@@ -59,7 +59,7 @@ abstract class FileLoader extends ArrayLoader
      *
      * @return array
      *
-     * @throws InvalidResourceException If stream content has an invalid format.
+     * @throws InvalidResourceException if stream content has an invalid format
      */
     abstract protected function loadResource($resource);
 }

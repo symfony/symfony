@@ -26,17 +26,10 @@ use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
  */
 abstract class AbstractDataGenerator
 {
-    /**
-     * @var GenrbCompiler
-     */
     private $compiler;
-
-    /**
-     * @var string
-     */
     private $dirName;
 
-    public function __construct(GenrbCompiler $compiler, $dirName)
+    public function __construct(GenrbCompiler $compiler, string $dirName)
     {
         $this->compiler = $compiler;
         $this->dirName = $dirName;

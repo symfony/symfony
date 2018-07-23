@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -219,7 +219,7 @@
         ],
         "BYN": [
             "BYN",
-            "Beyaz Rusya Rublesi"
+            "Belarus Rublesi"
         ],
         "BYR": [
             "BYR",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Şili Pesosu"
+        ],
+        "CNH": [
+            "CNH",
+            "Çin Yuanı (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -679,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Moritanya Ouguiyası (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Moritanya Ouguiyası"
         ],
         "MTL": [
@@ -911,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé ve Príncipe Dobrası (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé ve Príncipe Dobrası"
         ],
         "SUR": [

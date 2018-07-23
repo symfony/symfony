@@ -33,6 +33,15 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             'toto/',
             'toto/.git/',
             'foo bar',
+            'qux_0_1.php',
+            'qux_2_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux/',
+            'qux/baz_1_2.py',
+            'qux/baz_100_1.py',
         );
 
         self::$files = self::toAbsolute(self::$files);
@@ -60,11 +69,20 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
     public static function tearDownAfterClass()
     {
-        foreach (array_reverse(self::$files) as $file) {
-            if (DIRECTORY_SEPARATOR === $file[strlen($file) - 1]) {
-                @rmdir($file);
+        $paths = new \RecursiveIteratorIterator(
+             new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+             \RecursiveIteratorIterator::CHILD_FIRST
+         );
+
+        foreach ($paths as $path) {
+            if ($path->isDir()) {
+                if ($path->isLink()) {
+                    @unlink($path);
+                } else {
+                    @rmdir($path);
+                }
             } else {
-                @unlink($file);
+                @unlink($path);
             }
         }
     }

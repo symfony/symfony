@@ -5,17 +5,14 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="form.csrf_provider" class="Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfTokenManagerAdapter">
-            <argument type="service" id="security.csrf.token_manager" />
-            <deprecated>The "%service_id%" service is deprecated since Symfony 2.4 and will be removed in 3.0. Use the "security.csrf.token_manager" service instead.</deprecated>
-        </service>
+        <defaults public="false" />
 
         <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
             <argument type="service" id="security.csrf.token_manager" />
             <argument>%form.type_extension.csrf.enabled%</argument>
             <argument>%form.type_extension.csrf.field_name%</argument>
-            <argument type="service" id="translator.default" />
+            <argument type="service" id="translator" on-invalid="null" />
             <argument>%validator.translation_domain%</argument>
             <argument type="service" id="form.server_params" />
         </service>

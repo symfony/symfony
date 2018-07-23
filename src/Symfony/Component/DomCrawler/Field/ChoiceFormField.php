@@ -75,7 +75,7 @@ class ChoiceFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @param string $value The value of the field
+     * @param string|array $value The value of the field
      */
     public function select($value)
     {
@@ -97,14 +97,14 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Ticks a checkbox.
+     * Unticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
      */
     public function untick()
     {
         if ('checkbox' !== $this->type) {
-            throw new \LogicException(sprintf('You cannot tick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
+            throw new \LogicException(sprintf('You cannot untick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
         }
 
         $this->setValue(false);
@@ -113,7 +113,7 @@ class ChoiceFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @param string $value The value of the field
+     * @param string|array $value The value of the field
      *
      * @throws \InvalidArgumentException When value type provided is not correct
      */
@@ -254,12 +254,8 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns option value with associated disabled flag.
-     *
-     * @param \DOMElement $node
-     *
-     * @return array
      */
-    private function buildOptionValue(\DOMElement $node)
+    private function buildOptionValue(\DOMElement $node): array
     {
         $option = array();
 

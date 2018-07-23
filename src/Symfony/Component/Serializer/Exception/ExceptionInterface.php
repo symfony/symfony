@@ -16,6 +16,6 @@ namespace Symfony\Component\Serializer\Exception;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface ExceptionInterface extends Exception
+interface ExceptionInterface
 {
 }

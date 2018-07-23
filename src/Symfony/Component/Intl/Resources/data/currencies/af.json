@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "AED": [
             "AED",
@@ -120,6 +120,10 @@
         "CLP": [
             "CLP",
             "Chileense peso"
+        ],
+        "CNH": [
+            "CNH",
+            "Chinese joean"
         ],
         "CNY": [
             "CN¥",
@@ -387,6 +391,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaniese ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaniese ouguiya"
         ],
         "MUR": [
@@ -543,6 +551,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé en Príncipe dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé en Príncipe dobra"
         ],
         "SYP": [

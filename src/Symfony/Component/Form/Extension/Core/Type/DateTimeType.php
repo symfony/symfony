@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
@@ -30,22 +31,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class DateTimeType extends AbstractType
 {
     const DEFAULT_DATE_FORMAT = \IntlDateFormatter::MEDIUM;
-
     const DEFAULT_TIME_FORMAT = \IntlDateFormatter::MEDIUM;
 
     /**
      * This is not quite the HTML5 format yet, because ICU lacks the
-     * capability of parsing and generating RFC 3339 dates, which
-     * are like the below pattern but with a timezone suffix. The
-     * timezone suffix is.
-     *
-     *  * "Z" for UTC
-     *  * "(-|+)HH:mm" for other timezones (note the colon!)
+     * capability of parsing and generating RFC 3339 dates.
      *
      * For more information see:
      *
      * http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
-     * http://www.w3.org/TR/html-markup/input.datetime.html
+     * https://www.w3.org/TR/html5/sec-forms.html#local-date-and-time-state-typedatetimelocal
      * http://tools.ietf.org/html/rfc3339
      *
      * An ICU ticket was created:
@@ -55,7 +50,7 @@ class DateTimeType extends AbstractType
      * yet. To temporarily circumvent this issue, DateTimeToRfc3339Transformer
      * is used when the format matches this constant.
      */
-    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,
@@ -114,7 +109,6 @@ class DateTimeType extends AbstractType
                 'years',
                 'months',
                 'days',
-                'empty_value',
                 'placeholder',
                 'choice_translation_domain',
                 'required',
@@ -130,7 +124,6 @@ class DateTimeType extends AbstractType
                 'seconds',
                 'with_minutes',
                 'with_seconds',
-                'empty_value',
                 'placeholder',
                 'choice_translation_domain',
                 'required',
@@ -168,7 +161,9 @@ class DateTimeType extends AbstractType
             ;
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime_immutable' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
             ));
@@ -195,7 +190,7 @@ class DateTimeType extends AbstractType
         //  * the format matches the one expected by HTML5
         //  * the html5 is set to true
         if ($options['html5'] && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
-            $view->vars['type'] = 'datetime';
+            $view->vars['type'] = 'datetime-local';
         }
     }
 
@@ -245,7 +240,6 @@ class DateTimeType extends AbstractType
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
         $resolver->setDefined(array(
-            'empty_value', // deprecated
             'placeholder',
             'choice_translation_domain',
             'years',
@@ -258,6 +252,7 @@ class DateTimeType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetime_immutable',
             'string',
             'timestamp',
             'array',
@@ -281,14 +276,6 @@ class DateTimeType extends AbstractType
             'text',
             'choice',
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**

@@ -32,7 +32,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @var NativeRequestHandler
      */
-    private static $nativeRequestProcessor;
+    private static $nativeRequestHandler;
 
     /**
      * The accepted request methods.
@@ -138,7 +138,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $data;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $dataClass;
 
@@ -181,14 +181,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Creates an empty form configuration.
      *
      * @param string|int               $name       The form name
-     * @param string                   $dataClass  The class of the form's data
+     * @param string|null              $dataClass  The class of the form's data
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws InvalidArgumentException If the data class is not a valid class or if
-     *                                  the name contains invalid characters.
+     * @throws InvalidArgumentException if the data class is not a valid class or if
+     *                                  the name contains invalid characters
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
+    public function __construct($name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
         self::validateName($name);
 
@@ -347,21 +347,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Alias of {@link getInheritData()}.
-     *
-     * @return bool
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link getInheritData()} instead.
-     */
-    public function getVirtual()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the FormConfigBuilder::getInheritData() method instead.', E_USER_DEPRECATED);
-
-        return $this->getInheritData();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getCompound()
@@ -511,10 +496,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     public function getRequestHandler()
     {
         if (null === $this->requestHandler) {
-            if (null === self::$nativeRequestProcessor) {
-                self::$nativeRequestProcessor = new NativeRequestHandler();
+            if (null === self::$nativeRequestHandler) {
+                self::$nativeRequestHandler = new NativeRequestHandler();
             }
-            $this->requestHandler = self::$nativeRequestProcessor;
+            $this->requestHandler = self::$nativeRequestHandler;
         }
 
         return $this->requestHandler;
@@ -711,21 +696,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Alias of {@link setInheritData()}.
-     *
-     * @param bool $inheritData Whether the form should inherit its parent's data
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link setInheritData()} instead.
-     */
-    public function setVirtual($inheritData)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the FormConfigBuilder::setInheritData() method instead.', E_USER_DEPRECATED);
-
-        $this->setInheritData($inheritData);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setCompound($compound)
@@ -882,8 +852,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @param string|int $name The tested form name
      *
-     * @throws UnexpectedTypeException  If the name is not a string or an integer.
-     * @throws InvalidArgumentException If the name contains invalid characters.
+     * @throws UnexpectedTypeException  if the name is not a string or an integer
+     * @throws InvalidArgumentException if the name contains invalid characters
      */
     public static function validateName($name)
     {

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
-class DateTimeToStringTransformerTest extends DateTimeTestCase
+class DateTimeToStringTransformerTest extends TestCase
 {
     public function dataProvider()
     {
@@ -30,6 +31,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             array('H:i:00', '16:05:00', '1970-01-01 16:05:00 UTC'),
             array('H:i', '16:05', '1970-01-01 16:05:00 UTC'),
             array('H', '16', '1970-01-01 16:00:00 UTC'),
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
 
             // different day representations
             array('Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'),
@@ -94,9 +96,6 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    /**
-     * @requires PHP 5.5
-     */
     public function testTransformDateTimeImmutable()
     {
         $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
@@ -126,7 +125,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime($output);
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()
@@ -144,7 +143,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $input = $output->format('Y-m-d H:i:s');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformExpectsString()

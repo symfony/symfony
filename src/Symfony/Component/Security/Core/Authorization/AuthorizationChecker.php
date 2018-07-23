@@ -30,15 +30,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private $authenticationManager;
     private $alwaysAuthenticate;
 
-    /**
-     * Constructor.
-     *
-     * @param TokenStorageInterface          $tokenStorage
-     * @param AuthenticationManagerInterface $authenticationManager An AuthenticationManager instance
-     * @param AccessDecisionManagerInterface $accessDecisionManager An AccessDecisionManager instance
-     * @param bool                           $alwaysAuthenticate
-     */
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, $alwaysAuthenticate = false)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
@@ -49,9 +41,9 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     /**
      * {@inheritdoc}
      *
-     * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token.
+     * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token
      */
-    final public function isGranted($attributes, $object = null)
+    final public function isGranted($attributes, $subject = null)
     {
         if (null === ($token = $this->tokenStorage->getToken())) {
             throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
@@ -65,6 +57,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             $attributes = array($attributes);
         }
 
-        return $this->accessDecisionManager->decide($token, $attributes, $object);
+        return $this->accessDecisionManager->decide($token, $attributes, $subject);
     }
 }

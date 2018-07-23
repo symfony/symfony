@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
  * FirewallMap allows configuration of different firewalls for specific parts
@@ -25,14 +26,9 @@ class FirewallMap implements FirewallMapInterface
 {
     private $map = array();
 
-    /**
-     * @param RequestMatcherInterface $requestMatcher
-     * @param array                   $listeners
-     * @param ExceptionListener       $exceptionListener
-     */
-    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $exceptionListener = null)
+    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $exceptionListener = null, LogoutListener $logoutListener = null)
     {
-        $this->map[] = array($requestMatcher, $listeners, $exceptionListener);
+        $this->map[] = array($requestMatcher, $listeners, $exceptionListener, $logoutListener);
     }
 
     /**
@@ -42,10 +38,10 @@ class FirewallMap implements FirewallMapInterface
     {
         foreach ($this->map as $elements) {
             if (null === $elements[0] || $elements[0]->matches($request)) {
-                return array($elements[1], $elements[2]);
+                return array($elements[1], $elements[2], $elements[3]);
             }
         }
 
-        return array(array(), null);
+        return array(array(), null, null);
     }
 }

@@ -26,11 +26,6 @@ interface EquatableInterface
      * However, you do not need to compare every attribute, but only those that
      * are relevant for assessing whether re-authentication is required.
      *
-     * Also implementation should consider that $user instance may implement
-     * the extended user interface `AdvancedUserInterface`.
-     *
-     * @param UserInterface $user
-     *
      * @return bool
      */
     public function isEqualTo(UserInterface $user);

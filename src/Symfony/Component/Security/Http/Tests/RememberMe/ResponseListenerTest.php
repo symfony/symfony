@@ -96,7 +96,7 @@ class ResponseListenerTest extends TestCase
             ->getMock();
 
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
-        $event->expects($this->any())->method('isMasterRequest')->will($this->returnValue($type === HttpKernelInterface::MASTER_REQUEST));
+        $event->expects($this->any())->method('isMasterRequest')->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST === $type));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
 
         return $event;

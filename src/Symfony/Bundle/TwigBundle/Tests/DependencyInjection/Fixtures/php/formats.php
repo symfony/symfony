@@ -11,4 +11,5 @@ $container->loadFromExtension('twig', array(
         'decimal_point' => ',',
         'thousands_separator' => '.',
     ),
+    'strict_variables' => false, // to be removed in 5.0 relying on default
 ));

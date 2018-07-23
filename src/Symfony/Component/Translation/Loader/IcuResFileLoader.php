@@ -39,7 +39,6 @@ class IcuResFileLoader implements LoaderInterface
         try {
             $rb = new \ResourceBundle($locale, $resource);
         } catch (\Exception $e) {
-            // HHVM compatibility: constructor throws on invalid resource
             $rb = null;
         }
 
@@ -70,9 +69,9 @@ class IcuResFileLoader implements LoaderInterface
      *
      * This function takes an array by reference and will modify it
      *
-     * @param \ResourceBundle $rb       the ResourceBundle that will be flattened
-     * @param array           $messages used internally for recursive calls
-     * @param string          $path     current path being parsed, used internally for recursive calls
+     * @param \ResourceBundle $rb       The ResourceBundle that will be flattened
+     * @param array           $messages Used internally for recursive calls
+     * @param string          $path     Current path being parsed, used internally for recursive calls
      *
      * @return array the flattened ResourceBundle
      */

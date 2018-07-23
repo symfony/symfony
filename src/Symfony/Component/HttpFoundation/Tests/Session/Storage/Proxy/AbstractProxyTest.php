@@ -13,39 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
-
-// Note until PHPUnit_Mock_Objects 1.2 is released you cannot mock abstracts due to
-// https://github.com/sebastianbergmann/phpunit-mock-objects/issues/73
-class ConcreteProxy extends AbstractProxy
-{
-}
-
-class ConcreteSessionHandlerInterfaceProxy extends AbstractProxy implements \SessionHandlerInterface
-{
-    public function open($savePath, $sessionName)
-    {
-    }
-
-    public function close()
-    {
-    }
-
-    public function read($id)
-    {
-    }
-
-    public function write($id, $data)
-    {
-    }
-
-    public function destroy($id)
-    {
-    }
-
-    public function gc($maxlifetime)
-    {
-    }
-}
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
 /**
  * Test class for AbstractProxy.
@@ -61,7 +29,7 @@ class AbstractProxyTest extends TestCase
 
     protected function setUp()
     {
-        $this->proxy = new ConcreteProxy();
+        $this->proxy = $this->getMockForAbstractClass(AbstractProxy::class);
     }
 
     protected function tearDown()
@@ -77,7 +45,7 @@ class AbstractProxyTest extends TestCase
     public function testIsSessionHandlerInterface()
     {
         $this->assertFalse($this->proxy->isSessionHandlerInterface());
-        $sh = new ConcreteSessionHandlerInterfaceProxy();
+        $sh = new SessionHandlerProxy(new \SessionHandler());
         $this->assertTrue($sh->isSessionHandlerInterface());
     }
 
@@ -86,48 +54,15 @@ class AbstractProxyTest extends TestCase
         $this->assertFalse($this->proxy->isWrapper());
     }
 
-    public function testIsActivePhp53()
-    {
-        if (\PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->assertFalse($this->proxy->isActive());
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
-     * @requires PHP 5.4
      */
-    public function testIsActivePhp54()
+    public function testIsActive()
     {
         $this->assertFalse($this->proxy->isActive());
         session_start();
         $this->assertTrue($this->proxy->isActive());
-    }
-
-    public function testSetActivePhp53()
-    {
-        if (\PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->proxy->setActive(true);
-        $this->assertTrue($this->proxy->isActive());
-        $this->proxy->setActive(false);
-        $this->assertFalse($this->proxy->isActive());
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @expectedException \LogicException
-     * @requires PHP 5.4
-     */
-    public function testSetActivePhp54()
-    {
-        $this->proxy->setActive(true);
     }
 
     /**
@@ -143,25 +78,11 @@ class AbstractProxyTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     */
-    public function testNameExceptionPhp53()
-    {
-        if (\PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->proxy->setActive(true);
-        $this->proxy->setName('foo');
-    }
-
-    /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      * @expectedException \LogicException
-     * @requires PHP 5.4
      */
-    public function testNameExceptionPhp54()
+    public function testNameException()
     {
         session_start();
         $this->proxy->setName('foo');
@@ -180,25 +101,11 @@ class AbstractProxyTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     */
-    public function testIdExceptionPhp53()
-    {
-        if (\PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->proxy->setActive(true);
-        $this->proxy->setId('foo');
-    }
-
-    /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      * @expectedException \LogicException
-     * @requires PHP 5.4
      */
-    public function testIdExceptionPhp54()
+    public function testIdException()
     {
         session_start();
         $this->proxy->setId('foo');

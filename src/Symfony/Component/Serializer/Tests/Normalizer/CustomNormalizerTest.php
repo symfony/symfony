@@ -33,6 +33,7 @@ class CustomNormalizerTest extends TestCase
     {
         $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
         $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\SerializerAwareInterface', $this->normalizer);
     }
 
     public function testSerialize()
@@ -51,6 +52,18 @@ class CustomNormalizerTest extends TestCase
         $this->assertNull($obj->foo);
 
         $obj = $this->normalizer->denormalize('foo', get_class(new ScalarDummy()), 'json');
+        $this->assertEquals('foo', $obj->foo);
+        $this->assertNull($obj->xmlFoo);
+    }
+
+    public function testDenormalizeWithObjectToPopulateUsesProvidedObject()
+    {
+        $expected = new ScalarDummy();
+        $obj = $this->normalizer->denormalize('foo', ScalarDummy::class, 'json', array(
+            'object_to_populate' => $expected,
+        ));
+
+        $this->assertSame($expected, $obj);
         $this->assertEquals('foo', $obj->foo);
         $this->assertNull($obj->xmlFoo);
     }

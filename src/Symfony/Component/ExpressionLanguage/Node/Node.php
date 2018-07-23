@@ -24,8 +24,6 @@ class Node
     public $attributes = array();
 
     /**
-     * Constructor.
-     *
      * @param array $nodes      An array of nodes
      * @param array $attributes An array of attributes
      */
@@ -74,5 +72,39 @@ class Node
         }
 
         return $results;
+    }
+
+    public function toArray()
+    {
+        throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', get_class($this)));
+    }
+
+    public function dump()
+    {
+        $dump = '';
+
+        foreach ($this->toArray() as $v) {
+            $dump .= is_scalar($v) ? $v : $v->dump();
+        }
+
+        return $dump;
+    }
+
+    protected function dumpString($value)
+    {
+        return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
+    }
+
+    protected function isHash(array $value)
+    {
+        $expectedKey = 0;
+
+        foreach ($value as $key => $val) {
+            if ($key !== $expectedKey++) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

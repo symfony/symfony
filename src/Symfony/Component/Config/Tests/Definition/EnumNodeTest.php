@@ -43,6 +43,12 @@ class EnumNodeTest extends TestCase
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
+    public function testConstructionWithNullName()
+    {
+        $node = new EnumNode(null, null, array('foo'));
+        $this->assertSame('foo', $node->finalize('foo'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar"

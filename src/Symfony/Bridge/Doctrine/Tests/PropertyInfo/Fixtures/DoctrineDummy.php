@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 
@@ -46,6 +47,11 @@ class DoctrineDummy
     protected $indexedBar;
 
     /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="foo", indexBy="foo")
+     */
+    protected $indexedFoo;
+
+    /**
      * @Column(type="guid")
      */
     protected $guid;
@@ -54,6 +60,16 @@ class DoctrineDummy
      * @Column(type="time")
      */
     private $time;
+
+    /**
+     * @Column(type="time_immutable")
+     */
+    private $timeImmutable;
+
+    /**
+     * @Column(type="dateinterval")
+     */
+    private $dateInterval;
 
     /**
      * @Column(type="json_array")

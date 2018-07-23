@@ -30,12 +30,10 @@ class CacheLoader extends Loader
     protected $dir;
 
     /**
-     * Constructor.
-     *
      * @param LoaderInterface $loader A Loader instance
      * @param string          $dir    The directory where to store the cache files
      */
-    public function __construct(LoaderInterface $loader, $dir)
+    public function __construct(LoaderInterface $loader, string $dir)
     {
         $this->loader = $loader;
         $this->dir = $dir;
@@ -43,8 +41,6 @@ class CacheLoader extends Loader
 
     /**
      * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      */
@@ -58,9 +54,6 @@ class CacheLoader extends Loader
         if (is_file($path)) {
             if (null !== $this->logger) {
                 $this->logger->debug('Fetching template from cache.', array('name' => $template->get('name')));
-            } elseif (null !== $this->debugger) {
-                // just for BC, to be removed in 3.0
-                $this->debugger->log(sprintf('Fetching template "%s" from cache.', $template->get('name')));
             }
 
             return new FileStorage($path);
@@ -80,9 +73,6 @@ class CacheLoader extends Loader
 
         if (null !== $this->logger) {
             $this->logger->debug('Storing template in cache.', array('name' => $template->get('name')));
-        } elseif (null !== $this->debugger) {
-            // just for BC, to be removed in 3.0
-            $this->debugger->log(sprintf('Storing template "%s" in cache.', $template->get('name')));
         }
 
         return new FileStorage($path);

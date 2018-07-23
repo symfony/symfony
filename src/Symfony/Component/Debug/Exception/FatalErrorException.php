@@ -9,35 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Exception;
+namespace Symfony\Component\Debug\Exception;
 
 /**
  * Fatal Error Exception.
  *
- * @author Fabien Potencier <fabien@symfony.com>
  * @author Konstanton Myakshin <koc-dp@yandex.ru>
- * @author Nicolas Grekas <p@tchwork.com>
- *
- * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
  */
 class FatalErrorException extends \ErrorException
 {
-}
-
-namespace Symfony\Component\Debug\Exception;
-
-use Symfony\Component\HttpKernel\Exception\FatalErrorException as LegacyFatalErrorException;
-
-/**
- * Fatal Error Exception.
- *
- * @author Konstanton Myakshin <koc-dp@yandex.ru>
- */
-class FatalErrorException extends LegacyFatalErrorException
-{
-    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null, $traceArgs = true, array $trace = null)
+    public function __construct(string $message, int $code, int $severity, string $filename, int $lineno, int $traceOffset = null, bool $traceArgs = true, array $trace = null, \Throwable $previous = null)
     {
-        parent::__construct($message, $code, $severity, $filename, $lineno);
+        parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
 
         if (null !== $trace) {
             if (!$traceArgs) {
@@ -77,11 +60,6 @@ class FatalErrorException extends LegacyFatalErrorException
 
                 unset($frame);
                 $trace = array_reverse($trace);
-            } elseif (function_exists('symfony_debug_backtrace')) {
-                $trace = symfony_debug_backtrace();
-                if (0 < $traceOffset) {
-                    array_splice($trace, 0, $traceOffset);
-                }
             } else {
                 $trace = array();
             }

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Symfony\Component\Security\Core\User\UserChecker;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
@@ -24,23 +27,34 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
     private $simpleAuthenticator;
     private $userProvider;
     private $providerKey;
+    private $userChecker;
 
-    public function __construct(SimpleAuthenticatorInterface $simpleAuthenticator, UserProviderInterface $userProvider, $providerKey)
+    public function __construct(SimpleAuthenticatorInterface $simpleAuthenticator, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker = null)
     {
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->userProvider = $userProvider;
         $this->providerKey = $providerKey;
+        $this->userChecker = $userChecker ?: new UserChecker();
     }
 
     public function authenticate(TokenInterface $token)
     {
         $authToken = $this->simpleAuthenticator->authenticateToken($token, $this->userProvider, $this->providerKey);
 
-        if ($authToken instanceof TokenInterface) {
+        if (!$authToken instanceof TokenInterface) {
+            throw new AuthenticationException('Simple authenticator failed to return an authenticated token.');
+        }
+
+        $user = $authToken->getUser();
+
+        if (!$user instanceof UserInterface) {
             return $authToken;
         }
 
-        throw new AuthenticationException('Simple authenticator failed to return an authenticated token.');
+        $this->userChecker->checkPreAuth($user);
+        $this->userChecker->checkPostAuth($user);
+
+        return $authToken;
     }
 
     public function supports(TokenInterface $token)

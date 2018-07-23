@@ -24,15 +24,13 @@ class RememberMeToken extends AbstractToken
     private $providerKey;
 
     /**
-     * Constructor.
-     *
      * @param UserInterface $user
      * @param string        $providerKey
      * @param string        $secret      A secret used to make sure the token is created by the app and not by a malicious client
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, $providerKey, $secret)
+    public function __construct(UserInterface $user, string $providerKey, string $secret)
     {
         parent::__construct($user->getRoles());
 
@@ -71,16 +69,6 @@ class RememberMeToken extends AbstractToken
     public function getProviderKey()
     {
         return $this->providerKey;
-    }
-
-    /**
-     * @deprecated Since version 2.8, to be removed in 3.0. Use getSecret() instead.
-     */
-    public function getKey()
-    {
-        @trigger_error(__METHOD__.'() is deprecated since version 2.8 and will be removed in 3.0. Use getSecret() instead.', E_USER_DEPRECATED);
-
-        return $this->getSecret();
     }
 
     /**

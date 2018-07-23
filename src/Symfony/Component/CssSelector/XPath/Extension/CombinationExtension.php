@@ -28,7 +28,7 @@ class CombinationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getCombinationTranslators()
+    public function getCombinationTranslators(): array
     {
         return array(
             ' ' => array($this, 'translateDescendant'),
@@ -39,20 +39,14 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
-    public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath)
+    public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath->join('/descendant-or-self::*/', $combinedXpath);
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath)
@@ -61,9 +55,6 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)
@@ -75,9 +66,6 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)

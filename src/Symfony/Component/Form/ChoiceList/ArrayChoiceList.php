@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\ChoiceList;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
 /**
  * A list of choices with arbitrary data types.
  *
@@ -58,18 +56,14 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * The given choice array must have the same array keys as the value array.
      *
-     * @param array|\Traversable $choices The selectable choices
-     * @param callable|null      $value   The callable for creating the value
-     *                                    for a choice. If `null` is passed,
-     *                                    incrementing integers are used as
-     *                                    values
+     * @param iterable      $choices The selectable choices
+     * @param callable|null $value   The callable for creating the value
+     *                               for a choice. If `null` is passed,
+     *                               incrementing integers are used as
+     *                               values
      */
-    public function __construct($choices, $value = null)
+    public function __construct(iterable $choices, callable $value = null)
     {
-        if (null !== $value && !is_callable($value)) {
-            throw new UnexpectedTypeException($value, 'null or callable');
-        }
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -191,7 +185,7 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                   corresponding values
      * @param array    $structuredValues The values indexed by the original keys
      *
-     * @internal Must not be used by user-land code
+     * @internal
      */
     protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
     {
@@ -222,8 +216,8 @@ class ArrayChoiceList implements ChoiceListInterface
      * @param array      $choices The choices
      * @param array|null $cache   The cache for previously checked entries. Internal
      *
-     * @return bool Returns true if the choices can be cast to strings and
-     *              false otherwise.
+     * @return bool returns true if the choices can be cast to strings and
+     *              false otherwise
      */
     private function castableToString(array $choices, array &$cache = array())
     {

@@ -1,0 +1,10 @@
+services:
+    # This definition is valid and should not raise any deprecation notice
+    foo:
+        class: stdClass
+        arguments: [ 'foo', 'bar' ]
+
+    # This definition is invalid and must raise a deprecation notice
+    bar:
+        class: stdClass
+        private: true        # the "private" keyword is invalid

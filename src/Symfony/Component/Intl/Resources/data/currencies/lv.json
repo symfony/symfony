@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "AED": [
             "AED",
@@ -132,6 +132,10 @@
         "CLP": [
             "CLP",
             "Čīles peso"
+        ],
+        "CNH": [
+            "CNH",
+            "Ķīnas juaņa (ofšors)"
         ],
         "CNY": [
             "CN¥",
@@ -439,6 +443,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritānijas ugija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritānijas ugija"
         ],
         "MTL": [
@@ -627,6 +635,10 @@
         ],
         "STD": [
             "STD",
+            "Santome un Prinsipi dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Santome un Prinsipi dobra"
         ],
         "SVC": [

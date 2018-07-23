@@ -35,4 +35,14 @@ class UnaryNodeTest extends AbstractNodeTest
             array('(!true)', new UnaryNode('not', new ConstantNode(true))),
         );
     }
+
+    public function getDumpData()
+    {
+        return array(
+            array('(- 1)', new UnaryNode('-', new ConstantNode(1))),
+            array('(+ 3)', new UnaryNode('+', new ConstantNode(3))),
+            array('(! true)', new UnaryNode('!', new ConstantNode(true))),
+            array('(not true)', new UnaryNode('not', new ConstantNode(true))),
+        );
+    }
 }

@@ -31,21 +31,13 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('web_profiler');
+        $treeBuilder = new TreeBuilder('web_profiler');
 
-        $rootNode
+        $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('toolbar')->defaultFalse()->end()
-                ->scalarNode('position')
-                    ->defaultValue('bottom')
-                    ->validate()
-                        ->ifNotInArray(array('bottom', 'top'))
-                        ->thenInvalid('The CSS position %s is not supported')
-                    ->end()
-                ->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()
-                ->scalarNode('excluded_ajax_paths')->defaultValue('^/(app(_[\\w]+)?\\.php/)?_wdt')->end()
+                ->scalarNode('excluded_ajax_paths')->defaultValue('^/((index|app(_[\w]+)?)\.php/)?_wdt')->end()
             ->end()
         ;
 

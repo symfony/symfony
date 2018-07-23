@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -123,6 +123,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ugiyya Muritani (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ugiyya Muritani"
         ],
         "MUR": [
@@ -175,6 +179,10 @@
         ],
         "STD": [
             "STD",
+            "Dobra Sawo Tome e Prensipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobra Sawo Tome e Prensipe"
         ],
         "SZL": [

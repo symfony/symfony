@@ -29,7 +29,7 @@ class VarDumper
     {
         if (null === self::$handler) {
             $cloner = new VarCloner();
-            $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();
+            $dumper = \in_array(PHP_SAPI, array('cli', 'phpdbg'), true) ? new CliDumper() : new HtmlDumper();
             self::$handler = function ($var) use ($cloner, $dumper) {
                 $dumper->dump($cloner->cloneVar($var));
             };
@@ -38,12 +38,8 @@ class VarDumper
         return call_user_func(self::$handler, $var);
     }
 
-    public static function setHandler($callable)
+    public static function setHandler(callable $callable = null)
     {
-        if (null !== $callable && !is_callable($callable, true)) {
-            throw new \InvalidArgumentException('Invalid PHP callback.');
-        }
-
         $prevHandler = self::$handler;
         self::$handler = $callable;
 

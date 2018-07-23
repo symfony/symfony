@@ -21,11 +21,9 @@ abstract class Storage
     protected $template;
 
     /**
-     * Constructor.
-     *
      * @param string $template The template name
      */
-    public function __construct($template)
+    public function __construct(string $template)
     {
         $this->template = $template;
     }

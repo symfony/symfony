@@ -1,0 +1,19 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    listener_aggregator:
+        class: Bar\FooClass
+        public: true
+        arguments: [!tagged listener]
+    .2_stdClass~%s:
+        class: stdClass
+        public: false
+        tags:
+            - { name: listener }
+    decorated:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\StdClassDecorator
+        public: true
+        arguments: [!service { class: stdClass, public: false }]

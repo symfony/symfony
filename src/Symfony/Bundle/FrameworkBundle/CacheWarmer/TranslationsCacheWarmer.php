@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -21,26 +22,15 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Xavier Leune <xavier.leune@gmail.com>
  */
-class TranslationsCacheWarmer implements CacheWarmerInterface
+class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
     private $container;
     private $translator;
 
-    /**
-     * TranslationsCacheWarmer constructor.
-     *
-     * @param ContainerInterface|TranslatorInterface $container
-     */
-    public function __construct($container)
+    public function __construct(ContainerInterface $container)
     {
         // As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
-        if ($container instanceof ContainerInterface) {
-            $this->container = $container;
-        } elseif ($container instanceof TranslatorInterface) {
-            $this->translator = $container;
-        } else {
-            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface or Symfony\Component\Translation\TranslatorInterface as first argument.', __CLASS__));
-        }
+        $this->container = $container;
     }
 
     /**
@@ -63,5 +53,15 @@ class TranslationsCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'translator' => TranslatorInterface::class,
+        );
     }
 }

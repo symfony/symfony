@@ -167,7 +167,7 @@ interface FormConfigInterface
     /**
      * Returns the class of the form data or null if the data is scalar or an array.
      *
-     * @return string The data class or null
+     * @return null|string The data class or null
      */
     public function getDataClass();
 
@@ -213,8 +213,8 @@ interface FormConfigInterface
     /**
      * Returns whether the form should be initialized upon creation.
      *
-     * @return bool Returns true if the form should be initialized
-     *              when created, false otherwise.
+     * @return bool returns true if the form should be initialized
+     *              when created, false otherwise
      */
     public function getAutoInitialize();
 

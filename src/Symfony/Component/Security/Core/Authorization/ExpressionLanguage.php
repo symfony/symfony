@@ -11,23 +11,30 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
 
-/**
- * Adds some function to the default ExpressionLanguage.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @see ExpressionLanguageProvider
- */
-class ExpressionLanguage extends BaseExpressionLanguage
-{
-    public function __construct(ParserCacheInterface $cache = null, array $providers = array())
+if (!class_exists(BaseExpressionLanguage::class)) {
+    throw new \LogicException(sprintf('The "%s" class requires the "ExpressionLanguage" component. Try running "composer require symfony/expression-language".', ExpressionLanguage::class));
+} else {
+    /**
+     * Adds some function to the default ExpressionLanguage.
+     *
+     * @author Fabien Potencier <fabien@symfony.com>
+     *
+     * @see ExpressionLanguageProvider
+     */
+    class ExpressionLanguage extends BaseExpressionLanguage
     {
-        // prepend the default provider to let users override it easily
-        array_unshift($providers, new ExpressionLanguageProvider());
+        /**
+         * {@inheritdoc}
+         */
+        public function __construct(CacheItemPoolInterface $cache = null, array $providers = array())
+        {
+            // prepend the default provider to let users override it easily
+            array_unshift($providers, new ExpressionLanguageProvider());
 
-        parent::__construct($cache, $providers);
+            parent::__construct($cache, $providers);
+        }
     }
 }

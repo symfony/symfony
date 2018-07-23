@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "chilensk peso"
+        ],
+        "CNH": [
+            "CNH",
+            "CNH"
         ],
         "CNX": [
             "CNX",
@@ -679,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "mauretansk ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mauretansk ouguiya"
         ],
         "MTL": [
@@ -911,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "saotomeansk dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "saotomeansk dobra"
         ],
         "SUR": [

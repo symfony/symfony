@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -261,6 +261,10 @@
             "CLP",
             "Chilen peso"
         ],
+        "CNH": [
+            "CNH",
+            "Kiinan juan (offshore)"
+        ],
         "CNX": [
             "CNX",
             "Kiinan kansanpankin dollari"
@@ -279,7 +283,7 @@
         ],
         "CRC": [
             "CRC",
-            "Costa Rican colon"
+            "Costa Rican colón"
         ],
         "CSD": [
             "CSD",
@@ -355,7 +359,7 @@
         ],
         "ESA": [
             "ESA",
-            "Espanjan peseta (A–tili)"
+            "Espanjan peseta (A-tili)"
         ],
         "ESB": [
             "ESB",
@@ -679,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanian ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanian ouguiya"
         ],
         "MTL": [
@@ -799,11 +807,11 @@
         ],
         "PLN": [
             "PLN",
-            "Puolan zloty"
+            "Puolan złoty"
         ],
         "PLZ": [
             "PLZ",
-            "Puolan zloty (1950–1995)"
+            "Puolan złoty (1950–1995)"
         ],
         "PTE": [
             "PTE",
@@ -911,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomén ja Príncipen dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomén ja Príncipen dobra"
         ],
         "SUR": [
@@ -919,7 +931,7 @@
         ],
         "SVC": [
             "SVC",
-            "El Salvadorin colon"
+            "El Salvadorin colón"
         ],
         "SYP": [
             "SYP",

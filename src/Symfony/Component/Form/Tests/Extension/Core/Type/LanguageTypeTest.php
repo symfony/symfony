@@ -25,16 +25,6 @@ class LanguageTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('language');
-
-        $this->assertSame('language', $form->getConfig()->getType()->getName());
-    }
-
     public function testCountriesAreSelectable()
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
@@ -45,6 +35,25 @@ class LanguageTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('en_US', 'en_US', 'American English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('fr', 'fr', 'French'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('my', 'my', 'Burmese'), $choices, '', false, false);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testChoiceTranslationLocaleOption()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, array(
+                'choice_translation_locale' => 'uk',
+            ))
+            ->createView()->vars['choices'];
+
+        // Don't check objects for identity
+        $this->assertContains(new ChoiceView('en', 'en', 'англійська'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'British English'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_US', 'en_US', 'англійська (США)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('fr', 'fr', 'французька'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('my', 'my', 'бірманська'), $choices, '', false, false);
     }
 
     public function testMultipleLanguagesIsNotIncluded()

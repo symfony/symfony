@@ -30,7 +30,7 @@ class TimeDataCollectorTest extends TestCase
 
         $c->collect($request, new Response());
 
-        $this->assertEquals(1000, $c->getStartTime());
+        $this->assertEquals(0, $c->getStartTime());
 
         $request->server->set('REQUEST_TIME_FLOAT', 2);
 

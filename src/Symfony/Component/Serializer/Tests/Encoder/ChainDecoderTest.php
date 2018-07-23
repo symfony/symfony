@@ -33,9 +33,10 @@ class ChainDecoderTest extends TestCase
         $this->decoder1
             ->method('supportsDecoding')
             ->will($this->returnValueMap(array(
-                array(self::FORMAT_1, true),
-                array(self::FORMAT_2, false),
-                array(self::FORMAT_3, false),
+                array(self::FORMAT_1, array(), true),
+                array(self::FORMAT_2, array(), false),
+                array(self::FORMAT_3, array(), false),
+                array(self::FORMAT_3, array('foo' => 'bar'), true),
             )));
 
         $this->decoder2 = $this
@@ -45,9 +46,9 @@ class ChainDecoderTest extends TestCase
         $this->decoder2
             ->method('supportsDecoding')
             ->will($this->returnValueMap(array(
-                array(self::FORMAT_1, false),
-                array(self::FORMAT_2, true),
-                array(self::FORMAT_3, false),
+                array(self::FORMAT_1, array(), false),
+                array(self::FORMAT_2, array(), true),
+                array(self::FORMAT_3, array(), false),
             )));
 
         $this->chainDecoder = new ChainDecoder(array($this->decoder1, $this->decoder2));
@@ -58,6 +59,7 @@ class ChainDecoderTest extends TestCase
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_1));
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_2));
         $this->assertFalse($this->chainDecoder->supportsDecoding(self::FORMAT_3));
+        $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, array('foo' => 'bar')));
     }
 
     public function testDecode()

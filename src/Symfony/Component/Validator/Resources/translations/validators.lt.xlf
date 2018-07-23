@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Failas negali būti tuščias.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Klaida</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

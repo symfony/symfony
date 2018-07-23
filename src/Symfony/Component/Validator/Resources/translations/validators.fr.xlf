@@ -318,6 +318,10 @@
                 <source>Error</source>
                 <target>Erreur</target>
             </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Ceci n'est pas un UUID valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

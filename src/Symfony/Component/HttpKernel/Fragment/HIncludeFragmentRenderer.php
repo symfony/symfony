@@ -131,7 +131,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         if ($this->templating instanceof EngineInterface) {
             try {
                 return $this->templating->exists($template);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\Exception $e) {
                 return false;
             }
         }

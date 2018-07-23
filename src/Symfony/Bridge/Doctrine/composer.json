@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
-        "doctrine/common": "~2.4@stable",
+        "doctrine/common": "~2.4",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0"
     },

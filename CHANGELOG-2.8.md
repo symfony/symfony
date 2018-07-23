@@ -7,6 +7,20 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.43 (2018-07-23)
+
+ * bug #28005 [HttpKernel] Fixed templateExists on parse error of the template name (yceruto)
+ * bug #27997 Serbo-Croatian has Serbian plural rule (kylekatarnls)
+ * bug #27941 [WebProfilerBundle] Fixed icon alignment issue using Bootstrap 4.1.2 (jmsche)
+ * bug #27937 [HttpFoundation] reset callback on StreamedResponse when setNotModified() is called (rubencm)
+ * bug #27927 [HttpFoundation] Suppress side effects in 'get' and 'has' methods of NamespacedAttributeBag (webnet-fr)
+ * bug #27904 [Filesystem] fix lock file permissions (fritzmg)
+ * bug #27758 [WebProfilerBundle] Prevent toolbar links color override by css (alcalyn)
+ * bug #27831  Check for Hyper terminal on all operating systems.  (azjezz)
+ * bug #27794 Add color support for Hyper terminal . (azjezz)
+ * bug #27809 [HttpFoundation] Fix tests: new message for status 425 (dunglas)
+ * bug #27716 [DI] fix dumping deprecated service in yaml (nicolas-grekas)
+
 * 2.8.42 (2018-06-25)
 
  * bug #27669 [Filesystem] fix file lock on SunOS (fritzmg)

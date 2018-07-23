@@ -1,3 +1,8 @@
+<!--
+    Make sure to prefix the title of your PR above with the name of the
+    relevant components e.g. [Form] [Validator] My title
+-->
+
 | Q             | A
 | ------------- | ---
 | Branch?       | master for features / 2.8 up to 4.1 for bug fixes <!-- see below -->

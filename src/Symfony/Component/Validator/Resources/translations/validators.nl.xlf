@@ -310,7 +310,7 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Dit is geen geldige bedrijfsidentificatiecode (BIC/SWIFT).</target>
             </trans-unit>
-            <trans-unit id="82">
+            <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
                 <target>Deze waarde is geen geldige UUID waarde.</target>
             </trans-unit>

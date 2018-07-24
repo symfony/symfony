@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -530,50 +531,22 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->dump();
-
-        $this->addToAssertionCount(1);
-    }
-
-    public function testCircularReferenceAllowanceForInlinedDefinitionsForLazyServices()
-    {
-        /*
-         *   test graph:
-         *              [connection] -> [event_manager] --> [entity_manager](lazy)
-         *                                                           |
-         *                                                           --(call)- addEventListener ("@lazy_service")
-         *
-         *              [lazy_service](lazy) -> [entity_manager](lazy)
-         *
-         */
-
-        $container = new ContainerBuilder();
-
-        $eventManagerDefinition = new Definition('stdClass');
-
-        $connectionDefinition = $container->register('connection', 'stdClass')->setPublic(true);
-        $connectionDefinition->addArgument($eventManagerDefinition);
-
-        $container->register('entity_manager', 'stdClass')
-            ->setPublic(true)
-            ->setLazy(true)
-            ->addArgument(new Reference('connection'));
-
-        $lazyServiceDefinition = $container->register('lazy_service', 'stdClass');
-        $lazyServiceDefinition->setPublic(true);
-        $lazyServiceDefinition->setLazy(true);
-        $lazyServiceDefinition->addArgument(new Reference('entity_manager'));
-
-        $eventManagerDefinition->addMethodCall('addEventListener', array(new Reference('lazy_service')));
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-
         $dumper->setProxyDumper(new \DummyProxyDumper());
         $dumper->dump();
 
         $this->addToAssertionCount(1);
+
+        $dumper = new PhpDumper($container);
+
+        $message = 'Circular reference detected for service "bar", path: "bar -> foo -> bar". Try running "composer require symfony/proxy-manager-bridge".';
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(ServiceCircularReferenceException::class);
+            $this->expectExceptionMessage($message);
+        } else {
+            $this->setExpectedException(ServiceCircularReferenceException::class, $message);
+        }
+
+        $dumper->dump();
     }
 
     public function testDedupLazyProxy()
@@ -851,6 +824,12 @@ class PhpDumperTest extends TestCase
 
         $foo5 = $container->get('foo5');
         $this->assertSame($foo5, $foo5->bar->foo);
+
+        $manager = $container->get('manager');
+        $this->assertEquals(new \stdClass(), $manager);
+
+        $manager = $container->get('manager2');
+        $this->assertEquals(new \stdClass(), $manager);
     }
 
     public function provideAlmostCircular()

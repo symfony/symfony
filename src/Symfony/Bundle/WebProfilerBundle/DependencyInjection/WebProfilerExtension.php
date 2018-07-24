@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\DependencyInjection;
 
+use Symfony\Bundle\WebProfilerBundle\EventListener\ServerTimingListener;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -53,6 +54,13 @@ class WebProfilerExtension extends Extension
             $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(4, $config['excluded_ajax_paths']);
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
             $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
+        }
+
+        if ($config['server_timing']) {
+            $container->register('web_profiler.server_timing', ServerTimingListener::class)
+                ->addArgument(new Reference('debug.stopwatch'))
+                ->setPrivate(true)
+                ->addTag('kernel.event_subscriber');
         }
 
         if (Kernel::VERSION_ID >= 40008 || (Kernel::VERSION_ID >= 30408 && Kernel::VERSION_ID < 40000)) {

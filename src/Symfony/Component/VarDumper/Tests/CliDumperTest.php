@@ -321,16 +321,7 @@ stream resource {@{$ref}
             """
         }
       }
-      %d. %slosure%s() ==> Twig%cTemplate->render(): {
-        src: {
-          %sCliDumperTest.php:%d: """
 %A
-            """
-        }
-      }
-    }
-  }
-}
 
 EOTXT
             ,

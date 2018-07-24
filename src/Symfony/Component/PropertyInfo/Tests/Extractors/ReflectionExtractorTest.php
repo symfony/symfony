@@ -37,6 +37,8 @@ class ReflectionExtractorTest extends TestCase
                 'bal',
                 'parent',
                 'collection',
+                'nestedCollection',
+                'mixedCollection',
                 'B',
                 'Guid',
                 'g',

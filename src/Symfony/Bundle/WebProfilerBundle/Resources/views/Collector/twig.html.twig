@@ -25,6 +25,13 @@
             <b>Macro Calls</b>
             <span class="sf-toolbar-status">{{ collector.macrocount }}</span>
         </div>
+        <div class="sf-toolbar-info-piece">
+            <input type="color" id="__twig-debug-color" value="#ff0000">
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <span><a href="javascript:;" id="__twig-debug-enable">Enable debug</a></span><br>
+            <span><a href="javascript:;" id="__twig-debug-discover" style="display: none;">Discover</a></span>
+        </div>
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}

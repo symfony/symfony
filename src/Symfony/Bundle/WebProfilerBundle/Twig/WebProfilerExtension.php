@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Twig;
 
+use Symfony\Bundle\WebProfilerBundle\Twig\NodeVisitor\HtmlDebugNodeVisitor;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Twig\Environment;
@@ -67,6 +68,14 @@ class WebProfilerExtension extends ProfilerExtension
             new TwigFunction('profiler_dump', array($this, 'dumpData'), array('is_safe' => array('html'), 'needs_environment' => true)),
             new TwigFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNodeVisitors(): array
+    {
+        return array(new HtmlDebugNodeVisitor());
     }
 
     public function dumpData(Environment $env, Data $data, $maxDepth = 0)

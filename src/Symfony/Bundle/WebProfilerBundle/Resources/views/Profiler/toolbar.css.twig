@@ -550,6 +550,45 @@ div.sf-toolbar .sf-toolbar-block a:hover {
     margin-right: 10px;
 }
 
+#__twig-debug-bar {
+    position: absolute;
+    display: none;
+    padding: 3px;
+    margin-top: 3px;
+    margin-left: -5px;
+    background: red;
+    color: white;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+#__twig-debug-bar.colorized:after {
+    mix-blend-mode: difference;
+    content: attr(title);
+}
+
+#__twig-debug-color {
+    display: block;
+    width: 80px;
+    margin: 5px 0 0 0;
+}
+
+[data-twig-debug] {
+    position: absolute;
+}
+[data-twig-debug]:hover {
+    outline: 2px dashed red;
+    outline-offset: 3px;
+}
+[data-twig-debug].discovered:not(:hover):after {
+    content: ' \25E2';
+    font-size: x-small;
+    color: red;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
 /***** Media query print: Do not print the Toolbar. *****/
 @media print {
     .sf-toolbar {

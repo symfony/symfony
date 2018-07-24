@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Cursor;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Contracts\Console\CheckForAnsiColorSupport;
 
 /**
  * CliDumper dumps variables for command line output.
@@ -21,6 +22,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class CliDumper extends AbstractDumper
 {
+    use CheckForAnsiColorSupport;
+
     public static $defaultColors;
     public static $defaultOutput = 'php://stdout';
 
@@ -62,7 +65,7 @@ class CliDumper extends AbstractDumper
     {
         parent::__construct($output, $charset, $flags);
 
-        if ('\\' === DIRECTORY_SEPARATOR && !$this->isWindowsTrueColor()) {
+        if ('\\' === DIRECTORY_SEPARATOR && !static::isWindowsTrueColor()) {
             // Use only the base 16 xterm colors when using ANSICON or standard Windows 10 CLI
             $this->setStyles(array(
                 'default' => '31',
@@ -345,7 +348,6 @@ class CliDumper extends AbstractDumper
                         $this->line .= $bin.'"'.$this->style($style, $key).'" => ';
                     }
                     break;
-
                 case Cursor::HASH_RESOURCE:
                     $key = "\0~\0".$key;
                     // no break
@@ -467,7 +469,7 @@ class CliDumper extends AbstractDumper
     protected function supportsColors()
     {
         if ($this->outputStream !== static::$defaultOutput) {
-            return $this->hasColorSupport($this->outputStream);
+            return static::streamHasColorSupport($this->outputStream);
         }
         if (null !== static::$defaultColors) {
             return static::$defaultColors;
@@ -498,7 +500,7 @@ class CliDumper extends AbstractDumper
         $h = stream_get_meta_data($this->outputStream) + array('wrapper_type' => null);
         $h = 'Output' === $h['stream_type'] && 'PHP' === $h['wrapper_type'] ? fopen('php://stdout', 'wb') : $this->outputStream;
 
-        return static::$defaultColors = $this->hasColorSupport($h);
+        return static::$defaultColors = static::streamHasColorSupport($h);
     }
 
     /**
@@ -523,75 +525,5 @@ class CliDumper extends AbstractDumper
         }
 
         $this->dumpLine($cursor->depth, true);
-    }
-
-    /**
-     * Returns true if the stream supports colorization.
-     *
-     * Reference: Composer\XdebugHandler\Process::supportsColor
-     * https://github.com/composer/xdebug-handler
-     *
-     * @param mixed $stream A CLI output stream
-     *
-     * @return bool
-     */
-    private function hasColorSupport($stream)
-    {
-        if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
-            return false;
-        }
-
-        if ('Hyper' === getenv('TERM_PROGRAM')) {
-            return true;
-        }
-
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return (function_exists('sapi_windows_vt100_support')
-                && @sapi_windows_vt100_support($stream))
-                || false !== getenv('ANSICON')
-                || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
-        }
-
-        if (function_exists('stream_isatty')) {
-            return @stream_isatty($stream);
-        }
-
-        if (function_exists('posix_isatty')) {
-            return @posix_isatty($stream);
-        }
-
-        $stat = @fstat($stream);
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
-    }
-
-    /**
-     * Returns true if the Windows terminal supports true color.
-     *
-     * Note that this does not check an output stream, but relies on environment
-     * variables from known implementations, or a PHP and Windows version that
-     * supports true color.
-     *
-     * @return bool
-     */
-    private function isWindowsTrueColor()
-    {
-        $result = 183 <= getenv('ANSICON_VER')
-            || 'ON' === getenv('ConEmuANSI')
-            || 'xterm' === getenv('TERM')
-            || 'Hyper' === getenv('TERM_PROGRAM');
-
-        if (!$result && PHP_VERSION_ID >= 70200) {
-            $version = sprintf(
-                '%s.%s.%s',
-                PHP_WINDOWS_VERSION_MAJOR,
-                PHP_WINDOWS_VERSION_MINOR,
-                PHP_WINDOWS_VERSION_BUILD
-            );
-            $result = $version >= '10.0.15063';
-        }
-
-        return $result;
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Output;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Contracts\Console\CheckForAnsiColorSupport;
 
 /**
  * StreamOutput writes the output to a given stream.
@@ -30,6 +31,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class StreamOutput extends Output
 {
+    use CheckForAnsiColorSupport;
+
     private $stream;
 
     /**
@@ -49,7 +52,7 @@ class StreamOutput extends Output
         $this->stream = $stream;
 
         if (null === $decorated) {
-            $decorated = $this->hasColorSupport();
+            $decorated = static::hasColorSupport();
         }
 
         parent::__construct($verbosity, $decorated, $formatter);
@@ -76,45 +79,5 @@ class StreamOutput extends Output
         }
 
         fflush($this->stream);
-    }
-
-    /**
-     * Returns true if the stream supports colorization.
-     *
-     * Colorization is disabled if not supported by the stream:
-     *
-     * This is tricky on Windows, because Cygwin, Msys2 etc emulate pseudo
-     * terminals via named pipes, so we can only check the environment.
-     *
-     * Reference: Composer\XdebugHandler\Process::supportsColor
-     * https://github.com/composer/xdebug-handler
-     *
-     * @return bool true if the stream supports colorization, false otherwise
-     */
-    protected function hasColorSupport()
-    {
-        if ('Hyper' === getenv('TERM_PROGRAM')) {
-            return true;
-        }
-
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return (function_exists('sapi_windows_vt100_support')
-                && @sapi_windows_vt100_support($this->stream))
-                || false !== getenv('ANSICON')
-                || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
-        }
-
-        if (function_exists('stream_isatty')) {
-            return @stream_isatty($this->stream);
-        }
-
-        if (function_exists('posix_isatty')) {
-            return @posix_isatty($this->stream);
-        }
-
-        $stat = @fstat($this->stream);
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
     }
 }

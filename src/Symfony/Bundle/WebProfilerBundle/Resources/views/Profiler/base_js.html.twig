@@ -409,8 +409,8 @@
 
                 var visual = document.createElement('DIV');
                 visual.dataset.twigDebug = parts.join(' ');
-                visual.style.top = parseInt(bbox.top) + 'px';
-                visual.style.left = parseInt(bbox.left) + 'px';
+                visual.style.top = parseInt(bbox.top + document.documentElement.scrollTop || document.body.scrollTop) + 'px';
+                visual.style.left = parseInt(bbox.left + document.documentElement.scrollLeft || document.body.scrollLeft) + 'px';
                 visual.style.width = parseInt(bbox.width) + 'px';
                 visual.style.height = parseInt(bbox.height) + 'px';
                 visual.style.zIndex = String(MAX_ZINDEX - Math.min((MAX_ZINDEX - 99999), parseInt(bbox.width * bbox.height)));
@@ -437,8 +437,8 @@
                     } else {
                         bar.textContent = label;
                     }
-                    bar.style.top = parseInt(rect.top + rect.height) + 'px';
-                    bar.style.left = parseInt(rect.left) + 'px';
+                    bar.style.top = parseInt(rect.top + (document.documentElement.scrollTop || document.body.scrollTop) + rect.height) + 'px';
+                    bar.style.left = parseInt(rect.left + (document.documentElement.scrollLeft || document.body.scrollLeft)) + 'px';
                     bar.style.display = 'block';
                 });
                 addEventListener(visual, 'mouseleave', function () {
@@ -605,6 +605,14 @@
                             });
                         }
 
+                        addEventListener(window, 'resize', function() {
+                            if (twigDebugEnabled()) {
+                                twigDebugDisable();
+                                twigDebugEnable();
+                                document.getElementById('__twig-debug-discover').textContent = 'Discover';
+                            }
+                        });
+
                         addEventListener(document.getElementById('__twig-debug-enable'), 'click', function () {
                             var discover = document.getElementById('__twig-debug-discover');
                             discover.textContent = 'Discover';
@@ -613,6 +621,7 @@
                                 discover.style.display = 'none';
                                 this.textContent = 'Enable debug';
                             } else {
+                                window.scrollTo(0, 0);
                                 twigDebugEnable();
                                 discover.style.display = 'initial';
                                 this.textContent = 'Disable debug';

@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+use Symfony\Contracts\Console\CheckForAnsiColorSupport;
+
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
  *
@@ -18,6 +20,8 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DeprecationErrorHandler
 {
+    use CheckForAnsiColorSupport;
+
     const MODE_WEAK = 'weak';
     const MODE_WEAK_VENDORS = 'weak_vendors';
     const MODE_DISABLED = 'disabled';
@@ -295,44 +299,5 @@ class DeprecationErrorHandler
         register_shutdown_function(function () use ($outputFile, &$deprecations) {
             file_put_contents($outputFile, serialize($deprecations));
         });
-    }
-
-    /**
-     * Returns true if STDOUT is defined and supports colorization.
-     *
-     * Reference: Composer\XdebugHandler\Process::supportsColor
-     * https://github.com/composer/xdebug-handler
-     *
-     * @return bool
-     */
-    private static function hasColorSupport()
-    {
-        if (!defined('STDOUT')) {
-            return false;
-        }
-
-        if ('Hyper' === getenv('TERM_PROGRAM')) {
-            return true;
-        }
-
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return (function_exists('sapi_windows_vt100_support')
-                && sapi_windows_vt100_support(STDOUT))
-                || false !== getenv('ANSICON')
-                || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
-        }
-
-        if (function_exists('stream_isatty')) {
-            return stream_isatty(STDOUT);
-        }
-
-        if (function_exists('posix_isatty')) {
-            return posix_isatty(STDOUT);
-        }
-
-        $stat = fstat(STDOUT);
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
     }
 }

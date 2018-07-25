@@ -29,7 +29,7 @@ class DeprecationErrorHandler
      *
      * The following reporting modes are supported:
      * - use "weak" to hide the deprecation report but keep a global count;
-     * - use "weak_vendors" to act as "weak" but only for vendors;
+     * - use "weak_vendors" to fail only on deprecations triggered in your own code;
      * - use "/some-regexp/" to stop the test suite whenever a deprecation
      *   message matches the given regular expression;
      * - use a number to define the upper bound of allowed deprecations,
@@ -80,7 +80,7 @@ class DeprecationErrorHandler
                 return true;
             }
             foreach ($vendors as $vendor) {
-                if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                     return true;
                 }
             }
@@ -159,7 +159,7 @@ class DeprecationErrorHandler
                     echo "\n".ucfirst($group).' deprecation triggered by '.$class.'::'.$method.':';
                     echo "\n".$msg;
                     echo "\nStack trace:";
-                    echo "\n".str_replace(' '.getcwd().DIRECTORY_SEPARATOR, ' ', $e->getTraceAsString());
+                    echo "\n".str_replace(' '.getcwd().\DIRECTORY_SEPARATOR, ' ', $e->getTraceAsString());
                     echo "\n";
 
                     exit(1);
@@ -315,7 +315,7 @@ class DeprecationErrorHandler
             return true;
         }
 
-        if (DIRECTORY_SEPARATOR === '\\') {
+        if (\DIRECTORY_SEPARATOR === '\\') {
             return (function_exists('sapi_windows_vt100_support')
                 && sapi_windows_vt100_support(STDOUT))
                 || false !== getenv('ANSICON')

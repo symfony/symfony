@@ -573,6 +573,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertSame($messageToSenderIdsMapping, $senderLocatorDefinition->getArgument(1));
         $this->assertSame($messageToSendAndHandleMapping, $sendMessageMiddlewareDefinition->getArgument(1));
+        $this->assertEquals(array(new Reference('messenger.transport.amqp'), new Reference('audit')), $container->getDefinition('.messenger.chain_sender.'.DummyMessage::class)->getArgument(0));
     }
 
     /**

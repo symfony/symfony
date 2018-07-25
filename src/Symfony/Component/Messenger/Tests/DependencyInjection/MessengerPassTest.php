@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\ChainHandler;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\AllowNoHandlerMiddleware;
@@ -326,13 +327,28 @@ class MessengerPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaInterface": message class "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaInterface::getHandledMessages()" does not exist.
+     * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface": message class "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface::__invoke()" does not exist.
      */
-    public function testUndefinedMessageClassForHandlerViaInterface()
+    public function testUndefinedMessageClassForHandlerImplementingMessageHandlerInterface()
     {
         $container = $this->getContainerBuilder();
         $container
-            ->register(UndefinedMessageHandlerViaInterface::class, UndefinedMessageHandlerViaInterface::class)
+            ->register(UndefinedMessageHandlerViaHandlerInterface::class, UndefinedMessageHandlerViaHandlerInterface::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface": message class "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface::getHandledMessages()" does not exist.
+     */
+    public function testUndefinedMessageClassForHandlerImplementingMessageSubscriberInterface()
+    {
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(UndefinedMessageHandlerViaSubscriberInterface::class, UndefinedMessageHandlerViaSubscriberInterface::class)
             ->addTag('messenger.message_handler')
         ;
 
@@ -600,7 +616,14 @@ class UndefinedMessageHandler
     }
 }
 
-class UndefinedMessageHandlerViaInterface implements MessageSubscriberInterface
+class UndefinedMessageHandlerViaHandlerInterface implements MessageHandlerInterface
+{
+    public function __invoke(UndefinedMessage $message)
+    {
+    }
+}
+
+class UndefinedMessageHandlerViaSubscriberInterface implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {

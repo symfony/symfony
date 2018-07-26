@@ -530,7 +530,7 @@ class FrameworkExtension extends Extension
                     }
 
                     if (isset($transition['guard'])) {
-                        $configuration =  new Definition(Workflow\EventListener\GuardExpression::class);
+                        $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
                         $configuration->addArgument(new Reference($transitionId));
                         $configuration->addArgument($transition['guard']);
                         $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);

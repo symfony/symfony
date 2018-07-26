@@ -390,16 +390,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array(
             array(
                 'event' => 'workflow.article.guard.publish',
-                'method' => 'onTransition'
-            )
+                'method' => 'onTransition',
+            ),
         ), $guardDefinition->getTag('kernel.event_listener'));
         $guardsConfiguration = $guardDefinition->getArgument(0);
         $this->assertTrue(1 === count($guardsConfiguration), 'Workflow guard configuration contains one element per transition name');
         $transitionGuardExpressions = $guardsConfiguration['workflow.article.guard.publish'];
         $this->assertSame('workflow.article.transition.3', (string) $transitionGuardExpressions[0]->getArgument(0));
-        $this->assertSame("!!true", $transitionGuardExpressions[0]->getArgument(1));
+        $this->assertSame('!!true', $transitionGuardExpressions[0]->getArgument(1));
         $this->assertSame('workflow.article.transition.4', (string) $transitionGuardExpressions[1]->getArgument(0));
-        $this->assertSame("!!false", $transitionGuardExpressions[1]->getArgument(1));
+        $this->assertSame('!!false', $transitionGuardExpressions[1]->getArgument(1));
     }
 
     public function testWorkflowServicesCanBeEnabled()

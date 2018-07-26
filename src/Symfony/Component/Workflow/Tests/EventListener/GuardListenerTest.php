@@ -139,8 +139,6 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-
-
     private function createEvent($newTransition = false)
     {
         $subject = new \stdClass();
@@ -193,6 +191,7 @@ class GuardListenerTest extends TestCase
         if ($new || !$this->transition) {
             $this->transition = new Transition('name', 'from', 'to');
         }
+
         return $this->transition;
     }
 }

@@ -27,12 +27,12 @@ class GlobResourceTest extends TestCase
 
     public function testIterator()
     {
-        $dir = \dirname(__DIR__).DIRECTORY_SEPARATOR.'Fixtures';
+        $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/Resource', true);
 
         $paths = iterator_to_array($resource);
 
-        $file = $dir.'/Resource'.DIRECTORY_SEPARATOR.'ConditionalClass.php';
+        $file = $dir.'/Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals(array($file => new \SplFileInfo($file)), $paths);
         $this->assertInstanceOf('SplFileInfo', current($paths));
         $this->assertSame($dir, $resource->getPrefix());
@@ -41,7 +41,7 @@ class GlobResourceTest extends TestCase
 
         $paths = iterator_to_array($resource);
 
-        $file = $dir.DIRECTORY_SEPARATOR.'Resource'.DIRECTORY_SEPARATOR.'ConditionalClass.php';
+        $file = $dir.\DIRECTORY_SEPARATOR.'Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals(array($file => $file), $paths);
         $this->assertInstanceOf('SplFileInfo', current($paths));
         $this->assertSame($dir, $resource->getPrefix());

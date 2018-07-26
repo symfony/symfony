@@ -50,7 +50,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
 
         $this->templateLocator = new TemplateLocator($this->fileLocator);
 
-        $this->tmpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('cache_template_paths_', true);
+        $this->tmpDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('cache_template_paths_', true);
 
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->tmpDir);

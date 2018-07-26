@@ -126,7 +126,7 @@ EOF
             }
             $firstNamespace = false;
             foreach ($paths as $path) {
-                $rows[] = array($namespace, $path.DIRECTORY_SEPARATOR);
+                $rows[] = array($namespace, $path.\DIRECTORY_SEPARATOR);
                 $namespace = '';
             }
             if (\count($paths) > 1) {
@@ -159,7 +159,7 @@ EOF
         foreach ($loader->getNamespaces() as $namespace) {
             $paths = array_map(function ($path) {
                 if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
-                    $path = ltrim(substr($path, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                    $path = ltrim(substr($path, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
                 }
 
                 return $path;
@@ -272,7 +272,7 @@ EOF
 
         if ($this->rootDir && $this->projectDir) {
             $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
-            $relativePath = ltrim(substr($this->rootDir.'/Resources/', \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+            $relativePath = ltrim(substr($this->rootDir.'/Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce(
                 $folders,
                 function ($carry, $absolutePath) use ($relativePath) {
@@ -290,13 +290,13 @@ EOF
 
         if ($this->twigDefaultPath && $this->projectDir) {
             $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
-            $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles', \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+            $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce(
                 $folders,
                 function ($carry, $absolutePath) use ($relativePath) {
                     if (0 === strpos($absolutePath, $this->projectDir)) {
-                        $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
-                        $name = ltrim(substr($path, \strlen($relativePath)), DIRECTORY_SEPARATOR);
+                        $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+                        $name = ltrim(substr($path, \strlen($relativePath)), \DIRECTORY_SEPARATOR);
                         $carry[$name] = $path;
                     }
 

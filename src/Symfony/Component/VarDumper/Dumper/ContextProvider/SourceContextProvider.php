@@ -99,7 +99,7 @@ final class SourceContextProvider implements ContextProviderInterface
         if (null !== $this->projectDir) {
             $context['project_dir'] = $this->projectDir;
             if (0 === strpos($file, $this->projectDir)) {
-                $context['file_relative'] = ltrim(substr($file, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                $context['file_relative'] = ltrim(substr($file, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             }
         }
 

@@ -221,7 +221,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskHiddenResponse()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
         }
 

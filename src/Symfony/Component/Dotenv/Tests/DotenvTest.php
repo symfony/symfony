@@ -44,7 +44,7 @@ class DotenvTest extends TestCase
             array('FOO=${FOO', "Unclosed braces on variable expansion in \".env\" at line 1.\n...FOO=\${FOO...\n           ^ line 1 offset 9"),
         );
 
-        if ('\\' !== DIRECTORY_SEPARATOR) {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
             $tests[] = array('FOO=$((1dd2))', "Issue expanding a command (%s\n) in \".env\" at line 1.\n...FOO=$((1dd2))...\n               ^ line 1 offset 13");
         }
 
@@ -139,7 +139,7 @@ class DotenvTest extends TestCase
             array('FOO=$NOTDEFINED', array('FOO' => '')),
         );
 
-        if ('\\' !== DIRECTORY_SEPARATOR) {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
             $tests = array_merge($tests, array(
                 // command expansion
                 array('FOO=$(echo foo)', array('FOO' => 'foo')),

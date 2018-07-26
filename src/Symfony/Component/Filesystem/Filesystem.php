@@ -171,7 +171,7 @@ class Filesystem
         foreach ($files as $file) {
             if (is_link($file)) {
                 // See https://bugs.php.net/52176
-                if (!(self::box('unlink', $file) || '\\' !== DIRECTORY_SEPARATOR || self::box('rmdir', $file)) && file_exists($file)) {
+                if (!(self::box('unlink', $file) || '\\' !== \DIRECTORY_SEPARATOR || self::box('rmdir', $file)) && file_exists($file)) {
                     throw new IOException(sprintf('Failed to remove symlink "%s": %s.', $file, self::$lastError));
                 }
             } elseif (is_dir($file)) {
@@ -322,7 +322,7 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $originDir = strtr($originDir, '/', '\\');
             $targetDir = strtr($targetDir, '/', '\\');
 
@@ -388,7 +388,7 @@ class Filesystem
     private function linkException($origin, $target, $linkType)
     {
         if (self::$lastError) {
-            if ('\\' === DIRECTORY_SEPARATOR && false !== strpos(self::$lastError, 'error code(1314)')) {
+            if ('\\' === \DIRECTORY_SEPARATOR && false !== strpos(self::$lastError, 'error code(1314)')) {
                 throw new IOException(sprintf('Unable to create %s link due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?', $linkType), 0, null, $target);
             }
         }
@@ -422,14 +422,14 @@ class Filesystem
                 return;
             }
 
-            if ('\\' === DIRECTORY_SEPARATOR) {
+            if ('\\' === \DIRECTORY_SEPARATOR) {
                 $path = readlink($path);
             }
 
             return realpath($path);
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             return realpath($path);
         }
 
@@ -455,7 +455,7 @@ class Filesystem
         }
 
         // Normalize separators on Windows
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $endPath = str_replace('\\', '/', $endPath);
             $startPath = str_replace('\\', '/', $startPath);
         }

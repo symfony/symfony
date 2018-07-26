@@ -88,7 +88,7 @@ class FileLoaderTest extends TestCase
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__));
 
-        $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', DIRECTORY_SEPARATOR));
+        $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', \DIRECTORY_SEPARATOR));
     }
 }
 

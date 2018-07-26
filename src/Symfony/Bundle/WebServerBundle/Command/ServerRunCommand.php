@@ -91,8 +91,8 @@ EOF
 
         // deprecated, logic to be removed in 4.0
         // this allows the commands to work out of the box with web/ and public/
-        if ($this->documentRoot && !is_dir($this->documentRoot) && is_dir(dirname($this->documentRoot).'/web')) {
-            $this->documentRoot = dirname($this->documentRoot).'/web';
+        if ($this->documentRoot && !is_dir($this->documentRoot) && is_dir(\dirname($this->documentRoot).'/web')) {
+            $this->documentRoot = \dirname($this->documentRoot).'/web';
         }
 
         if (null === $documentRoot = $input->getOption('docroot')) {

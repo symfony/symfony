@@ -152,7 +152,7 @@ abstract class AbstractCloner implements ClonerInterface
             $casters = static::$defaultCasters;
         }
         $this->addCasters($casters);
-        $this->useExt = extension_loaded('symfony_debug');
+        $this->useExt = \extension_loaded('symfony_debug');
     }
 
     /**
@@ -168,7 +168,7 @@ abstract class AbstractCloner implements ClonerInterface
     public function addCasters(array $casters)
     {
         foreach ($casters as $type => $callback) {
-            $this->casters[strtolower($type)][] = is_string($callback) && false !== strpos($callback, '::') ? explode('::', $callback, 2) : $callback;
+            $this->casters[strtolower($type)][] = \is_string($callback) && false !== strpos($callback, '::') ? explode('::', $callback, 2) : $callback;
         }
     }
 
@@ -220,7 +220,7 @@ abstract class AbstractCloner implements ClonerInterface
             }
 
             if ($this->prevErrorHandler) {
-                return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
+                return \call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
             }
 
             return false;

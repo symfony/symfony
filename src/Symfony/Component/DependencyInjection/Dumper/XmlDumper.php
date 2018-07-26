@@ -80,7 +80,7 @@ class XmlDumper extends Dumper
         foreach ($methodcalls as $methodcall) {
             $call = $this->document->createElement('call');
             $call->setAttribute('method', $methodcall[0]);
-            if (count($methodcall[1])) {
+            if (\count($methodcall[1])) {
                 $this->convertParameters($methodcall[1], 'argument', $call);
             }
             $parent->appendChild($call);
@@ -160,10 +160,10 @@ class XmlDumper extends Dumper
         if ($callable = $definition->getFactory()) {
             $factory = $this->document->createElement('factory');
 
-            if (is_array($callable) && $callable[0] instanceof Definition) {
+            if (\is_array($callable) && $callable[0] instanceof Definition) {
                 $this->addService($callable[0], null, $factory);
                 $factory->setAttribute('method', $callable[1]);
-            } elseif (is_array($callable)) {
+            } elseif (\is_array($callable)) {
                 if (null !== $callable[0]) {
                     $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 }
@@ -203,10 +203,10 @@ class XmlDumper extends Dumper
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
 
-            if (is_array($callable) && $callable[0] instanceof Definition) {
+            if (\is_array($callable) && $callable[0] instanceof Definition) {
                 $this->addService($callable[0], null, $configurator);
                 $configurator->setAttribute('method', $callable[1]);
-            } elseif (is_array($callable)) {
+            } elseif (\is_array($callable)) {
                 $configurator->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {
@@ -268,7 +268,7 @@ class XmlDumper extends Dumper
      */
     private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
     {
-        $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
+        $withKeys = array_keys($parameters) !== range(0, \count($parameters) - 1);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
             if ($withKeys) {
@@ -278,7 +278,7 @@ class XmlDumper extends Dumper
             if ($value instanceof ServiceClosureArgument) {
                 $value = $value->getValues()[0];
             }
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
             } elseif ($value instanceof TaggedIteratorArgument) {
@@ -306,7 +306,7 @@ class XmlDumper extends Dumper
                 $text = $this->document->createTextNode(self::phpToXml((string) $value));
                 $element->appendChild($text);
             } else {
-                if (in_array($value, array('null', 'true', 'false'), true)) {
+                if (\in_array($value, array('null', 'true', 'false'), true)) {
                     $element->setAttribute('type', 'string');
                 }
                 $text = $this->document->createTextNode(self::phpToXml($value));
@@ -325,9 +325,9 @@ class XmlDumper extends Dumper
     {
         $args = array();
         foreach ($arguments as $k => $v) {
-            if (is_array($v)) {
+            if (\is_array($v)) {
                 $args[$k] = $this->escape($v);
-            } elseif (is_string($v)) {
+            } elseif (\is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);
             } else {
                 $args[$k] = $v;
@@ -357,7 +357,7 @@ class XmlDumper extends Dumper
                 return 'false';
             case $value instanceof Parameter:
                 return '%'.$value.'%';
-            case is_object($value) || is_resource($value):
+            case \is_object($value) || \is_resource($value):
                 throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
             default:
                 return (string) $value;

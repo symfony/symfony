@@ -33,7 +33,7 @@ class SlotsHelper extends Helper
      */
     public function start($name)
     {
-        if (in_array($name, $this->openSlots)) {
+        if (\in_array($name, $this->openSlots)) {
             throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
         }
 

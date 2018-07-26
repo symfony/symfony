@@ -115,7 +115,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ count }}', \count($value))
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -136,7 +136,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ count }}', \count($value))
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -158,7 +158,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ count }}', \count($value))
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -180,7 +180,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ count }}', \count($value))
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)

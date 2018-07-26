@@ -69,7 +69,7 @@ class PhpProcess extends Process
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');
         }
-        $env = 1 < func_num_args() ? func_get_arg(1) : null;
+        $env = 1 < \func_num_args() ? func_get_arg(1) : null;
 
         parent::start($callback, $env);
     }

@@ -31,7 +31,7 @@ class MemcachedStore implements StoreInterface
 
     public static function isSupported()
     {
-        return extension_loaded('memcached');
+        return \extension_loaded('memcached');
     }
 
     /**
@@ -71,7 +71,7 @@ class MemcachedStore implements StoreInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
+        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
 
     /**

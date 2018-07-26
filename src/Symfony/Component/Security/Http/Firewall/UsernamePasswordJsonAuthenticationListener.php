@@ -104,15 +104,15 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
                 throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
             }
 
-            if (!is_string($username)) {
+            if (!\is_string($username)) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
             }
 
-            if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+            if (\strlen($username) > Security::MAX_USERNAME_LENGTH) {
                 throw new BadCredentialsException('Invalid username.');
             }
 
-            if (!is_string($password)) {
+            if (!\is_string($password)) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
             }
 

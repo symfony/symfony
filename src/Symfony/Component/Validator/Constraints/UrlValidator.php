@@ -52,7 +52,7 @@ class UrlValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -79,7 +79,7 @@ class UrlValidator extends ConstraintValidator
                 @trigger_error(sprintf('Use of the boolean TRUE for the "checkDNS" option in %s is deprecated.  Use Url::CHECK_DNS_TYPE_ANY instead.', Url::class), E_USER_DEPRECATED);
             }
 
-            if (!in_array($constraint->checkDNS, array(
+            if (!\in_array($constraint->checkDNS, array(
                 Url::CHECK_DNS_TYPE_ANY,
                 Url::CHECK_DNS_TYPE_A,
                 Url::CHECK_DNS_TYPE_A6,
@@ -93,12 +93,12 @@ class UrlValidator extends ConstraintValidator
                 Url::CHECK_DNS_TYPE_SRV,
                 Url::CHECK_DNS_TYPE_TXT,
             ), true)) {
-                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', get_class($constraint)), array('checkDNS'));
+                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', \get_class($constraint)), array('checkDNS'));
             }
 
             $host = parse_url($value, PHP_URL_HOST);
 
-            if (!is_string($host) || !checkdnsrr($host, $constraint->checkDNS)) {
+            if (!\is_string($host) || !checkdnsrr($host, $constraint->checkDNS)) {
                 $this->context->buildViolation($constraint->dnsMessage)
                     ->setParameter('{{ value }}', $this->formatValue($host))
                     ->setCode(Url::INVALID_URL_ERROR)

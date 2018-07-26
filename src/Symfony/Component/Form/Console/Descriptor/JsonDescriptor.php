@@ -45,7 +45,7 @@ class JsonDescriptor extends Descriptor
         $this->sortOptions($formOptions);
 
         $data = array(
-            'class' => get_class($resolvedFormType->getInnerType()),
+            'class' => \get_class($resolvedFormType->getInnerType()),
             'block_prefix' => $resolvedFormType->getInnerType()->getBlockPrefix(),
             'options' => $formOptions,
             'parent_types' => $this->parents,
@@ -90,7 +90,7 @@ class JsonDescriptor extends Descriptor
         foreach ($options as &$opts) {
             $sorted = false;
             foreach ($opts as &$opt) {
-                if (is_array($opt)) {
+                if (\is_array($opt)) {
                     sort($opt);
                     $sorted = true;
                 }

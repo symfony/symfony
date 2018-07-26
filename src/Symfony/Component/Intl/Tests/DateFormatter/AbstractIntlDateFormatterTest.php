@@ -375,7 +375,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array('zzzzz', 'Etc/Greenwich', 'Greenwich Mean Time'),
         );
 
-        if (!defined('HHVM_VERSION')) {
+        if (!\defined('HHVM_VERSION')) {
             // these timezones are not considered valid in HHVM
             $cases = array_merge($cases, array(
                 array('z', 'GMT+03:00', 'GMT+3'),
@@ -439,7 +439,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithDateTimeZoneGmtOffset()
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) {
+        if (\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -450,7 +450,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithIntlTimeZone()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
         }
 

@@ -23,7 +23,7 @@ trait ApcuTrait
 {
     public static function isSupported()
     {
-        return function_exists('apcu_fetch') && ini_get('apc.enabled');
+        return \function_exists('apcu_fetch') && ini_get('apc.enabled');
     }
 
     private function init($namespace, $defaultLifetime, $version)
@@ -107,7 +107,7 @@ trait ApcuTrait
         } catch (\Exception $e) {
         }
 
-        if (1 === count($values)) {
+        if (1 === \count($values)) {
             // Workaround https://github.com/krakjoe/apcu/issues/170
             apcu_delete(key($values));
         }

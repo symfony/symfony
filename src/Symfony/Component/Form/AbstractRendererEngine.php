@@ -49,9 +49,9 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
         // Do not cast, as casting turns objects into arrays of properties
-        $this->themes[$cacheKey] = is_array($themes) ? $themes : array($themes);
+        $this->themes[$cacheKey] = \is_array($themes) ? $themes : array($themes);
 
-        $args = func_get_args();
+        $args = \func_get_args();
         $this->useDefaultThemes[$cacheKey] = isset($args[2]) ? (bool) $args[2] : true;
 
         // Unset instead of resetting to an empty array, in order to allow

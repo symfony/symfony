@@ -190,7 +190,7 @@ EOF
         $kernel = $this->getApplication()->getKernel();
 
         if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
-            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, get_class($kernel));
+            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
             $container->getCompilerPassConfig()->setRemovingPasses(array());
             $container->compile();
@@ -212,7 +212,7 @@ EOF
             throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
-        $default = 1 === count($matchingServices) ? $matchingServices[0] : null;
+        $default = 1 === \count($matchingServices) ? $matchingServices[0] : null;
 
         return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
     }

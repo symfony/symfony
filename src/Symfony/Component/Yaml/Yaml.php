@@ -80,7 +80,7 @@ class Yaml
      */
     public static function parse($input, $flags = 0)
     {
-        if (is_bool($flags)) {
+        if (\is_bool($flags)) {
             @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
 
             if ($flags) {
@@ -90,7 +90,7 @@ class Yaml
             }
         }
 
-        if (func_num_args() >= 3) {
+        if (\func_num_args() >= 3) {
             @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
 
             if (func_get_arg(2)) {
@@ -98,7 +98,7 @@ class Yaml
             }
         }
 
-        if (func_num_args() >= 4) {
+        if (\func_num_args() >= 4) {
             @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
 
             if (func_get_arg(3)) {
@@ -126,7 +126,7 @@ class Yaml
      */
     public static function dump($input, $inline = 2, $indent = 4, $flags = 0)
     {
-        if (is_bool($flags)) {
+        if (\is_bool($flags)) {
             @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
 
             if ($flags) {
@@ -136,7 +136,7 @@ class Yaml
             }
         }
 
-        if (func_num_args() >= 5) {
+        if (\func_num_args() >= 5) {
             @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
 
             if (func_get_arg(4)) {

@@ -169,7 +169,7 @@ class Cookie
                 continue;
             }
 
-            if (2 === count($elements = explode('=', $part, 2))) {
+            if (2 === \count($elements = explode('=', $part, 2))) {
                 if ('expires' === strtolower($elements[0])) {
                     $elements[1] = self::parseDate($elements[1]);
                 }
@@ -193,7 +193,7 @@ class Cookie
     private static function parseDate($dateValue)
     {
         // trim single quotes around date if present
-        if (($length = strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length - 1]) {
+        if (($length = \strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length - 1]) {
             $dateValue = substr($dateValue, 1, -1);
         }
 

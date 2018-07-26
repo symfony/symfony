@@ -46,8 +46,8 @@ class ConfigCachePassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $definitionsBefore = count($container->getDefinitions());
-        $aliasesBefore = count($container->getAliases());
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $pass = new ConfigCachePass();
         $pass->process($container);

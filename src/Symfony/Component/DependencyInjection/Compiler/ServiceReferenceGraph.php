@@ -94,8 +94,8 @@ class ServiceReferenceGraph
      */
     public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null/*, bool $lazy = false, bool $weak = false*/)
     {
-        $lazy = func_num_args() >= 6 ? func_get_arg(5) : false;
-        $weak = func_num_args() >= 7 ? func_get_arg(6) : false;
+        $lazy = \func_num_args() >= 6 ? func_get_arg(5) : false;
+        $weak = \func_num_args() >= 7 ? func_get_arg(6) : false;
 
         if (null === $sourceId || null === $destId) {
             return;

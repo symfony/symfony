@@ -158,7 +158,7 @@ class ProcessTest extends TestCase
 
         $o = $p->getOutput();
 
-        $this->assertEquals($expectedOutputSize, strlen($o));
+        $this->assertEquals($expectedOutputSize, \strlen($o));
     }
 
     public function testCallbacksAreExecutedWithStart()
@@ -200,8 +200,8 @@ class ProcessTest extends TestCase
         $p->setInput($expected);
         $p->run();
 
-        $this->assertEquals($expectedLength, strlen($p->getOutput()));
-        $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
+        $this->assertEquals($expectedLength, \strlen($p->getOutput()));
+        $this->assertEquals($expectedLength, \strlen($p->getErrorOutput()));
     }
 
     /**
@@ -222,8 +222,8 @@ class ProcessTest extends TestCase
 
         fclose($stream);
 
-        $this->assertEquals($expectedLength, strlen($p->getOutput()));
-        $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
+        $this->assertEquals($expectedLength, \strlen($p->getOutput()));
+        $this->assertEquals($expectedLength, \strlen($p->getErrorOutput()));
     }
 
     public function testLiveStreamAsInput()
@@ -575,7 +575,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertGreaterThan(0, strlen($process->getOutput()));
+        $this->assertGreaterThan(0, \strlen($process->getOutput()));
     }
 
     public function testGetExitCodeIsNullOnStart()
@@ -716,7 +716,7 @@ class ProcessTest extends TestCase
      */
     public function testProcessThrowsExceptionWhenExternallySignaled()
     {
-        if (!function_exists('posix_kill')) {
+        if (!\function_exists('posix_kill')) {
             $this->markTestSkipped('Function posix_kill is required.');
         }
         $this->skipIfNotEnhancedSigchild(false);

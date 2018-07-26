@@ -169,7 +169,7 @@ class Client extends BaseClient
         foreach (get_declared_classes() as $class) {
             if (0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
-                $file = dirname(dirname($r->getFileName())).'/autoload.php';
+                $file = \dirname(\dirname($r->getFileName())).'/autoload.php';
                 if (file_exists($file)) {
                     $requires .= "require_once '".str_replace("'", "\\'", $file)."';\n";
                 }

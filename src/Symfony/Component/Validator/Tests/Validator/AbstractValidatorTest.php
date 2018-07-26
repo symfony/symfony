@@ -1172,7 +1172,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Violation in Group 3');
         };
 
-        $metadata = new ClassMetadata(get_class($entity));
+        $metadata = new ClassMetadata(\get_class($entity));
         $metadata->addConstraint(new Callback(array(
             'callback' => function () {},
             'groups' => 'Group 1',
@@ -1192,7 +1192,7 @@ abstract class AbstractValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Default');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(count($assertViolations), $violations);
+        $this->assertCount(\count($assertViolations), $violations);
         foreach ($assertViolations as $key => $message) {
             $this->assertSame($message, $violations[$key]->getMessage());
         }

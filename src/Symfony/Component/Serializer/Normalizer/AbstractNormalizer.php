@@ -248,7 +248,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        if (in_array($attribute, $this->ignoredAttributes)) {
+        if (\in_array($attribute, $this->ignoredAttributes)) {
             return false;
         }
 
@@ -257,8 +257,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return true;
         }
 
-        if (isset($context[self::ATTRIBUTES]) && is_array($context[self::ATTRIBUTES])) {
-            return in_array($attribute, $context[self::ATTRIBUTES], true);
+        if (isset($context[self::ATTRIBUTES]) && \is_array($context[self::ATTRIBUTES])) {
+            return \in_array($attribute, $context[self::ATTRIBUTES], true);
         }
 
         return true;
@@ -321,7 +321,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s::%s() will have a 6th `string $format = null` argument in version 4.0. Not defining it is deprecated since Symfony 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Method %s::%s() will have a 6th `string $format = null` argument in version 4.0. Not defining it is deprecated since Symfony 3.2.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);
                 }
             }
 

@@ -97,7 +97,7 @@ class ArgvInput extends Input
     {
         $name = substr($token, 1);
 
-        if (strlen($name) > 1) {
+        if (\strlen($name) > 1) {
             if ($this->definition->hasShortcut($name[0]) && $this->definition->getOptionForShortcut($name[0])->acceptValue()) {
                 // an option with a value (with no space)
                 $this->addShortOption($name[0], substr($name, 1));
@@ -118,7 +118,7 @@ class ArgvInput extends Input
      */
     private function parseShortOptionSet($name)
     {
-        $len = strlen($name);
+        $len = \strlen($name);
         for ($i = 0; $i < $len; ++$i) {
             if (!$this->definition->hasShortcut($name[$i])) {
                 throw new RuntimeException(sprintf('The "-%s" option does not exist.', $name[$i]));
@@ -145,7 +145,7 @@ class ArgvInput extends Input
         $name = substr($token, 2);
 
         if (false !== $pos = strpos($name, '=')) {
-            if (0 === strlen($value = substr($name, $pos + 1))) {
+            if (0 === \strlen($value = substr($name, $pos + 1))) {
                 // if no value after "=" then substr() returns "" since php7 only, false before
                 // see http://php.net/manual/fr/migration70.incompatible.php#119151
                 if (\PHP_VERSION_ID < 70000 && false === $value) {
@@ -168,7 +168,7 @@ class ArgvInput extends Input
      */
     private function parseArgument($token)
     {
-        $c = count($this->arguments);
+        $c = \count($this->arguments);
 
         // if input is expecting another argument, add it
         if ($this->definition->hasArgument($c)) {
@@ -183,7 +183,7 @@ class ArgvInput extends Input
         // unexpected argument
         } else {
             $all = $this->definition->getArguments();
-            if (count($all)) {
+            if (\count($all)) {
                 throw new RuntimeException(sprintf('Too many arguments, expected arguments "%s".', implode('" "', array_keys($all))));
             }
 
@@ -228,11 +228,11 @@ class ArgvInput extends Input
             throw new RuntimeException(sprintf('The "--%s" option does not accept a value.', $name));
         }
 
-        if (in_array($value, array('', null), true) && $option->acceptValue() && count($this->parsed)) {
+        if (\in_array($value, array('', null), true) && $option->acceptValue() && \count($this->parsed)) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
             $next = array_shift($this->parsed);
-            if ((isset($next[0]) && '-' !== $next[0]) || in_array($next, array('', null), true)) {
+            if ((isset($next[0]) && '-' !== $next[0]) || \in_array($next, array('', null), true)) {
                 $value = $next;
             } else {
                 array_unshift($this->parsed, $next);
@@ -303,7 +303,7 @@ class ArgvInput extends Input
         $values = (array) $values;
         $tokens = $this->tokens;
 
-        while (0 < count($tokens)) {
+        while (0 < \count($tokens)) {
             $token = array_shift($tokens);
             if ($onlyParams && '--' === $token) {
                 return $default;
@@ -318,7 +318,7 @@ class ArgvInput extends Input
                 //   For short options, test for '-o' at beginning
                 $leading = 0 === strpos($value, '--') ? $value.'=' : $value;
                 if ('' !== $leading && 0 === strpos($token, $leading)) {
-                    return substr($token, strlen($leading));
+                    return substr($token, \strlen($leading));
                 }
             }
         }

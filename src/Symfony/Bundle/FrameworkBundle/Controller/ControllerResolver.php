@@ -42,7 +42,7 @@ class ControllerResolver extends ContainerControllerResolver
 
         $resolvedController = parent::createController($controller);
 
-        if (1 === substr_count($controller, ':') && is_array($resolvedController)) {
+        if (1 === substr_count($controller, ':') && \is_array($resolvedController)) {
             $resolvedController[0] = $this->configureController($resolvedController[0]);
         }
 

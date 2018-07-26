@@ -113,8 +113,8 @@ EOT
             if (!is_dir($targetArg)) {
                 // deprecated, logic to be removed in 4.0
                 // this allows the commands to work out of the box with web/ and public/
-                if (is_dir(dirname($targetArg).'/web')) {
-                    $targetArg = dirname($targetArg).'/web';
+                if (is_dir(\dirname($targetArg).'/web')) {
+                    $targetArg = \dirname($targetArg).'/web';
                 } else {
                     throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
                 }
@@ -263,8 +263,8 @@ EOT
     private function symlink($originDir, $targetDir, $relative = false)
     {
         if ($relative) {
-            $this->filesystem->mkdir(dirname($targetDir));
-            $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
+            $this->filesystem->mkdir(\dirname($targetDir));
+            $originDir = $this->filesystem->makePathRelative($originDir, realpath(\dirname($targetDir)));
         }
         $this->filesystem->symlink($originDir, $targetDir);
         if (!file_exists($targetDir)) {

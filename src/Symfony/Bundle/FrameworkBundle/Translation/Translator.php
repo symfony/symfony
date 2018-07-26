@@ -67,7 +67,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     public function __construct(ContainerInterface $container, $formatter, $defaultLocale = null, array $loaderIds = array(), array $options = array())
     {
         // BC 3.x, to be removed in 4.0 along with the $defaultLocale default value
-        if (is_array($defaultLocale) || 3 > func_num_args()) {
+        if (\is_array($defaultLocale) || 3 > \func_num_args()) {
             if (!$container instanceof SymfonyContainerInterface) {
                 throw new \InvalidArgumentException('Missing third $defaultLocale argument.');
             }

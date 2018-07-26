@@ -102,10 +102,10 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         // BC to be removed in 4.0
-        if (__CLASS__ !== get_class($this)) {
+        if (__CLASS__ !== \get_class($this)) {
             $r = new \ReflectionMethod($this, 'getTwigEnvironment');
             if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Usage of method "%s" is deprecated since Symfony 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Usage of method "%s" is deprecated since Symfony 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', \get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
 
                 $this->twig = $this->getTwigEnvironment();
             }
@@ -154,7 +154,7 @@ EOF
         $firstNamespace = true;
         $prevHasSeparator = false;
         foreach ($this->getLoaderPaths() as $namespace => $paths) {
-            if (!$firstNamespace && !$prevHasSeparator && count($paths) > 1) {
+            if (!$firstNamespace && !$prevHasSeparator && \count($paths) > 1) {
                 $rows[] = array('', '');
             }
             $firstNamespace = false;
@@ -162,7 +162,7 @@ EOF
                 $rows[] = array($namespace, $path.DIRECTORY_SEPARATOR);
                 $namespace = '';
             }
-            if (count($paths) > 1) {
+            if (\count($paths) > 1) {
                 $rows[] = array('', '');
                 $prevHasSeparator = true;
             } else {
@@ -188,7 +188,7 @@ EOF
         foreach ($loader->getNamespaces() as $namespace) {
             $paths = array_map(function ($path) {
                 if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
-                    $path = ltrim(substr($path, strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                    $path = ltrim(substr($path, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
                 }
 
                 return $path;
@@ -219,16 +219,16 @@ EOF
             if (null === $cb) {
                 return;
             }
-            if (is_array($cb)) {
+            if (\is_array($cb)) {
                 if (!method_exists($cb[0], $cb[1])) {
                     return;
                 }
                 $refl = new \ReflectionMethod($cb[0], $cb[1]);
-            } elseif (is_object($cb) && method_exists($cb, '__invoke')) {
+            } elseif (\is_object($cb) && method_exists($cb, '__invoke')) {
                 $refl = new \ReflectionMethod($cb, '__invoke');
-            } elseif (function_exists($cb)) {
+            } elseif (\function_exists($cb)) {
                 $refl = new \ReflectionFunction($cb);
-            } elseif (is_string($cb) && preg_match('{^(.+)::(.+)$}', $cb, $m) && method_exists($m[1], $m[2])) {
+            } elseif (\is_string($cb) && preg_match('{^(.+)::(.+)$}', $cb, $m) && method_exists($m[1], $m[2])) {
                 $refl = new \ReflectionMethod($m[1], $m[2]);
             } else {
                 throw new \UnexpectedValueException('Unsupported callback type');
@@ -278,8 +278,8 @@ EOF
         }
 
         if ('globals' === $type) {
-            if (is_object($meta)) {
-                return ' = object('.get_class($meta).')';
+            if (\is_object($meta)) {
+                return ' = object('.\get_class($meta).')';
             }
 
             return ' = '.substr(@json_encode($meta), 0, 50);

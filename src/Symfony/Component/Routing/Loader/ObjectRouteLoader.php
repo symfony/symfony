@@ -45,7 +45,7 @@ abstract class ObjectRouteLoader extends Loader
     public function load($resource, $type = null)
     {
         $parts = explode(':', $resource);
-        if (2 != count($parts)) {
+        if (2 != \count($parts)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service_name:methodName"', $resource));
         }
 
@@ -54,20 +54,20 @@ abstract class ObjectRouteLoader extends Loader
 
         $loaderObject = $this->getServiceObject($serviceString);
 
-        if (!is_object($loaderObject)) {
-            throw new \LogicException(sprintf('%s:getServiceObject() must return an object: %s returned', get_class($this), gettype($loaderObject)));
+        if (!\is_object($loaderObject)) {
+            throw new \LogicException(sprintf('%s:getServiceObject() must return an object: %s returned', \get_class($this), \gettype($loaderObject)));
         }
 
         if (!method_exists($loaderObject, $method)) {
-            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s"', $method, get_class($loaderObject), $resource));
+            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s"', $method, \get_class($loaderObject), $resource));
         }
 
-        $routeCollection = call_user_func(array($loaderObject, $method), $this);
+        $routeCollection = \call_user_func(array($loaderObject, $method), $this);
 
         if (!$routeCollection instanceof RouteCollection) {
-            $type = is_object($routeCollection) ? get_class($routeCollection) : gettype($routeCollection);
+            $type = \is_object($routeCollection) ? \get_class($routeCollection) : \gettype($routeCollection);
 
-            throw new \LogicException(sprintf('The %s::%s method must return a RouteCollection: %s returned', get_class($loaderObject), $method, $type));
+            throw new \LogicException(sprintf('The %s::%s method must return a RouteCollection: %s returned', \get_class($loaderObject), $method, $type));
         }
 
         // make the service file tracked so that if it changes, the cache rebuilds

@@ -49,7 +49,7 @@ class ClassMapGenerator
      */
     public static function createMap($dir)
     {
-        if (is_string($dir)) {
+        if (\is_string($dir)) {
             $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         }
 
@@ -110,7 +110,7 @@ class ClassMapGenerator
                     $namespace = '';
                     // If there is a namespace, extract it
                     while (isset($tokens[++$i][1])) {
-                        if (in_array($tokens[$i][0], array(T_STRING, T_NS_SEPARATOR))) {
+                        if (\in_array($tokens[$i][0], array(T_STRING, T_NS_SEPARATOR))) {
                             $namespace .= $tokens[$i][1];
                         }
                     }
@@ -129,7 +129,7 @@ class ClassMapGenerator
                         if (T_DOUBLE_COLON === $tokens[$j][0]) {
                             $isClassConstant = true;
                             break;
-                        } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                        } elseif (!\in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
                             break;
                         }
                     }

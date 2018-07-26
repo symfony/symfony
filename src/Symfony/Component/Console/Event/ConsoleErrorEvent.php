@@ -51,7 +51,7 @@ final class ConsoleErrorEvent extends ConsoleEvent
     public function setError($error)
     {
         if (!$error instanceof \Throwable && !$error instanceof \Exception) {
-            throw new InvalidArgumentException(sprintf('The error passed to ConsoleErrorEvent must be an instance of \Throwable or \Exception, "%s" was passed instead.', is_object($error) ? get_class($error) : gettype($error)));
+            throw new InvalidArgumentException(sprintf('The error passed to ConsoleErrorEvent must be an instance of \Throwable or \Exception, "%s" was passed instead.', \is_object($error) ? \get_class($error) : \gettype($error)));
         }
 
         $this->error = $error;
@@ -78,6 +78,6 @@ final class ConsoleErrorEvent extends ConsoleEvent
      */
     public function getExitCode()
     {
-        return null !== $this->exitCode ? $this->exitCode : (is_int($this->error->getCode()) && 0 !== $this->error->getCode() ? $this->error->getCode() : 1);
+        return null !== $this->exitCode ? $this->exitCode : (\is_int($this->error->getCode()) && 0 !== $this->error->getCode() ? $this->error->getCode() : 1);
     }
 }

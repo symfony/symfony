@@ -236,7 +236,7 @@ class YamlDumper extends Dumper
      */
     private function dumpCallable($callable)
     {
-        if (is_array($callable)) {
+        if (\is_array($callable)) {
             if ($callable[0] instanceof Reference) {
                 $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
             } else {
@@ -268,13 +268,13 @@ class YamlDumper extends Dumper
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
             } else {
-                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_class($value)));
+                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', \get_class($value)));
             }
 
             return new TaggedValue($tag, $this->dumpValue($value->getValues()));
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $code = array();
             foreach ($value as $k => $v) {
                 $code[$k] = $this->dumpValue($v);
@@ -289,7 +289,7 @@ class YamlDumper extends Dumper
             return $this->getExpressionCall((string) $value);
         } elseif ($value instanceof Definition) {
             return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
-        } elseif (is_object($value) || is_resource($value)) {
+        } elseif (\is_object($value) || \is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
 
@@ -346,9 +346,9 @@ class YamlDumper extends Dumper
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $value = $this->prepareParameters($value, $escape);
-            } elseif ($value instanceof Reference || is_string($value) && 0 === strpos($value, '@')) {
+            } elseif ($value instanceof Reference || \is_string($value) && 0 === strpos($value, '@')) {
                 $value = '@'.$value;
             }
 
@@ -367,9 +367,9 @@ class YamlDumper extends Dumper
     {
         $args = array();
         foreach ($arguments as $k => $v) {
-            if (is_array($v)) {
+            if (\is_array($v)) {
                 $args[$k] = $this->escape($v);
-            } elseif (is_string($v)) {
+            } elseif (\is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);
             } else {
                 $args[$k] = $v;

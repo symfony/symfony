@@ -40,8 +40,8 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     protected function __construct($namespace = '', $defaultLifetime = 0)
     {
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
-        if (null !== $this->maxIdLength && strlen($namespace) > $this->maxIdLength - 24) {
-            throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, strlen($namespace), $namespace));
+        if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
+            throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) use ($defaultLifetime) {
@@ -128,8 +128,8 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
     public static function createConnection($dsn, array $options = array())
     {
-        if (!is_string($dsn)) {
-            throw new InvalidArgumentException(sprintf('The %s() method expect argument #1 to be string, %s given.', __METHOD__, gettype($dsn)));
+        if (!\is_string($dsn)) {
+            throw new InvalidArgumentException(sprintf('The %s() method expect argument #1 to be string, %s given.', __METHOD__, \gettype($dsn)));
         }
         if (0 === strpos($dsn, 'redis://')) {
             return RedisAdapter::createConnection($dsn, $options);
@@ -238,11 +238,11 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                 continue;
             }
             if (\is_array($e) || 1 === \count($values)) {
-                foreach (is_array($e) ? $e : array_keys($values) as $id) {
+                foreach (\is_array($e) ? $e : array_keys($values) as $id) {
                     $ok = false;
                     $v = $values[$id];
-                    $type = is_object($v) ? get_class($v) : gettype($v);
-                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
+                    $type = \is_object($v) ? \get_class($v) : \gettype($v);
+                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
                 }
             } else {
                 foreach ($values as $id => $v) {
@@ -263,8 +263,8 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                     continue;
                 }
                 $ok = false;
-                $type = is_object($v) ? get_class($v) : gettype($v);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
+                $type = \is_object($v) ? \get_class($v) : \gettype($v);
+                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
             }
         }
 

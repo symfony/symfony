@@ -56,7 +56,7 @@ class ParameterNotFoundException extends InvalidArgumentException
         }
 
         if ($this->alternatives) {
-            if (1 == count($this->alternatives)) {
+            if (1 == \count($this->alternatives)) {
                 $this->message .= ' Did you mean this: "';
             } else {
                 $this->message .= ' Did you mean one of these: "';

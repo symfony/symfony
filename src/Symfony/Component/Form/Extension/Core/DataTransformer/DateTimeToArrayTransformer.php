@@ -117,7 +117,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             return;
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -133,7 +133,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             }
         }
 
-        if (count($emptyFields) > 0) {
+        if (\count($emptyFields) > 0) {
             throw new TransformationFailedException(
                 sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)
             ));

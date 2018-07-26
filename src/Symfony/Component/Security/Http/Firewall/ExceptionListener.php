@@ -199,9 +199,9 @@ class ExceptionListener
         $response = $this->authenticationEntryPoint->start($request, $authException);
 
         if (!$response instanceof Response) {
-            $given = is_object($response) ? get_class($response) : gettype($response);
+            $given = \is_object($response) ? \get_class($response) : \gettype($response);
 
-            throw new \LogicException(sprintf('The %s::start() method must return a Response object (%s returned)', get_class($this->authenticationEntryPoint), $given));
+            throw new \LogicException(sprintf('The %s::start() method must return a Response object (%s returned)', \get_class($this->authenticationEntryPoint), $given));
         }
 
         return $response;

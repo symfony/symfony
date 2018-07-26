@@ -370,7 +370,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
             // return the response and not the cache entry if the response is valid but not cached
             $etag = $response->getEtag();
-            if ($etag && in_array($etag, $requestEtags) && !in_array($etag, $cachedEtags)) {
+            if ($etag && \in_array($etag, $requestEtags) && !\in_array($etag, $cachedEtags)) {
                 return $response;
             }
 
@@ -457,7 +457,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $request->server->set('REMOTE_ADDR', '127.0.0.1');
 
         // make sure HttpCache is a trusted proxy
-        if (!in_array('127.0.0.1', $trustedProxies = Request::getTrustedProxies())) {
+        if (!\in_array('127.0.0.1', $trustedProxies = Request::getTrustedProxies())) {
             $trustedProxies[] = '127.0.0.1';
             Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_ALL);
         }
@@ -467,7 +467,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // FIXME: we probably need to also catch exceptions if raw === true
 
         // we don't implement the stale-if-error on Requests, which is nonetheless part of the RFC
-        if (null !== $entry && in_array($response->getStatusCode(), array(500, 502, 503, 504))) {
+        if (null !== $entry && \in_array($response->getStatusCode(), array(500, 502, 503, 504))) {
             if (null === $age = $entry->headers->getCacheControlDirective('stale-if-error')) {
                 $age = $this->options['stale_if_error'];
             }
@@ -606,7 +606,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $response->setContent(ob_get_clean());
             $response->headers->remove('X-Body-Eval');
             if (!$response->headers->has('Transfer-Encoding')) {
-                $response->headers->set('Content-Length', strlen($response->getContent()));
+                $response->headers->set('Content-Length', \strlen($response->getContent()));
             }
         } elseif ($response->headers->has('X-Body-File')) {
             // Response does not include possibly dynamic content (ESI, SSI), so we need
@@ -640,7 +640,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $key = strtolower(str_replace('HTTP_', '', $key));
 
             if ('cookie' === $key) {
-                if (count($request->cookies->all())) {
+                if (\count($request->cookies->all())) {
                     return true;
                 }
             } elseif ($request->headers->has($key)) {

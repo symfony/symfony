@@ -70,7 +70,7 @@ class Regex extends Constraint
         }
 
         // Quit if delimiters not at very beginning/end (e.g. when options are passed)
-        if ($this->pattern[0] !== $this->pattern[strlen($this->pattern) - 1]) {
+        if ($this->pattern[0] !== $this->pattern[\strlen($this->pattern) - 1]) {
             return;
         }
 
@@ -95,7 +95,7 @@ class Regex extends Constraint
         $pattern = '^' === $pattern[0] ? substr($pattern, 1) : '.*'.$pattern;
 
         // Trim trailing $, otherwise append .*
-        $pattern = '$' === $pattern[strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
+        $pattern = '$' === $pattern[\strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
 
         return $pattern;
     }

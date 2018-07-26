@@ -61,7 +61,7 @@ class TwigExtension extends Extension
         foreach ($configs as $key => $config) {
             if (isset($config['globals'])) {
                 foreach ($config['globals'] as $name => $value) {
-                    if (is_array($value) && isset($value['key'])) {
+                    if (\is_array($value) && isset($value['key'])) {
                         $configs[$key]['globals'][$name] = array(
                             'key' => $name,
                             'value' => $value,
@@ -120,7 +120,7 @@ class TwigExtension extends Extension
 
             // add exclusive namespace for root bundles only
             // to override a bundle template that also extends itself
-            if (count($bundle['paths']) > 0 && 0 === count($bundle['parents'])) {
+            if (\count($bundle['paths']) > 0 && 0 === \count($bundle['parents'])) {
                 // the last path must be the bundle views directory
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array(end($bundle['paths']), '!'.$namespace));
             }

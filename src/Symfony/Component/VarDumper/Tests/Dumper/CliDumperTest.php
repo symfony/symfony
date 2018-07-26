@@ -48,7 +48,7 @@ class CliDumperTest extends TestCase
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
+        $r = \defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -290,7 +290,7 @@ EOTXT
 
     public function testClosedResource()
     {
-        if (defined('HHVM_VERSION') && HHVM_VERSION_ID < 30600) {
+        if (\defined('HHVM_VERSION') && HHVM_VERSION_ID < 30600) {
             $this->markTestSkipped();
         }
 
@@ -384,7 +384,7 @@ EOTXT
         $dumper->dump($data, $out);
         $out = stream_get_contents($out, -1, 0);
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
+        $r = \defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 stream resource {@{$ref}
@@ -429,7 +429,7 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $out = $dumper->dump($data, true);
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
+        $r = \defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 {{$r}

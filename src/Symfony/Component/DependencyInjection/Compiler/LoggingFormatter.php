@@ -49,6 +49,6 @@ class LoggingFormatter
 
     public function format(CompilerPassInterface $pass, $message)
     {
-        return sprintf('%s: %s', get_class($pass), $message);
+        return sprintf('%s: %s', \get_class($pass), $message);
     }
 }

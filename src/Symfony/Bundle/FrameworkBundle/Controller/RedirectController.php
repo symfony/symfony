@@ -80,7 +80,7 @@ class RedirectController implements ContainerAwareInterface
         }
 
         $attributes = array();
-        if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
+        if (false === $ignoreAttributes || \is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
             unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes']);
             if ($ignoreAttributes) {

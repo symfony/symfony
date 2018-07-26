@@ -59,7 +59,7 @@ class ContainerConfigurator extends AbstractConfigurator
 
     final public function import($resource, $type = null, $ignoreErrors = false)
     {
-        $this->loader->setCurrentDir(dirname($this->path));
+        $this->loader->setCurrentDir(\dirname($this->path));
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
     }
 

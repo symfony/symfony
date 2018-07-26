@@ -91,7 +91,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
 
         $username = trim($username);
 
-        if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+        if (\strlen($username) > Security::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Invalid username.');
         }
 

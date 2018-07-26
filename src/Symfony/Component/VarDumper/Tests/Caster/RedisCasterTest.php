@@ -26,7 +26,7 @@ class RedisCasterTest extends TestCase
     {
         $redis = new \Redis();
 
-        if (defined('HHVM_VERSION_ID')) {
+        if (\defined('HHVM_VERSION_ID')) {
             $xCast = <<<'EODUMP'
 Redis {
   #host: ""
@@ -52,7 +52,7 @@ EODUMP;
             self::markTestSkipped($e['message']);
         }
 
-        if (defined('HHVM_VERSION_ID')) {
+        if (\defined('HHVM_VERSION_ID')) {
             $xCast = <<<'EODUMP'
 Redis {
   #host: "127.0.0.1"

@@ -60,6 +60,6 @@ class TraceableFirewallListenerTest extends TestCase
         $this->assertCount(1, $listeners);
         $this->assertSame($response, $listeners[0]['response']);
         $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
-        $this->assertSame(get_class($listener), (string) $listeners[0]['stub']);
+        $this->assertSame(\get_class($listener), (string) $listeners[0]['stub']);
     }
 }

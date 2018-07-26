@@ -189,7 +189,7 @@ class TimeType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (is_array($placeholder)) {
+            if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
                 return array_merge(
@@ -206,7 +206,7 @@ class TimeType extends AbstractType
         };
 
         $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
-            if (is_array($choiceTranslationDomain)) {
+            if (\is_array($choiceTranslationDomain)) {
                 $default = false;
 
                 return array_replace(

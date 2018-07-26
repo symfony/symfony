@@ -65,8 +65,8 @@ class AddConstraintValidatorsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $definitionsBefore = count($container->getDefinitions());
-        $aliasesBefore = count($container->getAliases());
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
         $addConstraintValidatorsPass->process($container);

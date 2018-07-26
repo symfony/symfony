@@ -30,7 +30,7 @@ class RedisCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        if (defined('HHVM_VERSION_ID')) {
+        if (\defined('HHVM_VERSION_ID')) {
             if (isset($a[Caster::PREFIX_PROTECTED.'serializer'])) {
                 $ser = $a[Caster::PREFIX_PROTECTED.'serializer'];
                 $a[Caster::PREFIX_PROTECTED.'serializer'] = isset(self::$serializer[$ser]) ? new ConstStub(self::$serializer[$ser], $ser) : $ser;
@@ -46,7 +46,7 @@ class RedisCaster
         }
 
         $ser = $c->getOption(\Redis::OPT_SERIALIZER);
-        $retry = defined('Redis::OPT_SCAN') ? $c->getOption(\Redis::OPT_SCAN) : 0;
+        $retry = \defined('Redis::OPT_SCAN') ? $c->getOption(\Redis::OPT_SCAN) : 0;
 
         return $a + array(
             $prefix.'isConnected' => $connected,

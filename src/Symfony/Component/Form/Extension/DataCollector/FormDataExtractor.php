@@ -41,7 +41,7 @@ class FormDataExtractor implements FormDataExtractorInterface
         $data = array(
             'id' => $this->buildId($form),
             'name' => $form->getName(),
-            'type_class' => get_class($form->getConfig()->getType()->getInnerType()),
+            'type_class' => \get_class($form->getConfig()->getType()->getInnerType()),
             'synchronized' => $form->isSynchronized(),
             'passed_options' => array(),
             'resolved_options' => array(),
@@ -107,7 +107,7 @@ class FormDataExtractor implements FormDataExtractorInterface
         foreach ($form->getErrors() as $error) {
             $errorData = array(
                 'message' => $error->getMessage(),
-                'origin' => is_object($error->getOrigin())
+                'origin' => \is_object($error->getOrigin())
                     ? spl_object_hash($error->getOrigin())
                     : null,
                 'trace' => array(),

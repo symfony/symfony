@@ -33,7 +33,7 @@ class Reader
     public function __construct($source)
     {
         $this->source = $source;
-        $this->length = strlen($source);
+        $this->length = \strlen($source);
     }
 
     /**

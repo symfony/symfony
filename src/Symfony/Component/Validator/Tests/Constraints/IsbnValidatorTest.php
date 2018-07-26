@@ -60,7 +60,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             array('1A34567890', Isbn::INVALID_CHARACTERS_ERROR),
             // chr(1) evaluates to 0
             // 2070546810 is valid
-            array('2'.chr(1).'70546810', Isbn::INVALID_CHARACTERS_ERROR),
+            array('2'.\chr(1).'70546810', Isbn::INVALID_CHARACTERS_ERROR),
         );
     }
 
@@ -98,7 +98,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             array('978-272C442282', Isbn::INVALID_CHARACTERS_ERROR),
             // chr(1) evaluates to 0
             // 978-2070546817 is valid
-            array('978-2'.chr(1).'70546817', Isbn::INVALID_CHARACTERS_ERROR),
+            array('978-2'.\chr(1).'70546817', Isbn::INVALID_CHARACTERS_ERROR),
         );
     }
 

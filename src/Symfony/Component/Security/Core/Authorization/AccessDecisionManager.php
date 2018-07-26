@@ -43,7 +43,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function __construct($voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
-        if (!is_callable(array($this, $strategyMethod))) {
+        if (!\is_callable(array($this, $strategyMethod))) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
 
@@ -212,6 +212,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return $voter->vote($token, $subject, $attributes);
         }
 
-        throw new LogicException(sprintf('%s should implement the %s interface when used as voter.', get_class($voter), VoterInterface::class));
+        throw new LogicException(sprintf('%s should implement the %s interface when used as voter.', \get_class($voter), VoterInterface::class));
     }
 }

@@ -59,7 +59,7 @@ class FactoryReturnTypePassTest extends TestCase
      */
     public function testReturnTypes($factory, $returnType, $hhvmSupport = true)
     {
-        if (!$hhvmSupport && defined('HHVM_VERSION')) {
+        if (!$hhvmSupport && \defined('HHVM_VERSION')) {
             $this->markTestSkipped('Scalar typehints not supported by hhvm.');
         }
 

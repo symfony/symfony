@@ -54,7 +54,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     {
         $handle = fopen('php://temp,', 'w+');
 
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             $data = array(array($data));
         } elseif (empty($data)) {
             $data = array(array());
@@ -62,7 +62,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             // Sequential arrays of arrays are considered as collections
             $i = 0;
             foreach ($data as $key => $value) {
-                if ($i !== $key || !is_array($value)) {
+                if ($i !== $key || !\is_array($value)) {
                     $data = array($data);
                     break;
                 }
@@ -121,7 +121,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
 
         while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
-            $nbCols = count($cols);
+            $nbCols = \count($cols);
 
             if (null === $headers) {
                 $nbHeaders = $nbCols;
@@ -129,7 +129,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 foreach ($cols as $col) {
                     $header = explode($keySeparator, $col);
                     $headers[] = $header;
-                    $headerCount[] = count($header);
+                    $headerCount[] = \count($header);
                 }
 
                 continue;
@@ -186,7 +186,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     private function flatten(array $array, array &$result, $keySeparator, $parentKey = '')
     {
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator);
             } else {
                 $result[$parentKey.$key] = $value;
@@ -202,8 +202,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $keySeparator = isset($context[self::KEY_SEPARATOR_KEY]) ? $context[self::KEY_SEPARATOR_KEY] : $this->keySeparator;
         $headers = isset($context[self::HEADERS_KEY]) ? $context[self::HEADERS_KEY] : array();
 
-        if (!is_array($headers)) {
-            throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, gettype($headers)));
+        if (!\is_array($headers)) {
+            throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, \gettype($headers)));
         }
 
         return array($delimiter, $enclosure, $escapeChar, $keySeparator, $headers);
@@ -227,11 +227,11 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 }
 
                 if (null === $previousHeader) {
-                    $n = count($headers);
+                    $n = \count($headers);
                 } else {
                     $n = $flippedHeaders[$previousHeader] + 1;
 
-                    for ($j = count($headers); $j > $n; --$j) {
+                    for ($j = \count($headers); $j > $n; --$j) {
                         ++$flippedHeaders[$headers[$j] = $headers[$j - 1]];
                     }
                 }

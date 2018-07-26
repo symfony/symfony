@@ -115,7 +115,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
                     foreach ($a as $k => $v) {
-                        if (is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
+                        if (\is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
                             $a[$k] = new CutStub($v);
                         }
                     }

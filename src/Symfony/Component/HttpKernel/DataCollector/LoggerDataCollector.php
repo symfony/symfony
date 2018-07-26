@@ -222,7 +222,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             return true;
         }
 
-        if ($exception instanceof \ErrorException && in_array($exception->getSeverity(), array(E_DEPRECATED, E_USER_DEPRECATED), true)) {
+        if ($exception instanceof \ErrorException && \in_array($exception->getSeverity(), array(E_DEPRECATED, E_USER_DEPRECATED), true)) {
             return true;
         }
 

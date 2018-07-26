@@ -78,7 +78,7 @@ class ProcessBuilder
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = is_array($prefix) ? $prefix : array($prefix);
+        $this->prefix = \is_array($prefix) ? $prefix : array($prefix);
 
         return $this;
     }
@@ -258,7 +258,7 @@ class ProcessBuilder
      */
     public function getProcess()
     {
-        if (0 === count($this->prefix) && 0 === count($this->arguments)) {
+        if (0 === \count($this->prefix) && 0 === \count($this->arguments)) {
             throw new LogicException('You must add() command arguments before calling getProcess().');
         }
 

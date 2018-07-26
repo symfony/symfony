@@ -124,7 +124,7 @@ EOF;
             return '0.0.1';
         }
 
-        return defined(Version::class.'::VERSION') ? Version::VERSION : Version::getVersion();
+        return \defined(Version::class.'::VERSION') ? Version::VERSION : Version::getVersion();
     }
 
     /**

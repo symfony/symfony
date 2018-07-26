@@ -136,7 +136,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testReadConvertsStreamToString()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('PHPUnit_MockObject cannot mock the PDOStatement class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
         }
 
@@ -157,7 +157,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testReadLockedConvertsStreamToString()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('PHPUnit_MockObject cannot mock the PDOStatement class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
         }
         if (ini_get('session.use_strict_mode')) {
@@ -396,8 +396,8 @@ class MockPdo extends \PDO
 
     public function prepare($statement, $driverOptions = array())
     {
-        return is_callable($this->prepareResult)
-            ? call_user_func($this->prepareResult, $statement, $driverOptions)
+        return \is_callable($this->prepareResult)
+            ? \call_user_func($this->prepareResult, $statement, $driverOptions)
             : $this->prepareResult;
     }
 

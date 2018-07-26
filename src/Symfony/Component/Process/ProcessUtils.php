@@ -91,10 +91,10 @@ class ProcessUtils
     public static function validateInput($caller, $input)
     {
         if (null !== $input) {
-            if (is_resource($input)) {
+            if (\is_resource($input)) {
                 return $input;
             }
-            if (is_string($input)) {
+            if (\is_string($input)) {
                 return $input;
             }
             if (is_scalar($input)) {
@@ -118,6 +118,6 @@ class ProcessUtils
 
     private static function isSurroundedBy($arg, $char)
     {
-        return 2 < strlen($arg) && $char === $arg[0] && $char === $arg[strlen($arg) - 1];
+        return 2 < \strlen($arg) && $char === $arg[0] && $char === $arg[\strlen($arg) - 1];
     }
 }

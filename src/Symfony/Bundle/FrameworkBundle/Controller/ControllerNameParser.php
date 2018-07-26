@@ -42,7 +42,7 @@ class ControllerNameParser
     public function parse($controller)
     {
         $parts = explode(':', $controller);
-        if (3 !== count($parts) || in_array('', $parts, true)) {
+        if (3 !== \count($parts) || \in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
@@ -68,7 +68,7 @@ class ControllerNameParser
             throw new \InvalidArgumentException($message, 0, $e);
         }
 
-        if (!is_array($allBundles)) {
+        if (!\is_array($allBundles)) {
             // happens when HttpKernel is version 4+
             $allBundles = array($allBundles);
         }
@@ -83,7 +83,7 @@ class ControllerNameParser
             $msg = sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundle, $controller, $action, $try);
         }
 
-        if (count($bundles) > 1) {
+        if (\count($bundles) > 1) {
             $msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $bundles));
         }
 
@@ -141,7 +141,7 @@ class ControllerNameParser
             }
 
             $lev = levenshtein($nonExistentBundleName, $bundleName);
-            if ($lev <= strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
+            if ($lev <= \strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
                 $alternative = $bundleName;
                 $shortest = $lev;
             }

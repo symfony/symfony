@@ -61,7 +61,7 @@ class FactoryReturnTypePass implements CompilerPassInterface
         }
 
         $class = null;
-        if (is_string($factory)) {
+        if (\is_string($factory)) {
             try {
                 $m = new \ReflectionFunction($factory);
                 if (false !== $m->getFileName() && file_exists($m->getFileName())) {

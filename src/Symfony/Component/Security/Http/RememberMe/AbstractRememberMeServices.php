@@ -60,7 +60,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
-        if (0 === count($userProviders)) {
+        if (0 === \count($userProviders)) {
             throw new \InvalidArgumentException('You must provide at least one user provider.');
         }
 

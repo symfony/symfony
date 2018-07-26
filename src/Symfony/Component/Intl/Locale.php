@@ -67,16 +67,16 @@ final class Locale extends \Locale
      */
     public static function getFallback($locale)
     {
-        if (function_exists('locale_parse')) {
+        if (\function_exists('locale_parse')) {
             $localeSubTags = locale_parse($locale);
-            if (1 === count($localeSubTags)) {
+            if (1 === \count($localeSubTags)) {
                 if (self::$defaultFallback === $localeSubTags['language']) {
                     return 'root';
                 }
 
                 // Don't return default fallback for "root", "meta" or others
                 // Normal locales have two or three letters
-                if (strlen($locale) < 4) {
+                if (\strlen($locale) < 4) {
                     return self::$defaultFallback;
                 }
 
@@ -102,7 +102,7 @@ final class Locale extends \Locale
 
         // Don't return default fallback for "root", "meta" or others
         // Normal locales have two or three letters
-        if (strlen($locale) < 4) {
+        if (\strlen($locale) < 4) {
             return self::$defaultFallback;
         }
     }

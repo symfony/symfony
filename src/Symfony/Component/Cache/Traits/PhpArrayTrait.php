@@ -44,7 +44,7 @@ trait PhpArrayTrait
                 throw new InvalidArgumentException(sprintf('Cache file is not writable: %s.', $this->file));
             }
         } else {
-            $directory = dirname($this->file);
+            $directory = \dirname($this->file);
 
             if (!is_dir($directory) && !@mkdir($directory, 0777, true)) {
                 throw new InvalidArgumentException(sprintf('Cache directory does not exist and cannot be created: %s.', $directory));
@@ -72,7 +72,7 @@ EOF;
                 try {
                     $value = serialize($value);
                 } catch (\Exception $e) {
-                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, get_class($value)), 0, $e);
+                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \get_class($value)), 0, $e);
                 }
             } elseif (\is_array($value)) {
                 try {
@@ -91,7 +91,7 @@ EOF;
                     $value = serialize($value);
                 }
             } elseif (!\is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, gettype($value)));
+                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \gettype($value)));
             }
 
             $dump .= var_export($key, true).' => '.var_export($value, true).",\n";

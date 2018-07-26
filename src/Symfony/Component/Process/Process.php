@@ -143,7 +143,7 @@ class Process implements \IteratorAggregate
      */
     public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = null)
     {
-        if (!function_exists('proc_open')) {
+        if (!\function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
@@ -154,7 +154,7 @@ class Process implements \IteratorAggregate
         // on Gnu/Linux, PHP builds with --enable-maintainer-zts are also affected
         // @see : https://bugs.php.net/bug.php?id=51800
         // @see : https://bugs.php.net/bug.php?id=50524
-        if (null === $this->cwd && (defined('ZEND_THREAD_SAFE') || '\\' === DIRECTORY_SEPARATOR)) {
+        if (null === $this->cwd && (\defined('ZEND_THREAD_SAFE') || '\\' === DIRECTORY_SEPARATOR)) {
             $this->cwd = getcwd();
         }
         if (null !== $env) {
@@ -206,7 +206,7 @@ class Process implements \IteratorAggregate
      */
     public function run($callback = null/*, array $env = array()*/)
     {
-        $env = 1 < func_num_args() ? func_get_arg(1) : null;
+        $env = 1 < \func_num_args() ? func_get_arg(1) : null;
         $this->start($callback, $env);
 
         return $this->wait();
@@ -233,7 +233,7 @@ class Process implements \IteratorAggregate
         if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
         }
-        $env = 1 < func_num_args() ? func_get_arg(1) : null;
+        $env = 1 < \func_num_args() ? func_get_arg(1) : null;
 
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
@@ -267,7 +267,7 @@ class Process implements \IteratorAggregate
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
         }
-        if (2 <= func_num_args()) {
+        if (2 <= \func_num_args()) {
             $env = func_get_arg(1);
         } else {
             if (__CLASS__ !== static::class) {
@@ -286,7 +286,7 @@ class Process implements \IteratorAggregate
         $descriptors = $this->getDescriptors();
         $inheritEnv = $this->inheritEnv;
 
-        if (is_array($commandline = $this->commandline)) {
+        if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map(array($this, 'escapeArgument'), $commandline));
 
             if ('\\' !== DIRECTORY_SEPARATOR) {
@@ -326,7 +326,7 @@ class Process implements \IteratorAggregate
             // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $envPairs = $env;
         } else {
             $envPairs = array();
@@ -343,7 +343,7 @@ class Process implements \IteratorAggregate
 
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
 
-        if (!is_resource($this->process)) {
+        if (!\is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
         }
         $this->status = self::STATUS_STARTED;
@@ -383,7 +383,7 @@ class Process implements \IteratorAggregate
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
         }
-        $env = 1 < func_num_args() ? func_get_arg(1) : null;
+        $env = 1 < \func_num_args() ? func_get_arg(1) : null;
 
         $process = clone $this;
         $process->start($callback, $env);
@@ -939,7 +939,7 @@ class Process implements \IteratorAggregate
      */
     public function getCommandLine()
     {
-        return is_array($this->commandline) ? implode(' ', array_map(array($this, 'escapeArgument'), $this->commandline)) : $this->commandline;
+        return \is_array($this->commandline) ? implode(' ', array_map(array($this, 'escapeArgument'), $this->commandline)) : $this->commandline;
     }
 
     /**
@@ -1141,7 +1141,7 @@ class Process implements \IteratorAggregate
     {
         // Process can not handle env values that are arrays
         $env = array_filter($env, function ($value) {
-            return !is_array($value);
+            return !\is_array($value);
         });
 
         $this->env = $env;
@@ -1396,7 +1396,7 @@ class Process implements \IteratorAggregate
         if ($this->outputDisabled) {
             return function ($type, $data) use ($callback) {
                 if (null !== $callback) {
-                    call_user_func($callback, $type, $data);
+                    \call_user_func($callback, $type, $data);
                 }
             };
         }
@@ -1411,7 +1411,7 @@ class Process implements \IteratorAggregate
             }
 
             if (null !== $callback) {
-                call_user_func($callback, $type, $data);
+                \call_user_func($callback, $type, $data);
             }
         };
     }
@@ -1452,7 +1452,7 @@ class Process implements \IteratorAggregate
             return self::$sigchild;
         }
 
-        if (!function_exists('phpinfo') || defined('HHVM_VERSION')) {
+        if (!\function_exists('phpinfo') || \defined('HHVM_VERSION')) {
             return self::$sigchild = false;
         }
 
@@ -1531,7 +1531,7 @@ class Process implements \IteratorAggregate
     private function close()
     {
         $this->processPipes->close();
-        if (is_resource($this->process)) {
+        if (\is_resource($this->process)) {
             proc_close($this->process);
         }
         $this->exitcode = $this->processInformation['exitcode'];
@@ -1608,7 +1608,7 @@ class Process implements \IteratorAggregate
         } else {
             if (!$this->enhanceSigchildCompatibility || !$this->isSigchildEnabled()) {
                 $ok = @proc_terminate($this->process, $signal);
-            } elseif (function_exists('posix_kill')) {
+            } elseif (\function_exists('posix_kill')) {
                 $ok = @posix_kill($pid, $signal);
             } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $pid), array(2 => array('pipe', 'w')), $pipes)) {
                 $ok = false === fgets($pipes[2]);
@@ -1735,13 +1735,13 @@ class Process implements \IteratorAggregate
         $env = array();
 
         foreach ($_SERVER as $k => $v) {
-            if (is_string($v) && false !== $v = getenv($k)) {
+            if (\is_string($v) && false !== $v = getenv($k)) {
                 $env[$k] = $v;
             }
         }
 
         foreach ($_ENV as $k => $v) {
-            if (is_string($v)) {
+            if (\is_string($v)) {
                 $env[$k] = $v;
             }
         }

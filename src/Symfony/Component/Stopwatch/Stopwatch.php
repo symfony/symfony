@@ -85,7 +85,7 @@ class Stopwatch
     {
         $this->stop('__section__');
 
-        if (1 == count($this->activeSections)) {
+        if (1 == \count($this->activeSections)) {
             throw new \LogicException('There is no started section to stop.');
         }
 

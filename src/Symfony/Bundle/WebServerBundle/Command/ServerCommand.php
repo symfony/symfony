@@ -27,6 +27,6 @@ abstract class ServerCommand extends Command
      */
     public function isEnabled()
     {
-        return !defined('HHVM_VERSION') && parent::isEnabled();
+        return !\defined('HHVM_VERSION') && parent::isEnabled();
     }
 }

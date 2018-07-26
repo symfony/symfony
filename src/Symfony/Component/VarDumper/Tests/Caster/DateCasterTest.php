@@ -29,7 +29,7 @@ class DateCasterTest extends TestCase
      */
     public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp)
     {
-        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -49,7 +49,7 @@ EODUMP;
      */
     public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
-        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -220,7 +220,7 @@ EODUMP;
      */
     public function testDumpTimeZone($timezone, $expected)
     {
-        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -240,7 +240,7 @@ EODUMP;
      */
     public function testDumpTimeZoneExcludingVerbosity($timezone, $expected)
     {
-        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -260,7 +260,7 @@ EODUMP;
      */
     public function testCastTimeZone($timezone, $xTimezone, $xRegion)
     {
-        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -295,7 +295,7 @@ EODUMP;
 
     public function provideTimeZones()
     {
-        $xRegion = extension_loaded('intl') ? '%s' : '';
+        $xRegion = \extension_loaded('intl') ? '%s' : '';
 
         return array(
             // type 1 (UTC offset)
@@ -325,11 +325,11 @@ EODUMP;
      */
     public function testDumpPeriod($start, $interval, $end, $options, $expected)
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) {
+        if (\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) {
             $this->markTestSkipped();
         }
 
-        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), is_int($end) ? $end : new \DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
 
         $xDump = <<<EODUMP
 DatePeriod {
@@ -345,11 +345,11 @@ EODUMP;
      */
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) {
+        if (\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) {
             $this->markTestSkipped();
         }
 
-        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), is_int($end) ? $end : new \DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
         $stub = new Stub();
 
         $cast = DateCaster::castPeriod($p, array(), $stub, false, 0);

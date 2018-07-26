@@ -153,7 +153,7 @@ EOF
         $encodedPassword = $encoder->encodePassword($password, $salt);
 
         $rows = array(
-            array('Encoder used', get_class($encoder)),
+            array('Encoder used', \get_class($encoder)),
             array('Encoded password', $encodedPassword),
         );
         if (!$emptySalt) {
@@ -162,7 +162,7 @@ EOF
         $io->table(array('Key', 'Value'), $rows);
 
         if (!$emptySalt) {
-            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
+            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));
         } elseif ($saltlessWithoutEmptySalt) {
             $errorIo->note('Self-salting encoder used: the encoder generated its own built-in salt.');
         }
@@ -208,7 +208,7 @@ EOF
             throw new RuntimeException('There are no configured encoders for the "security" extension.');
         }
 
-        if (!$input->isInteractive() || 1 === count($this->userClasses)) {
+        if (!$input->isInteractive() || 1 === \count($this->userClasses)) {
             return reset($this->userClasses);
         }
 

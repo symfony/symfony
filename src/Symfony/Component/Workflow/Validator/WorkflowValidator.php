@@ -35,7 +35,7 @@ class WorkflowValidator implements DefinitionValidatorInterface
         $places = array_fill_keys($definition->getPlaces(), array());
         foreach ($definition->getTransitions() as $transition) {
             foreach ($transition->getFroms() as $from) {
-                if (in_array($transition->getName(), $places[$from])) {
+                if (\in_array($transition->getName(), $places[$from])) {
                     throw new InvalidDefinitionException(sprintf('All transitions for a place must have an unique name. Multiple transitions named "%s" where found for place "%s" in workflow "%s".', $transition->getName(), $from, $name));
                 }
                 $places[$from][] = $transition->getName();
@@ -47,8 +47,8 @@ class WorkflowValidator implements DefinitionValidatorInterface
         }
 
         foreach ($definition->getTransitions() as $transition) {
-            if (1 < count($transition->getTos())) {
-                throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" can not store many places. But the transition "%s" has too many output (%d). Only one is accepted.', $name, $transition->getName(), count($transition->getTos())));
+            if (1 < \count($transition->getTos())) {
+                throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" can not store many places. But the transition "%s" has too many output (%d). Only one is accepted.', $name, $transition->getName(), \count($transition->getTos())));
             }
         }
     }

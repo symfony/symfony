@@ -27,7 +27,7 @@ abstract class AbstractGuardAuthenticator implements AuthenticatorInterface
      */
     public function supports(Request $request)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Implement the "%s::supports()" method in class "%s" instead.', __METHOD__, AuthenticatorInterface::class, get_class($this)), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Implement the "%s::supports()" method in class "%s" instead.', __METHOD__, AuthenticatorInterface::class, \get_class($this)), E_USER_DEPRECATED);
 
         return true;
     }

@@ -92,13 +92,13 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         // we need to sign the absolute URI, but want to return the path only.
         $fragmentUri = $this->signer->sign($this->generateFragmentUri($uri, $request, true));
 
-        return substr($fragmentUri, strlen($request->getSchemeAndHttpHost()));
+        return substr($fragmentUri, \strlen($request->getSchemeAndHttpHost()));
     }
 
     private function containsNonScalars(array $values)
     {
         foreach ($values as $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 return $this->containsNonScalars($value);
             } elseif (!is_scalar($value) && null !== $value) {
                 return true;

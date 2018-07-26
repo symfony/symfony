@@ -194,7 +194,7 @@ final class Intl
         if (false === self::$icuVersion) {
             if (!self::isExtensionLoaded()) {
                 self::$icuVersion = self::getIcuStubVersion();
-            } elseif (defined('INTL_ICU_VERSION')) {
+            } elseif (\defined('INTL_ICU_VERSION')) {
                 self::$icuVersion = INTL_ICU_VERSION;
             } else {
                 try {

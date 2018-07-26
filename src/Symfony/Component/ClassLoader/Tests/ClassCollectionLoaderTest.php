@@ -231,7 +231,7 @@ class ClassCollectionLoaderTest extends TestCase
             }
         });
 
-        $strictTypes = defined('HHVM_VERSION') ? '' : "\nnamespace {require __DIR__.'/Fixtures/Namespaced/WithStrictTypes.php';}";
+        $strictTypes = \defined('HHVM_VERSION') ? '' : "\nnamespace {require __DIR__.'/Fixtures/Namespaced/WithStrictTypes.php';}";
 
         ClassCollectionLoader::load(
             array('Namespaced\\WithComments', 'Pearlike_WithComments', 'Namespaced\\WithDirMagic', 'Namespaced\\WithFileMagic', 'Namespaced\\WithHaltCompiler', $strictTypes ? 'Namespaced\\WithStrictTypes' : 'Namespaced\\WithComments'),

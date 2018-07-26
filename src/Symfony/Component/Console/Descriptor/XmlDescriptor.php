@@ -203,7 +203,7 @@ class XmlDescriptor extends Descriptor
         $descriptionXML->appendChild($dom->createTextNode($argument->getDescription()));
 
         $objectXML->appendChild($defaultsXML = $dom->createElement('defaults'));
-        $defaults = is_array($argument->getDefault()) ? $argument->getDefault() : (is_bool($argument->getDefault()) ? array(var_export($argument->getDefault(), true)) : ($argument->getDefault() ? array($argument->getDefault()) : array()));
+        $defaults = \is_array($argument->getDefault()) ? $argument->getDefault() : (\is_bool($argument->getDefault()) ? array(var_export($argument->getDefault(), true)) : ($argument->getDefault() ? array($argument->getDefault()) : array()));
         foreach ($defaults as $default) {
             $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
             $defaultXML->appendChild($dom->createTextNode($default));
@@ -235,7 +235,7 @@ class XmlDescriptor extends Descriptor
         $descriptionXML->appendChild($dom->createTextNode($option->getDescription()));
 
         if ($option->acceptValue()) {
-            $defaults = is_array($option->getDefault()) ? $option->getDefault() : (is_bool($option->getDefault()) ? array(var_export($option->getDefault(), true)) : ($option->getDefault() ? array($option->getDefault()) : array()));
+            $defaults = \is_array($option->getDefault()) ? $option->getDefault() : (\is_bool($option->getDefault()) ? array(var_export($option->getDefault(), true)) : ($option->getDefault() ? array($option->getDefault()) : array()));
             $objectXML->appendChild($defaultsXML = $dom->createElement('defaults'));
 
             if (!empty($defaults)) {

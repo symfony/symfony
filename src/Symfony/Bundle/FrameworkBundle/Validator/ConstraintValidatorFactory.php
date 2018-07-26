@@ -71,7 +71,7 @@ class ConstraintValidatorFactory extends ContainerConstraintValidatorFactory
             return parent::getInstance($constraint);
         }
 
-        if (is_string($this->validators[$name])) {
+        if (\is_string($this->validators[$name])) {
             $this->validators[$name] = $this->container->get($this->validators[$name]);
         }
 

@@ -80,7 +80,7 @@ final class FirewallConfig
 
     public function allowsAnonymous()
     {
-        return in_array('anonymous', $this->listeners, true);
+        return \in_array('anonymous', $this->listeners, true);
     }
 
     public function isStateless()

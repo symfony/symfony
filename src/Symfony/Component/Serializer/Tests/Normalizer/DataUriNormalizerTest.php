@@ -169,7 +169,7 @@ class DataUriNormalizerTest extends TestCase
             array('data:a!b#c&d-e^f_g+h.i/a!b#c&d-e^f_g+h.i;base64,foobar'),
         );
 
-        if (!defined('HHVM_VERSION')) {
+        if (!\defined('HHVM_VERSION')) {
             // See https://github.com/facebook/hhvm/issues/6354
             $data[] = array('data:text/plain;charset=utf-8;base64,SGVsbG8gV29ybGQh');
         }

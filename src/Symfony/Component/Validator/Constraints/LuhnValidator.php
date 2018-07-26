@@ -49,7 +49,7 @@ class LuhnValidator extends ConstraintValidator
 
         // Work with strings only, because long numbers are represented as floats
         // internally and don't work with strlen()
-        if (!is_string($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -65,7 +65,7 @@ class LuhnValidator extends ConstraintValidator
         }
 
         $checkSum = 0;
-        $length = strlen($value);
+        $length = \strlen($value);
 
         // Starting with the last digit and walking left, add every second
         // digit to the check sum

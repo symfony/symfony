@@ -76,7 +76,7 @@ class DateCaster
     {
         $location = $timeZone->getLocation();
         $formatted = (new \DateTime('now', $timeZone))->format($location ? 'e (P)' : 'P');
-        $title = $location && extension_loaded('intl') ? \Locale::getDisplayRegion('-'.$location['country_code'], \Locale::getDefault()) : '';
+        $title = $location && \extension_loaded('intl') ? \Locale::getDisplayRegion('-'.$location['country_code'], \Locale::getDefault()) : '';
 
         $z = array(Caster::PREFIX_VIRTUAL.'timezone' => new ConstStub($formatted, $title));
 
@@ -85,7 +85,7 @@ class DateCaster
 
     public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, $isNested, $filter)
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) { // see https://bugs.php.net/bug.php?id=71635
+        if (\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) { // see https://bugs.php.net/bug.php?id=71635
             return $a;
         }
 
@@ -124,6 +124,6 @@ class DateCaster
 
     private static function formatSeconds($s, $us)
     {
-        return sprintf('%02d.%s', $s, 0 === ($len = strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
+        return sprintf('%02d.%s', $s, 0 === ($len = \strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
     }
 }

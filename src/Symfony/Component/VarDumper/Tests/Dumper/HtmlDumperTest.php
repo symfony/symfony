@@ -51,7 +51,7 @@ class HtmlDumperTest extends TestCase
         $dumpId = $dumpId[0];
         $res = (int) $var['res'];
 
-        $r = defined('HHVM_VERSION') ? '' : '<a class=sf-dump-ref>#%d</a>';
+        $r = \defined('HHVM_VERSION') ? '' : '<a class=sf-dump-ref>#%d</a>';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 <foo></foo><bar><span class=sf-dump-note>array:24</span> [<samp>

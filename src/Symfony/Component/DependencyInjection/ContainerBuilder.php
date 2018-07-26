@@ -293,8 +293,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addObjectResource($object)
     {
         if ($this->trackResources) {
-            if (is_object($object)) {
-                $object = get_class($object);
+            if (\is_object($object)) {
+                $object = \get_class($object);
             }
             if (!isset($this->classReflectors[$object])) {
                 $this->classReflectors[$object] = new \ReflectionClass($object);
@@ -421,7 +421,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (is_dir($path)) {
             if ($trackContents) {
-                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+                $this->addResource(new DirectoryResource($path, \is_string($trackContents) ? $trackContents : null));
             } else {
                 $this->addResource(new GlobResource($path, '/*', false));
             }
@@ -449,7 +449,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Cannot load from an extension on a compiled container.');
         }
 
-        if (func_num_args() < 2) {
+        if (\func_num_args() < 2) {
             $values = array();
         }
 
@@ -471,10 +471,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION/*, int $priority = 0*/)
     {
-        if (func_num_args() >= 3) {
+        if (\func_num_args() >= 3) {
             $priority = func_get_arg(2);
         } else {
-            if (__CLASS__ !== get_class($this)) {
+            if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                     @trigger_error(sprintf('Method %s() will have a third `int $priority = 0` argument in version 4.0. Not defining it is deprecated since Symfony 3.2.', __METHOD__), E_USER_DEPRECATED);
@@ -751,7 +751,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function compile(/*$resolveEnvPlaceholders = false*/)
     {
-        if (1 <= func_num_args()) {
+        if (1 <= \func_num_args()) {
             $resolveEnvPlaceholders = func_get_arg(0);
         } else {
             if (__CLASS__ !== static::class) {
@@ -856,7 +856,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $alias = $this->normalizeId($alias);
 
-        if (is_string($id)) {
+        if (\is_string($id)) {
             $id = new Alias($this->normalizeId($id));
         } elseif (!$id instanceof Alias) {
             throw new InvalidArgumentException('$id must be a string, or an Alias object.');
@@ -1067,7 +1067,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             if (isset($seen[$id])) {
                 $seen = array_values($seen);
-                $seen = array_slice($seen, array_search($id, $seen));
+                $seen = \array_slice($seen, array_search($id, $seen));
                 $seen[] = $id;
 
                 throw new ServiceCircularReferenceException($id, $seen);
@@ -1138,15 +1138,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (null !== $factory = $definition->getFactory()) {
-            if (is_array($factory)) {
+            if (\is_array($factory)) {
                 $factory = array($this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlineServices), $factory[1]);
-            } elseif (!is_string($factory)) {
+            } elseif (!\is_string($factory)) {
                 throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
             }
 
-            $service = call_user_func_array($factory, $arguments);
+            $service = \call_user_func_array($factory, $arguments);
 
-            if (!$definition->isDeprecated() && is_array($factory) && is_string($factory[0])) {
+            if (!$definition->isDeprecated() && \is_array($factory) && \is_string($factory[0])) {
                 $r = new \ReflectionClass($factory[0]);
 
                 if (0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
@@ -1181,7 +1181,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable)) {
+            if (\is_array($callable)) {
                 $callable[0] = $parameterBag->resolveValue($callable[0]);
 
                 if ($callable[0] instanceof Reference) {
@@ -1191,11 +1191,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
             }
 
-            if (!is_callable($callable)) {
-                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_class($service)));
+            if (!\is_callable($callable)) {
+                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', \get_class($service)));
             }
 
-            call_user_func($callable, $service);
+            \call_user_func($callable, $service);
         }
 
         return $service;
@@ -1216,7 +1216,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function doResolveServices($value, array &$inlineServices = array())
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $k => $v) {
                 $value[$k] = $this->doResolveServices($v, $inlineServices);
             }
@@ -1421,8 +1421,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         $value = $resolved;
                         $completed = true;
                     } else {
-                        if (!is_string($resolved) && !is_numeric($resolved)) {
-                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type %s inside string value "%s".', $env, gettype($resolved), $this->resolveEnvPlaceholders($value)));
+                        if (!\is_string($resolved) && !is_numeric($resolved)) {
+                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type %s inside string value "%s".', $env, \gettype($resolved), $this->resolveEnvPlaceholders($value)));
                         }
                         $value = str_ireplace($placeholder, $resolved, $value);
                     }
@@ -1507,7 +1507,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $services = array();
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
@@ -1531,7 +1531,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $services = array();
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getInitializedConditionals($v)));
             }
@@ -1564,7 +1564,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $value = parent::getEnv($name);
         $bag = $this->getParameterBag();
 
-        if (!is_string($value) || !$bag instanceof EnvPlaceholderParameterBag) {
+        if (!\is_string($value) || !$bag instanceof EnvPlaceholderParameterBag) {
             return $value;
         }
 
@@ -1611,7 +1611,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        call_user_func_array(array($service, $call[0]), $this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlineServices));
+        \call_user_func_array(array($service, $call[0]), $this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlineServices));
     }
 
     /**
@@ -1653,7 +1653,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $path = realpath($path) ?: $path;
 
         foreach ($this->vendors as $vendor) {
-            if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+            if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, \strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
                 return true;
             }
         }

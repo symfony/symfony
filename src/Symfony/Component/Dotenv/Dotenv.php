@@ -48,7 +48,7 @@ final class Dotenv
     public function load($path/*, ...$paths*/)
     {
         // func_get_args() to be replaced by a variadic argument for Symfony 4.0
-        foreach (func_get_args() as $path) {
+        foreach (\func_get_args() as $path) {
             if (!is_readable($path) || is_dir($path)) {
                 throw new PathException($path);
             }
@@ -109,7 +109,7 @@ final class Dotenv
         $this->data = str_replace(array("\r\n", "\r"), "\n", $data);
         $this->lineno = 1;
         $this->cursor = 0;
-        $this->end = strlen($this->data);
+        $this->end = \strlen($this->data);
         $this->state = self::STATE_VARNAME;
         $this->values = array();
         $name = '';
@@ -231,7 +231,7 @@ final class Dotenv
             } else {
                 $value = '';
                 $prevChr = $this->data[$this->cursor - 1];
-                while ($this->cursor < $this->end && !in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
+                while ($this->cursor < $this->end && !\in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
                     if ('\\' === $this->data[$this->cursor] && isset($this->data[$this->cursor + 1]) && ('"' === $this->data[$this->cursor + 1] || "'" === $this->data[$this->cursor + 1])) {
                         ++$this->cursor;
                     }
@@ -390,7 +390,7 @@ final class Dotenv
 
     private function moveCursor($text)
     {
-        $this->cursor += strlen($text);
+        $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");
     }
 

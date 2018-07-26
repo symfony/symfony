@@ -30,7 +30,7 @@ trait PhpFilesTrait
 
     public static function isSupported()
     {
-        return function_exists('opcache_invalidate') && ini_get('opcache.enable');
+        return \function_exists('opcache_invalidate') && ini_get('opcache.enable');
     }
 
     /**
@@ -137,7 +137,7 @@ trait PhpFilesTrait
                     $value = serialize($value);
                 }
             } elseif (!\is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, gettype($value)));
+                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \gettype($value)));
             }
 
             $data[1] = $value;

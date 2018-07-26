@@ -133,7 +133,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         }
         if (!headers_sent() && ini_get('session.use_cookies')) {
             if (!$this->sessionName) {
-                throw new \LogicException(sprintf('Session name cannot be empty, did you forget to call "parent::open()" in "%s"?.', get_class($this)));
+                throw new \LogicException(sprintf('Session name cannot be empty, did you forget to call "parent::open()" in "%s"?.', \get_class($this)));
             }
             $sessionCookie = sprintf(' %s=', urlencode($this->sessionName));
             $sessionCookieWithId = sprintf('%s%s;', $sessionCookie, urlencode($sessionId));

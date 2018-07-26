@@ -73,7 +73,7 @@ class DelegatingLoader extends BaseDelegatingLoader
         }
 
         foreach ($collection->all() as $route) {
-            if (!is_string($controller = $route->getDefault('_controller')) || !$controller) {
+            if (!\is_string($controller = $route->getDefault('_controller')) || !$controller) {
                 continue;
             }
 

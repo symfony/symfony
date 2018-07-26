@@ -35,7 +35,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $fallbackPool = new ArrayAdapter();
 
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 
@@ -64,7 +64,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $fallbackPool = new ArrayAdapter();
 
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 
@@ -93,7 +93,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $fallbackPool = new ArrayAdapter();
 
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 

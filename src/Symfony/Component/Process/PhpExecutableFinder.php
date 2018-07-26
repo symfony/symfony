@@ -39,7 +39,7 @@ class PhpExecutableFinder
         $args = $includeArgs && $args ? ' '.implode(' ', $args) : '';
 
         // HHVM support
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             return (getenv('PHP_BINARY') ?: PHP_BINARY).$args;
         }
 
@@ -83,7 +83,7 @@ class PhpExecutableFinder
     {
         $arguments = array();
 
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $arguments[] = '--php';
         } elseif ('phpdbg' === PHP_SAPI) {
             $arguments[] = '-qrr';

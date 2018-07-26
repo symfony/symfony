@@ -241,7 +241,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
         $registryDefinition = $container->getDefinition('workflow.registry');
-        $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
+        $this->assertGreaterThan(0, \count($registryDefinition->getMethodCalls()));
     }
 
     /**
@@ -501,19 +501,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $files = array_map('realpath', $options['resource_files']['en']);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
@@ -571,7 +571,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $xmlMappings = array(
-            dirname($ref->getFileName()).'/Resources/config/validation.xml',
+            \dirname($ref->getFileName()).'/Resources/config/validation.xml',
             strtr($projectDir.'/config/validator/foo.xml', '/', DIRECTORY_SEPARATOR),
         );
 
@@ -1074,7 +1074,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file, $data = array(), $resetCompilerPasses = true, $compile = true)
     {
-        $cacheKey = md5(get_class($this).$file.serialize($data));
+        $cacheKey = md5(\get_class($this).$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }

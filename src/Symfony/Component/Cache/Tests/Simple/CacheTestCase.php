@@ -28,7 +28,7 @@ abstract class CacheTestCase extends SimpleCacheTest
 
     public static function validKeys()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             return parent::validKeys();
         }
 

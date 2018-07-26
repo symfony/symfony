@@ -41,7 +41,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     {
         $this->container = $container;
 
-        $class = get_class($this);
+        $class = \get_class($this);
         if ($this instanceof \PHPUnit_Framework_MockObject_MockObject || $this instanceof \Prophecy\Doubler\DoubleInterface) {
             $class = get_parent_class($class);
         }
@@ -66,7 +66,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     {
         @trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
 
-        if (!is_array($callback) || 2 !== count($callback)) {
+        if (!\is_array($callback) || 2 !== \count($callback)) {
             throw new \InvalidArgumentException('Expected an array("service", "method") argument');
         }
 
@@ -149,9 +149,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         @trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
 
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
-            if (is_string($params)) {
+            if (\is_string($params)) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params, 0);
-            } elseif (is_string($params[0])) {
+            } elseif (\is_string($params[0])) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params[0], isset($params[1]) ? $params[1] : 0);
             } else {
                 foreach ($params as $listener) {

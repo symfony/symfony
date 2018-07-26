@@ -53,7 +53,7 @@ class StopwatchEvent
     public function __construct($origin, $category = null, $morePrecision = false)
     {
         $this->origin = $this->formatTime($origin);
-        $this->category = is_string($category) ? $category : 'default';
+        $this->category = \is_string($category) ? $category : 'default';
         $this->morePrecision = $morePrecision;
     }
 
@@ -98,7 +98,7 @@ class StopwatchEvent
      */
     public function stop()
     {
-        if (!count($this->started)) {
+        if (!\count($this->started)) {
             throw new \LogicException('stop() called but start() has not been called before.');
         }
 
@@ -132,7 +132,7 @@ class StopwatchEvent
      */
     public function ensureStopped()
     {
-        while (count($this->started)) {
+        while (\count($this->started)) {
             $this->stop();
         }
     }
@@ -164,7 +164,7 @@ class StopwatchEvent
      */
     public function getEndTime()
     {
-        $count = count($this->periods);
+        $count = \count($this->periods);
 
         return $count ? $this->periods[$count - 1]->getEndTime() : 0;
     }
@@ -177,8 +177,8 @@ class StopwatchEvent
     public function getDuration()
     {
         $periods = $this->periods;
-        $stopped = count($periods);
-        $left = count($this->started) - $stopped;
+        $stopped = \count($periods);
+        $left = \count($this->started) - $stopped;
 
         for ($i = 0; $i < $left; ++$i) {
             $index = $stopped + $i;

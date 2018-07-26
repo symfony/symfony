@@ -18,7 +18,7 @@ class GlobResourceTest extends TestCase
 {
     protected function tearDown()
     {
-        $dir = dirname(__DIR__).'/Fixtures';
+        $dir = \dirname(__DIR__).'/Fixtures';
         @rmdir($dir.'/TmpGlob');
         @unlink($dir.'/TmpGlob');
         @unlink($dir.'/Resource/TmpGlob');
@@ -27,7 +27,7 @@ class GlobResourceTest extends TestCase
 
     public function testIterator()
     {
-        $dir = dirname(__DIR__).DIRECTORY_SEPARATOR.'Fixtures';
+        $dir = \dirname(__DIR__).DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/Resource', true);
 
         $paths = iterator_to_array($resource);
@@ -49,7 +49,7 @@ class GlobResourceTest extends TestCase
 
     public function testIsFreshNonRecursiveDetectsNewFile()
     {
-        $dir = dirname(__DIR__).'/Fixtures';
+        $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', false);
 
         $this->assertTrue($resource->isFresh(0));
@@ -69,7 +69,7 @@ class GlobResourceTest extends TestCase
 
     public function testIsFreshNonRecursiveDetectsRemovedFile()
     {
-        $dir = dirname(__DIR__).'/Fixtures';
+        $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', false);
 
         touch($dir.'/TmpGlob');
@@ -85,7 +85,7 @@ class GlobResourceTest extends TestCase
 
     public function testIsFreshRecursiveDetectsRemovedFile()
     {
-        $dir = dirname(__DIR__).'/Fixtures';
+        $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', true);
 
         touch($dir.'/Resource/TmpGlob');
@@ -103,7 +103,7 @@ class GlobResourceTest extends TestCase
 
     public function testIsFreshRecursiveDetectsNewFile()
     {
-        $dir = dirname(__DIR__).'/Fixtures';
+        $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', true);
 
         $this->assertTrue($resource->isFresh(0));

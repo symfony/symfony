@@ -115,7 +115,7 @@ EOF
         $this->getApplication()->setDispatcher(new EventDispatcher());
 
         $containerDir = new \ReflectionObject($kernel->getContainer());
-        $containerDir = basename(dirname($containerDir->getFileName()));
+        $containerDir = basename(\dirname($containerDir->getFileName()));
 
         // the warmup cache dir name must have the same length as the real one
         // to avoid the many problems in serialized resources files
@@ -147,7 +147,7 @@ EOF
 
         if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
             foreach ($mounts as $mount) {
-                $mount = array_slice(explode(' ', $mount), 1, -3);
+                $mount = \array_slice(explode(' ', $mount), 1, -3);
                 if (!\in_array(array_pop($mount), array('vboxsf', 'nfs'))) {
                     continue;
                 }
@@ -201,7 +201,7 @@ EOF
             $tempKernel = $realKernel;
         } else {
             $this->warning = 'Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is deprecated since Symfony 3.4 and will be unsupported in 4.0.';
-            $realKernelClass = get_class($realKernel);
+            $realKernelClass = \get_class($realKernel);
             $namespace = '';
             if (false !== $pos = strrpos($realKernelClass, '\\')) {
                 $namespace = substr($realKernelClass, 0, $pos);
@@ -236,8 +236,8 @@ EOF
         }
 
         // fix references to the Kernel in .meta files
-        $safeTempKernel = str_replace('\\', '\\\\', get_class($tempKernel));
-        $realKernelFQN = get_class($realKernel);
+        $safeTempKernel = str_replace('\\', '\\\\', \get_class($tempKernel));
+        $realKernelFQN = \get_class($realKernel);
 
         foreach (Finder::create()->files()->depth('<3')->name('*.meta')->in($warmupDir) as $file) {
             file_put_contents($file, preg_replace(
@@ -255,7 +255,7 @@ EOF
             file_put_contents($file, $content);
             rename($file, str_replace(DIRECTORY_SEPARATOR.$tempContainerClass, DIRECTORY_SEPARATOR.$realContainerClass, $file));
         }
-        if (is_dir($tempContainerDir = $warmupDir.'/'.get_class($tempKernel->getContainer()))) {
+        if (is_dir($tempContainerDir = $warmupDir.'/'.\get_class($tempKernel->getContainer()))) {
             foreach (Finder::create()->files()->in($tempContainerDir) as $file) {
                 $content = str_replace($tempContainerClass, $realContainerClass, file_get_contents($file));
                 file_put_contents($file, $content);
@@ -285,7 +285,7 @@ EOF
         $class = substr($parentClass, 0, -1).'_';
         // the temp container class must be changed too
         $container = $parent->getContainer();
-        $realContainerClass = var_export($container->hasParameter('kernel.container_class') ? $container->getParameter('kernel.container_class') : get_class($parent->getContainer()), true);
+        $realContainerClass = var_export($container->hasParameter('kernel.container_class') ? $container->getParameter('kernel.container_class') : \get_class($parent->getContainer()), true);
         $containerClass = substr_replace($realContainerClass, '_', -2, 1);
 
         if (method_exists($parent, 'getProjectDir')) {

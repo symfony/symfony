@@ -151,7 +151,7 @@ class LdapClientTest extends LdapTestCase
         $reflMethod = $reflObj->getMethod('normalizeConfig');
         $reflMethod->setAccessible(true);
         array_unshift($args, $this->client);
-        $this->assertEquals($expected, call_user_func_array(array($reflMethod, 'invoke'), $args));
+        $this->assertEquals($expected, \call_user_func_array(array($reflMethod, 'invoke'), $args));
     }
 
     /**

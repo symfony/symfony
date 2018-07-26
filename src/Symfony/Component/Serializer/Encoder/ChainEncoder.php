@@ -45,7 +45,7 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      */
     public function supportsEncoding($format/*, array $context = array()*/)
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
+        $context = \func_num_args() > 1 ? func_get_arg(1) : array();
 
         try {
             $this->getEncoder($format, $context);
@@ -66,7 +66,7 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      */
     public function needsNormalization($format/*, array $context = array()*/)
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
+        $context = \func_num_args() > 1 ? func_get_arg(1) : array();
         $encoder = $this->getEncoder($format, $context);
 
         if (!$encoder instanceof NormalizationAwareInterface) {

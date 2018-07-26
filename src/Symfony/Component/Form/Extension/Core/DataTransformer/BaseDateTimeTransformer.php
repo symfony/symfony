@@ -38,11 +38,11 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
      */
     public function __construct($inputTimezone = null, $outputTimezone = null)
     {
-        if (null !== $inputTimezone && !is_string($inputTimezone)) {
+        if (null !== $inputTimezone && !\is_string($inputTimezone)) {
             throw new UnexpectedTypeException($inputTimezone, 'string');
         }
 
-        if (null !== $outputTimezone && !is_string($outputTimezone)) {
+        if (null !== $outputTimezone && !\is_string($outputTimezone)) {
             throw new UnexpectedTypeException($outputTimezone, 'string');
         }
 

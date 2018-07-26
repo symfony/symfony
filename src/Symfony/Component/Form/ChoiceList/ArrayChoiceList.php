@@ -155,7 +155,7 @@ class ArrayChoiceList implements ChoiceListInterface
             $givenValues = array();
 
             foreach ($choices as $i => $givenChoice) {
-                $givenValues[$i] = (string) call_user_func($this->valueCallback, $givenChoice);
+                $givenValues[$i] = (string) \call_user_func($this->valueCallback, $givenChoice);
             }
 
             return array_intersect($givenValues, array_keys($this->choices));
@@ -196,13 +196,13 @@ class ArrayChoiceList implements ChoiceListInterface
         }
 
         foreach ($choices as $key => $choice) {
-            if (is_array($choice)) {
+            if (\is_array($choice)) {
                 $this->flatten($choice, $value, $choicesByValues, $keysByValues, $structuredValues[$key]);
 
                 continue;
             }
 
-            $choiceValue = (string) call_user_func($value, $choice);
+            $choiceValue = (string) \call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
             $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;
@@ -222,7 +222,7 @@ class ArrayChoiceList implements ChoiceListInterface
     private function castableToString(array $choices, array &$cache = array())
     {
         foreach ($choices as $choice) {
-            if (is_array($choice)) {
+            if (\is_array($choice)) {
                 if (!$this->castableToString($choice, $cache)) {
                     return false;
                 }

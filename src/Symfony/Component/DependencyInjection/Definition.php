@@ -97,7 +97,7 @@ class Definition
     {
         $this->changes['factory'] = true;
 
-        if (is_string($factory) && false !== strpos($factory, '::')) {
+        if (\is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
         }
 
@@ -255,12 +255,12 @@ class Definition
      */
     public function replaceArgument($index, $argument)
     {
-        if (0 === count($this->arguments)) {
+        if (0 === \count($this->arguments)) {
             throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
         }
 
-        if (is_int($index) && ($index < 0 || $index > count($this->arguments) - 1)) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+        if (\is_int($index) && ($index < 0 || $index > \count($this->arguments) - 1)) {
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, \count($this->arguments) - 1));
         }
 
         if (!array_key_exists($index, $this->arguments)) {
@@ -784,7 +784,7 @@ class Definition
     {
         $this->changes['configurator'] = true;
 
-        if (is_string($configurator) && false !== strpos($configurator, '::')) {
+        if (\is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
         }
 
@@ -860,7 +860,7 @@ class Definition
      */
     public function getAutowiringTypes(/*$triggerDeprecation = true*/)
     {
-        if (1 > func_num_args() || func_get_arg(0)) {
+        if (1 > \func_num_args() || func_get_arg(0)) {
             @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
         }
 

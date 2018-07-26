@@ -150,7 +150,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             if (is_numeric($k)) {
                 $def->addArgument($v);
             } elseif (0 === strpos($k, 'index_')) {
-                $def->replaceArgument((int) substr($k, strlen('index_')), $v);
+                $def->replaceArgument((int) substr($k, \strlen('index_')), $v);
             } else {
                 $def->setArgument($k, $v);
             }

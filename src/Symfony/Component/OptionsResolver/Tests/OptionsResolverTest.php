@@ -1584,7 +1584,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefined('bar');
         $this->resolver->setDefault('lazy1', function () {});
 
-        count($this->resolver);
+        \count($this->resolver);
     }
 
     public function testNestedArrays()

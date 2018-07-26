@@ -112,12 +112,12 @@ class Crawler implements \Countable, \IteratorAggregate
             $this->addNodeList($node);
         } elseif ($node instanceof \DOMNode) {
             $this->addNode($node);
-        } elseif (is_array($node)) {
+        } elseif (\is_array($node)) {
             $this->addNodes($node);
-        } elseif (is_string($node)) {
+        } elseif (\is_string($node)) {
             $this->addContent($node);
         } elseif (null !== $node) {
-            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', is_object($node) ? get_class($node) : gettype($node)));
+            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', \is_object($node) ? \get_class($node) : \gettype($node)));
         }
     }
 
@@ -211,7 +211,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(array('href'));
 
         $baseHref = current($base);
-        if (count($base) && !empty($baseHref)) {
+        if (\count($base) && !empty($baseHref)) {
             if ($this->baseHref) {
                 $linkNode = $dom->createElement('a');
                 $linkNode->setAttribute('href', $baseHref);
@@ -322,7 +322,7 @@ class Crawler implements \Countable, \IteratorAggregate
         }
 
         // Don't add duplicate nodes in the Crawler
-        if (in_array($node, $this->nodes, true)) {
+        if (\in_array($node, $this->nodes, true)) {
             return;
         }
 
@@ -381,7 +381,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function slice($offset = 0, $length = null)
     {
-        return $this->createSubCrawler(array_slice($this->nodes, $offset, $length));
+        return $this->createSubCrawler(\array_slice($this->nodes, $offset, $length));
     }
 
     /**
@@ -422,7 +422,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function last()
     {
-        return $this->eq(count($this->nodes) - 1);
+        return $this->eq(\count($this->nodes) - 1);
     }
 
     /**
@@ -635,7 +635,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function extract($attributes)
     {
         $attributes = (array) $attributes;
-        $count = count($attributes);
+        $count = \count($attributes);
 
         $data = array();
         foreach ($this->nodes as $node) {
@@ -765,7 +765,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', \get_class($node)));
         }
 
         return new Link($node, $this->baseHref, $method);
@@ -783,7 +783,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $links = array();
         foreach ($this->nodes as $node) {
             if (!$node instanceof \DOMElement) {
-                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', \get_class($node)));
             }
 
             $links[] = new Link($node, $this->baseHref, 'get');
@@ -801,14 +801,14 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function image()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', \get_class($node)));
         }
 
         return new Image($node, $this->baseHref);
@@ -824,7 +824,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $images = array();
         foreach ($this as $node) {
             if (!$node instanceof \DOMElement) {
-                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', \get_class($node)));
             }
 
             $images[] = new Image($node, $this->baseHref);
@@ -852,7 +852,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', \get_class($node)));
         }
 
         $form = new Form($node, $this->uri, $method, $this->baseHref);
@@ -971,7 +971,7 @@ class Crawler implements \Countable, \IteratorAggregate
         // We cannot simply drop
         $nonMatchingExpression = 'a[name() = "b"]';
 
-        $xpathLen = strlen($xpath);
+        $xpathLen = \strlen($xpath);
         $openedBrackets = 0;
         $startPosition = strspn($xpath, " \t\n\r\0\x0B");
 
@@ -1064,7 +1064,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function count()
     {
-        return count($this->nodes);
+        return \count($this->nodes);
     }
 
     /**

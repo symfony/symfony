@@ -110,7 +110,7 @@ class FormRegistry implements FormRegistryInterface
     {
         $typeExtensions = array();
         $parentType = $type->getParent();
-        $fqcn = get_class($type);
+        $fqcn = \get_class($type);
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($fqcn)));

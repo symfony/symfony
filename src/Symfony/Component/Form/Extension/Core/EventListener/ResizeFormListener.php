@@ -66,7 +66,7 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+        if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
@@ -92,7 +92,7 @@ class ResizeFormListener implements EventSubscriberInterface
             @trigger_error('Support for objects implementing both \Traversable and \ArrayAccess is deprecated since Symfony 3.1 and will be removed in 4.0. Use an array instead.', E_USER_DEPRECATED);
         }
 
-        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+        if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             $data = array();
         }
 
@@ -130,7 +130,7 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+        if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
@@ -139,7 +139,7 @@ class ResizeFormListener implements EventSubscriberInterface
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
-                $isEmpty = is_callable($this->deleteEmpty) ? call_user_func($this->deleteEmpty, $child->getData()) : $child->isEmpty();
+                $isEmpty = \is_callable($this->deleteEmpty) ? \call_user_func($this->deleteEmpty, $child->getData()) : $child->isEmpty();
 
                 // $isNew can only be true if allowAdd is true, so we don't
                 // need to check allowAdd again

@@ -30,7 +30,7 @@ class TableCell
      */
     public function __construct($value = '', array $options = array())
     {
-        if (is_numeric($value) && !is_string($value)) {
+        if (is_numeric($value) && !\is_string($value)) {
             $value = (string) $value;
         }
 

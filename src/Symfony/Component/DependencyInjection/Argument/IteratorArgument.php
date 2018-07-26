@@ -46,7 +46,7 @@ class IteratorArgument implements ArgumentInterface
     {
         foreach ($values as $k => $v) {
             if (null !== $v && !$v instanceof Reference) {
-                throw new InvalidArgumentException(sprintf('An IteratorArgument must hold only Reference instances, "%s" given.', is_object($v) ? get_class($v) : gettype($v)));
+                throw new InvalidArgumentException(sprintf('An IteratorArgument must hold only Reference instances, "%s" given.', \is_object($v) ? \get_class($v) : \gettype($v)));
             }
         }
 

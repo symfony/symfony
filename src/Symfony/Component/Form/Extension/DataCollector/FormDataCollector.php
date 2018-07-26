@@ -161,7 +161,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
         // Count errors
         if (isset($this->dataByForm[$hash]['errors'])) {
-            $this->data['nb_errors'] += count($this->dataByForm[$hash]['errors']);
+            $this->data['nb_errors'] += \count($this->dataByForm[$hash]['errors']);
         }
 
         foreach ($form as $child) {
@@ -260,7 +260,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             FormInterface::class => function (FormInterface $f, array $a) {
                 return array(
                     Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(\get_class($f->getConfig()->getType()->getInnerType())),
                 );
             },
             FormView::class => array(StubCaster::class, 'cutInternals'),

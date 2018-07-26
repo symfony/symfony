@@ -87,7 +87,7 @@ class QuestionHelper extends Helper
     {
         @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
 
-        if (!is_resource($stream)) {
+        if (!\is_resource($stream)) {
             throw new InvalidArgumentException('Input stream must be a valid resource.');
         }
 
@@ -104,7 +104,7 @@ class QuestionHelper extends Helper
      */
     public function getInputStream()
     {
-        if (0 === func_num_args() || func_get_arg(0)) {
+        if (0 === \func_num_args() || func_get_arg(0)) {
             @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
         }
 
@@ -161,10 +161,10 @@ class QuestionHelper extends Helper
                 $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question, $inputStream, is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
+            $ret = trim($this->autocomplete($output, $question, $inputStream, \is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
         }
 
-        $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
+        $ret = \strlen($ret) > 0 ? $ret : $question->getDefault();
 
         if ($normalizer = $question->getNormalizer()) {
             return $normalizer($ret);
@@ -228,7 +228,7 @@ class QuestionHelper extends Helper
         $i = 0;
         $ofs = -1;
         $matches = $autocomplete;
-        $numMatches = count($matches);
+        $numMatches = \count($matches);
 
         $sttyMode = shell_exec('stty -g');
 
@@ -253,7 +253,7 @@ class QuestionHelper extends Helper
                 if (0 === $i) {
                     $ofs = -1;
                     $matches = $autocomplete;
-                    $numMatches = count($matches);
+                    $numMatches = \count($matches);
                 } else {
                     $numMatches = 0;
                 }
@@ -277,13 +277,13 @@ class QuestionHelper extends Helper
                     $ofs += ('A' === $c[2]) ? -1 : 1;
                     $ofs = ($numMatches + $ofs) % $numMatches;
                 }
-            } elseif (ord($c) < 32) {
+            } elseif (\ord($c) < 32) {
                 if ("\t" === $c || "\n" === $c) {
                     if ($numMatches > 0 && -1 !== $ofs) {
                         $ret = $matches[$ofs];
                         // Echo out remaining chars for current match
                         $output->write(substr($ret, $i));
-                        $i = strlen($ret);
+                        $i = \strlen($ret);
                     }
 
                     if ("\n" === $c) {
@@ -412,7 +412,7 @@ class QuestionHelper extends Helper
             }
 
             try {
-                return call_user_func($question->getValidator(), $interviewer());
+                return \call_user_func($question->getValidator(), $interviewer());
             } catch (RuntimeException $e) {
                 throw $e;
             } catch (\Exception $error) {

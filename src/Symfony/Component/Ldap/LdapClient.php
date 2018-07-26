@@ -73,7 +73,7 @@ final class LdapClient implements LdapClientInterface
 
             foreach ($entry->getAttributes() as $attribute => $values) {
                 $resultAttribute = array(
-                    'count' => count($values),
+                    'count' => \count($values),
                 );
 
                 foreach ($values as $val) {
@@ -81,17 +81,17 @@ final class LdapClient implements LdapClientInterface
                 }
                 $attributeName = strtolower($attribute);
 
-                $resultAttribute['count'] = count($values);
+                $resultAttribute['count'] = \count($values);
                 $resultEntry[$attributeName] = $resultAttribute;
                 $resultEntry[] = $attributeName;
             }
 
-            $resultEntry['count'] = count($resultEntry) / 2;
+            $resultEntry['count'] = \count($resultEntry) / 2;
             $resultEntry['dn'] = $entry->getDn();
             $result[] = $resultEntry;
         }
 
-        $result['count'] = count($result) - 1;
+        $result['count'] = \count($result) - 1;
 
         return $result;
     }

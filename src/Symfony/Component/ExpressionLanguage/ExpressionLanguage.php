@@ -96,7 +96,7 @@ class ExpressionLanguage
         $cacheKeyItems = array();
 
         foreach ($names as $nameKey => $name) {
-            $cacheKeyItems[] = is_int($nameKey) ? $name : $nameKey.':'.$name;
+            $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey.':'.$name;
         }
 
         $cacheItem = $this->cache->getItem(rawurlencode($expression.'//'.implode('|', $cacheKeyItems)));

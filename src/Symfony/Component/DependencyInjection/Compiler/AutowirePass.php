@@ -542,7 +542,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $extraContext = $extraContext ? ' '.$extraContext : '';
-        if (1 < $len = count($aliases)) {
+        if (1 < $len = \count($aliases)) {
             $message = sprintf('Try changing the type-hint%s to one of its parents: ', $extraContext);
             for ($i = 0, --$len; $i < $len; ++$i) {
                 $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);

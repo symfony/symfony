@@ -276,7 +276,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
-            if (!in_array($color, array('white', 'black'))) {
+            if (!\in_array($color, array('white', 'black'))) {
                 throw new \InvalidArgumentException($error);
             }
 
@@ -688,7 +688,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
-            if (!in_array($color, array('white', 'black'))) {
+            if (!\in_array($color, array('white', 'black'))) {
                 throw new \InvalidArgumentException($error);
             }
 

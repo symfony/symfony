@@ -105,10 +105,10 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         // BC to be removed in 4.0
-        if (__CLASS__ !== get_class($this)) {
+        if (__CLASS__ !== \get_class($this)) {
             $r = new \ReflectionMethod($this, 'getTwigEnvironment');
             if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Usage of method "%s" is deprecated since Symfony 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Usage of method "%s" is deprecated since Symfony 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', \get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
 
                 $this->twig = $this->getTwigEnvironment();
             }
@@ -119,7 +119,7 @@ EOF
 
         $filenames = $input->getArgument('filename');
 
-        if (0 === count($filenames)) {
+        if (0 === \count($filenames)) {
             if (0 !== ftell(STDIN)) {
                 throw new RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
@@ -204,9 +204,9 @@ EOF
         }
 
         if (0 === $errors) {
-            $io->success(sprintf('All %d Twig files contain valid syntax.', count($filesInfo)));
+            $io->success(sprintf('All %d Twig files contain valid syntax.', \count($filesInfo)));
         } else {
-            $io->warning(sprintf('%d Twig files have valid syntax and %d contain errors.', count($filesInfo) - $errors, $errors));
+            $io->warning(sprintf('%d Twig files have valid syntax and %d contain errors.', \count($filesInfo) - $errors, $errors));
         }
 
         return min($errors, 1);
@@ -259,7 +259,7 @@ EOF
         $lines = explode("\n", $template);
 
         $position = max(0, $line - $context);
-        $max = min(count($lines), $line - 1 + $context);
+        $max = min(\count($lines), $line - 1 + $context);
 
         $result = array();
         while ($position < $max) {

@@ -33,7 +33,7 @@ class WebProfilerExtensionTest extends TestCase
         $errors = array();
         $knownPrivates[] = 'debug.file_link_formatter.url_format';
         foreach ($container->getServiceIds() as $id) {
-            if (in_array($id, $knownPrivates, true)) { // to be removed in 4.0
+            if (\in_array($id, $knownPrivates, true)) { // to be removed in 4.0
                 continue;
             }
             try {

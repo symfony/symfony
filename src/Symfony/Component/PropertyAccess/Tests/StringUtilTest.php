@@ -34,9 +34,9 @@ class StringUtilTest extends TestCase
     public function testSingularify($plural, $singular)
     {
         $single = StringUtil::singularify($plural);
-        if (is_string($singular) && is_array($single)) {
+        if (\is_string($singular) && \is_array($single)) {
             $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (is_array($singular) && is_string($single)) {
+        } elseif (\is_array($singular) && \is_string($single)) {
             $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
         }
 

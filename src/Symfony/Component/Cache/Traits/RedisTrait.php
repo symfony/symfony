@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Predis\Connection\Factory;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\RedisCluster;
+use Predis\Connection\Factory;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;

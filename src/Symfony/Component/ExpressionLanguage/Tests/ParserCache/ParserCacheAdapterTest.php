@@ -12,9 +12,9 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheAdapter;
-use Symfony\Component\ExpressionLanguage\Node\Node;
 
 /**
  * @group legacy

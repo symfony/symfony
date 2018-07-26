@@ -4,8 +4,8 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterMappingsPass;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterMappingsPassTest extends TestCase
 {

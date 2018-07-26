@@ -13,12 +13,12 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
-use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
+use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 
 class AutowiringTypesTest extends WebTestCase
 {

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Intl\NumberFormatter;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
-use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodNotImplementedException;
+use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale\Locale;

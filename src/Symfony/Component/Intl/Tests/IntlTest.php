@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Component\Intl\Intl;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Intl\Intl;
 
 class IntlTest extends TestCase
 {

@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\TwigBundle\Tests;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\ContainerAwareRuntimeLoader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @group legacy

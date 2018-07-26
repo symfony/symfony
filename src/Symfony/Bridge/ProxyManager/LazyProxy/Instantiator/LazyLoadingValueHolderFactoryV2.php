@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\ProxyManager\LazyProxy\Instantiator;
 
-use ProxyManager\ProxyGenerator\ProxyGeneratorInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory as BaseFactory;
+use ProxyManager\ProxyGenerator\ProxyGeneratorInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\LazyLoadingValueHolderGenerator;
 
 /**

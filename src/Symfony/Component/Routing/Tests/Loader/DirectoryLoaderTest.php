@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\RouteCollection;
 
 class DirectoryLoaderTest extends AbstractAnnotationLoaderTest

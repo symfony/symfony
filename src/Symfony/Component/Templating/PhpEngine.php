@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Templating;
 
-use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\HelperInterface;
 use Symfony\Component\Templating\Loader\LoaderInterface;
+use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\Storage\StringStorage;
 
 /**
  * PhpEngine is an engine able to render PHP templates.

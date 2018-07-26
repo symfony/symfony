@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
-use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReader;
 
 /**
  * @deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Component\Translation\Reader\TranslationReader instead

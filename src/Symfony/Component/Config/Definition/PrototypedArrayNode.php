@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
-use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * Represents a prototyped Array node in the config tree.

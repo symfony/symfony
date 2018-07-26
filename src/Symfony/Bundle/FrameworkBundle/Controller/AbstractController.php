@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Psr\Container\ContainerInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;

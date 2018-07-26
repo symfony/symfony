@@ -12,10 +12,10 @@
 namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Yaml\Command\LintCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Yaml\Command\LintCommand;
 
 /**
  * Tests the YamlLintCommand.

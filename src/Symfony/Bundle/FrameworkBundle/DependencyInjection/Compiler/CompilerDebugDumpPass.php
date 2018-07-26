@@ -13,9 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 @trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0.', CompilerDebugDumpPass::class), E_USER_DEPRECATED);
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 

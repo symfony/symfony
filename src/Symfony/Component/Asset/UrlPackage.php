@@ -12,9 +12,9 @@
 namespace Symfony\Component\Asset;
 
 use Symfony\Component\Asset\Context\ContextInterface;
-use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\Asset\Exception\InvalidArgumentException;
 use Symfony\Component\Asset\Exception\LogicException;
+use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
  * Package that adds a base URL to asset URLs in addition to a version.

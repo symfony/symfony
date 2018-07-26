@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Session;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The default session strategy implementation.

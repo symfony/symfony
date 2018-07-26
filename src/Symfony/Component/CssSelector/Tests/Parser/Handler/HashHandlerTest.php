@@ -13,8 +13,8 @@ namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
 
 use Symfony\Component\CssSelector\Parser\Handler\HashHandler;
 use Symfony\Component\CssSelector\Parser\Token;
-use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
 class HashHandlerTest extends AbstractHandlerTest
 {

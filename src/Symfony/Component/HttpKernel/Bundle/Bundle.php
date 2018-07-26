@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * An implementation of BundleInterface that adds a few conventions

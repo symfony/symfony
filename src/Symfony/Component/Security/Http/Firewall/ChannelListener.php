@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Http\AccessMapInterface;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Http\AccessMapInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * ChannelListener switches the HTTP protocol based on the access control

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

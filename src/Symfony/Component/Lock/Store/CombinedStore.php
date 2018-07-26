@@ -19,8 +19,8 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
  * CombinedStore is a StoreInterface implementation able to manage and synchronize several StoreInterfaces.

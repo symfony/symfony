@@ -103,15 +103,6 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithGuardExpression()
-    {
-        $event = $this->createEvent();
-        $this->configureValidator(true, true);
-        $this->listener->onTransition($event, 'test_expression');
-
-        $this->assertFalse($event->isBlocked());
-    }
-
     public function testWithGuardExpressionWithNotSupportedTransition()
     {
         $event = $this->createEvent(true);

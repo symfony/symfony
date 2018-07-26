@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
+class LoggingTranslator implements TranslatorFallbackInterface, TranslatorBagInterface
 {
     /**
      * @var TranslatorInterface|TranslatorBagInterface
@@ -87,13 +87,19 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * Gets the fallback locales.
-     *
-     * @return array $locales The fallback locales
+     * {@inheritdoc}
      */
     public function getFallbackLocales()
     {
-        if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
+        $implementsFallback = $this->translator instanceof TranslatorFallbackInterface;
+        if ($implementsFallback || method_exists($this->translator, 'getFallbackLocales')) {
+            if (!$implementsFallback) {
+                @trigger_error(
+                    sprintf('Having `getFallbackLocales` in %s without implementing %s is deprecated', get_class($this->translator), TranslatorFallbackInterface::class),
+                    E_USER_DEPRECATED
+                );
+            }
+
             return $this->translator->getFallbackLocales();
         }
 

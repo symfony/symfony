@@ -43,8 +43,8 @@ class DebugClassLoader
         $this->isFinder = \is_array($classLoader) && method_exists($classLoader[0], 'findFile');
 
         if (!isset(self::$caseCheck)) {
-            $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), DIRECTORY_SEPARATOR);
-            $i = strrpos($file, DIRECTORY_SEPARATOR);
+            $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), \DIRECTORY_SEPARATOR);
+            $i = strrpos($file, \DIRECTORY_SEPARATOR);
             $dir = substr($file, 0, 1 + $i);
             $file = substr($file, 1 + $i);
             $test = strtoupper($file) === $file ? strtolower($file) : strtoupper($file);
@@ -294,7 +294,7 @@ class DebugClassLoader
             }
             if (self::$caseCheck) {
                 $real = explode('\\', $class.strrchr($file, '.'));
-                $tail = explode(DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $file));
+                $tail = explode(\DIRECTORY_SEPARATOR, str_replace('/', \DIRECTORY_SEPARATOR, $file));
 
                 $i = \count($tail) - 1;
                 $j = \count($real) - 1;
@@ -307,7 +307,7 @@ class DebugClassLoader
                 array_splice($tail, 0, $i + 1);
             }
             if (self::$caseCheck && $tail) {
-                $tail = DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $tail);
+                $tail = \DIRECTORY_SEPARATOR.implode(\DIRECTORY_SEPARATOR, $tail);
                 $tailLen = \strlen($tail);
                 $real = $refl->getFileName();
 

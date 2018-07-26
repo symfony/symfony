@@ -2095,7 +2095,7 @@ YAML;
      */
     public function testParsingNotReadableFilesThrowsException()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
 

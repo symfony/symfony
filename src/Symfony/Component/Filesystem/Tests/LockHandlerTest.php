@@ -48,7 +48,7 @@ class LockHandlerTest extends TestCase
     public function testErrorHandlingInLockIfLockPathBecomesUnwritable()
     {
         // skip test on Windows; PHP can't easily set file as unreadable on Windows
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot run on Windows.');
         }
 

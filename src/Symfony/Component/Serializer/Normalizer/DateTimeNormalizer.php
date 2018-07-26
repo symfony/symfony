@@ -88,7 +88,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         if (null !== $dateTimeFormat) {
-            if (null === $timezone && PHP_VERSION_ID < 70000) {
+            if (null === $timezone && \PHP_VERSION_ID < 70000) {
                 // https://bugs.php.net/bug.php?id=68669
                 $object = \DateTime::class === $class ? \DateTime::createFromFormat($dateTimeFormat, $data) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data);
             } else {

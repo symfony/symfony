@@ -58,7 +58,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testSymlinksNotResolved()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('symlinks are not supported on Windows');
         }
 
@@ -265,7 +265,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testFollowLinks()
     {
-        if ('\\' == DIRECTORY_SEPARATOR) {
+        if ('\\' == \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('symlinks are not supported on Windows');
         }
 
@@ -280,9 +280,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in(array(self::$tmpDir, __DIR__))->getIterator();
 
         $expected = array(
-            self::$tmpDir.DIRECTORY_SEPARATOR.'test.php',
-            __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php',
-            __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php',
+            self::$tmpDir.\DIRECTORY_SEPARATOR.'test.php',
+            __DIR__.\DIRECTORY_SEPARATOR.'FinderTest.php',
+            __DIR__.\DIRECTORY_SEPARATOR.'GlobTest.php',
         );
 
         $this->assertIterator($expected, $iterator);
@@ -384,7 +384,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $paths[] = $file->getRelativePathname();
         }
 
-        $ref = array('test.php', 'toto', 'test.py', 'foo', 'foo'.DIRECTORY_SEPARATOR.'bar.tmp', 'foo bar');
+        $ref = array('test.php', 'toto', 'test.py', 'foo', 'foo'.\DIRECTORY_SEPARATOR.'bar.tmp', 'foo bar');
 
         sort($paths);
         sort($ref);
@@ -395,7 +395,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAppendWithAFinder()
     {
         $finder = $this->buildFinder();
-        $finder->files()->in(self::$tmpDir.DIRECTORY_SEPARATOR.'foo');
+        $finder->files()->in(self::$tmpDir.\DIRECTORY_SEPARATOR.'foo');
 
         $finder1 = $this->buildFinder();
         $finder1->directories()->in(self::$tmpDir);
@@ -408,7 +408,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAppendWithAnArray()
     {
         $finder = $this->buildFinder();
-        $finder->files()->in(self::$tmpDir.DIRECTORY_SEPARATOR.'foo');
+        $finder->files()->in(self::$tmpDir.\DIRECTORY_SEPARATOR.'foo');
 
         $finder->append($this->toAbsolute(array('foo', 'toto')));
 
@@ -423,7 +423,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAppendDoesNotRequireIn()
     {
         $finder = $this->buildFinder();
-        $finder->in(self::$tmpDir.DIRECTORY_SEPARATOR.'foo');
+        $finder->in(self::$tmpDir.\DIRECTORY_SEPARATOR.'foo');
 
         $finder1 = Finder::create()->append($finder);
 
@@ -444,7 +444,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testCountFiles()
     {
-        $files = Finder::create()->files()->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $files = Finder::create()->files()->in(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures');
         $i = 0;
 
         foreach ($files as $file) {
@@ -483,7 +483,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testContains($matchPatterns, $noMatchPatterns, $expected)
     {
         $finder = $this->buildFinder();
-        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
+        $finder->in(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures')
             ->name('*.txt')->sortByName()
             ->contains($matchPatterns)
             ->notContains($noMatchPatterns);
@@ -546,15 +546,15 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $locations = array(
             __DIR__.'/Fixtures/one',
-            self::$tmpDir.DIRECTORY_SEPARATOR.'toto',
+            self::$tmpDir.\DIRECTORY_SEPARATOR.'toto',
         );
 
         $finder = $this->buildFinder();
         $finder->in($locations)->depth('< 10')->name('*.neon');
 
         $expected = array(
-            __DIR__.'/Fixtures/one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'c.neon',
-            __DIR__.'/Fixtures/one'.DIRECTORY_SEPARATOR.'b'.DIRECTORY_SEPARATOR.'d.neon',
+            __DIR__.'/Fixtures/one'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c.neon',
+            __DIR__.'/Fixtures/one'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'d.neon',
         );
 
         $this->assertIterator($expected, $finder);
@@ -575,10 +575,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testRegexSpecialCharsLocationWithPathRestrictionContainingStartFlag()
     {
         $finder = $this->buildFinder();
-        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'r+e.gex[c]a(r)s')
+        $finder->in(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'r+e.gex[c]a(r)s')
             ->path('/^dir/');
 
-        $expected = array('r+e.gex[c]a(r)s'.DIRECTORY_SEPARATOR.'dir', 'r+e.gex[c]a(r)s'.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'bar.dat');
+        $expected = array('r+e.gex[c]a(r)s'.\DIRECTORY_SEPARATOR.'dir', 'r+e.gex[c]a(r)s'.\DIRECTORY_SEPARATOR.'dir'.\DIRECTORY_SEPARATOR.'bar.dat');
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
@@ -612,7 +612,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testPath($matchPatterns, $noMatchPatterns, array $expected)
     {
         $finder = $this->buildFinder();
-        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
+        $finder->in(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures')
             ->path($matchPatterns)
             ->notPath($noMatchPatterns);
 
@@ -624,41 +624,41 @@ class FinderTest extends Iterator\RealIteratorTestCase
         return array(
             array('', '', array()),
             array('/^A\/B\/C/', '/C$/',
-                array('A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat'),
+                array('A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat'),
             ),
             array('/^A\/B/', 'foobar',
                 array(
-                    'A'.DIRECTORY_SEPARATOR.'B',
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                    'A'.\DIRECTORY_SEPARATOR.'B',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'ab.dat',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat',
                 ),
             ),
             array('A/B/C', 'foobar',
                 array(
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
-                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
-                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat',
+                    'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
+                    'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat.copy',
                 ),
             ),
             array('A/B', 'foobar',
                 array(
                     //dirs
-                    'A'.DIRECTORY_SEPARATOR.'B',
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
-                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B',
-                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'A'.\DIRECTORY_SEPARATOR.'B',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
+                    'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B',
+                    'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
                     //files
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
-                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
-                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat.copy',
-                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'ab.dat',
+                    'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat',
+                    'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'ab.dat.copy',
+                    'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat.copy',
                 ),
             ),
             array('/^with space\//', 'foobar',
                 array(
-                    'with space'.DIRECTORY_SEPARATOR.'foo.txt',
+                    'with space'.\DIRECTORY_SEPARATOR.'foo.txt',
                 ),
             ),
         );
@@ -666,7 +666,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testAccessDeniedException()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
 
@@ -674,7 +674,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->files()->in(self::$tmpDir);
 
         // make 'foo' directory non-readable
-        $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
+        $testDir = self::$tmpDir.\DIRECTORY_SEPARATOR.'foo';
         chmod($testDir, 0333);
 
         if (false === $couldRead = is_readable($testDir)) {
@@ -706,7 +706,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testIgnoredAccessDeniedException()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
 
@@ -714,7 +714,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->files()->ignoreUnreadableDirs()->in(self::$tmpDir);
 
         // make 'foo' directory non-readable
-        $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
+        $testDir = self::$tmpDir.\DIRECTORY_SEPARATOR.'foo';
         chmod($testDir, 0333);
 
         if (false === ($couldRead = is_readable($testDir))) {

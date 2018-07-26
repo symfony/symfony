@@ -33,7 +33,7 @@ class CacheClearCommandTest extends TestCase
     {
         $this->fs = new Filesystem();
         $this->kernel = new TestAppKernel('test', true);
-        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('sf2_cache_', true);
+        $this->rootDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf2_cache_', true);
         $this->kernel->setRootDir($this->rootDir);
         $this->fs->mkdir($this->rootDir);
     }
@@ -86,7 +86,7 @@ class CacheClearCommandTest extends TestCase
             return;
         }
         $containerRef = new \ReflectionClass(require $containerFile);
-        $containerFile = str_replace('tes_'.DIRECTORY_SEPARATOR, 'test'.DIRECTORY_SEPARATOR, $containerRef->getFileName());
+        $containerFile = str_replace('tes_'.\DIRECTORY_SEPARATOR, 'test'.\DIRECTORY_SEPARATOR, $containerRef->getFileName());
         $this->assertRegExp(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
     }
 }

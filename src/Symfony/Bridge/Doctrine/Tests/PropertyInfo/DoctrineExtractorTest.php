@@ -30,7 +30,7 @@ class DoctrineExtractorTest extends TestCase
 
     protected function setUp()
     {
-        $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'), true);
+        $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'), true);
         $entityManager = EntityManager::create(array('driver' => 'pdo_sqlite'), $config);
 
         if (!DBALType::hasType('foo')) {

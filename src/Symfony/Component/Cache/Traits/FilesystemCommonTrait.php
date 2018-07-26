@@ -34,14 +34,14 @@ trait FilesystemCommonTrait
             if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
                 throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
-            $directory .= DIRECTORY_SEPARATOR.$namespace;
+            $directory .= \DIRECTORY_SEPARATOR.$namespace;
         }
         if (!file_exists($directory)) {
             @mkdir($directory, 0777, true);
         }
-        $directory .= DIRECTORY_SEPARATOR;
+        $directory .= \DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
-        if ('\\' === DIRECTORY_SEPARATOR && \strlen($directory) > 234) {
+        if ('\\' === \DIRECTORY_SEPARATOR && \strlen($directory) > 234) {
             throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
         }
 
@@ -99,7 +99,7 @@ trait FilesystemCommonTrait
     private function getFile($id, $mkdir = false)
     {
         $hash = str_replace('/', '-', base64_encode(hash('sha256', static::class.$id, true)));
-        $dir = $this->directory.strtoupper($hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR);
+        $dir = $this->directory.strtoupper($hash[0].\DIRECTORY_SEPARATOR.$hash[1].\DIRECTORY_SEPARATOR);
 
         if ($mkdir && !file_exists($dir)) {
             @mkdir($dir, 0777, true);

@@ -39,7 +39,7 @@ class DebugCommandTest extends TestCase
             FilesystemLoader::MAIN_NAMESPACE => array('extractor', 'extractor'),
         ));
         $ret = $tester->execute(array(), array('decorated' => false));
-        $ds = DIRECTORY_SEPARATOR;
+        $ds = \DIRECTORY_SEPARATOR;
         $loaderPaths = <<<TXT
 Loader Paths
 ------------

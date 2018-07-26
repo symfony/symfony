@@ -49,7 +49,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
             return $supported;
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR || !\function_exists('passthru') || !\function_exists('escapeshellarg')) {
+        if ('\\' === \DIRECTORY_SEPARATOR || !\function_exists('passthru') || !\function_exists('escapeshellarg')) {
             return $supported = false;
         }
 

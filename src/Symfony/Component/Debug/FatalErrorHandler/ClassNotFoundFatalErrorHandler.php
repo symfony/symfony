@@ -159,7 +159,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     {
         $candidates = array(
             // namespaced class
-            $namespacedClass = str_replace(array($path.DIRECTORY_SEPARATOR, '.php', '/'), array('', '', '\\'), $file),
+            $namespacedClass = str_replace(array($path.\DIRECTORY_SEPARATOR, '.php', '/'), array('', '', '\\'), $file),
             // namespaced class (with target dir)
             $prefix.$namespacedClass,
             // namespaced class (with target dir and separator)

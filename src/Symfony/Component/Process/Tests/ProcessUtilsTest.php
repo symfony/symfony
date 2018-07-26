@@ -29,7 +29,7 @@ class ProcessUtilsTest extends TestCase
 
     public function dataArguments()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             return array(
                 array('"\"php\" \"-v\""', '"php" "-v"'),
                 array('"foo bar"', 'foo bar'),

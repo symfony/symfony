@@ -159,7 +159,7 @@ EOF
             }
             $firstNamespace = false;
             foreach ($paths as $path) {
-                $rows[] = array($namespace, $path.DIRECTORY_SEPARATOR);
+                $rows[] = array($namespace, $path.\DIRECTORY_SEPARATOR);
                 $namespace = '';
             }
             if (\count($paths) > 1) {
@@ -188,7 +188,7 @@ EOF
         foreach ($loader->getNamespaces() as $namespace) {
             $paths = array_map(function ($path) {
                 if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
-                    $path = ltrim(substr($path, \strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                    $path = ltrim(substr($path, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
                 }
 
                 return $path;

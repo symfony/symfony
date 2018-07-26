@@ -321,7 +321,7 @@ final class Dotenv
                 return substr($matches[0], 1);
             }
 
-            if ('\\' === DIRECTORY_SEPARATOR) {
+            if ('\\' === \DIRECTORY_SEPARATOR) {
                 throw new \LogicException('Resolving commands is not supported on Windows.');
             }
 

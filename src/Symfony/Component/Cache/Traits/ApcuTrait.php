@@ -31,7 +31,7 @@ trait ApcuTrait
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled');
         }
-        if ('cli' === PHP_SAPI) {
+        if ('cli' === \PHP_SAPI) {
             ini_set('apc.use_request_time', 0);
         }
         parent::__construct($namespace, $defaultLifetime);
@@ -75,7 +75,7 @@ trait ApcuTrait
      */
     protected function doClear($namespace)
     {
-        return isset($namespace[0]) && class_exists('APCuIterator', false) && ('cli' !== PHP_SAPI || ini_get('apc.enable_cli'))
+        return isset($namespace[0]) && class_exists('APCuIterator', false) && ('cli' !== \PHP_SAPI || ini_get('apc.enable_cli'))
             ? apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY))
             : apcu_clear_cache();
     }

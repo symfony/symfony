@@ -253,7 +253,7 @@ EOF
         foreach (Finder::create()->files()->depth('<2')->name($tempContainerClass.'*')->in($warmupDir) as $file) {
             $content = str_replace($tempContainerClass, $realContainerClass, file_get_contents($file));
             file_put_contents($file, $content);
-            rename($file, str_replace(DIRECTORY_SEPARATOR.$tempContainerClass, DIRECTORY_SEPARATOR.$realContainerClass, $file));
+            rename($file, str_replace(\DIRECTORY_SEPARATOR.$tempContainerClass, \DIRECTORY_SEPARATOR.$realContainerClass, $file));
         }
         if (is_dir($tempContainerDir = $warmupDir.'/'.\get_class($tempKernel->getContainer()))) {
             foreach (Finder::create()->files()->in($tempContainerDir) as $file) {

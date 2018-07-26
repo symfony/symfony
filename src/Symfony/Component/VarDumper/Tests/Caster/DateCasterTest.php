@@ -29,7 +29,7 @@ class DateCasterTest extends TestCase
      */
     public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp)
     {
-        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -49,7 +49,7 @@ EODUMP;
      */
     public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
-        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -102,7 +102,7 @@ EODUMP;
      */
     public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
     {
-        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
+        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
         }
 
@@ -122,7 +122,7 @@ EODUMP;
      */
     public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
     {
-        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
+        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
         }
 
@@ -142,7 +142,7 @@ EODUMP;
      */
     public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
     {
-        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
+        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
         }
 
@@ -220,7 +220,7 @@ EODUMP;
      */
     public function testDumpTimeZone($timezone, $expected)
     {
-        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -240,7 +240,7 @@ EODUMP;
      */
     public function testDumpTimeZoneExcludingVerbosity($timezone, $expected)
     {
-        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -260,7 +260,7 @@ EODUMP;
      */
     public function testCastTimeZone($timezone, $xTimezone, $xRegion)
     {
-        if ((\defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
+        if ((\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) && !preg_match('/\w+\/\w+/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\PhpDocExtractor;
 
+use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
-use phpDocumentor\Reflection\Types\Collection;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

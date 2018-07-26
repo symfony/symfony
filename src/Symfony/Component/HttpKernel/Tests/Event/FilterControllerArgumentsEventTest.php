@@ -2,9 +2,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
 class FilterControllerArgumentsEventTest extends TestCase

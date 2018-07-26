@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
-use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Twig\Environment;
 
 /**

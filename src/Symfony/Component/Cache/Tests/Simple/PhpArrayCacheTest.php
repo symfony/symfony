@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
-use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
 use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Cache\Simple\PhpArrayCache;
+use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
 
 /**
  * @group time-sensitive

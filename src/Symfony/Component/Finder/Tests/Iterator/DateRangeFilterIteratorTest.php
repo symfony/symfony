@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 use Symfony\Component\Finder\Comparator\DateComparator;
+use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 
 class DateRangeFilterIteratorTest extends RealIteratorTestCase
 {

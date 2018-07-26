@@ -12,8 +12,8 @@
 namespace Symfony\Component\VarDumper\Caster;
 
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
-use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
  * Casts common Exception classes to array representation.

@@ -13,9 +13,9 @@ namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\UpdateOperationException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
+use Symfony\Component\Ldap\Exception\UpdateOperationException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>

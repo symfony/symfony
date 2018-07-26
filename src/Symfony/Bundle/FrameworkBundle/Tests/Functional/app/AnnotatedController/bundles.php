@@ -9,8 +9,8 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
 
 return array(
     new FrameworkBundle(),

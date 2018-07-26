@@ -49,7 +49,7 @@ class YamlDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new YamlDumper($container);
-        $this->assertEqualYamlStructure(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/yaml/services9.yml')), $dumper->dump(), '->dump() dumps services');
+        $this->assertEqualYamlStructure(str_replace('%path%', self::$fixturesPath.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/yaml/services9.yml')), $dumper->dump(), '->dump() dumps services');
 
         $dumper = new YamlDumper($container = new ContainerBuilder());
         $container->register('foo', 'FooClass')->addArgument(new \stdClass())->setPublic(true);

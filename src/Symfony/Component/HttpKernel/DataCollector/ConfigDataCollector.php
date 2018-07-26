@@ -71,7 +71,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'apcu_enabled' => \extension_loaded('apcu') && ini_get('apc.enabled'),
             'zend_opcache_enabled' => \extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles' => array(),
-            'sapi_name' => PHP_SAPI,
+            'sapi_name' => \PHP_SAPI,
         );
 
         if (isset($this->kernel)) {

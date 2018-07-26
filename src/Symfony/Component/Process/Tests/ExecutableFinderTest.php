@@ -83,7 +83,7 @@ class ExecutableFinderTest extends TestCase
 
     public function testFindWithOpenBaseDir()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot run test on windows');
         }
 
@@ -104,7 +104,7 @@ class ExecutableFinderTest extends TestCase
         if (ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot run test on windows');
         }
 
@@ -125,7 +125,7 @@ class ExecutableFinderTest extends TestCase
         if (ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
-        if ('\\' !== DIRECTORY_SEPARATOR) {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Can be only tested on windows');
         }
 
@@ -149,7 +149,7 @@ class ExecutableFinderTest extends TestCase
 
     private function assertSamePath($expected, $tested)
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->assertEquals(strtolower($expected), strtolower($tested));
         } else {
             $this->assertEquals($expected, $tested);
@@ -158,6 +158,6 @@ class ExecutableFinderTest extends TestCase
 
     private function getPhpBinaryName()
     {
-        return basename(PHP_BINARY, '\\' === DIRECTORY_SEPARATOR ? '.exe' : '');
+        return basename(PHP_BINARY, '\\' === \DIRECTORY_SEPARATOR ? '.exe' : '');
     }
 }

@@ -27,12 +27,12 @@ class ApcuAdapterTest extends AdapterTestCase
         if (!\function_exists('apcu_fetch') || !ini_get('apc.enabled')) {
             $this->markTestSkipped('APCu extension is required.');
         }
-        if ('cli' === PHP_SAPI && !ini_get('apc.enable_cli')) {
+        if ('cli' === \PHP_SAPI && !ini_get('apc.enable_cli')) {
             if ('testWithCliSapi' !== $this->getName()) {
                 $this->markTestSkipped('apc.enable_cli=1 is required.');
             }
         }
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Fails transiently on Windows.');
         }
 

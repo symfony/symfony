@@ -40,7 +40,7 @@ trait PhpFilesTrait
     {
         $time = time();
         $pruned = true;
-        $allowCompile = 'cli' !== PHP_SAPI || ini_get('opcache.enable_cli');
+        $allowCompile = 'cli' !== \PHP_SAPI || ini_get('opcache.enable_cli');
 
         set_error_handler($this->includeHandler);
         try {
@@ -119,7 +119,7 @@ trait PhpFilesTrait
     {
         $ok = true;
         $data = array($lifetime ? time() + $lifetime : PHP_INT_MAX, '');
-        $allowCompile = 'cli' !== PHP_SAPI || ini_get('opcache.enable_cli');
+        $allowCompile = 'cli' !== \PHP_SAPI || ini_get('opcache.enable_cli');
 
         foreach ($values as $key => $value) {
             if (null === $value || \is_object($value)) {

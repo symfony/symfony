@@ -13,8 +13,6 @@ return PhpCsFixer\Config::create()
         'array_syntax' => array('syntax' => 'long'),
         'ordered_imports' => true,
         'protected_to_private' => false,
-        // TODO remove the disabling once https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/3876 is merged and released
-        'native_constant_invocation' => false,
         // Part of @Symfony:risky in PHP-CS-Fixer 2.13.0. To be removed from the config file once upgrading
         'native_function_invocation' => array('include' => array('@compiler_optimized'), 'scope' => 'namespaced'),
     ))

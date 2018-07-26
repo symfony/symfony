@@ -389,8 +389,8 @@ class MockPdo extends \PDO
 
     public function prepare($statement, $driverOptions = array())
     {
-        return is_callable($this->prepareResult)
-            ? call_user_func($this->prepareResult, $statement, $driverOptions)
+        return \is_callable($this->prepareResult)
+            ? \call_user_func($this->prepareResult, $statement, $driverOptions)
             : $this->prepareResult;
     }
 

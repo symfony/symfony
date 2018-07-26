@@ -274,7 +274,7 @@ class HttpKernelTest extends TestCase
             $oldArguments = $event->getArguments();
 
             $newController = function ($id) use ($oldController, $oldArguments) {
-                $response = call_user_func_array($oldController, $oldArguments);
+                $response = \call_user_func_array($oldController, $oldArguments);
 
                 $response->headers->set('X-Id', $id);
 

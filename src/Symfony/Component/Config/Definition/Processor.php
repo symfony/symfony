@@ -86,7 +86,7 @@ class Processor
         }
 
         if (isset($config[$key])) {
-            if (is_string($config[$key]) || !is_int(key($config[$key]))) {
+            if (\is_string($config[$key]) || !\is_int(key($config[$key]))) {
                 // only one
                 return  array($config[$key]);
             }

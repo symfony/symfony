@@ -535,7 +535,7 @@ class OptionsResolver implements Options
             ));
         }
 
-        if (!is_array($allowedValues)) {
+        if (!\is_array($allowedValues)) {
             $allowedValues = array($allowedValues);
         }
 
@@ -718,12 +718,12 @@ class OptionsResolver implements Options
         // Make sure that no unknown options are passed
         $diff = array_diff_key($options, $clone->defined);
 
-        if (count($diff) > 0) {
+        if (\count($diff) > 0) {
             ksort($clone->defined);
             ksort($diff);
 
             throw new UndefinedOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Defined options are: "%s".',
+                (\count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Defined options are: "%s".',
                 implode('", "', array_keys($diff)),
                 implode('", "', array_keys($clone->defined))
             ));
@@ -738,11 +738,11 @@ class OptionsResolver implements Options
         // Check whether any required option is missing
         $diff = array_diff_key($clone->required, $clone->defaults);
 
-        if (count($diff) > 0) {
+        if (\count($diff) > 0) {
             ksort($diff);
 
             throw new MissingOptionsException(sprintf(
-                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
+                \count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
                 implode('", "', array_keys($diff))
             ));
         }
@@ -882,7 +882,7 @@ class OptionsResolver implements Options
                     $this->formatValue($value)
                 );
 
-                if (count($printableAllowedValues) > 0) {
+                if (\count($printableAllowedValues) > 0) {
                     $message .= sprintf(
                         ' Accepted values are: %s.',
                         $this->formatValues($printableAllowedValues)
@@ -1049,7 +1049,7 @@ class OptionsResolver implements Options
             throw new AccessException('Counting is only supported within closures of lazy options and normalizers.');
         }
 
-        return count($this->defaults);
+        return \count($this->defaults);
     }
 
     /**
@@ -1088,7 +1088,7 @@ class OptionsResolver implements Options
             }
         }
 
-        return (\is_object($value) ? get_class($value) : gettype($value)).$suffix;
+        return (\is_object($value) ? \get_class($value) : \gettype($value)).$suffix;
     }
 
     /**
@@ -1103,7 +1103,7 @@ class OptionsResolver implements Options
     private function formatValue($value): string
     {
         if (\is_object($value)) {
-            return get_class($value);
+            return \get_class($value);
         }
 
         if (\is_array($value)) {
@@ -1152,7 +1152,7 @@ class OptionsResolver implements Options
 
     private static function isValueValidType(string $type, $value): bool
     {
-        return (function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
+        return (\function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
     }
 
     private function getInvalidValues(array $arrayValues, string $type): array

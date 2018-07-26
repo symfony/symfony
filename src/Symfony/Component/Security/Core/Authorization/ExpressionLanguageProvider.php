@@ -61,7 +61,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }, function (array $variables, $role) {
                 @trigger_error('Using the "has_role()" function in security expressions is deprecated since Symfony 4.2, use "is_granted()" instead.', E_USER_DEPRECATED);
 
-                return in_array($role, $variables['roles']);
+                return \in_array($role, $variables['roles']);
             }),
         );
     }

@@ -145,7 +145,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $requirements = $annot->getRequirements();
 
         foreach ($requirements as $placeholder => $requirement) {
-            if (is_int($placeholder)) {
+            if (\is_int($placeholder)) {
                 @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s::%s()"?', $placeholder, $requirement, $name, $class->getName(), $method->getName()), E_USER_DEPRECATED);
             }
         }
@@ -224,7 +224,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
+        return \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
     }
 
     /**
@@ -315,7 +315,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             }
 
             foreach ($globals['requirements'] as $placeholder => $requirement) {
-                if (is_int($placeholder)) {
+                if (\is_int($placeholder)) {
                     @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" in "%s"?', $placeholder, $requirement, $class->getName()), E_USER_DEPRECATED);
                 }
             }

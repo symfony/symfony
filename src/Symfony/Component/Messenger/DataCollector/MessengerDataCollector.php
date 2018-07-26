@@ -103,7 +103,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         if (array_key_exists('result', $tracedMessage)) {
             $result = $tracedMessage['result'];
             $debugRepresentation['result'] = array(
-                'type' => \is_object($result) ? \get_class($result) : gettype($result),
+                'type' => \is_object($result) ? \get_class($result) : \gettype($result),
                 'value' => $result,
             );
         }

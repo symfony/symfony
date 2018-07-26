@@ -9,7 +9,7 @@ use Symfony\Component\Debug\DebugClassLoader;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
-    $vendor = dirname($vendor);
+    $vendor = \dirname($vendor);
 }
 require $vendor.'/vendor/autoload.php';
 

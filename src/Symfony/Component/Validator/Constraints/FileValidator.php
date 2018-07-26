@@ -113,7 +113,7 @@ class FileValidator extends ConstraintValidator
             }
         }
 
-        if (!is_scalar($value) && !$value instanceof FileObject && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !$value instanceof FileObject && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -196,7 +196,7 @@ class FileValidator extends ConstraintValidator
 
     private static function moreDecimalsThan($double, $numberOfDecimals)
     {
-        return strlen((string) $double) > strlen(round($double, $numberOfDecimals));
+        return \strlen((string) $double) > \strlen(round($double, $numberOfDecimals));
     }
 
     /**

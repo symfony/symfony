@@ -58,7 +58,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeOption($object, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
         }
     }
 
@@ -133,7 +133,7 @@ abstract class Descriptor implements DescriptorInterface
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type)
     {
-        $this->parents[$class = get_class($type->getInnerType())] = array();
+        $this->parents[$class = \get_class($type->getInnerType())] = array();
 
         if (null !== $type->getParent()) {
             $optionsResolver = clone $this->getParentOptionsResolver($type->getParent());
@@ -155,7 +155,7 @@ abstract class Descriptor implements DescriptorInterface
         foreach ($type->getTypeExtensions() as $extension) {
             $inheritedOptions = $optionsResolver->getDefinedOptions();
             $extension->configureOptions($optionsResolver);
-            $this->extensions[get_class($extension)] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
+            $this->extensions[\get_class($extension)] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
         }
     }
 }

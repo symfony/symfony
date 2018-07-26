@@ -40,7 +40,7 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', get_class($mock), false, false, null);
+        $metadata = new ArgumentMetadata('foo', \get_class($mock), false, false, null);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }

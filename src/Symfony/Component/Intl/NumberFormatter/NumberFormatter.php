@@ -263,7 +263,7 @@ class NumberFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
 
-        if (!in_array($style, self::$supportedStyles)) {
+        if (!\in_array($style, self::$supportedStyles)) {
             $message = sprintf('The available styles are: %s.', implode(', ', array_keys(self::$supportedStyles)));
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'style', $style, $message);
         }
@@ -521,9 +521,9 @@ class NumberFormatter
         // Any string before the numeric value causes error in the parsing
         if (preg_match("/^-?(?:\.\d++|([\d{$groupSep}]++)(?:\.\d++)?)/", $value, $matches)) {
             $value = $matches[0];
-            $position = strlen($value);
+            $position = \strlen($value);
             if ($error = $groupSep && isset($matches[1]) && !preg_match('/^\d{1,3}+(?:(?:,\d{3})++|\d*+)$/', $matches[1])) {
-                $position -= strlen(preg_replace('/^\d{1,3}+(?:(?:,\d++)++|\d*+)/', '', $matches[1]));
+                $position -= \strlen(preg_replace('/^\d{1,3}+(?:(?:,\d++)++|\d*+)/', '', $matches[1]));
             }
         } else {
             $error = 1;
@@ -564,7 +564,7 @@ class NumberFormatter
      */
     public function setAttribute($attr, $value)
     {
-        if (!in_array($attr, self::$supportedAttributes)) {
+        if (!\in_array($attr, self::$supportedAttributes)) {
             $message = sprintf(
                 'The available attributes are: %s',
                 implode(', ', array_keys(self::$supportedAttributes))
@@ -765,7 +765,7 @@ class NumberFormatter
         if (!$this->isInitializedAttribute(self::FRACTION_DIGITS)) {
             preg_match('/.*\.(.*)/', (string) $value, $digits);
             if (isset($digits[1])) {
-                $precision = strlen($digits[1]);
+                $precision = \strlen($digits[1]);
             }
         }
 
@@ -850,7 +850,7 @@ class NumberFormatter
      */
     private function isInvalidRoundingMode($value)
     {
-        if (in_array($value, self::$roundingModes, true)) {
+        if (\in_array($value, self::$roundingModes, true)) {
             return false;
         }
 

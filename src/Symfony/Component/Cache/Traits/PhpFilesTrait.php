@@ -175,7 +175,7 @@ trait PhpFilesTrait
                 } catch (\Exception $e) {
                 }
                 if (null !== $e || false === $serialized) {
-                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \is_object($value) ? get_class($value) : 'array'), 0, $e);
+                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \is_object($value) ? \get_class($value) : 'array'), 0, $e);
                 }
                 // Keep value serialized if it contains any internal references
                 $value = false !== strpos($serialized, ';R:') ? $serialized : PhpMarshaller::marshall($value, $objectsCount);
@@ -185,7 +185,7 @@ trait PhpFilesTrait
                     ++$objectsCount;
                 }
             } elseif (!\is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, gettype($value)));
+                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \gettype($value)));
             }
 
             $value = var_export($value, true);

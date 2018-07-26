@@ -45,7 +45,7 @@ trait ReferenceSetArgumentTrait
     {
         foreach ($values as $k => $v) {
             if (null !== $v && !$v instanceof Reference) {
-                throw new InvalidArgumentException(sprintf('A %s must hold only Reference instances, "%s" given.', __CLASS__, is_object($v) ? get_class($v) : gettype($v)));
+                throw new InvalidArgumentException(sprintf('A %s must hold only Reference instances, "%s" given.', __CLASS__, \is_object($v) ? \get_class($v) : \gettype($v)));
             }
         }
 

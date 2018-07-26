@@ -50,23 +50,23 @@ class DoctrineProviderTest extends TestCase
 
     public function provideMarshall()
     {
-        yield ['bool', true, 0];
-        yield ['simple-array', [123, ['abc']], 0];
-        yield ['datetime', \DateTime::createFromFormat('U', 0), 1];
+        yield array('bool', true, 0);
+        yield array('simple-array', array(123, array('abc')), 0);
+        yield array('datetime', \DateTime::createFromFormat('U', 0), 1);
 
         $value = new \ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
 
-        yield ['array-object', $value, 3];
+        yield array('array-object', $value, 3);
 
         yield array('array-iterator', new \ArrayIterator(array(123), 1), 1);
         yield array('array-object-custom', new MyArrayObject(array(234)), 1);
 
         $value = new MySerializable();
 
-        yield ['serializable', array($value, $value), 2];
+        yield array('serializable', array($value, $value), 2);
 
         $value = new MyWakeup();
         $value->sub = new MyWakeup();
@@ -74,16 +74,16 @@ class DoctrineProviderTest extends TestCase
         $value->sub->bis = 123;
         $value->sub->baz = 123;
 
-        yield ['wakeup', $value, 2];
+        yield array('wakeup', $value, 2);
 
-        yield ['clone', array(new MyCloneable(), new MyNotCloneable()), 2];
+        yield array('clone', array(new MyCloneable(), new MyNotCloneable()), 2);
 
-        yield ['private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)), 2];
+        yield array('private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)), 2);
 
         $value = new \SplObjectStorage();
         $value[new \stdClass()] = 345;
 
-        yield ['spl-object-storage', $value, 2];
+        yield array('spl-object-storage', $value, 2);
     }
 }
 

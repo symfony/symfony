@@ -103,8 +103,8 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
      */
     protected function getConstructor(Definition $definition, $required)
     {
-        if (is_string($factory = $definition->getFactory())) {
-            if (!function_exists($factory)) {
+        if (\is_string($factory = $definition->getFactory())) {
+            if (!\function_exists($factory)) {
                 throw new RuntimeException(sprintf('Invalid service "%s": function "%s" does not exist.', $this->currentId, $factory));
             }
             $r = new \ReflectionFunction($factory);
@@ -196,7 +196,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                     $id = stripcslashes(substr($arg, 1, -1));
                     $arg = $this->processValue(new Reference($id), false, true);
                     if (!$arg instanceof Reference) {
-                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, %s returned for service("%s").', get_class($this), is_object($arg) ? get_class($arg) : gettype($arg)));
+                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, %s returned for service("%s").', \get_class($this), \is_object($arg) ? \get_class($arg) : \gettype($arg)));
                     }
                     $arg = sprintf('"%s"', $arg);
                 }

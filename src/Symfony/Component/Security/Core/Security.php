@@ -42,12 +42,12 @@ final class Security
         }
 
         $user = $token->getUser();
-        if (!is_object($user)) {
+        if (!\is_object($user)) {
             return null;
         }
 
         if (!$user instanceof UserInterface) {
-            @trigger_error(sprintf('Accessing the user object "%s" that is not an instance of "%s" from "%s()" is deprecated since Symfony 4.2, use "getToken()->getUser()" instead.', get_class($user), UserInterface::class, __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Accessing the user object "%s" that is not an instance of "%s" from "%s()" is deprecated since Symfony 4.2, use "getToken()->getUser()" instead.', \get_class($user), UserInterface::class, __METHOD__), E_USER_DEPRECATED);
             //return null; // 5.0 behavior
         }
 

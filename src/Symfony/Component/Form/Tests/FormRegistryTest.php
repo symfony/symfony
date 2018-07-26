@@ -86,7 +86,7 @@ class FormRegistryTest extends TestCase
             ->with($type)
             ->willReturn($resolvedType);
 
-        $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
+        $this->assertSame($resolvedType, $this->registry->getType(\get_class($type)));
     }
 
     public function testLoadUnregisteredType()
@@ -134,7 +134,7 @@ class FormRegistryTest extends TestCase
             ->with($type, array($ext1, $ext2))
             ->willReturn($resolvedType);
 
-        $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
+        $this->assertSame($resolvedType, $this->registry->getType(\get_class($type)));
     }
 
     public function testGetTypeConnectsParent()
@@ -157,7 +157,7 @@ class FormRegistryTest extends TestCase
             ->with($type, array(), $parentResolvedType)
             ->willReturn($resolvedType);
 
-        $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
+        $this->assertSame($resolvedType, $this->registry->getType(\get_class($type)));
     }
 
     /**
@@ -210,7 +210,7 @@ class FormRegistryTest extends TestCase
 
         $this->extension2->addType($type);
 
-        $this->assertTrue($this->registry->hasType(get_class($type)));
+        $this->assertTrue($this->registry->hasType(\get_class($type)));
     }
 
     public function testHasTypeIfFQCN()

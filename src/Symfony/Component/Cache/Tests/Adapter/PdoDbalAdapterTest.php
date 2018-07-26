@@ -26,7 +26,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     public static function setupBeforeClass()
     {
-        if (!extension_loaded('pdo_sqlite')) {
+        if (!\extension_loaded('pdo_sqlite')) {
             self::markTestSkipped('Extension pdo_sqlite required.');
         }
 

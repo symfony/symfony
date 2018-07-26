@@ -35,6 +35,6 @@ class StoreFactory
             return new MemcachedStore($connection);
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', get_class($connection)));
+        throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
     }
 }

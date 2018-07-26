@@ -140,7 +140,7 @@ EOF
                 );
         }
 
-        return array('file' => $file, 'valid' => 0 === count($errors), 'messages' => $errors);
+        return array('file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors);
     }
 
     private function display(SymfonyStyle $io, array $files)
@@ -157,7 +157,7 @@ EOF
 
     private function displayTxt(SymfonyStyle $io, array $filesInfo)
     {
-        $countFiles = count($filesInfo);
+        $countFiles = \count($filesInfo);
         $erroredFiles = 0;
 
         foreach ($filesInfo as $info) {
@@ -207,7 +207,7 @@ EOF
         }
 
         foreach ($this->getDirectoryIterator($fileOrDirectory) as $file) {
-            if (!in_array($file->getExtension(), array('xlf', 'xliff'))) {
+            if (!\in_array($file->getExtension(), array('xlf', 'xliff'))) {
                 continue;
             }
 
@@ -239,7 +239,7 @@ EOF
         };
 
         if (null !== $this->directoryIteratorProvider) {
-            return call_user_func($this->directoryIteratorProvider, $directory, $default);
+            return \call_user_func($this->directoryIteratorProvider, $directory, $default);
         }
 
         return $default($directory);
@@ -252,7 +252,7 @@ EOF
         };
 
         if (null !== $this->isReadableProvider) {
-            return call_user_func($this->isReadableProvider, $fileOrDirectory, $default);
+            return \call_user_func($this->isReadableProvider, $fileOrDirectory, $default);
         }
 
         return $default($fileOrDirectory);

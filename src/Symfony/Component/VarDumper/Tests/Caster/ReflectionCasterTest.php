@@ -154,7 +154,7 @@ EOTXT
 
     public function testGenerator()
     {
-        if (extension_loaded('xdebug')) {
+        if (\extension_loaded('xdebug')) {
             $this->markTestSkipped('xdebug is active');
         }
 

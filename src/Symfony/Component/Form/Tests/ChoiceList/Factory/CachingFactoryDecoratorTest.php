@@ -486,7 +486,7 @@ class CachingFactoryDecoratorTest extends TestCase
             array(0, 0),
             array('a', 'a'),
             // https://github.com/symfony/symfony/issues/10409
-            array(chr(181).'meter', chr(181).'meter'), // UTF-8
+            array(\chr(181).'meter', \chr(181).'meter'), // UTF-8
             array($object, $object),
         );
     }
@@ -516,7 +516,7 @@ class CachingFactoryDecoratorTest extends TestCase
             array(0, 0),
             array(0, '0'),
             array('a', 'a'),
-            array(chr(181).'meter', chr(181).'meter'),
+            array(\chr(181).'meter', \chr(181).'meter'),
         );
     }
 

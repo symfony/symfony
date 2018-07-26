@@ -51,7 +51,7 @@ class HashHandler implements HandlerInterface
 
         $value = $this->escaping->escapeUnicode($match[1]);
         $stream->push(new Token(Token::TYPE_HASH, $value, $reader->getPosition()));
-        $reader->moveForward(strlen($match[0]));
+        $reader->moveForward(\strlen($match[0]));
 
         return true;
     }

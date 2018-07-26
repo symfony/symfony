@@ -220,7 +220,7 @@ class Configuration implements ConfigurationInterface
                                 $workflows = $v;
                                 unset($workflows['enabled']);
 
-                                if (1 === count($workflows) && isset($workflows[0]['enabled'])) {
+                                if (1 === \count($workflows) && isset($workflows[0]['enabled'])) {
                                     $workflows = array();
                                 }
 
@@ -300,19 +300,19 @@ class Configuration implements ConfigurationInterface
                                             ->always()
                                             ->then(function ($places) {
                                                 // It's an indexed array of shape  ['place1', 'place2']
-                                                if (isset($places[0]) && is_string($places[0])) {
+                                                if (isset($places[0]) && \is_string($places[0])) {
                                                     return array_map(function (string $place) {
                                                         return array('name' => $place);
                                                     }, $places);
                                                 }
 
                                                 // It's an indexed array, we let the validation occur
-                                                if (isset($places[0]) && is_array($places[0])) {
+                                                if (isset($places[0]) && \is_array($places[0])) {
                                                     return $places;
                                                 }
 
                                                 foreach ($places as $name => $place) {
-                                                    if (is_array($place) && array_key_exists('name', $place)) {
+                                                    if (\is_array($place) && array_key_exists('name', $place)) {
                                                         continue;
                                                     }
                                                     $place['name'] = $name;
@@ -345,12 +345,12 @@ class Configuration implements ConfigurationInterface
                                             ->always()
                                             ->then(function ($transitions) {
                                                 // It's an indexed array, we let the validation occur
-                                                if (isset($transitions[0]) && is_array($transitions[0])) {
+                                                if (isset($transitions[0]) && \is_array($transitions[0])) {
                                                     return $transitions;
                                                 }
 
                                                 foreach ($transitions as $name => $transition) {
-                                                    if (is_array($transition) && array_key_exists('name', $transition)) {
+                                                    if (\is_array($transition) && array_key_exists('name', $transition)) {
                                                         continue;
                                                     }
                                                     $transition['name'] = $name;
@@ -512,11 +512,11 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return is_array($v) && isset($v['mime_type']); })
+                                    ->ifTrue(function ($v) { return \is_array($v) && isset($v['mime_type']); })
                                     ->then(function ($v) { return $v['mime_type']; })
                                 ->end()
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return !is_array($v); })
+                                    ->ifTrue(function ($v) { return !\is_array($v); })
                                     ->then(function ($v) { return array($v); })
                                 ->end()
                                 ->prototype('scalar')->end()
@@ -536,7 +536,7 @@ class Configuration implements ConfigurationInterface
                     ->info('templating configuration')
                     ->canBeEnabled()
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return false === $v || is_array($v) && false === $v['enabled']; })
+                        ->ifTrue(function ($v) { return false === $v || \is_array($v) && false === $v['enabled']; })
                         ->then(function () { return array('enabled' => false, 'engines' => false); })
                     ->end()
                     ->children()
@@ -550,7 +550,7 @@ class Configuration implements ConfigurationInterface
                                     ->addDefaultChildrenIfNoneSet()
                                     ->prototype('scalar')->defaultValue('FrameworkBundle:Form')->end()
                                     ->validate()
-                                        ->ifTrue(function ($v) {return !in_array('FrameworkBundle:Form', $v); })
+                                        ->ifTrue(function ($v) {return !\in_array('FrameworkBundle:Form', $v); })
                                         ->then(function ($v) {
                                             return array_merge(array('FrameworkBundle:Form'), $v);
                                         })
@@ -567,7 +567,7 @@ class Configuration implements ConfigurationInterface
                             ->requiresAtLeastOneElement()
                             ->canBeUnset()
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return !is_array($v) && false !== $v; })
+                                ->ifTrue(function ($v) { return !\is_array($v) && false !== $v; })
                                 ->then(function ($v) { return array($v); })
                             ->end()
                             ->prototype('scalar')->end()
@@ -577,7 +577,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('loaders')
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->ifTrue(function ($v) { return !\is_array($v); })
                                 ->then(function ($v) { return array($v); })
                              ->end()
                             ->prototype('scalar')->end()
@@ -605,7 +605,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('base_urls')
                             ->requiresAtLeastOneElement()
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->ifTrue(function ($v) { return !\is_array($v); })
                                 ->then(function ($v) { return array($v); })
                             ->end()
                             ->prototype('scalar')->end()
@@ -649,7 +649,7 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('base_urls')
                                         ->requiresAtLeastOneElement()
                                         ->beforeNormalization()
-                                            ->ifTrue(function ($v) { return !is_array($v); })
+                                            ->ifTrue(function ($v) { return !\is_array($v); })
                                             ->then(function ($v) { return array($v); })
                                         ->end()
                                         ->prototype('scalar')->end()
@@ -747,7 +747,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->treatFalseLike(array())
                             ->validate()
-                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->ifTrue(function ($v) { return !\is_array($v); })
                                 ->then(function ($v) { return (array) $v; })
                             ->end()
                         ->end()
@@ -933,7 +933,7 @@ class Configuration implements ConfigurationInterface
                         ->ifString()->then(function ($v) { return array('enabled' => true, 'resources' => $v); })
                     ->end()
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return is_array($v) && !isset($v['resources']); })
+                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['resources']); })
                         ->then(function ($v) {
                             $e = $v['enabled'];
                             unset($v['enabled']);
@@ -951,7 +951,7 @@ class Configuration implements ConfigurationInterface
                                 ->ifString()->then(function ($v) { return array('default' => $v); })
                             ->end()
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return is_array($v) && array_keys($v) === range(0, count($v) - 1); })
+                                ->ifTrue(function ($v) { return \is_array($v) && array_keys($v) === range(0, \count($v) - 1); })
                                 ->then(function ($v) { return array('default' => $v); })
                             ->end()
                             ->prototype('array')

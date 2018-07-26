@@ -47,7 +47,7 @@ class OptionsResolverIntrospector
      */
     public function getDefault(string $option)
     {
-        return call_user_func($this->get, 'defaults', $option, sprintf('No default value was set for the "%s" option.', $option));
+        return \call_user_func($this->get, 'defaults', $option, sprintf('No default value was set for the "%s" option.', $option));
     }
 
     /**
@@ -57,7 +57,7 @@ class OptionsResolverIntrospector
      */
     public function getLazyClosures(string $option): array
     {
-        return call_user_func($this->get, 'lazy', $option, sprintf('No lazy closures were set for the "%s" option.', $option));
+        return \call_user_func($this->get, 'lazy', $option, sprintf('No lazy closures were set for the "%s" option.', $option));
     }
 
     /**
@@ -67,7 +67,7 @@ class OptionsResolverIntrospector
      */
     public function getAllowedTypes(string $option): array
     {
-        return call_user_func($this->get, 'allowedTypes', $option, sprintf('No allowed types were set for the "%s" option.', $option));
+        return \call_user_func($this->get, 'allowedTypes', $option, sprintf('No allowed types were set for the "%s" option.', $option));
     }
 
     /**
@@ -77,7 +77,7 @@ class OptionsResolverIntrospector
      */
     public function getAllowedValues(string $option): array
     {
-        return call_user_func($this->get, 'allowedValues', $option, sprintf('No allowed values were set for the "%s" option.', $option));
+        return \call_user_func($this->get, 'allowedValues', $option, sprintf('No allowed values were set for the "%s" option.', $option));
     }
 
     /**
@@ -85,6 +85,6 @@ class OptionsResolverIntrospector
      */
     public function getNormalizer(string $option): \Closure
     {
-        return call_user_func($this->get, 'normalizers', $option, sprintf('No normalizer was set for the "%s" option.', $option));
+        return \call_user_func($this->get, 'normalizers', $option, sprintf('No normalizer was set for the "%s" option.', $option));
     }
 }

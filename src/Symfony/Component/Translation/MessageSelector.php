@@ -82,7 +82,7 @@ class MessageSelector
         if (!isset($standardRules[$position])) {
             // when there's exactly one rule given, and that rule is a standard
             // rule, use this rule
-            if (1 === count($parts) && isset($standardRules[0])) {
+            if (1 === \count($parts) && isset($standardRules[0])) {
                 return $standardRules[0];
             }
 

@@ -30,7 +30,7 @@ class RadioListMapper implements DataMapperInterface
      */
     public function mapDataToForms($choice, $radios)
     {
-        if (!is_string($choice)) {
+        if (!\is_string($choice)) {
             throw new UnexpectedTypeException($choice, 'string');
         }
 
@@ -45,7 +45,7 @@ class RadioListMapper implements DataMapperInterface
      */
     public function mapFormsToData($radios, &$choice)
     {
-        if (null !== $choice && !is_string($choice)) {
+        if (null !== $choice && !\is_string($choice)) {
             throw new UnexpectedTypeException($choice, 'null or string');
         }
 

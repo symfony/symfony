@@ -127,17 +127,17 @@ class ErrorHandler
             $handler->isRoot = true;
         }
 
-        if ($handlerIsNew && is_array($prev) && $prev[0] instanceof self) {
+        if ($handlerIsNew && \is_array($prev) && $prev[0] instanceof self) {
             $handler = $prev[0];
             $replace = false;
         }
         if (!$replace && $prev) {
             restore_error_handler();
-            $handlerIsRegistered = is_array($prev) && $handler === $prev[0];
+            $handlerIsRegistered = \is_array($prev) && $handler === $prev[0];
         } else {
             $handlerIsRegistered = true;
         }
-        if (is_array($prev = set_exception_handler(array($handler, 'handleException'))) && $prev[0] instanceof self) {
+        if (\is_array($prev = set_exception_handler(array($handler, 'handleException'))) && $prev[0] instanceof self) {
             restore_exception_handler();
             if (!$handlerIsRegistered) {
                 $handler = $prev[0];
@@ -177,7 +177,7 @@ class ErrorHandler
     {
         $loggers = array();
 
-        if (is_array($levels)) {
+        if (\is_array($levels)) {
             foreach ($levels as $type => $logLevel) {
                 if (empty($this->loggers[$type][0]) || $replace || $this->loggers[$type][0] === $this->bootstrappingLogger) {
                     $loggers[$type] = array($logger, $logLevel);
@@ -217,7 +217,7 @@ class ErrorHandler
             if (!isset($prev[$type])) {
                 throw new \InvalidArgumentException('Unknown error type: '.$type);
             }
-            if (!is_array($log)) {
+            if (!\is_array($log)) {
                 $log = array($log);
             } elseif (!array_key_exists(0, $log)) {
                 throw new \InvalidArgumentException('No logger provided');
@@ -350,7 +350,7 @@ class ErrorHandler
     {
         if ($prev !== $this->thrownErrors | $this->loggedErrors) {
             $handler = set_error_handler('var_dump');
-            $handler = is_array($handler) ? $handler[0] : null;
+            $handler = \is_array($handler) ? $handler[0] : null;
             restore_error_handler();
             if ($handler === $this) {
                 restore_error_handler();
@@ -393,7 +393,7 @@ class ErrorHandler
         }
         $scope = $this->scopedErrors & $type;
 
-        if (4 < $numArgs = func_num_args()) {
+        if (4 < $numArgs = \func_num_args()) {
             $context = $scope ? (func_get_arg(4) ?: array()) : array();
         } else {
             $context = array();
@@ -583,7 +583,7 @@ class ErrorHandler
         $previousHandler = null;
         $sameHandlerLimit = 10;
 
-        while (!is_array($handler) || !$handler[0] instanceof self) {
+        while (!\is_array($handler) || !$handler[0] instanceof self) {
             $handler = set_exception_handler('var_dump');
             restore_exception_handler();
 
@@ -667,7 +667,7 @@ class ErrorHandler
 
         for ($i = 0; isset($backtrace[$i]); ++$i) {
             if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
-                $lightTrace = array_slice($lightTrace, 1 + $i);
+                $lightTrace = \array_slice($lightTrace, 1 + $i);
                 break;
             }
         }

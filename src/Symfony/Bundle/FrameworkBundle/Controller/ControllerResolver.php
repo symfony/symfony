@@ -62,7 +62,7 @@ class ControllerResolver extends ContainerControllerResolver
         if ($controller instanceof AbstractController) {
             if (null === $previousContainer = $controller->setContainer($this->container)) {
                 @trigger_error(sprintf('Auto-injection of the container for "%s" is deprecated since Symfony 4.2. Configure it as a service instead.', $class), E_USER_DEPRECATED);
-                // To be uncommented on Symfony 5:
+            // To be uncommented on Symfony 5:
                 //throw new \LogicException(sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
             } else {
                 $controller->setContainer($previousContainer);

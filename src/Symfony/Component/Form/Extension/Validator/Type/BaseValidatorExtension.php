@@ -39,7 +39,7 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
                 return;
             }
 
-            if (is_callable($groups)) {
+            if (\is_callable($groups)) {
                 return $groups;
             }
 

@@ -248,7 +248,7 @@ class NativeSessionStorage implements SessionStorageInterface
                 $handler = $handler->getHandler();
             }
 
-            trigger_error(sprintf('session_write_close(): Failed to write session data with %s handler', get_class($handler)), E_USER_WARNING);
+            trigger_error(sprintf('session_write_close(): Failed to write session data with %s handler', \get_class($handler)), E_USER_WARNING);
         }
 
         $this->closed = true;

@@ -63,7 +63,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false, $escape = true)
     {
-        $messages = is_array($messages) ? array_values($messages) : array($messages);
+        $messages = \is_array($messages) ? array_values($messages) : array($messages);
 
         $this->autoPrependBlock();
         $this->writeln($this->createBlock($messages, $type, $style, $prefix, $padding, $escape));
@@ -117,7 +117,7 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
 
-        $messages = is_array($message) ? array_values($message) : array($message);
+        $messages = \is_array($message) ? array_values($message) : array($message);
         foreach ($messages as $message) {
             $this->writeln(sprintf(' %s', $message));
         }
@@ -396,7 +396,7 @@ class SymfonyStyle extends OutputStyle
 
         if (null !== $type) {
             $type = sprintf('[%s] ', $type);
-            $indentLength = strlen($type);
+            $indentLength = \strlen($type);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
 
@@ -408,7 +408,7 @@ class SymfonyStyle extends OutputStyle
 
             $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL, true)));
 
-            if (count($messages) > 1 && $key < count($messages) - 1) {
+            if (\count($messages) > 1 && $key < \count($messages) - 1) {
                 $lines[] = '';
             }
         }

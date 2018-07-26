@@ -439,7 +439,7 @@ abstract class Client
             unlink($deprecationsFile);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
-                    trigger_error($deprecation[1], E_USER_DEPRECATED);
+                    @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 }
@@ -581,7 +581,7 @@ abstract class Client
 
         $request = $this->internalRequest;
 
-        if (in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
+        if (\in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
             $method = 'GET';
             $files = array();
             $content = null;

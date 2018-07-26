@@ -52,7 +52,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     {
         if ($this->debug) {
             $collectedLogs = array();
-            $previousHandler = defined('PHPUNIT_COMPOSER_INSTALL');
+            $previousHandler = \defined('PHPUNIT_COMPOSER_INSTALL');
             $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                 if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
                     return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
@@ -68,7 +68,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                 // Clean the trace by removing first frames added by the error handler itself.
                 for ($i = 0; isset($backtrace[$i]); ++$i) {
                     if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
-                        $backtrace = array_slice($backtrace, 1 + $i);
+                        $backtrace = \array_slice($backtrace, 1 + $i);
                         break;
                     }
                 }

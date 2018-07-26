@@ -353,7 +353,7 @@ class FormDataCollectorTest extends TestCase
         $form2View = new FormView();
         $child1View = new FormView();
         $child1View->vars['is_selected'] = function ($choice, array $values) {
-            return in_array($choice, $values, true);
+            return \in_array($choice, $values, true);
         };
 
         $form1->add($child1);

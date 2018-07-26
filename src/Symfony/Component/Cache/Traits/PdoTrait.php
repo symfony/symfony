@@ -54,10 +54,10 @@ trait PdoTrait
             $this->conn = $connOrDsn;
         } elseif ($connOrDsn instanceof Connection) {
             $this->conn = $connOrDsn;
-        } elseif (is_string($connOrDsn)) {
+        } elseif (\is_string($connOrDsn)) {
             $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, is_object($connOrDsn) ? get_class($connOrDsn) : gettype($connOrDsn)));
+            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, \is_object($connOrDsn) ? \get_class($connOrDsn) : \gettype($connOrDsn)));
         }
 
         $this->table = isset($options['db_table']) ? $options['db_table'] : $this->table;
@@ -177,7 +177,7 @@ trait PdoTrait
         $now = time();
         $expired = array();
 
-        $sql = str_pad('', (count($ids) << 1) - 1, '?,');
+        $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN ($sql)";
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
@@ -190,12 +190,12 @@ trait PdoTrait
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
-                yield $row[0] => $this->marshaller->unmarshall(is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $row[0] => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
         if ($expired) {
-            $sql = str_pad('', (count($expired) << 1) - 1, '?,');
+            $sql = str_pad('', (\count($expired) << 1) - 1, '?,');
             $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= ? AND $this->idCol IN ($sql)";
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
@@ -251,7 +251,7 @@ trait PdoTrait
      */
     protected function doDelete(array $ids)
     {
-        $sql = str_pad('', (count($ids) << 1) - 1, '?,');
+        $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
         try {
             $stmt = $this->getConnection()->prepare($sql);

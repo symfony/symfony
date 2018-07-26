@@ -28,9 +28,9 @@ class TextDescriptor extends Descriptor
     protected function describeDefaults(array $options)
     {
         $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
-        $shortClassNames = array_map(function ($fqcn) { return array_slice(explode('\\', $fqcn), -1)[0]; }, $options['core_types']);
-        for ($i = 0; $i * 5 < count($shortClassNames); ++$i) {
-            $this->output->writeln(' '.implode(', ', array_slice($shortClassNames, $i * 5, 5)));
+        $shortClassNames = array_map(function ($fqcn) { return \array_slice(explode('\\', $fqcn), -1)[0]; }, $options['core_types']);
+        for ($i = 0; $i * 5 < \count($shortClassNames); ++$i) {
+            $this->output->writeln(' '.implode(', ', \array_slice($shortClassNames, $i * 5, 5)));
         }
 
         $this->output->section('Service form types');
@@ -63,14 +63,14 @@ class TextDescriptor extends Descriptor
         ), $formOptions);
 
         $tableRows = array();
-        $count = count(max($formOptions));
+        $count = \count(max($formOptions));
         for ($i = 0; $i < $count; ++$i) {
             $cells = array();
             foreach (array_keys($tableHeaders) as $group) {
                 if (isset($formOptions[$group][$i])) {
                     $option = $formOptions[$group][$i];
 
-                    if (is_string($option) && in_array($option, $this->requiredOptions)) {
+                    if (\is_string($option) && \in_array($option, $this->requiredOptions)) {
                         $option .= ' <info>(required)</info>';
                     }
 
@@ -82,7 +82,7 @@ class TextDescriptor extends Descriptor
             $tableRows[] = $cells;
         }
 
-        $this->output->title(sprintf('%s (Block prefix: "%s")', get_class($resolvedFormType->getInnerType()), $resolvedFormType->getInnerType()->getBlockPrefix()));
+        $this->output->title(sprintf('%s (Block prefix: "%s")', \get_class($resolvedFormType->getInnerType()), $resolvedFormType->getInnerType()->getBlockPrefix()));
         $this->output->table($tableHeaders, $tableRows);
 
         if ($this->parents) {
@@ -120,7 +120,7 @@ class TextDescriptor extends Descriptor
         }
         array_pop($rows);
 
-        $this->output->title(sprintf('%s (%s)', get_class($options['type']), $options['option']));
+        $this->output->title(sprintf('%s (%s)', \get_class($options['type']), $options['option']));
         $this->output->table(array(), $rows);
     }
 
@@ -129,11 +129,11 @@ class TextDescriptor extends Descriptor
         foreach ($options as $group => $opts) {
             $sorted = false;
             foreach ($opts as $class => $opt) {
-                if (is_string($class)) {
+                if (\is_string($class)) {
                     unset($options[$group][$class]);
                 }
 
-                if (!is_array($opt) || 0 === count($opt)) {
+                if (!\is_array($opt) || 0 === \count($opt)) {
                     continue;
                 }
 
@@ -165,7 +165,7 @@ class TextDescriptor extends Descriptor
             $prefix = Caster::PREFIX_VIRTUAL;
 
             return array(
-                $prefix.'parameters' => isset($a[$prefix.'parameters']) ? count($a[$prefix.'parameters']->value) : 0,
+                $prefix.'parameters' => isset($a[$prefix.'parameters']) ? \count($a[$prefix.'parameters']->value) : 0,
                 $prefix.'file' => $a[$prefix.'file'],
                 $prefix.'line' => $a[$prefix.'line'],
             );

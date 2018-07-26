@@ -32,9 +32,9 @@ abstract class AbstractPipes implements PipesInterface
      */
     public function __construct($input)
     {
-        if (is_resource($input) || $input instanceof \Iterator) {
+        if (\is_resource($input) || $input instanceof \Iterator) {
             $this->input = $input;
-        } elseif (is_string($input)) {
+        } elseif (\is_string($input)) {
             $this->inputBuffer = $input;
         } else {
             $this->inputBuffer = (string) $input;
@@ -78,7 +78,7 @@ abstract class AbstractPipes implements PipesInterface
         foreach ($this->pipes as $pipe) {
             stream_set_blocking($pipe, 0);
         }
-        if (is_resource($this->input)) {
+        if (\is_resource($this->input)) {
             stream_set_blocking($this->input, 0);
         }
 
@@ -100,12 +100,12 @@ abstract class AbstractPipes implements PipesInterface
         if ($input instanceof \Iterator) {
             if (!$input->valid()) {
                 $input = null;
-            } elseif (is_resource($input = $input->current())) {
+            } elseif (\is_resource($input = $input->current())) {
                 stream_set_blocking($input, 0);
             } elseif (!isset($this->inputBuffer[0])) {
-                if (!is_string($input)) {
+                if (!\is_string($input)) {
                     if (!is_scalar($input)) {
-                        throw new InvalidArgumentException(sprintf('%s yielded a value of type "%s", but only scalars and stream resources are supported', get_class($this->input), gettype($input)));
+                        throw new InvalidArgumentException(sprintf('%s yielded a value of type "%s", but only scalars and stream resources are supported', \get_class($this->input), \gettype($input)));
                     }
                     $input = (string) $input;
                 }

@@ -47,12 +47,12 @@ class DateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $dateFormat = is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
+        $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
         $timeFormat = \IntlDateFormatter::NONE;
         $calendar = \IntlDateFormatter::GREGORIAN;
-        $pattern = is_string($options['format']) ? $options['format'] : null;
+        $pattern = \is_string($options['format']) ? $options['format'] : null;
 
-        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+        if (!\in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
@@ -160,7 +160,7 @@ class DateType extends AbstractType
             $pattern = $form->getConfig()->getAttribute('formatter')->getPattern();
 
             // remove special characters unless the format was explicitly specified
-            if (!is_string($options['format'])) {
+            if (!\is_string($options['format'])) {
                 // remove quoted strings first
                 $pattern = preg_replace('/\'[^\']+\'/', '', $pattern);
 
@@ -195,7 +195,7 @@ class DateType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (is_array($placeholder)) {
+            if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
                 return array_merge(
@@ -212,7 +212,7 @@ class DateType extends AbstractType
         };
 
         $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
-            if (is_array($choiceTranslationDomain)) {
+            if (\is_array($choiceTranslationDomain)) {
                 $default = false;
 
                 return array_replace(

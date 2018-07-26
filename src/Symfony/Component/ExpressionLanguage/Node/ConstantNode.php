@@ -56,7 +56,7 @@ class ConstantNode extends Node
             $array[] = 'null';
         } elseif (is_numeric($value)) {
             $array[] = $value;
-        } elseif (!is_array($value)) {
+        } elseif (!\is_array($value)) {
             $array[] = $this->dumpString($value);
         } elseif ($this->isHash($value)) {
             foreach ($value as $k => $v) {

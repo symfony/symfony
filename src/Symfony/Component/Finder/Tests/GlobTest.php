@@ -33,8 +33,8 @@ class GlobTest extends TestCase
 
         foreach ($finder->in(__DIR__) as $k => $v) {
             $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);
@@ -50,8 +50,8 @@ class GlobTest extends TestCase
 
         foreach ($finder->in(__DIR__) as $k => $v) {
             $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);
@@ -67,8 +67,8 @@ class GlobTest extends TestCase
 
         foreach ($finder->in(__DIR__) as $k => $v) {
             $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);
@@ -84,8 +84,8 @@ class GlobTest extends TestCase
 
         foreach ($finder->in(__DIR__) as $k => $v) {
             $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);

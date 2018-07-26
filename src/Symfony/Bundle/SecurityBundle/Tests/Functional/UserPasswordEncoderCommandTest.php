@@ -231,7 +231,7 @@ EOTXT
 
     protected function setUp()
     {
-        putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
+        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode'));
         $kernel->boot();
 
@@ -249,7 +249,7 @@ EOTXT
 
     private function setupArgon2i()
     {
-        putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
+        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode', 'root_config' => 'argon2i.yml'));
         $kernel->boot();
 

@@ -72,7 +72,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             $this->resourceCheckers = iterator_to_array($this->resourceCheckers);
         }
 
-        if (!count($this->resourceCheckers)) {
+        if (!\count($this->resourceCheckers)) {
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 

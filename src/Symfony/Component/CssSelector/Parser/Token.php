@@ -72,7 +72,7 @@ class Token
             return true;
         }
 
-        return in_array($this->value, $values);
+        return \in_array($this->value, $values);
     }
 
     public function isWhitespace(): bool

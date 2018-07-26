@@ -56,7 +56,7 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            if (is_array($shortcut)) {
+            if (\is_array($shortcut)) {
                 $shortcut = implode('|', $shortcut);
             }
             $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
@@ -162,7 +162,7 @@ class InputOption
         if ($this->isArray()) {
             if (null === $default) {
                 $default = array();
-            } elseif (!is_array($default)) {
+            } elseif (!\is_array($default)) {
                 throw new LogicException('A default value for an array option must be an array.');
             }
         }

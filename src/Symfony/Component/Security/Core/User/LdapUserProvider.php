@@ -70,7 +70,7 @@ class LdapUserProvider implements UserProviderInterface
         }
 
         $entries = $search->execute();
-        $count = count($entries);
+        $count = \count($entries);
 
         if (!$count) {
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
@@ -98,7 +98,7 @@ class LdapUserProvider implements UserProviderInterface
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
         return new User($user->getUsername(), null, $user->getRoles());
@@ -145,7 +145,7 @@ class LdapUserProvider implements UserProviderInterface
 
         $values = $entry->getAttribute($attribute);
 
-        if (1 !== count($values)) {
+        if (1 !== \count($values)) {
             throw new InvalidArgumentException(sprintf('Attribute "%s" has multiple values.', $attribute));
         }
 

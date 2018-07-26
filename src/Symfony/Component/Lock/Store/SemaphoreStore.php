@@ -32,7 +32,7 @@ class SemaphoreStore implements StoreInterface
      */
     public static function isSupported()
     {
-        return extension_loaded('sysvsem');
+        return \extension_loaded('sysvsem');
     }
 
     public function __construct()

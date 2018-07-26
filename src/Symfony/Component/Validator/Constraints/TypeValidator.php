@@ -38,9 +38,9 @@ class TypeValidator extends ConstraintValidator
         $isFunction = 'is_'.$type;
         $ctypeFunction = 'ctype_'.$type;
 
-        if (function_exists($isFunction) && $isFunction($value)) {
+        if (\function_exists($isFunction) && $isFunction($value)) {
             return;
-        } elseif (function_exists($ctypeFunction) && $ctypeFunction($value)) {
+        } elseif (\function_exists($ctypeFunction) && $ctypeFunction($value)) {
             return;
         } elseif ($value instanceof $constraint->type) {
             return;

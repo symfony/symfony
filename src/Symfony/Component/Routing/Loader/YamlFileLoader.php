@@ -73,7 +73,7 @@ class YamlFileLoader extends FileLoader
         }
 
         // not an array
-        if (!is_array($parsedConfig)) {
+        if (!\is_array($parsedConfig)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $path));
         }
 
@@ -95,7 +95,7 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true) && (!$type || 'yaml' === $type);
+        return \is_string($resource) && \in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true) && (!$type || 'yaml' === $type);
     }
 
     /**
@@ -117,7 +117,7 @@ class YamlFileLoader extends FileLoader
         $condition = isset($config['condition']) ? $config['condition'] : null;
 
         foreach ($requirements as $placeholder => $requirement) {
-            if (is_int($placeholder)) {
+            if (\is_int($placeholder)) {
                 @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s"?', $placeholder, $requirement, $name, $path), E_USER_DEPRECATED);
             }
         }
@@ -126,7 +126,7 @@ class YamlFileLoader extends FileLoader
             $defaults['_controller'] = $config['controller'];
         }
 
-        if (is_array($config['path'])) {
+        if (\is_array($config['path'])) {
             $route = new Route('', $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
             foreach ($config['path'] as $locale => $path) {
@@ -167,11 +167,11 @@ class YamlFileLoader extends FileLoader
             $defaults['_controller'] = $config['controller'];
         }
 
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
 
         $imported = $this->import($config['resource'], $type, false, $file);
 
-        if (!is_array($imported)) {
+        if (!\is_array($imported)) {
             $imported = array($imported);
         }
 
@@ -246,7 +246,7 @@ class YamlFileLoader extends FileLoader
      */
     protected function validate($config, $name, $path)
     {
-        if (!is_array($config)) {
+        if (!\is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
         }
         if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {

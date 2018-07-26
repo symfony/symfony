@@ -79,7 +79,7 @@ EOF
 
         if ($name) {
             if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
-                $default = 1 === count($matchingRoutes) ? $matchingRoutes[0] : null;
+                $default = 1 === \count($matchingRoutes) ? $matchingRoutes[0] : null;
                 $name = $io->choice('Select one of the matching routes', $matchingRoutes, $default);
                 $route = $routes->get($name);
             }

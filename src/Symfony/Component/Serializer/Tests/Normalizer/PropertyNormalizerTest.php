@@ -310,7 +310,7 @@ class PropertyNormalizerTest extends TestCase
             array(
                 array(
                     'bar' => function ($bars) {
-                        return count($bars);
+                        return \count($bars);
                     },
                 ),
                 array(new PropertyConstructorDummy('baz', ''), new PropertyConstructorDummy('quux', '')),
@@ -354,7 +354,7 @@ class PropertyNormalizerTest extends TestCase
         $serializer = new Serializer(array($this->normalizer));
         $this->normalizer->setSerializer($serializer);
         $this->normalizer->setCircularReferenceHandler(function ($obj) {
-            return get_class($obj);
+            return \get_class($obj);
         });
 
         $obj = new PropertyCircularReferenceDummy();

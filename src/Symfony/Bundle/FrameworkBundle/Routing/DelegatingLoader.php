@@ -78,7 +78,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             if ($this->defaultOptions) {
                 $route->setOptions($route->getOptions() + $this->defaultOptions);
             }
-            if (!is_string($controller = $route->getDefault('_controller'))) {
+            if (!\is_string($controller = $route->getDefault('_controller'))) {
                 continue;
             }
 

@@ -140,7 +140,7 @@ class RegionDataGenerator extends AbstractDataGenerator
             }
 
             // WORLD/CONTINENT/SUBCONTINENT/GROUPING
-            if (ctype_digit($region) || is_int($region)) {
+            if (ctype_digit($region) || \is_int($region)) {
                 continue;
             }
 

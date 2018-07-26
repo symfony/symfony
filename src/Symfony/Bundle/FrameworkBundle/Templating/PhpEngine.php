@@ -46,7 +46,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
         }
 
-        if (is_string($this->helpers[$name])) {
+        if (\is_string($this->helpers[$name])) {
             $this->helpers[$name] = $this->container->get($this->helpers[$name]);
             $this->helpers[$name]->setCharset($this->charset);
         }

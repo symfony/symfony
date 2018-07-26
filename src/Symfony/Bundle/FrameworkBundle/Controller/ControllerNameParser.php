@@ -44,12 +44,12 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
-        if (2 > func_num_args() || func_get_arg(1)) {
+        if (2 > \func_num_args() || func_get_arg(1)) {
             @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
         }
 
         $parts = explode(':', $controller);
-        if (3 !== count($parts) || in_array('', $parts, true)) {
+        if (3 !== \count($parts) || \in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
@@ -131,7 +131,7 @@ class ControllerNameParser
             }
 
             $lev = levenshtein($nonExistentBundleName, $bundleName);
-            if ($lev <= strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
+            if ($lev <= \strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
                 $alternative = $bundleName;
                 $shortest = $lev;
             }

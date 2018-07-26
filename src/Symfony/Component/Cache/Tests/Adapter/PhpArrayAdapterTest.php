@@ -146,7 +146,7 @@ class PhpArrayAdapterWrapper extends PhpArrayAdapter
 
     public function save(CacheItemInterface $item)
     {
-        call_user_func(\Closure::bind(function () use ($item) {
+        \call_user_func(\Closure::bind(function () use ($item) {
             $key = $item->getKey();
             $this->keys[$key] = $id = \count($this->values);
             $this->data[$key] = $this->values[$id] = $item->get();

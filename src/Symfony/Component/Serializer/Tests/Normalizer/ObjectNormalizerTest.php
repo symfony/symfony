@@ -477,7 +477,7 @@ class ObjectNormalizerTest extends TestCase
             array(
                 array(
                     'bar' => function ($bars) {
-                        return count($bars);
+                        return \count($bars);
                     },
                 ),
                 array(new ObjectConstructorDummy('baz', '', false), new ObjectConstructorDummy('quux', '', false)),
@@ -537,7 +537,7 @@ class ObjectNormalizerTest extends TestCase
         $serializer = new Serializer(array($this->normalizer));
         $this->normalizer->setSerializer($serializer);
         $this->normalizer->setCircularReferenceHandler(function ($obj) {
-            return get_class($obj);
+            return \get_class($obj);
         });
 
         $obj = new CircularReferenceDummy();
@@ -1082,11 +1082,11 @@ class FormatAndContextAwareNormalizer extends ObjectNormalizer
 {
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        if (in_array($attribute, array('foo', 'bar')) && 'foo_and_bar_included' === $format) {
+        if (\in_array($attribute, array('foo', 'bar')) && 'foo_and_bar_included' === $format) {
             return true;
         }
 
-        if (in_array($attribute, array('foo', 'bar')) && isset($context['include_foo_and_bar']) && true === $context['include_foo_and_bar']) {
+        if (\in_array($attribute, array('foo', 'bar')) && isset($context['include_foo_and_bar']) && true === $context['include_foo_and_bar']) {
             return true;
         }
 

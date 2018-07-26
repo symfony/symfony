@@ -103,7 +103,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $this->roleHierarchy) {
                 $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
                 foreach ($allRoles as $role) {
-                    if (!in_array($role, $assignedRoles, true)) {
+                    if (!\in_array($role, $assignedRoles, true)) {
                         $inheritedRoles[] = $role;
                     }
                 }
@@ -125,7 +125,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'impersonator_user' => $impersonatorUser,
                 'impersonation_exit_path' => null,
                 'token' => $token,
-                'token_class' => $this->hasVarDumper ? new ClassStub(get_class($token)) : get_class($token),
+                'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
                 'roles' => array_map(function (Role $role) { return $role->getRole(); }, $assignedRoles),
@@ -140,7 +140,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
 
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
-                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(get_class($voter)) : get_class($voter);
+                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(\get_class($voter)) : \get_class($voter);
             }
         } else {
             $this->data['access_decision_log'] = array();

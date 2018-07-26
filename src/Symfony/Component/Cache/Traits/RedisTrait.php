@@ -56,7 +56,7 @@ trait RedisTrait
         if ($redisClient instanceof \RedisCluster) {
             $this->enableVersioning();
         } elseif (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \Predis\Client && !$redisClient instanceof RedisProxy) {
-            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redisClient) ? get_class($redisClient) : gettype($redisClient)));
+            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($redisClient) ? \get_class($redisClient) : \gettype($redisClient)));
         }
         $this->redis = $redisClient;
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
@@ -99,7 +99,7 @@ trait RedisTrait
         }
         if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
             $params['dbindex'] = $m[1];
-            $params['path'] = substr($params['path'], 0, -strlen($m[0]));
+            $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
         }
         if (isset($params['host'])) {
             $scheme = 'tcp';
@@ -116,10 +116,10 @@ trait RedisTrait
             $params += $query;
         }
         $params += $options + self::$defaultConnectionOptions;
-        if (null === $params['class'] && !extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
+        if (null === $params['class'] && !\extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
             throw new CacheException(sprintf('Cannot find the "redis" extension, and "predis/predis" is not installed: %s', $dsn));
         }
-        $class = null === $params['class'] ? (extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
+        $class = null === $params['class'] ? (\extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
 
         if (is_a($class, \Redis::class, true)) {
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
@@ -315,7 +315,7 @@ trait RedisTrait
         if ($this->redis instanceof \Predis\Client && !$this->redis->getConnection() instanceof ClusterInterface) {
             $results = $this->redis->pipeline(function ($redis) use ($generator, &$ids) {
                 foreach ($generator() as $command => $args) {
-                    call_user_func_array(array($redis, $command), $args);
+                    \call_user_func_array(array($redis, $command), $args);
                     $ids[] = $args[0];
                 }
             });
@@ -326,7 +326,7 @@ trait RedisTrait
                     $connections[$h] = array($this->redis->_instance($h), -1);
                     $connections[$h][0]->multi(\Redis::PIPELINE);
                 }
-                call_user_func_array(array($connections[$h][0], $command), $args);
+                \call_user_func_array(array($connections[$h][0], $command), $args);
                 $results[] = array($h, ++$connections[$h][1]);
                 $ids[] = $args[0];
             }
@@ -342,13 +342,13 @@ trait RedisTrait
             // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
             $results = array();
             foreach ($generator() as $command => $args) {
-                $results[] = call_user_func_array(array($this->redis, $command), $args);
+                $results[] = \call_user_func_array(array($this->redis, $command), $args);
                 $ids[] = $args[0];
             }
         } else {
             $this->redis->multi(\Redis::PIPELINE);
             foreach ($generator() as $command => $args) {
-                call_user_func_array(array($this->redis, $command), $args);
+                \call_user_func_array(array($this->redis, $command), $args);
                 $ids[] = $args[0];
             }
             $results = $this->redis->exec();

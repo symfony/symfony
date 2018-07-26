@@ -252,11 +252,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     private function varToString($var): string
     {
-        if (is_object($var)) {
-            return sprintf('an object of type %s', get_class($var));
+        if (\is_object($var)) {
+            return sprintf('an object of type %s', \get_class($var));
         }
 
-        if (is_array($var)) {
+        if (\is_array($var)) {
             $a = array();
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => ...', $k);
@@ -265,7 +265,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             return sprintf('an array ([%s])', mb_substr(implode(', ', $a), 0, 255));
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return sprintf('a resource (%s)', get_resource_type($var));
         }
 
@@ -281,7 +281,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             return 'a boolean value (true)';
         }
 
-        if (is_string($var)) {
+        if (\is_string($var)) {
             return sprintf('a string ("%s%s")', mb_substr($var, 0, 255), mb_strlen($var) > 255 ? '...' : '');
         }
 

@@ -127,7 +127,7 @@ trait ArrayTrait
             try {
                 $serialized = serialize($value);
             } catch (\Exception $e) {
-                $type = is_object($value) ? get_class($value) : gettype($value);
+                $type = \is_object($value) ? \get_class($value) : \gettype($value);
                 CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
 
                 return;

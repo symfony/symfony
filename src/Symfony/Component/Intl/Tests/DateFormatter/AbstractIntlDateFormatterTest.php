@@ -432,7 +432,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithIntlTimeZone()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
         }
 

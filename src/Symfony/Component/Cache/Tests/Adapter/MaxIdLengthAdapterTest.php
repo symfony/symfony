@@ -47,9 +47,9 @@ class MaxIdLengthAdapterTest extends TestCase
 
         // No versioning enabled
         $this->assertEquals('--------------------------:------------', $reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12))));
-        $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12)))));
-        $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 23)))));
-        $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 40)))));
+        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12)))));
+        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 23)))));
+        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 40)))));
 
         $reflectionProperty = $reflectionClass->getProperty('versioningIsEnabled');
         $reflectionProperty->setAccessible(true);
@@ -57,9 +57,9 @@ class MaxIdLengthAdapterTest extends TestCase
 
         // Versioning enabled
         $this->assertEquals('--------------------------:1/------------', $reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12))));
-        $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12)))));
-        $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 23)))));
-        $this->assertLessThanOrEqual(50, strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 40)))));
+        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 12)))));
+        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 23)))));
+        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, array(str_repeat('-', 40)))));
     }
 
     /**

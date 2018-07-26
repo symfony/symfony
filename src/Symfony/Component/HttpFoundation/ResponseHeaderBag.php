@@ -216,7 +216,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCookies($format = self::COOKIES_FLAT)
     {
-        if (!in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
+        if (!\in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
             throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(self::COOKIES_FLAT, self::COOKIES_ARRAY))));
         }
 
@@ -267,7 +267,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
-        if (!in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
+        if (!\in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
             throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
         }
 

@@ -64,7 +64,7 @@ class MappingRule
      */
     public function isPrefix($propertyPath)
     {
-        $length = strlen($propertyPath);
+        $length = \strlen($propertyPath);
         $prefix = substr($this->propertyPath, 0, $length);
         $next = isset($this->propertyPath[$length]) ? $this->propertyPath[$length] : null;
 

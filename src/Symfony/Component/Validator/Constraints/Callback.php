@@ -32,11 +32,11 @@ class Callback extends Constraint
     public function __construct($options = null)
     {
         // Invocation through annotations with an array parameter only
-        if (is_array($options) && 1 === count($options) && isset($options['value'])) {
+        if (\is_array($options) && 1 === \count($options) && isset($options['value'])) {
             $options = $options['value'];
         }
 
-        if (is_array($options) && !isset($options['callback']) && !isset($options['groups']) && !isset($options['payload'])) {
+        if (\is_array($options) && !isset($options['callback']) && !isset($options['groups']) && !isset($options['payload'])) {
             $options = array('callback' => $options);
         }
 

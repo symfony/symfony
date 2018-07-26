@@ -521,12 +521,14 @@ class FrameworkExtension extends Extension
                     $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
                     $container->setDefinition($transitionId, $transitionDefinition);
                     $transitions[] = new Reference($transitionId);
+
                     if ($transition['metadata']) {
                         $transitionsMetadataDefinition->addMethodCall('attach', array(
                             $transitionDefinition,
                             $transition['metadata'],
                         ));
                     }
+
                     if (isset($transition['guard'])) {
                         $configuration =  new Definition(Workflow\EventListener\GuardExpression::class);
                         $configuration->addArgument(new Reference($transitionId));
@@ -535,18 +537,20 @@ class FrameworkExtension extends Extension
                         $guardsConfiguration[$eventName][] = $configuration;
                     }
                 } elseif ('state_machine' === $type) {
-                    foreach ($transition['from'] as $keyFrom => $from) {
-                        foreach ($transition['to'] as $keyTo => $to) {
+                    foreach ($transition['from'] as $from) {
+                        foreach ($transition['to'] as $to) {
                             $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
                             $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
                             $container->setDefinition($transitionId, $transitionDefinition);
                             $transitions[] = new Reference($transitionId);
+
                             if ($transition['metadata']) {
                                 $transitionsMetadataDefinition->addMethodCall('attach', array(
                                     $transitionDefinition,
                                     $transition['metadata'],
                                 ));
                             }
+
                             if (isset($transition['guard'])) {
                                 $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
                                 $configuration->addArgument(new Reference($transitionId));

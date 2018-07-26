@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -338,6 +339,29 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         // make sure this service *does* exist and returns the correct value
         $this->assertTrue($container->has((string) $reference));
         $this->assertSame('foo_val', $container->get((string) $reference));
+    }
+
+    public function testBindingsOnChildDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('parent', ArgumentWithoutTypeController::class);
+
+        $container->setDefinition('child', (new ChildDefinition('parent'))
+            ->setBindings(array('$someArg' => new Reference('parent')))
+            ->addTag('controller.service_arguments')
+        );
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertInstanceOf(ServiceClosureArgument::class, $locator['child:fooAction']);
+
+        $locator = $container->getDefinition((string) $locator['child:fooAction']->getValues()[0])->getArgument(0);
+        $this->assertInstanceOf(ServiceClosureArgument::class, $locator['someArg']);
+        $this->assertEquals(new Reference('parent'), $locator['someArg']->getValues()[0]);
     }
 }
 

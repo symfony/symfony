@@ -112,7 +112,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->choices,
         ));
 
-        $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
+        $this->assertCount(\count($this->choices), $form, 'Each choice should become a new field');
     }
 
     public function testChoiceListWithScalarValues()
@@ -197,7 +197,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ));
 
         $this->assertArrayHasKey('placeholder', $form);
-        $this->assertCount(count($this->choices) + 1, $form, 'Each choice should become a new field');
+        $this->assertCount(\count($this->choices) + 1, $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderNotPresentIfRequired()
@@ -210,7 +210,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ));
 
         $this->assertArrayNotHasKey('placeholder', $form);
-        $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
+        $this->assertCount(\count($this->choices), $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderNotPresentIfMultiple()
@@ -223,7 +223,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ));
 
         $this->assertArrayNotHasKey('placeholder', $form);
-        $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
+        $this->assertCount(\count($this->choices), $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderNotPresentIfEmptyChoice()

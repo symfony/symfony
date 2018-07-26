@@ -236,10 +236,10 @@ EOF;
         $hostMatches = false;
         $methods = $route->getMethods();
 
-        $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('GET', $methods));
+        $supportsTrailingSlash = $supportsRedirections && (!$methods || \in_array('GET', $methods));
         $regex = $compiledRoute->getRegex();
 
-        if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#'.('u' === substr($regex, -1) ? 'u' : ''), $regex, $m)) {
+        if (!\count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#'.('u' === substr($regex, -1) ? 'u' : ''), $regex, $m)) {
             if ($supportsTrailingSlash && '/' === substr($m['url'], -1)) {
                 $conditions[] = sprintf('%s === $trimmedPathinfo', var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
@@ -279,7 +279,7 @@ EOF;
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
 
         // the offset where the return value is appended below, with indendation
-        $retOffset = 12 + strlen($code);
+        $retOffset = 12 + \strlen($code);
 
         // optimize parameters array
         if ($matches || $hostMatches) {
@@ -318,7 +318,7 @@ EOF;
         }
 
         if ($methods) {
-            $methodVariable = in_array('GET', $methods) ? '$canonicalMethod' : '$requestMethod';
+            $methodVariable = \in_array('GET', $methods) ? '$canonicalMethod' : '$requestMethod';
             $methods = implode("', '", $methods);
         }
 

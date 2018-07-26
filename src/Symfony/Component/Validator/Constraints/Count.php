@@ -38,7 +38,7 @@ class Count extends Constraint
 
     public function __construct($options = null)
     {
-        if (null !== $options && !is_array($options)) {
+        if (null !== $options && !\is_array($options)) {
             $options = array(
                 'min' => $options,
                 'max' => $options,

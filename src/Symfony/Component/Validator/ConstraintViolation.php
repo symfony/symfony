@@ -70,9 +70,9 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function __toString()
     {
-        if (is_object($this->root)) {
-            $class = 'Object('.get_class($this->root).')';
-        } elseif (is_array($this->root)) {
+        if (\is_object($this->root)) {
+            $class = 'Object('.\get_class($this->root).')';
+        } elseif (\is_array($this->root)) {
             $class = 'Array';
         } else {
             $class = (string) $this->root;

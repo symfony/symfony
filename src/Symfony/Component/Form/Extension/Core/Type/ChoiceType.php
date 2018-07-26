@@ -70,7 +70,7 @@ class ChoiceType extends AbstractType
 
             // Check if the choices already contain the empty value
             // Only add the placeholder option if this is not the case
-            if (null !== $options['placeholder'] && 0 === count($choiceList->getChoicesForValues(array('')))) {
+            if (null !== $options['placeholder'] && 0 === \count($choiceList->getChoicesForValues(array('')))) {
                 $placeholderView = new ChoiceView(null, '', $options['placeholder']);
 
                 // "placeholder" is a reserved name
@@ -96,7 +96,7 @@ class ChoiceType extends AbstractType
 
                 // Convert the submitted data to a string, if scalar, before
                 // casting it to an array
-                if (!is_array($data)) {
+                if (!\is_array($data)) {
                     $data = (array) (string) $data;
                 }
 
@@ -127,7 +127,7 @@ class ChoiceType extends AbstractType
                 unset($unknownValues['']);
 
                 // Throw exception if unknown values were submitted
-                if (count($unknownValues) > 0) {
+                if (\count($unknownValues) > 0) {
                     throw new TransformationFailedException(sprintf(
                         'The choices "%s" do not exist in the choice list.',
                         implode('", "', array_keys($unknownValues))
@@ -157,12 +157,12 @@ class ChoiceType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
 
-            if (!is_array($data)) {
+            if (!\is_array($data)) {
                 return;
             }
 
             foreach ($data as $v) {
-                if (null !== $v && !is_string($v) && !is_int($v)) {
+                if (null !== $v && !\is_string($v) && !\is_int($v)) {
                     throw new TransformationFailedException('All choices submitted must be NULL, strings or ints.');
                 }
             }
@@ -203,7 +203,7 @@ class ChoiceType extends AbstractType
         // avoid making the type check inside the closure.
         if ($options['multiple']) {
             $view->vars['is_selected'] = function ($choice, array $values) {
-                return in_array($choice, $values, true);
+                return \in_array($choice, $values, true);
             };
         } else {
             $view->vars['is_selected'] = function ($choice, $value) {
@@ -351,7 +351,7 @@ class ChoiceType extends AbstractType
     {
         foreach ($choiceViews as $name => $choiceView) {
             // Flatten groups
-            if (is_array($choiceView)) {
+            if (\is_array($choiceView)) {
                 $this->addSubForms($builder, $choiceView, $options);
                 continue;
             }

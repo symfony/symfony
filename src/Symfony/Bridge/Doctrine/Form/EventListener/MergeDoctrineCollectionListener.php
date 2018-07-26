@@ -45,7 +45,7 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
 
         // If all items were removed, call clear which has a higher
         // performance on persistent collections
-        if ($collection instanceof Collection && 0 === count($data)) {
+        if ($collection instanceof Collection && 0 === \count($data)) {
             $collection->clear();
         }
     }

@@ -53,7 +53,7 @@ class FlattenException
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTraceFromException($exception);
-        $e->setClass(get_class($exception));
+        $e->setClass(\get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
 
@@ -228,9 +228,9 @@ class FlattenException
             if ($value instanceof \__PHP_Incomplete_Class) {
                 // is_object() returns false on PHP<=7.1
                 $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
-            } elseif (is_object($value)) {
-                $result[$key] = array('object', get_class($value));
-            } elseif (is_array($value)) {
+            } elseif (\is_object($value)) {
+                $result[$key] = array('object', \get_class($value));
+            } elseif (\is_array($value)) {
                 if ($level > 10) {
                     $result[$key] = array('array', '*DEEP NESTED ARRAY*');
                 } else {
@@ -238,13 +238,13 @@ class FlattenException
                 }
             } elseif (null === $value) {
                 $result[$key] = array('null', null);
-            } elseif (is_bool($value)) {
+            } elseif (\is_bool($value)) {
                 $result[$key] = array('boolean', $value);
-            } elseif (is_int($value)) {
+            } elseif (\is_int($value)) {
                 $result[$key] = array('integer', $value);
-            } elseif (is_float($value)) {
+            } elseif (\is_float($value)) {
                 $result[$key] = array('float', $value);
-            } elseif (is_resource($value)) {
+            } elseif (\is_resource($value)) {
                 $result[$key] = array('resource', get_resource_type($value));
             } else {
                 $result[$key] = array('string', (string) $value);

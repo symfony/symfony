@@ -272,7 +272,7 @@ EODUMP;
 
     public function provideTimeZones()
     {
-        $xRegion = extension_loaded('intl') ? '%s' : '';
+        $xRegion = \extension_loaded('intl') ? '%s' : '';
 
         return array(
             // type 1 (UTC offset)
@@ -302,7 +302,7 @@ EODUMP;
      */
     public function testDumpPeriod($start, $interval, $end, $options, $expected)
     {
-        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), is_int($end) ? $end : new \DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
 
         $xDump = <<<EODUMP
 DatePeriod {
@@ -318,7 +318,7 @@ EODUMP;
      */
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
-        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), is_int($end) ? $end : new \DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
         $stub = new Stub();
 
         $cast = DateCaster::castPeriod($p, array(), $stub, false, 0);

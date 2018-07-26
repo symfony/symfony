@@ -41,7 +41,7 @@ class TwigEnvironmentPass implements CompilerPassInterface
             $methodCall = array('addExtension', array(new Reference($id)));
             $extensionClass = $container->getDefinition($id)->getClass();
 
-            if (is_string($extensionClass) && 0 === strpos($extensionClass, 'Symfony\Bridge\Twig\Extension')) {
+            if (\is_string($extensionClass) && 0 === strpos($extensionClass, 'Symfony\Bridge\Twig\Extension')) {
                 $twigBridgeExtensionsMethodCalls[] = $methodCall;
             } else {
                 $othersExtensionsMethodCalls[] = $methodCall;

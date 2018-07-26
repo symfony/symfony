@@ -99,7 +99,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
     public function getFallbackLocales()
     {
-        return (isset($this->data['fallback_locales']) && count($this->data['fallback_locales']) > 0) ? $this->data['fallback_locales'] : array();
+        return (isset($this->data['fallback_locales']) && \count($this->data['fallback_locales']) > 0) ? $this->data['fallback_locales'] : array();
     }
 
     /**
@@ -158,7 +158,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
             if (mb_strlen($string, $encoding) > $length) {
                 return mb_substr($string, 0, $length - 3, $encoding).'...';
             }
-        } elseif (strlen($string) > $length) {
+        } elseif (\strlen($string) > $length) {
             return substr($string, 0, $length - 3).'...';
         }
 

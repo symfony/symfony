@@ -180,7 +180,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        return in_array($attribute, array('foo', 'baz'));
+        return \in_array($attribute, array('foo', 'baz'));
     }
 
     public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)

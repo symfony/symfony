@@ -55,7 +55,7 @@ class TraversableArrayObject implements \ArrayAccess, \IteratorAggregate, \Count
 
     public function count()
     {
-        return count($this->array);
+        return \count($this->array);
     }
 
     public function serialize()

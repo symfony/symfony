@@ -24,7 +24,7 @@ trait FactoryTrait
      */
     final public function factory($factory)
     {
-        if (is_string($factory) && 1 === substr_count($factory, ':')) {
+        if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);
 
             throw new InvalidArgumentException(sprintf('Invalid factory "%s": the `service:method` notation is not available when using PHP-based DI configuration. Use "[ref(\'%s\'), \'%s\']" instead.', $factory, $factoryParts[0], $factoryParts[1]));

@@ -55,7 +55,7 @@ class Registry
         }
 
         if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_class($subject)));
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', \get_class($subject)));
         }
 
         return $matched;

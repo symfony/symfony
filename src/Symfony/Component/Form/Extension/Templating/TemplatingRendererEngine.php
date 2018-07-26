@@ -60,7 +60,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
 
         // Check each theme whether it contains the searched block
         if (isset($this->themes[$cacheKey])) {
-            for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
+            for ($i = \count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
                 if ($this->loadResourceFromTheme($cacheKey, $blockName, $this->themes[$cacheKey][$i])) {
                     return true;
                 }
@@ -70,7 +70,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
         // Check the default themes once we reach the root form without success
         if (!$view->parent) {
             if (!isset($this->useDefaultThemes[$cacheKey]) || $this->useDefaultThemes[$cacheKey]) {
-                for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
+                for ($i = \count($this->defaultThemes) - 1; $i >= 0; --$i) {
                     if ($this->loadResourceFromTheme($cacheKey, $blockName, $this->defaultThemes[$i])) {
                         return true;
                     }

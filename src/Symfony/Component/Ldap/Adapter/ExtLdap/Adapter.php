@@ -25,7 +25,7 @@ class Adapter implements AdapterInterface
 
     public function __construct(array $config = array())
     {
-        if (!extension_loaded('ldap')) {
+        if (!\extension_loaded('ldap')) {
             throw new LdapException('The LDAP PHP extension is not enabled.');
         }
 
@@ -76,7 +76,7 @@ class Adapter implements AdapterInterface
             if (!empty($value) && ' ' === $value[0]) {
                 $value = '\\20'.substr($value, 1);
             }
-            if (!empty($value) && ' ' === $value[strlen($value) - 1]) {
+            if (!empty($value) && ' ' === $value[\strlen($value) - 1]) {
                 $value = substr($value, 0, -1).'\\20';
             }
             $value = str_replace("\r", '\0d', $value);

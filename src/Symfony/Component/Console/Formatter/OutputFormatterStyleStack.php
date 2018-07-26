@@ -66,7 +66,7 @@ class OutputFormatterStyleStack
 
         foreach (array_reverse($this->styles, true) as $index => $stackedStyle) {
             if ($style->apply('') === $stackedStyle->apply('')) {
-                $this->styles = array_slice($this->styles, 0, $index);
+                $this->styles = \array_slice($this->styles, 0, $index);
 
                 return $stackedStyle;
             }
@@ -86,7 +86,7 @@ class OutputFormatterStyleStack
             return $this->emptyStyle;
         }
 
-        return $this->styles[count($this->styles) - 1];
+        return $this->styles[\count($this->styles) - 1];
     }
 
     /**

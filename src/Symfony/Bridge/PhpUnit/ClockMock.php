@@ -71,7 +71,7 @@ class ClockMock
 
     public static function register($class)
     {
-        $self = get_called_class();
+        $self = \get_called_class();
 
         $mockedNs = array(substr($class, 0, strrpos($class, '\\')));
         if (0 < strpos($class, '\\Tests\\')) {
@@ -81,7 +81,7 @@ class ClockMock
             $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
-            if (function_exists($ns.'\time')) {
+            if (\function_exists($ns.'\time')) {
                 continue;
             }
             eval(<<<EOPHP

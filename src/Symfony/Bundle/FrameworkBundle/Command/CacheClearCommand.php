@@ -95,7 +95,7 @@ EOF
         $this->getApplication()->setDispatcher(new EventDispatcher());
 
         $containerDir = new \ReflectionObject($kernel->getContainer());
-        $containerDir = basename(dirname($containerDir->getFileName()));
+        $containerDir = basename(\dirname($containerDir->getFileName()));
 
         // the warmup cache dir name must have the same length as the real one
         // to avoid the many problems in serialized resources files
@@ -121,7 +121,7 @@ EOF
 
         if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
             foreach ($mounts as $mount) {
-                $mount = array_slice(explode(' ', $mount), 1, -3);
+                $mount = \array_slice(explode(' ', $mount), 1, -3);
                 if (!\in_array(array_pop($mount), array('vboxsf', 'nfs'))) {
                     continue;
                 }

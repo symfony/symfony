@@ -51,7 +51,7 @@ class IdentifierHandler implements HandlerInterface
 
         $value = $this->escaping->escapeUnicode($match[0]);
         $stream->push(new Token(Token::TYPE_IDENTIFIER, $value, $reader->getPosition()));
-        $reader->moveForward(strlen($match[0]));
+        $reader->moveForward(\strlen($match[0]));
 
         return true;
     }

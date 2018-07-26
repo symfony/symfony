@@ -112,7 +112,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             return;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 

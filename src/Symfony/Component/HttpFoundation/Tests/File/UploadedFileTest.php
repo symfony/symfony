@@ -46,7 +46,7 @@ class UploadedFileTest extends TestCase
 
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
 
-        if (extension_loaded('fileinfo')) {
+        if (\extension_loaded('fileinfo')) {
             $this->assertEquals('image/gif', $file->getMimeType());
         }
     }

@@ -24,7 +24,7 @@ class RouterDataCollector extends BaseRouterDataCollector
 {
     public function guessRoute(Request $request, $controller)
     {
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             $controller = $controller[0];
         }
 

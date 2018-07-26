@@ -96,7 +96,7 @@ class Definition
     {
         $this->changes['factory'] = true;
 
-        if (is_string($factory) && false !== strpos($factory, '::')) {
+        if (\is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
         }
 
@@ -254,12 +254,12 @@ class Definition
      */
     public function replaceArgument($index, $argument)
     {
-        if (0 === count($this->arguments)) {
+        if (0 === \count($this->arguments)) {
             throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
         }
 
-        if (is_int($index) && ($index < 0 || $index > count($this->arguments) - 1)) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+        if (\is_int($index) && ($index < 0 || $index > \count($this->arguments) - 1)) {
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, \count($this->arguments) - 1));
         }
 
         if (!array_key_exists($index, $this->arguments)) {
@@ -783,7 +783,7 @@ class Definition
     {
         $this->changes['configurator'] = true;
 
-        if (is_string($configurator) && false !== strpos($configurator, '::')) {
+        if (\is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
         }
 

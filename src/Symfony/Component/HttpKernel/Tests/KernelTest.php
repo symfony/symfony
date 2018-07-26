@@ -74,7 +74,7 @@ class KernelTest extends TestCase
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerDir = __DIR__.'/Fixtures/cache/custom/'.substr(get_class($kernel->getContainer()), 0, 16);
+        $containerDir = __DIR__.'/Fixtures/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileNotExists($containerDir.'.legacy');
@@ -530,7 +530,7 @@ EOF;
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerClass = get_class($kernel->getContainer());
+        $containerClass = \get_class($kernel->getContainer());
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
         unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
 
@@ -546,7 +546,7 @@ EOF;
 
         $this->assertNotInstanceOf($containerClass, $kernel->getContainer());
         $this->assertFileExists($containerFile);
-        $this->assertFileExists(dirname($containerFile).'.legacy');
+        $this->assertFileExists(\dirname($containerFile).'.legacy');
     }
 
     public function testKernelPass()
@@ -626,7 +626,7 @@ EOF;
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(null === $bundleName ? get_class($bundle) : $bundleName))
+            ->will($this->returnValue(null === $bundleName ? \get_class($bundle) : $bundleName))
         ;
 
         $bundle

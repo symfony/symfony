@@ -23,7 +23,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
         }
 

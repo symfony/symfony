@@ -53,7 +53,7 @@ class ServiceLocator implements PsrContainerInterface
 
         if (isset($this->loading[$id])) {
             $ids = array_values($this->loading);
-            $ids = array_slice($this->loading, array_search($id, $ids));
+            $ids = \array_slice($this->loading, array_search($id, $ids));
             $ids[] = $id;
 
             throw new ServiceCircularReferenceException($id, $ids);
@@ -91,7 +91,7 @@ class ServiceLocator implements PsrContainerInterface
         }
 
         $class = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        $class = isset($class[2]['object']) ? get_class($class[2]['object']) : null;
+        $class = isset($class[2]['object']) ? \get_class($class[2]['object']) : null;
         $externalId = $this->externalId ?: $class;
 
         $msg = sprintf('Service "%s" not found: ', $id);
@@ -136,7 +136,7 @@ class ServiceLocator implements PsrContainerInterface
             if (!$alternatives = array_keys($this->factories)) {
                 return 'is empty...';
             }
-            $format = sprintf('only knows about the %s service%s.', $format, 1 < count($alternatives) ? 's' : '');
+            $format = sprintf('only knows about the %s service%s.', $format, 1 < \count($alternatives) ? 's' : '');
         }
         $last = array_pop($alternatives);
 

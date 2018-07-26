@@ -125,7 +125,7 @@ class GenericMetadata implements MetadataInterface
             throw new ConstraintDefinitionException(sprintf(
                 'The constraint "%s" can only be put on classes. Please use '.
                 '"Symfony\Component\Validator\Constraints\Valid" instead.',
-                get_class($constraint)
+                \get_class($constraint)
             ));
         }
 
@@ -181,7 +181,7 @@ class GenericMetadata implements MetadataInterface
      */
     public function hasConstraints()
     {
-        return count($this->constraints) > 0;
+        return \count($this->constraints) > 0;
     }
 
     /**

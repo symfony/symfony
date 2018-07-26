@@ -28,7 +28,7 @@ class LocaleTest extends TestCase
             array(null, 'root'),
         );
 
-        if (function_exists('locale_parse')) {
+        if (\function_exists('locale_parse')) {
             $tests[] = array('sl_Latn_IT', 'sl-Latn-IT-nedis');
             $tests[] = array('sl_Latn', 'sl-Latn_IT');
         } else {

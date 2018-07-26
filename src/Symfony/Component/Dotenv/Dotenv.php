@@ -110,7 +110,7 @@ final class Dotenv
         $this->data = str_replace(array("\r\n", "\r"), "\n", $data);
         $this->lineno = 1;
         $this->cursor = 0;
-        $this->end = strlen($this->data);
+        $this->end = \strlen($this->data);
         $this->state = self::STATE_VARNAME;
         $this->values = array();
         $name = '';
@@ -232,7 +232,7 @@ final class Dotenv
             } else {
                 $value = '';
                 $prevChr = $this->data[$this->cursor - 1];
-                while ($this->cursor < $this->end && !in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
+                while ($this->cursor < $this->end && !\in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
                     if ('\\' === $this->data[$this->cursor] && isset($this->data[$this->cursor + 1]) && ('"' === $this->data[$this->cursor + 1] || "'" === $this->data[$this->cursor + 1])) {
                         ++$this->cursor;
                     }
@@ -391,7 +391,7 @@ final class Dotenv
 
     private function moveCursor($text)
     {
-        $this->cursor += strlen($text);
+        $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");
     }
 

@@ -42,7 +42,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $route = '';
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' === $key) {
-                $route = is_object($value) ? $value->getPath() : $value;
+                $route = \is_object($value) ? $value->getPath() : $value;
                 $attributes[$key] = $route;
             } else {
                 $attributes[$key] = $value;
@@ -116,7 +116,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         foreach ($this->data as $key => $value) {
-            if (!is_array($value)) {
+            if (!\is_array($value)) {
                 continue;
             }
             if ('request_headers' === $key || 'response_headers' === $key) {
@@ -149,7 +149,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             ));
         }
 
-        $this->data['identifier'] = $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
+        $this->data['identifier'] = $this->data['route'] ?: (\is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
     }
 
     public function lateCollect()
@@ -350,25 +350,25 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     protected function parseController($controller)
     {
-        if (is_string($controller) && false !== strpos($controller, '::')) {
+        if (\is_string($controller) && false !== strpos($controller, '::')) {
             $controller = explode('::', $controller);
         }
 
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             try {
                 $r = new \ReflectionMethod($controller[0], $controller[1]);
 
                 return array(
-                    'class' => is_object($controller[0]) ? get_class($controller[0]) : $controller[0],
+                    'class' => \is_object($controller[0]) ? \get_class($controller[0]) : $controller[0],
                     'method' => $controller[1],
                     'file' => $r->getFileName(),
                     'line' => $r->getStartLine(),
                 );
             } catch (\ReflectionException $e) {
-                if (is_callable($controller)) {
+                if (\is_callable($controller)) {
                     // using __call or  __callStatic
                     return array(
-                        'class' => is_object($controller[0]) ? get_class($controller[0]) : $controller[0],
+                        'class' => \is_object($controller[0]) ? \get_class($controller[0]) : $controller[0],
                         'method' => $controller[1],
                         'file' => 'n/a',
                         'line' => 'n/a',
@@ -388,7 +388,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             );
         }
 
-        if (is_object($controller)) {
+        if (\is_object($controller)) {
             $r = new \ReflectionClass($controller);
 
             return array(
@@ -399,6 +399,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             );
         }
 
-        return is_string($controller) ? $controller : 'n/a';
+        return \is_string($controller) ? $controller : 'n/a';
     }
 }

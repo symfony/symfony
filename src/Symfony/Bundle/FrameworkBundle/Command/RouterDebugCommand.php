@@ -129,7 +129,7 @@ EOF
         if (1 === substr_count($controller, ':')) {
             list($service, $method) = explode(':', $controller);
             try {
-                return sprintf('%s::%s', get_class($this->getApplication()->getKernel()->getContainer()->get($service)), $method);
+                return sprintf('%s::%s', \get_class($this->getApplication()->getKernel()->getContainer()->get($service)), $method);
             } catch (ServiceNotFoundException $e) {
             }
         }

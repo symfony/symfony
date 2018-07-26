@@ -72,7 +72,7 @@ class XmlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        if (!is_string($resource)) {
+        if (!\is_string($resource)) {
             return false;
         }
 
@@ -111,7 +111,7 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
-        $defaultDirectory = dirname($file);
+        $defaultDirectory = \dirname($file);
         foreach ($imports as $import) {
             $this->setCurrentDir($defaultDirectory);
             $this->import($import->getAttribute('resource'), XmlUtils::phpize($import->getAttribute('type')) ?: null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
@@ -132,7 +132,7 @@ class XmlFileLoader extends FileLoader
         if (false === $services = $xpath->query('//container:services/container:service|//container:services/container:prototype')) {
             return;
         }
-        $this->setCurrentDir(dirname($file));
+        $this->setCurrentDir(\dirname($file));
 
         $this->instanceof = array();
         $this->isLoadingInstanceof = true;
@@ -515,7 +515,7 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = $arg->nodeValue;
                     break;
                 case 'constant':
-                    $arguments[$key] = constant(trim($arg->nodeValue));
+                    $arguments[$key] = \constant(trim($arg->nodeValue));
                     break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($arg->nodeValue);
@@ -560,7 +560,7 @@ class XmlFileLoader extends FileLoader
 
         if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
             $items = preg_split('/\s+/', $element);
-            for ($i = 0, $nb = count($items); $i < $nb; $i += 2) {
+            for ($i = 0, $nb = \count($items); $i < $nb; $i += 2) {
                 if (!$this->container->hasExtension($items[$i])) {
                     continue;
                 }
@@ -569,7 +569,7 @@ class XmlFileLoader extends FileLoader
                     $path = str_replace($extension->getNamespace(), str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
 
                     if (!is_file($path)) {
-                        throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
+                        throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', \get_class($extension), $path));
                     }
 
                     $schemaLocations[$items[$i]] = $path;
@@ -632,7 +632,7 @@ EOF
     private function validateAlias(\DOMElement $alias, $file)
     {
         foreach ($alias->attributes as $name => $node) {
-            if (!in_array($name, array('alias', 'id', 'public'))) {
+            if (!\in_array($name, array('alias', 'id', 'public'))) {
                 throw new InvalidArgumentException(sprintf('Invalid attribute "%s" defined for alias "%s" in "%s".', $name, $alias->getAttribute('id'), $file));
             }
         }
@@ -686,7 +686,7 @@ EOF
             }
 
             $values = static::convertDomElementToArray($node);
-            if (!is_array($values)) {
+            if (!\is_array($values)) {
                 $values = array();
             }
 

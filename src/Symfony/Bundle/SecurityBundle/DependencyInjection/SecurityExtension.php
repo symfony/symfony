@@ -122,7 +122,7 @@ class SecurityExtension extends Extension
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)
     {
-        if (!isset($config['role_hierarchy']) || 0 === count($config['role_hierarchy'])) {
+        if (!isset($config['role_hierarchy']) || 0 === \count($config['role_hierarchy'])) {
             $container->removeDefinition('security.access.role_hierarchy_voter');
 
             return;
@@ -254,7 +254,7 @@ class SecurityExtension extends Extension
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
             $defaultProvider = $providerIds[$normalizedName];
-        } elseif (1 === count($providerIds)) {
+        } elseif (1 === \count($providerIds)) {
             $defaultProvider = reset($providerIds);
         }
 
@@ -317,7 +317,7 @@ class SecurityExtension extends Extension
             }
 
             // add cookie logout handler
-            if (count($firewall['logout']['delete_cookies']) > 0) {
+            if (\count($firewall['logout']['delete_cookies']) > 0) {
                 $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
                 $cookieHandler = $container->setDefinition($cookieHandlerId, new ChildDefinition('security.logout.handler.cookie_clearing'));
                 $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
@@ -396,7 +396,7 @@ class SecurityExtension extends Extension
             return $this->contextListeners[$contextKey];
         }
 
-        $listenerId = 'security.context_listener.'.count($this->contextListeners);
+        $listenerId = 'security.context_listener.'.\count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
 
@@ -659,7 +659,7 @@ class SecurityExtension extends Extension
 
         // only add arguments that are necessary
         $arguments = array($path, $host, $methods, $ip, $attributes);
-        while (count($arguments) > 0 && !end($arguments)) {
+        while (\count($arguments) > 0 && !end($arguments)) {
             array_pop($arguments);
         }
 

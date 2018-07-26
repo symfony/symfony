@@ -70,7 +70,7 @@ EOT
             new TableSeparator(),
             array('<info>Kernel</>'),
             new TableSeparator(),
-            array('Type', get_class($kernel)),
+            array('Type', \get_class($kernel)),
             array('Name', $kernel->getName()),
             array('Environment', $kernel->getEnvironment()),
             array('Debug', $kernel->isDebug() ? 'true' : 'false'),
@@ -85,9 +85,9 @@ EOT
             array('Architecture', (PHP_INT_SIZE * 8).' bits'),
             array('Intl locale', class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a'),
             array('Timezone', date_default_timezone_get().' (<comment>'.(new \DateTime())->format(\DateTime::W3C).'</>)'),
-            array('OPcache', extension_loaded('Zend OPcache') && ini_get('opcache.enable') ? 'true' : 'false'),
-            array('APCu', extension_loaded('apcu') && ini_get('apc.enabled') ? 'true' : 'false'),
-            array('Xdebug', extension_loaded('xdebug') ? 'true' : 'false'),
+            array('OPcache', \extension_loaded('Zend OPcache') && ini_get('opcache.enable') ? 'true' : 'false'),
+            array('APCu', \extension_loaded('apcu') && ini_get('apc.enabled') ? 'true' : 'false'),
+            array('Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'),
         );
 
         if ($dotenv = self::getDotenvVars()) {

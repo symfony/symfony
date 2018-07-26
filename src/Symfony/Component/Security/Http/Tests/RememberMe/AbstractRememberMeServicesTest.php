@@ -304,7 +304,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     private function callProtected($object, $method, array $args)
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new \ReflectionClass(\get_class($object));
         $reflectionMethod = $reflection->getMethod($method);
         $reflectionMethod->setAccessible(true);
 

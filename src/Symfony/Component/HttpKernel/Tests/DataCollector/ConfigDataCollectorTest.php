@@ -38,9 +38,9 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());
-        $this->assertSame(extension_loaded('xdebug'), $c->hasXDebug());
-        $this->assertSame(extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
-        $this->assertSame(extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
+        $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
+        $this->assertSame(\extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
+        $this->assertSame(\extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
     }
 }
 

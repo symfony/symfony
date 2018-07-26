@@ -41,7 +41,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
             $resolvedArguments = array();
 
             foreach ($arguments as $key => $argument) {
-                if (is_int($key)) {
+                if (\is_int($key)) {
                     $resolvedArguments[$key] = $argument;
                     continue;
                 }
@@ -65,7 +65,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                 }
 
                 if (null !== $argument && !$argument instanceof Reference && !$argument instanceof Definition) {
-                    throw new InvalidArgumentException(sprintf('Invalid service "%s": the value of argument "%s" of method "%s()" must be null, an instance of %s or an instance of %s, %s given.', $this->currentId, $key, $class !== $this->currentId ? $class.'::'.$method : $method, Reference::class, Definition::class, gettype($argument)));
+                    throw new InvalidArgumentException(sprintf('Invalid service "%s": the value of argument "%s" of method "%s()" must be null, an instance of %s or an instance of %s, %s given.', $this->currentId, $key, $class !== $this->currentId ? $class.'::'.$method : $method, Reference::class, Definition::class, \gettype($argument)));
                 }
 
                 $typeFound = false;

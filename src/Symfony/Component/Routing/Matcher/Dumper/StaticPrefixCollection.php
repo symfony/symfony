@@ -69,7 +69,7 @@ class StaticPrefixCollection
             // This is needed because otherwise routes that come afterwards have higher precedence
             // than a possible regular expression, which goes against the input order sorting.
             $this->items[] = array($prefix, $route);
-            $this->matchStart = count($this->items);
+            $this->matchStart = \count($this->items);
 
             return;
         }
@@ -145,9 +145,9 @@ class StaticPrefixCollection
      */
     private function detectCommonPrefix(string $prefix, string $anotherPrefix)
     {
-        $baseLength = strlen($this->prefix);
+        $baseLength = \strlen($this->prefix);
         $commonLength = $baseLength;
-        $end = min(strlen($prefix), strlen($anotherPrefix));
+        $end = min(\strlen($prefix), \strlen($anotherPrefix));
 
         for ($i = $baseLength; $i <= $end; ++$i) {
             if (substr($prefix, 0, $i) !== substr($anotherPrefix, 0, $i)) {
@@ -159,7 +159,7 @@ class StaticPrefixCollection
 
         $commonPrefix = rtrim(substr($prefix, 0, $commonLength), '/');
 
-        if (strlen($commonPrefix) > $baseLength) {
+        if (\strlen($commonPrefix) > $baseLength) {
             return $commonPrefix;
         }
 
@@ -194,7 +194,7 @@ class StaticPrefixCollection
 
     private function shouldBeInlined(): bool
     {
-        if (count($this->items) >= 3) {
+        if (\count($this->items) >= 3) {
             return false;
         }
 
@@ -205,7 +205,7 @@ class StaticPrefixCollection
         }
 
         foreach ($this->items as $item) {
-            if (is_array($item) && $item[0] === $this->prefix) {
+            if (\is_array($item) && $item[0] === $this->prefix) {
                 return false;
             }
         }

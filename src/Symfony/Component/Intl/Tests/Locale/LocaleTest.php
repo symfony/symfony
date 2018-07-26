@@ -159,8 +159,8 @@ class LocaleTest extends AbstractLocaleTest
 
     protected function call($methodName)
     {
-        $args = array_slice(func_get_args(), 1);
+        $args = \array_slice(\func_get_args(), 1);
 
-        return call_user_func_array(array('Symfony\Component\Intl\Locale\Locale', $methodName), $args);
+        return \call_user_func_array(array('Symfony\Component\Intl\Locale\Locale', $methodName), $args);
     }
 }

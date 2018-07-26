@@ -47,7 +47,7 @@ trait PriorityTaggedServiceTrait
 
         if ($services) {
             krsort($services);
-            $services = call_user_func_array('array_merge', $services);
+            $services = \call_user_func_array('array_merge', $services);
         }
 
         return $services;

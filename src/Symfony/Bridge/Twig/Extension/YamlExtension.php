@@ -42,7 +42,7 @@ class YamlExtension extends AbstractExtension
             $dumper = new YamlDumper();
         }
 
-        if (defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+        if (\defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
             return $dumper->dump($input, $inline, 0, $dumpObjects);
         }
 
@@ -51,12 +51,12 @@ class YamlExtension extends AbstractExtension
 
     public function dump($value, $inline = 0, $dumpObjects = false)
     {
-        if (is_resource($value)) {
+        if (\is_resource($value)) {
             return '%Resource%';
         }
 
-        if (is_array($value) || is_object($value)) {
-            return '%'.gettype($value).'% '.$this->encode($value, $inline, $dumpObjects);
+        if (\is_array($value) || \is_object($value)) {
+            return '%'.\gettype($value).'% '.$this->encode($value, $inline, $dumpObjects);
         }
 
         return $this->encode($value, $inline, $dumpObjects);

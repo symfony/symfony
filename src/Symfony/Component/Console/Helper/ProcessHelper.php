@@ -121,7 +121,7 @@ class ProcessHelper extends Helper
             $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
-                call_user_func($callback, $type, $buffer);
+                \call_user_func($callback, $type, $buffer);
             }
         };
     }

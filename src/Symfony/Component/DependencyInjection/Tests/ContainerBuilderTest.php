@@ -333,7 +333,7 @@ class ContainerBuilderTest extends TestCase
         $builder->addCompilerPass($pass2 = $this->getMockBuilder('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface')->getMock(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
 
         $passes = $builder->getCompiler()->getPassConfig()->getPasses();
-        $this->assertCount(count($passes) - 2, $defaultPasses);
+        $this->assertCount(\count($passes) - 2, $defaultPasses);
         // Pass 1 is executed later
         $this->assertTrue(array_search($pass1, $passes, true) > array_search($pass2, $passes, true));
     }
@@ -358,7 +358,7 @@ class ContainerBuilderTest extends TestCase
         $foo1 = $builder->get('foo1');
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertSame('Bar\FooClass', get_class($foo1));
+        $this->assertSame('Bar\FooClass', \get_class($foo1));
     }
 
     public function testCreateServiceClass()
@@ -972,7 +972,7 @@ class ContainerBuilderTest extends TestCase
         $A = new ComposerResource();
         $a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml');
         $b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml');
-        $c = new DirectoryResource($dir = dirname($b));
+        $c = new DirectoryResource($dir = \dirname($b));
 
         $this->assertTrue($container->fileExists((string) $a) && $container->fileExists((string) $b) && $container->fileExists($dir));
 

@@ -42,7 +42,7 @@ class ControllerNameParser
     public function parse($controller)
     {
         $parts = explode(':', $controller);
-        if (3 !== count($parts) || in_array('', $parts, true)) {
+        if (3 !== \count($parts) || \in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
@@ -122,7 +122,7 @@ class ControllerNameParser
             }
 
             $lev = levenshtein($nonExistentBundleName, $bundleName);
-            if ($lev <= strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
+            if ($lev <= \strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
                 $alternative = $bundleName;
                 $shortest = $lev;
             }

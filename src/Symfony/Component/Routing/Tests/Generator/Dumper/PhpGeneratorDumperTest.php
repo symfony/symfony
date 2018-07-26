@@ -178,4 +178,17 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('https://localhost/app.php/testing', $absoluteUrl);
         $this->assertEquals('/app.php/testing', $relativeUrl);
     }
+
+    public function testHasRoute()
+    {
+        $this->routeCollection->add('Test', new Route('/test'));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'HasRouteUrlGenerator')));
+        include $this->testTmpFilepath;
+
+        $projectUrlGenerator = new \HasRouteUrlGenerator(new RequestContext());
+
+        $this->assertTrue($projectUrlGenerator->hasRoute('Test'));
+        $this->assertFalse($projectUrlGenerator->hasRoute('non-existent'));
+    }
 }

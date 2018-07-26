@@ -31,7 +31,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Router implements RouterInterface, RequestMatcherInterface
+class Router implements RouterInterface, RequestMatcherInterface, RoutePresenceCheckableInterface
 {
     /**
      * @var UrlMatcherInterface|null
@@ -230,6 +230,24 @@ class Router implements RouterInterface, RequestMatcherInterface
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
         $this->configCacheFactory = $configCacheFactory;
+    }
+
+    /**
+     * Returns whether a route with the given name exists.
+     *
+     * @param string $name The route name
+     *
+     * @throws \RuntimeException When an url generator does not implement the RoutePresenceCheckableInterface
+     *
+     * @return bool
+     */
+    public function hasRoute($name)
+    {
+        if (!$this->getGenerator() instanceof RoutePresenceCheckableInterface) {
+            throw new \RuntimeException('The current implementaion of an url generator does not support the RoutePresenceCheckableInterface.');
+        }
+
+        return $this->getGenerator()->hasRoute($name);
     }
 
     /**

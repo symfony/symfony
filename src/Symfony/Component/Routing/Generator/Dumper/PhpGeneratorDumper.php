@@ -63,6 +63,8 @@ class {$options['class']} extends {$options['base_class']}
     }
 
 {$this->generateGenerateMethod()}
+
+{$this->generateHasRouteMethod()}
 }
 
 EOF;
@@ -112,6 +114,21 @@ EOF;
         list($variables, $defaults, $requirements, $tokens, $hostTokens, $requiredSchemes) = self::$declaredRoutes[$name];
 
         return $this->doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
+    }
+EOF;
+    }
+
+    /**
+     * Generates PHP code representing the `hasRoute` method that implements the RoutePresenceCheckableInterface.
+     *
+     * @return string PHP code
+     */
+    private function generateHasRouteMethod()
+    {
+        return <<<'EOF'
+    public function hasRoute($name)
+    {
+        return isset(self::$declaredRoutes[$name]);
     }
 EOF;
     }

@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\RoutePresenceCheckableInterface;
 
 /**
  * UrlGenerator can generate a URL or a path for any route in the RouteCollection
@@ -25,7 +26,7 @@ use Psr\Log\LoggerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
+class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface, RoutePresenceCheckableInterface
 {
     protected $routes;
     protected $context;
@@ -102,6 +103,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     public function isStrictRequirements()
     {
         return $this->strictRequirements;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasRoute($name)
+    {
+        return isset($this->routes[$name]);
     }
 
     /**

@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by keradus at 2018-07-05T12:39:51Z
+
+@stof , would be great if you can create a benchmark without and with those changes !
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-05T12:50:29Z
+
+I don't think a benchmark will show much differences here, as the hot path of the DI component (and of a few other places) were already fully-qualified manually by @nicolas-grekas (well, maybe not in 2.8, but at least in newer versions).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T12:51:54Z
+
+> make separate PRs for newer branches with their own updates (exclude rules, and CS fixes), once this PR gets merged.
+
+Actually, the process for this is:
+- merge everything up to master
+- merge this PR on 2.8
+- merge everything up to master. Resolving conflicts just means running the command again on each branch (thus no need for per-branches PRs.)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-05T12:52:56Z
+
+@nicolas-grekas the update of the config file (exclude rules) will be needed for newer branches too (due to renaming some code, or adding more places needing to be excluded).
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-05T12:53:19Z
+
+but yes, fixing conflicts would be done by running the command again.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-07-05T13:33:33Z
+
+Wouldn't it make more sense to have `use` statements for global imports? Especially as readability and merge conflicts are a commonly provided rejection for doing this in existing code.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-05T13:45:27Z
+
+@iltar this would require using `use const` and `use function`, which cannot be used in 2.8 or in 3.x due to our PHP requirements.
+
+And for classes, our existing rule is already to avoid use statements for global classes, so this is consistent.
+
+and regarding merge conflicts, this is precisely the reason why I'm doing this in 2.8, not in master (so that all branches are using the same CS), and why I'm doing it now and not 6 months ago (the change is now automated)
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-07-05T13:53:57Z
+
+I mention this because a lot of people are complaining about the readability of backslashes in the code, and are asking for imports instead. I do agree with them on this point, because it _does_ hurt readability quite some. I understand we can't merge this in 2.8, but why not do it in 3.4+ only? 2.8 support won't last long anymore either way and to be fair, people should've already upgraded a while ago.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-05T13:58:39Z
+
+@iltar 3.4 supports PHP 5.5.9+, so this would not be 3.4+, but 4.0+. And having CS violations in 4.x for any code contributed in 3.4 and merged up would mean that we suffer from branch merging for the whole 3.4 lifetime (i.e. for the next 2 years: https://symfony.com/roadmap/3.4).
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-07-05T14:00:04Z
+
+Ah my bad, I forgot that 3.4 was not on 7.x yet. Yay for LTS.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-10T18:36:05Z
+
+regarding the constant invocation, I will revert the change, and disable the rule temporarily, until https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/3876 is merged and released. This would avoid some of the existing changes which add visual clutter for no performance benefit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-12T07:15:35Z
+
+@stof Can you revert what needs to be reverted so that I can merge this one and then I will take care of propagating changes up to master?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-12T07:16:36Z
+
+fabbot is now using v2.12.2
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-24T09:52:05Z
+
+@fabpot done.
+
+The list of excluded files in the php-cs--fixer configuration file (updated in the first commit of this PR) will need some adjustments for newer branches (I have a branch locally with a similar commit for master (I started there before switching target branch), and there were a few differences.
+I could perform the propagation of changes to newer branches, taking care of this if you want.
+
+I intentionally kept multiple commits in the history, to better see the different changes performed in this PR (as some of them are automated).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-24T10:08:07Z
+
+CliDumperTest.php needs a tweak: the last frame (`%d. %slosure%s() ==> Twig%cTemplate->render(): {`) is now removed on PHP7 & HHVM.
+Let's replace it with a "%A" in the fixture.

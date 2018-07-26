@@ -20,7 +20,7 @@ final class CliContextProvider implements ContextProviderInterface
 {
     public function getContext(): ?array
     {
-        if ('cli' !== PHP_SAPI) {
+        if ('cli' !== \PHP_SAPI) {
             return null;
         }
 

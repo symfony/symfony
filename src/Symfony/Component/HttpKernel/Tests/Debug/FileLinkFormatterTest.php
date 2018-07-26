@@ -27,7 +27,7 @@ class FileLinkFormatterTest extends TestCase
 
     public function testWhenFileLinkFormatAndNoRequest()
     {
-        $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
 
         $sut = new FileLinkFormatter('debug://open?url=file://%f&line=%l', new RequestStack());
 
@@ -36,7 +36,7 @@ class FileLinkFormatterTest extends TestCase
 
     public function testWhenFileLinkFormatAndRequest()
     {
-        $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
         $baseDir = __DIR__;
         $requestStack = new RequestStack();
         $request = new Request();
@@ -49,7 +49,7 @@ class FileLinkFormatterTest extends TestCase
 
     public function testWhenNoFileLinkFormatAndRequest()
     {
-        $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
         $requestStack = new RequestStack();
         $request = new Request();
         $requestStack->push($request);

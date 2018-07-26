@@ -566,7 +566,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testDegradationWhenCacheLocked()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Skips on windows to avoid permissions issues.');
         }
 

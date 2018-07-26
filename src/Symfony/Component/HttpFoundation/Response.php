@@ -370,7 +370,7 @@ class Response
 
         if (\function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
-        } elseif (!\in_array(PHP_SAPI, array('cli', 'phpdbg'), true)) {
+        } elseif (!\in_array(\PHP_SAPI, array('cli', 'phpdbg'), true)) {
             static::closeOutputBuffers(0, true);
         }
 

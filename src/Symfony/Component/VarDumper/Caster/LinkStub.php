@@ -55,8 +55,8 @@ class LinkStub extends ConstStub
         if ($composerRoot = $this->getComposerRoot($href, $this->inVendor)) {
             $this->attr['ellipsis'] = \strlen($href) - \strlen($composerRoot) + 1;
             $this->attr['ellipsis-type'] = 'path';
-            $this->attr['ellipsis-tail'] = 1 + ($this->inVendor ? 2 + \strlen(implode(\array_slice(explode(DIRECTORY_SEPARATOR, substr($href, 1 - $this->attr['ellipsis'])), 0, 2))) : 0);
-        } elseif (3 < \count($ellipsis = explode(DIRECTORY_SEPARATOR, $href))) {
+            $this->attr['ellipsis-tail'] = 1 + ($this->inVendor ? 2 + \strlen(implode(\array_slice(explode(\DIRECTORY_SEPARATOR, substr($href, 1 - $this->attr['ellipsis'])), 0, 2))) : 0);
+        } elseif (3 < \count($ellipsis = explode(\DIRECTORY_SEPARATOR, $href))) {
             $this->attr['ellipsis'] = 2 + \strlen(implode(\array_slice($ellipsis, -2)));
             $this->attr['ellipsis-type'] = 'path';
             $this->attr['ellipsis-tail'] = 1;
@@ -73,7 +73,7 @@ class LinkStub extends ConstStub
                     $r = new \ReflectionClass($class);
                     $v = \dirname(\dirname($r->getFileName()));
                     if (file_exists($v.'/composer/installed.json')) {
-                        self::$vendorRoots[] = $v.DIRECTORY_SEPARATOR;
+                        self::$vendorRoots[] = $v.\DIRECTORY_SEPARATOR;
                     }
                 }
             }
@@ -103,6 +103,6 @@ class LinkStub extends ConstStub
             $parent = \dirname($parent);
         }
 
-        return self::$composerRoots[$dir] = $parent.DIRECTORY_SEPARATOR;
+        return self::$composerRoots[$dir] = $parent.\DIRECTORY_SEPARATOR;
     }
 }

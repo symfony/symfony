@@ -33,7 +33,7 @@ class SortableIteratorTest extends RealIteratorTestCase
         if (!\is_callable($mode)) {
             switch ($mode) {
                 case SortableIterator::SORT_BY_ACCESSED_TIME:
-                    if ('\\' === DIRECTORY_SEPARATOR) {
+                    if ('\\' === \DIRECTORY_SEPARATOR) {
                         touch(self::toAbsolute('.git'));
                     } else {
                         file_get_contents(self::toAbsolute('.git'));
@@ -62,7 +62,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             || SortableIterator::SORT_BY_CHANGED_TIME === $mode
             || SortableIterator::SORT_BY_MODIFIED_TIME === $mode
         ) {
-            if ('\\' === DIRECTORY_SEPARATOR && SortableIterator::SORT_BY_MODIFIED_TIME !== $mode) {
+            if ('\\' === \DIRECTORY_SEPARATOR && SortableIterator::SORT_BY_MODIFIED_TIME !== $mode) {
                 $this->markTestSkipped('Sorting by atime or ctime is not supported on Windows');
             }
             $this->assertOrderedIteratorForGroups($expected, $iterator);

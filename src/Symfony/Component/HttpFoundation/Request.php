@@ -1766,9 +1766,9 @@ class Request
             return $prefix;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(\dirname($baseUrl), '/'.DIRECTORY_SEPARATOR).'/')) {
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(\dirname($baseUrl), '/'.\DIRECTORY_SEPARATOR).'/')) {
             // directory portion of $baseUrl matches
-            return rtrim($prefix, '/'.DIRECTORY_SEPARATOR);
+            return rtrim($prefix, '/'.\DIRECTORY_SEPARATOR);
         }
 
         $truncatedRequestUri = $requestUri;
@@ -1789,7 +1789,7 @@ class Request
             $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
         }
 
-        return rtrim($baseUrl, '/'.DIRECTORY_SEPARATOR);
+        return rtrim($baseUrl, '/'.\DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -1811,7 +1811,7 @@ class Request
             $basePath = $baseUrl;
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $basePath = str_replace('\\', '/', $basePath);
         }
 

@@ -62,7 +62,7 @@ class CliDumper extends AbstractDumper
     {
         parent::__construct($output, $charset, $flags);
 
-        if ('\\' === DIRECTORY_SEPARATOR && !$this->isWindowsTrueColor()) {
+        if ('\\' === \DIRECTORY_SEPARATOR && !$this->isWindowsTrueColor()) {
             // Use only the base 16 xterm colors when using ANSICON or standard Windows 10 CLI
             $this->setStyles(array(
                 'default' => '31',
@@ -417,7 +417,7 @@ class CliDumper extends AbstractDumper
 
         if (isset($attr['ellipsis'], $attr['ellipsis-type'])) {
             $prefix = substr($value, 0, -$attr['ellipsis']);
-            if ('cli' === PHP_SAPI && 'path' === $attr['ellipsis-type'] && isset($_SERVER[$pwd = '\\' === DIRECTORY_SEPARATOR ? 'CD' : 'PWD']) && 0 === strpos($prefix, $_SERVER[$pwd])) {
+            if ('cli' === \PHP_SAPI && 'path' === $attr['ellipsis-type'] && isset($_SERVER[$pwd = '\\' === \DIRECTORY_SEPARATOR ? 'CD' : 'PWD']) && 0 === strpos($prefix, $_SERVER[$pwd])) {
                 $prefix = '.'.substr($prefix, \strlen($_SERVER[$pwd]));
             }
             if (!empty($attr['ellipsis-tail'])) {
@@ -545,7 +545,7 @@ class CliDumper extends AbstractDumper
             return true;
         }
 
-        if (DIRECTORY_SEPARATOR === '\\') {
+        if (\DIRECTORY_SEPARATOR === '\\') {
             return (\function_exists('sapi_windows_vt100_support')
                 && @sapi_windows_vt100_support($stream))
                 || false !== getenv('ANSICON')
@@ -582,7 +582,7 @@ class CliDumper extends AbstractDumper
             || 'xterm' === getenv('TERM')
             || 'Hyper' === getenv('TERM_PROGRAM');
 
-        if (!$result && PHP_VERSION_ID >= 70200) {
+        if (!$result && \PHP_VERSION_ID >= 70200) {
             $version = sprintf(
                 '%s.%s.%s',
                 PHP_WINDOWS_VERSION_MAJOR,

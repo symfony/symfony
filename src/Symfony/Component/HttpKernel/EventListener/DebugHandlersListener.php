@@ -147,7 +147,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     {
         $events = array(KernelEvents::REQUEST => array('configure', 2048));
 
-        if ('cli' === PHP_SAPI && \defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
+        if ('cli' === \PHP_SAPI && \defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
             $events[ConsoleEvents::COMMAND] = array('configure', 2048);
         }
 

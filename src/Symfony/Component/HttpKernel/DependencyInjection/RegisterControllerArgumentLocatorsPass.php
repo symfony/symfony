@@ -62,7 +62,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             while ($def instanceof ChildDefinition) {
                 $def = $container->findDefinition($def->getParent());
                 $class = $class ?: $def->getClass();
-                $bindings = $def->getBindings();
+                $bindings += $def->getBindings();
             }
             $class = $parameterBag->resolveValue($class);
 

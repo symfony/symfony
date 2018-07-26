@@ -26,7 +26,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Merges an existing violation list into this list.
      */
-    public function addAll(self $otherList);
+    public function addAll(ConstraintViolationListInterface $otherList);
 
     /**
      * Returns the violation at a given offset.

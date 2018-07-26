@@ -60,5 +60,5 @@ interface AttributeMetadataInterface
     /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      */
-    public function merge(self $attributeMetadata);
+    public function merge(AttributeMetadataInterface $attributeMetadata);
 }

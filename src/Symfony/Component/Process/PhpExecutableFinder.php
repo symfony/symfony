@@ -44,7 +44,7 @@ class PhpExecutableFinder
         }
 
         // PHP_BINARY return the current sapi executable
-        if (\defined('PHP_BINARY') && PHP_BINARY && \in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg'), true)) {
+        if (\defined('PHP_BINARY') && PHP_BINARY && \in_array(\PHP_SAPI, array('cli', 'cli-server', 'phpdbg'), true)) {
             return PHP_BINARY.$args;
         }
 
@@ -62,12 +62,12 @@ class PhpExecutableFinder
             }
         }
 
-        if (@is_executable($php = PHP_BINDIR.('\\' === DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
+        if (@is_executable($php = PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
             return $php;
         }
 
         $dirs = array(PHP_BINDIR);
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $dirs[] = 'C:\xampp\php\\';
         }
 
@@ -85,7 +85,7 @@ class PhpExecutableFinder
 
         if (\defined('HHVM_VERSION')) {
             $arguments[] = '--php';
-        } elseif ('phpdbg' === PHP_SAPI) {
+        } elseif ('phpdbg' === \PHP_SAPI) {
             $arguments[] = '-qrr';
         }
 

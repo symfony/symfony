@@ -68,7 +68,7 @@ class ConfigDataCollector extends DataCollector
             'wincache_enabled' => \extension_loaded('wincache') && ini_get('wincache.ocenabled'),
             'zend_opcache_enabled' => \extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles' => array(),
-            'sapi_name' => PHP_SAPI,
+            'sapi_name' => \PHP_SAPI,
         );
 
         if (isset($this->kernel)) {

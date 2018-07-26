@@ -106,7 +106,7 @@ class DeprecationErrorHandler
                     echo "\n".ucfirst($group).' deprecation triggered by '.$class.'::'.$method.':';
                     echo "\n".$msg;
                     echo "\nStack trace:";
-                    echo "\n".str_replace(' '.getcwd().DIRECTORY_SEPARATOR, ' ', $e->getTraceAsString());
+                    echo "\n".str_replace(' '.getcwd().\DIRECTORY_SEPARATOR, ' ', $e->getTraceAsString());
                     echo "\n";
 
                     exit(1);
@@ -230,7 +230,7 @@ class DeprecationErrorHandler
             return true;
         }
 
-        if (DIRECTORY_SEPARATOR === '\\') {
+        if (\DIRECTORY_SEPARATOR === '\\') {
             return (\function_exists('sapi_windows_vt100_support')
                 && sapi_windows_vt100_support(STDOUT))
                 || false !== getenv('ANSICON')

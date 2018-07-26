@@ -90,10 +90,10 @@ class ApacheMatcherDumper extends MatcherDumper
 
             $methodVars = array_merge($methodVars, $route->getMethods());
         }
-        if (0 < count($methodVars)) {
+        if (0 < \count($methodVars)) {
             $rule = array('# 405 Method Not Allowed');
             $methodVars = array_values(array_unique($methodVars));
-            if (in_array('GET', $methodVars) && !in_array('HEAD', $methodVars)) {
+            if (\in_array('GET', $methodVars) && !\in_array('HEAD', $methodVars)) {
                 $methodVars[] = 'HEAD';
             }
             foreach ($methodVars as $i => $methodVar) {
@@ -127,7 +127,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         $methods = $this->getRouteMethods($route);
 
-        $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' === substr($regex, -2) && '^/$' !== $regex;
+        $hasTrailingSlash = (!$methods || \in_array('HEAD', $methods)) && '/$' === substr($regex, -2) && '^/$' !== $regex;
 
         $variables = array('E=_ROUTING_route:'.$name);
         foreach ($compiledRoute->getHostVariables() as $variable) {
@@ -149,7 +149,7 @@ class ApacheMatcherDumper extends MatcherDumper
         $rule = array("# $name");
 
         // method mismatch
-        if (0 < count($methods)) {
+        if (0 < \count($methods)) {
             $allow = array();
             foreach ($methods as $method) {
                 $allow[] = 'E=_ROUTING_allow_'.$method.':1';
@@ -196,7 +196,7 @@ class ApacheMatcherDumper extends MatcherDumper
         $methods = $route->getMethods();
 
         // GET and HEAD are equivalent
-        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+        if (\in_array('GET', $methods) && !\in_array('HEAD', $methods)) {
             $methods[] = 'HEAD';
         }
 
@@ -258,7 +258,7 @@ class ApacheMatcherDumper extends MatcherDumper
     {
         $normalizedValues = array();
         foreach ($values as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 foreach ($value as $index => $bit) {
                     $normalizedValues[sprintf('%s[%s]', $key, $index)] = $bit;
                 }

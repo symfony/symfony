@@ -43,7 +43,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
-            if ('_route' === $key && is_object($value)) {
+            if ('_route' === $key && \is_object($value)) {
                 $attributes[$key] = $this->varToString($value->getPath());
             } elseif ('_route_params' === $key) {
                 // we need to keep route params as an array (see getRouteParams())
@@ -114,7 +114,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         foreach ($this->data as $key => $value) {
-            if (!is_array($value)) {
+            if (!\is_array($value)) {
                 continue;
             }
             if ('request_headers' === $key || 'response_headers' === $key) {
@@ -127,20 +127,20 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
-            if (is_array($controller)) {
+            if (\is_array($controller)) {
                 try {
                     $r = new \ReflectionMethod($controller[0], $controller[1]);
                     $this->data['controller'] = array(
-                        'class' => is_object($controller[0]) ? get_class($controller[0]) : $controller[0],
+                        'class' => \is_object($controller[0]) ? \get_class($controller[0]) : $controller[0],
                         'method' => $controller[1],
                         'file' => $r->getFileName(),
                         'line' => $r->getStartLine(),
                     );
                 } catch (\ReflectionException $e) {
-                    if (is_callable($controller)) {
+                    if (\is_callable($controller)) {
                         // using __call or  __callStatic
                         $this->data['controller'] = array(
-                            'class' => is_object($controller[0]) ? get_class($controller[0]) : $controller[0],
+                            'class' => \is_object($controller[0]) ? \get_class($controller[0]) : $controller[0],
                             'method' => $controller[1],
                             'file' => 'n/a',
                             'line' => 'n/a',
@@ -155,7 +155,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'file' => $r->getFileName(),
                     'line' => $r->getStartLine(),
                 );
-            } elseif (is_object($controller)) {
+            } elseif (\is_object($controller)) {
                 $r = new \ReflectionClass($controller);
                 $this->data['controller'] = array(
                     'class' => $r->getName(),

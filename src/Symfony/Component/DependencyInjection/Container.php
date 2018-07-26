@@ -157,7 +157,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
-        if (!in_array($scope, array('container', 'request')) || ('request' === $scope && 'request' !== $id)) {
+        if (!\in_array($scope, array('container', 'request')) || ('request' === $scope && 'request' !== $id)) {
             @trigger_error('The concept of container scopes is deprecated since Symfony 2.8 and will be removed in 3.0. Omit the third parameter.', E_USER_DEPRECATED);
         }
 
@@ -280,7 +280,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
                     $alternatives = array();
                     foreach ($this->getServiceIds() as $knownId) {
                         $lev = levenshtein($id, $knownId);
-                        if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                        if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
                             $alternatives[] = $knownId;
                         }
                     }
@@ -410,7 +410,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
             }
 
             // update global map
-            $this->services = call_user_func_array('array_diff_key', $services);
+            $this->services = \call_user_func_array('array_diff_key', $services);
             array_shift($services);
 
             // add stack entry for this scope so we can restore the removed services later
@@ -456,10 +456,10 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
         }
 
         // update global map
-        $this->services = call_user_func_array('array_diff_key', $services);
+        $this->services = \call_user_func_array('array_diff_key', $services);
 
         // check if we need to restore services of a previous scope of this type
-        if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
+        if (isset($this->scopeStacks[$name]) && \count($this->scopeStacks[$name]) > 0) {
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 

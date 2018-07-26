@@ -56,7 +56,7 @@ class FilePathsIterator extends \ArrayIterator
     public function __construct(array $paths, $baseDir)
     {
         $this->baseDir = $baseDir;
-        $this->baseDirLength = strlen($baseDir);
+        $this->baseDirLength = \strlen($baseDir);
 
         parent::__construct($paths);
     }
@@ -69,7 +69,7 @@ class FilePathsIterator extends \ArrayIterator
      */
     public function __call($name, array $arguments)
     {
-        return call_user_func_array(array($this->current(), $name), $arguments);
+        return \call_user_func_array(array($this->current(), $name), $arguments);
     }
 
     /**
@@ -124,7 +124,7 @@ class FilePathsIterator extends \ArrayIterator
 
         if ($this->baseDir === substr($absolutePath, 0, $this->baseDirLength)) {
             $this->subPathname = ltrim(substr($absolutePath, $this->baseDirLength), '/\\');
-            $dir = dirname($this->subPathname);
+            $dir = \dirname($this->subPathname);
             $this->subPath = '.' === $dir ? '' : $dir;
         } else {
             $this->subPath = $this->subPathname = '';

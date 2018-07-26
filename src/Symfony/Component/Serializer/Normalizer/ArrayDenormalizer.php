@@ -36,8 +36,8 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
         if (null === $this->serializer) {
             throw new BadMethodCallException('Please set a serializer before calling denormalize()!');
         }
-        if (!is_array($data)) {
-            throw new InvalidArgumentException('Data expected to be an array, '.gettype($data).' given.');
+        if (!\is_array($data)) {
+            throw new InvalidArgumentException('Data expected to be an array, '.\gettype($data).' given.');
         }
         if ('[]' !== substr($class, -2)) {
             throw new InvalidArgumentException('Unsupported class: '.$class);

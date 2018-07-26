@@ -189,7 +189,7 @@ class BundleEntryReaderTest extends TestCase
      */
     public function testMergeDataWithFallbackData($childData, $parentData, $result)
     {
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
@@ -227,7 +227,7 @@ class BundleEntryReaderTest extends TestCase
      */
     public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
     {
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
@@ -270,7 +270,7 @@ class BundleEntryReaderTest extends TestCase
      */
     public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result)
     {
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
@@ -313,8 +313,8 @@ class BundleEntryReaderTest extends TestCase
      */
     public function testMergeTraversables($childData, $parentData, $result)
     {
-        $parentData = is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
-        $childData = is_array($childData) ? new \ArrayObject($childData) : $childData;
+        $parentData = \is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
+        $childData = \is_array($childData) ? new \ArrayObject($childData) : $childData;
 
         if (null === $childData || $childData instanceof \ArrayObject) {
             $this->readerImpl->expects($this->at(0))
@@ -343,7 +343,7 @@ class BundleEntryReaderTest extends TestCase
     {
         $this->reader->setLocaleAliases(array('mo' => 'ro_MD'));
 
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'ro_MD')

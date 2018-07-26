@@ -95,7 +95,7 @@ EOF
         foreach ($input->getArgument('arguments') as $argument) {
             $data = explode(':', $argument, 2);
 
-            if (count($data) > 1) {
+            if (\count($data) > 1) {
                 $objectIdentities[] = new ObjectIdentity($data[1], strtr($data[0], '/', '\\'));
             } else {
                 $maskBuilder->add($data[0]);
@@ -120,7 +120,7 @@ EOF
             foreach ($userOption as $user) {
                 $data = explode(':', $user, 2);
 
-                if (1 === count($data)) {
+                if (1 === \count($data)) {
                     throw new \InvalidArgumentException('The user must follow the format "Acme/MyUser:username".');
                 }
 

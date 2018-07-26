@@ -134,7 +134,7 @@ class GraphvizDumper extends Dumper
         foreach ($arguments as $argument) {
             if ($argument instanceof Parameter) {
                 $argument = $this->container->hasParameter($argument) ? $this->container->getParameter($argument) : null;
-            } elseif (is_string($argument) && preg_match('/^%([^%]+)%$/', $argument, $match)) {
+            } elseif (\is_string($argument) && preg_match('/^%([^%]+)%$/', $argument, $match)) {
                 $argument = $this->container->hasParameter($match[1]) ? $this->container->getParameter($match[1]) : null;
             }
 
@@ -144,7 +144,7 @@ class GraphvizDumper extends Dumper
                 }
 
                 $edges[] = array('name' => $name, 'required' => $required, 'to' => $argument);
-            } elseif (is_array($argument)) {
+            } elseif (\is_array($argument)) {
                 $edges = array_merge($edges, $this->findEdges($id, $argument, $required, $name));
             }
         }
@@ -187,7 +187,7 @@ class GraphvizDumper extends Dumper
             }
 
             if (!$container->hasDefinition($id)) {
-                $class = ('service_container' === $id) ? get_class($this->container) : get_class($service);
+                $class = ('service_container' === $id) ? \get_class($this->container) : \get_class($service);
                 $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => $this->options['node.instance']);
             }
         }

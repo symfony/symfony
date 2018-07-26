@@ -39,7 +39,7 @@ class LazyLoadingFragmentHandler extends FragmentHandler
         if ((null !== $requestStack && !$requestStack instanceof RequestStack) || $debug instanceof RequestStack) {
             $tmp = $debug;
             $debug = $requestStack;
-            $requestStack = func_num_args() < 3 ? null : $tmp;
+            $requestStack = \func_num_args() < 3 ? null : $tmp;
 
             @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as second argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
         } elseif (!$requestStack instanceof RequestStack) {

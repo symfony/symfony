@@ -53,7 +53,7 @@ class ProgressIndicator
 
         $indicatorValues = array_values($indicatorValues);
 
-        if (2 > count($indicatorValues)) {
+        if (2 > \count($indicatorValues)) {
             throw new InvalidArgumentException('Must have at least 2 indicator value characters.');
         }
 
@@ -108,7 +108,7 @@ class ProgressIndicator
      */
     public function getCurrentValue()
     {
-        return $this->indicatorValues[$this->indicatorCurrent % count($this->indicatorValues)];
+        return $this->indicatorValues[$this->indicatorCurrent % \count($this->indicatorValues)];
     }
 
     /**
@@ -232,7 +232,7 @@ class ProgressIndicator
 
         $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self) {
             if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
-                return call_user_func($formatter, $self);
+                return \call_user_func($formatter, $self);
             }
 
             return $matches[0];

@@ -158,7 +158,7 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     private function getAttributes($object, array $context)
     {
-        $class = get_class($object);
+        $class = \get_class($object);
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {

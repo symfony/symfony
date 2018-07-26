@@ -44,7 +44,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         }
 
         foreach (self::$files as $file) {
-            if (DIRECTORY_SEPARATOR === $file[strlen($file) - 1]) {
+            if (DIRECTORY_SEPARATOR === $file[\strlen($file) - 1]) {
                 mkdir($file);
             } else {
                 touch($file);
@@ -87,10 +87,10 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             self::$tmpDir = realpath(sys_get_temp_dir()).DIRECTORY_SEPARATOR.'symfony_finder';
         }
 
-        if (is_array($files)) {
+        if (\is_array($files)) {
             $f = array();
             foreach ($files as $file) {
-                if (is_array($file)) {
+                if (\is_array($file)) {
                     $f[] = self::toAbsolute($file);
                 } else {
                     $f[] = self::$tmpDir.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $file);
@@ -100,7 +100,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             return $f;
         }
 
-        if (is_string($files)) {
+        if (\is_string($files)) {
             return self::$tmpDir.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $files);
         }
 

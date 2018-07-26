@@ -86,7 +86,7 @@ class PhpGeneratorDumperTest extends TestCase
 
     public function testDumpWithTooManyRoutes()
     {
-        if (defined('HHVM_VERSION_ID')) {
+        if (\defined('HHVM_VERSION_ID')) {
             $this->markTestSkipped('HHVM consumes too much memory on this test.');
         }
 

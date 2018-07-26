@@ -45,11 +45,11 @@ class StringUtils
     public static function equals($knownString, $userInput)
     {
         // Avoid making unnecessary duplications of secret data
-        if (!is_string($knownString)) {
+        if (!\is_string($knownString)) {
             $knownString = (string) $knownString;
         }
 
-        if (!is_string($userInput)) {
+        if (!\is_string($userInput)) {
             $userInput = (string) $userInput;
         }
 

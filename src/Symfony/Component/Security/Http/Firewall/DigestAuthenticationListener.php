@@ -207,7 +207,7 @@ class DigestData
 
         $nonceTokens = explode(':', $nonceAsPlainText);
 
-        if (2 !== count($nonceTokens)) {
+        if (2 !== \count($nonceTokens)) {
             throw new BadCredentialsException(sprintf('Nonce should have yielded two tokens but was "%s".', $nonceAsPlainText));
         }
 

@@ -91,7 +91,7 @@ class UuidValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Uuid');
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -315,7 +315,7 @@ class UuidValidator extends ConstraintValidator
         }
 
         // Check version
-        if (!in_array($value[self::STRICT_VERSION_POSITION], $constraint->versions)) {
+        if (!\in_array($value[self::STRICT_VERSION_POSITION], $constraint->versions)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))

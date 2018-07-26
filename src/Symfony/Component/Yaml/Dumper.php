@@ -55,13 +55,13 @@ class Dumper
         $output = '';
         $prefix = $indent ? str_repeat(' ', $indent) : '';
 
-        if ($inline <= 0 || !is_array($input) || empty($input)) {
+        if ($inline <= 0 || !\is_array($input) || empty($input)) {
             $output .= $prefix.Inline::dump($input, $exceptionOnInvalidType, $objectSupport);
         } else {
             $isAHash = Inline::isHash($input);
 
             foreach ($input as $key => $value) {
-                $willBeInlined = $inline - 1 <= 0 || !is_array($value) || empty($value);
+                $willBeInlined = $inline - 1 <= 0 || !\is_array($value) || empty($value);
 
                 $output .= sprintf('%s%s%s%s',
                     $prefix,

@@ -83,7 +83,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
 
         if (!$configuration instanceof ConfigurationInterface) {
-            throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
+            throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', \get_class($configuration)));
         }
     }
 

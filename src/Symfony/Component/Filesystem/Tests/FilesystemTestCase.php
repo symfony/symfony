@@ -122,7 +122,7 @@ class FilesystemTestCase extends TestCase
 
     protected function markAsSkippedIfPosixIsMissing()
     {
-        if (!function_exists('posix_isatty')) {
+        if (!\function_exists('posix_isatty')) {
             $this->markTestSkipped('Function posix_isatty is required.');
         }
     }

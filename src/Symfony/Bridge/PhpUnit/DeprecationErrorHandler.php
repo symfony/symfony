@@ -75,13 +75,13 @@ class DeprecationErrorHandler
             $trace = debug_backtrace(true);
             $group = 'other';
 
-            $i = count($trace);
+            $i = \count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_')))) {
                 // No-op
             }
 
             if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
-                $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
+                $class = isset($trace[$i]['object']) ? \get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
 
                 if (0 !== error_reporting()) {
@@ -90,7 +90,7 @@ class DeprecationErrorHandler
                     || 0 === strpos($method, 'provideLegacy')
                     || 0 === strpos($method, 'getLegacy')
                     || strpos($class, '\Legacy')
-                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+                    || \in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
                 ) {
                     $group = 'legacy';
                 } else {
@@ -101,7 +101,7 @@ class DeprecationErrorHandler
                     $e = new \Exception($msg);
                     $r = new \ReflectionProperty($e, 'trace');
                     $r->setAccessible(true);
-                    $r->setValue($e, array_slice($trace, 1, $i));
+                    $r->setValue($e, \array_slice($trace, 1, $i));
 
                     echo "\n".ucfirst($group).' deprecation triggered by '.$class.'::'.$method.':';
                     echo "\n".$msg;
@@ -193,12 +193,12 @@ class DeprecationErrorHandler
 
                 // reset deprecations array
                 foreach ($deprecations as $group => $arrayOrInt) {
-                    $deprecations[$group] = is_int($arrayOrInt) ? 0 : array();
+                    $deprecations[$group] = \is_int($arrayOrInt) ? 0 : array();
                 }
 
                 register_shutdown_function(function () use (&$deprecations, $isFailing, $displayDeprecations, $mode) {
                     foreach ($deprecations as $group => $arrayOrInt) {
-                        if (0 < (is_int($arrayOrInt) ? $arrayOrInt : count($arrayOrInt))) {
+                        if (0 < (\is_int($arrayOrInt) ? $arrayOrInt : \count($arrayOrInt))) {
                             echo "Shutdown-time deprecations:\n";
                             break;
                         }
@@ -222,7 +222,7 @@ class DeprecationErrorHandler
      */
     private static function hasColorSupport()
     {
-        if (!defined('STDOUT')) {
+        if (!\defined('STDOUT')) {
             return false;
         }
 
@@ -231,18 +231,18 @@ class DeprecationErrorHandler
         }
 
         if (DIRECTORY_SEPARATOR === '\\') {
-            return (function_exists('sapi_windows_vt100_support')
+            return (\function_exists('sapi_windows_vt100_support')
                 && sapi_windows_vt100_support(STDOUT))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
         }
 
-        if (function_exists('stream_isatty')) {
+        if (\function_exists('stream_isatty')) {
             return stream_isatty(STDOUT);
         }
 
-        if (function_exists('posix_isatty')) {
+        if (\function_exists('posix_isatty')) {
             return posix_isatty(STDOUT);
         }
 

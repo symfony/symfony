@@ -49,7 +49,7 @@ class FrameworkExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
         $loader->load('web.xml');
         $loader->load('services.xml');
@@ -439,7 +439,7 @@ class FrameworkExtension extends Extension
             $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
 
             // Use a delegation unless only a single loader was registered
-            if (1 === count($loaders)) {
+            if (1 === \count($loaders)) {
                 $container->setAlias('templating.loader', (string) reset($loaders));
             } else {
                 $container->getDefinition('templating.loader.chain')->addArgument($loaders);
@@ -468,7 +468,7 @@ class FrameworkExtension extends Extension
         $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
         // Use a delegation unless only a single engine was registered
-        if (1 === count($engines)) {
+        if (1 === \count($engines)) {
             $container->setAlias('templating', (string) reset($engines));
         } else {
             $templateEngineDefinition = $container->getDefinition('templating.engine.delegating');
@@ -484,7 +484,7 @@ class FrameworkExtension extends Extension
         ;
 
         // configure the PHP engine if needed
-        if (in_array('php', $config['engines'], true)) {
+        if (\in_array('php', $config['engines'], true)) {
             $loader->load('templating_php.xml');
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
@@ -592,17 +592,17 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
-            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
+            $dirs[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
         }
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
@@ -676,11 +676,11 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
         list($xmlMappings, $yamlMappings) = $this->getValidatorMappingFiles($container);
-        if (count($xmlMappings) > 0) {
+        if (\count($xmlMappings) > 0) {
             $validatorBuilder->addMethodCall('addXmlMappings', array($xmlMappings));
         }
 
-        if (count($yamlMappings) > 0) {
+        if (\count($yamlMappings) > 0) {
             $validatorBuilder->addMethodCall('addYamlMappings', array($yamlMappings));
         }
 
@@ -719,7 +719,7 @@ class FrameworkExtension extends Extension
 
         if (interface_exists('Symfony\Component\Form\FormInterface')) {
             $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
-            $files[0][] = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
+            $files[0][] = \dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
             $container->addResource(new FileResource($files[0][0]));
         }
 
@@ -935,7 +935,7 @@ class FrameworkExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return dirname(__DIR__).'/Resources/config/schema';
+        return \dirname(__DIR__).'/Resources/config/schema';
     }
 
     public function getNamespace()

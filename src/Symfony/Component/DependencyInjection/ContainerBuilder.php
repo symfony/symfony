@@ -282,7 +282,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Cannot load from an extension on a frozen container.');
         }
 
-        if (func_num_args() < 2) {
+        if (\func_num_args() < 2) {
             $values = array();
         }
 
@@ -641,7 +641,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $alias = strtolower($alias);
 
-        if (is_string($id)) {
+        if (\is_string($id)) {
             $id = new Alias($id);
         } elseif (!$id instanceof Alias) {
             throw new InvalidArgumentException('$id must be a string, or an Alias object.');
@@ -894,15 +894,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $arguments = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())), $inlinedDefinitions);
 
         if (null !== $factory = $definition->getFactory()) {
-            if (is_array($factory)) {
+            if (\is_array($factory)) {
                 $factory = array($this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlinedDefinitions), $factory[1]);
-            } elseif (!is_string($factory)) {
+            } elseif (!\is_string($factory)) {
                 throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
             }
 
-            $service = call_user_func_array($factory, $arguments);
+            $service = \call_user_func_array($factory, $arguments);
 
-            if (!$definition->isDeprecated() && is_array($factory) && is_string($factory[0])) {
+            if (!$definition->isDeprecated() && \is_array($factory) && \is_string($factory[0])) {
                 $r = new \ReflectionClass($factory[0]);
 
                 if (0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
@@ -918,7 +918,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new RuntimeException(sprintf('Cannot create service "%s" from factory method without a factory service or factory class.', $id));
             }
 
-            $service = call_user_func_array(array($factory, $definition->getFactoryMethod(false)), $arguments);
+            $service = \call_user_func_array(array($factory, $definition->getFactoryMethod(false)), $arguments);
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
@@ -944,7 +944,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable)) {
+            if (\is_array($callable)) {
                 $callable[0] = $parameterBag->resolveValue($callable[0]);
 
                 if ($callable[0] instanceof Reference) {
@@ -954,11 +954,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
             }
 
-            if (!is_callable($callable)) {
-                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_class($service)));
+            if (!\is_callable($callable)) {
+                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', \get_class($service)));
             }
 
-            call_user_func($callable, $service);
+            \call_user_func($callable, $service);
         }
 
         return $service;
@@ -979,7 +979,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function doResolveServices($value, \SplObjectStorage $inlinedDefinitions)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $k => $v) {
                 $value[$k] = $this->doResolveServices($v, $inlinedDefinitions);
             }
@@ -1074,7 +1074,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $services = array();
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
@@ -1141,7 +1141,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        call_user_func_array(array($service, $call[0]), $this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlinedDefinitions));
+        \call_user_func_array(array($service, $call[0]), $this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlinedDefinitions));
     }
 
     /**

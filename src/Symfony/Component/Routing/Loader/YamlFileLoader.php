@@ -72,7 +72,7 @@ class YamlFileLoader extends FileLoader
         }
 
         // not an array
-        if (!is_array($parsedConfig)) {
+        if (!\is_array($parsedConfig)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $path));
         }
 
@@ -105,7 +105,7 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true) && (!$type || 'yaml' === $type);
+        return \is_string($resource) && \in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true) && (!$type || 'yaml' === $type);
     }
 
     /**
@@ -127,7 +127,7 @@ class YamlFileLoader extends FileLoader
         $condition = isset($config['condition']) ? $config['condition'] : null;
 
         if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
+            if (0 === \count($methods)) {
                 $methods = explode('|', $requirements['_method']);
             }
 
@@ -136,7 +136,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
+            if (0 === \count($schemes)) {
                 $schemes = explode('|', $requirements['_scheme']);
             }
 
@@ -169,7 +169,7 @@ class YamlFileLoader extends FileLoader
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
 
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
 
         $subCollection = $this->import($config['resource'], $type, false, $file);
         /* @var $subCollection RouteCollection */
@@ -205,7 +205,7 @@ class YamlFileLoader extends FileLoader
      */
     protected function validate($config, $name, $path)
     {
-        if (!is_array($config)) {
+        if (!\is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
         }
         if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {

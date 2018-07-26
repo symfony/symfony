@@ -32,7 +32,7 @@ while ($dir !== $lastDir) {
         break;
     }
 
-    $dir = dirname($dir);
+    $dir = \dirname($dir);
 }
 
 use Symfony\Component\Config\Loader\LoaderInterface;

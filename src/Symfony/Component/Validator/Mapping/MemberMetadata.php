@@ -88,10 +88,10 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function addConstraint(Constraint $constraint)
     {
-        if (!in_array(Constraint::PROPERTY_CONSTRAINT, (array) $constraint->getTargets())) {
+        if (!\in_array(Constraint::PROPERTY_CONSTRAINT, (array) $constraint->getTargets())) {
             throw new ConstraintDefinitionException(sprintf(
                 'The constraint %s cannot be put on properties or getters',
-                get_class($constraint)
+                \get_class($constraint)
             ));
         }
 
@@ -230,7 +230,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function getReflectionMember($objectOrClassName)
     {
-        $className = is_string($objectOrClassName) ? $objectOrClassName : get_class($objectOrClassName);
+        $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
         if (!isset($this->reflMember[$className])) {
             $this->reflMember[$className] = $this->newReflectionMember($objectOrClassName);
         }

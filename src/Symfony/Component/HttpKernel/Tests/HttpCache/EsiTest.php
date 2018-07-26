@@ -231,10 +231,10 @@ class EsiTest extends TestCase
               ->method('getRequest')
               ->will($this->returnValue($request))
         ;
-        if (is_array($response)) {
+        if (\is_array($response)) {
             $cache->expects($this->any())
                   ->method('handle')
-                  ->will(call_user_func_array(array($this, 'onConsecutiveCalls'), $response))
+                  ->will(\call_user_func_array(array($this, 'onConsecutiveCalls'), $response))
             ;
         } else {
             $cache->expects($this->any())

@@ -183,7 +183,7 @@ class HeaderBagTest extends TestCase
             $this->assertEquals(array($headers[$key]), $val);
         }
 
-        $this->assertEquals(count($headers), $i);
+        $this->assertEquals(\count($headers), $i);
     }
 
     public function testCount()
@@ -191,6 +191,6 @@ class HeaderBagTest extends TestCase
         $headers = array('foo' => 'bar', 'HELLO' => 'WORLD');
         $headerBag = new HeaderBag($headers);
 
-        $this->assertCount(count($headers), $headerBag);
+        $this->assertCount(\count($headers), $headerBag);
     }
 }

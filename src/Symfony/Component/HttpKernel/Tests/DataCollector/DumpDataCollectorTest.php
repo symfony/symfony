@@ -94,7 +94,7 @@ class DumpDataCollectorTest extends TestCase
 </pre>
 EOTXT;
         } else {
-            $len = strlen("DumpDataCollectorTest.php on line {$line}:");
+            $len = \strlen("DumpDataCollectorTest.php on line {$line}:");
             $xOutput = <<<EOTXT
 <pre class=sf-dump id=sf-dump data-indent-pad="  ">"<span class=sf-dump-str title="{$len} characters">DumpDataCollectorTest.php on line {$line}:</span>"
 </pre>

@@ -58,7 +58,7 @@ class BCryptPasswordEncoderTest extends TestCase
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(self::PASSWORD, null);
-        $this->assertEquals(60, strlen($result));
+        $this->assertEquals(60, \strlen($result));
     }
 
     public function testValidation()

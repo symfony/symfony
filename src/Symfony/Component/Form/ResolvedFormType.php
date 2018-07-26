@@ -56,7 +56,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
     {
-        $fqcn = get_class($innerType);
+        $fqcn = \get_class($innerType);
         $name = $innerType->getName();
         $hasCustomName = $name !== $fqcn;
 
@@ -71,12 +71,12 @@ class ResolvedFormType implements ResolvedFormTypeInterface
             // Anyone else should only override getBlockPrefix() if they actually
             // want to have a different block prefix than the default one
             if ($isOldOverwritten && !$isNewOverwritten) {
-                @trigger_error(get_class($innerType).': The FormTypeInterface::getName() method is deprecated since Symfony 2.8 and will be removed in 3.0. Remove it from your classes. Use getBlockPrefix() if you want to customize the template block prefix. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                @trigger_error(\get_class($innerType).': The FormTypeInterface::getName() method is deprecated since Symfony 2.8 and will be removed in 3.0. Remove it from your classes. Use getBlockPrefix() if you want to customize the template block prefix. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
             }
 
             $blockPrefix = $innerType->getBlockPrefix();
         } else {
-            @trigger_error(get_class($innerType).': The FormTypeInterface::getBlockPrefix() method will be added in version 3.0. You should extend AbstractType or add it to your implementation.', E_USER_DEPRECATED);
+            @trigger_error(\get_class($innerType).': The FormTypeInterface::getBlockPrefix() method will be added in version 3.0. You should extend AbstractType or add it to your implementation.', E_USER_DEPRECATED);
 
             // Deal with classes that don't extend AbstractType
             // Calculate block prefix from the FQCN by default
@@ -88,7 +88,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         if ($hasCustomName && !preg_match('/^[a-z0-9_]*$/i', $name)) {
             throw new InvalidArgumentException(sprintf(
                 'The "%s" form type name ("%s") is not valid. Names must only contain letters, numbers, and "_".',
-                get_class($innerType),
+                \get_class($innerType),
                 $name
             ));
         }
@@ -260,10 +260,10 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 $isNewOverwritten = 'Symfony\Component\Form\AbstractType' !== $reflector->getDeclaringClass()->getName();
 
                 if ($isOldOverwritten && !$isNewOverwritten) {
-                    @trigger_error(get_class($this->innerType).': The FormTypeInterface::setDefaultOptions() method is deprecated since Symfony 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                    @trigger_error(\get_class($this->innerType).': The FormTypeInterface::setDefaultOptions() method is deprecated since Symfony 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
                 }
             } else {
-                @trigger_error(get_class($this->innerType).': The FormTypeInterface::configureOptions() method will be added in Symfony 3.0. You should extend AbstractType or implement it in your classes.', E_USER_DEPRECATED);
+                @trigger_error(\get_class($this->innerType).': The FormTypeInterface::configureOptions() method will be added in Symfony 3.0. You should extend AbstractType or implement it in your classes.', E_USER_DEPRECATED);
             }
 
             foreach ($this->typeExtensions as $extension) {
@@ -277,10 +277,10 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                     $isNewOverwritten = 'Symfony\Component\Form\AbstractTypeExtension' !== $reflector->getDeclaringClass()->getName();
 
                     if ($isOldOverwritten && !$isNewOverwritten) {
-                        @trigger_error(get_class($extension).': The FormTypeExtensionInterface::setDefaultOptions() method is deprecated since Symfony 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeExtensionInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                        @trigger_error(\get_class($extension).': The FormTypeExtensionInterface::setDefaultOptions() method is deprecated since Symfony 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeExtensionInterface with Symfony 3.0.', E_USER_DEPRECATED);
                     }
                 } else {
-                    @trigger_error(get_class($this->innerType).': The FormTypeExtensionInterface::configureOptions() method will be added in Symfony 3.0. You should extend AbstractTypeExtension or implement it in your classes.', E_USER_DEPRECATED);
+                    @trigger_error(\get_class($this->innerType).': The FormTypeExtensionInterface::configureOptions() method will be added in Symfony 3.0. You should extend AbstractTypeExtension or implement it in your classes.', E_USER_DEPRECATED);
                 }
             }
         }

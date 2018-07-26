@@ -120,7 +120,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ($first) {
-            return count($this->headers[$key]) ? $this->headers[$key][0] : $default;
+            return \count($this->headers[$key]) ? $this->headers[$key][0] : $default;
         }
 
         return $this->headers[$key];
@@ -172,7 +172,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function contains($key, $value)
     {
-        return in_array($value, $this->get($key, null, false));
+        return \in_array($value, $this->get($key, null, false));
     }
 
     /**
@@ -280,7 +280,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->headers);
+        return \count($this->headers);
     }
 
     protected function getCacheControlHeader()

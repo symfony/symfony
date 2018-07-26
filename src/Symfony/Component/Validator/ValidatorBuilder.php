@@ -220,7 +220,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory)
     {
-        if (count($this->xmlMappings) > 0 || count($this->yamlMappings) > 0 || count($this->methodMappings) > 0 || null !== $this->annotationReader) {
+        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || null !== $this->annotationReader) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -305,7 +305,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         @trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
-        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
+        if (!\in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
             throw new InvalidArgumentException(sprintf('The requested API version is invalid: "%s"', $apiVersion));
         }
 
@@ -322,15 +322,15 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         if (!$metadataFactory) {
             $loaders = array();
 
-            if (count($this->xmlMappings) > 1) {
+            if (\count($this->xmlMappings) > 1) {
                 $loaders[] = new XmlFilesLoader($this->xmlMappings);
-            } elseif (1 === count($this->xmlMappings)) {
+            } elseif (1 === \count($this->xmlMappings)) {
                 $loaders[] = new XmlFileLoader($this->xmlMappings[0]);
             }
 
-            if (count($this->yamlMappings) > 1) {
+            if (\count($this->yamlMappings) > 1) {
                 $loaders[] = new YamlFilesLoader($this->yamlMappings);
-            } elseif (1 === count($this->yamlMappings)) {
+            } elseif (1 === \count($this->yamlMappings)) {
                 $loaders[] = new YamlFileLoader($this->yamlMappings[0]);
             }
 
@@ -344,9 +344,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
             $loader = null;
 
-            if (count($loaders) > 1) {
+            if (\count($loaders) > 1) {
                 $loader = new LoaderChain($loaders);
-            } elseif (1 === count($loaders)) {
+            } elseif (1 === \count($loaders)) {
                 $loader = $loaders[0];
             }
 

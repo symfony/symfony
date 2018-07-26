@@ -89,10 +89,10 @@ class Caster
             if (empty($v)) {
                 $type |= self::EXCLUDE_EMPTY & $filter;
             }
-            if ((self::EXCLUDE_NOT_IMPORTANT & $filter) && !in_array($k, $listedProperties, true)) {
+            if ((self::EXCLUDE_NOT_IMPORTANT & $filter) && !\in_array($k, $listedProperties, true)) {
                 $type |= self::EXCLUDE_NOT_IMPORTANT;
             }
-            if ((self::EXCLUDE_VERBOSE & $filter) && in_array($k, $listedProperties, true)) {
+            if ((self::EXCLUDE_VERBOSE & $filter) && \in_array($k, $listedProperties, true)) {
                 $type |= self::EXCLUDE_VERBOSE;
             }
 

@@ -93,9 +93,9 @@ class SimpleChoiceList extends ChoiceList
     {
         // Add choices to the nested buckets
         foreach ($choices as $choice => $label) {
-            if (is_array($label)) {
+            if (\is_array($label)) {
                 // Don't do the work if the array is empty
-                if (count($label) > 0) {
+                if (\count($label) > 0) {
                     $this->addChoiceGroup(
                         $choice,
                         $bucketForPreferred,

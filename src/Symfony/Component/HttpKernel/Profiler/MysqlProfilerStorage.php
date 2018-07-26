@@ -33,7 +33,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
                 throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Mysql with an invalid dsn "%s". The expected format is "mysql:dbname=database_name;host=host_name".', $this->dsn));
             }
 
-            if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            if (!class_exists('PDO') || !\in_array('mysql', \PDO::getAvailableDrivers(), true)) {
                 throw new \RuntimeException('You need to enable PDO_Mysql extension for the profiler to run properly.');
             }
 

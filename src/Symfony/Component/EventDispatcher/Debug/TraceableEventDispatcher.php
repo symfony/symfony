@@ -210,7 +210,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     public function __call($method, $arguments)
     {
-        return call_user_func_array(array($this->dispatcher, $method), $arguments);
+        return \call_user_func_array(array($this->dispatcher, $method), $arguments);
     }
 
     /**
@@ -310,7 +310,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 'type' => 'Closure',
                 'pretty' => 'closure',
             );
-        } elseif (is_string($listener)) {
+        } elseif (\is_string($listener)) {
             try {
                 $r = new \ReflectionFunction($listener);
                 $file = $r->getFileName();
@@ -326,11 +326,11 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 'line' => $line,
                 'pretty' => $listener,
             );
-        } elseif (is_array($listener) || (is_object($listener) && is_callable($listener))) {
-            if (!is_array($listener)) {
+        } elseif (\is_array($listener) || (\is_object($listener) && \is_callable($listener))) {
+            if (!\is_array($listener)) {
                 $listener = array($listener, '__invoke');
             }
-            $class = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
+            $class = \is_object($listener[0]) ? \get_class($listener[0]) : $listener[0];
             try {
                 $r = new \ReflectionMethod($class, $listener[1]);
                 $file = $r->getFileName();
@@ -354,11 +354,11 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     private function sortListenersByPriority($a, $b)
     {
-        if (is_int($a['priority']) && !is_int($b['priority'])) {
+        if (\is_int($a['priority']) && !\is_int($b['priority'])) {
             return 1;
         }
 
-        if (!is_int($a['priority']) && is_int($b['priority'])) {
+        if (!\is_int($a['priority']) && \is_int($b['priority'])) {
             return -1;
         }
 

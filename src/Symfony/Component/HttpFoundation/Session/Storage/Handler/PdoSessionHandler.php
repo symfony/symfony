@@ -507,7 +507,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     return '';
                 }
 
-                return is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
+                return \is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
             }
 
             if (null !== $insertStmt) {
@@ -617,11 +617,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private function convertStringToInt($string)
     {
         if (4 === \PHP_INT_SIZE) {
-            return (ord($string[3]) << 24) + (ord($string[2]) << 16) + (ord($string[1]) << 8) + ord($string[0]);
+            return (\ord($string[3]) << 24) + (\ord($string[2]) << 16) + (\ord($string[1]) << 8) + \ord($string[0]);
         }
 
-        $int1 = (ord($string[7]) << 24) + (ord($string[6]) << 16) + (ord($string[5]) << 8) + ord($string[4]);
-        $int2 = (ord($string[3]) << 24) + (ord($string[2]) << 16) + (ord($string[1]) << 8) + ord($string[0]);
+        $int1 = (\ord($string[7]) << 24) + (\ord($string[6]) << 16) + (\ord($string[5]) << 8) + \ord($string[4]);
+        $int2 = (\ord($string[3]) << 24) + (\ord($string[2]) << 16) + (\ord($string[1]) << 8) + \ord($string[0]);
 
         return $int2 + ($int1 << 32);
     }

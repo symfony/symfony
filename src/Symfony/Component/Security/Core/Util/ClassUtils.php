@@ -57,7 +57,7 @@ class ClassUtils
         }
 
         // fallback in case security-acl is not installed
-        $class = is_object($object) ? get_class($object) : $object;
+        $class = \is_object($object) ? \get_class($object) : $object;
 
         if (false === $pos = strrpos($class, '\\'.self::MARKER.'\\')) {
             return $class;

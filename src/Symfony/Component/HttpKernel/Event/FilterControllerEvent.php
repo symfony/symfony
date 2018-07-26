@@ -56,7 +56,7 @@ class FilterControllerEvent extends KernelEvent
     public function setController($controller)
     {
         // controller must be a callable
-        if (!is_callable($controller)) {
+        if (!\is_callable($controller)) {
             throw new \LogicException(sprintf('The controller must be a callable (%s given).', $this->varToString($controller)));
         }
 
@@ -65,11 +65,11 @@ class FilterControllerEvent extends KernelEvent
 
     private function varToString($var)
     {
-        if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+        if (\is_object($var)) {
+            return sprintf('Object(%s)', \get_class($var));
         }
 
-        if (is_array($var)) {
+        if (\is_array($var)) {
             $a = array();
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
@@ -78,7 +78,7 @@ class FilterControllerEvent extends KernelEvent
             return sprintf('Array(%s)', implode(', ', $a));
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return sprintf('Resource(%s)', get_resource_type($var));
         }
 

@@ -171,7 +171,7 @@ class FlashBagTest extends TestCase
             ++$i;
         }
 
-        $this->assertEquals(count($flashes), $i);
+        $this->assertEquals(\count($flashes), $i);
         $this->assertCount(0, $this->bag->all());
     }
 }

@@ -136,7 +136,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->storage->getBag($this->attributeName)->all());
+        return \count($this->storage->getBag($this->attributeName)->all());
     }
 
     /**

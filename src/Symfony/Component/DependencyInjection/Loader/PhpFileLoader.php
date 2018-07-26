@@ -33,7 +33,7 @@ class PhpFileLoader extends FileLoader
         $loader = $this;
 
         $path = $this->locator->locate($resource);
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
         $this->container->addResource(new FileResource($path));
 
         include $path;
@@ -44,6 +44,6 @@ class PhpFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
+        return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 }

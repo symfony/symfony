@@ -164,7 +164,7 @@ EOF;
     {
         $code = '';
         $prefix = $collection->getPrefix();
-        $optimizable = 1 < strlen($prefix) && 1 < count($collection->all());
+        $optimizable = 1 < \strlen($prefix) && 1 < \count($collection->all());
         $optimizedPrefix = $parentPrefix;
 
         if ($optimizable) {
@@ -213,13 +213,13 @@ EOF;
         $methods = $route->getMethods();
 
         // GET and HEAD are equivalent
-        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+        if (\in_array('GET', $methods) && !\in_array('HEAD', $methods)) {
             $methods[] = 'HEAD';
         }
 
-        $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('GET', $methods));
+        $supportsTrailingSlash = $supportsRedirections && (!$methods || \in_array('GET', $methods));
 
-        if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
+        if (!\count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
             if ($supportsTrailingSlash && '/' === substr($m['url'], -1)) {
                 $conditions[] = sprintf("%s === rtrim(\$pathinfo, '/')", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
@@ -314,7 +314,7 @@ EOF;
 EOF;
             }
         } elseif ($methods) {
-            if (1 === count($methods)) {
+            if (1 === \count($methods)) {
                 $code .= <<<EOF
             if (\$this->context->getMethod() != '$methods[0]') {
                 \$allow[] = '$methods[0]';

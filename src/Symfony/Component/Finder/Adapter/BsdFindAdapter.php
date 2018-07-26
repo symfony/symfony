@@ -40,7 +40,7 @@ class BsdFindAdapter extends AbstractFindAdapter
      */
     protected function canBeUsed()
     {
-        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
+        return \in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
     }
 
     /**

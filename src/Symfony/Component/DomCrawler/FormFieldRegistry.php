@@ -33,7 +33,7 @@ class FormFieldRegistry
 
         $target = &$this->fields;
         while ($segments) {
-            if (!is_array($target)) {
+            if (!\is_array($target)) {
                 $target = array();
             }
             $path = array_shift($segments);
@@ -55,7 +55,7 @@ class FormFieldRegistry
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
-        while (count($segments) > 1) {
+        while (\count($segments) > 1) {
             $path = array_shift($segments);
             if (!array_key_exists($path, $target)) {
                 return;
@@ -118,9 +118,9 @@ class FormFieldRegistry
     public function set($name, $value)
     {
         $target = &$this->get($name);
-        if ((!is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
+        if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             $fields = self::create($name, $value);
             foreach ($fields->all() as $k => $v) {
                 $this->set($k, $v);
@@ -173,7 +173,7 @@ class FormFieldRegistry
     {
         foreach ($array as $k => $v) {
             $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
-            if (is_array($v)) {
+            if (\is_array($v)) {
                 $this->walk($v, $path, $output);
             } else {
                 $output[$path] = $v;

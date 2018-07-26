@@ -48,11 +48,11 @@ class FragmentHandler
      */
     public function __construct($requestStack = null, $renderers = array(), $debug = false)
     {
-        if (is_array($requestStack)) {
+        if (\is_array($requestStack)) {
             $tmp = $debug;
-            $debug = func_num_args() < 2 ? false : $renderers;
+            $debug = \func_num_args() < 2 ? false : $renderers;
             $renderers = $requestStack;
-            $requestStack = func_num_args() < 3 ? null : $tmp;
+            $requestStack = \func_num_args() < 3 ? null : $tmp;
 
             @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as first argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
         } elseif (!$requestStack instanceof RequestStack) {
@@ -62,7 +62,7 @@ class FragmentHandler
         if (null !== $requestStack && !$requestStack instanceof RequestStack) {
             throw new \InvalidArgumentException('RequestStack instance expected.');
         }
-        if (!is_array($renderers)) {
+        if (!\is_array($renderers)) {
             throw new \InvalidArgumentException('Renderers must be an array.');
         }
 

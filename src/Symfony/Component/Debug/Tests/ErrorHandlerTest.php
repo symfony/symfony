@@ -526,7 +526,7 @@ class ErrorHandlerTest extends TestCase
 
         $handler = new ErrorHandler();
         $handler->setExceptionHandler(function () use (&$args) {
-            $args = func_get_args();
+            $args = \func_get_args();
         });
 
         $handler->handleException($exception);
@@ -571,7 +571,7 @@ class ErrorHandlerTest extends TestCase
                 'backtrace' => array(456),
             );
 
-            call_user_func_array(array($handler, 'handleError'), $error);
+            \call_user_func_array(array($handler, 'handleError'), $error);
             $handler->handleFatalError($error);
 
             restore_error_handler();

@@ -28,7 +28,7 @@ class FormDataExtractorTest_SimpleValueExporter extends ValueExporter
      */
     public function exportValue($value, $depth = 1, $deep = false)
     {
-        return is_object($value) ? sprintf('object(%s)', get_class($value)) : var_export($value, true);
+        return \is_object($value) ? sprintf('object(%s)', \get_class($value)) : var_export($value, true);
     }
 }
 

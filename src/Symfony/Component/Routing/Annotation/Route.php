@@ -46,7 +46,7 @@ class Route
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, get_class($this)));
+                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, \get_class($this)));
             }
             $this->$method($value);
         }
@@ -105,7 +105,7 @@ class Route
     public function setRequirements($requirements)
     {
         if (isset($requirements['_method'])) {
-            if (0 === count($this->methods)) {
+            if (0 === \count($this->methods)) {
                 $this->methods = explode('|', $requirements['_method']);
             }
 
@@ -113,7 +113,7 @@ class Route
         }
 
         if (isset($requirements['_scheme'])) {
-            if (0 === count($this->schemes)) {
+            if (0 === \count($this->schemes)) {
                 $this->schemes = explode('|', $requirements['_scheme']);
             }
 
@@ -150,7 +150,7 @@ class Route
 
     public function setSchemes($schemes)
     {
-        $this->schemes = is_array($schemes) ? $schemes : array($schemes);
+        $this->schemes = \is_array($schemes) ? $schemes : array($schemes);
     }
 
     public function getSchemes()
@@ -160,7 +160,7 @@ class Route
 
     public function setMethods($methods)
     {
-        $this->methods = is_array($methods) ? $methods : array($methods);
+        $this->methods = \is_array($methods) ? $methods : array($methods);
     }
 
     public function getMethods()

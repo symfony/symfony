@@ -47,7 +47,7 @@ class NumberHandler implements HandlerInterface
         }
 
         $stream->push(new Token(Token::TYPE_NUMBER, $match[0], $reader->getPosition()));
-        $reader->moveForward(strlen($match[0]));
+        $reader->moveForward(\strlen($match[0]));
 
         return true;
     }

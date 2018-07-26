@@ -90,7 +90,7 @@ class JsonResponse extends Response
             );
             $parts = explode('.', $callback);
             foreach ($parts as $part) {
-                if (!preg_match($pattern, $part) || in_array($part, $reserved, true)) {
+                if (!preg_match($pattern, $part) || \in_array($part, $reserved, true)) {
                     throw new \InvalidArgumentException('The callback name is not valid.');
                 }
             }
@@ -112,7 +112,7 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             // HHVM does not trigger any warnings and let exceptions
             // thrown from a JsonSerializable object pass through.
             // If only PHP did the same...
@@ -136,7 +136,7 @@ class JsonResponse extends Response
                     restore_error_handler();
                     set_error_handler(function () use ($errorHandler) {
                         if (JSON_ERROR_NONE === json_last_error()) {
-                            return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
+                            return $errorHandler && false !== \call_user_func_array($errorHandler, \func_get_args());
                         }
                     });
                     $data = json_encode($data, $this->encodingOptions);
@@ -153,7 +153,7 @@ class JsonResponse extends Response
                 if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
                     restore_error_handler();
                 }
-                if (interface_exists('JsonSerializable', false) && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                if (interface_exists('JsonSerializable', false) && 'Exception' === \get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                     throw $e->getPrevious() ?: $e;
                 }
                 throw $e;

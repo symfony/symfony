@@ -31,7 +31,7 @@ class TimeZoneTransformer extends Transformer
     {
         $timeZone = substr($dateTime->getTimezone()->getName(), 0, 3);
 
-        if (!in_array($timeZone, array('Etc', 'UTC', 'GMT'))) {
+        if (!\in_array($timeZone, array('Etc', 'UTC', 'GMT'))) {
             throw new NotImplementedException('Time zone different than GMT or UTC is not supported as a formatting output.');
         }
 
@@ -41,7 +41,7 @@ class TimeZoneTransformer extends Transformer
         }
 
         // From ICU >= 59.1 GMT and UTC are no longer unified
-        if (in_array($timeZone, array('UTC', 'UCT', 'Universal', 'Zulu'))) {
+        if (\in_array($timeZone, array('UTC', 'UCT', 'Universal', 'Zulu'))) {
             // offset is not supported with UTC
             return $length > 3 ? 'Coordinated Universal Time' : 'UTC';
         }

@@ -110,7 +110,7 @@ class NamespacedAttributeBag extends AttributeBag
         }
 
         $parts = explode($this->namespaceCharacter, $name);
-        if (count($parts) < 2) {
+        if (\count($parts) < 2) {
             if (!$writeContext) {
                 return $array;
             }
@@ -120,7 +120,7 @@ class NamespacedAttributeBag extends AttributeBag
             return $array;
         }
 
-        unset($parts[count($parts) - 1]);
+        unset($parts[\count($parts) - 1]);
 
         foreach ($parts as $part) {
             if (null !== $array && !array_key_exists($part, $array)) {

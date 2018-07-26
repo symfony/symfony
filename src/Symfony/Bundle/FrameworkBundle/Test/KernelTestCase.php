@@ -59,7 +59,7 @@ abstract class KernelTestCase extends TestCase
         }
 
         if (!is_dir($dir)) {
-            $dir = dirname($dir);
+            $dir = \dirname($dir);
         }
 
         return $dir;
@@ -82,11 +82,11 @@ abstract class KernelTestCase extends TestCase
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
             } elseif (0 === strpos($testArg, '--configuration=')) {
-                $argPath = substr($testArg, strlen('--configuration='));
+                $argPath = substr($testArg, \strlen('--configuration='));
                 $dir = realpath($argPath);
                 break;
             } elseif (0 === strpos($testArg, '-c')) {
-                $argPath = substr($testArg, strlen('-c'));
+                $argPath = substr($testArg, \strlen('-c'));
                 $dir = realpath($argPath);
                 break;
             }
@@ -122,7 +122,7 @@ abstract class KernelTestCase extends TestCase
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
-        if (!count($results)) {
+        if (!\count($results)) {
             throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
         }
 

@@ -206,6 +206,6 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-        return count($this->groups);
+        return \count($this->groups);
     }
 }

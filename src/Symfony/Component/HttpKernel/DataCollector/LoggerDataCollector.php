@@ -155,7 +155,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     private function sanitizeContext($context)
     {
-        if (is_array($context)) {
+        if (\is_array($context)) {
             foreach ($context as $key => $value) {
                 $context[$key] = $this->sanitizeContext($value);
             }
@@ -163,16 +163,16 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             return $context;
         }
 
-        if (is_resource($context)) {
+        if (\is_resource($context)) {
             return sprintf('Resource(%s)', get_resource_type($context));
         }
 
-        if (is_object($context)) {
+        if (\is_object($context)) {
             if ($context instanceof \Exception) {
-                return sprintf('Exception(%s): %s', get_class($context), $context->getMessage());
+                return sprintf('Exception(%s): %s', \get_class($context), $context->getMessage());
             }
 
-            return sprintf('Object(%s)', get_class($context));
+            return sprintf('Object(%s)', \get_class($context));
         }
 
         return $context;

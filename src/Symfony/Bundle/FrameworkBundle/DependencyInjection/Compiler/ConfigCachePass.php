@@ -38,7 +38,7 @@ class ConfigCachePass implements CompilerPassInterface
 
         // sort by priority and flatten
         krsort($resourceCheckers);
-        $resourceCheckers = call_user_func_array('array_merge', $resourceCheckers);
+        $resourceCheckers = \call_user_func_array('array_merge', $resourceCheckers);
 
         $container->getDefinition('config_cache_factory')->replaceArgument(0, $resourceCheckers);
     }

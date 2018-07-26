@@ -69,7 +69,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
         }
 
         if ($this->placeholderPresent) {
-            $values['placeholder'] = 0 === count($valueMap);
+            $values['placeholder'] = 0 === \count($valueMap);
         }
 
         return $values;
@@ -91,7 +91,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      */
     public function reverseTransform($values)
     {
-        if (!is_array($values)) {
+        if (!\is_array($values)) {
             throw new TransformationFailedException('Expected an array.');
         }
 

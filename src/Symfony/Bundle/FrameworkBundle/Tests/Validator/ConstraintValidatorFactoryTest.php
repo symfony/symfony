@@ -22,7 +22,7 @@ class ConstraintValidatorFactoryTest extends TestCase
 {
     public function testGetInstanceCreatesValidator()
     {
-        $class = get_class($this->getMockForAbstractClass('Symfony\\Component\\Validator\\ConstraintValidator'));
+        $class = \get_class($this->getMockForAbstractClass('Symfony\\Component\\Validator\\ConstraintValidator'));
 
         $constraint = $this->getMockBuilder('Symfony\\Component\\Validator\\Constraint')->getMock();
         $constraint

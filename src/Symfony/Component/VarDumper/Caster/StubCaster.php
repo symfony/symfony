@@ -43,7 +43,7 @@ class StubCaster
     public static function cutInternals($obj, array $a, Stub $stub, $isNested)
     {
         if ($isNested) {
-            $stub->cut += count($a);
+            $stub->cut += \count($a);
 
             return array();
         }

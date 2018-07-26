@@ -28,7 +28,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
      */
     public static function enable()
     {
-        if (!is_array($functions = spl_autoload_functions())) {
+        if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
 
@@ -37,7 +37,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
         }
 
         foreach ($functions as $function) {
-            if (is_array($function) && $function[0] instanceof UniversalClassLoader) {
+            if (\is_array($function) && $function[0] instanceof UniversalClassLoader) {
                 $loader = new static();
                 $loader->registerNamespaceFallbacks($function[0]->getNamespaceFallbacks());
                 $loader->registerPrefixFallbacks($function[0]->getPrefixFallbacks());
@@ -60,7 +60,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
         if ($file = $this->findFile($class)) {
             require $file;
 
-            if (!class_exists($class, false) && !interface_exists($class, false) && (!function_exists('trait_exists') || !trait_exists($class, false))) {
+            if (!class_exists($class, false) && !interface_exists($class, false) && (!\function_exists('trait_exists') || !trait_exists($class, false))) {
                 throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but the class was not in it, the class name or namespace probably has a typo.', $class, $file));
             }
         }

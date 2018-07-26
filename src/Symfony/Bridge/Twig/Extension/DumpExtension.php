@@ -56,7 +56,7 @@ class DumpExtension extends AbstractExtension
             return;
         }
 
-        if (2 === func_num_args()) {
+        if (2 === \func_num_args()) {
             $vars = array();
             foreach ($context as $key => $value) {
                 if (!$value instanceof Template) {
@@ -66,7 +66,7 @@ class DumpExtension extends AbstractExtension
 
             $vars = array($vars);
         } else {
-            $vars = func_get_args();
+            $vars = \func_get_args();
             unset($vars[0], $vars[1]);
         }
 

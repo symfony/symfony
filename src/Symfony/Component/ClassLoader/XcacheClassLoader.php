@@ -60,7 +60,7 @@ class XcacheClassLoader
      */
     public function __construct($prefix, $decorated)
     {
-        if (!extension_loaded('xcache')) {
+        if (!\extension_loaded('xcache')) {
             throw new \RuntimeException('Unable to use XcacheClassLoader as XCache is not enabled.');
         }
 
@@ -130,6 +130,6 @@ class XcacheClassLoader
      */
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->decorated, $method), $args);
+        return \call_user_func_array(array($this->decorated, $method), $args);
     }
 }

@@ -66,7 +66,7 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     private function resolveEngines()
     {
         foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
+            if (\is_string($engine)) {
                 $this->engines[$i] = $this->container->get($engine);
             }
         }

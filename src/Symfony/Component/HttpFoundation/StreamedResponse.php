@@ -69,7 +69,7 @@ class StreamedResponse extends Response
      */
     public function setCallback($callback)
     {
-        if (!is_callable($callback)) {
+        if (!\is_callable($callback)) {
             throw new \LogicException('The Response callback must be a valid PHP callable.');
         }
         $this->callback = $callback;
@@ -108,7 +108,7 @@ class StreamedResponse extends Response
             throw new \LogicException('The Response callback must not be null.');
         }
 
-        call_user_func($this->callback);
+        \call_user_func($this->callback);
 
         return $this;
     }

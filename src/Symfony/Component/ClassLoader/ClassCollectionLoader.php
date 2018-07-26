@@ -45,7 +45,7 @@ class ClassCollectionLoader
 
         if ($adaptive) {
             $declared = array_merge(get_declared_classes(), get_declared_interfaces());
-            if (function_exists('get_declared_traits')) {
+            if (\function_exists('get_declared_traits')) {
                 $declared = array_merge($declared, get_declared_traits());
             }
 
@@ -99,7 +99,7 @@ class ClassCollectionLoader
         }
         if (!$adaptive) {
             $declared = array_merge(get_declared_classes(), get_declared_interfaces());
-            if (function_exists('get_declared_traits')) {
+            if (\function_exists('get_declared_traits')) {
                 $declared = array_merge($declared, get_declared_traits());
             }
         }
@@ -118,7 +118,7 @@ REGEX;
         $files = array();
         $content = '';
         foreach (self::getOrderedClasses($classes) as $class) {
-            if (in_array($class->getName(), $declared)) {
+            if (\in_array($class->getName(), $declared)) {
                 continue;
             }
 
@@ -136,8 +136,8 @@ REGEX;
                 if (1 >= $i) {
                     $file = var_export(implode('/', $file), true);
                 } else {
-                    $file = array_slice($file, $i);
-                    $file = str_repeat('../', count($cacheDir) - $i).implode('/', $file);
+                    $file = \array_slice($file, $i);
+                    $file = str_repeat('../', \count($cacheDir) - $i).implode('/', $file);
                     $file = '__DIR__.'.var_export('/'.$file, true);
                 }
 
@@ -173,7 +173,7 @@ REGEX;
      */
     public static function fixNamespaceDeclarations($source)
     {
-        if (!function_exists('token_get_all') || !self::$useTokenizer) {
+        if (!\function_exists('token_get_all') || !self::$useTokenizer) {
             if (preg_match('/(^|\s)namespace(.*?)\s*;/', $source)) {
                 $source = preg_replace('/(^|\s)namespace(.*?)\s*;/', "$1namespace$2\n{", $source)."}\n";
             }
@@ -190,7 +190,7 @@ REGEX;
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
-            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+            } elseif (\in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 // strip comments
                 continue;
             } elseif (T_NAMESPACE === $token[0]) {
@@ -200,7 +200,7 @@ REGEX;
                 $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (isset($tokens[++$i][1]) && in_array($tokens[$i][0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (isset($tokens[++$i][1]) && \in_array($tokens[$i][0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
                     $rawChunk .= $tokens[$i][1];
                 }
                 if ('{' === $tokens[$i]) {
@@ -275,7 +275,7 @@ REGEX;
      */
     private static function writeCacheFile($file, $content)
     {
-        $dir = dirname($file);
+        $dir = \dirname($file);
         if (!is_writable($dir)) {
             throw new \RuntimeException(sprintf('Cache directory "%s" is not writable.', $dir));
         }

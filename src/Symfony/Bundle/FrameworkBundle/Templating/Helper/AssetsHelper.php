@@ -43,10 +43,10 @@ class AssetsHelper extends Helper
     public function getUrl($path, $packageName = null, $version = null)
     {
         // BC layer to be removed in 3.0
-        if (3 === func_num_args()) {
+        if (3 === \func_num_args()) {
             @trigger_error('Forcing a version for an asset was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-            $args = func_get_args();
+            $args = \func_get_args();
 
             return $this->getLegacyAssetUrl($path, $packageName, $args[2]);
         }

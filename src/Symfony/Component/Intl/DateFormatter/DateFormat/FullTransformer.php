@@ -109,7 +109,7 @@ class FullTransformer
      */
     public function formatReplace($dateChars, $dateTime)
     {
-        $length = strlen($dateChars);
+        $length = \strlen($dateChars);
 
         if ($this->isQuoteMatch($dateChars)) {
             return $this->replaceQuoteMatch($dateChars);
@@ -149,7 +149,7 @@ class FullTransformer
 
             foreach ($this->transformers as $char => $transformer) {
                 if (isset($matches[$char])) {
-                    $length = strlen($matches[$char]['pattern']);
+                    $length = \strlen($matches[$char]['pattern']);
                     $options = array_merge($options, $transformer->extractDateOptions($matches[$char]['value'], $length));
                 }
             }
@@ -185,7 +185,7 @@ class FullTransformer
         $escapedPattern = preg_replace('/\\\[\-|\/]/', '[\/\-]', $escapedPattern);
 
         $reverseMatchingRegExp = preg_replace_callback($this->regExp, function ($matches) use ($that) {
-            $length = strlen($matches[0]);
+            $length = \strlen($matches[0]);
             $transformerIndex = $matches[0][0];
 
             $dateChars = $matches[0];
@@ -262,7 +262,7 @@ class FullTransformer
         $ret = array();
 
         foreach ($data as $key => $value) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 continue;
             }
 
@@ -317,7 +317,7 @@ class FullTransformer
 
         // Normalize yy year
         preg_match_all($this->regExp, $this->pattern, $matches);
-        if (in_array('yy', $matches[0])) {
+        if (\in_array('yy', $matches[0])) {
             $dateTime->setTimestamp(time());
             $year = $year > $dateTime->format('y') + 20 ? 1900 + $year : 2000 + $year;
         }

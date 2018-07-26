@@ -77,7 +77,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     private function processArguments(array $arguments, $inMethodCall = false)
     {
         foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
+            if (\is_array($argument)) {
                 $arguments[$k] = $this->processArguments($argument, $inMethodCall);
             } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;

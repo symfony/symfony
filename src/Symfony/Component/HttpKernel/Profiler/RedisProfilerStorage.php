@@ -216,7 +216,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The minimal expected format is "redis://[host]:port".', $this->dsn));
             }
 
-            if (!extension_loaded('redis')) {
+            if (!\extension_loaded('redis')) {
                 throw new \RuntimeException('RedisProfilerStorage requires that the redis extension is loaded.');
             }
 
@@ -317,7 +317,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
     private function isItemNameValid($name)
     {
-        $length = strlen($name);
+        $length = \strlen($name);
 
         if ($length > 2147483648) {
             throw new \RuntimeException(sprintf('The Redis item key "%s" is too long (%s bytes). Allowed maximum size is 2^31 bytes.', $name, $length));

@@ -69,6 +69,6 @@ class PropertyInfoPass implements CompilerPassInterface
         krsort($sortedServices);
 
         // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
+        return \call_user_func_array('array_merge', $sortedServices);
     }
 }

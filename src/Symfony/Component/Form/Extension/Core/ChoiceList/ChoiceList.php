@@ -81,7 +81,7 @@ class ChoiceList implements ChoiceListInterface
      */
     public function __construct($choices, array $labels, array $preferredChoices = array())
     {
-        if (!is_array($choices) && !$choices instanceof \Traversable) {
+        if (!\is_array($choices) && !$choices instanceof \Traversable) {
             throw new UnexpectedTypeException($choices, 'array or \Traversable');
         }
 
@@ -159,7 +159,7 @@ class ChoiceList implements ChoiceListInterface
                     $choices[$i] = $this->choices[$j];
                     unset($values[$i]);
 
-                    if (0 === count($values)) {
+                    if (0 === \count($values)) {
                         break 2;
                     }
                 }
@@ -183,7 +183,7 @@ class ChoiceList implements ChoiceListInterface
                     $values[$i] = $this->values[$j];
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (0 === \count($choices)) {
                         break 2;
                     }
                 }
@@ -211,7 +211,7 @@ class ChoiceList implements ChoiceListInterface
                     $indices[$i] = $j;
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (0 === \count($choices)) {
                         break 2;
                     }
                 }
@@ -239,7 +239,7 @@ class ChoiceList implements ChoiceListInterface
                     $indices[$i] = $j;
                     unset($values[$i]);
 
-                    if (0 === count($values)) {
+                    if (0 === \count($values)) {
                         break 2;
                     }
                 }
@@ -269,9 +269,9 @@ class ChoiceList implements ChoiceListInterface
                 throw new InvalidArgumentException('The structures of the choices and labels array do not match.');
             }
 
-            if (is_array($choice)) {
+            if (\is_array($choice)) {
                 // Don't do the work if the array is empty
-                if (count($choice) > 0) {
+                if (\count($choice) > 0) {
                     $this->addChoiceGroup(
                         $group,
                         $bucketForPreferred,
@@ -350,8 +350,8 @@ class ChoiceList implements ChoiceListInterface
 
         $value = $this->createValue($choice);
 
-        if (!is_string($value)) {
-            throw new InvalidConfigurationException(sprintf('The value created by the choice list is of type "%s", but should be a string.', gettype($value)));
+        if (!\is_string($value)) {
+            throw new InvalidConfigurationException(sprintf('The value created by the choice list is of type "%s", but should be a string.', \gettype($value)));
         }
 
         $view = new ChoiceView($choice, $value, $label);
@@ -380,7 +380,7 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
-        return in_array($choice, $preferredChoices, true);
+        return \in_array($choice, $preferredChoices, true);
     }
 
     /**
@@ -395,7 +395,7 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function createIndex($choice)
     {
-        return count($this->choices);
+        return \count($this->choices);
     }
 
     /**
@@ -411,7 +411,7 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function createValue($choice)
     {
-        return (string) count($this->values);
+        return (string) \count($this->values);
     }
 
     /**
@@ -454,7 +454,7 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function fixIndex($index)
     {
-        if (is_bool($index) || (string) (int) $index === (string) $index) {
+        if (\is_bool($index) || (string) (int) $index === (string) $index) {
             return (int) $index;
         }
 

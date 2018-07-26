@@ -357,9 +357,9 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertInstanceOf(ServiceClosureArgument::class, $locator['child:fooAction']);
+        $this->assertInstanceOf(ServiceClosureArgument::class, $locator['child::fooAction']);
 
-        $locator = $container->getDefinition((string) $locator['child:fooAction']->getValues()[0])->getArgument(0);
+        $locator = $container->getDefinition((string) $locator['child::fooAction']->getValues()[0])->getArgument(0);
         $this->assertInstanceOf(ServiceClosureArgument::class, $locator['someArg']);
         $this->assertEquals(new Reference('parent'), $locator['someArg']->getValues()[0]);
     }

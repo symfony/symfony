@@ -138,7 +138,7 @@ class ClassMapGeneratorTest extends TestCase
         ), ClassMapGenerator::createMap($finder));
     }
 
-    protected function assertEqualsNormalized($expected, $actual, $message = null)
+    protected function assertEqualsNormalized($expected, $actual, $message = '')
     {
         foreach ($expected as $ns => $path) {
             $expected[$ns] = str_replace('\\', '/', $path);

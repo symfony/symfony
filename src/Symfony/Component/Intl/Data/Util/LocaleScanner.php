@@ -82,4 +82,24 @@ class LocaleScanner
 
         return $aliases;
     }
+
+    /**
+     * Returns all locale parents found in the given directory.
+     */
+    public function scanParents(string $sourceDir): array
+    {
+        $locales = $this->scanLocales($sourceDir);
+        $fallbacks = array();
+
+        foreach ($locales as $locale) {
+            $content = \file_get_contents($sourceDir.'/'.$locale.'.txt');
+
+            // Aliases contain the text "%%PARENT" followed by the aliased locale
+            if (\preg_match('/%%Parent{"([^"]+)"}/', $content, $matches)) {
+                $fallbacks[$locale] = $matches[1];
+            }
+        }
+
+        return $fallbacks;
+    }
 }

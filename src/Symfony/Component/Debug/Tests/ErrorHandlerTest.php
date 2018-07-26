@@ -480,7 +480,7 @@ class ErrorHandlerTest extends TestCase
 
         $handler = new ErrorHandler();
         $handler->setExceptionHandler(function () use (&$args) {
-            $args = func_get_args();
+            $args = \func_get_args();
         });
 
         $handler->handleException($exception);

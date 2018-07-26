@@ -64,7 +64,7 @@ TXT;
 
     private function createCommandTester(array $paths = array())
     {
-        $filesystemLoader = new FilesystemLoader(array(), dirname(__DIR__).'/Fixtures');
+        $filesystemLoader = new FilesystemLoader(array(), \dirname(__DIR__).'/Fixtures');
         foreach ($paths as $namespace => $relDirs) {
             foreach ($relDirs as $relDir) {
                 $filesystemLoader->addPath($relDir, $namespace);

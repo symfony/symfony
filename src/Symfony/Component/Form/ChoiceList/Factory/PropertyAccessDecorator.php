@@ -71,7 +71,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromChoices($choices, $value = null)
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $value = new PropertyPath($value);
         }
 
@@ -82,7 +82,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (is_object($choice) || is_array($choice)) {
+                if (\is_object($choice) || \is_array($choice)) {
                     return $accessor->getValue($choice, $value);
                 }
             };
@@ -102,7 +102,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $value = new PropertyPath($value);
         }
 
@@ -113,7 +113,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (is_object($choice) || is_array($choice)) {
+                if (\is_object($choice) || \is_array($choice)) {
                     return $accessor->getValue($choice, $value);
                 }
             };
@@ -138,7 +138,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     {
         $accessor = $this->propertyAccessor;
 
-        if (is_string($label)) {
+        if (\is_string($label)) {
             $label = new PropertyPath($label);
         }
 
@@ -148,7 +148,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($preferredChoices)) {
+        if (\is_string($preferredChoices)) {
             $preferredChoices = new PropertyPath($preferredChoices);
         }
 
@@ -163,7 +163,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($index)) {
+        if (\is_string($index)) {
             $index = new PropertyPath($index);
         }
 
@@ -173,7 +173,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($groupBy)) {
+        if (\is_string($groupBy)) {
             $groupBy = new PropertyPath($groupBy);
         }
 
@@ -187,7 +187,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($attr)) {
+        if (\is_string($attr)) {
             $attr = new PropertyPath($attr);
         }
 

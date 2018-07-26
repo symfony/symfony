@@ -284,7 +284,7 @@ class EnvConfiguration implements ConfigurationInterface
                 ->booleanNode('bool_node')->end()
                 ->arrayNode('array_node')
                     ->beforeNormalization()
-                        ->ifTrue(function ($value) { return !is_array($value); })
+                        ->ifTrue(function ($value) { return !\is_array($value); })
                         ->then(function ($value) { return array('child_node' => $value); })
                     ->end()
                     ->beforeNormalization()

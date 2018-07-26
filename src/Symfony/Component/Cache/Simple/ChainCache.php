@@ -43,13 +43,13 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
 
         foreach ($caches as $cache) {
             if (!$cache instanceof CacheInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_class($cache), CacheInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', \get_class($cache), CacheInterface::class));
             }
         }
 
         $this->miss = new \stdClass();
         $this->caches = array_values($caches);
-        $this->cacheCount = count($this->caches);
+        $this->cacheCount = \count($this->caches);
         $this->defaultLifetime = 0 < $defaultLifetime ? $defaultLifetime : null;
     }
 

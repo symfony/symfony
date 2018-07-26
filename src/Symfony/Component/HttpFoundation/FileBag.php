@@ -45,7 +45,7 @@ class FileBag extends ParameterBag
      */
     public function set($key, $value)
     {
-        if (!is_array($value) && !$value instanceof UploadedFile) {
+        if (!\is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
         }
 
@@ -76,7 +76,7 @@ class FileBag extends ParameterBag
         }
 
         $file = $this->fixPhpFilesArray($file);
-        if (is_array($file)) {
+        if (\is_array($file)) {
             $keys = array_keys($file);
             sort($keys);
 
@@ -113,14 +113,14 @@ class FileBag extends ParameterBag
      */
     protected function fixPhpFilesArray($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys != $keys || !isset($data['name']) || !is_array($data['name'])) {
+        if (self::$fileKeys != $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 

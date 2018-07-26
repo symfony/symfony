@@ -37,9 +37,9 @@ class TranslatorTest extends TestCase
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(count($elementsId), $elements);
+        $this->assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
-            $this->assertTrue(in_array($element->attributes()->id, $elementsId));
+            $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
         }
     }
 
@@ -54,10 +54,10 @@ class TranslatorTest extends TestCase
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(count($elementsId), $elementsId);
+        $this->assertCount(\count($elementsId), $elementsId);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
-                $this->assertTrue(in_array($element->attributes()->id, $elementsId));
+                $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
             }
         }
         libxml_clear_errors();

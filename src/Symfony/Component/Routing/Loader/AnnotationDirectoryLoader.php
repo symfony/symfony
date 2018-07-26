@@ -80,7 +80,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
             return true;
         }
 
-        if ($type || !is_string($resource)) {
+        if ($type || !\is_string($resource)) {
             return false;
         }
 

@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\Serializer;
 
 class ConfigurationTest extends TestCase
 {

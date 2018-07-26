@@ -41,7 +41,7 @@ class TemplatingPass implements CompilerPassInterface
                 }
             }
 
-            if (count($helpers) > 0) {
+            if (\count($helpers) > 0) {
                 $definition = $container->getDefinition('templating.engine.php');
                 $definition->addMethodCall('setHelpers', array($helpers));
 

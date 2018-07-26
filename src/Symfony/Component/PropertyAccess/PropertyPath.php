@@ -76,12 +76,12 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             return;
         }
-        if (!is_string($propertyPath)) {
+        if (!\is_string($propertyPath)) {
             throw new InvalidArgumentException(sprintf(
                 'The property path constructor needs a string or an instance of '.
                 '"Symfony\Component\PropertyAccess\PropertyPath". '.
                 'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
+                \is_object($propertyPath) ? \get_class($propertyPath) : \gettype($propertyPath)
             ));
         }
 
@@ -107,7 +107,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             $this->elements[] = $element;
 
-            $position += strlen($matches[1]);
+            $position += \strlen($matches[1]);
             $remaining = $matches[4];
             $pattern = '/^(\.([^\.|\[]++)|\[([^\]]++)\])(.*)/';
         }
@@ -121,7 +121,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             ));
         }
 
-        $this->length = count($this->elements);
+        $this->length = \count($this->elements);
     }
 
     /**

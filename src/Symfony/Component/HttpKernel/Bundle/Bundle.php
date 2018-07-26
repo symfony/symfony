@@ -72,7 +72,7 @@ abstract class Bundle implements BundleInterface
 
             if (null !== $extension) {
                 if (!$extension instanceof ExtensionInterface) {
-                    throw new \LogicException(sprintf('Extension %s must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface.', get_class($extension)));
+                    throw new \LogicException(sprintf('Extension %s must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface.', \get_class($extension)));
                 }
 
                 // check naming convention
@@ -120,7 +120,7 @@ abstract class Bundle implements BundleInterface
     {
         if (null === $this->path) {
             $reflected = new \ReflectionObject($this);
-            $this->path = dirname($reflected->getFileName());
+            $this->path = \dirname($reflected->getFileName());
         }
 
         return $this->path;

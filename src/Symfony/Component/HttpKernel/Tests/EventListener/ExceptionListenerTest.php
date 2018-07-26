@@ -37,9 +37,9 @@ class ExceptionListenerTest extends TestCase
         $logger = new TestLogger();
         $l = new ExceptionListener('foo', $logger);
 
-        $_logger = new \ReflectionProperty(get_class($l), 'logger');
+        $_logger = new \ReflectionProperty(\get_class($l), 'logger');
         $_logger->setAccessible(true);
-        $_controller = new \ReflectionProperty(get_class($l), 'controller');
+        $_controller = new \ReflectionProperty(\get_class($l), 'controller');
         $_controller->setAccessible(true);
 
         $this->assertSame($logger, $_logger->getValue($l));
@@ -161,7 +161,7 @@ class TestLogger extends Logger implements DebugLoggerInterface
 {
     public function countErrors()
     {
-        return count($this->logs['critical']);
+        return \count($this->logs['critical']);
     }
 }
 

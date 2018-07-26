@@ -111,10 +111,10 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, get_class($resolvedType->getInnerType()));
+                    $message = sprintf('Option "%s" is not defined in "%s".', $option, \get_class($resolvedType->getInnerType()));
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
-                        if (1 == count($alternatives)) {
+                        if (1 == \count($alternatives)) {
                             $message .= "\n\nDid you mean this?\n    ";
                         } else {
                             $message .= "\n\nDid you mean one of these?\n    ";
@@ -147,12 +147,12 @@ EOF
             }
         }
 
-        if (0 === $count = count($classes)) {
+        if (0 === $count = \count($classes)) {
             $message = sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
 
             $allTypes = array_merge($this->getCoreTypes(), $this->types);
             if ($alternatives = $this->findAlternatives($shortClassName, $allTypes)) {
-                if (1 == count($alternatives)) {
+                if (1 == \count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
                 } else {
                     $message .= "\n\nDid you mean one of these?\n    ";
@@ -178,7 +178,7 @@ EOF
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $loadTypesRefMethod->setAccessible(true);
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(function (FormTypeInterface $type) { return get_class($type); }, $coreTypes);
+        $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;
@@ -189,7 +189,7 @@ EOF
         $alternatives = array();
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
-            if ($lev <= strlen($name) / 3 || false !== strpos($item, $name)) {
+            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
                 $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
             }
         }

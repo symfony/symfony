@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                     ->example(array('MyBundle::form.html.twig'))
                     ->validate()
-                        ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                        ->ifTrue(function ($v) { return !\in_array('form_div_layout.html.twig', $v); })
                         ->then(function ($v) {
                             return array_merge(array('form_div_layout.html.twig'), $v);
                         })
@@ -78,7 +78,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return is_string($v) && 0 === strpos($v, '@'); })
+                            ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {
                                 if (0 === strpos($v, '@@')) {
                                     return substr($v, 1);
@@ -89,7 +89,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                if (is_array($v)) {
+                                if (\is_array($v)) {
                                     $keys = array_keys($v);
                                     sort($keys);
 
@@ -149,7 +149,7 @@ class Configuration implements ConfigurationInterface
                         ->then(function ($paths) {
                             $normalized = array();
                             foreach ($paths as $path => $namespace) {
-                                if (is_array($namespace)) {
+                                if (\is_array($namespace)) {
                                     // xml
                                     $path = $namespace['value'];
                                     $namespace = $namespace['namespace'];

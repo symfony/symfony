@@ -45,7 +45,7 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
             throw new BadCredentialsException('Invalid password.');
         }
 
-        if (!in_array($this->algorithm, hash_algos(), true)) {
+        if (!\in_array($this->algorithm, hash_algos(), true)) {
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 

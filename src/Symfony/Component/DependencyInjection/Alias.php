@@ -21,7 +21,7 @@ class Alias
     {
         $this->id = $id;
         $this->public = $public;
-        $this->private = 2 > func_num_args();
+        $this->private = 2 > \func_num_args();
     }
 
     /**

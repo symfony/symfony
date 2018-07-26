@@ -87,7 +87,7 @@ class Terminal
      */
     private static function getConsoleMode()
     {
-        if (!function_exists('proc_open')) {
+        if (!\function_exists('proc_open')) {
             return;
         }
 
@@ -96,7 +96,7 @@ class Terminal
             2 => array('pipe', 'w'),
         );
         $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (is_resource($process)) {
+        if (\is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
             fclose($pipes[2]);
@@ -115,7 +115,7 @@ class Terminal
      */
     private static function getSttyColumns()
     {
-        if (!function_exists('proc_open')) {
+        if (!\function_exists('proc_open')) {
             return;
         }
 
@@ -125,7 +125,7 @@ class Terminal
         );
 
         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (is_resource($process)) {
+        if (\is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
             fclose($pipes[2]);

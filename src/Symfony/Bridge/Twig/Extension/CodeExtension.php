@@ -34,7 +34,7 @@ class CodeExtension extends AbstractExtension
     public function __construct($fileLinkFormat, string $rootDir, string $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
+        $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, \dirname($rootDir)).DIRECTORY_SEPARATOR;
         $this->charset = $charset;
     }
 
@@ -94,7 +94,7 @@ class CodeExtension extends AbstractExtension
                 $short = array_pop($parts);
                 $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -105,7 +105,7 @@ class CodeExtension extends AbstractExtension
                 $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), ENT_COMPAT | ENT_SUBSTITUTE, $this->charset));
             }
 
-            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
         }
 
         return implode(', ', $result);
@@ -148,10 +148,10 @@ class CodeExtension extends AbstractExtension
 
             $lines = array();
             if (0 > $srcContext) {
-                $srcContext = count($content);
+                $srcContext = \count($content);
             }
 
-            for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, count($content)); $i <= $max; ++$i) {
+            for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, \count($content)); $i <= $max; ++$i) {
                 $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" name="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
@@ -175,7 +175,7 @@ class CodeExtension extends AbstractExtension
         if (null === $text) {
             $text = str_replace('/', DIRECTORY_SEPARATOR, $file);
             if (0 === strpos($text, $this->rootDir)) {
-                $text = substr($text, strlen($this->rootDir));
+                $text = substr($text, \strlen($this->rootDir));
                 $text = explode(DIRECTORY_SEPARATOR, $text, 2);
                 $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->rootDir, $text[0], isset($text[1]) ? DIRECTORY_SEPARATOR.$text[1] : '');
             }
@@ -203,7 +203,7 @@ class CodeExtension extends AbstractExtension
     public function getFileLink($file, $line)
     {
         if ($fmt = $this->fileLinkFormat) {
-            return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+            return \is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
         }
 
         return false;

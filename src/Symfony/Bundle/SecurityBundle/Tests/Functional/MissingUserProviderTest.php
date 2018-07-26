@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 class MissingUserProviderTest extends WebTestCase
 {
     /**

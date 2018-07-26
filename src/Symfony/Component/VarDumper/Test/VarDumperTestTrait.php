@@ -48,7 +48,7 @@ trait VarDumperTestTrait
 
     private function prepareExpectation($expected, $filter)
     {
-        if (!is_string($expected)) {
+        if (!\is_string($expected)) {
             $expected = $this->getDump($expected, null, $filter);
         }
 

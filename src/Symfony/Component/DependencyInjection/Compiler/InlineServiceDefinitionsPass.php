@@ -70,7 +70,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             $ids = array_keys($this->cloningIds);
             $ids[] = $id;
 
-            throw new ServiceCircularReferenceException($id, array_slice($ids, array_search($id, $ids)));
+            throw new ServiceCircularReferenceException($id, \array_slice($ids, array_search($id, $ids)));
         }
 
         $this->cloningIds[$id] = true;
@@ -122,11 +122,11 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             $ids[] = $edge->getSourceNode()->getId();
         }
 
-        if (count(array_unique($ids)) > 1) {
+        if (\count(array_unique($ids)) > 1) {
             return false;
         }
 
-        if (count($ids) > 1 && is_array($factory = $definition->getFactory()) && ($factory[0] instanceof Reference || $factory[0] instanceof Definition)) {
+        if (\count($ids) > 1 && \is_array($factory = $definition->getFactory()) && ($factory[0] instanceof Reference || $factory[0] instanceof Definition)) {
             return false;
         }
 

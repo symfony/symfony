@@ -43,7 +43,7 @@ class Event extends BaseEvent
         if (null === $workflow) {
             @trigger_error(sprintf('Passing only three parameters to "%s" is deprecated since Symfony 4.1. Pass a %s instance as fourth parameter instead.', __METHOD__, WorkflowInterface::class), E_USER_DEPRECATED);
             $this->workflowName = 'unnamed';
-        } elseif (is_string($workflow)) {
+        } elseif (\is_string($workflow)) {
             @trigger_error(sprintf('Passing a string as the 4th parameter of "%s()" is deprecated since Symfony 4.1. Pass a %s instance instead.', __METHOD__, WorkflowInterface::class), E_USER_DEPRECATED);
             $this->workflowName = $workflow;
         } elseif ($workflow instanceof WorkflowInterface) {

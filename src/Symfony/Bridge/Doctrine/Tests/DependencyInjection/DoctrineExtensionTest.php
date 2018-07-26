@@ -68,7 +68,7 @@ class DoctrineExtensionTest extends TestCase
             'SecondBundle' => 'My\SecondBundle',
         );
 
-        $reflection = new \ReflectionClass(get_class($this->extension));
+        $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
         $method->setAccessible(true);
 
@@ -157,7 +157,7 @@ class DoctrineExtensionTest extends TestCase
             'SecondBundle' => 'My\SecondBundle',
         );
 
-        $reflection = new \ReflectionClass(get_class($this->extension));
+        $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
         $method->setAccessible(true);
 

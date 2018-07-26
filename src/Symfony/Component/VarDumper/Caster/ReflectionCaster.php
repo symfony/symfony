@@ -198,7 +198,7 @@ class ReflectionCaster
 
         if ($v = $c->getStaticVariables()) {
             foreach ($v as $k => &$v) {
-                if (is_object($v)) {
+                if (\is_object($v)) {
                     $a[$prefix.'use']['$'.$k] = new CutStub($v);
                 } else {
                     $a[$prefix.'use']['$'.$k] = &$v;

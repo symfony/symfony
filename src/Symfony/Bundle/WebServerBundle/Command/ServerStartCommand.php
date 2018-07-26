@@ -90,7 +90,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if (!extension_loaded('pcntl')) {
+        if (!\extension_loaded('pcntl')) {
             $io->error(array(
                 'This command needs the pcntl extension to run.',
                 'You can either install it or use the "server:run" command instead.',

@@ -31,7 +31,7 @@ class ProxyHelper
         if (!$type) {
             return;
         }
-        if (!is_string($type)) {
+        if (!\is_string($type)) {
             $name = $type->getName();
 
             if ($type->isBuiltin()) {

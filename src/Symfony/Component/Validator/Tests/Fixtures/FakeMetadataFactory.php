@@ -23,13 +23,13 @@ class FakeMetadataFactory implements MetadataFactoryInterface
     {
         $hash = null;
 
-        if (is_object($class)) {
+        if (\is_object($class)) {
             $hash = spl_object_hash($class);
-            $class = get_class($class);
+            $class = \get_class($class);
         }
 
-        if (!is_string($class)) {
-            throw new NoSuchMetadataException(sprintf('No metadata for type %s', gettype($class)));
+        if (!\is_string($class)) {
+            throw new NoSuchMetadataException(sprintf('No metadata for type %s', \gettype($class)));
         }
 
         if (!isset($this->metadatas[$class])) {
@@ -47,12 +47,12 @@ class FakeMetadataFactory implements MetadataFactoryInterface
     {
         $hash = null;
 
-        if (is_object($class)) {
+        if (\is_object($class)) {
             $hash = spl_object_hash($class);
-            $class = get_class($class);
+            $class = \get_class($class);
         }
 
-        if (!is_string($class)) {
+        if (!\is_string($class)) {
             return false;
         }
 
@@ -66,7 +66,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
 
     public function addMetadataForValue($value, MetadataInterface $metadata)
     {
-        $key = is_object($value) ? spl_object_hash($value) : $value;
+        $key = \is_object($value) ? spl_object_hash($value) : $value;
         $this->metadatas[$key] = $metadata;
     }
 }

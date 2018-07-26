@@ -71,7 +71,7 @@ class ExprBuilder
      */
     public function ifString()
     {
-        $this->ifPart = function ($v) { return is_string($v); };
+        $this->ifPart = function ($v) { return \is_string($v); };
 
         return $this;
     }
@@ -107,7 +107,7 @@ class ExprBuilder
      */
     public function ifArray()
     {
-        $this->ifPart = function ($v) { return is_array($v); };
+        $this->ifPart = function ($v) { return \is_array($v); };
 
         return $this;
     }
@@ -119,7 +119,7 @@ class ExprBuilder
      */
     public function ifInArray(array $array)
     {
-        $this->ifPart = function ($v) use ($array) { return in_array($v, $array, true); };
+        $this->ifPart = function ($v) use ($array) { return \in_array($v, $array, true); };
 
         return $this;
     }
@@ -131,7 +131,7 @@ class ExprBuilder
      */
     public function ifNotInArray(array $array)
     {
-        $this->ifPart = function ($v) use ($array) { return !in_array($v, $array, true); };
+        $this->ifPart = function ($v) use ($array) { return !\in_array($v, $array, true); };
 
         return $this;
     }
@@ -143,7 +143,7 @@ class ExprBuilder
      */
     public function castToArray()
     {
-        $this->ifPart = function ($v) { return !is_array($v); };
+        $this->ifPart = function ($v) { return !\is_array($v); };
         $this->thenPart = function ($v) { return array($v); };
 
         return $this;

@@ -40,15 +40,15 @@ class Route
     public function __construct(array $data)
     {
         if (isset($data['localized_paths'])) {
-            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', get_class($this)));
+            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', \get_class($this)));
         }
 
         if (isset($data['value'])) {
-            $data[is_array($data['value']) ? 'localized_paths' : 'path'] = $data['value'];
+            $data[\is_array($data['value']) ? 'localized_paths' : 'path'] = $data['value'];
             unset($data['value']);
         }
 
-        if (isset($data['path']) && is_array($data['path'])) {
+        if (isset($data['path']) && \is_array($data['path'])) {
             $data['localized_paths'] = $data['path'];
             unset($data['path']);
         }
@@ -56,7 +56,7 @@ class Route
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, get_class($this)));
+                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, \get_class($this)));
             }
             $this->$method($value);
         }
@@ -134,7 +134,7 @@ class Route
 
     public function setSchemes($schemes)
     {
-        $this->schemes = is_array($schemes) ? $schemes : array($schemes);
+        $this->schemes = \is_array($schemes) ? $schemes : array($schemes);
     }
 
     public function getSchemes()
@@ -144,7 +144,7 @@ class Route
 
     public function setMethods($methods)
     {
-        $this->methods = is_array($methods) ? $methods : array($methods);
+        $this->methods = \is_array($methods) ? $methods : array($methods);
     }
 
     public function getMethods()

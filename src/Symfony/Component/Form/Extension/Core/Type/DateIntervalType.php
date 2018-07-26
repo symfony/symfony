@@ -186,7 +186,7 @@ class DateIntervalType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault, $timeParts) {
-            if (is_array($placeholder)) {
+            if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
                 return array_merge(array_fill_keys($timeParts, $default), $placeholder);

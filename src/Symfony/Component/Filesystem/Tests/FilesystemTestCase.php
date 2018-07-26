@@ -48,7 +48,7 @@ class FilesystemTestCase extends TestCase
             $targetFile = tempnam(sys_get_temp_dir(), 'li');
             if (true !== @link($originFile, $targetFile)) {
                 $report = error_get_last();
-                if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
+                if (\is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
                     self::$linkOnWindows = false;
                 }
             } else {
@@ -60,7 +60,7 @@ class FilesystemTestCase extends TestCase
             $targetDir = tempnam(sys_get_temp_dir(), 'sl');
             if (true !== @symlink($originDir, $targetDir)) {
                 $report = error_get_last();
-                if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
+                if (\is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
                     self::$symlinkOnWindows = false;
                 }
             } else {
@@ -129,7 +129,7 @@ class FilesystemTestCase extends TestCase
 
     protected function markAsSkippedIfLinkIsMissing()
     {
-        if (!function_exists('link')) {
+        if (!\function_exists('link')) {
             $this->markTestSkipped('link is not supported');
         }
 
@@ -159,7 +159,7 @@ class FilesystemTestCase extends TestCase
 
     protected function markAsSkippedIfPosixIsMissing()
     {
-        if (!function_exists('posix_isatty')) {
+        if (!\function_exists('posix_isatty')) {
             $this->markTestSkipped('Function posix_isatty is required.');
         }
     }

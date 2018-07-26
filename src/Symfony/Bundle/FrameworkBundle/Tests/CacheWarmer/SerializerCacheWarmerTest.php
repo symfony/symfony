@@ -39,7 +39,7 @@ class SerializerCacheWarmerTest extends TestCase
         $fallbackPool = new ArrayAdapter();
 
         $warmer = new SerializerCacheWarmer($loaders, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 
@@ -68,7 +68,7 @@ class SerializerCacheWarmerTest extends TestCase
         $fallbackPool = new ArrayAdapter();
 
         $warmer = new SerializerCacheWarmer(array(), $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 

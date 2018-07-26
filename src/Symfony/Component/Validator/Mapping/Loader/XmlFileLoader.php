@@ -75,17 +75,17 @@ class XmlFileLoader extends FileLoader
         $constraints = array();
 
         foreach ($nodes as $node) {
-            if (count($node) > 0) {
-                if (count($node->value) > 0) {
+            if (\count($node) > 0) {
+                if (\count($node->value) > 0) {
                     $options = $this->parseValues($node->value);
-                } elseif (count($node->constraint) > 0) {
+                } elseif (\count($node->constraint) > 0) {
                     $options = $this->parseConstraints($node->constraint);
-                } elseif (count($node->option) > 0) {
+                } elseif (\count($node->option) > 0) {
                     $options = $this->parseOptions($node->option);
                 } else {
                     $options = array();
                 }
-            } elseif (strlen((string) $node) > 0) {
+            } elseif (\strlen((string) $node) > 0) {
                 $options = XmlUtils::phpize(trim($node));
             } else {
                 $options = null;
@@ -109,10 +109,10 @@ class XmlFileLoader extends FileLoader
         $values = array();
 
         foreach ($nodes as $node) {
-            if (count($node) > 0) {
-                if (count($node->value) > 0) {
+            if (\count($node) > 0) {
+                if (\count($node->value) > 0) {
                     $value = $this->parseValues($node->value);
-                } elseif (count($node->constraint) > 0) {
+                } elseif (\count($node->constraint) > 0) {
                     $value = $this->parseConstraints($node->constraint);
                 } else {
                     $value = array();
@@ -143,17 +143,17 @@ class XmlFileLoader extends FileLoader
         $options = array();
 
         foreach ($nodes as $node) {
-            if (count($node) > 0) {
-                if (count($node->value) > 0) {
+            if (\count($node) > 0) {
+                if (\count($node->value) > 0) {
                     $value = $this->parseValues($node->value);
-                } elseif (count($node->constraint) > 0) {
+                } elseif (\count($node->constraint) > 0) {
                     $value = $this->parseConstraints($node->constraint);
                 } else {
                     $value = array();
                 }
             } else {
                 $value = XmlUtils::phpize($node);
-                if (is_string($value)) {
+                if (\is_string($value)) {
                     $value = trim($value);
                 }
             }
@@ -203,12 +203,12 @@ class XmlFileLoader extends FileLoader
 
     private function loadClassMetadataFromXml(ClassMetadata $metadata, \SimpleXMLElement $classDescription)
     {
-        if (count($classDescription->{'group-sequence-provider'}) > 0) {
+        if (\count($classDescription->{'group-sequence-provider'}) > 0) {
             $metadata->setGroupSequenceProvider(true);
         }
 
         foreach ($classDescription->{'group-sequence'} as $groupSequence) {
-            if (count($groupSequence->value) > 0) {
+            if (\count($groupSequence->value) > 0) {
                 $metadata->setGroupSequence($this->parseValues($groupSequence[0]->value));
             }
         }

@@ -90,7 +90,7 @@ final class Definition
 
     private function addPlace(string $place)
     {
-        if (!count($this->places)) {
+        if (!\count($this->places)) {
             $this->initialPlace = $place;
         }
 

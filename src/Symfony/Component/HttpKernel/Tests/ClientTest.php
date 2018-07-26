@@ -119,7 +119,7 @@ class ClientTest extends TestCase
             $this->assertEquals(1, $file->getSize());
         }
 
-        $file->move(dirname($target), basename($target));
+        $file->move(\dirname($target), basename($target));
 
         $this->assertFileExists($target);
         unlink($target);

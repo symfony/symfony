@@ -68,7 +68,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
         $types = explode('|', $types);
 
         foreach ($types as $type) {
-            if (!in_array($type, self::$allowedTypes)) {
+            if (!\in_array($type, self::$allowedTypes)) {
                 throw new InvalidArgumentException(sprintf('Invalid type "%s" returned by "%s::getProvidedTypes()", expected one of "%s".', $type, $class, implode('", "', self::$allowedTypes)));
             }
         }

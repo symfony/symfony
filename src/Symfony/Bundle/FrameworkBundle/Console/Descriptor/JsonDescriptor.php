@@ -90,7 +90,7 @@ class JsonDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
         } else {
-            $this->writeData(get_class($service), $options);
+            $this->writeData(\get_class($service), $options);
         }
     }
 
@@ -121,7 +121,7 @@ class JsonDescriptor extends Descriptor
             } elseif ($service instanceof Definition) {
                 $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments);
             } else {
-                $data['services'][$serviceId] = get_class($service);
+                $data['services'][$serviceId] = \get_class($service);
             }
         }
 
@@ -200,7 +200,7 @@ class JsonDescriptor extends Descriptor
             'hostRegex' => '' !== $route->getHost() ? $route->compile()->getHostRegex() : '',
             'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
-            'class' => get_class($route),
+            'class' => \get_class($route),
             'defaults' => $route->getDefaults(),
             'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
             'options' => $route->getOptions(),
@@ -227,7 +227,7 @@ class JsonDescriptor extends Descriptor
         $data['file'] = $definition->getFile();
 
         if ($factory = $definition->getFactory()) {
-            if (is_array($factory)) {
+            if (\is_array($factory)) {
                 if ($factory[0] instanceof Reference) {
                     $data['factory_service'] = (string) $factory[0];
                 } elseif ($factory[0] instanceof Definition) {
@@ -242,7 +242,7 @@ class JsonDescriptor extends Descriptor
         }
 
         $calls = $definition->getMethodCalls();
-        if (count($calls) > 0) {
+        if (\count($calls) > 0) {
             $data['calls'] = array();
             foreach ($calls as $callData) {
                 $data['calls'][] = $callData[0];
@@ -299,12 +299,12 @@ class JsonDescriptor extends Descriptor
     {
         $data = array();
 
-        if (is_array($callable)) {
+        if (\is_array($callable)) {
             $data['type'] = 'function';
 
-            if (is_object($callable[0])) {
+            if (\is_object($callable[0])) {
                 $data['name'] = $callable[1];
-                $data['class'] = get_class($callable[0]);
+                $data['class'] = \get_class($callable[0]);
             } else {
                 if (0 !== strpos($callable[1], 'parent::')) {
                     $data['name'] = $callable[1];
@@ -321,7 +321,7 @@ class JsonDescriptor extends Descriptor
             return $data;
         }
 
-        if (is_string($callable)) {
+        if (\is_string($callable)) {
             $data['type'] = 'function';
 
             if (false === strpos($callable, '::')) {
@@ -345,7 +345,7 @@ class JsonDescriptor extends Descriptor
 
         if (method_exists($callable, '__invoke')) {
             $data['type'] = 'object';
-            $data['name'] = get_class($callable);
+            $data['name'] = \get_class($callable);
 
             return $data;
         }
@@ -355,7 +355,7 @@ class JsonDescriptor extends Descriptor
 
     private function describeValue($value, $omitTags, $showArguments)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $data = array();
             foreach ($value as $k => $v) {
                 $data[$k] = $this->describeValue($v, $omitTags, $showArguments);

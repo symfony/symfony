@@ -12,11 +12,11 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
 /**
  * AnnotationClassLoader loads routing information from a PHP class and its methods.

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -22,8 +24,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
-use Symfony\Component\HttpKernel\EventListener\TestSessionListener as BaseTestSessionListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\EventListener\TestSessionListener as BaseTestSessionListener;
 
 /**
  * TestSessionListener.

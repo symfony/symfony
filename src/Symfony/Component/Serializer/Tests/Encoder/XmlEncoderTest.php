@@ -12,13 +12,13 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class XmlEncoderTest extends TestCase
 {

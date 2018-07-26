@@ -12,9 +12,9 @@
 namespace Symfony\Bridge\Doctrine\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * Merge changes from the request to a Doctrine\Common\Collections\Collection instance.

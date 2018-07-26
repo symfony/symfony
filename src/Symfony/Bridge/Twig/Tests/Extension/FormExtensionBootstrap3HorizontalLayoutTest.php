@@ -12,11 +12,11 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
-use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractBootstrap3HorizontalLayoutTest;
 use Twig\Environment;

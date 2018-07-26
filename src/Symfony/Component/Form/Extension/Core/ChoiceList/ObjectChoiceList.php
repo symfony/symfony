@@ -13,12 +13,12 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 @trigger_error('The '.__NAMESPACE__.'\ObjectChoiceList class is deprecated since Symfony 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
 
-use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * A choice list for object choices.

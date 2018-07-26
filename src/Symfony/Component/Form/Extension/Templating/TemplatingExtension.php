@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Templating;
 
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
@@ -18,7 +19,6 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Templating\PhpEngine;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 
 /**
  * Integrates the Templating component with the Form library.

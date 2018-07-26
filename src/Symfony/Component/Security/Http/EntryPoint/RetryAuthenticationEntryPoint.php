@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * RetryAuthenticationEntryPoint redirects URL based on the configured scheme.

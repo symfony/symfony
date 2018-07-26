@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\ChoiceList\Factory;
 
-use Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;

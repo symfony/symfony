@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProfilerController extends ContainerAware
 {

@@ -16,8 +16,8 @@ use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestLis
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

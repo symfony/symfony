@@ -13,8 +13,8 @@ namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\BufferingLogger;
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 
 /**

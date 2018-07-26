@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * TranslationLoader loads translation messages from translation files.

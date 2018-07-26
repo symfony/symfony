@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Fragment;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Fragment\ContainerAwareHIncludeFragmentRenderer;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

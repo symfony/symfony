@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Monolog\Handler;
 
-use Monolog\Logger;
 use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**

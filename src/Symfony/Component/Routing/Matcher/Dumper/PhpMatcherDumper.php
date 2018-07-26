@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.

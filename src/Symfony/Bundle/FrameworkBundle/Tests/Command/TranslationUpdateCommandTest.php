@@ -12,11 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel;
 
 class TranslationUpdateCommandTest extends TestCase

@@ -13,9 +13,9 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use Symfony\Component\Config\Definition\Processor;
 
 class ArrayNodeDefinitionTest extends TestCase
 {

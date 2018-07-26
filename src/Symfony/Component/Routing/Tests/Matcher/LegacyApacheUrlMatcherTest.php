@@ -12,9 +12,9 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\ApacheUrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @group legacy

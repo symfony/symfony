@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\Version;
 
 class ORMQueryBuilderLoaderTest extends TestCase
 {

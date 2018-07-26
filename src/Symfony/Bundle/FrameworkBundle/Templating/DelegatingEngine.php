@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
 
 /**
  * DelegatingEngine selects an engine for a given template.

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Process\Pipes;
 
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 /**
  * WindowsPipes implementation uses temporary files as handles.

@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
-use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
  * Uses a service container to create constraint validators.

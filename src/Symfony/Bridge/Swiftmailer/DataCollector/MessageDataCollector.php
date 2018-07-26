@@ -13,10 +13,10 @@ namespace Symfony\Bridge\Swiftmailer\DataCollector;
 
 @trigger_error('The '.__NAMESPACE__.'\MessageDataCollector class is deprecated since Symfony 2.4 and will be removed in 3.0. Use the Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector class from SwiftmailerBundle instead. Require symfony/swiftmailer-bundle package to download SwiftmailerBundle with Composer.', E_USER_DEPRECATED);
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

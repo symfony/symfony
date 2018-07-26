@@ -13,8 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Extractor\AbstractFileExtractor;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * PhpExtractor extracts translation messages from a PHP template.

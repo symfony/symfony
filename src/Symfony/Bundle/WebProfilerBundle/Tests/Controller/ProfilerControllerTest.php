@@ -13,8 +13,8 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ProfilerControllerTest extends TestCase
 {

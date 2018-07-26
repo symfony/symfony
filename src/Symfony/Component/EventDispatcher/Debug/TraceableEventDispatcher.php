@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Psr\Log\LoggerInterface;
 
 /**
  * Collects some data about event listeners.

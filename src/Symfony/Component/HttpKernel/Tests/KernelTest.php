@@ -14,15 +14,15 @@ namespace Symfony\Component\HttpKernel\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\Config\EnvParametersResource;
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Config\EnvParametersResource;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 
 class KernelTest extends TestCase
 {

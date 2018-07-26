@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ScopeCrossingInjectionException;
 use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Checks the validity of references.

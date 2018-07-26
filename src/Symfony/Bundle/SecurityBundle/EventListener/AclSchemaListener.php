@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\Security\Acl\Dbal\Schema;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Symfony\Component\Security\Acl\Dbal\Schema;
 
 /**
  * Merges ACL schema into the given schema.

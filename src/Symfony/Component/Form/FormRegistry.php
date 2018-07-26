@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\ExceptionInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * The central registry of the Form component.

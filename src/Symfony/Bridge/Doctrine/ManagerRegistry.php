@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine;
 
+use Doctrine\Common\Persistence\AbstractManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\Persistence\AbstractManagerRegistry;
 
 /**
  * References Doctrine connections and entity/document managers.

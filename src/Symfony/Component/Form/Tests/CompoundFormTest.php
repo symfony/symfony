@@ -18,9 +18,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 class CompoundFormTest extends AbstractFormTest
 {

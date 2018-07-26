@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Overwrites a service but keeps the overridden one.

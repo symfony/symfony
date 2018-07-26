@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class RedirectableUrlMatcherTest extends TestCase
 {

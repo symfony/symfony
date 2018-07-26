@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 
 abstract class TypeTestCase extends BaseTypeTestCase
 {

@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

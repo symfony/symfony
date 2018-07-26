@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\EventListener\FragmentListener;
 
 /**

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\ConfigCacheInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

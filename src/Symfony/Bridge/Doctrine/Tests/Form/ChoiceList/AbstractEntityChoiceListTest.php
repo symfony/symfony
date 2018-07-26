@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest;
 
 if (!class_exists('Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest')) {

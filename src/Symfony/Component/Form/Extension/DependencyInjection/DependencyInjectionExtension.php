@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Extension\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
-use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtension implements FormExtensionInterface
 {

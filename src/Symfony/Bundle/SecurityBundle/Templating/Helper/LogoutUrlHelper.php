@@ -13,8 +13,8 @@ namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**

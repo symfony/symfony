@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Yaml;
 
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Exception\DumpException;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
  * Inline implements a YAML parser/dumper for the YAML inline syntax.

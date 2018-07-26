@@ -18,8 +18,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Twig\Template;
 
 /**

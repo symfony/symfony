@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
-use Symfony\Component\HttpKernel\EventListener\SessionListener as BaseSessionListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\EventListener\SessionListener as BaseSessionListener;
 
 /**
  * Sets the session in the request.

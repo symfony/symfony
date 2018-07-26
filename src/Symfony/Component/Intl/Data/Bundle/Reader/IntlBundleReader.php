@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Intl\Data\Bundle\Reader;
 
-use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 
 /**
  * Reads binary .res resource bundles.

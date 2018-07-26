@@ -12,14 +12,14 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class RequestDataCollectorTest extends TestCase
 {

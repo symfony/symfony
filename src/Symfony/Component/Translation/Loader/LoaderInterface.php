@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * LoaderInterface is the interface implemented by all translation loaders.

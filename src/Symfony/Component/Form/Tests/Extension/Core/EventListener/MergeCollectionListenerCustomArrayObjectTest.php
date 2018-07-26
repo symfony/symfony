@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
 
 class MergeCollectionListenerCustomArrayObjectTest extends MergeCollectionListenerTest
 {

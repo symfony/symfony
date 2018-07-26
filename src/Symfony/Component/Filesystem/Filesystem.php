@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Filesystem;
 
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Provides basic utility to manipulate the file system.

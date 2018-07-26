@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
-use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
-use Symfony\Component\Translation\Translator as BaseTranslator;
-use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
  * Translator.

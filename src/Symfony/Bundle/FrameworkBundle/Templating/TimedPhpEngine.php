@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * Times the time spent to render a template.

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
  * This class provides a fluent interface for defining a node.

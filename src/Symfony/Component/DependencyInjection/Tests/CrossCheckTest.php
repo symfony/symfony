@@ -12,8 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CrossCheckTest extends TestCase
 {

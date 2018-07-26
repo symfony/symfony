@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 
 class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
 {

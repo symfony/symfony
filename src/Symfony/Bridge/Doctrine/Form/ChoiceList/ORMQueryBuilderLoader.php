@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\DBAL\Connection;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Test;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Forms;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

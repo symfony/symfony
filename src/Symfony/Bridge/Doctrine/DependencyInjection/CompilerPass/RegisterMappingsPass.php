@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Base class for the doctrine bundles to provide a compiler pass class that

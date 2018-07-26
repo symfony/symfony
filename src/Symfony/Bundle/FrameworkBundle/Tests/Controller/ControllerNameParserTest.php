@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\ClassLoader\ClassLoader;
 
 class ControllerNameParserTest extends TestCase

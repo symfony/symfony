@@ -12,8 +12,8 @@
 namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Adapter\AdapterInterface;
-use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 use Symfony\Component\Finder\Adapter\BsdFindAdapter;
+use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;

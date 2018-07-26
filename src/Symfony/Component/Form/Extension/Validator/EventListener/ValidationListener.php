@@ -12,12 +12,12 @@
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

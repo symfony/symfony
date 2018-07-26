@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
-use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
  * Iterates over the errors of a form.

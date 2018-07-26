@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\ErrorMappingException;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

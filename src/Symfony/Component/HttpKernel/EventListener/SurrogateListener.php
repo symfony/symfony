@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * SurrogateListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for Surrogates.

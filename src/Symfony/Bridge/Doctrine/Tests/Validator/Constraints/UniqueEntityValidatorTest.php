@@ -15,16 +15,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Validation;
-use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

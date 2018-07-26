@@ -20,12 +20,12 @@ use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
-use Symfony\Component\Form\Tests\Fixtures\TestExtension;
-use Symfony\Component\Form\Tests\Fixtures\LegacyFooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\LegacyFooSubType;
-use Symfony\Component\Form\Tests\Fixtures\LegacyFooTypeBazExtension;
-use Symfony\Component\Form\Tests\Fixtures\LegacyFooTypeBarExtension;
+use Symfony\Component\Form\Tests\Fixtures\LegacyFooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\LegacyFooType;
+use Symfony\Component\Form\Tests\Fixtures\LegacyFooTypeBarExtension;
+use Symfony\Component\Form\Tests\Fixtures\LegacyFooTypeBazExtension;
+use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

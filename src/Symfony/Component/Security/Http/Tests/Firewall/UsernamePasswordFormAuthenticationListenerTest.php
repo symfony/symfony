@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 

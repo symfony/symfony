@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-use Symfony\Component\Security\Http\FirewallMapInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\FirewallMapInterface;
 
 /**
  * This is a lazy-loading firewall map implementation.

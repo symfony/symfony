@@ -13,9 +13,9 @@ namespace Symfony\Component\Console\Input;
 
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * A InputDefinition represents a set of valid command line arguments and options.

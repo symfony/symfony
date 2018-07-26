@@ -13,9 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 @trigger_error('The '.__NAMESPACE__.'\FragmentRendererPass class is deprecated since Symfony 2.7 and will be removed in 3.0. Use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass instead.', E_USER_DEPRECATED);
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Adds services tagged kernel.fragment_renderer as HTTP content rendering strategies.

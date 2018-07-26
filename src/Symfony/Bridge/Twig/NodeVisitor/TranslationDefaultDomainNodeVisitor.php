@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
-use Symfony\Bridge\Twig\Node\TransNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\BlockNode;
 use Twig\Node\Expression\ArrayExpression;

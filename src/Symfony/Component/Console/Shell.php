@@ -14,8 +14,8 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * A Shell wraps an Application to add shell capabilities to it.

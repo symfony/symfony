@@ -13,9 +13,9 @@ namespace Symfony\Component\Form\Extension\HttpFoundation\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
-use Symfony\Component\Form\RequestHandlerInterface;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\RequestHandlerInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

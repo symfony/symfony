@@ -13,9 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;

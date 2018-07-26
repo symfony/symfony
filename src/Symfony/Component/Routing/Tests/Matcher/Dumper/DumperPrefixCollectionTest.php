@@ -12,10 +12,10 @@
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Matcher\Dumper\DumperCollection;
 use Symfony\Component\Routing\Matcher\Dumper\DumperPrefixCollection;
 use Symfony\Component\Routing\Matcher\Dumper\DumperRoute;
-use Symfony\Component\Routing\Matcher\Dumper\DumperCollection;
+use Symfony\Component\Routing\Route;
 
 class DumperPrefixCollectionTest extends TestCase
 {

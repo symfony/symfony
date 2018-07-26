@@ -11,12 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Twig\Extension\AbstractExtension;
 use Twig\NodeVisitor\NodeVisitorInterface;
 use Twig\TokenParser\AbstractTokenParser;

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
-use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

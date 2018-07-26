@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Event;
 
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * SwitchUserEvent.

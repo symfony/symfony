@@ -13,10 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
 

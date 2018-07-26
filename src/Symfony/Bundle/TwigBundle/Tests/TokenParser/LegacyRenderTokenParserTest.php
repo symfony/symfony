@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\TokenParser;
 
+use Symfony\Bundle\TwigBundle\Node\RenderNode;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
-use Symfony\Bundle\TwigBundle\Node\RenderNode;
 use Twig\Environment;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;

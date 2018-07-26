@@ -15,8 +15,8 @@ namespace Symfony\Bundle\FrameworkBundle\Fragment;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
+use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Implements the Hinclude rendering strategy.

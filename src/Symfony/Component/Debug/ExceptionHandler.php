@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * ExceptionHandler converts an exception to a Response object.

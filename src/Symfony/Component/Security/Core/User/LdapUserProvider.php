@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapClientInterface;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 /**
  * LdapUserProvider is a simple user provider on top of ldap.

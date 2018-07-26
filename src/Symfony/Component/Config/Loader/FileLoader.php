@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Config\Loader;
 
-use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.

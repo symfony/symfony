@@ -12,14 +12,14 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 /**
  * A console command for retrieving information about services.

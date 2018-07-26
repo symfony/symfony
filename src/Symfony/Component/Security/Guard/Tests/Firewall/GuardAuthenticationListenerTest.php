@@ -14,9 +14,9 @@ namespace Symfony\Component\Security\Guard\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>

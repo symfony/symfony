@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
@@ -20,7 +21,6 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Doctrine\Common\Util\ClassUtils;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {

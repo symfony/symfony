@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 /**
  * EntityFactory creates services for Doctrine user provider.

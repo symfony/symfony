@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Logger;
 
+use Doctrine\DBAL\Logging\SQLLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Doctrine\DBAL\Logging\SQLLogger;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

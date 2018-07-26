@@ -79,7 +79,7 @@ class StopwatchTest extends TestCase
         $event = $stopwatch->stop('foo');
 
         $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+        $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
     }
 
     /**

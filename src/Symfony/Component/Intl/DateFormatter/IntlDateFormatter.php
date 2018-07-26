@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Intl\DateFormatter;
 
-use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\DateFormatter\DateFormat\FullTransformer;
-use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodNotImplementedException;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Locale\Locale;
 
 /**

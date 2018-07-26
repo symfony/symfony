@@ -16,14 +16,14 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
-use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType;
-use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar;
-use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz;
-use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
+use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType;
+use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar;
+use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz;
+use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 
 /**

@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
-use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\Loader\LoaderInterface;
+use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * This engine knows how to render Symfony templates.

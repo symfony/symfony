@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.

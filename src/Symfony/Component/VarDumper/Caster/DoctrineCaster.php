@@ -12,8 +12,8 @@
 namespace Symfony\Component\VarDumper\Caster;
 
 use Doctrine\Common\Proxy\Proxy as CommonProxy;
-use Doctrine\ORM\Proxy\Proxy as OrmProxy;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Proxy\Proxy as OrmProxy;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Intl\Data\Bundle\Reader;
 
+use Symfony\Component\Intl\Data\Util\RecursiveArrayAccess;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Locale;
-use Symfony\Component\Intl\Data\Util\RecursiveArrayAccess;
 
 /**
  * Default implementation of {@link BundleEntryReaderInterface}.

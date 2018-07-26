@@ -13,9 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
-use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
  * Translator.

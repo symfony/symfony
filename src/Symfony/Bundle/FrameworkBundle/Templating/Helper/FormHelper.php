@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * FormHelper provides helpers to help display forms.

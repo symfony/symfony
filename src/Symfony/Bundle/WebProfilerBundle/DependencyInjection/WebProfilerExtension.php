@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\DependencyInjection;
 
+use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 
 /**
  * WebProfilerExtension.

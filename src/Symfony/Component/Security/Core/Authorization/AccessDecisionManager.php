@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * AccessDecisionManager is the base class for all access decision managers

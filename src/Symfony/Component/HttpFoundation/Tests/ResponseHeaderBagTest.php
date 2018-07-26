@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @group time-sensitive

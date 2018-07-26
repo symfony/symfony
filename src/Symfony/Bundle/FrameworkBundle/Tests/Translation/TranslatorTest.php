@@ -14,9 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Filesystem\Filesystem;
 
 class TranslatorTest extends TestCase
 {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -102,6 +105,50 @@ class Client extends BaseClient
     public function enableReboot()
     {
         $this->reboot = true;
+    }
+
+    /**
+     * Logins a user against a specific firewall.
+     *
+     * @param string|object $user
+     * @param string[]      $roles
+     * @param string        $firewallName
+     */
+    public function login(
+        $user,
+        array $roles = array(),
+        string $firewallName = 'main'
+    ) {
+        if (!class_exists(UsernamePasswordToken::class)) {
+            throw new \RuntimeException('You must install the Symfony Security component to use this feature.');
+        }
+
+        $config = sprintf('security.firewall.map.config.%s', $firewallName);
+
+        if (!$this->getContainer()->has($config)) {
+            throw new \RuntimeException(sprintf('Firewall "%s" does not exists.', $firewallName));
+        }
+
+        $context = $this->getContainer()->get($config)->getContext();
+        if ($user instanceof UserInterface) {
+            $roles = array_merge($user->getRoles(), $roles);
+        }
+        $session = $this->getContainer()->get('session');
+
+        $token = new UsernamePasswordToken($user, null, $firewallName, $roles);
+        $session->set('_security_'.$context, serialize($token));
+        $session->save();
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->getCookieJar()->set($cookie);
+    }
+
+    /**
+     * Logouts a user.
+     */
+    public function logout()
+    {
+        $this->getContainer()->get('session')->invalidate();
     }
 
     /**

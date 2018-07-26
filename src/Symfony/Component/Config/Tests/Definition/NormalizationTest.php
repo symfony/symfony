@@ -12,8 +12,8 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\NodeInterface;
 
 class NormalizationTest extends TestCase
 {

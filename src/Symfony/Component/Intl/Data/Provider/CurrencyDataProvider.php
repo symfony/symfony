@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Intl\Data\Provider;
 
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Locale;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 
 /**
  * Data provider for currency-related data.

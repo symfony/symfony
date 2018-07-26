@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Http\Tests\EntryPoint;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint;
 
 class RetryAuthenticationEntryPointTest extends TestCase
 {

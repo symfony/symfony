@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Debug\FatalErrorHandler;
 
-use Symfony\Component\Debug\Exception\UndefinedFunctionException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\UndefinedFunctionException;
 
 /**
  * ErrorHandler for undefined functions.

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 

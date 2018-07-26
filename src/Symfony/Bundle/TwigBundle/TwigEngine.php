@@ -14,9 +14,9 @@ namespace Symfony\Bundle\TwigBundle;
 use Symfony\Bridge\Twig\TwigEngine as BaseEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 use Twig\Environment;
 use Twig\Error\Error;
 

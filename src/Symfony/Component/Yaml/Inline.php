@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Yaml;
 
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Exception\DumpException;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**

@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
 
 class TemplateNameParserTest extends TestCase

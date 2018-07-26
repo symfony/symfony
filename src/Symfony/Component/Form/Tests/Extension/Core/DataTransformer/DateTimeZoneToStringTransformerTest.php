@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
 
 class DateTimeZoneToStringTransformerTest extends TestCase
 {

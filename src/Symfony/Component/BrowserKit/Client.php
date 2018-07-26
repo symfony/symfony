@@ -13,8 +13,8 @@ namespace Symfony\Component\BrowserKit;
 
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
 
 /**

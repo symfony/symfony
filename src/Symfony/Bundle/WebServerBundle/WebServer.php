@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\WebServerBundle;
 
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Manages a local HTTP web server.

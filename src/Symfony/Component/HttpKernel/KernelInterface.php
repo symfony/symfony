@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * The Kernel is the heart of the Symfony system.

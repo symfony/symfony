@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\FirePHPHandler as BaseFirePHPHandler;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
  * FirePHPHandler.

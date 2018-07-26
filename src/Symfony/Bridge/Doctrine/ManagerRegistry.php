@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine;
 
+use Doctrine\Common\Persistence\AbstractManagerRegistry;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Doctrine\Common\Persistence\AbstractManagerRegistry;
 
 /**
  * References Doctrine connections and entity/document managers.

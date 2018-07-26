@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\StringUtil;
 
 /**

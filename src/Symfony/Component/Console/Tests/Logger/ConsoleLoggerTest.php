@@ -16,8 +16,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 /**
  * Console logger test.

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\CssSelector\Tests\Node;
 
-use Symfony\Component\CssSelector\Node\HashNode;
 use Symfony\Component\CssSelector\Node\ElementNode;
+use Symfony\Component\CssSelector\Node\HashNode;
 
 class HashNodeTest extends AbstractNodeTest
 {

@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Iterator for all templates in bundles and in the application Resources directory.

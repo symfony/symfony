@@ -12,8 +12,8 @@
 namespace Symfony\Component\CssSelector\Tests\Node;
 
 use Symfony\Component\CssSelector\Node\ClassNode;
-use Symfony\Component\CssSelector\Node\NegationNode;
 use Symfony\Component\CssSelector\Node\ElementNode;
+use Symfony\Component\CssSelector\Node\NegationNode;
 
 class NegationNodeTest extends AbstractNodeTest
 {

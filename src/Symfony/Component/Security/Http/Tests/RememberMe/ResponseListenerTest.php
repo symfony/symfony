@@ -12,13 +12,13 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Http\RememberMe\ResponseListener;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class ResponseListenerTest extends TestCase
 {

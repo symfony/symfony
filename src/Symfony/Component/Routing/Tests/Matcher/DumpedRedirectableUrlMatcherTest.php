@@ -14,8 +14,8 @@ namespace Symfony\Component\Routing\Tests\Matcher;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 class DumpedRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 {

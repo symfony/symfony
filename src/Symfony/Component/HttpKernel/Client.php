@@ -12,10 +12,10 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\BrowserKit\Client as BaseClient;
+use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
-use Symfony\Component\BrowserKit\History;
-use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

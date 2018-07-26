@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Provides helpers to display a table.

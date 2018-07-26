@@ -15,8 +15,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Traits\AbstractTrait;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\AbstractTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

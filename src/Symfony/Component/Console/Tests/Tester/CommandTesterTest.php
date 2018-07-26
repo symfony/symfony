@@ -14,12 +14,12 @@ namespace Symfony\Component\Console\Tests\Tester;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTesterTest extends TestCase
 {

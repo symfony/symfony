@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests\File\MimeType;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\FileBinaryMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
  * @requires extension fileinfo

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
+use Symfony\Component\Form\FormEvent;
 
 abstract class MergeCollectionListenerTest extends TestCase
 {

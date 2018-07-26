@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Cache\Simple;
 
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheException as Psr6CacheException;
-use Psr\SimpleCache\CacheInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheException as SimpleCacheException;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;

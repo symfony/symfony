@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by destillat at 2018-07-20T08:14:53Z
+
+BTW, if transition names are not unique, the latest guard expression per transition name is evaluated for all transitions

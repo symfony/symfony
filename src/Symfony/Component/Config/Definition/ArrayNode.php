@@ -307,7 +307,30 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         // if extra fields are present, throw exception
         if (\count($value) && !$this->ignoreExtraKeys) {
+            $proposals = array_keys($this->children);
+            sort($proposals);
+            $guesses = array();
+
+            foreach (array_keys($value) as $subject) {
+                $minScore = INF;
+                foreach ($proposals as $proposal) {
+                    $distance = levenshtein($subject, $proposal);
+                    if ($distance <= $minScore && $distance < 3) {
+                        $guesses[$proposal] = $distance;
+                        $minScore = $distance;
+                    }
+                }
+            }
+
             $msg = sprintf('Unrecognized option%s "%s" under "%s"', 1 === \count($value) ? '' : 's', implode(', ', array_keys($value)), $this->getPath());
+
+            if (\count($guesses)) {
+                asort($guesses);
+                $msg .= sprintf('. Did you mean "%s"?', implode('", "', array_keys($guesses)));
+            } else {
+                $msg .= sprintf('. Available option%s %s "%s".', 1 === \count($proposals) ? '' : 's', 1 === \count($proposals) ? 'is' : 'are', implode('", "', $proposals));
+            }
+
             $ex = new InvalidConfigurationException($msg);
             $ex->setPath($this->getPath());
 

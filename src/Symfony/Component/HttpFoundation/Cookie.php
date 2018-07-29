@@ -183,6 +183,6 @@ class Cookie
      */
     public function isCleared()
     {
-        return $this->expire < time();
+        return 0 !== $this->expire && $this->expire < time();
     }
 }

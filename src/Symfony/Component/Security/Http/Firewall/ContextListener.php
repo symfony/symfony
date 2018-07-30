@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -21,6 +22,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -36,6 +39,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class ContextListener implements ListenerInterface
 {
+    private $trackUsage;
     private $tokenStorage;
     private $sessionKey;
     private $logger;
@@ -53,7 +57,8 @@ class ContextListener implements ListenerInterface
             throw new \InvalidArgumentException('$contextKey must not be empty.');
         }
 
-        $this->tokenStorage = $tokenStorage;
+        $this->trackUsage = $tokenStorage instanceof UsageTrackingTokenStorageInterface;
+        $this->tokenStorage = $this->trackUsage ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
         $this->userProviders = $userProviders;
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
@@ -84,10 +89,18 @@ class ContextListener implements ListenerInterface
         }
 
         $request = $event->getRequest();
-        $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
-        if (null === $session || null === $token = $session->get($this->sessionKey)) {
-            $this->tokenStorage->setToken(null);
+        if (null !== $session = $request->hasPreviousSession() ? $request->getSession() : null) {
+            $usageIndexValue = \method_exists($request, 'getAcceptableFormats') && $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+            $sessionId = $session->getId();
+            $token = $session->get($this->sessionKey);
+            if ($this->trackUsage && $session->getId() === $sessionId) {
+                $usageIndexReference = $usageIndexValue;
+            }
+        }
+
+        if (null === $session || null === $token) {
+            $this->tokenStorage->setToken(null, function () use (&$usageIndexReference) { ++$usageIndexReference; });
 
             return;
         }
@@ -111,7 +124,7 @@ class ContextListener implements ListenerInterface
             $token = null;
         }
 
-        $this->tokenStorage->setToken($token);
+        $this->tokenStorage->setToken($token, function () use (&$usageIndexReference) { ++$usageIndexReference; });
     }
 
     /**
@@ -132,6 +145,8 @@ class ContextListener implements ListenerInterface
         $this->dispatcher->removeListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
         $this->registered = false;
         $session = $request->getSession();
+        $sessionId = $session->getId();
+        $usageIndexValue = \method_exists($request, 'getAcceptableFormats') && $session instanceof Session ? $usageIndexValue = $usageIndexReference = &$session->getUsageIndex() : null;
 
         if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
             if ($request->hasPreviousSession()) {
@@ -143,6 +158,9 @@ class ContextListener implements ListenerInterface
             if (null !== $this->logger) {
                 $this->logger->debug('Stored the security token in the session.', array('key' => $this->sessionKey));
             }
+        }
+        if ($this->trackUsage && $session->getId() === $sessionId) {
+            $usageIndexReference = $usageIndexValue;
         }
     }
 

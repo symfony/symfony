@@ -24,11 +24,12 @@
     "require-dev": {
         "symfony/console": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
-        "symfony/security-core": "~3.4|~4.0",
+        "symfony/security-core": "~4.2",
         "symfony/var-dumper": "~3.4|~4.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<3.4"
+        "symfony/http-foundation": "<3.4",
+        "symfony/security-core": "<4.2"
     },
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",

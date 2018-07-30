@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
@@ -26,8 +26,8 @@ class TokenProcessorTest extends TestCase
     public function testProcessor()
     {
         $token = new UsernamePasswordToken('user', 'password', 'provider', array('ROLE_USER'));
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $tokenStorage->method('getToken')->willReturn($token);
+        $tokenStorage = $this->getMockBuilder(UsageTrackingTokenStorageInterface::class)->getMock();
+        $tokenStorage->method('getToken')->with(false)->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);
         $record = array('extra' => array());

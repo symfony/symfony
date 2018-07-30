@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener;
@@ -91,6 +92,25 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $listener = new SimplePreAuthenticationListener($this->tokenStorage, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);
 
         $listener->handle($this->event);
+    }
+
+    public function testHandleWithTokenStorageHavingAToken()
+    {
+        $tokenStorage = $this->getMockBuilder(UsageTrackingTokenStorageInterface::class)->getMock();
+        $tokenStorage
+            ->expects($this->any())
+            ->method('getToken')
+            ->with(false)
+            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()))
+        ;
+        $tokenStorage
+            ->expects($this->never())
+            ->method('setToken')
+        ;
+        $simpleAuthenticator = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface')->getMock();
+
+        $listener = new SimplePreAuthenticationListener($tokenStorage, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);
+        $listener->handle($this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock());
     }
 
     protected function setUp()

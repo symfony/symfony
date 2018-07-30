@@ -21,10 +21,11 @@
         </service>
         <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" />
 
-        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" public="true">
+        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage" public="true">
             <tag name="kernel.reset" method="setToken" />
         </service>
         <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" />
+        <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface" alias="security.token_storage" />
 
         <service id="security.helper" class="Symfony\Component\Security\Core\Security">
             <argument type="service_locator">

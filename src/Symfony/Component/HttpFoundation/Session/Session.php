@@ -146,7 +146,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      *
      * @internal
      */
-    public function getUsageIndex()
+    public function &getUsageIndex()
     {
         return $this->usageIndex;
     }

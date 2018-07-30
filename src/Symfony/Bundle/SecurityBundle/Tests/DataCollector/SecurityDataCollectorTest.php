@@ -19,7 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
@@ -51,7 +51,8 @@ class SecurityDataCollectorTest extends TestCase
 
     public function testCollectWhenAuthenticationTokenIsNull()
     {
-        $tokenStorage = new TokenStorage();
+        $tokenStorage = new UsageTrackingTokenStorage();
+        $tokenStorage->setToken(null, \Closure::fromCallable(array($this, 'fail')));
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
         $collector->collect($this->getRequest(), $this->getResponse());
 
@@ -71,8 +72,8 @@ class SecurityDataCollectorTest extends TestCase
     /** @dataProvider provideRoles */
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {
-        $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $roles));
+        $tokenStorage = new UsageTrackingTokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $roles), \Closure::fromCallable(array($this, 'fail')));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
         $collector->collect($this->getRequest(), $this->getResponse());
@@ -99,8 +100,8 @@ class SecurityDataCollectorTest extends TestCase
             new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $adminToken),
         );
 
-        $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles));
+        $tokenStorage = new UsageTrackingTokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles), \Closure::fromCallable(array($this, 'fail')));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
         $collector->collect($this->getRequest(), $this->getResponse());

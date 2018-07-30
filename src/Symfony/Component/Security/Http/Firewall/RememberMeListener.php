@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
@@ -40,7 +42,7 @@ class RememberMeListener implements ListenerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, bool $catchExceptions = true, SessionAuthenticationStrategyInterface $sessionStrategy = null)
     {
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenStorage = $tokenStorage instanceof UsageTrackingTokenStorageInterface ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
         $this->rememberMeServices = $rememberMeServices;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
@@ -54,7 +56,7 @@ class RememberMeListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null !== $this->tokenStorage->getToken()) {
+        if (null !== $this->tokenStorage->getToken(false)) {
             return;
         }
 

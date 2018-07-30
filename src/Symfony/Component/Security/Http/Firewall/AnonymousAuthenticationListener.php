@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -33,7 +35,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, string $secret, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
     {
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenStorage = $tokenStorage instanceof UsageTrackingTokenStorageInterface ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
         $this->secret = $secret;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
@@ -44,7 +46,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null !== $this->tokenStorage->getToken()) {
+        if (null !== $this->tokenStorage->getToken(false)) {
             return;
         }
 

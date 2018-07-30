@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Role\Role;
@@ -44,7 +46,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenStorage = null === $tokenStorage || $tokenStorage instanceof UsageTrackingTokenStorageInterface ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
         $this->roleHierarchy = $roleHierarchy;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
         $this->accessDecisionManager = $accessDecisionManager;
@@ -73,7 +75,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'inherited_roles' => array(),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
-        } elseif (null === $token = $this->tokenStorage->getToken()) {
+        } elseif (null === $token = $this->tokenStorage->getToken(false)) {
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => false,

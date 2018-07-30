@@ -13,16 +13,18 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
 
 class AnonymousAuthenticationListenerTest extends TestCase
 {
     public function testHandleWithTokenStorageHavingAToken()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(UsageTrackingTokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()))
         ;
         $tokenStorage
@@ -42,10 +44,11 @@ class AnonymousAuthenticationListenerTest extends TestCase
 
     public function testHandleWithTokenStorageHavingNoToken()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(UsageTrackingTokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 

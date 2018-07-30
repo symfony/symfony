@@ -14,6 +14,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -33,7 +35,7 @@ class AccessListener implements ListenerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager)
     {
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenStorage = $tokenStorage instanceof UsageTrackingTokenStorageInterface ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
         $this->authManager = $authManager;
@@ -47,16 +49,16 @@ class AccessListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null === $token = $this->tokenStorage->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
-        }
-
         $request = $event->getRequest();
 
         list($attributes) = $this->map->getPatterns($request);
 
-        if (null === $attributes) {
+        if (!$attributes) {
             return;
+        }
+
+        if (null === $token = $this->tokenStorage->getToken()) {
+            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
         }
 
         if (!$token->isAuthenticated()) {

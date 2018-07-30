@@ -22,6 +22,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -53,7 +55,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenStorage = $tokenStorage instanceof UsageTrackingTokenStorageInterface ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->simpleAuthenticator = $simpleAuthenticator;
@@ -83,7 +85,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             $this->logger->info('Attempting SimplePreAuthentication.', array('key' => $this->providerKey, 'authenticator' => \get_class($this->simpleAuthenticator)));
         }
 
-        if ((null !== $token = $this->tokenStorage->getToken()) && !$this->trustResolver->isAnonymous($token)) {
+        if ((null !== $token = $this->tokenStorage->getToken(false)) && !$this->trustResolver->isAnonymous($token)) {
             return;
         }
 

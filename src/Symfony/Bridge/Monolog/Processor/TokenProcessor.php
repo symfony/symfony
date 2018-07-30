@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Monolog\Processor;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 
 /**
  * Adds the current security token to the log entry.
@@ -24,13 +26,13 @@ class TokenProcessor implements ProcessorInterface
 
     public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenStorage = $tokenStorage instanceof UsageTrackingTokenStorageInterface ? $tokenStorage : new UsageTrackingTokenStorage($tokenStorage);
     }
 
     public function __invoke(array $records)
     {
         $records['extra']['token'] = null;
-        if (null !== $token = $this->tokenStorage->getToken()) {
+        if (null !== $token = $this->tokenStorage->getToken(false)) {
             $records['extra']['token'] = array(
                 'username' => $token->getUsername(),
                 'authenticated' => $token->isAuthenticated(),

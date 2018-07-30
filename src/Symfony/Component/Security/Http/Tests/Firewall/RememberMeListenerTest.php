@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -26,6 +27,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()))
         ;
 
@@ -44,6 +46,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -72,6 +75,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -114,6 +118,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -152,6 +157,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -189,6 +195,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -228,6 +235,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -293,6 +301,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -356,6 +365,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
+            ->with(false)
             ->will($this->returnValue(null))
         ;
 
@@ -440,7 +450,7 @@ class RememberMeListenerTest extends TestCase
 
     protected function getTokenStorage()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        return $this->getMockBuilder(UsageTrackingTokenStorageInterface::class)->getMock();
     }
 
     protected function getDispatcher()

@@ -13,6 +13,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -49,11 +51,12 @@ class ContextListener implements ListenerInterface
     private $dispatcher;
     private $registered;
     private $trustResolver;
+    private $sessionTrackerEnabler;
 
     /**
      * @param iterable|UserProviderInterface[] $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -65,6 +68,7 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 
     /**
@@ -92,7 +96,21 @@ class ContextListener implements ListenerInterface
         $request = $event->getRequest();
         $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
 
-        if (null === $session || null === $token = $session->get($this->sessionKey)) {
+        if (null !== $session) {
+            $usageIndexValue = method_exists(Request::class, 'getPreferredFormat') && $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+            $sessionId = $session->getId();
+            $token = $session->get($this->sessionKey);
+
+            if ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
+                $usageIndexReference = $usageIndexValue;
+            }
+        }
+
+        if (null === $session || null === $token) {
+            if ($this->sessionTrackerEnabler) {
+                ($this->sessionTrackerEnabler)();
+            }
+
             $this->tokenStorage->setToken(null);
 
             return;
@@ -117,6 +135,10 @@ class ContextListener implements ListenerInterface
             $token = null;
         }
 
+        if ($this->sessionTrackerEnabler) {
+            ($this->sessionTrackerEnabler)();
+        }
+
         $this->tokenStorage->setToken($token);
     }
 
@@ -137,18 +159,25 @@ class ContextListener implements ListenerInterface
 
         $this->dispatcher->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
         $this->registered = false;
+        $session = $request->getSession();
+        $sessionId = $session->getId();
+        $usageIndexValue = method_exists(Request::class, 'getPreferredFormat') && $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : null;
         $token = $this->tokenStorage->getToken();
 
         if (null === $token || $this->trustResolver->isAnonymous($token)) {
-            if ($request->hasPreviousSession() && $request->hasSession()) {
-                $request->getSession()->remove($this->sessionKey);
+            if ($request->hasPreviousSession()) {
+                $session->remove($this->sessionKey);
             }
         } else {
-            $request->getSession()->set($this->sessionKey, serialize($token));
+            $session->set($this->sessionKey, serialize($token));
 
             if (null !== $this->logger) {
                 $this->logger->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
             }
+        }
+
+        if ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
+            $usageIndexReference = $usageIndexValue;
         }
     }
 

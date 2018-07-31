@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T09:48:30Z
+
+AFAIK, subnets have never been supported, isn't it? If confirmed, shouldn't this be a new feature, thus on master?
+
+---------------------------------------------------------------------------
+
+by netiul at 2018-07-23T14:23:54Z
+
+@nicolas-grekas https://symfony.com/doc/current/deployment/proxies.html. Feature is there for quite some time actually.

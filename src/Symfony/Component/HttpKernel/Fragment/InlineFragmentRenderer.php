@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\SubRequestHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -76,7 +77,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
 
         $level = ob_get_level();
         try {
-            return $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
+            return SubRequestHandler::handle($this->kernel, $subRequest, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
             // we dispatch the exception event to trigger the logging
             // the response that comes back is simply ignored
@@ -109,20 +110,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
-        // Override the arguments to emulate a sub-request.
-        // Sub-request object will point to localhost as client ip and real client ip
-        // will be included into trusted header for client ip
-        try {
-            if ($trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP)) {
-                $currentXForwardedFor = $request->headers->get($trustedHeaderName, '');
-
-                $server['HTTP_'.$trustedHeaderName] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
-            }
-        } catch (\InvalidArgumentException $e) {
-            // Do nothing
-        }
-
-        $server['REMOTE_ADDR'] = '127.0.0.1';
         unset($server['HTTP_IF_MODIFIED_SINCE']);
         unset($server['HTTP_IF_NONE_MATCH']);
 

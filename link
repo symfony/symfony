@@ -42,6 +42,8 @@ $directories = array_merge(...array_values(array_map(function ($part) {
     return glob(__DIR__.'/src/Symfony/'.$part.'/*', GLOB_ONLYDIR | GLOB_NOSORT);
 }, $braces)));
 
+$directories[] = __DIR__.'/src/Symfony/Contracts';
+
 foreach ($directories as $dir) {
     if ($filesystem->exists($composer = "$dir/composer.json")) {
         $sfPackages[json_decode(file_get_contents($composer))->name] = $dir;

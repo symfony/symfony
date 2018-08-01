@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.7.49
+------
+
+ * [BC BREAK] Support for the IIS-only `X_ORIGINAL_URL` and `X_REWRITE_URL`
+   HTTP headers has been dropped for security reasons.
+
 2.6.0
 -----
 

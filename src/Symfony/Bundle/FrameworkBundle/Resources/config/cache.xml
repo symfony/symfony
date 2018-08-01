@@ -149,6 +149,7 @@
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" />
         <service id="Psr\SimpleCache\CacheInterface" alias="cache.app.simple" />
         <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="cache.app" />
-        <service id="Symfony\Component\Cache\CacheInterface" alias="cache.app.taggable" />
+        <service id="Symfony\Contracts\Cache\CacheInterface" alias="cache.app" />
+        <service id="Symfony\Contracts\Cache\TagAwareCacheInterface" alias="cache.app.taggable" />
     </services>
 </container>

@@ -18,6 +18,9 @@
     "require": {
         "php": "^7.1.3"
     },
+    "suggest": {
+        "psr/cache": "When using the Cache contract"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\": "" },
         "exclude-from-classmap": [

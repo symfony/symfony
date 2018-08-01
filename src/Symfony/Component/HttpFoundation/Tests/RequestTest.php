@@ -854,6 +854,11 @@ class RequestTest extends TestCase
         $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->query->set('_method', array('delete', 'patch'));
+        $this->assertSame('POST', $request->getMethod(), '->getMethod() returns the request method if invalid type is defined in query');
     }
 
     /**

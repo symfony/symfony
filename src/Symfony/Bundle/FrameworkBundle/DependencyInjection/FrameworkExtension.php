@@ -593,7 +593,9 @@ class FrameworkExtension extends Extension
             $guard = new Definition(Workflow\EventListener\GuardListener::class);
             $guard->setPrivate(true);
             $configuration = array();
-            foreach ($workflow['transitions'] as $transitionName => $config) {
+            foreach ($workflow['transitions'] as $config) {
+                $transitionName = $config['name'];
+
                 if (!isset($config['guard'])) {
                     continue;
                 }

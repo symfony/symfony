@@ -1240,6 +1240,30 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The definition for "\DateTime" has no class attribute, and appears to reference a class or interface in the global namespace.
+     */
+    public function testNoClassFromGlobalNamespaceClassIdWithLeadingSlash()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('\\'.\DateTime::class);
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The definition for "\Symfony\Component\DependencyInjection\Tests\FooClass" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "Symfony\Component\DependencyInjection\Tests\FooClass" to get rid of this error.
+     */
+    public function testNoClassFromNamespaceClassIdWithLeadingSlash()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('\\'.FooClass::class);
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage The definition for "123_abc" has no class.
      */
     public function testNoClassFromNonClassId()

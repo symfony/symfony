@@ -195,6 +195,25 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies(array(), -1);
     }
 
+    public function testIpAddressOfRangedTrustedProxyIsSetAsRemote()
+    {
+        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
+        $expectedSubRequest->server->set('REMOTE_ADDR', '1.1.1.1');
+        $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
+        $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+
+        Request::setTrustedProxies(array('1.1.1.1/24'), -1);
+
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
+
+        $request = Request::create('/');
+        $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
+        $strategy->render('/', $request);
+
+        Request::setTrustedProxies(array(), -1);
+    }
+
     /**
      * Creates a Kernel expecting a request equals to $request
      * Allows delta in comparison in case REQUEST_TIME changed by 1 second.

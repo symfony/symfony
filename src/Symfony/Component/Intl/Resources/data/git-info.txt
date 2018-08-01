@@ -1,0 +1,7 @@
+Git information
+===============
+
+URL: https://github.com/unicode-org/icu.git
+Revision: 4a3ba8eee90ea1414d4f7ee36563e6c9b28fda96
+Author: Yoshito Umaoka
+Date: 2018-06-20T05:34:56+00:00

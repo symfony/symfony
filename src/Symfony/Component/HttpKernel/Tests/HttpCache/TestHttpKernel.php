@@ -34,19 +34,40 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->status = $status;
         $this->headers = $headers;
         $this->customizer = $customizer;
+        $this->trustedHeadersReflector = new \ReflectionProperty('Symfony\Component\HttpFoundation\Request', 'trustedHeaders');
+        $this->trustedHeadersReflector->setAccessible(true);
 
         parent::__construct(new EventDispatcher(), $this);
     }
 
-    public function getBackendRequest()
+    public function assert(\Closure $callback)
     {
-        return $this->backendRequest;
+        $trustedConfig = array(Request::getTrustedProxies(), $this->trustedHeadersReflector->getValue());
+
+        list($trustedProxies, $trustedHeaders, $backendRequest) = $this->backendRequest;
+        Request::setTrustedProxies($trustedProxies);
+        $this->trustedHeadersReflector->setValue(null, $trustedHeaders);
+
+        try {
+            $e = null;
+            $callback($backendRequest);
+        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+        }
+
+        list($trustedProxies, $trustedHeaders) = $trustedConfig;
+        Request::setTrustedProxies($trustedProxies);
+        $this->trustedHeadersReflector->setValue(null, $trustedHeaders);
+
+        if (null !== $e) {
+            throw $e;
+        }
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
     {
         $this->catch = $catch;
-        $this->backendRequest = $request;
+        $this->backendRequest = array($request::getTrustedProxies(), $this->trustedHeadersReflector->getValue(), $request);
 
         return parent::handle($request, $type, $catch);
     }

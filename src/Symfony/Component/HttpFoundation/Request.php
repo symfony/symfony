@@ -1962,7 +1962,7 @@ class Request
             foreach ($parts as $subParts) {
                 $assoc = HeaderUtils::combine($subParts);
                 if (isset($assoc[$param])) {
-                    $forwardedValues[] = $assoc[$param];
+                    $forwardedValues[] = self::HEADER_X_FORWARDED_PORT === $type ? substr_replace($assoc[$param], '0.0.0.0', 0, strrpos($assoc[$param], ':')) : $assoc[$param];
                 }
             }
         }

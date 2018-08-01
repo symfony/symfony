@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T18:10:24Z
+
+also needs https://github.com/doctrine/doctrine2/pull/7307 to be merged into doctrine/orm 2.7
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-01T15:27:40Z
+
+Good to go, green on 4.1  also: https://travis-ci.org/symfony/symfony/builds/410846878

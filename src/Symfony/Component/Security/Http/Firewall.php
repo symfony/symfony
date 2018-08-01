@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Http\Firewall\AccessListener;
 
 /**
  * Firewall uses a FirewallMap to register security listeners for the given
@@ -58,8 +59,16 @@ class Firewall implements EventSubscriberInterface
             $exceptionListener->register($this->dispatcher);
         }
 
+        $accessListener = null;
+
         // initiate the listener chain
         foreach ($authenticationListeners as $listener) {
+            if ($listener instanceof AccessListener) {
+                $accessListener = $listener;
+
+                continue;
+            }
+
             $listener->handle($event);
 
             if ($event->hasResponse()) {
@@ -69,6 +78,10 @@ class Firewall implements EventSubscriberInterface
 
         if (null !== $logoutListener) {
             $logoutListener->handle($event);
+        }
+
+        if (!$event->hasResponse() && null !== $accessListener) {
+            $accessListener->handle($event);
         }
     }
 

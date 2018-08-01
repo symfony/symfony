@@ -115,8 +115,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $server['HTTP_X_FORWARDED_FOR'] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
         }
 
-        $trustedProxies = Request::getTrustedProxies();
-        $server['REMOTE_ADDR'] = $trustedProxies ? reset($trustedProxies) : '127.0.0.1';
+        $server['REMOTE_ADDR'] = $this->resolveTrustedProxy();
 
         unset($server['HTTP_IF_MODIFIED_SINCE']);
         unset($server['HTTP_IF_NONE_MATCH']);
@@ -134,6 +133,17 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $setSession($subRequest, $request);
 
         return $subRequest;
+    }
+
+    private function resolveTrustedProxy()
+    {
+        if (!$trustedProxies = Request::getTrustedProxies()) {
+            return '127.0.0.1';
+        }
+
+        $firstTrustedProxy = reset($trustedProxies);
+
+        return false !== ($i = strpos($firstTrustedProxy, '/')) ? substr($firstTrustedProxy, 0, $i) : $firstTrustedProxy;
     }
 
     /**

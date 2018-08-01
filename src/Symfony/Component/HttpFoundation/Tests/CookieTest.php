@@ -154,6 +154,18 @@ class CookieTest extends TestCase
         $cookie = new Cookie('foo', 'bar', time() - 20);
 
         $this->assertTrue($cookie->isCleared(), '->isCleared() returns true if the cookie has expired');
+
+        $cookie = new Cookie('foo', 'bar');
+
+        $this->assertFalse($cookie->isCleared());
+
+        $cookie = new Cookie('foo', 'bar', 0);
+
+        $this->assertFalse($cookie->isCleared());
+
+        $cookie = new Cookie('foo', 'bar', -1);
+
+        $this->assertFalse($cookie->isCleared());
     }
 
     public function testToString()

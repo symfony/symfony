@@ -1225,7 +1225,10 @@ class Request
                 if ($method = $this->headers->get('X-HTTP-METHOD-OVERRIDE')) {
                     $this->method = strtoupper($method);
                 } elseif (self::$httpMethodParameterOverride) {
-                    $this->method = strtoupper($this->request->get('_method', $this->query->get('_method', 'POST')));
+                    $method = $this->request->get('_method', $this->query->get('_method', 'POST'));
+                    if (\is_string($method)) {
+                        $this->method = strtoupper($method);
+                    }
                 }
             }
         }

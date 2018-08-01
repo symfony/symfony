@@ -2060,6 +2060,11 @@ class Request
         if (self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED])) {
             $forwardedValues = $this->headers->get(self::$trustedHeaders[self::HEADER_FORWARDED]);
             $forwardedValues = preg_match_all(sprintf('{(?:%s)=(?:"?\[?)([a-zA-Z0-9\.:_\-/]*+)}', self::$forwardedParams[$type]), $forwardedValues, $matches) ? $matches[1] : array();
+            if (self::HEADER_CLIENT_PORT === $type) {
+                foreach ($forwardedValues as $k => $v) {
+                    $forwardedValues[$k] = substr_replace($v, '0.0.0.0', 0, strrpos($v, ':'));
+                }
+            }
         }
 
         if (null !== $ip) {

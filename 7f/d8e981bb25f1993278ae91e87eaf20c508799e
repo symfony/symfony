@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-23T16:11:39Z
+
+```
+
+Testing src/Symfony/Bridge/Doctrine
+...............................................................  63 / 234 ( 26%)
+............................................................... 126 / 234 ( 53%)
+............................S.................................. 189 / 234 ( 80%)
+.............................................                   234 / 234 (100%)
+Time: 2.27 seconds, Memory: 26.00MB
+OK, but incomplete, skipped, or risky tests!
+Tests: 234, Assertions: 484, Skipped: 1.
+Remaining deprecation notices (1)
+  1x: Doctrine\Common\ClassLoader is deprecated.
+    1x in EntityTypeTest::setUp from Symfony\Bridge\Doctrine\Tests\Form\Type
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T18:07:19Z
+
+Needs https://github.com/doctrine/doctrine2/pull/7307 to be merged into doctrine/orm 2.7.

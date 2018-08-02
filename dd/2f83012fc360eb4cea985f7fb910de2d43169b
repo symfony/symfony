@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-21T18:18:19Z
+
+@mktcode : Just to mention a pending discussion on the way we'll allow to specify sub-types labels: https://github.com/symfony/symfony/pull/20887#discussion_r93305270
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-23T18:19:34Z
+
+Would it make sense to make all options of the subtypes configurable (i.e. add options like `date_options` and `time_options`)?
+
+---------------------------------------------------------------------------
+
+by mktcode at 2016-12-24T02:25:04Z
+
+I just handled it like the widget options (`date_widget` and `time_widget`) but on a second look making all subtype options configurable makes more sense I guess.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-24T11:05:24Z
+
+Configuring every sub-types options does not really make sense to me. You shouldn't care about most of them, which [are inherited or guessed within the parent type](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/Type/DateTimeType.php#L112-L154) acting as encapsulation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T18:34:05Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by mktcode at 2017-03-22T21:02:01Z
+
+This PR is coherent with current handling of subtype options, so it seemed viable to me. On the other hand, in case of sub types, granting access to all of their options seems very legit too, but maybe this is a topic of its own.
+So if it was my project I would merge and start a separate discussion on sup type options. But(!) as I am not that much into it maybe I don't get the whole picture.
+
+---------------------------------------------------------------------------
+
+by Shoplifter at 2017-05-24T08:16:10Z
+
++1 for accessibility reasons (http://webaim.org/techniques/forms/controls#input)
+it will often make sense to visually hide the labels for time, so label_attr will also be needed to supply the appropriate class for that.
+
+form rows:
+Even on smallest screens you will want both fields to be displayed in one row (side by side)
+wrapping each part of datetime in a separate div makes this difficult to handle though.
+
+Personally I use this SO solution for form row atributes on a regular basis in all of my projects.
+https://stackoverflow.com/questions/23011450/symfony-twig-how-to-add-class-to-a-form-row
+That gives you all css hooks needed to make
+`{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}`
+a viable way to render a form without any tweaking in the template.
+Maybe that should be part of the standard symfony form component, but that would be another issue, i guess.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-06T09:22:17Z
+
+Thinking about this again the proposed solution looks good to me and is in line with the existing `date_widget` and `time_widget` options.
+
+@mktcode Can you check the failure and make fabbot happy?
+
+---------------------------------------------------------------------------
+
+by mktcode at 2018-07-06T11:48:40Z
+
+@xabbuh @fabpot patch applied
+
+---------------------------------------------------------------------------
+
+by mktcode at 2018-07-31T20:11:49Z
+
+@xabbuh @fabpot will this PR ever be merged (or closed)? I would like to see my PR list empty again. :D

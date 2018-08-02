@@ -19,6 +19,15 @@
                     }
                 },
                 "options": {
+                    "ansi": {
+                        "name": "--ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Force ANSI output",
+                        "default": false
+                    },
                     "format": {
                         "name": "--format",
                         "shortcut": "",
@@ -28,15 +37,6 @@
                         "description": "The output format (txt, xml, json, or md)",
                         "default": "txt"
                     },
-                    "raw": {
-                        "name": "--raw",
-                        "shortcut": "",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "To output raw command help",
-                        "default": false
-                    },
                     "help": {
                         "name": "--help",
                         "shortcut": "-h",
@@ -44,42 +44,6 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Display this help message",
-                        "default": false
-                    },
-                    "quiet": {
-                        "name": "--quiet",
-                        "shortcut": "-q",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "Do not output any message",
-                        "default": false
-                    },
-                    "verbose": {
-                        "name": "--verbose",
-                        "shortcut": "-v|-vv|-vvv",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
-                        "default": false
-                    },
-                    "version": {
-                        "name": "--version",
-                        "shortcut": "-V",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "Display this application version",
-                        "default": false
-                    },
-                    "ansi": {
-                        "name": "--ansi",
-                        "shortcut": "",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "Force ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -98,6 +62,42 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "quiet": {
+                        "name": "--quiet",
+                        "shortcut": "-q",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
+                    "raw": {
+                        "name": "--raw",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "To output raw command help",
+                        "default": false
+                    },
+                    "verbose": {
+                        "name": "--verbose",
+                        "shortcut": "-v|-vv|-vvv",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
+                        "default": false
+                    },
+                    "version": {
+                        "name": "--version",
+                        "shortcut": "-V",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this application version",
                         "default": false
                     }
                 }
@@ -122,15 +122,6 @@
                     }
                 },
                 "options": {
-                    "raw": {
-                        "name": "--raw",
-                        "shortcut": "",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "To output raw command list",
-                        "default": false
-                    },
                     "format": {
                         "name": "--format",
                         "shortcut": "",
@@ -139,6 +130,15 @@
                         "is_multiple": false,
                         "description": "The output format (txt, xml, json, or md)",
                         "default": "txt"
+                    },
+                    "raw": {
+                        "name": "--raw",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "To output raw command list",
+                        "default": false
                     }
                 }
             }

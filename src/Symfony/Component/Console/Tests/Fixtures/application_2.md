@@ -48,6 +48,15 @@ The command name
 
 ### Options
 
+#### `--ansi`
+
+Force ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
 #### `--format`
 
 The output format (txt, xml, json, or md)
@@ -57,54 +66,9 @@ The output format (txt, xml, json, or md)
 * Is multiple: no
 * Default: `'txt'`
 
-#### `--raw`
-
-To output raw command help
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
 #### `--help|-h`
 
 Display this help message
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--quiet|-q`
-
-Do not output any message
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--verbose|-v|-vv|-vvv`
-
-Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--version|-V`
-
-Display this application version
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--ansi`
-
-Force ANSI output
 
 * Accept value: no
 * Is value required: no
@@ -123,6 +87,42 @@ Disable ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--raw`
+
+To output raw command help
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--verbose|-v|-vv|-vvv`
+
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--version|-V`
+
+Display this application version
 
 * Accept value: no
 * Is value required: no
@@ -166,15 +166,6 @@ The namespace name
 
 ### Options
 
-#### `--raw`
-
-To output raw command list
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
 #### `--format`
 
 The output format (txt, xml, json, or md)
@@ -183,6 +174,15 @@ The output format (txt, xml, json, or md)
 * Is value required: yes
 * Is multiple: no
 * Default: `'txt'`
+
+#### `--raw`
+
+To output raw command list
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
 
 `descriptor:command1`
 ---------------------
@@ -199,9 +199,36 @@ command 1 help
 
 ### Options
 
+#### `--ansi`
+
+Force ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
 #### `--help|-h`
 
 Display this help message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
 
 * Accept value: no
 * Is value required: no
@@ -229,33 +256,6 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 #### `--version|-V`
 
 Display this application version
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--ansi`
-
-Force ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--no-ansi`
-
-Disable ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--no-interaction|-n`
-
-Do not ask any interactive question
 
 * Accept value: no
 * Is value required: no
@@ -285,7 +285,9 @@ command 2 help
 
 ### Options
 
-#### `--option_name|-o`
+#### `--ansi`
+
+Force ANSI output
 
 * Accept value: no
 * Is value required: no
@@ -295,6 +297,31 @@ command 2 help
 #### `--help|-h`
 
 Display this help message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--option_name|-o`
 
 * Accept value: no
 * Is value required: no
@@ -322,33 +349,6 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 #### `--version|-V`
 
 Display this application version
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--ansi`
-
-Force ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--no-ansi`
-
-Disable ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--no-interaction|-n`
-
-Do not ask any interactive question
 
 * Accept value: no
 * Is value required: no
@@ -367,9 +367,36 @@ Do not ask any interactive question
 
 ### Options
 
+#### `--ansi`
+
+Force ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
 #### `--help|-h`
 
 Display this help message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
 
 * Accept value: no
 * Is value required: no
@@ -397,33 +424,6 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 #### `--version|-V`
 
 Display this application version
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--ansi`
-
-Force ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--no-ansi`
-
-Disable ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Default: `false`
-
-#### `--no-interaction|-n`
-
-Do not ask any interactive question
 
 * Accept value: no
 * Is value required: no

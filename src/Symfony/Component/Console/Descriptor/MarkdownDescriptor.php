@@ -90,7 +90,7 @@ class MarkdownDescriptor extends Descriptor
     {
         if ($showArguments = \count($definition->getArguments()) > 0) {
             $this->write('### Arguments');
-            foreach ($definition->getArguments() as $argument) {
+            foreach ($this->sortByName($definition->getArguments()) as $argument) {
                 $this->write("\n\n");
                 $this->write($this->describeInputArgument($argument));
             }
@@ -102,7 +102,7 @@ class MarkdownDescriptor extends Descriptor
             }
 
             $this->write('### Options');
-            foreach ($definition->getOptions() as $option) {
+            foreach ($this->sortByName($definition->getOptions()) as $option) {
                 $this->write("\n\n");
                 $this->write($this->describeInputOption($option));
             }

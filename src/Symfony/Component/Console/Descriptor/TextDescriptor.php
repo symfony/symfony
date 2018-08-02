@@ -102,7 +102,7 @@ class TextDescriptor extends Descriptor
         if ($definition->getArguments()) {
             $this->writeText('<comment>Arguments:</comment>', $options);
             $this->writeText("\n");
-            foreach ($definition->getArguments() as $argument) {
+            foreach ($this->sortByName($definition->getArguments()) as $argument) {
                 $this->describeInputArgument($argument, array_merge($options, array('total_width' => $totalWidth)));
                 $this->writeText("\n");
             }
@@ -116,7 +116,7 @@ class TextDescriptor extends Descriptor
             $laterOptions = array();
 
             $this->writeText('<comment>Options:</comment>', $options);
-            foreach ($definition->getOptions() as $option) {
+            foreach ($this->sortByName($definition->getOptions()) as $option) {
                 if (\strlen($option->getShortcut()) > 1) {
                     $laterOptions[] = $option;
                     continue;

@@ -71,6 +71,22 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
+     * Sorts alphabetically given array of objects using ->getName(), and returns it.
+     *
+     * @param array $objects
+     *
+     * @return array
+     */
+    protected function sortByName(array $objects): array
+    {
+        \uasort($objects, function ($objectA, $objectB) {
+            return \strcmp($objectA->getName(), $objectB->getName());
+        });
+
+        return $objects;
+    }
+
+    /**
      * Describes an InputArgument instance.
      *
      * @return string|mixed

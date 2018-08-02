@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Descriptor;
 
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -102,6 +103,14 @@ abstract class AbstractDescriptorTest extends TestCase
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options + array('raw_output' => true));
-        $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+
+        try {
+            $actual = trim(str_replace(PHP_EOL, "\n", $output->fetch()));
+            $this->assertEquals(trim($expectedDescription), $actual);
+        } catch (ExpectationFailedException $exception) {
+//            \var_dump($actual);
+//            die;
+            throw $exception;
+        }
     }
 }

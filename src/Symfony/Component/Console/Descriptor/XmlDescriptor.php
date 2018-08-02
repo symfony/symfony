@@ -35,12 +35,12 @@ class XmlDescriptor extends Descriptor
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
 
         $definitionXML->appendChild($argumentsXML = $dom->createElement('arguments'));
-        foreach ($definition->getArguments() as $argument) {
+        foreach ($this->sortByName($definition->getArguments()) as $argument) {
             $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
         }
 
         $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
-        foreach ($definition->getOptions() as $option) {
+        foreach ($this->sortByName($definition->getOptions()) as $option) {
             $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
         }
 

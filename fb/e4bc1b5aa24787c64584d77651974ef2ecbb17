@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-08-01T18:50:21Z
+
+This is how it looks like:
+
+Parsing the [`services.yaml` file](https://github.com/symfony/recipes/blob/master/symfony/framework-bundle/3.3/config/services.yaml) from the FrameworkBundle recipe:
+
+<img width="733" alt="bildschirmfoto 2018-08-01 um 20 45 06" src="https://user-images.githubusercontent.com/1957048/43541939-ee7b840c-95cb-11e8-9a9c-b0b512b1e2e2.png">
+
+(see
+https://blackfire.io/profiles/compare/b59c7350-088d-4a74-be43-45a39152ce89/graph)
+
+Executing the Yaml component test suite:
+
+<img width="757" alt="bildschirmfoto 2018-08-01 um 20 49 28" src="https://user-images.githubusercontent.com/1957048/43542100-6bfbdbd4-95cc-11e8-930c-957cf80bfdc5.png">
+
+(see https://blackfire.io/profiles/compare/b2f2e6a6-87d3-40ad-95dd-52a2ba6bdda7/graph)

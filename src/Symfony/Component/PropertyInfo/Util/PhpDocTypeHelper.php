@@ -89,28 +89,26 @@ final class PhpDocTypeHelper
     {
         // Cannot guess
         if (!$docType || 'mixed' === $docType) {
-            return;
+            return null;
         }
 
-        if ($collection = '[]' === substr($docType, -2)) {
-            $docType = substr($docType, 0, -2);
+        if ('[]' === substr($docType, -2)) {
+            if ('mixed[]' === $docType) {
+                $collectionKeyType = null;
+                $collectionValueType = null;
+            } else {
+                $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
+                $collectionValueType = $this->createType(substr($docType, 0, -2), $nullable);
+            }
+
+            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
         }
 
         $docType = $this->normalizeType($docType);
         list($phpType, $class) = $this->getPhpTypeAndClass($docType);
 
-        $array = 'array' === $docType;
-
-        if ($collection || $array) {
-            if ($array || 'mixed' === $docType) {
-                $collectionKeyType = null;
-                $collectionValueType = null;
-            } else {
-                $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-                $collectionValueType = new Type($phpType, $nullable, $class);
-            }
-
-            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
+        if ('array' === $docType) {
+            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, null, null);
         }
 
         return new Type($phpType, $nullable, $class);

@@ -45,6 +45,14 @@ class Dummy extends ParentDummy
      * @Groups({"a", "b"})
      */
     public $collection;
+    /**
+     * @var string[][]
+     */
+    public $nestedCollection;
+    /**
+     * @var mixed[]
+     */
+    public $mixedCollection;
 
     /**
      * @var string[][]

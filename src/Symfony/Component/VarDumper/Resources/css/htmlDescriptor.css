@@ -102,7 +102,7 @@ pre.sf-dump {
     margin-bottom: 0;
 }
 .hidden {
-    display: none; !important
+    display: none !important;
 }
 .dumped-tag > .sf-dump {
     display: inline-block;

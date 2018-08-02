@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* The `$currentUri` constructor argument of the `AbstractUriElement`, `Link` and
+  `Image` classes is now optional.
+
 3.1.0
 -----
 

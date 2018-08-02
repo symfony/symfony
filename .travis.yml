@@ -50,7 +50,15 @@ before_install:
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
 
-      nanoseconds() {
+      if [[ $PHP = 5.* ]]; then
+          composer () {
+              $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/composer config platform.php $TRAVIS_PHP_VERSION
+              $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/composer $*
+          }
+          export -f composer
+      fi
+
+      nanoseconds () {
           local cmd="date"
           local format="+%s%N"
           local os=$(uname)
@@ -90,7 +98,7 @@ before_install:
           INI=/etc/hhvm/php.ini
       else
           INI=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-          phpenv config-rm xdebug.ini || echo "xdebug not available"
+          find ~/.phpenv -name xdebug.ini -delete
       fi
       echo date.timezone = Europe/Paris >> $INI
       echo memory_limit = -1 >> $INI

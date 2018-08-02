@@ -9,6 +9,7 @@ CHANGELOG
  * deprecated passing a command as a string to `ProcessHelper::run()`,
    pass it the command as an array of its arguments instead
  * made the `ProcessHelper` class final
+ * sort alphabetically arguments and options when describing commands definitions
 
 4.1.0
 -----

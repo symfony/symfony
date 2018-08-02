@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-23T12:48:29Z
+
+In the latest commit 1f797ea21603c7c5f9fbeb11f7825cecffa46eb1 I made the constructor argument optional, because this is probably what the issue reporter wanted in the first place. If we agree with this ... we should rebase into master as a new feature.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-24T13:49:35Z
+
+@stof do you agree that we should rebase this on `master` and treat it as a new feature? Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-24T13:52:11Z
+
+We could indeed consider that a new feature rather than a bugfix.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-24T18:51:41Z
+
+IMO there is one downside with this new approach: Previously, you could safe call `getUri()` as the object was in a valid state. Now you could run into exceptions based on the internal state. That's probably something consuming code isn't prepared for.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-25T10:39:01Z
+
+@xabbuh you are right! I've refactored this to introduce the new feature without changing the current behavior much. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-26T09:25:53Z
+
+(rebase needed)

@@ -170,7 +170,7 @@ class Response
         422 => 'Unprocessable Entity',                                        // RFC4918
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
-        425 => 'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
+        425 => 'Too Early',                                                   // RFC-ietf-httpbis-replay-04
         426 => 'Upgrade Required',                                            // RFC2817
         428 => 'Precondition Required',                                       // RFC6585
         429 => 'Too Many Requests',                                           // RFC6585

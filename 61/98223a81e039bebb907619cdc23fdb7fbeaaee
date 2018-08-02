@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by BoShurik at 2018-06-28T20:11:38Z
+
+Not sure that failed build is related to the changes...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-03T06:54:13Z
+
+Let's ask some heavy users of Ajax requests (like @ostrolucky) what do they think of this proposal. I "remember" that in the past we did the opposite change ... but I'm not sure at all. Thanks!
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-03T07:29:36Z
+
+I don't remember this being at bottom ever
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2018-07-03T09:16:12Z
+
+@ostrolucky this behaviour was at the first (light) profiler design with symfony <=2.7
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2018-07-03T10:08:49Z
+
+<details><summary>Before:</summary>
+
+![ajax-before](https://user-images.githubusercontent.com/1428848/42213546-c14227f0-7ec1-11e8-9ad6-93686a8c80df.gif)
+
+</details>
+<details><summary>After:</summary>
+
+![ajax-after](https://user-images.githubusercontent.com/1428848/42213543-bdc605ba-7ec1-11e8-9f71-f34e421eadfd.gif)
+
+</details>
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-03T10:52:13Z
+
+The past change was done in https://github.com/symfony/symfony/pull/17457, based on discussion in https://github.com/symfony/symfony/issues/16831
+
+---------------------------------------------------------------------------
+
+by stof at 2018-07-03T10:53:18Z
+
+btw, your GIF shows that you are reintroducing the behavior which was asked for removal: having to scroll to be able to see the latest requests.
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2018-07-03T11:31:00Z
+
+@stof missed that one. Is this the only reason?
+<details><summary>What about this behavior:</summary>
+
+![ajax-after-2](https://user-images.githubusercontent.com/1428848/42217346-7be5c278-7ecd-11e8-9700-e85ad2127b40.gif)
+
+</details>
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-03T11:40:02Z
+
+I think that would be best. It mimics behaviour of browser network inspectors

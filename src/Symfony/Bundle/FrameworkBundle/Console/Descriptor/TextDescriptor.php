@@ -260,6 +260,10 @@ class TextDescriptor extends Descriptor
             $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
         }
 
+        if ('' !== $classDescription = $this->getClassDescription($definition->getClass())) {
+            $options['output']->text($classDescription."\n");
+        }
+
         $tableHeaders = array('Option', 'Value');
 
         $tableRows[] = array('Service ID', isset($options['id']) ? $options['id'] : '-');

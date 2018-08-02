@@ -220,6 +220,10 @@ class JsonDescriptor extends Descriptor
             'autoconfigure' => $definition->isAutoconfigured(),
         );
 
+        if ('' !== $classDescription = $this->getClassDescription($definition->getClass())) {
+            $data['description'] = $classDescription;
+        }
+
         if ($showArguments) {
             $data['arguments'] = $this->describeValue($definition->getArguments(), $omitTags, $showArguments);
         }

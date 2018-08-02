@@ -124,7 +124,7 @@ before_install:
           deps=skip
           skip=1
       else
-          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+          COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       fi
 
     - |
@@ -151,6 +151,7 @@ before_install:
           tfold ext.libsodium tpecl libsodium sodium.so $INI
           tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
           tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
+          tfold ext.igbinary tpecl igbinary-2.0.6 igbinary.so $INI
       fi
 
     - |
@@ -180,7 +181,7 @@ install:
           SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//) &&
           git fetch origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
-          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+          COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       elif [[ ! $skip ]]; then
           SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
       fi

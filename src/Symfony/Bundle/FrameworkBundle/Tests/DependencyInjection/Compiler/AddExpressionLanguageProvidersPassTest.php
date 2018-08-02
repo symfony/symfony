@@ -22,7 +22,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
     public function testProcessForRouter()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
 
         $definition = new Definition('\stdClass');
         $definition->addTag('routing.expression_language_provider');
@@ -41,7 +41,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
     public function testProcessForRouterAlias()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
 
         $definition = new Definition('\stdClass');
         $definition->addTag('routing.expression_language_provider');
@@ -58,6 +58,10 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Registering services tagged "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
+     */
     public function testProcessForSecurity()
     {
         $container = new ContainerBuilder();
@@ -76,6 +80,10 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Registering services tagged "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
+     */
     public function testProcessForSecurityAlias()
     {
         $container = new ContainerBuilder();
@@ -93,5 +101,44 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertCount(1, $calls);
         $this->assertEquals('registerProvider', $calls[0][0]);
         $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testProcessIgnoreSecurity()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+
+        $definition = new Definition('\stdClass');
+        $definition->addTag('security.expression_language_provider');
+        $container->setDefinition('some_security_provider', $definition->setPublic(true));
+
+        $container->register('security.expression_language', '\stdClass')->setPublic(true);
+        $container->compile();
+
+        $calls = $container->getDefinition('security.expression_language')->getMethodCalls();
+        $this->assertCount(0, $calls);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testProcessIgnoreSecurityAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+
+        $definition = new Definition('\stdClass');
+        $definition->addTag('security.expression_language_provider');
+        $container->setDefinition('some_security_provider', $definition->setPublic(true));
+
+        $container->register('my_security.expression_language', '\stdClass')->setPublic(true);
+        $container->setAlias('security.expression_language', 'my_security.expression_language');
+        $container->compile();
+
+        $calls = $container->getDefinition('my_security.expression_language')->getMethodCalls();
+        $this->assertCount(0, $calls);
     }
 }

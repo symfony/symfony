@@ -265,6 +265,7 @@
     <xsd:complexType name="cache_pool">
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="adapter" type="xsd:string" />
+        <xsd:attribute name="tags" type="xsd:string" />
         <xsd:attribute name="public" type="xsd:boolean" />
         <xsd:attribute name="default-lifetime" type="xsd:integer" />
         <xsd:attribute name="provider" type="xsd:string" />

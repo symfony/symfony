@@ -1,4 +1,4 @@
-[39;49m // [39;49mThis service is an alias for the service [32mservice_1[39m                                                                  
+[39;49m // [39;49mThis service is a [32mpublic[39m alias for the service [32mservice_1[39m                                                            
 
 [33mInformation for Service "[39m[32mservice_1[39m[33m"[39m
 [33m===================================[39m

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `Symfony\Component\Form\ClearableErrorsInterface`
+ * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+
 4.1.0
 -----
 

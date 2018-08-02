@@ -24,8 +24,12 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
  */
 class ChainAdapterTest extends AdapterTestCase
 {
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0, $testMethod = null)
     {
+        if ('testGetMetadata' === $testMethod) {
+            return new ChainAdapter(array(new FilesystemAdapter('', $defaultLifetime)), $defaultLifetime);
+        }
+
         return new ChainAdapter(array(new ArrayAdapter($defaultLifetime), new ExternalAdapter(), new FilesystemAdapter('', $defaultLifetime)), $defaultLifetime);
     }
 

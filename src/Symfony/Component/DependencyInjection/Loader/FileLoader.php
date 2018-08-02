@@ -40,10 +40,10 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * Registers a set of classes as services using PSR-4 for discovery.
      *
-     * @param Definition $prototype A definition to use as template
-     * @param string     $namespace The namespace prefix of classes in the scanned directory
-     * @param string     $resource  The directory to look for classes, glob-patterns allowed
-     * @param string     $exclude   A globed path of files to exclude
+     * @param Definition           $prototype A definition to use as template
+     * @param string               $namespace The namespace prefix of classes in the scanned directory
+     * @param string               $resource  The directory to look for classes, glob-patterns allowed
+     * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      */
     public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
     {
@@ -54,7 +54,7 @@ abstract class FileLoader extends BaseFileLoader
             throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: %s.', $namespace));
         }
 
-        $classes = $this->findClasses($namespace, $resource, $exclude);
+        $classes = $this->findClasses($namespace, $resource, (array) $exclude);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
         $interfaces = array();
@@ -101,14 +101,14 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses($namespace, $pattern, $excludePattern)
+    private function findClasses($namespace, $pattern, array $excludePatterns)
     {
         $parameterBag = $this->container->getParameterBag();
 
         $excludePaths = array();
         $excludePrefix = null;
-        if ($excludePattern) {
-            $excludePattern = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePattern));
+        $excludePatterns = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePatterns));
+        foreach ($excludePatterns as $excludePattern) {
             foreach ($this->glob($excludePattern, true, $resource) as $path => $info) {
                 if (null === $excludePrefix) {
                     $excludePrefix = $resource->getPrefix();

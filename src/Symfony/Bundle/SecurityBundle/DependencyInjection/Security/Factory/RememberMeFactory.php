@@ -25,6 +25,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         'domain' => null,
         'secure' => false,
         'httponly' => true,
+        'samesite' => null,
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',
     );

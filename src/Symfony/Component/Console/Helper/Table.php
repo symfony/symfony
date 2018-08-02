@@ -34,6 +34,9 @@ class Table
     private const BORDER_OUTSIDE = 0;
     private const BORDER_INSIDE = 1;
 
+    private $headerTitle;
+    private $footerTitle;
+
     /**
      * Table headers.
      */
@@ -290,6 +293,20 @@ class Table
         return $this;
     }
 
+    public function setHeaderTitle(?string $title): self
+    {
+        $this->headerTitle = $title;
+
+        return $this;
+    }
+
+    public function setFooterTitle(?string $title): self
+    {
+        $this->footerTitle = $title;
+
+        return $this;
+    }
+
     /**
      * Renders table to output.
      *
@@ -331,15 +348,17 @@ class Table
             }
 
             if ($isHeader || $isFirstRow) {
-                $this->renderRowSeparator($isFirstRow ? self::SEPARATOR_TOP_BOTTOM : self::SEPARATOR_TOP);
                 if ($isFirstRow) {
+                    $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
                     $isFirstRow = false;
+                } else {
+                    $this->renderRowSeparator(self::SEPARATOR_TOP, $this->headerTitle, $this->style->getHeaderTitleFormat());
                 }
             }
 
             $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
         }
-        $this->renderRowSeparator(self::SEPARATOR_BOTTOM);
+        $this->renderRowSeparator(self::SEPARATOR_BOTTOM, $this->footerTitle, $this->style->getFooterTitleFormat());
 
         $this->cleanup();
         $this->rendered = true;
@@ -350,7 +369,7 @@ class Table
      *
      * Example: <code>+-----+-----------+-------+</code>
      */
-    private function renderRowSeparator(int $type = self::SEPARATOR_MID)
+    private function renderRowSeparator(int $type = self::SEPARATOR_MID, string $title = null, string $titleFormat = null)
     {
         if (0 === $count = $this->numberOfColumns) {
             return;
@@ -376,6 +395,23 @@ class Table
         for ($column = 0; $column < $count; ++$column) {
             $markup .= str_repeat($horizontal, $this->effectiveColumnWidths[$column]);
             $markup .= $column === $count - 1 ? $rightChar : $midChar;
+        }
+
+        if (null !== $title) {
+            $titleLength = Helper::strlenWithoutDecoration($formatter = $this->output->getFormatter(), $formattedTitle = sprintf($titleFormat, $title));
+            $markupLength = Helper::strlen($markup);
+            if ($titleLength > $limit = $markupLength - 4) {
+                $titleLength = $limit;
+                $formatLength = Helper::strlenWithoutDecoration($formatter, sprintf($titleFormat, ''));
+                $formattedTitle = sprintf($titleFormat, Helper::substr($title, 0, $limit - $formatLength - 3).'...');
+            }
+
+            $titleStart = ($markupLength - $titleLength) / 2;
+            if (false === mb_detect_encoding($markup, null, true)) {
+                $markup = substr_replace($markup, $formattedTitle, $titleStart, $titleLength);
+            } else {
+                $markup = mb_substr($markup, 0, $titleStart).$formattedTitle.mb_substr($markup, $titleStart + $titleLength);
+            }
         }
 
         $this->output->writeln(sprintf($this->style->getBorderFormat(), $markup));

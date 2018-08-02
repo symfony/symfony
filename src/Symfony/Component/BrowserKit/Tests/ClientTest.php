@@ -322,6 +322,30 @@ class ClientTest extends TestCase
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
+    public function testClickLink()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->clickLink('foo');
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
+    }
+
+    public function testClickLinkNotFound()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><a href="/foo">foobar</a></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        try {
+            $client->clickLink('foo');
+            $this->fail('->clickLink() throws a \InvalidArgumentException if the link could not be found');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->clickLink() throws a \InvalidArgumentException if the link could not be found');
+        }
+    }
+
     public function testClickForm()
     {
         $client = new TestClient();
@@ -342,6 +366,45 @@ class ClientTest extends TestCase
         $client->submit($crawler->filter('input')->form());
 
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+    }
+
+    public function testSubmitForm()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" value="the username" /><input type="password" name="password" value="the password" /><input type="submit" value="Register" /></form></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->submitForm('Register', array(
+            'username' => 'new username',
+            'password' => 'new password',
+        ), 'PUT', array(
+            'HTTP_USER_AGENT' => 'Symfony User Agent',
+            'HTTPS' => true,
+        ));
+
+        $this->assertEquals('https://www.example.com/foo', $client->getRequest()->getUri(), '->submitForm() submit forms');
+        $this->assertEquals('PUT', $client->getRequest()->getMethod(), '->submitForm() allows to change the method');
+        $this->assertEquals('new username', $client->getRequest()->getParameters()['username'], '->submitForm() allows to override the form values');
+        $this->assertEquals('new password', $client->getRequest()->getParameters()['password'], '->submitForm() allows to override the form values');
+        $this->assertEquals('Symfony User Agent', $client->getRequest()->getServer()['HTTP_USER_AGENT'], '->submitForm() allows to change the $_SERVER parameters');
+        $this->assertTrue($client->getRequest()->getServer()['HTTPS'], '->submitForm() allows to change the $_SERVER parameters');
+    }
+
+    public function testSubmitFormNotFound()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        try {
+            $client->submitForm('Register', array(
+                'username' => 'username',
+                'password' => 'password',
+            ), 'POST');
+            $this->fail('->submitForm() throws a \InvalidArgumentException if the form could not be found');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
+        }
     }
 
     public function testSubmitPreserveAuth()
@@ -592,6 +655,39 @@ class ClientTest extends TestCase
             $this->assertEmpty($client->getRequest()->getContent(), '->followRedirect() drops content with POST method on response code: '.$code.'.');
             $this->assertEquals('GET', $client->getRequest()->getMethod(), '->followRedirect() drops request method to GET on response code: '.$code.'.');
         }
+    }
+
+    /**
+     * @dataProvider getTestsForMetaRefresh
+     */
+    public function testFollowMetaRefresh(string $content, string $expectedEndingUrl, bool $followMetaRefresh = true)
+    {
+        $client = new TestClient();
+        $client->followMetaRefresh($followMetaRefresh);
+        $client->setNextResponse(new Response($content));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals($expectedEndingUrl, $client->getRequest()->getUri());
+    }
+
+    public function getTestsForMetaRefresh()
+    {
+        return array(
+            array('<html><head><meta http-equiv="Refresh" content="4" /><meta http-equiv="refresh" content="0; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;URL=\'http://www.example.com/redirected\'"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content=\'0;URL="http://www.example.com/redirected"\'/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0; URL = http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;URL= http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'),
+            array('<html><head><noscript><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></noscript></head></head></html>', 'http://www.example.com/redirected'),
+            // Non-zero timeout should not result in a redirect.
+            array('<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'),
+            array('<html><body></body></html>', 'http://www.example.com/foo/foobar'),
+            // Invalid meta tag placement should not result in a redirect.
+            array('<html><body><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected"/></body></html>', 'http://www.example.com/foo/foobar'),
+            // Valid meta refresh should not be followed if disabled.
+            array('<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar', false),
+        );
     }
 
     public function testBack()

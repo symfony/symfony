@@ -208,7 +208,7 @@ class AutowirePass extends AbstractRecursivePass
                         continue;
                     }
                     $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, false);
-                    $type = $type ? sprintf('is type-hinted "%s"', $type) : 'has no type-hint';
+                    $type = $type ? sprintf('is type-hinted "%s"', ltrim($type, '\\')) : 'has no type-hint';
 
                     throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" %s, you should configure its value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method, $type));
                 }

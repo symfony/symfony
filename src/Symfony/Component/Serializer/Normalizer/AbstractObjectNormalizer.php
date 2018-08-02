@@ -79,7 +79,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object);
+            return $this->handleCircularReference($object, $format, $context);
         }
 
         $data = array();

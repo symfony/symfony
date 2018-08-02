@@ -34,6 +34,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
             '.foo',
             '.git',
             'foo',
+            'qux',
             'test.php',
             'toto',
             'toto/.git',

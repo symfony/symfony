@@ -529,7 +529,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "DateTime", "string" given
+     * @expectedExceptionMessage Expected argument of type "DateTime", "string" given at property path "date"
      */
     public function testThrowTypeError()
     {

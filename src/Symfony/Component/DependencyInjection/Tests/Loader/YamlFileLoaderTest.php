@@ -739,4 +739,14 @@ class YamlFileLoaderTest extends TestCase
             '$factory' => 'factory',
         ), array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
     }
+
+    public function testFqcnLazyProxy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_lazy_fqcn.yml');
+
+        $definition = $container->getDefinition('foo');
+        $this->assertSame(array(array('interface' => 'SomeInterface')), $definition->getTag('proxy'));
+    }
 }

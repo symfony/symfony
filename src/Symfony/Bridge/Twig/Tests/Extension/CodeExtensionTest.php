@@ -23,6 +23,11 @@ class CodeExtensionTest extends TestCase
         $this->assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
     }
 
+    public function testFileRelative()
+    {
+        $this->assertEquals('CodeExtensionTest.php', $this->getExtension()->getFileRelative(__FILE__));
+    }
+
     /**
      * @dataProvider getClassNameProvider
      */
@@ -64,6 +69,6 @@ class CodeExtensionTest extends TestCase
 
     protected function getExtension()
     {
-        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), '/root', 'UTF-8');
+        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), '/root', 'UTF-8', __DIR__);
     }
 }

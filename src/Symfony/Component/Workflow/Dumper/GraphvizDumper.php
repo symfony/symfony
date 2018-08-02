@@ -28,7 +28,7 @@ class GraphvizDumper implements DumperInterface
 {
     protected static $defaultOptions = array(
         'graph' => array('ratio' => 'compress', 'rankdir' => 'LR'),
-        'node' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => true, 'width' => 1),
+        'node' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => 'false', 'width' => 1),
         'edge' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'arrowhead' => 'normal', 'arrowsize' => 0.5),
     );
 

@@ -190,16 +190,23 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * If a circular reference handler is set, it will be called. Otherwise, a
      * {@class CircularReferenceException} will be thrown.
      *
-     * @param object $object
+     * @final since Symfony 4.2
+     *
+     * @param object      $object
+     * @param string|null $format
+     * @param array       $context
      *
      * @return mixed
      *
      * @throws CircularReferenceException
      */
-    protected function handleCircularReference($object)
+    protected function handleCircularReference($object/*, string $format = null, array $context = array()*/)
     {
+        $format = \func_num_args() > 1 ? func_get_arg(1) : null;
+        $context = \func_num_args() > 2 ? func_get_arg(2) : array();
+
         if ($this->circularReferenceHandler) {
-            return \call_user_func($this->circularReferenceHandler, $object);
+            return \call_user_func($this->circularReferenceHandler, $object, $format, $context);
         }
 
         throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
@@ -227,8 +234,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         $groups = false;
-        if (isset($context[static::GROUPS]) && \is_array($context[static::GROUPS])) {
-            $groups = $context[static::GROUPS];
+        if (isset($context[static::GROUPS]) && (\is_array($context[static::GROUPS]) || is_scalar($context[static::GROUPS]))) {
+            $groups = (array) $context[static::GROUPS];
         } elseif (!isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) || $context[static::ALLOW_EXTRA_ATTRIBUTES]) {
             return false;
         }

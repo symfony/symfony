@@ -544,6 +544,15 @@ class ObjectNormalizerTest extends TestCase
 
         $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy');
         $this->assertEquals($expected, $this->normalizer->normalize($obj));
+
+        $this->normalizer->setCircularReferenceHandler(function ($obj, string $format, array $context) {
+            $this->assertInstanceOf(CircularReferenceDummy::class, $obj);
+            $this->assertSame('test', $format);
+            $this->arrayHasKey('foo', $context);
+
+            return \get_class($obj);
+        });
+        $this->assertEquals($expected, $this->normalizer->normalize($obj, 'test', array('foo' => 'bar')));
     }
 
     public function testDenormalizeNonExistingAttribute()

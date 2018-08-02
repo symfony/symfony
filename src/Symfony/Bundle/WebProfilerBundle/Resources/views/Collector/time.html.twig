@@ -4,8 +4,8 @@
 
 {% if colors is not defined %}
     {% set colors = {
-        'default':                '#999',
-        'section':                '#444',
+        'default':                '#777',
+        'section':                '#999',
         'event_listener':         '#00B8F5',
         'template':               '#66CC00',
         'doctrine':               '#FF6633',
@@ -220,6 +220,11 @@
                 return query('#collector-content h2').clientWidth;
             }
 
+            function getCssVarValue(varName)
+            {
+                return getComputedStyle(document.querySelector('body')).getPropertyValue(varName);
+            }
+
             /**
              * Draw one canvas.
              *
@@ -272,7 +277,11 @@
                 ctx.lineWidth = 0;
 
                 // For each event, draw a line.
-                ctx.strokeStyle = "#CCC";
+                ctx.strokeStyle = getCssVarValue('--table-border');
+
+                // set the background color of the canvas
+                ctx.fillStyle = getCssVarValue('--table-background');
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 drawableEvents.forEach(function(event) {
                     event.periods.forEach(function(period) {
@@ -379,31 +388,31 @@
                 // For each event, draw the label.
                 mainEvents.forEach(function(event) {
 
-                    ctx.fillStyle = "#444";
+                    ctx.fillStyle = getCssVarValue('--color-text');
                     ctx.font = "12px sans-serif";
                     text = event.name;
                     ms = "  " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
-                        ctx.fillStyle = "#777";
+                        ctx.fillStyle = getCssVarValue('--color-muted');
                         xc = x + event.endtime * ratio - 1;
                         ctx.fillText(ms, xc, h);
 
                         xc -= ctx.measureText(ms).width;
                         ctx.font = "12px sans-serif";
-                        ctx.fillStyle = "#222";
+                        ctx.fillStyle = getCssVarValue('--color-text');
                         ctx.fillText(text, xc, h);
                     } else {
                         ctx.textAlign = "start";
                         ctx.font = "13px sans-serif";
-                        ctx.fillStyle = "#222";
+                        ctx.fillStyle = getCssVarValue('--color-text');
                         xc = x + event.starttime * ratio + 1;
                         ctx.fillText(text, xc, h);
 
                         xc += ctx.measureText(text).width;
                         ctx.font = "11px sans-serif";
-                        ctx.fillStyle = "#777";
+                        ctx.fillStyle = getCssVarValue('--color-muted');
                         ctx.fillText(ms, xc, h);
                     }
 

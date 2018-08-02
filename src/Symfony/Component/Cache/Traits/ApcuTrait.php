@@ -51,14 +51,20 @@ trait ApcuTrait
      */
     protected function doFetch(array $ids)
     {
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
+            $values = array();
             foreach (apcu_fetch($ids, $ok) ?: array() as $k => $v) {
                 if (null !== $v || $ok) {
-                    yield $k => $v;
+                    $values[$k] = $v;
                 }
             }
+
+            return $values;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+        } finally {
+            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
         }
     }
 

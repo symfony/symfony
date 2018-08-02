@@ -34,14 +34,15 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
     }
 
     /**
+     * @param Envelope $envelope
+     *
      * {@inheritdoc}
      */
-    public function handle($message, callable $next)
+    public function handle($envelope, callable $next)
     {
-        $envelope = Envelope::wrap($message);
         if ($envelope->get(ReceivedMessage::class)) {
             // It's a received message. Do not send it back:
-            return $next($message);
+            return $next($envelope);
         }
 
         $sender = $this->senderLocator->getSenderForMessage($envelope->getMessage());
@@ -54,7 +55,7 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
             }
         }
 
-        return $next($message);
+        return $next($envelope);
     }
 
     private function mustSendAndHandle($message): bool

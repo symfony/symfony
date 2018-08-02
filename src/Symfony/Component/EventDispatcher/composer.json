@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": "^7.1.3"
+        "php": "^7.1.3",
+        "symfony/contracts": "^1.0"
     },
     "require-dev": {
         "symfony/dependency-injection": "~3.4|~4.0",
@@ -41,7 +42,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

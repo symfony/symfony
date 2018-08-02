@@ -41,6 +41,7 @@ class CachePoolPass implements CompilerPassInterface
         $clearers = array();
         $attributes = array(
             'provider',
+            'name',
             'namespace',
             'default_lifetime',
             'reset',
@@ -56,8 +57,9 @@ class CachePoolPass implements CompilerPassInterface
                     $tags[0] += $t[0];
                 }
             }
+            $name = $tags[0]['name'] ?? $id;
             if (!isset($tags[0]['namespace'])) {
-                $tags[0]['namespace'] = $this->getNamespace($seed, $id);
+                $tags[0]['namespace'] = $this->getNamespace($seed, $name);
             }
             if (isset($tags[0]['clearer'])) {
                 $clearer = $tags[0]['clearer'];
@@ -67,7 +69,7 @@ class CachePoolPass implements CompilerPassInterface
             } else {
                 $clearer = null;
             }
-            unset($tags[0]['clearer']);
+            unset($tags[0]['clearer'], $tags[0]['name']);
 
             if (isset($tags[0]['provider'])) {
                 $tags[0]['provider'] = new Reference(static::getServiceProvider($container, $tags[0]['provider']));
@@ -86,14 +88,14 @@ class CachePoolPass implements CompilerPassInterface
                 unset($tags[0][$attr]);
             }
             if (!empty($tags[0])) {
-                throw new InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "clearer", "provider", "namespace", "default_lifetime" and "reset", found "%s".', $id, implode('", "', array_keys($tags[0]))));
+                throw new InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "clearer", "provider", "name", "namespace", "default_lifetime" and "reset", found "%s".', $id, implode('", "', array_keys($tags[0]))));
             }
 
             if (null !== $clearer) {
-                $clearers[$clearer][$id] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
+                $clearers[$clearer][$name] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
             }
 
-            $pools[$id] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
+            $pools[$name] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
         }
 
         $clearer = 'cache.global_clearer';

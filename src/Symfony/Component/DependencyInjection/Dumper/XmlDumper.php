@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -279,6 +280,9 @@ class XmlDumper extends Dumper
                 $element->setAttribute('tag', $value->getTag());
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');
+                $this->convertParameters($value->getValues(), $type, $element, 'key');
+            } elseif ($value instanceof ServiceLocatorArgument) {
+                $element->setAttribute('type', 'service_locator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');
             } elseif ($value instanceof Reference) {
                 $element->setAttribute('type', 'service');

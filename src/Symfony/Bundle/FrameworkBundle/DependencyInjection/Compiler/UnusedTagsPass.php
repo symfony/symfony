@@ -44,6 +44,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'messenger.receiver',
         'messenger.message_handler',
         'monolog.logger',
+        'proxy',
         'routing.expression_language_provider',
         'routing.loader',
         'security.expression_language_provider',

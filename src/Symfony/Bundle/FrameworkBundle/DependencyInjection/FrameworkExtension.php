@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Monolog\Processor\ProcessorInterface;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -22,6 +23,9 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -92,6 +96,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * FrameworkExtension.
@@ -321,8 +326,16 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
-        $container->registerForAutoconfiguration(ResettableInterface::class)
+        $container->registerForAutoconfiguration(ResetInterface::class)
             ->addTag('kernel.reset', array('method' => 'reset'));
+
+        if (!interface_exists(MarshallerInterface::class)) {
+            $container->registerForAutoconfiguration(ResettableInterface::class)
+                ->addTag('kernel.reset', array('method' => 'reset'));
+        }
+
+        $container->registerForAutoconfiguration(ProcessorInterface::class)
+            ->addTag('monolog.processor');
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
@@ -685,6 +698,9 @@ class FrameworkExtension extends Extension
 
         $loader->load('routing.xml');
 
+        if ($config['utf8']) {
+            $container->getDefinition('routing.loader')->replaceArgument(2, array('utf8' => true));
+        }
         if (!interface_exists(ContainerBagInterface::class)) {
             $container->getDefinition('router.default')
                 ->replaceArgument(0, new Reference('service_container'))
@@ -1542,9 +1558,12 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
     {
+        if (!class_exists(DefaultMarshaller::class)) {
+            $container->removeDefinition('cache.default_marshaller');
+        }
+
         $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
-        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
         if (isset($config['prefix_seed'])) {
@@ -1554,7 +1573,7 @@ class FrameworkExtension extends Extension
             // Inline any env vars referenced in the parameter
             $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
         }
-        foreach (array('doctrine', 'psr6', 'redis', 'memcached') as $name) {
+        foreach (array('doctrine', 'psr6', 'redis', 'memcached', 'pdo') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }
@@ -1563,12 +1582,31 @@ class FrameworkExtension extends Extension
             $config['pools']['cache.'.$name] = array(
                 'adapter' => $config[$name],
                 'public' => true,
+                'tags' => false,
             );
         }
         foreach ($config['pools'] as $name => $pool) {
+            if ($config['pools'][$pool['adapter']]['tags'] ?? false) {
+                $pool['adapter'] = '.'.$pool['adapter'].'.inner';
+            }
             $definition = new ChildDefinition($pool['adapter']);
+
+            if ($pool['tags']) {
+                if ($config['pools'][$pool['tags']]['tags'] ?? false) {
+                    $pool['tags'] = '.'.$pool['tags'].'.inner';
+                }
+                $container->register($name, TagAwareAdapter::class)
+                    ->addArgument(new Reference('.'.$name.'.inner'))
+                    ->addArgument(true !== $pool['tags'] ? new Reference($pool['tags']) : null)
+                    ->setPublic($pool['public'])
+                ;
+
+                $pool['name'] = $name;
+                $pool['public'] = false;
+                $name = '.'.$name.'.inner';
+            }
             $definition->setPublic($pool['public']);
-            unset($pool['adapter'], $pool['public']);
+            unset($pool['adapter'], $pool['public'], $pool['tags']);
 
             $definition->addTag('cache.pool', $pool);
             $container->setDefinition($name, $definition);

@@ -72,9 +72,11 @@ class PhpFileLoaderTest extends TestCase
         yield array('defaults');
         yield array('instanceof');
         yield array('prototype');
+        yield array('prototype_array');
         yield array('child');
         yield array('php7');
         yield array('anonymous');
+        yield array('lazy_fqcn');
     }
 
     /**

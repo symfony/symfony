@@ -17,11 +17,13 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -213,6 +215,11 @@ class PhpDumperTest extends TestCase
             ->setFile(realpath(self::$fixturesPath.'/includes/foo.php'))
             ->setShared(false)
             ->setPublic(true);
+        $container->register('throwing_one', \Bar\FooClass::class)
+            ->addArgument(new Reference('errored_one', ContainerBuilder::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE))
+            ->setPublic(true);
+        $container->register('errored_one', 'stdClass')
+            ->addError('No-no-no-no');
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(array('as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot')), true);
@@ -1032,6 +1039,38 @@ class PhpDumperTest extends TestCase
 
         $container = new \Symfony_DI_PhpDumper_Errored_Definition();
         $container->get('runtime_error');
+    }
+
+    public function testServiceLocatorArgument()
+    {
+        $container = include self::$fixturesPath.'/containers/container_service_locator_argument.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Service_Locator_Argument'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_service_locator_argument.php', str_replace(str_replace('\\', '\\\\', self::$fixturesPath.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dump));
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_Locator_Argument();
+        $locator = $container->get('bar')->locator;
+
+        $this->assertInstanceOf(ArgumentServiceLocator::class, $locator);
+        $this->assertSame($container->get('foo1'), $locator->get('foo1'));
+        $this->assertEquals(new \stdClass(), $locator->get('foo2'));
+        $this->assertSame($locator->get('foo2'), $locator->get('foo2'));
+        $this->assertEquals(new \stdClass(), $locator->get('foo3'));
+        $this->assertNotSame($locator->get('foo3'), $locator->get('foo3'));
+
+        try {
+            $locator->get('foo4');
+            $this->fail('RuntimeException expected.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('BOOM', $e->getMessage());
+        }
+
+        $this->assertNull($locator->get('foo5'));
+
+        $container->set('foo5', $foo5 = new \stdClass());
+        $this->assertSame($foo5, $locator->get('foo5'));
     }
 }
 

@@ -116,6 +116,12 @@ class YamlFileLoader extends FileLoader
         $methods = isset($config['methods']) ? $config['methods'] : array();
         $condition = isset($config['condition']) ? $config['condition'] : null;
 
+        foreach ($requirements as $placeholder => $requirement) {
+            if (\is_int($placeholder)) {
+                @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s"?', $placeholder, $requirement, $name, $path), E_USER_DEPRECATED);
+            }
+        }
+
         if (isset($config['controller'])) {
             $defaults['_controller'] = $config['controller'];
         }

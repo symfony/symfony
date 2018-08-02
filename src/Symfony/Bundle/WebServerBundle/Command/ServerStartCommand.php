@@ -135,7 +135,7 @@ EOF
         try {
             $server = new WebServer();
             if ($server->isRunning($input->getOption('pidfile'))) {
-                $io->error(sprintf('The web server is already running (listening on http://%s).', $server->getAddress($input->getOption('pidfile'))));
+                $io->error(sprintf('The web server has already been started. It is currently listening on http://%s. Please stop the web server before you try to start it again.', $server->getAddress($input->getOption('pidfile'))));
 
                 return 1;
             }

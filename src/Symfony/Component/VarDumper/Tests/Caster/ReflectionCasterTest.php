@@ -68,14 +68,14 @@ EOTXT
         $var = function ($x) use ($a, &$b) {};
 
         $this->assertDumpMatchesFormat(
-            <<<EOTXT
-Closure {
+            <<<'EOTXT'
+Closure($x) {
 %Aparameters: {
-    \$x: {}
+    $x: {}
   }
   use: {
-    \$a: 123
-    \$b: & 123
+    $a: 123
+    $b: & 123
   }
   file: "%sReflectionCasterTest.php"
   line: "68 to 68"
@@ -90,7 +90,7 @@ EOTXT
         $var = function () {};
 
         $expectedDump = <<<EOTXT
-Closure {
+Closure() {
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
 }
@@ -140,7 +140,7 @@ EOTXT
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
-Closure {
+Closure(): int {
   returnType: "int"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}

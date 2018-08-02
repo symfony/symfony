@@ -859,6 +859,10 @@ class Definition
     public function setBindings(array $bindings)
     {
         foreach ($bindings as $key => $binding) {
+            if (0 < strpos($key, '$') && $key !== $k = preg_replace('/[ \t]*\$/', ' $', $key)) {
+                unset($bindings[$key]);
+                $bindings[$key = $k] = $binding;
+            }
             if (!$binding instanceof BoundArgument) {
                 $bindings[$key] = new BoundArgument($binding);
             }

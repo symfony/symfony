@@ -24,7 +24,7 @@ class LoggerTest extends TestCase
         $handler = new TestHandler();
         $logger = new Logger(__METHOD__, array($handler));
 
-        $this->assertTrue($logger->error('error message'));
+        $logger->error('error message');
         $this->assertSame(array(), $logger->getLogs());
     }
 
@@ -33,7 +33,7 @@ class LoggerTest extends TestCase
         $handler = new TestHandler();
         $logger = new Logger(__METHOD__, array($handler));
 
-        $this->assertTrue($logger->error('error message'));
+        $logger->error('error message');
         $this->assertSame(0, $logger->countErrors());
     }
 
@@ -43,7 +43,7 @@ class LoggerTest extends TestCase
         $processor = new DebugProcessor();
         $logger = new Logger(__METHOD__, array($handler), array($processor));
 
-        $this->assertTrue($logger->error('error message'));
+        $logger->error('error message');
         $this->assertCount(1, $logger->getLogs());
     }
 
@@ -53,15 +53,15 @@ class LoggerTest extends TestCase
         $processor = new DebugProcessor();
         $logger = new Logger(__METHOD__, array($handler), array($processor));
 
-        $this->assertTrue($logger->debug('test message'));
-        $this->assertTrue($logger->info('test message'));
-        $this->assertTrue($logger->notice('test message'));
-        $this->assertTrue($logger->warning('test message'));
+        $logger->debug('test message');
+        $logger->info('test message');
+        $logger->notice('test message');
+        $logger->warning('test message');
 
-        $this->assertTrue($logger->error('test message'));
-        $this->assertTrue($logger->critical('test message'));
-        $this->assertTrue($logger->alert('test message'));
-        $this->assertTrue($logger->emergency('test message'));
+        $logger->error('test message');
+        $logger->critical('test message');
+        $logger->alert('test message');
+        $logger->emergency('test message');
 
         $this->assertSame(4, $logger->countErrors());
     }
@@ -72,7 +72,7 @@ class LoggerTest extends TestCase
         $logger = new Logger('test', array($handler));
         $logger->pushProcessor(new DebugProcessor());
 
-        $logger->addInfo('test');
+        $logger->info('test');
         $this->assertCount(1, $logger->getLogs());
         list($record) = $logger->getLogs();
 
@@ -101,7 +101,7 @@ class LoggerTest extends TestCase
         $logger = new Logger('test', array($handler));
         $logger->pushProcessor(new DebugProcessor());
 
-        $logger->addInfo('test');
+        $logger->info('test');
         $logger->clear();
 
         $this->assertEmpty($logger->getLogs());

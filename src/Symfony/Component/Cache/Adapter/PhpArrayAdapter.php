@@ -13,10 +13,13 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\GetTrait;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
 
 /**
@@ -26,11 +29,13 @@ use Symfony\Component\Cache\Traits\PhpArrayTrait;
  * @author Titouan Galopin <galopintitouan@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class PhpArrayAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
+class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     use PhpArrayTrait;
+    use GetTrait;
 
     private $createCacheItem;
+    private $marshaller;
 
     /**
      * @param string           $file         The PHP file were values are cached
@@ -40,7 +45,6 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
     {
         $this->file = $file;
         $this->pool = $fallbackPool;
-        $this->zendDetectUnicode = ini_get('zend.detect_unicode');
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) {
                 $item = new CacheItem();
@@ -80,6 +84,42 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
     /**
      * {@inheritdoc}
      */
+    public function get(string $key, callable $callback, float $beta = null)
+    {
+        if (null === $this->values) {
+            $this->initialize();
+        }
+        if (!isset($this->keys[$key])) {
+            get_from_pool:
+            if ($this->pool instanceof CacheInterface) {
+                return $this->pool->get($key, $callback, $beta);
+            }
+
+            return $this->doGet($this->pool, $key, $callback, $beta ?? 1.0);
+        }
+        $value = $this->values[$this->keys[$key]];
+
+        if ('N;' === $value) {
+            return null;
+        }
+        try {
+            if ($value instanceof \Closure) {
+                return $value();
+            }
+            if (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
+                return ($this->marshaller ?? $this->marshaller = new DefaultMarshaller())->unmarshall($value);
+            }
+        } catch (\Throwable $e) {
+            unset($this->keys[$key]);
+            goto get_from_pool;
+        }
+
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getItem($key)
     {
         if (!\is_string($key)) {
@@ -88,15 +128,22 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
         if (null === $this->values) {
             $this->initialize();
         }
-        if (!isset($this->values[$key])) {
+        if (!isset($this->keys[$key])) {
             return $this->pool->getItem($key);
         }
 
-        $value = $this->values[$key];
+        $value = $this->values[$this->keys[$key]];
         $isHit = true;
 
         if ('N;' === $value) {
             $value = null;
+        } elseif ($value instanceof \Closure) {
+            try {
+                $value = $value();
+            } catch (\Throwable $e) {
+                $value = null;
+                $isHit = false;
+            }
         } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
             try {
                 $value = unserialize($value);
@@ -140,7 +187,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
             $this->initialize();
         }
 
-        return isset($this->values[$key]) || $this->pool->hasItem($key);
+        return isset($this->keys[$key]) || $this->pool->hasItem($key);
     }
 
     /**
@@ -155,7 +202,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
             $this->initialize();
         }
 
-        return !isset($this->values[$key]) && $this->pool->deleteItem($key);
+        return !isset($this->keys[$key]) && $this->pool->deleteItem($key);
     }
 
     /**
@@ -171,7 +218,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
                 throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', \is_object($key) ? \get_class($key) : \gettype($key)));
             }
 
-            if (isset($this->values[$key])) {
+            if (isset($this->keys[$key])) {
                 $deleted = false;
             } else {
                 $fallbackKeys[] = $key;
@@ -197,7 +244,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
             $this->initialize();
         }
 
-        return !isset($this->values[$item->getKey()]) && $this->pool->save($item);
+        return !isset($this->keys[$item->getKey()]) && $this->pool->save($item);
     }
 
     /**
@@ -209,7 +256,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
             $this->initialize();
         }
 
-        return !isset($this->values[$item->getKey()]) && $this->pool->saveDeferred($item);
+        return !isset($this->keys[$item->getKey()]) && $this->pool->saveDeferred($item);
     }
 
     /**
@@ -226,14 +273,20 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
         $fallbackKeys = array();
 
         foreach ($keys as $key) {
-            if (isset($this->values[$key])) {
-                $value = $this->values[$key];
+            if (isset($this->keys[$key])) {
+                $value = $this->values[$this->keys[$key]];
 
                 if ('N;' === $value) {
                     yield $key => $f($key, null, true);
+                } elseif ($value instanceof \Closure) {
+                    try {
+                        yield $key => $f($key, $value(), true);
+                    } catch (\Throwable $e) {
+                        yield $key => $f($key, null, false);
+                    }
                 } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
                     try {
-                        yield $key => $f($key, unserialize($value), true);
+                        yield $key => $f($key, $this->unserializeValue($value), true);
                     } catch (\Throwable $e) {
                         yield $key => $f($key, null, false);
                     }

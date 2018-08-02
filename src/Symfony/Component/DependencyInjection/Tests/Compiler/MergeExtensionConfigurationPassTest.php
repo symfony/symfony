@@ -136,9 +136,8 @@ class FooConfiguration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('foo');
-        $rootNode
+        $treeBuilder = new TreeBuilder('foo');
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('bar')->end()
                 ->scalarNode('baz')->end()

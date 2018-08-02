@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-21T14:11:31Z
+
+There is another change you left out
+
+For:
+```php
+/** @var mixed[][] */
+```
+
+before:
+```yml
+builtintype: array
+collectionKeyType: null
+collectionValueType: null
+```
+after:
+```yml
+builtintype: array
+collectionKeyType:
+  builtintype: int
+collectionValueType:
+  builtintype: array
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-07-21T18:39:59Z
+
+Hi @ostrolucky ,
+
+I agreed, that I didn't handle the `mixed[]` the same way than before, but I think the new return is
+```
+builtintype: array
+collectionKeyType:
+  builtintype: int
+collectionValueType: null
+```
+(because of line 92) can you please double check?
+
+Which led to a different behavior for the field `collectionKeyType` because, this is what I would expect. And I though it was a bug too:  Why `int[]`, `bool[]`, `object[]` will not return the same collectionKeyType than `mixed[]`?
+Should I consider it has a BC break?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-21T19:14:34Z
+
+I double checked. Please write unit test for this.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-23T19:58:59Z
+
+mixed[][] behavior not clarified. What's the consensus? Seems there is different behavior currently than expected by author
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-23T21:24:56Z
+
+Also, not sure it's right to always use `int` for keyType, as there is no way to specify via docblock otherwise
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-07-24T15:17:57Z
+
+I reverted changes on `mixed[]` as PhpDocumentor cast `mixed[]` to generic `array` => https://github.com/phpDocumentor/TypeResolver/blob/0.4.0/src/Types/Array_.php#L80-L82.
+
+now `mixed[]` will return (as before)
+```
+builtintype: array
+collectionKeyType: null
+collectionValueType: null
+```

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Tests\Descriptor;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;

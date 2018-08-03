@@ -362,6 +362,11 @@ class ResponseTest extends ResponseTestCase
         $response->headers->set('Expires', -1);
         $response->expire();
         $this->assertNull($response->headers->get('Age'), '->expire() does not set the Age when the response is expired');
+
+        $response = new Response();
+        $response->headers->set('Expires', date(DATE_RFC2822, time() + 600));
+        $response->expire();
+        $this->assertNull($response->headers->get('Expires'), '->expire() removes the Expires header when the response is fresh');
     }
 
     public function testGetTtl()

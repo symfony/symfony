@@ -47,6 +47,16 @@ class Dummy extends ParentDummy
     public $collection;
 
     /**
+     * @var string[][]
+     */
+    public $nestedCollection;
+
+    /**
+     * @var mixed[]
+     */
+    public $mixedCollection;
+
+    /**
      * @var ParentDummy
      */
     public $B;

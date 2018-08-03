@@ -230,7 +230,7 @@ install:
           fi
           phpenv global ${PHP/hhvm*/hhvm}
           if [[ $PHP = 7.* ]]; then
-              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.0; composer require --dev --no-update mongodb/mongodb)
           fi
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install

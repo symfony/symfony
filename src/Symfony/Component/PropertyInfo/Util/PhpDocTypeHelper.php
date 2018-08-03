@@ -80,9 +80,9 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      */
-    private function createType(DocType $type, bool $nullable): ?Type
+    private function createType(DocType $type, bool $nullable, string $docType = null): ?Type
     {
-        $docType = (string) $type;
+        $docType = $docType ?? (string) $type;
 
         if ($type instanceof Collection) {
             list($phpType, $class) = $this->getPhpTypeAndClass((string) $type->getFqsen());
@@ -109,7 +109,7 @@ final class PhpDocTypeHelper
                 $collectionValueType = null;
             } else {
                 $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-                $collectionValueType = $this->createType(substr($docType, 0, -2), $nullable);
+                $collectionValueType = $this->createType($type, $nullable, substr($docType, 0, -2));
             }
 
             return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);

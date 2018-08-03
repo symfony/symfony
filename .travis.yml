@@ -196,9 +196,9 @@ install:
               break
           fi
           phpenv global $PHP
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
           if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then

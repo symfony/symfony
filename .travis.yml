@@ -22,9 +22,7 @@ matrix:
           sudo: required
           group: edge
         - php: 5.4
-        - php: 5.5
-        - php: 5.6
-        - php: 7.0
+          env: php_extra="5.5 5.6 7.0"
         - php: 7.1
           env: deps=high
         - php: 7.2
@@ -42,15 +40,26 @@ services: mongodb
 before_install:
     - |
       # General configuration
+      set -e
       stty cols 120
-      PHP=$TRAVIS_PHP_VERSION
       [ -d ~/.composer ] || mkdir ~/.composer
       cp .composer/* ~/.composer/
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
+      export COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+      find ~/.phpenv -name xdebug.ini -delete
 
-      nanoseconds() {
+      if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then
+          composer () {
+              $HOME/.phpenv/versions/7.1/bin/composer config platform.php $(echo ' <?php echo preg_replace("/-.*/", "", PHP_VERSION);' | php /dev/stdin)
+              $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer $*
+          }
+          export -f composer
+          ~/.phpenv/versions/7.1/bin/composer self-update
+      fi
+
+      nanoseconds () {
           local cmd="date"
           local format="+%s%N"
           local os=$(uname)
@@ -65,7 +74,7 @@ before_install:
 
       # tfold is a helper to create folded reports
       tfold () {
-          local title=$1
+          local title="🐘 $PHP $1"
           local fold=$(echo $title | sed -r 's/[^-_A-Za-z0-9]+/./g')
           shift
           local id=$(printf %08x $(( RANDOM * RANDOM )))
@@ -85,24 +94,6 @@ before_install:
       }
       export -f tfold
 
-      # php.ini configuration
-      if [[ $PHP = hhvm* ]]; then
-          INI=/etc/hhvm/php.ini
-      else
-          INI=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-          phpenv config-rm xdebug.ini || echo "xdebug not available"
-      fi
-      echo date.timezone = Europe/Paris >> $INI
-      echo memory_limit = -1 >> $INI
-      echo session.gc_probability = 0 >> $INI
-      echo opcache.enable_cli = 1 >> $INI
-      echo hhvm.jit = 0 >> $INI
-      echo apc.enable_cli = 1 >> $INI
-      [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI
-      if [[ $PHP = 5.* ]]; then
-          echo extension = mongo.so >> $INI
-      fi
-
       # tpecl is a helper to compile and cache php extensions
       tpecl () {
           local ext_name=$1
@@ -114,6 +105,7 @@ before_install:
           if [[ -e $ext_cache/$ext_so ]]; then
               echo extension = $ext_cache/$ext_so >> $INI
           else
+              rm ~/.pearrc /tmp/pear 2>/dev/null || true
               mkdir -p $ext_cache
               echo yes | pecl install -f $ext_name &&
               cp $ext_dir/$ext_so $ext_cache
@@ -121,38 +113,62 @@ before_install:
       }
       export -f tpecl
 
-      # Matrix lines for intermediate PHP versions are skipped for pull requests
-      if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then
-          deps=skip
-          skip=1
-      else
-          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
-      fi
-
     - |
       # Install sigchild-enabled PHP to test the Process component on the lowest PHP matrix line
-      if [[ ! $deps && $PHP = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then
+      if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then
           wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj &&
           (cd php-$MIN_PHP && ./configure --enable-sigchild --enable-pcntl && make -j2)
       fi
 
     - |
+      # php.ini configuration
+      for PHP in $TRAVIS_PHP_VERSION $php_extra; do
+          if [[ $PHP = hhvm* ]]; then
+              INI=/etc/hhvm/php.ini
+          else
+              phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
+              INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
+          fi
+          echo date.timezone = Europe/Paris >> $INI
+          echo memory_limit = -1 >> $INI
+          echo session.gc_probability = 0 >> $INI
+          echo opcache.enable_cli = 1 >> $INI
+          echo hhvm.jit = 0 >> $INI
+          echo apc.enable_cli = 1 >> $INI
+          [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI
+          if [[ $PHP = 5.* ]]; then
+              echo extension = mongo.so >> $INI
+          fi
+      done
+
+    - |
       # Install extra PHP extensions
-      if [[ ! $skip && $PHP = 5.* ]]; then
-          ([[ $deps ]] || tfold ext.symfony_debug 'cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> '"$INI")
-          tfold ext.memcached tpecl memcached-2.1.0 memcached.so $INI
-          tfold ext.apcu tpecl apcu-4.0.11 apcu.so $INI
-      elif [[ ! $skip && $PHP = 7.* ]]; then
-          tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-          tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
-      fi
+      for PHP in $TRAVIS_PHP_VERSION $php_extra; do
+          if [[ $PHP = hhvm* ]]; then
+              continue
+          fi
+          export PHP=$PHP
+          phpenv global $PHP
+          INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
+          if [[ $PHP = 5.* ]]; then
+              tfold ext.memcached tpecl memcached-2.1.0 memcached.so $INI
+              tfold ext.apcu tpecl apcu-4.0.11 apcu.so $INI
+              [[ $deps ]] && continue
+              ext_cache=~/php-ext/$(php -r "echo basename(ini_get('extension_dir'));")/symfony_debug.so
+              [[ -e $ext_cache ]] || (tfold ext.symfony_debug "cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && mv modules/symfony_debug.so $ext_cache && phpize --clean")
+              echo extension = $ext_cache >> $INI
+          elif [[ $PHP = 7.* ]]; then
+              tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
+              tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
+          fi
+      done
 
 install:
     - |
       # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit
-      elif [[ ! $skip ]]; then
+      else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&
           echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json &&
@@ -168,7 +184,7 @@ install:
           git fetch origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
           COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
-      elif [[ ! $skip ]]; then
+      else
           SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
       fi
 
@@ -177,24 +193,27 @@ install:
       [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]] && LEGACY=,legacy
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
-      if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
+      if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi
 
-      if [[ ! $skip && $PHP = 7.* ]]; then
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
-      fi
-
-    - if [[ ! $skip ]]; then $COMPOSER_UP; fi
-    - if [[ ! $skip ]]; then ./phpunit install; fi
     - |
       # phpinfo
-      if [[ ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+      if [[ ! $TRAVIS_PHP_VERSION = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
 
     - |
       run_tests () {
           set -e
-          if [[ $skip ]]; then
+          export PHP=$1
+          if [[ $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
               echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
-          elif [[ $deps = high ]]; then
+              break
+          fi
+          phpenv global ${PHP/hhvm*/hhvm}
+          tfold 'composer update' $COMPOSER_UP
+          tfold 'phpunit install' ./phpunit install
+          if [[ $PHP = 7.* ]]; then
+              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+          fi
+          if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'"
@@ -202,12 +221,13 @@ install:
               $PHPUNIT --exclude-group no-hhvm,benchmark,intl-data
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
-              tfold tty-group $PHPUNIT --group tty
+              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
-                  echo -e "1\\n0" | xargs -I{} bash -c "tfold src/Symfony/Component/Process.sigchild{} ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/"
+                  export PHP=$MIN_PHP
+                  echo -e "1\\n0" | xargs -I{} bash -c "tfold src/Symfony/Component/Process.sigchild{} SYMFONY_DEPRECATIONS_HELPER=weak ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/"
               fi
           fi
       }
 
 script:
-    - (run_tests)
+    - for PHP in $TRAVIS_PHP_VERSION $php_extra; do (run_tests $PHP); done

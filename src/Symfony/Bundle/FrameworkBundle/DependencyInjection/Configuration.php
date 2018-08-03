@@ -631,7 +631,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->fixXmlConfig('package')
                     ->children()
-                        ->arrayNode('packages')
+                        ->arrayNode('packages')->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->fixXmlConfig('base_url')

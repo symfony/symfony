@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-02T15:50:58Z
+
+Should be ready:
+- [x] uses PHP 7.1 to compute `composer update` on HHVM + PHP 5.*, saving ~1 minute per job
+- [x] runs intermediary PHP versions in one single job (skipped for PRs as before)
+
+This should relax the pressure on the CI, by reducing the number of jobs and making them faster to complete.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-02T16:13:28Z
+
+> runs intermediary PHP versions in one single job (skipped for PRs as before)
+
+wouldn't this make the build summary more confusing for contributors ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-02T16:24:43Z
+
+> wouldn't this make the build summary more confusing for contributors ?
+
+for contributors, these will be skipped with a message
+for regular builds, the PHP version is displayed in the output
+I invite you to check travis logs to figure out.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-02T16:29:21Z
+
+Skipping does not seems to work. It displays `Intermediate PHP version 5.5 is skipped for pull requests.` and then runs the tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-02T16:35:37Z
+
+You're too impatient, I was running a job with skipping disabled so you could look at the output :)
+So here is a job that runs tests for PHP version 5.4, 5.5, 5.6 and 7.0 in 10 minutes:
+https://travis-ci.org/symfony/symfony/jobs/411366615
+
+Ready now.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-02T16:39:47Z
+
+Well, you invited me to check the output, so I did it :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-02T16:42:45Z
+
+Thanks for doing it :) Here is a screenshot for others:
+![image](https://user-images.githubusercontent.com/243674/43597946-d0af66c4-9683-11e8-85e2-25770443597b.png)

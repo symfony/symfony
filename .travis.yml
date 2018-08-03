@@ -208,11 +208,11 @@ install:
               break
           fi
           phpenv global ${PHP/hhvm*/hhvm}
-          tfold 'composer update' $COMPOSER_UP
-          tfold 'phpunit install' ./phpunit install
           if [[ $PHP = 7.* ]]; then
               ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
           fi
+          tfold 'composer update' $COMPOSER_UP
+          tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then

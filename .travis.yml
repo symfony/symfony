@@ -22,7 +22,7 @@ env:
 
 matrix:
     include:
-        - php: 7.1.3
+        - php: 7.1
         - php: 7.1
           env: deps=high
         - php: 7.2
@@ -113,7 +113,7 @@ before_install:
 
     - |
       # Install sigchild-enabled PHP to test the Process component on the lowest PHP matrix line
-      if [[ ! $deps && $TRAVIS_PHP_VERSION = $MIN_PHP && ! -d php-$MIN_PHP/sapi ]]; then
+      if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then
           wget http://php.net/get/php-$MIN_PHP.tar.bz2/from/this/mirror -O - | tar -xj &&
           (cd php-$MIN_PHP && ./configure --enable-sigchild --enable-pcntl && make -j2)
       fi
@@ -216,7 +216,8 @@ install:
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
-              if [[ $PHP = $MIN_PHP ]]; then
+              if [[ $PHP = ${MIN_PHP%.*} ]]; then
+                  export PHP=$MIN_PHP
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/
               fi
           fi

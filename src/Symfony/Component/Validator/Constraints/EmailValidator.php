@@ -22,11 +22,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
+    /**
+     * @var bool
+     */
     private $isStrict;
 
-    /**
-     * @param bool $strict
-     */
     public function __construct($strict = false)
     {
         $this->isStrict = $strict;
@@ -138,6 +138,7 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
+        @trigger_error(__METHOD__.'() is deprecated since Symfony 2.8 and will be removed in 5.0.', E_USER_DEPRECATED);
         return '' !== $host && checkdnsrr($host, 'MX');
     }
 
@@ -150,6 +151,7 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkHost($host)
     {
+        @trigger_error(__METHOD__.'() is deprecated since Symfony 2.8 and will be removed in 5.0.', E_USER_DEPRECATED);
         return '' !== $host && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
     }
 }

@@ -23,6 +23,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class FileLinkFormatter implements \Serializable
 {
+    private static $routerCalled = false;
+
     private $fileLinkFormat;
     private $requestStack;
     private $baseDir;
@@ -77,7 +79,9 @@ class FileLinkFormatter implements \Serializable
     public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString)
     {
         try {
-            return $router->generate($routeName).$queryString;
+            self::$routerCalled = true;
+
+            return $router->generate($routeName, array(), UrlGeneratorInterface::ABSOLUTE_URL).$queryString;
         } catch (ExceptionInterface $e) {
             return null;
         }
@@ -95,9 +99,11 @@ class FileLinkFormatter implements \Serializable
                     return;
                 }
 
+                $urlFormat = self::$routerCalled ? $this->urlFormat : $request->getSchemeAndHttpHost().$request->getBaseUrl().$this->urlFormat;
+
                 return array(
-                    $request->getSchemeAndHttpHost().$request->getBaseUrl().$this->urlFormat,
-                    $this->baseDir.DIRECTORY_SEPARATOR, '',
+                    $urlFormat,
+                    $this->baseDir.\DIRECTORY_SEPARATOR, '',
                 );
             }
         }

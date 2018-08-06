@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Test;
 
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 abstract class TypeTestCase extends FormIntegrationTestCase
@@ -37,7 +37,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
 
     protected function tearDown()
     {
-        if (in_array(ValidatorExtensionTrait::class, class_uses($this))) {
+        if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
             $this->validator = null;
         }
     }
@@ -46,7 +46,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
     {
         $extensions = array();
 
-        if (in_array(ValidatorExtensionTrait::class, class_uses($this))) {
+        if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
             $extensions[] = $this->getValidatorExtension();
         }
 

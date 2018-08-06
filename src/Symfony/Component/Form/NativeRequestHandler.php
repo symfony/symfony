@@ -78,7 +78,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $form->submit(null, false);
 
                 $form->addError(new FormError(
-                    call_user_func($form->getConfig()->getOption('upload_max_size_message')),
+                    \call_user_func($form->getConfig()->getOption('upload_max_size_message')),
                     null,
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
                 ));
@@ -103,7 +103,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                 return;
             }
 
-            if (is_array($params) && is_array($files)) {
+            if (\is_array($params) && \is_array($files)) {
                 $data = array_replace_recursive($params, $files);
             } else {
                 $data = $params ?: $files;
@@ -111,7 +111,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         // Don't auto-submit the form unless at least one field is present.
-        if ('' === $name && count(array_intersect_key($data, $form->all())) <= 0) {
+        if ('' === $name && \count(array_intersect_key($data, $form->all())) <= 0) {
             return;
         }
 
@@ -126,7 +126,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         // POST data will always be strings or arrays of strings. Thus, we can be sure
         // that the submitted data is a file upload if the "error" value is an integer
         // (this value must have been injected by PHP itself).
-        return is_array($data) && isset($data['error']) && is_int($data['error']);
+        return \is_array($data) && isset($data['error']) && \is_int($data['error']);
     }
 
     /**
@@ -166,14 +166,14 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private static function fixPhpFilesArray($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys !== $keys || !isset($data['name']) || !is_array($data['name'])) {
+        if (self::$fileKeys !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
@@ -204,7 +204,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private static function stripEmptyFiles($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 

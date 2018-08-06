@@ -24,15 +24,15 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        if (!function_exists('apcu_fetch') || !ini_get('apc.enabled')) {
+        if (!\function_exists('apcu_fetch') || !ini_get('apc.enabled')) {
             $this->markTestSkipped('APCu extension is required.');
         }
-        if ('cli' === PHP_SAPI && !ini_get('apc.enable_cli')) {
+        if ('cli' === \PHP_SAPI && !ini_get('apc.enable_cli')) {
             if ('testWithCliSapi' !== $this->getName()) {
                 $this->markTestSkipped('apc.enable_cli=1 is required.');
             }
         }
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Fails transiently on Windows.');
         }
 
@@ -54,7 +54,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testVersion()
     {
-        $namespace = str_replace('\\', '.', get_class($this));
+        $namespace = str_replace('\\', '.', \get_class($this));
 
         $pool1 = new ApcuAdapter($namespace, 0, 'p1');
 
@@ -79,7 +79,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testNamespace()
     {
-        $namespace = str_replace('\\', '.', get_class($this));
+        $namespace = str_replace('\\', '.', \get_class($this));
 
         $pool1 = new ApcuAdapter($namespace.'_1', 0, 'p1');
 

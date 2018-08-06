@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
-use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
+use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -48,7 +48,7 @@ class ViolationMapper implements ViolationMapperInterface
         $match = false;
 
         // Don't create a ViolationPath instance for empty property paths
-        if (strlen($violation->getPropertyPath()) > 0) {
+        if (\strlen($violation->getPropertyPath()) > 0) {
             $violationPath = new ViolationPath($violation->getPropertyPath());
             $relativePath = $this->reconstructPath($violationPath, $form);
         }

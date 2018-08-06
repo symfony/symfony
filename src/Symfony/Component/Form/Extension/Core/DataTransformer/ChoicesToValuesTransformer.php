@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -38,7 +38,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
             return array();
         }
 
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -58,13 +58,13 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
             return array();
         }
 
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
         $choices = $this->choiceList->getChoicesForValues($array);
 
-        if (count($choices) !== count($array)) {
+        if (\count($choices) !== \count($array)) {
             throw new TransformationFailedException('Could not find all matching choices for the given values');
         }
 

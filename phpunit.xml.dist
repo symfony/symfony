@@ -26,6 +26,7 @@
             <directory>./src/Symfony/Bridge/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/*/Tests/</directory>
+            <directory>./src/Symfony/Contract/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -44,6 +45,7 @@
                 <directory>./src/Symfony/Bridge/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/*/Tests</directory>
+                <directory>./src/Symfony/Contract/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
@@ -52,6 +54,7 @@
                 <directory>./src/Symfony/Bundle/*/vendor</directory>
                 <directory>./src/Symfony/Component/*/vendor</directory>
                 <directory>./src/Symfony/Component/*/*/vendor</directory>
+                <directory>./src/Symfony/Contract/*/vendor</directory>
             </exclude>
         </whitelist>
     </filter>

@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
 
 /**
  * DelegatingEngine selects an engine for a given template.
@@ -66,7 +66,7 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     private function resolveEngines()
     {
         foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
+            if (\is_string($engine)) {
                 $this->engines[$i] = $this->container->get($engine);
             }
         }

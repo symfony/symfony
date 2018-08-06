@@ -110,7 +110,7 @@ final class Dotenv
         $this->data = str_replace(array("\r\n", "\r"), "\n", $data);
         $this->lineno = 1;
         $this->cursor = 0;
-        $this->end = strlen($this->data);
+        $this->end = \strlen($this->data);
         $this->state = self::STATE_VARNAME;
         $this->values = array();
         $name = '';
@@ -232,7 +232,7 @@ final class Dotenv
             } else {
                 $value = '';
                 $prevChr = $this->data[$this->cursor - 1];
-                while ($this->cursor < $this->end && !in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
+                while ($this->cursor < $this->end && !\in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
                     if ('\\' === $this->data[$this->cursor] && isset($this->data[$this->cursor + 1]) && ('"' === $this->data[$this->cursor + 1] || "'" === $this->data[$this->cursor + 1])) {
                         ++$this->cursor;
                     }
@@ -322,7 +322,7 @@ final class Dotenv
                 return substr($matches[0], 1);
             }
 
-            if ('\\' === DIRECTORY_SEPARATOR) {
+            if ('\\' === \DIRECTORY_SEPARATOR) {
                 throw new \LogicException('Resolving commands is not supported on Windows.');
             }
 
@@ -330,7 +330,7 @@ final class Dotenv
                 throw new \LogicException('Resolving commands requires the Symfony Process component.');
             }
 
-            $process = new Process('echo '.$matches[0]);
+            $process = \method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
             $process->inheritEnvironmentVariables(true);
             $process->setEnv($this->values);
             try {
@@ -391,7 +391,7 @@ final class Dotenv
 
     private function moveCursor($text)
     {
-        $this->cursor += strlen($text);
+        $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");
     }
 

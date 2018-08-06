@@ -44,7 +44,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
 
-            $coreThemePath = dirname(dirname($reflClass->getFileName())).'/Resources/views/Form';
+            $coreThemePath = \dirname(\dirname($reflClass->getFileName())).'/Resources/views/Form';
             $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array($coreThemePath));
 
             $paths = $container->getDefinition('twig.cache_warmer')->getArgument(2);
@@ -80,6 +80,10 @@ class ExtensionPass implements CompilerPassInterface
             if (!$container->has('twig.extension.dump')) {
                 $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
             }
+        }
+
+        if ($container->has('web_link.add_link_header_listener')) {
+            $container->getDefinition('twig.extension.weblink')->addTag('twig.extension');
         }
 
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');

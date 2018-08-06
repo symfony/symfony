@@ -66,7 +66,7 @@ class Store implements StoreInterface
 
         if (!isset($this->locks[$key])) {
             $path = $this->getPath($key);
-            if (!file_exists(dirname($path)) && false === @mkdir(dirname($path), 0777, true) && !is_dir(dirname($path))) {
+            if (!file_exists(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
                 return $path;
             }
             $h = fopen($path, 'cb');
@@ -185,7 +185,7 @@ class Store implements StoreInterface
             $response->headers->set('X-Content-Digest', $digest);
 
             if (!$response->headers->has('Transfer-Encoding')) {
-                $response->headers->set('Content-Length', strlen($response->getContent()));
+                $response->headers->set('Content-Length', \strlen($response->getContent()));
             }
         }
 
@@ -373,17 +373,17 @@ class Store implements StoreInterface
             @ftruncate($fp, 0);
             @fseek($fp, 0);
             $len = @fwrite($fp, $data);
-            if (strlen($data) !== $len) {
+            if (\strlen($data) !== $len) {
                 @ftruncate($fp, 0);
 
                 return false;
             }
         } else {
-            if (!file_exists(dirname($path)) && false === @mkdir(dirname($path), 0777, true) && !is_dir(dirname($path))) {
+            if (!file_exists(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
                 return false;
             }
 
-            $tmpFile = tempnam(dirname($path), basename($path));
+            $tmpFile = tempnam(\dirname($path), basename($path));
             if (false === $fp = @fopen($tmpFile, 'wb')) {
                 @unlink($tmpFile);
 
@@ -410,7 +410,7 @@ class Store implements StoreInterface
 
     public function getPath($key)
     {
-        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
+        return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);
     }
 
     /**

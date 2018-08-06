@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -22,31 +23,31 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ValidateEnvPlaceholdersPassTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Invalid type for env parameter "env(FOO)". Expected "string", but got "bool".
-     */
-    public function testDefaultEnvIsValidatedByType()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('env(FOO)', true);
-        $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
-            'scalar_node' => '%env(FOO)%',
-        ));
-
-        $this->doProcess($container);
-    }
-
     public function testEnvsAreValidatedInConfig()
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
+        $container->setParameter('env(FLOATISH)', 3.2);
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = array(
             'scalar_node' => '%env(NULLED)%',
+            'scalar_node_not_empty' => '%env(FLOATISH)%',
             'int_node' => '%env(int:FOO)%',
             'float_node' => '%env(float:BAR)%',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
+    public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FLOATISH)', 3.2);
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
+            'float_node' => '%env(FLOATISH)%',
         ));
 
         $this->doProcess($container);
@@ -222,6 +223,47 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testConfigurationWithoutRootNode(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new EnvExtension(new EnvConfigurationWithoutRootNode()));
+        $container->loadFromExtension('env_extension');
+
+        $this->doProcess($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testEmptyConfigFromMoreThanOneSource()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new EnvExtension(new ConfigurationWithArrayNodeRequiringOneElement()));
+        $container->loadFromExtension('env_extension', array());
+        $container->loadFromExtension('env_extension', array());
+
+        $this->doProcess($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testDiscardedEnvInConfig(): void
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(BOOLISH)', '1');
+        $container->setParameter('boolish', '%env(BOOLISH)%');
+        $container->registerExtension(new EnvExtension());
+        $container->prependExtensionConfig('env_extension', array(
+            'array_node' => array('bool_force_cast' => '%boolish%'),
+        ));
+
+        $container->compile(true);
+
+        $this->assertSame('1', $container->getParameter('boolish'));
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -234,9 +276,8 @@ class EnvConfiguration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('env_extension');
-        $rootNode
+        $treeBuilder = new TreeBuilder('env_extension');
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('scalar_node')->end()
                 ->scalarNode('scalar_node_not_empty')->cannotBeEmpty()->end()
@@ -245,11 +286,22 @@ class EnvConfiguration implements ConfigurationInterface
                 ->booleanNode('bool_node')->end()
                 ->arrayNode('array_node')
                     ->beforeNormalization()
-                        ->ifTrue(function ($value) { return !is_array($value); })
+                        ->ifTrue(function ($value) { return !\is_array($value); })
                         ->then(function ($value) { return array('child_node' => $value); })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function (array $v) {
+                            if (isset($v['bool_force_cast'])) {
+                                $v['bool_force_cast'] = (bool) $v['bool_force_cast'];
+                            }
+
+                            return $v;
+                        })
                     ->end()
                     ->children()
                         ->scalarNode('child_node')->end()
+                        ->booleanNode('bool_force_cast')->end()
                         ->integerNode('int_unset_at_zero')
                             ->validate()
                                 ->ifTrue(function ($value) { return 0 === $value; })
@@ -267,9 +319,41 @@ class EnvConfiguration implements ConfigurationInterface
     }
 }
 
+class EnvConfigurationWithoutRootNode implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        return new TreeBuilder();
+    }
+}
+
+class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder();
+        $treeBuilder->root('env_extension')
+            ->children()
+                ->arrayNode('nodes')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->scalarPrototype()->end()
+                ->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
 class EnvExtension extends Extension
 {
+    private $configuration;
     private $config;
+
+    public function __construct(ConfigurationInterface $configuration = null)
+    {
+        $this->configuration = $configuration ?? new EnvConfiguration();
+    }
 
     public function getAlias()
     {
@@ -278,12 +362,20 @@ class EnvExtension extends Extension
 
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        return new EnvConfiguration();
+        return $this->configuration;
     }
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        if (!array_filter($configs)) {
+            return;
+        }
+
+        try {
+            $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        } catch (TreeWithoutRootNodeException $e) {
+            $this->config = null;
+        }
     }
 
     public function getConfig()

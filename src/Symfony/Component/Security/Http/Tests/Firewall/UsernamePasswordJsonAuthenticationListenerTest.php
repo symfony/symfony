@@ -212,4 +212,42 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->listener->handle($event);
         $this->assertSame('ok', $event->getResponse()->getContent());
     }
+
+    public function testNoErrorOnMissingSessionStrategy()
+    {
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "password": "foo"}');
+        $this->configurePreviousSession($request);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
+        $this->assertEquals('ok', $event->getResponse()->getContent());
+    }
+
+    public function testMigratesViaSessionStrategy()
+    {
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "password": "foo"}');
+        $this->configurePreviousSession($request);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+
+        $sessionStrategy = $this->getMockBuilder('Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock();
+        $sessionStrategy->expects($this->once())
+            ->method('onAuthentication')
+            ->with($request, $this->isInstanceOf(TokenInterface::class));
+        $this->listener->setSessionAuthenticationStrategy($sessionStrategy);
+
+        $this->listener->handle($event);
+        $this->assertEquals('ok', $event->getResponse()->getContent());
+    }
+
+    private function configurePreviousSession(Request $request)
+    {
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_session_name');
+        $request->setSession($session);
+        $request->cookies->set('test_session_name', 'session_cookie_val');
+    }
 }

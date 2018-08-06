@@ -37,7 +37,7 @@ class RedisCaster
         }
 
         $ser = $c->getOption(\Redis::OPT_SERIALIZER);
-        $retry = defined('Redis::OPT_SCAN') ? $c->getOption(\Redis::OPT_SCAN) : 0;
+        $retry = \defined('Redis::OPT_SCAN') ? $c->getOption(\Redis::OPT_SCAN) : 0;
 
         return $a + array(
             $prefix.'isConnected' => $connected,

@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Predis\Connection\Factory;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\RedisCluster;
+use Predis\Connection\Factory;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
@@ -34,14 +36,17 @@ trait RedisTrait
         'timeout' => 30,
         'read_timeout' => 0,
         'retry_interval' => 0,
+        'compression' => true,
+        'tcp_keepalive' => 0,
         'lazy' => false,
     );
     private $redis;
+    private $marshaller;
 
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
      */
-    public function init($redisClient, $namespace = '', $defaultLifetime = 0)
+    private function init($redisClient, $namespace, $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         parent::__construct($namespace, $defaultLifetime);
 
@@ -51,9 +56,10 @@ trait RedisTrait
         if ($redisClient instanceof \RedisCluster) {
             $this->enableVersioning();
         } elseif (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \Predis\Client && !$redisClient instanceof RedisProxy) {
-            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redisClient) ? get_class($redisClient) : gettype($redisClient)));
+            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($redisClient) ? \get_class($redisClient) : \gettype($redisClient)));
         }
         $this->redis = $redisClient;
+        $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
     /**
@@ -93,7 +99,7 @@ trait RedisTrait
         }
         if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
             $params['dbindex'] = $m[1];
-            $params['path'] = substr($params['path'], 0, -strlen($m[0]));
+            $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
         }
         if (isset($params['host'])) {
             $scheme = 'tcp';
@@ -110,10 +116,10 @@ trait RedisTrait
             $params += $query;
         }
         $params += $options + self::$defaultConnectionOptions;
-        if (null === $params['class'] && !extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
+        if (null === $params['class'] && !\extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
             throw new CacheException(sprintf('Cannot find the "redis" extension, and "predis/predis" is not installed: %s', $dsn));
         }
-        $class = null === $params['class'] ? (extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
+        $class = null === $params['class'] ? (\extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
 
         if (is_a($class, \Redis::class, true)) {
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
@@ -126,9 +132,12 @@ trait RedisTrait
                     throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e->getMessage(), $dsn));
                 }
 
-                if (@!$redis->isConnected()) {
-                    $e = ($e = error_get_last()) && preg_match('/^Redis::p?connect\(\): (.*)/', $e['message'], $e) ? sprintf(' (%s)', $e[1]) : '';
-                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $e, $dsn));
+                set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+                $isConnected = $redis->isConnected();
+                restore_error_handler();
+                if (!$isConnected) {
+                    $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
+                    throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $error, $dsn));
                 }
 
                 if ((null !== $auth && !$redis->auth($auth))
@@ -137,6 +146,13 @@ trait RedisTrait
                 ) {
                     $e = preg_replace('/^ERR /', '', $redis->getLastError());
                     throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));
+                }
+
+                if (0 < $params['tcp_keepalive'] && \defined('Redis::OPT_TCP_KEEPALIVE')) {
+                    $redis->setOption(\Redis::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
+                }
+                if ($params['compression'] && \defined('Redis::COMPRESSION_LZF')) {
+                    $redis->setOption(\Redis::OPT_COMPRESSION, \Redis::COMPRESSION_LZF);
                 }
 
                 return true;
@@ -174,7 +190,7 @@ trait RedisTrait
             });
             foreach ($values as $id => $v) {
                 if ($v) {
-                    yield $id => parent::unserialize($v);
+                    yield $id => $this->marshaller->unmarshall($v);
                 }
             }
         }
@@ -194,7 +210,7 @@ trait RedisTrait
     protected function doClear($namespace)
     {
         // When using a native Redis cluster, clearing the cache is done by versioning in AbstractTrait::clear().
-        // This means old keys are not really removed until they expire and may need gargage collection.
+        // This means old keys are not really removed until they expire and may need garbage collection.
 
         $cleared = true;
         $hosts = array($this->redis);
@@ -270,23 +286,12 @@ trait RedisTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        $serialized = array();
-        $failed = array();
-
-        foreach ($values as $id => $value) {
-            try {
-                $serialized[$id] = serialize($value);
-            } catch (\Exception $e) {
-                $failed[] = $id;
-            }
-        }
-
-        if (!$serialized) {
+        if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
         }
 
-        $results = $this->pipeline(function () use ($serialized, $lifetime) {
-            foreach ($serialized as $id => $value) {
+        $results = $this->pipeline(function () use ($values, $lifetime) {
+            foreach ($values as $id => $value) {
                 if (0 >= $lifetime) {
                     yield 'set' => array($id, $value);
                 } else {
@@ -310,7 +315,7 @@ trait RedisTrait
         if ($this->redis instanceof \Predis\Client && !$this->redis->getConnection() instanceof ClusterInterface) {
             $results = $this->redis->pipeline(function ($redis) use ($generator, &$ids) {
                 foreach ($generator() as $command => $args) {
-                    call_user_func_array(array($redis, $command), $args);
+                    \call_user_func_array(array($redis, $command), $args);
                     $ids[] = $args[0];
                 }
             });
@@ -321,7 +326,7 @@ trait RedisTrait
                     $connections[$h] = array($this->redis->_instance($h), -1);
                     $connections[$h][0]->multi(\Redis::PIPELINE);
                 }
-                call_user_func_array(array($connections[$h][0], $command), $args);
+                \call_user_func_array(array($connections[$h][0], $command), $args);
                 $results[] = array($h, ++$connections[$h][1]);
                 $ids[] = $args[0];
             }
@@ -337,13 +342,13 @@ trait RedisTrait
             // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
             $results = array();
             foreach ($generator() as $command => $args) {
-                $results[] = call_user_func_array(array($this->redis, $command), $args);
+                $results[] = \call_user_func_array(array($this->redis, $command), $args);
                 $ids[] = $args[0];
             }
         } else {
             $this->redis->multi(\Redis::PIPELINE);
             foreach ($generator() as $command => $args) {
-                call_user_func_array(array($this->redis, $command), $args);
+                \call_user_func_array(array($this->redis, $command), $args);
                 $ids[] = $args[0];
             }
             $results = $this->redis->exec();

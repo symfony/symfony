@@ -33,7 +33,7 @@ class CollectionValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
+        if (!\is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($value, 'array or Traversable and ArrayAccess');
         }
 
@@ -50,11 +50,11 @@ class CollectionValidator extends ConstraintValidator
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             // bug fix issue #2779
-            $existsInArray = is_array($value) && array_key_exists($field, $value);
+            $existsInArray = \is_array($value) && array_key_exists($field, $value);
             $existsInArrayAccess = $value instanceof \ArrayAccess && $value->offsetExists($field);
 
             if ($existsInArray || $existsInArrayAccess) {
-                if (count($fieldConstraint->constraints) > 0) {
+                if (\count($fieldConstraint->constraints) > 0) {
                     $context->getValidator()
                         ->inContext($context)
                         ->atPath('['.$field.']')

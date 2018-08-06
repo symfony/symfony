@@ -90,7 +90,7 @@ class TwigExtractorTest extends TestCase
             $extractor->extract($resources, new MessageCatalogue('en'));
         } catch (Error $e) {
             if (method_exists($e, 'getSourceContext')) {
-                $this->assertSame(dirname(__DIR__).strtr('/Fixtures/extractor/syntax_error.twig', '/', DIRECTORY_SEPARATOR), $e->getFile());
+                $this->assertSame(\dirname(__DIR__).strtr('/Fixtures/extractor/syntax_error.twig', '/', \DIRECTORY_SEPARATOR), $e->getFile());
                 $this->assertSame(1, $e->getLine());
                 $this->assertSame('Unclosed "block".', $e->getMessage());
             } else {

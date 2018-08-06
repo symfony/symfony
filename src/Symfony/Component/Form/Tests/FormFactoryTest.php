@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Guess\Guess;
-use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

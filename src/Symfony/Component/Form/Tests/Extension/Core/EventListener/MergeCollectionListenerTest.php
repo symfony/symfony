@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
+use Symfony\Component\Form\FormEvent;
 
 abstract class MergeCollectionListenerTest extends TestCase
 {
@@ -85,7 +85,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $listener->onSubmit($event);
 
         // The original object was modified
-        if (is_object($originalData)) {
+        if (\is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
 
@@ -109,7 +109,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $listener->onSubmit($event);
 
         // The original object was modified
-        if (is_object($originalData)) {
+        if (\is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
 
@@ -134,7 +134,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $listener->onSubmit($event);
 
         // We still have the original object
-        if (is_object($originalData)) {
+        if (\is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
 
@@ -158,7 +158,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $listener->onSubmit($event);
 
         // The original object was modified
-        if (is_object($originalData)) {
+        if (\is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
 
@@ -183,7 +183,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $listener->onSubmit($event);
 
         // We still have the original object
-        if (is_object($originalData)) {
+        if (\is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
 

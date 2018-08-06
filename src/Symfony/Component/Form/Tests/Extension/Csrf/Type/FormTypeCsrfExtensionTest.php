@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
@@ -391,7 +391,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $expected = new FormError('[trans]Foobar[/trans]');
         $expected->setOrigin($form);
 
-        $this->assertGreaterThan(0, count($errors));
+        $this->assertGreaterThan(0, \count($errors));
         $this->assertEquals($expected, $errors[0]);
     }
 }

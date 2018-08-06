@@ -25,7 +25,7 @@ trait TagTrait
      */
     final public function tag($name, array $attributes = array())
     {
-        if (!is_string($name) || '' === $name) {
+        if (!\is_string($name) || '' === $name) {
             throw new InvalidArgumentException(sprintf('The tag name for service "%s" must be a non-empty string.', $this->id));
         }
 

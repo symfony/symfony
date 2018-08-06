@@ -82,9 +82,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      */
     protected function getTestService()
     {
-        $class = $this->getEnv('FOO');
-
-        return $this->services['test'] = new $class($this->getEnv('Bar'), 'foo'.$this->getEnv('string:FOO').'baz', $this->getEnv('int:Baz'));
+        return $this->services['test'] = new ${($_ = $this->getEnv('FOO')) && false ?: "_"}($this->getEnv('Bar'), 'foo'.$this->getEnv('string:FOO').'baz', $this->getEnv('int:Baz'));
     }
 
     public function getParameter($name)

@@ -19,9 +19,9 @@ abstract class IteratorTestCase extends TestCase
     {
         // set iterator_to_array $use_key to false to avoid values merge
         // this made FinderTest::testAppendWithAnArray() fail with GnuFinderAdapter
-        $values = array_map(function (\SplFileInfo $fileinfo) { return str_replace('/', DIRECTORY_SEPARATOR, $fileinfo->getPathname()); }, iterator_to_array($iterator, false));
+        $values = array_map(function (\SplFileInfo $fileinfo) { return str_replace('/', \DIRECTORY_SEPARATOR, $fileinfo->getPathname()); }, iterator_to_array($iterator, false));
 
-        $expected = array_map(function ($path) { return str_replace('/', DIRECTORY_SEPARATOR, $path); }, $expected);
+        $expected = array_map(function ($path) { return str_replace('/', \DIRECTORY_SEPARATOR, $path); }, $expected);
 
         sort($values);
         sort($expected);
@@ -52,7 +52,7 @@ abstract class IteratorTestCase extends TestCase
 
         foreach ($expected as $subarray) {
             $temp = array();
-            while (count($values) && count($temp) < count($subarray)) {
+            while (\count($values) && \count($temp) < \count($subarray)) {
                 $temp[] = array_shift($values);
             }
             sort($temp);

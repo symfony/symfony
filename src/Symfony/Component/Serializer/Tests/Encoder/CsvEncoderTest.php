@@ -282,7 +282,11 @@ CSV
         $this->assertFalse($this->encoder->supportsDecoding('foo'));
     }
 
-    public function testDecode()
+    /**
+     * @group legacy
+     * @expectedDeprecation Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.
+     */
+    public function testDecodeLegacy()
     {
         $expected = array('foo' => 'a', 'bar' => 'b');
 
@@ -291,6 +295,17 @@ foo,bar
 a,b
 CSV
         , 'csv'));
+    }
+
+    public function testDecodeAsSingle()
+    {
+        $expected = array('foo' => 'a', 'bar' => 'b');
+
+        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
+foo,bar
+a,b
+CSV
+        , 'csv', array(CsvEncoder::AS_COLLECTION_KEY => false)));
     }
 
     public function testDecodeCollection()
@@ -311,10 +326,8 @@ CSV
         , 'csv'));
     }
 
-    public function testDecodeOnlyOneAsCollection()
+    public function testDecode()
     {
-        $this->encoder = new CsvEncoder(',', '"', '\\', '.');
-
         $expected = array(
             array('foo' => 'a'),
         );
@@ -324,7 +337,9 @@ foo
 a
 
 CSV
-            , 'csv', array('as_collection' => true)));
+        , 'csv', array(
+            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+        )));
     }
 
     public function testDecodeToManyRelation()
@@ -365,17 +380,19 @@ CSV
     {
         $this->encoder = new CsvEncoder(';', "'", '|', '-');
 
-        $expected = array('a' => 'hell\'o', 'bar' => array('baz' => 'b'));
+        $expected = array(array('a' => 'hell\'o', 'bar' => array('baz' => 'b')));
         $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
 a;bar-baz
 'hell''o';b;c
 CSV
-        , 'csv'));
+        , 'csv', array(
+            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+        )));
     }
 
     public function testDecodeCustomSettingsPassedInContext()
     {
-        $expected = array('a' => 'hell\'o', 'bar' => array('baz' => 'b'));
+        $expected = array(array('a' => 'hell\'o', 'bar' => array('baz' => 'b')));
         $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
 a;bar-baz
 'hell''o';b;c
@@ -385,6 +402,7 @@ CSV
             CsvEncoder::ENCLOSURE_KEY => "'",
             CsvEncoder::ESCAPE_CHAR_KEY => '|',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
+            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
         )));
     }
 

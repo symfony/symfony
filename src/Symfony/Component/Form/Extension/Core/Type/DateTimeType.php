@@ -12,19 +12,19 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -78,12 +78,12 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        $dateFormat = is_int($options['date_format']) ? $options['date_format'] : self::DEFAULT_DATE_FORMAT;
+        $dateFormat = \is_int($options['date_format']) ? $options['date_format'] : self::DEFAULT_DATE_FORMAT;
         $timeFormat = self::DEFAULT_TIME_FORMAT;
         $calendar = \IntlDateFormatter::GREGORIAN;
-        $pattern = is_string($options['format']) ? $options['format'] : null;
+        $pattern = \is_string($options['format']) ? $options['format'] : null;
 
-        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+        if (!\in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
@@ -137,8 +137,16 @@ class DateTimeType extends AbstractType
                 $dateOptions['widget'] = $options['date_widget'];
             }
 
+            if (null !== $options['date_label']) {
+                $dateOptions['label'] = $options['date_label'];
+            }
+
             if (null !== $options['time_widget']) {
                 $timeOptions['widget'] = $options['time_widget'];
+            }
+
+            if (null !== $options['time_label']) {
+                $timeOptions['label'] = $options['time_label'];
             }
 
             if (null !== $options['date_format']) {
@@ -235,6 +243,8 @@ class DateTimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'date_label' => null,
+            'time_label' => null,
         ));
 
         // Don't add some defaults in order to preserve the defaults

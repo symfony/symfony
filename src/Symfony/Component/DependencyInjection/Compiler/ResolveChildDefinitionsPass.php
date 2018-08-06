@@ -100,7 +100,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setAutowired($parentDef->isAutowired());
         $def->setChanges($parentDef->getChanges());
 
-        $def->setBindings($parentDef->getBindings());
+        $def->setBindings($definition->getBindings() + $parentDef->getBindings());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
@@ -147,7 +147,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             if (is_numeric($k)) {
                 $def->addArgument($v);
             } elseif (0 === strpos($k, 'index_')) {
-                $def->replaceArgument((int) substr($k, strlen('index_')), $v);
+                $def->replaceArgument((int) substr($k, \strlen('index_')), $v);
             } else {
                 $def->setArgument($k, $v);
             }

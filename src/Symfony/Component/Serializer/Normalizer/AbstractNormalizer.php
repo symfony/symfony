@@ -12,12 +12,12 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -190,16 +190,23 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * If a circular reference handler is set, it will be called. Otherwise, a
      * {@class CircularReferenceException} will be thrown.
      *
-     * @param object $object
+     * @final since Symfony 4.2
+     *
+     * @param object      $object
+     * @param string|null $format
+     * @param array       $context
      *
      * @return mixed
      *
      * @throws CircularReferenceException
      */
-    protected function handleCircularReference($object)
+    protected function handleCircularReference($object/*, string $format = null, array $context = array()*/)
     {
+        $format = \func_num_args() > 1 ? func_get_arg(1) : null;
+        $context = \func_num_args() > 2 ? func_get_arg(2) : array();
+
         if ($this->circularReferenceHandler) {
-            return \call_user_func($this->circularReferenceHandler, $object);
+            return \call_user_func($this->circularReferenceHandler, $object, $format, $context);
         }
 
         throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
@@ -212,17 +219,23 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
+     * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
+     *
      * @return string[]|AttributeMetadataInterface[]|bool
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
         if (!$this->classMetadataFactory) {
+            if (isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) && !$context[static::ALLOW_EXTRA_ATTRIBUTES]) {
+                throw new LogicException(sprintf('A class metadata factory must be provided in the constructor when setting "%s" to false.', static::ALLOW_EXTRA_ATTRIBUTES));
+            }
+
             return false;
         }
 
         $groups = false;
-        if (isset($context[static::GROUPS]) && \is_array($context[static::GROUPS])) {
-            $groups = $context[static::GROUPS];
+        if (isset($context[static::GROUPS]) && (\is_array($context[static::GROUPS]) || is_scalar($context[static::GROUPS]))) {
+            $groups = (array) $context[static::GROUPS];
         } elseif (!isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) || $context[static::ALLOW_EXTRA_ATTRIBUTES]) {
             return false;
         }
@@ -254,7 +267,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        if (in_array($attribute, $this->ignoredAttributes)) {
+        if (\in_array($attribute, $this->ignoredAttributes)) {
             return false;
         }
 
@@ -263,8 +276,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return true;
         }
 
-        if (isset($context[self::ATTRIBUTES]) && is_array($context[self::ATTRIBUTES])) {
-            return in_array($attribute, $context[self::ATTRIBUTES], true);
+        if (isset($context[self::ATTRIBUTES]) && \is_array($context[self::ATTRIBUTES])) {
+            return \in_array($attribute, $context[self::ATTRIBUTES], true);
         }
 
         return true;
@@ -349,6 +362,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
+                    if (null === $parameterData && $constructorParameter->allowsNull()) {
+                        $params[] = null;
+                        // Don't run set for a parameter passed to the constructor
+                        unset($data[$key]);
+                        continue;
+                    }
                     try {
                         if (null !== $constructorParameter->getClass()) {
                             if (!$this->serializer instanceof DenormalizerInterface) {

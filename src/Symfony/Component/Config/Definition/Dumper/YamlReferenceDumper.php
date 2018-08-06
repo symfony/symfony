@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Config\Definition\Dumper;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
+use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Yaml\Inline;
@@ -86,9 +86,9 @@ class YamlReferenceDumper
             }
 
             if (!$children) {
-                if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
+                if ($node->hasDefaultValue() && \count($defaultArray = $node->getDefaultValue())) {
                     $default = '';
-                } elseif (!is_array($example)) {
+                } elseif (!\is_array($example)) {
                     $default = '[]';
                 }
             }
@@ -101,10 +101,10 @@ class YamlReferenceDumper
             if ($node->hasDefaultValue()) {
                 $default = $node->getDefaultValue();
 
-                if (is_array($default)) {
-                    if (count($defaultArray = $node->getDefaultValue())) {
+                if (\is_array($default)) {
+                    if (\count($defaultArray = $node->getDefaultValue())) {
                         $default = '';
-                    } elseif (!is_array($example)) {
+                    } elseif (!\is_array($example)) {
                         $default = '[]';
                     }
                 } else {
@@ -124,12 +124,12 @@ class YamlReferenceDumper
         }
 
         // example
-        if ($example && !is_array($example)) {
+        if ($example && !\is_array($example)) {
             $comments[] = 'Example: '.$example;
         }
 
         $default = '' != (string) $default ? ' '.$default : '';
-        $comments = count($comments) ? '# '.implode(', ', $comments) : '';
+        $comments = \count($comments) ? '# '.implode(', ', $comments) : '';
 
         $key = $prototypedArray ? '-' : $node->getName().':';
         $text = rtrim(sprintf('%-21s%s %s', $key, $default, $comments), ' ');
@@ -147,17 +147,17 @@ class YamlReferenceDumper
         if ($defaultArray) {
             $this->writeLine('');
 
-            $message = count($defaultArray) > 1 ? 'Defaults' : 'Default';
+            $message = \count($defaultArray) > 1 ? 'Defaults' : 'Default';
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
             $this->writeArray($defaultArray, $depth + 1);
         }
 
-        if (is_array($example)) {
+        if (\is_array($example)) {
             $this->writeLine('');
 
-            $message = count($example) > 1 ? 'Examples' : 'Example';
+            $message = \count($example) > 1 ? 'Examples' : 'Example';
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
@@ -176,7 +176,7 @@ class YamlReferenceDumper
      */
     private function writeLine(string $text, int $indent = 0)
     {
-        $indent = strlen($text) + $indent;
+        $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
 
         $this->reference .= sprintf($format, $text)."\n";
@@ -187,7 +187,7 @@ class YamlReferenceDumper
         $isIndexed = array_values($array) === $array;
 
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $val = '';
             } else {
                 $val = $value;
@@ -199,7 +199,7 @@ class YamlReferenceDumper
                 $this->writeLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $this->writeArray($value, $depth + 1);
             }
         }

@@ -65,10 +65,10 @@ class UploadedFile extends File
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
 
-        if (4 < func_num_args() ? !is_bool($test) : null !== $error && @filesize($path) === $error) {
+        if (4 < \func_num_args() ? !\is_bool($test) : null !== $error && @filesize($path) === $error) {
             @trigger_error(sprintf('Passing a size as 4th argument to the constructor of "%s" is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
             $error = $test;
-            $test = 5 < func_num_args() ? func_get_arg(5) : false;
+            $test = 5 < \func_num_args() ? func_get_arg(5) : false;
         }
 
         $this->error = $error ?: UPLOAD_ERR_OK;
@@ -158,7 +158,7 @@ class UploadedFile extends File
      */
     public function getClientSize()
     {
-        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->getSize();
     }
@@ -207,9 +207,11 @@ class UploadedFile extends File
 
             $target = $this->getTargetFile($directory, $name);
 
-            if (!@move_uploaded_file($this->getPathname(), $target)) {
-                $error = error_get_last();
-                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+            set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+            $moved = move_uploaded_file($this->getPathname(), $target);
+            restore_error_handler();
+            if (!$moved) {
+                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error)));
             }
 
             @chmod($target, 0666 & ~umask());
@@ -252,9 +254,9 @@ class UploadedFile extends File
 
         $max = ltrim($iniMax, '+');
         if (0 === strpos($max, '0x')) {
-            $max = intval($max, 16);
+            $max = \intval($max, 16);
         } elseif (0 === strpos($max, '0')) {
-            $max = intval($max, 8);
+            $max = \intval($max, 8);
         } else {
             $max = (int) $max;
         }

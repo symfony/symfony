@@ -86,4 +86,15 @@ final class Envelope
     {
         return $this->message;
     }
+
+    /**
+     * @param object $target
+     *
+     * @return Envelope|object The original message or the envelope if the target supports it
+     *                         (i.e implements {@link EnvelopeAwareInterface}).
+     */
+    public function getMessageFor($target)
+    {
+        return $target instanceof EnvelopeAwareInterface ? $this : $this->message;
+    }
 }

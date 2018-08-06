@@ -12,11 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\Config\FileLocator;
 
 class PhpFileLoaderTest extends TestCase
 {
@@ -47,7 +47,7 @@ class PhpFileLoaderTest extends TestCase
 
         $container->compile();
         $dumper = new PhpDumper($container);
-        $this->assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
+        $this->assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
     }
 
     /**
@@ -72,9 +72,11 @@ class PhpFileLoaderTest extends TestCase
         yield array('defaults');
         yield array('instanceof');
         yield array('prototype');
+        yield array('prototype_array');
         yield array('child');
         yield array('php7');
         yield array('anonymous');
+        yield array('lazy_fqcn');
     }
 
     /**

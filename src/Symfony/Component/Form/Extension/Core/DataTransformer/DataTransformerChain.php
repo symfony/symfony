@@ -73,7 +73,7 @@ class DataTransformerChain implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        for ($i = count($this->transformers) - 1; $i >= 0; --$i) {
+        for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
             $value = $this->transformers[$i]->reverseTransform($value);
         }
 

@@ -22,7 +22,7 @@ class AnnotatedController
      */
     public function requestDefaultNullAction(Request $request = null)
     {
-        return new Response($request ? get_class($request) : null);
+        return new Response($request ? \get_class($request) : null);
     }
 
     /**

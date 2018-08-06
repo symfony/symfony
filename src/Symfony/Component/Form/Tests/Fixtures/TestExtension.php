@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Fixtures;
 
-use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
-use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
 class TestExtension implements FormExtensionInterface
 {
@@ -31,7 +31,7 @@ class TestExtension implements FormExtensionInterface
 
     public function addType(FormTypeInterface $type)
     {
-        $this->types[get_class($type)] = $type;
+        $this->types[\get_class($type)] = $type;
     }
 
     public function getType($name)

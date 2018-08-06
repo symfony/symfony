@@ -120,7 +120,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      */
     public function count()
     {
-        return count($this->violations);
+        return \count($this->violations);
     }
 
     /**
@@ -171,7 +171,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         $codes = (array) $codes;
         $violations = array();
         foreach ($this as $violation) {
-            if (in_array($violation->getCode(), $codes, true)) {
+            if (\in_array($violation->getCode(), $codes, true)) {
                 $violations[] = $violation;
             }
         }

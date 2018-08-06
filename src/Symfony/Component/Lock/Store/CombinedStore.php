@@ -19,8 +19,8 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
  * CombinedStore is a StoreInterface implementation able to manage and synchronize several StoreInterfaces.
@@ -46,7 +46,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     {
         foreach ($stores as $store) {
             if (!$store instanceof StoreInterface) {
-                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', StoreInterface::class, get_class($store)));
+                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', StoreInterface::class, \get_class($store)));
             }
         }
 
@@ -62,7 +62,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     {
         $successCount = 0;
         $failureCount = 0;
-        $storesCount = count($this->stores);
+        $storesCount = \count($this->stores);
 
         foreach ($this->stores as $store) {
             try {
@@ -92,7 +92,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
+        throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
 
     /**
@@ -102,7 +102,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     {
         $successCount = 0;
         $failureCount = 0;
-        $storesCount = count($this->stores);
+        $storesCount = \count($this->stores);
         $expireAt = microtime(true) + $ttl;
 
         foreach ($this->stores as $store) {
@@ -164,7 +164,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     {
         $successCount = 0;
         $failureCount = 0;
-        $storesCount = count($this->stores);
+        $storesCount = \count($this->stores);
 
         foreach ($this->stores as $store) {
             if ($store->exists($key)) {

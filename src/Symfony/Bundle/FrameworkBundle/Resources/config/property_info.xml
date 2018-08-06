@@ -13,7 +13,11 @@
             <argument type="collection" />
             <argument type="collection" />
         </service>
+        <service id="Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface" alias="property_info" />
+        <service id="Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface" alias="property_info" />
         <service id="Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface" alias="property_info" />
+        <service id="Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface" alias="property_info" />
+        <service id="Symfony\Component\PropertyInfo\PropertyListExtractorInterface" alias="property_info" />
 
         <!-- Extractor -->
         <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor">

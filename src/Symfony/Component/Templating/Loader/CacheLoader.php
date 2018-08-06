@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
@@ -47,9 +47,9 @@ class CacheLoader extends Loader
     public function load(TemplateReferenceInterface $template)
     {
         $key = hash('sha256', $template->getLogicalName());
-        $dir = $this->dir.DIRECTORY_SEPARATOR.substr($key, 0, 2);
+        $dir = $this->dir.\DIRECTORY_SEPARATOR.substr($key, 0, 2);
         $file = substr($key, 2).'.tpl';
-        $path = $dir.DIRECTORY_SEPARATOR.$file;
+        $path = $dir.\DIRECTORY_SEPARATOR.$file;
 
         if (is_file($path)) {
             if (null !== $this->logger) {

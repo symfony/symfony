@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 class RedisAdapter extends AbstractAdapter
@@ -22,8 +23,8 @@ class RedisAdapter extends AbstractAdapter
      * @param string                                          $namespace       The default namespace
      * @param int                                             $defaultLifetime The default lifetime
      */
-    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0)
+    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
-        $this->init($redisClient, $namespace, $defaultLifetime);
+        $this->init($redisClient, $namespace, $defaultLifetime, $marshaller);
     }
 }

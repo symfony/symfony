@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Symfony\Component\VarDumper\Dumper\ServerDumper;
+use Symfony\Component\VarDumper\Server\Connection;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -57,13 +57,13 @@ class DumpDataCollectorTest extends TestCase
         $this->assertSame('a:2:{i:0;b:0;i:1;s:5:"UTF-8";}', $collector->serialize());
     }
 
-    public function testDumpWithServerDumper()
+    public function testDumpWithServerConnection()
     {
         $data = new Data(array(array(123)));
 
         // Server is up, server dumper is used
-        $serverDumper = $this->getMockBuilder(ServerDumper::class)->disableOriginalConstructor()->getMock();
-        $serverDumper->expects($this->once())->method('dump');
+        $serverDumper = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $serverDumper->expects($this->once())->method('write')->willReturn(true);
 
         $collector = new DumpDataCollector(null, null, null, null, $serverDumper);
         $collector->dump($data);

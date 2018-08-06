@@ -17,11 +17,11 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TwigExtensionTest extends TestCase
 {
@@ -74,7 +74,7 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
-        if (in_array($format, array('yml', 'php'))) {
+        if (\in_array($format, array('yml', 'php'))) {
             $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
             $this->assertEquals(array('key' => 'foo'), $calls[5][1][1], '->load() registers variables as Twig globals');
         }
@@ -160,7 +160,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
-        foreach (array_slice($calls, 2) as $call) {
+        foreach (\array_slice($calls, 2) as $call) {
             $this->assertEquals(key($globals), $call[1][0]);
             $this->assertSame(current($globals), $call[1][1]);
 

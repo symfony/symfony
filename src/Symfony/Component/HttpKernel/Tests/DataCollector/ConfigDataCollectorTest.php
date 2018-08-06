@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector;
+use Symfony\Component\HttpKernel\Kernel;
 
 class ConfigDataCollectorTest extends TestCase
 {
@@ -38,9 +38,9 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());
-        $this->assertSame(extension_loaded('xdebug'), $c->hasXDebug());
-        $this->assertSame(extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
-        $this->assertSame(extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
+        $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
+        $this->assertSame(\extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
+        $this->assertSame(\extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
     }
 }
 

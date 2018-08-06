@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection;
 
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -53,7 +54,7 @@ class ServiceLocator implements PsrContainerInterface
 
         if (isset($this->loading[$id])) {
             $ids = array_values($this->loading);
-            $ids = array_slice($this->loading, array_search($id, $ids));
+            $ids = \array_slice($this->loading, array_search($id, $ids));
             $ids[] = $id;
 
             throw new ServiceCircularReferenceException($id, $ids);
@@ -62,6 +63,22 @@ class ServiceLocator implements PsrContainerInterface
         $this->loading[$id] = $id;
         try {
             return $this->factories[$id]();
+        } catch (RuntimeException $e) {
+            if (!$this->externalId) {
+                throw $e;
+            }
+            $what = sprintf('service "%s" required by "%s"', $id, $this->externalId);
+            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
+
+            if ($e->getMessage() === $message) {
+                $message = sprintf('Cannot resolve %s: %s', $what, $message);
+            }
+
+            $r = new \ReflectionProperty($e, 'message');
+            $r->setAccessible(true);
+            $r->setValue($e, $message);
+
+            throw $e;
         } finally {
             unset($this->loading[$id]);
         }
@@ -91,7 +108,7 @@ class ServiceLocator implements PsrContainerInterface
         }
 
         $class = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        $class = isset($class[2]['object']) ? get_class($class[2]['object']) : null;
+        $class = isset($class[2]['object']) ? \get_class($class[2]['object']) : null;
         $externalId = $this->externalId ?: $class;
 
         $msg = sprintf('Service "%s" not found: ', $id);
@@ -136,7 +153,7 @@ class ServiceLocator implements PsrContainerInterface
             if (!$alternatives = array_keys($this->factories)) {
                 return 'is empty...';
             }
-            $format = sprintf('only knows about the %s service%s.', $format, 1 < count($alternatives) ? 's' : '');
+            $format = sprintf('only knows about the %s service%s.', $format, 1 < \count($alternatives) ? 's' : '');
         }
         $last = array_pop($alternatives);
 

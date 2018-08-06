@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -34,13 +34,13 @@ class ChoiceToValueTransformer implements DataTransformerInterface
 
     public function reverseTransform($value)
     {
-        if (null !== $value && !is_string($value)) {
+        if (null !== $value && !\is_string($value)) {
             throw new TransformationFailedException('Expected a string or null.');
         }
 
         $choices = $this->choiceList->getChoicesForValues(array((string) $value));
 
-        if (1 !== count($choices)) {
+        if (1 !== \count($choices)) {
             if (null === $value || '' === $value) {
                 return;
             }

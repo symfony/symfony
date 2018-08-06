@@ -1,7 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% macro profile_search_filter(request, result, property) %}
-    {%- if request.session is not null -%}
+    {%- if request.hasSession -%}
         <a href="{{ path('_profiler_search_results', request.query.all|merge({token: result.token})|merge({ (property): result[property] })) }}" title="Search"><span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span></a>
     {%- endif -%}
 {% endmacro %}

@@ -64,7 +64,12 @@ class Response
     const HTTP_UNPROCESSABLE_ENTITY = 422;                                        // RFC4918
     const HTTP_LOCKED = 423;                                                      // RFC4918
     const HTTP_FAILED_DEPENDENCY = 424;                                           // RFC4918
+
+    /**
+     * @deprecated
+     */
     const HTTP_RESERVED_FOR_WEBDAV_ADVANCED_COLLECTIONS_EXPIRED_PROPOSAL = 425;   // RFC2817
+    const HTTP_TOO_EARLY = 425;                                                   // RFC-ietf-httpbis-replay-04
     const HTTP_UPGRADE_REQUIRED = 426;                                            // RFC2817
     const HTTP_PRECONDITION_REQUIRED = 428;                                       // RFC6585
     const HTTP_TOO_MANY_REQUESTS = 429;                                           // RFC6585
@@ -169,7 +174,7 @@ class Response
         422 => 'Unprocessable Entity',                                        // RFC4918
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
-        425 => 'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
+        425 => 'Too Early',                                                   // RFC-ietf-httpbis-replay-04
         426 => 'Upgrade Required',                                            // RFC2817
         428 => 'Precondition Required',                                       // RFC6585
         429 => 'Too Many Requests',                                           // RFC6585
@@ -324,10 +329,15 @@ class Response
         }
 
         // headers
-        foreach ($this->headers->allPreserveCase() as $name => $values) {
+        foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
             foreach ($values as $value) {
                 header($name.': '.$value, false, $this->statusCode);
             }
+        }
+
+        // cookies
+        foreach ($this->headers->getCookies() as $cookie) {
+            header('Set-Cookie: '.$cookie->getName().strstr($cookie, '='), false, $this->statusCode);
         }
 
         // status
@@ -358,9 +368,9 @@ class Response
         $this->sendHeaders();
         $this->sendContent();
 
-        if (function_exists('fastcgi_finish_request')) {
+        if (\function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
-        } elseif (!\in_array(PHP_SAPI, array('cli', 'phpdbg'), true)) {
+        } elseif (!\in_array(\PHP_SAPI, array('cli', 'phpdbg'), true)) {
             static::closeOutputBuffers(0, true);
         }
 
@@ -380,8 +390,8 @@ class Response
      */
     public function setContent($content)
     {
-        if (null !== $content && !is_string($content) && !is_numeric($content) && !is_callable(array($content, '__toString'))) {
-            throw new \UnexpectedValueException(sprintf('The Response content must be a string or object implementing __toString(), "%s" given.', gettype($content)));
+        if (null !== $content && !\is_string($content) && !is_numeric($content) && !\is_callable(array($content, '__toString'))) {
+            throw new \UnexpectedValueException(sprintf('The Response content must be a string or object implementing __toString(), "%s" given.', \gettype($content)));
         }
 
         $this->content = (string) $content;
@@ -512,7 +522,7 @@ class Response
      */
     public function isCacheable(): bool
     {
-        if (!in_array($this->statusCode, array(200, 203, 300, 301, 302, 404, 410))) {
+        if (!\in_array($this->statusCode, array(200, 203, 300, 301, 302, 404, 410))) {
             return false;
         }
 
@@ -679,6 +689,7 @@ class Response
     {
         if ($this->isFresh()) {
             $this->headers->set('Age', $this->getMaxAge());
+            $this->headers->remove('Expires');
         }
 
         return $this;
@@ -1057,7 +1068,7 @@ class Response
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
         if ($etags = $request->getETags()) {
-            $notModified = in_array($this->getEtag(), $etags) || in_array('*', $etags);
+            $notModified = \in_array($this->getEtag(), $etags) || \in_array('*', $etags);
         }
 
         if ($modifiedSince && $lastModified) {
@@ -1170,7 +1181,7 @@ class Response
      */
     public function isRedirect(string $location = null): bool
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        return \in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**
@@ -1180,7 +1191,7 @@ class Response
      */
     public function isEmpty(): bool
     {
-        return in_array($this->statusCode, array(204, 304));
+        return \in_array($this->statusCode, array(204, 304));
     }
 
     /**
@@ -1193,7 +1204,7 @@ class Response
     public static function closeOutputBuffers(int $targetLevel, bool $flush)
     {
         $status = ob_get_status(true);
-        $level = count($status);
+        $level = \count($status);
         $flags = PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE);
 
         while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {

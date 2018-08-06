@@ -73,7 +73,7 @@ class DateCaster
     {
         $location = $timeZone->getLocation();
         $formatted = (new \DateTime('now', $timeZone))->format($location ? 'e (P)' : 'P');
-        $title = $location && extension_loaded('intl') ? \Locale::getDisplayRegion('-'.$location['country_code']) : '';
+        $title = $location && \extension_loaded('intl') ? \Locale::getDisplayRegion('-'.$location['country_code']) : '';
 
         $z = array(Caster::PREFIX_VIRTUAL.'timezone' => new ConstStub($formatted, $title));
 
@@ -117,6 +117,6 @@ class DateCaster
 
     private static function formatSeconds($s, $us)
     {
-        return sprintf('%02d.%s', $s, 0 === ($len = strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
+        return sprintf('%02d.%s', $s, 0 === ($len = \strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
     }
 }

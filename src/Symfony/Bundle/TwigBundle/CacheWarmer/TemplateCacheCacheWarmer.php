@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
 use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
 use Twig\Error\Error;

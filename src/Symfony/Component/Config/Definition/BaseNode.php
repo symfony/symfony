@@ -507,33 +507,19 @@ abstract class BaseNode implements NodeInterface
         return $value;
     }
 
-    private static function getType($value): string
-    {
-        switch ($type = \gettype($value)) {
-            case 'boolean':
-                return 'bool';
-            case 'double':
-                return 'float';
-            case 'integer':
-                return 'int';
-        }
-
-        return $type;
-    }
-
     private function doValidateType($value): void
     {
+        if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
+            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', \get_class($this), $this->getPath()));
+            $e->setPath($this->getPath());
+
+            throw $e;
+        }
+
         if (null === $this->handlingPlaceholder || null === $value) {
             $this->validateType($value);
 
             return;
-        }
-
-        if (!$this->allowPlaceholders()) {
-            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', get_class($this), $this->getPath()));
-            $e->setPath($this->getPath());
-
-            throw $e;
         }
 
         $knownTypes = array_keys(self::$placeholders[$this->handlingPlaceholder]);
@@ -543,8 +529,8 @@ abstract class BaseNode implements NodeInterface
             $e = new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected %s, but got %s.',
                 $this->getPath(),
-                1 === count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',
-                1 === count($knownTypes) ? '"'.reset($knownTypes).'"' : 'one of "'.implode('", "', $knownTypes).'"'
+                1 === \count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',
+                1 === \count($knownTypes) ? '"'.reset($knownTypes).'"' : 'one of "'.implode('", "', $knownTypes).'"'
             ));
             if ($hint = $this->getInfo()) {
                 $e->addHint($hint);

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Intl\Data\Generator;
 
+use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
-use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
 /**
@@ -140,7 +140,7 @@ class RegionDataGenerator extends AbstractDataGenerator
             }
 
             // WORLD/CONTINENT/SUBCONTINENT/GROUPING
-            if (ctype_digit($region) || is_int($region)) {
+            if (ctype_digit($region) || \is_int($region)) {
                 continue;
             }
 

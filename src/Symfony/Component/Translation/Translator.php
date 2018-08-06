@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\LogicException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
-use Symfony\Component\Config\ConfigCacheInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
-use Symfony\Component\Config\ConfigCacheFactory;
-use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Formatter\ChoiceMessageFormatterInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -125,7 +125,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
         $this->resources[$locale][] = array($format, $resource, $domain);
 
-        if (in_array($locale, $this->fallbackLocales)) {
+        if (\in_array($locale, $this->fallbackLocales)) {
             $this->catalogues = array();
         } else {
             unset($this->catalogues[$locale]);
@@ -196,7 +196,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
         if (!$this->formatter instanceof ChoiceMessageFormatterInterface) {
-            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', get_class($this->formatter)));
+            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($this->formatter)));
         }
 
         if (null === $domain) {
@@ -402,7 +402,7 @@ EOF
         }
 
         if (false !== strrchr($locale, '_')) {
-            array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
+            array_unshift($locales, substr($locale, 0, -\strlen(strrchr($locale, '_'))));
         }
 
         return array_unique($locales);

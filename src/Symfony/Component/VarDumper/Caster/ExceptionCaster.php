@@ -12,8 +12,8 @@
 namespace Symfony\Component\VarDumper\Caster;
 
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
-use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
  * Casts common Exception classes to array representation.
@@ -71,8 +71,8 @@ class ExceptionCaster
 
         if (isset($a[$xPrefix.'previous'], $a[$trace]) && $a[$xPrefix.'previous'] instanceof \Exception) {
             $b = (array) $a[$xPrefix.'previous'];
-            self::traceUnshift($b[$xPrefix.'trace'], get_class($a[$xPrefix.'previous']), $b[$prefix.'file'], $b[$prefix.'line']);
-            $a[$trace] = new TraceStub($b[$xPrefix.'trace'], false, 0, -count($a[$trace]->value));
+            self::traceUnshift($b[$xPrefix.'trace'], \get_class($a[$xPrefix.'previous']), $b[$prefix.'file'], $b[$prefix.'line']);
+            $a[$trace] = new TraceStub($b[$xPrefix.'trace'], false, 0, -\count($a[$trace]->value));
         }
 
         unset($a[$xPrefix.'previous'], $a[$prefix.'code'], $a[$prefix.'file'], $a[$prefix.'line']);
@@ -118,7 +118,7 @@ class ExceptionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         $a = array();
-        $j = count($frames);
+        $j = \count($frames);
         if (0 > $i = $trace->sliceOffset) {
             $i = max(0, $j + $i);
         }
@@ -175,7 +175,7 @@ class ExceptionCaster
             $lastCall = $call;
         }
         if (null !== $trace->sliceLength) {
-            $a = array_slice($a, 0, $trace->sliceLength, true);
+            $a = \array_slice($a, 0, $trace->sliceLength, true);
         }
 
         return $a;
@@ -199,7 +199,7 @@ class ExceptionCaster
                 $a[$prefix.'src'] = self::$framesCache[$cacheKey];
             } else {
                 if (preg_match('/\((\d+)\)(?:\([\da-f]{32}\))? : (?:eval\(\)\'d code|runtime-created function)$/', $f['file'], $match)) {
-                    $f['file'] = substr($f['file'], 0, -strlen($match[0]));
+                    $f['file'] = substr($f['file'], 0, -\strlen($match[0]));
                     $f['line'] = (int) $match[1];
                 }
                 $caller = isset($f['function']) ? sprintf('in %s() on line %d', (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'], $f['line']) : null;
@@ -212,7 +212,7 @@ class ExceptionCaster
 
                 if (file_exists($f['file']) && 0 <= self::$srcContext) {
                     if (!empty($f['class']) && (is_subclass_of($f['class'], 'Twig\Template') || is_subclass_of($f['class'], 'Twig_Template')) && method_exists($f['class'], 'getDebugInfo')) {
-                        $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
+                        $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
 
                         $ellipsis = 0;
                         $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
@@ -231,7 +231,7 @@ class ExceptionCaster
                         $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, $caller, 'php', $f['file']);
                         $srcKey .= ':'.$f['line'];
                         if ($ellipsis) {
-                            $ellipsis += 1 + strlen($f['line']);
+                            $ellipsis += 1 + \strlen($f['line']);
                         }
                     }
                     $srcAttr .= '&separator= ';

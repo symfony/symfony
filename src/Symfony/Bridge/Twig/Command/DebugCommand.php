@@ -13,8 +13,8 @@ namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Environment;
@@ -31,13 +31,19 @@ class DebugCommand extends Command
 
     private $twig;
     private $projectDir;
+    private $bundlesMetadata;
+    private $twigDefaultPath;
+    private $rootDir;
 
-    public function __construct(Environment $twig, string $projectDir = null)
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = array(), string $twigDefaultPath = null, string $rootDir = null)
     {
         parent::__construct();
 
         $this->twig = $twig;
         $this->projectDir = $projectDir;
+        $this->bundlesMetadata = $bundlesMetadata;
+        $this->twigDefaultPath = $twigDefaultPath;
+        $this->rootDir = $rootDir;
     }
 
     protected function configure()
@@ -82,6 +88,10 @@ EOF
             }
             $data['tests'] = array_keys($data['tests']);
             $data['loader_paths'] = $this->getLoaderPaths();
+            if ($wrongBundles = $this->findWrongBundleOverrides()) {
+                $data['warnings'] = $this->buildWarningMessages($wrongBundles);
+            }
+
             $io->writeln(json_encode($data));
 
             return 0;
@@ -108,21 +118,33 @@ EOF
         }
 
         $rows = array();
+        $firstNamespace = true;
+        $prevHasSeparator = false;
         foreach ($this->getLoaderPaths() as $namespace => $paths) {
-            if (count($paths) > 1) {
+            if (!$firstNamespace && !$prevHasSeparator && \count($paths) > 1) {
                 $rows[] = array('', '');
             }
+            $firstNamespace = false;
             foreach ($paths as $path) {
-                $rows[] = array($namespace, '- '.$path);
+                $rows[] = array($namespace, $path.\DIRECTORY_SEPARATOR);
                 $namespace = '';
             }
-            if (count($paths) > 1) {
+            if (\count($paths) > 1) {
                 $rows[] = array('', '');
+                $prevHasSeparator = true;
+            } else {
+                $prevHasSeparator = false;
             }
         }
-        array_pop($rows);
+        if ($prevHasSeparator) {
+            array_pop($rows);
+        }
         $io->section('Loader Paths');
         $io->table(array('Namespace', 'Paths'), $rows);
+        $messages = $this->buildWarningMessages($this->findWrongBundleOverrides());
+        foreach ($messages as $message) {
+            $io->warning($message);
+        }
 
         return 0;
     }
@@ -137,7 +159,7 @@ EOF
         foreach ($loader->getNamespaces() as $namespace) {
             $paths = array_map(function ($path) {
                 if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
-                    $path = ltrim(substr($path, strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                    $path = ltrim(substr($path, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
                 }
 
                 return $path;
@@ -168,16 +190,16 @@ EOF
             if (null === $cb) {
                 return;
             }
-            if (is_array($cb)) {
+            if (\is_array($cb)) {
                 if (!method_exists($cb[0], $cb[1])) {
                     return;
                 }
                 $refl = new \ReflectionMethod($cb[0], $cb[1]);
-            } elseif (is_object($cb) && method_exists($cb, '__invoke')) {
+            } elseif (\is_object($cb) && method_exists($cb, '__invoke')) {
                 $refl = new \ReflectionMethod($cb, '__invoke');
-            } elseif (function_exists($cb)) {
+            } elseif (\function_exists($cb)) {
                 $refl = new \ReflectionFunction($cb);
-            } elseif (is_string($cb) && preg_match('{^(.+)::(.+)$}', $cb, $m) && method_exists($m[1], $m[2])) {
+            } elseif (\is_string($cb) && preg_match('{^(.+)::(.+)$}', $cb, $m) && method_exists($m[1], $m[2])) {
                 $refl = new \ReflectionMethod($m[1], $m[2]);
             } else {
                 throw new \UnexpectedValueException('Unsupported callback type');
@@ -227,8 +249,8 @@ EOF
         }
 
         if ('globals' === $type) {
-            if (is_object($meta)) {
-                return ' = object('.get_class($meta).')';
+            if (\is_object($meta)) {
+                return ' = object('.\get_class($meta).')';
             }
 
             return ' = '.substr(@json_encode($meta), 0, 50);
@@ -241,5 +263,86 @@ EOF
         if ('filters' === $type) {
             return $meta ? '('.implode(', ', $meta).')' : '';
         }
+    }
+
+    private function findWrongBundleOverrides(): array
+    {
+        $alternatives = array();
+        $bundleNames = array();
+
+        if ($this->rootDir && $this->projectDir) {
+            $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
+            $relativePath = ltrim(substr($this->rootDir.'/Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+            $bundleNames = array_reduce(
+                $folders,
+                function ($carry, $absolutePath) use ($relativePath) {
+                    if (0 === strpos($absolutePath, $this->projectDir)) {
+                        $name = basename(\dirname($absolutePath));
+                        $path = $relativePath.$name;
+                        $carry[$name] = $path;
+                    }
+
+                    return $carry;
+                },
+                $bundleNames
+            );
+        }
+
+        if ($this->twigDefaultPath && $this->projectDir) {
+            $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
+            $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+            $bundleNames = array_reduce(
+                $folders,
+                function ($carry, $absolutePath) use ($relativePath) {
+                    if (0 === strpos($absolutePath, $this->projectDir)) {
+                        $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+                        $name = ltrim(substr($path, \strlen($relativePath)), \DIRECTORY_SEPARATOR);
+                        $carry[$name] = $path;
+                    }
+
+                    return $carry;
+                },
+                $bundleNames
+            );
+        }
+
+        if (\count($bundleNames)) {
+            $notFoundBundles = array_diff_key($bundleNames, $this->bundlesMetadata);
+            if (\count($notFoundBundles)) {
+                $alternatives = array();
+                foreach ($notFoundBundles as $notFoundBundle => $path) {
+                    $alternatives[$path] = array();
+                    foreach ($this->bundlesMetadata as $name => $bundle) {
+                        $lev = levenshtein($notFoundBundle, $name);
+                        if ($lev <= \strlen($notFoundBundle) / 3 || false !== strpos($name, $notFoundBundle)) {
+                            $alternatives[$path][] = $name;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $alternatives;
+    }
+
+    private function buildWarningMessages(array $wrongBundles): array
+    {
+        $messages = array();
+        foreach ($wrongBundles as $path => $alternatives) {
+            $message = sprintf('Path "%s" not matching any bundle found', $path);
+            if ($alternatives) {
+                if (1 === \count($alternatives)) {
+                    $message .= sprintf(", did you mean \"%s\"?\n", $alternatives[0]);
+                } else {
+                    $message .= ", did you mean one of these:\n";
+                    foreach ($alternatives as $bundle) {
+                        $message .= sprintf("  - %s\n", $bundle);
+                    }
+                }
+            }
+            $messages[] = trim($message);
+        }
+
+        return $messages;
     }
 }

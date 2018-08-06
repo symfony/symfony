@@ -31,7 +31,7 @@ class CacheWarmerTest extends TestCase
     public function testWriteCacheFileCreatesTheFile()
     {
         $warmer = new TestCacheWarmer(self::$cacheFile);
-        $warmer->warmUp(dirname(self::$cacheFile));
+        $warmer->warmUp(\dirname(self::$cacheFile));
 
         $this->assertFileExists(self::$cacheFile);
     }
@@ -43,7 +43,7 @@ class CacheWarmerTest extends TestCase
     {
         $nonWritableFile = '/this/file/is/very/probably/not/writable';
         $warmer = new TestCacheWarmer($nonWritableFile);
-        $warmer->warmUp(dirname($nonWritableFile));
+        $warmer->warmUp(\dirname($nonWritableFile));
     }
 }
 

@@ -141,7 +141,7 @@ class ContentSecurityPolicyHandler
                     }
                 }
                 $ruleIsSet = true;
-                if (!in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
+                if (!\in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
                     $headers[$header][$type][] = '\'unsafe-inline\'';
                 }
                 $headers[$header][$type][] = sprintf('\'nonce-%s\'', $nonces[$tokenName]);
@@ -196,7 +196,7 @@ class ContentSecurityPolicyHandler
 
         foreach (explode(';', $header) as $directive) {
             $parts = explode(' ', trim($directive));
-            if (count($parts) < 1) {
+            if (\count($parts) < 1) {
                 continue;
             }
             $name = array_shift($parts);
@@ -224,7 +224,7 @@ class ContentSecurityPolicyHandler
             return false;
         }
 
-        return in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
+        return \in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
     }
 
     private function hasHashOrNonce(array $directives)
@@ -236,7 +236,7 @@ class ContentSecurityPolicyHandler
             if ('\'nonce-' === substr($directive, 0, 7)) {
                 return true;
             }
-            if (in_array(substr($directive, 0, 8), array('\'sha256-', '\'sha384-', '\'sha512-'), true)) {
+            if (\in_array(substr($directive, 0, 8), array('\'sha256-', '\'sha384-', '\'sha512-'), true)) {
                 return true;
             }
         }

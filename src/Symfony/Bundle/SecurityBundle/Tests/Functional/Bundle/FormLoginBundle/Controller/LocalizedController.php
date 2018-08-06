@@ -13,9 +13,9 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
 
 class LocalizedController implements ContainerAwareInterface
 {

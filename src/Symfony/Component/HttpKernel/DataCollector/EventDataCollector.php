@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * EventDataCollector.
@@ -47,7 +48,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     {
         $this->data = array();
 
-        if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
+        if ($this->dispatcher instanceof ResetInterface) {
             $this->dispatcher->reset();
         }
     }

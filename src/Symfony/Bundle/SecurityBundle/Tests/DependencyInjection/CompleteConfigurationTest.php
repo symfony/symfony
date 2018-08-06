@@ -12,11 +12,11 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
@@ -71,7 +71,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map('strval', $arguments['index_0']->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_2']);
+            $configDef = $container->getDefinition((string) $arguments['index_3']);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -99,7 +99,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 null,
                 null,
                 array(
-                    'logout',
                     'switch_user',
                     'x509',
                     'remote_user',
@@ -171,7 +170,6 @@ abstract class CompleteConfigurationTest extends TestCase
             array(),
             array(
                 'security.channel_listener',
-                'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
@@ -259,7 +257,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
-            $i = count($matcherIds);
+            $i = \count($matcherIds);
             if (1 === $i) {
                 $this->assertEquals(array('ROLE_USER'), $attributes);
                 $this->assertEquals('https', $channel);

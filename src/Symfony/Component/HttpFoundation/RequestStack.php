@@ -92,7 +92,7 @@ class RequestStack
      */
     public function getParentRequest()
     {
-        $pos = count($this->requests) - 2;
+        $pos = \count($this->requests) - 2;
 
         if (!isset($this->requests[$pos])) {
             return;

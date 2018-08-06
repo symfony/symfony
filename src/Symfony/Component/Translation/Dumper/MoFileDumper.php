@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Translation\Dumper;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Loader\MoFileLoader;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * MoFileDumper generates a gettext formatted string representation of a message catalogue.
@@ -47,7 +47,7 @@ class MoFileDumper extends FileDumper
             'offsetHashes' => MoFileLoader::MO_HEADER_SIZE + (16 * $size),
         );
 
-        $sourcesSize = strlen($sources);
+        $sourcesSize = \strlen($sources);
         $sourcesStart = $header['offsetHashes'] + 1;
 
         foreach ($offsets as $offset) {

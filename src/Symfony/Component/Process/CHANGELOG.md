@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added the `Process::fromShellCommandline()` to run commands in a shell wrapper
+ * deprecated passing a command as string when creating a `Process` instance
+ * deprecated the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods
+
 4.1.0
 -----
 

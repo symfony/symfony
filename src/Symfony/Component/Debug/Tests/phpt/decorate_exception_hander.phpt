@@ -7,7 +7,7 @@ namespace Symfony\Component\Debug;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
-    $vendor = dirname($vendor);
+    $vendor = \dirname($vendor);
 }
 require $vendor.'/vendor/autoload.php';
 
@@ -38,8 +38,7 @@ Did you forget a "use" statement for another namespace?"
   ["line":protected]=>
   int(%d)
   ["trace":"Exception":private]=>
-  array(0) {
-  }
+  array(%d) {%A}
   ["previous":"Exception":private]=>
   NULL
   ["severity":protected]=>

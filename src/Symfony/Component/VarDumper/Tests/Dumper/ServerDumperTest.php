@@ -55,18 +55,16 @@ class ServerDumperTest extends TestCase
 
         $dumped = null;
         $process = $this->getServerProcess();
-        $process->start(function ($type, $buffer) use ($process, &$dumped) {
+        $process->start(function ($type, $buffer) use ($process, &$dumped, $dumper, $data) {
             if (Process::ERR === $type) {
                 $process->stop();
                 $this->fail();
+            } elseif ("READY\n" === $buffer) {
+                $dumper->dump($data);
             } else {
                 $dumped .= $buffer;
             }
         });
-
-        sleep(3);
-
-        $dumper->dump($data);
 
         $process->wait();
 
@@ -74,7 +72,7 @@ class ServerDumperTest extends TestCase
         $this->assertStringMatchesFormat(<<<'DUMP'
 (3) "foo"
 [
-  "timestamp" => %d
+  "timestamp" => %d.%d
   "foo_provider" => [
     (3) "foo"
   ]

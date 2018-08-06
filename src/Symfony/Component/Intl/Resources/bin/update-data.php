@@ -9,6 +9,9 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
 use Symfony\Component\Intl\Data\Generator\CurrencyDataGenerator;
@@ -21,12 +24,8 @@ use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
 use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Locale;
-use Symfony\Component\Intl\Util\IcuVersion;
-use Symfony\Component\Intl\Util\SvnRepository;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Intl\Util\GitRepository;
 
 require_once __DIR__.'/common.php';
 require_once __DIR__.'/autoload.php';
@@ -40,7 +39,7 @@ Usage: php update-data.php <path/to/icu/source> <path/to/icu/build>
 
 Updates the ICU data for Symfony to the latest version of ICU.
 
-If you downloaded the SVN repository before, you can pass the path to the
+If you downloaded the git repository before, you can pass the path to the
 repository source in the first optional argument.
 
 If you also built the repository before, you can pass the directory where that
@@ -64,36 +63,30 @@ if (!Intl::isExtensionLoaded()) {
     bailout('The intl extension for PHP is not installed.');
 }
 
-$filesystem = new Filesystem();
-$urls = parse_ini_file(__DIR__.'/icu.ini');
-
-echo "icu.ini parsed. Available versions:\n";
-
-$maxVersion = 0;
-
-foreach ($urls as $urlVersion => $url) {
-    $maxVersion = IcuVersion::compare($maxVersion, $urlVersion, '<')
-        ? $urlVersion
-        : $maxVersion;
-
-    echo "  $urlVersion\n";
-}
-
-$shortIcuVersion = strip_minor_versions($maxVersion);
-
 if ($argc >= 2) {
-    $sourceDir = $argv[1];
-    $svn = new SvnRepository($sourceDir);
+    $repoDir = $argv[1];
+    $git = new GitRepository($repoDir);
 
-    echo "Using existing SVN repository at {$sourceDir}.\n";
+    echo "Using the existing git repository at {$repoDir}.\n";
 } else {
-    echo "Starting SVN checkout for version $shortIcuVersion. This may take a while...\n";
+    echo "Starting git clone. This may take a while...\n";
 
-    $sourceDir = sys_get_temp_dir().'/icu-data/'.$shortIcuVersion.'/source';
-    $svn = SvnRepository::download($urls[$shortIcuVersion], $sourceDir);
+    $repoDir = sys_get_temp_dir().'/icu-data';
+    $git = GitRepository::download('https://github.com/unicode-org/icu.git', $repoDir);
 
-    echo "SVN checkout to {$sourceDir} complete.\n";
+    echo "Git clone to {$repoDir} complete.\n";
 }
+
+$gitTag = $git->getLastTag(function ($tag) {
+    return preg_match('#^release-[0-9]{1,}-[0-9]{1}$#', $tag);
+});
+$shortIcuVersion = strip_minor_versions(preg_replace('#release-([0-9]{1,})-([0-9]{1,})#', '$1.$2', $gitTag));
+
+echo "Checking out `{$gitTag}` for version `{$shortIcuVersion}`...\n";
+$git->checkout('tags/'.$gitTag);
+
+$filesystem = new Filesystem();
+$sourceDir = $repoDir.'/icu4c/source';
 
 if ($argc >= 3) {
     $buildDir = $argv[2];
@@ -265,23 +258,23 @@ $generator->generateData($config);
 
 echo "Resource bundle compilation complete.\n";
 
-$svnInfo = <<<SVN_INFO
-SVN information
+$gitInfo = <<<GIT_INFO
+Git information
 ===============
 
-URL: {$svn->getUrl()}
-Revision: {$svn->getLastCommit()->getRevision()}
-Author: {$svn->getLastCommit()->getAuthor()}
-Date: {$svn->getLastCommit()->getDate()}
+URL: {$git->getUrl()}
+Revision: {$git->getLastCommitHash()}
+Author: {$git->getLastAuthor()}
+Date: {$git->getLastAuthoredDate()->format('c')}
 
-SVN_INFO;
+GIT_INFO;
 
 foreach ($targetDirs as $targetDir) {
-    $svnInfoFile = $targetDir.'/svn-info.txt';
+    $gitInfoFile = $targetDir.'/git-info.txt';
 
-    file_put_contents($svnInfoFile, $svnInfo);
+    file_put_contents($gitInfoFile, $gitInfo);
 
-    echo "Wrote $svnInfoFile.\n";
+    echo "Wrote $gitInfoFile.\n";
 
     $versionFile = $targetDir.'/version.txt';
 

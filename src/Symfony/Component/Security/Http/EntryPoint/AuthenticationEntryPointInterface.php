@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Implement this interface for any classes that will be called to "start"

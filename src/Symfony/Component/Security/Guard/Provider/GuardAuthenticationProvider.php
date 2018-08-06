@@ -12,17 +12,17 @@
 namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
 /**
  * Responsible for accepting the PreAuthenticationGuardToken and calling
@@ -102,23 +102,23 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser()', get_class($guardAuthenticator)));
+            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser()', \get_class($guardAuthenticator)));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', get_class($guardAuthenticator), is_object($user) ? get_class($user) : gettype($user)));
+            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', \get_class($guardAuthenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
         }
 
         $this->userChecker->checkPreAuth($user);
         if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
-            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', get_class($guardAuthenticator)));
+            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', \get_class($guardAuthenticator)));
         }
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface
         $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', get_class($guardAuthenticator), is_object($authenticatedToken) ? get_class($authenticatedToken) : gettype($authenticatedToken)));
+            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', \get_class($guardAuthenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
         }
 
         return $authenticatedToken;

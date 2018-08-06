@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
@@ -177,7 +177,7 @@ EOF
         list($staticRoutes, $dynamicRoutes) = $this->groupStaticRoutes($routes);
 
         $code = $this->compileStaticRoutes($staticRoutes, $matchHost);
-        $chunkLimit = count($dynamicRoutes);
+        $chunkLimit = \count($dynamicRoutes);
 
         while (true) {
             try {
@@ -250,7 +250,7 @@ EOF
         $code = $default = '';
 
         foreach ($staticRoutes as $url => $routes) {
-            if (1 === count($routes)) {
+            if (1 === \count($routes)) {
                 foreach ($routes as $name => $route) {
                 }
 
@@ -368,7 +368,7 @@ EOF;
             $prev = false;
             $rx = '{^(?';
             $code .= "\n            {$state->mark} => ".self::export($rx);
-            $state->mark += strlen($rx);
+            $state->mark += \strlen($rx);
             $state->regex = $rx;
 
             foreach ($perHost as list($hostRegex, $routes)) {
@@ -376,13 +376,13 @@ EOF;
                     if ($hostRegex) {
                         preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $hostRegex, $rx);
                         $state->vars = array();
-                        $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')';
+                        $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')\.';
                         $state->hostVars = $state->vars;
                     } else {
-                        $hostRegex = '[^/]*+';
+                        $hostRegex = '(?:(?:[^./]*+\.)++)';
                         $state->hostVars = array();
                     }
-                    $state->mark += strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");
+                    $state->mark += \strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");
                     $code .= "\n                .".self::export($rx);
                     $state->regex .= $rx;
                     $prev = true;
@@ -406,6 +406,7 @@ EOF;
             $rx = ")$}{$modifiers}";
             $code .= "\n                .'{$rx}',";
             $state->regex .= $rx;
+            $state->markTail = 0;
 
             // if the regex is too large, throw a signaling exception to recompute with smaller chunk size
             set_error_handler(function ($type, $message) { throw 0 === strpos($message, $this->signalingException->getMessage()) ? $this->signalingException : new \ErrorException($message); });
@@ -427,7 +428,7 @@ EOF;
 EOF;
         }
 
-        $matchedPathinfo = $matchHost ? '$host.$pathinfo' : '$pathinfo';
+        $matchedPathinfo = $matchHost ? '$host.\'.\'.$pathinfo' : '$pathinfo';
         unset($state->getVars);
 
         return <<<EOF
@@ -467,13 +468,13 @@ EOF;
             if ($route instanceof StaticPrefixCollection) {
                 $prevRegex = null;
                 $prefix = substr($route->getPrefix(), $prefixLen);
-                $state->mark += strlen($rx = "|{$prefix}(?");
+                $state->mark += \strlen($rx = "|{$prefix}(?");
                 $code .= "\n                    .".self::export($rx);
                 $state->regex .= $rx;
-                $code .= $this->indent($this->compileStaticPrefixCollection($route, $state, $prefixLen + strlen($prefix)));
+                $code .= $this->indent($this->compileStaticPrefixCollection($route, $state, $prefixLen + \strlen($prefix)));
                 $code .= "\n                    .')'";
                 $state->regex .= ')';
-                $state->markTail += 1;
+                ++$state->markTail;
                 continue;
             }
 
@@ -485,14 +486,14 @@ EOF;
                 continue;
             }
 
-            $state->mark += 3 + $state->markTail + strlen($regex) - $prefixLen;
-            $state->markTail = 2 + strlen($state->mark);
+            $state->mark += 3 + $state->markTail + \strlen($regex) - $prefixLen;
+            $state->markTail = 2 + \strlen($state->mark);
             $rx = sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
             $code .= "\n                    .".self::export($rx);
             $state->regex .= $rx;
             $vars = array_merge($state->hostVars, $vars);
 
-            if (!$route->getCondition() && (!is_array($next = $routes[1 + $i] ?? null) || $regex !== $next[1])) {
+            if (!$route->getCondition() && (!\is_array($next = $routes[1 + $i] ?? null) || $regex !== $next[1])) {
                 $prevRegex = null;
                 $defaults = $route->getDefaults();
                 if (isset($defaults['_canonical_route'])) {
@@ -627,7 +628,7 @@ EOF;
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
 
         // the offset where the return value is appended below, with indendation
-        $retOffset = 12 + strlen($code);
+        $retOffset = 12 + \strlen($code);
         $defaults = $route->getDefaults();
         if (isset($defaults['_canonical_route'])) {
             $name = $defaults['_canonical_route'];
@@ -745,6 +746,10 @@ EOF;
             return 'null';
         }
         if (!\is_array($value)) {
+            if (\is_object($value)) {
+                throw new \InvalidArgumentException('Symfony\Component\Routing\Route cannot contain objects.');
+            }
+
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Intl\DateFormatter;
 
-use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\DateFormatter\DateFormat\FullTransformer;
-use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodNotImplementedException;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Locale\Locale;
 
 /**
@@ -187,7 +187,7 @@ class IntlDateFormatter
     public function format($timestamp)
     {
         // intl allows timestamps to be passed as arrays - we don't
-        if (is_array($timestamp)) {
+        if (\is_array($timestamp)) {
             $message = 'Only integer Unix timestamps and DateTime objects are supported';
 
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, $message);
@@ -195,7 +195,7 @@ class IntlDateFormatter
 
         // behave like the intl extension
         $argumentError = null;
-        if (!is_int($timestamp) && !$timestamp instanceof \DateTime) {
+        if (!\is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
         }
 

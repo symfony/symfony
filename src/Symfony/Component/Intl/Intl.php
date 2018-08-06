@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Intl;
 
-use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
+use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
@@ -194,7 +194,7 @@ final class Intl
         if (false === self::$icuVersion) {
             if (!self::isExtensionLoaded()) {
                 self::$icuVersion = self::getIcuStubVersion();
-            } elseif (defined('INTL_ICU_VERSION')) {
+            } elseif (\defined('INTL_ICU_VERSION')) {
                 self::$icuVersion = INTL_ICU_VERSION;
             } else {
                 try {
@@ -235,7 +235,7 @@ final class Intl
      */
     public static function getIcuStubVersion()
     {
-        return '61.1';
+        return '62.1';
     }
 
     /**

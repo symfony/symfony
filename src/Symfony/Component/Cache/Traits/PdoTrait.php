@@ -12,16 +12,20 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @internal
  */
 trait PdoTrait
 {
+    private $marshaller;
     private $conn;
     private $dsn;
     private $driver;
@@ -36,7 +40,7 @@ trait PdoTrait
     private $connectionOptions = array();
     private $namespace;
 
-    private function init($connOrDsn, $namespace, $defaultLifetime, array $options)
+    private function init($connOrDsn, $namespace, $defaultLifetime, array $options, ?MarshallerInterface $marshaller)
     {
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
@@ -50,10 +54,10 @@ trait PdoTrait
             $this->conn = $connOrDsn;
         } elseif ($connOrDsn instanceof Connection) {
             $this->conn = $connOrDsn;
-        } elseif (is_string($connOrDsn)) {
+        } elseif (\is_string($connOrDsn)) {
             $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, is_object($connOrDsn) ? get_class($connOrDsn) : gettype($connOrDsn)));
+            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, \is_object($connOrDsn) ? \get_class($connOrDsn) : \gettype($connOrDsn)));
         }
 
         $this->table = isset($options['db_table']) ? $options['db_table'] : $this->table;
@@ -65,6 +69,7 @@ trait PdoTrait
         $this->password = isset($options['db_password']) ? $options['db_password'] : $this->password;
         $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
         $this->namespace = $namespace;
+        $this->marshaller = $marshaller ?? new DefaultMarshaller();
 
         parent::__construct($namespace, $defaultLifetime);
     }
@@ -150,7 +155,11 @@ trait PdoTrait
             $deleteSql .= " AND $this->idCol LIKE :namespace";
         }
 
-        $delete = $this->getConnection()->prepare($deleteSql);
+        try {
+            $delete = $this->getConnection()->prepare($deleteSql);
+        } catch (TableNotFoundException $e) {
+            return true;
+        }
         $delete->bindValue(':time', time(), \PDO::PARAM_INT);
 
         if ('' !== $this->namespace) {
@@ -168,7 +177,7 @@ trait PdoTrait
         $now = time();
         $expired = array();
 
-        $sql = str_pad('', (count($ids) << 1) - 1, '?,');
+        $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN ($sql)";
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
@@ -181,12 +190,12 @@ trait PdoTrait
             if (null === $row[1]) {
                 $expired[] = $row[0];
             } else {
-                yield $row[0] => parent::unserialize(is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
+                yield $row[0] => $this->marshaller->unmarshall(\is_resource($row[1]) ? stream_get_contents($row[1]) : $row[1]);
             }
         }
 
         if ($expired) {
-            $sql = str_pad('', (count($expired) << 1) - 1, '?,');
+            $sql = str_pad('', (\count($expired) << 1) - 1, '?,');
             $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= ? AND $this->idCol IN ($sql)";
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
@@ -229,7 +238,10 @@ trait PdoTrait
             $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%'";
         }
 
-        $conn->exec($sql);
+        try {
+            $conn->exec($sql);
+        } catch (TableNotFoundException $e) {
+        }
 
         return true;
     }
@@ -239,10 +251,13 @@ trait PdoTrait
      */
     protected function doDelete(array $ids)
     {
-        $sql = str_pad('', (count($ids) << 1) - 1, '?,');
+        $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute(array_values($ids));
+        try {
+            $stmt = $this->getConnection()->prepare($sql);
+            $stmt->execute(array_values($ids));
+        } catch (TableNotFoundException $e) {
+        }
 
         return true;
     }
@@ -252,18 +267,7 @@ trait PdoTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        $serialized = array();
-        $failed = array();
-
-        foreach ($values as $id => $value) {
-            try {
-                $serialized[$id] = serialize($value);
-            } catch (\Exception $e) {
-                $failed[] = $id;
-            }
-        }
-
-        if (!$serialized) {
+        if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
         }
 
@@ -302,7 +306,14 @@ trait PdoTrait
 
         $now = time();
         $lifetime = $lifetime ?: null;
-        $stmt = $conn->prepare($sql);
+        try {
+            $stmt = $conn->prepare($sql);
+        } catch (TableNotFoundException $e) {
+            if (!$conn->isTransactionActive() || \in_array($this->driver, array('pgsql', 'sqlite', 'sqlsrv'), true)) {
+                $this->createTable();
+            }
+            $stmt = $conn->prepare($sql);
+        }
 
         if ('sqlsrv' === $driver || 'oci' === $driver) {
             $stmt->bindParam(1, $id);
@@ -328,7 +339,7 @@ trait PdoTrait
             $insertStmt->bindValue(':time', $now, \PDO::PARAM_INT);
         }
 
-        foreach ($serialized as $id => $data) {
+        foreach ($values as $id => $data) {
             $stmt->execute();
 
             if (null === $driver && !$stmt->rowCount()) {

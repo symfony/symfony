@@ -71,7 +71,7 @@ class Esi extends AbstractSurrogate
         }
 
         $parts = explode(';', $type);
-        if (!in_array($parts[0], $this->contentTypes)) {
+        if (!\in_array($parts[0], $this->contentTypes)) {
             return $response;
         }
 

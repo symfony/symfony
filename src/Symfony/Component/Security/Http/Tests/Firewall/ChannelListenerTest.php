@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Http\Firewall\ChannelListener;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Firewall\ChannelListener;
 
 class ChannelListenerTest extends TestCase
 {

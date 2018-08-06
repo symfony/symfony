@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * BinaryFileResponse represents an HTTP response delivering a file.
@@ -165,7 +165,7 @@ class BinaryFileResponse extends Response
             for ($i = 0, $filenameLength = mb_strlen($filename, $encoding); $i < $filenameLength; ++$i) {
                 $char = mb_substr($filename, $i, 1, $encoding);
 
-                if ('%' === $char || ord($char) < 32 || ord($char) > 126) {
+                if ('%' === $char || \ord($char) < 32 || \ord($char) > 126) {
                     $filenameFallback .= '_';
                 } else {
                     $filenameFallback .= $char;
@@ -221,8 +221,8 @@ class BinaryFileResponse extends Response
                 $parts = HeaderUtils::split($request->headers->get('X-Accel-Mapping', ''), ',=');
                 $mappings = HeaderUtils::combine($parts);
                 foreach ($mappings as $pathPrefix => $location) {
-                    if (substr($path, 0, strlen($pathPrefix)) === $pathPrefix) {
-                        $path = $location.substr($path, strlen($pathPrefix));
+                    if (substr($path, 0, \strlen($pathPrefix)) === $pathPrefix) {
+                        $path = $location.substr($path, \strlen($pathPrefix));
                         break;
                     }
                 }

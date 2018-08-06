@@ -17,8 +17,9 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -61,6 +62,21 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegexp Unused binding "$quz" in service [\s\S]+ Invalid service ".*\\ParentNotExists": class NotExists not found\.
+     */
+    public function testMissingParent()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(ParentNotExists::class, ParentNotExists::class);
+        $definition->setBindings(array('$quz' => '123'));
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+    }
+
     public function testTypedReferenceSupport()
     {
         $container = new ContainerBuilder();
@@ -94,5 +110,29 @@ class ResolveBindingsPassTest extends TestCase
         (new ResolveBindingsPass())->process($container);
 
         $this->assertEquals(array(array('setDefaultLocale', array('fr'))), $definition->getMethodCalls());
+    }
+
+    public function testTupleBinding()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = array(
+            '$c' => new BoundArgument(new Reference('bar')),
+            CaseSensitiveClass::class.'$c' => new BoundArgument(new Reference('foo')),
+        );
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->addMethodCall('setSensitiveClass');
+        $definition->addMethodCall('setAnotherC');
+        $definition->setBindings($bindings);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $expected = array(
+            array('setSensitiveClass', array(new Reference('foo'))),
+            array('setAnotherC', array(new Reference('bar'))),
+        );
+        $this->assertEquals($expected, $definition->getMethodCalls());
     }
 }

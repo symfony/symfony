@@ -44,6 +44,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'messenger.receiver',
         'messenger.message_handler',
         'monolog.logger',
+        'proxy',
         'routing.expression_language_provider',
         'routing.loader',
         'security.expression_language_provider',
@@ -67,7 +68,7 @@ class UnusedTagsPass implements CompilerPassInterface
 
         foreach ($container->findUnusedTags() as $tag) {
             // skip whitelisted tags
-            if (in_array($tag, $this->whitelist)) {
+            if (\in_array($tag, $this->whitelist)) {
                 continue;
             }
 
@@ -78,7 +79,7 @@ class UnusedTagsPass implements CompilerPassInterface
                     continue;
                 }
 
-                if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= strlen($tag) / 3) {
+                if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= \strlen($tag) / 3) {
                     $candidates[] = $definedTag;
                 }
             }

@@ -398,7 +398,7 @@
 {# Support #}
 
 {%- block form_rows -%}
-    {% for child in form %}
+    {% for child in form if not child.rendered %}
         {{- form_row(child) -}}
     {% endfor %}
 {%- endblock form_rows -%}

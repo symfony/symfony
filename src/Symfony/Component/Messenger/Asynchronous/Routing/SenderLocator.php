@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Asynchronous\Routing;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Transport\SenderInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -19,42 +20,47 @@ use Psr\Container\ContainerInterface;
 class SenderLocator implements SenderLocatorInterface
 {
     private $senderServiceLocator;
-    private $messageToSenderIdsMapping;
+    private $messageToSenderIdMapping;
 
-    public function __construct(ContainerInterface $senderServiceLocator, array $messageToSenderIdsMapping)
+    public function __construct(ContainerInterface $senderServiceLocator, array $messageToSenderIdMapping)
     {
         $this->senderServiceLocator = $senderServiceLocator;
-        $this->messageToSenderIdsMapping = $messageToSenderIdsMapping;
+        $this->messageToSenderIdMapping = $messageToSenderIdMapping;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSendersForMessage($message): array
+    public function getSenderForMessage($message): ?SenderInterface
     {
-        $senders = array();
-        foreach ($this->getSenderIds($message) as $senderId) {
-            $senders[] = $this->senderServiceLocator->get($senderId);
-        }
+        $senderId = $this->getSenderId($message);
 
-        return $senders;
+        return $senderId ? $this->senderServiceLocator->get($senderId) : null;
     }
 
-    private function getSenderIds($message): array
+    private function getSenderId($message): ?string
     {
-        if (isset($this->messageToSenderIdsMapping[\get_class($message)])) {
-            return $this->messageToSenderIdsMapping[\get_class($message)];
+        return self::getValueFromMessageRouting($this->messageToSenderIdMapping, $message);
+    }
+
+    /**
+     * @internal
+     */
+    public static function getValueFromMessageRouting(array $mapping, $message)
+    {
+        if (isset($mapping[\get_class($message)])) {
+            return $mapping[\get_class($message)];
         }
-        if ($messageToSenderIdsMapping = array_intersect_key($this->messageToSenderIdsMapping, class_parents($message))) {
-            return current($messageToSenderIdsMapping);
+        if ($parentsMapping = array_intersect_key($mapping, class_parents($message))) {
+            return current($parentsMapping);
         }
-        if ($messageToSenderIdsMapping = array_intersect_key($this->messageToSenderIdsMapping, class_implements($message))) {
-            return current($messageToSenderIdsMapping);
+        if ($interfaceMapping = array_intersect_key($mapping, class_implements($message))) {
+            return current($interfaceMapping);
         }
-        if (isset($this->messageToSenderIdsMapping['*'])) {
-            return $this->messageToSenderIdsMapping['*'];
+        if (isset($mapping['*'])) {
+            return $mapping['*'];
         }
 
-        return array();
+        return null;
     }
 }

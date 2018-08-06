@@ -89,7 +89,7 @@ class PlantUmlDumper implements DumperInterface
                             "$transitionEscaped --> $toEscaped",
                         );
                         foreach ($lines as $line) {
-                            if (!in_array($line, $code)) {
+                            if (!\in_array($line, $code)) {
                                 $code[] = $line;
                             }
                         }
@@ -135,12 +135,12 @@ class PlantUmlDumper implements DumperInterface
         if (isset($options['name'])) {
             $code[] = "title {$options['name']}";
         }
-        if (isset($options['skinparams']) && is_array($options['skinparams'])) {
+        if (isset($options['skinparams']) && \is_array($options['skinparams'])) {
             foreach ($options['skinparams'] as $skinparamKey => $skinparamValue) {
                 if (!$this->isWorkflowTransitionType() && 'agent' === $skinparamKey) {
                     continue;
                 }
-                if (!is_array($skinparamValue)) {
+                if (!\is_array($skinparamValue)) {
                     $code[] = "skinparam {$skinparamKey} $skinparamValue";
                     continue;
                 }

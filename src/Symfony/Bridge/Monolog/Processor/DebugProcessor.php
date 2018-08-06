@@ -15,8 +15,9 @@ use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class DebugProcessor implements DebugLoggerInterface
+class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
     private $records = array();
     private $errorCount = array();
@@ -90,5 +91,13 @@ class DebugProcessor implements DebugLoggerInterface
     {
         $this->records = array();
         $this->errorCount = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->clear();
     }
 }

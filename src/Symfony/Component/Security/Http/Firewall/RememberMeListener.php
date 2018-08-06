@@ -12,16 +12,16 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * RememberMeListener implements authentication capabilities via a cookie.
@@ -59,7 +59,25 @@ class RememberMeListener implements ListenerInterface
         }
 
         $request = $event->getRequest();
-        if (null === $token = $this->rememberMeServices->autoLogin($request)) {
+        try {
+            if (null === $token = $this->rememberMeServices->autoLogin($request)) {
+                return;
+            }
+        } catch (AuthenticationException $e) {
+            if (null !== $this->logger) {
+                $this->logger->warning(
+                    'The token storage was not populated with remember-me token as the'
+                   .' RememberMeServices was not able to create a token from the remember'
+                   .' me information.', array('exception' => $e)
+                );
+            }
+
+            $this->rememberMeServices->loginFail($request);
+
+            if (!$this->catchExceptions) {
+                throw $e;
+            }
+
             return;
         }
 

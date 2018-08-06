@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `ProcessorInterface`: an optional interface to allow autoconfiguration of Monolog processors
+
 4.1.0
 -----
 

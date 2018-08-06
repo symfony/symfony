@@ -26,14 +26,14 @@ class DataTest extends TestCase
         $clonedValues = array();
 
         $this->assertInstanceOf(Data::class, $data);
-        $this->assertCount(count($values), $data);
+        $this->assertCount(\count($values), $data);
         $this->assertFalse(isset($data->{0}));
         $this->assertFalse(isset($data[0]));
 
         foreach ($data as $k => $v) {
             $this->assertTrue(isset($data->{$k}));
             $this->assertTrue(isset($data[$k]));
-            $this->assertSame(gettype($values[$k]), $data->seek($k)->getType());
+            $this->assertSame(\gettype($values[$k]), $data->seek($k)->getType());
             $this->assertSame($values[$k], $data->seek($k)->getValue());
             $this->assertSame($values[$k], $data->{$k});
             $this->assertSame($values[$k], $data[$k]);

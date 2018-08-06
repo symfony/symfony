@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 /**
  * Guesses the mime type with the binary "file" (only available on *nix).
@@ -49,7 +49,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
             return $supported;
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR || !function_exists('passthru') || !function_exists('escapeshellarg')) {
+        if ('\\' === \DIRECTORY_SEPARATOR || !\function_exists('passthru') || !\function_exists('escapeshellarg')) {
             return $supported = false;
         }
 

@@ -141,7 +141,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
-  <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:10" rel="noopener noreferrer"><span class=sf-dump-str title="5 characters">hello</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:10" rel="noopener noreferrer"><span class=sf-dump-str title="39 characters">hello(?stdClass $a, stdClass $b = null)</span></a>"
 </samp>]
 </bar>
 EODUMP;

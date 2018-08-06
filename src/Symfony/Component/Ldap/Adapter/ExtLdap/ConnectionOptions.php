@@ -64,15 +64,15 @@ final class ConnectionOptions
         // Convert
         $constantName = self::getOptionName($name);
 
-        if (!defined($constantName)) {
+        if (!\defined($constantName)) {
             throw new LdapException(sprintf('Unknown option "%s".', $name));
         }
 
-        return constant($constantName);
+        return \constant($constantName);
     }
 
     public static function isOption($name)
     {
-        return defined(self::getOptionName($name));
+        return \defined(self::getOptionName($name));
     }
 }

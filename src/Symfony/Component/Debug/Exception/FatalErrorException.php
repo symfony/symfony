@@ -18,9 +18,9 @@ namespace Symfony\Component\Debug\Exception;
  */
 class FatalErrorException extends \ErrorException
 {
-    public function __construct(string $message, int $code, int $severity, string $filename, int $lineno, int $traceOffset = null, bool $traceArgs = true, array $trace = null)
+    public function __construct(string $message, int $code, int $severity, string $filename, int $lineno, int $traceOffset = null, bool $traceArgs = true, array $trace = null, \Throwable $previous = null)
     {
-        parent::__construct($message, $code, $severity, $filename, $lineno);
+        parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
 
         if (null !== $trace) {
             if (!$traceArgs) {
@@ -31,7 +31,7 @@ class FatalErrorException extends \ErrorException
 
             $this->setTrace($trace);
         } elseif (null !== $traceOffset) {
-            if (function_exists('xdebug_get_function_stack')) {
+            if (\function_exists('xdebug_get_function_stack')) {
                 $trace = xdebug_get_function_stack();
                 if (0 < $traceOffset) {
                     array_splice($trace, -$traceOffset);

@@ -148,7 +148,7 @@ class IbanValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -231,7 +231,7 @@ class IbanValidator extends ConstraintValidator
         foreach ($chars as $char) {
             // Convert uppercase characters to ordinals, starting with 10 for "A"
             if (ctype_upper($char)) {
-                $bigInt .= (ord($char) - 55);
+                $bigInt .= (\ord($char) - 55);
 
                 continue;
             }

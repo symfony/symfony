@@ -12,9 +12,9 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 class RememberMeListenerTest extends TestCase
@@ -133,6 +133,43 @@ class RememberMeListenerTest extends TestCase
             ->expects($this->once())
             ->method('authenticate')
             ->will($this->throwException($exception))
+        ;
+
+        $event = $this->getGetResponseEvent();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue(new Request()))
+        ;
+
+        $listener->handle($event);
+    }
+
+    public function testOnCoreSecurityAuthenticationExceptionDuringAutoLoginTriggersLoginFail()
+    {
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
+
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null))
+        ;
+
+        $exception = new AuthenticationException('Authentication failed.');
+        $service
+            ->expects($this->once())
+            ->method('autoLogin')
+            ->will($this->throwException($exception))
+        ;
+
+        $service
+            ->expects($this->once())
+            ->method('loginFail')
+        ;
+
+        $manager
+            ->expects($this->never())
+            ->method('authenticate')
         ;
 
         $event = $this->getGetResponseEvent();

@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
-use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
+use Symfony\Component\Templating\PhpEngine;
 
 class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 {
@@ -32,7 +32,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         // should be moved to the Form component once absolute file paths are supported
         // by the default name parser in the Templating component
         $reflClass = new \ReflectionClass('Symfony\Bundle\FrameworkBundle\FrameworkBundle');
-        $root = realpath(dirname($reflClass->getFileName()).'/Resources/views');
+        $root = realpath(\dirname($reflClass->getFileName()).'/Resources/views');
         $rootTheme = realpath(__DIR__.'/Resources');
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());

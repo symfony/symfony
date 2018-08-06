@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 
 class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 {
@@ -100,10 +100,10 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     private function expectAnnotationsToBeReadFrom(array $classes)
     {
-        $this->reader->expects($this->exactly(count($classes)))
+        $this->reader->expects($this->exactly(\count($classes)))
             ->method('getClassAnnotation')
             ->with($this->callback(function (\ReflectionClass $class) use ($classes) {
-                return in_array($class->getName(), $classes);
+                return \in_array($class->getName(), $classes);
             }));
     }
 }

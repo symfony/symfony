@@ -13,11 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AnalyzeServiceReferencesPassTest extends TestCase
 {
@@ -207,7 +206,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $pass = new RepeatedPass(array(new AnalyzeServiceReferencesPass()));
+        $pass = new AnalyzeServiceReferencesPass();
         $pass->process($container);
 
         return $container->getCompiler()->getServiceReferenceGraph();

@@ -22,18 +22,22 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('test.service_container')) {
+        if (!$container->hasDefinition('test.private_services_locator')) {
             return;
         }
 
-        $testContainer = $container->getDefinition('test.service_container');
-        $privateContainer = $container->getDefinition((string) $testContainer->getArgument(2));
+        $privateContainer = $container->getDefinition('test.private_services_locator');
         $definitions = $container->getDefinitions();
+        $privateServices = $privateContainer->getArgument(0);
 
-        foreach ($privateContainer->getArgument(0) as $id => $argument) {
+        foreach ($privateServices as $id => $argument) {
             if (isset($definitions[$target = (string) $argument->getValues()[0]])) {
                 $argument->setValues(array(new Reference($target)));
+            } else {
+                unset($privateServices[$id]);
             }
         }
+
+        $privateContainer->replaceArgument(0, $privateServices);
     }
 }

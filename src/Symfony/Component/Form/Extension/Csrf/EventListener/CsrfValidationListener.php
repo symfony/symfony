@@ -12,9 +12,9 @@
 namespace Symfony\Component\Form\Extension\Csrf\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -69,7 +69,7 @@ class CsrfValidationListener implements EventSubscriberInterface
                 $form->addError(new FormError($errorMessage));
             }
 
-            if (is_array($data)) {
+            if (\is_array($data)) {
                 unset($data[$this->fieldName]);
                 $event->setData($data);
             }

@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * RequestHelper provides access to the current request parameters.

@@ -13,13 +13,13 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Emulates the invalid behavior if the reference is not found within the
@@ -66,7 +66,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             $value->setArguments($this->processValue($value->getArguments(), 0));
             $value->setProperties($this->processValue($value->getProperties(), 1));
             $value->setMethodCalls($this->processValue($value->getMethodCalls(), 2));
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             $i = 0;
 
             foreach ($value as $k => $v) {

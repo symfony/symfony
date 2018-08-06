@@ -30,18 +30,21 @@ class Event extends BaseEvent
     private $workflowName;
 
     /**
-     * @param object     $subject
-     * @param Marking    $marking
-     * @param Transition $transition
-     * @param Workflow   $workflow
+     * @param object            $subject
+     * @param Marking           $marking
+     * @param Transition        $transition
+     * @param WorkflowInterface $workflow
      */
     public function __construct($subject, Marking $marking, Transition $transition, $workflow = null)
     {
         $this->subject = $subject;
         $this->marking = $marking;
         $this->transition = $transition;
-        if (is_string($workflow)) {
-            @trigger_error(sprintf('Passing a string as 4th parameter of "%s" is deprecated since Symfony 4.1. Pass a %s instance instead.', __METHOD__, WorkflowInterface::class), E_USER_DEPRECATED);
+        if (null === $workflow) {
+            @trigger_error(sprintf('Passing only three parameters to "%s" is deprecated since Symfony 4.1. Pass a %s instance as fourth parameter instead.', __METHOD__, WorkflowInterface::class), E_USER_DEPRECATED);
+            $this->workflowName = 'unnamed';
+        } elseif (\is_string($workflow)) {
+            @trigger_error(sprintf('Passing a string as the 4th parameter of "%s()" is deprecated since Symfony 4.1. Pass a %s instance instead.', __METHOD__, WorkflowInterface::class), E_USER_DEPRECATED);
             $this->workflowName = $workflow;
         } elseif ($workflow instanceof WorkflowInterface) {
             $this->workflow = $workflow;

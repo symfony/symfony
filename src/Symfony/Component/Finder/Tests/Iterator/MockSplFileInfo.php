@@ -25,9 +25,9 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function __construct($param)
     {
-        if (is_string($param)) {
+        if (\is_string($param)) {
             parent::__construct($param);
-        } elseif (is_array($param)) {
+        } elseif (\is_array($param)) {
             $defaults = array(
               'name' => 'file.txt',
               'contents' => null,
@@ -92,7 +92,7 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function setType($type)
     {
-        if (is_string($type)) {
+        if (\is_string($type)) {
             switch ($type) {
                 case 'directory':
                 case 'd':

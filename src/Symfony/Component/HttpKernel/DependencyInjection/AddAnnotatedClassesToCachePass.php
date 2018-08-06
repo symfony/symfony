@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Composer\Autoload\ClassLoader;
 use Symfony\Component\Debug\DebugClassLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -88,7 +88,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         $classes = array();
 
         foreach (spl_autoload_functions() as $function) {
-            if (!is_array($function)) {
+            if (!\is_array($function)) {
                 continue;
             }
 
@@ -96,7 +96,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
                 $function = $function[0]->getClassLoader();
             }
 
-            if (is_array($function) && $function[0] instanceof ClassLoader) {
+            if (\is_array($function) && $function[0] instanceof ClassLoader) {
                 $classes += array_filter($function[0]->getClassMap());
             }
         }

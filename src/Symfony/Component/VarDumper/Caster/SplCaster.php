@@ -29,30 +29,12 @@ class SplCaster
 
     public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, $isNested)
     {
-        $prefix = Caster::PREFIX_VIRTUAL;
-        $class = $stub->class;
-        $flags = $c->getFlags();
+        return self::castSplArray($c, $a, $stub, $isNested);
+    }
 
-        $b = array(
-            $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
-            $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
-            $prefix.'iteratorClass' => new ClassStub($c->getIteratorClass()),
-            $prefix.'storage' => $c->getArrayCopy(),
-        );
-
-        if ('ArrayObject' === $class) {
-            $a = $b;
-        } else {
-            if (!($flags & \ArrayObject::STD_PROP_LIST)) {
-                $c->setFlags(\ArrayObject::STD_PROP_LIST);
-                $a = Caster::castObject($c, $class);
-                $c->setFlags($flags);
-            }
-
-            $a += $b;
-        }
-
-        return $a;
+    public static function castArrayIterator(\ArrayIterator $c, array $a, Stub $stub, $isNested)
+    {
+        return self::castSplArray($c, $a, $stub, $isNested);
     }
 
     public static function castHeap(\Iterator $c, array $a, Stub $stub, $isNested)
@@ -186,7 +168,7 @@ class SplCaster
 
         $clone = clone $c;
         foreach ($clone as $obj) {
-            $storage[spl_object_hash($obj)] = array(
+            $storage[] = array(
                 'object' => $obj,
                 'info' => $clone->getInfo(),
              );
@@ -202,6 +184,29 @@ class SplCaster
     public static function castOuterIterator(\OuterIterator $c, array $a, Stub $stub, $isNested)
     {
         $a[Caster::PREFIX_VIRTUAL.'innerIterator'] = $c->getInnerIterator();
+
+        return $a;
+    }
+
+    private static function castSplArray($c, array $a, Stub $stub, $isNested)
+    {
+        $prefix = Caster::PREFIX_VIRTUAL;
+        $class = $stub->class;
+        $flags = $c->getFlags();
+
+        if (!($flags & \ArrayObject::STD_PROP_LIST)) {
+            $c->setFlags(\ArrayObject::STD_PROP_LIST);
+            $a = Caster::castObject($c, $class);
+            $c->setFlags($flags);
+        }
+        $a += array(
+            $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
+            $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
+        );
+        if ($c instanceof \ArrayObject) {
+            $a[$prefix.'iteratorClass'] = new ClassStub($c->getIteratorClass());
+        }
+        $a[$prefix.'storage'] = $c->getArrayCopy();
 
         return $a;
     }

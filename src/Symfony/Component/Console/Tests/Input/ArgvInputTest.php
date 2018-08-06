@@ -13,8 +13,8 @@ namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class ArgvInputTest extends TestCase
@@ -395,25 +395,26 @@ class ArgvInputTest extends TestCase
     /**
      * @dataProvider provideGetParameterOptionValues
      */
-    public function testGetParameterOptionEqualSign($argv, $key, $onlyParams, $expected)
+    public function testGetParameterOptionEqualSign($argv, $key, $default, $onlyParams, $expected)
     {
         $input = new ArgvInput($argv);
-        $this->assertEquals($expected, $input->getParameterOption($key, false, $onlyParams), '->getParameterOption() returns the expected value');
+        $this->assertEquals($expected, $input->getParameterOption($key, $default, $onlyParams), '->getParameterOption() returns the expected value');
     }
 
     public function provideGetParameterOptionValues()
     {
         return array(
-            array(array('app/console', 'foo:bar', '-e', 'dev'), '-e', false, 'dev'),
-            array(array('app/console', 'foo:bar', '--env=dev'), '--env', false, 'dev'),
-            array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), false, 'dev'),
-            array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), false, 'dev'),
-            array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), false, '1'),
-            array(array('app/console', 'foo:bar', '--env=dev', '', '--en=1'), array('--en'), false, '1'),
-            array(array('app/console', 'foo:bar', '--env', 'val'), '--env', false, 'val'),
-            array(array('app/console', 'foo:bar', '--env', 'val', '--dummy'), '--env', false, 'val'),
-            array(array('app/console', 'foo:bar', '--', '--env=dev'), '--env', false, 'dev'),
-            array(array('app/console', 'foo:bar', '--', '--env=dev'), '--env', true, false),
+            array(array('app/console', 'foo:bar'), '-e', 'default', false, 'default'),
+            array(array('app/console', 'foo:bar', '-e', 'dev'), '-e', 'default', false, 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev'), '--env', 'default', false, 'dev'),
+            array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), 'default', false, 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), 'default', false, 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), 'default', false, '1'),
+            array(array('app/console', 'foo:bar', '--env=dev', '', '--en=1'), array('--en'), 'default', false, '1'),
+            array(array('app/console', 'foo:bar', '--env', 'val'), '--env', 'default', false, 'val'),
+            array(array('app/console', 'foo:bar', '--env', 'val', '--dummy'), '--env', 'default', false, 'val'),
+            array(array('app/console', 'foo:bar', '--', '--env=dev'), '--env', 'default', false, 'dev'),
+            array(array('app/console', 'foo:bar', '--', '--env=dev'), '--env', 'default', true, 'default'),
         );
     }
 

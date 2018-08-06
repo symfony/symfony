@@ -11,15 +11,14 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
-use Symfony\Bridge\Twig\Extension\WebLinkExtension;
+use Symfony\Bundle\TwigBundle\Loader\NativeFilesystemLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -53,17 +52,10 @@ class TwigExtension extends Extension
             $container->removeDefinition('twig.translation.extractor');
         }
 
-        if (class_exists(HttpHeaderSerializer::class)) {
-            $definition = $container->register('twig.extension.weblink', WebLinkExtension::class);
-            $definition->setPublic(false);
-            $definition->addArgument(new Reference('request_stack'));
-            $definition->addTag('twig.extension');
-        }
-
         foreach ($configs as $key => $config) {
             if (isset($config['globals'])) {
                 foreach ($config['globals'] as $name => $value) {
-                    if (is_array($value) && isset($value['key'])) {
+                    if (\is_array($value) && isset($value['key'])) {
                         $configs[$key]['globals'][$name] = array(
                             'key' => $name,
                             'value' => $value,
@@ -91,6 +83,10 @@ class TwigExtension extends Extension
         $envConfiguratorDefinition->replaceArgument(5, $config['number_format']['thousands_separator']);
 
         $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.native_filesystem');
+
+        if ($container->getParameter('kernel.debug')) {
+            $twigFilesystemLoaderDefinition->setClass(NativeFilesystemLoader::class);
+        }
 
         // register user-configured paths
         foreach ($config['paths'] as $path => $namespace) {

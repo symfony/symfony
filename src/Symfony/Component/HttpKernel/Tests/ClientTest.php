@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\Client;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
 /**
@@ -119,7 +119,7 @@ class ClientTest extends TestCase
             $this->assertEquals(1, $file->getSize());
         }
 
-        $file->move(dirname($target), basename($target));
+        $file->move(\dirname($target), basename($target));
 
         $this->assertFileExists($target);
         unlink($target);

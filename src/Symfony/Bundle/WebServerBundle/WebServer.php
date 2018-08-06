@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\WebServerBundle;
 
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Manages a local HTTP web server.
@@ -154,7 +154,7 @@ class WebServer
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 
-        if (in_array('APP_ENV', explode(',', getenv('SYMFONY_DOTENV_VARS')))) {
+        if (\in_array('APP_ENV', explode(',', getenv('SYMFONY_DOTENV_VARS')))) {
             $process->setEnv(array('APP_ENV' => false));
             $process->inheritEnvironmentVariables();
         }

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
-use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -55,7 +55,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
                     'The errors must be instances of '.
                     '"\Symfony\Component\Form\FormError" or "%s". Got: "%s".',
                     __CLASS__,
-                    is_object($error) ? get_class($error) : gettype($error)
+                    \is_object($error) ? \get_class($error) : \gettype($error)
                 ));
             }
         }
@@ -234,7 +234,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      */
     public function count()
     {
-        return count($this->errors);
+        return \count($this->errors);
     }
 
     /**
@@ -270,7 +270,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
         $errors = array();
         foreach ($this as $error) {
             $cause = $error->getCause();
-            if ($cause instanceof ConstraintViolation && in_array($cause->getCode(), $codes, true)) {
+            if ($cause instanceof ConstraintViolation && \in_array($cause->getCode(), $codes, true)) {
                 $errors[] = $error;
             }
         }

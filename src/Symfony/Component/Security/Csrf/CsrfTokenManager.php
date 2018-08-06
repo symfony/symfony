@@ -13,8 +13,8 @@ namespace Symfony\Component\Security\Csrf;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
-use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
@@ -56,10 +56,10 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
 
                 return $superGlobalNamespaceGenerator();
             };
-        } elseif (is_callable($namespace) || is_string($namespace)) {
+        } elseif (\is_callable($namespace) || \is_string($namespace)) {
             $this->namespace = $namespace;
         } else {
-            throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', gettype($namespace)));
+            throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', \gettype($namespace)));
         }
     }
 
@@ -116,6 +116,6 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
 
     private function getNamespace()
     {
-        return is_callable($ns = $this->namespace) ? $ns() : $ns;
+        return \is_callable($ns = $this->namespace) ? $ns() : $ns;
     }
 }

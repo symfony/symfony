@@ -17,8 +17,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -90,7 +90,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if (!extension_loaded('pcntl')) {
+        if (!\extension_loaded('pcntl')) {
             $io->error(array(
                 'This command needs the pcntl extension to run.',
                 'You can either install it or use the "server:run" command instead.',
@@ -135,7 +135,7 @@ EOF
         try {
             $server = new WebServer();
             if ($server->isRunning($input->getOption('pidfile'))) {
-                $io->error(sprintf('The web server is already running (listening on http://%s).', $server->getAddress($input->getOption('pidfile'))));
+                $io->error(sprintf('The web server has already been started. It is currently listening on http://%s. Please stop the web server before you try to start it again.', $server->getAddress($input->getOption('pidfile'))));
 
                 return 1;
             }

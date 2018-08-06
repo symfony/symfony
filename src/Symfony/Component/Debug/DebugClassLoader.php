@@ -39,11 +39,11 @@ class DebugClassLoader
     public function __construct(callable $classLoader)
     {
         $this->classLoader = $classLoader;
-        $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
+        $this->isFinder = \is_array($classLoader) && method_exists($classLoader[0], 'findFile');
 
         if (!isset(self::$caseCheck)) {
-            $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), DIRECTORY_SEPARATOR);
-            $i = strrpos($file, DIRECTORY_SEPARATOR);
+            $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), \DIRECTORY_SEPARATOR);
+            $i = strrpos($file, \DIRECTORY_SEPARATOR);
             $dir = substr($file, 0, 1 + $i);
             $file = substr($file, 1 + $i);
             $test = strtoupper($file) === $file ? strtolower($file) : strtoupper($file);
@@ -52,7 +52,7 @@ class DebugClassLoader
             if (false === $test || false === $i) {
                 // filesystem is case sensitive
                 self::$caseCheck = 0;
-            } elseif (substr($test, -strlen($file)) === $file) {
+            } elseif (substr($test, -\strlen($file)) === $file) {
                 // filesystem is case insensitive and realpath() normalizes the case of characters
                 self::$caseCheck = 1;
             } elseif (false !== stripos(PHP_OS, 'darwin')) {
@@ -84,7 +84,7 @@ class DebugClassLoader
         class_exists('Symfony\Component\Debug\ErrorHandler');
         class_exists('Psr\Log\LogLevel');
 
-        if (!is_array($functions = spl_autoload_functions())) {
+        if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
 
@@ -93,7 +93,7 @@ class DebugClassLoader
         }
 
         foreach ($functions as $function) {
-            if (!is_array($function) || !$function[0] instanceof self) {
+            if (!\is_array($function) || !$function[0] instanceof self) {
                 $function = array(new static($function), 'loadClass');
             }
 
@@ -106,7 +106,7 @@ class DebugClassLoader
      */
     public static function disable()
     {
-        if (!is_array($functions = spl_autoload_functions())) {
+        if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
 
@@ -115,7 +115,7 @@ class DebugClassLoader
         }
 
         foreach ($functions as $function) {
-            if (is_array($function) && $function[0] instanceof self) {
+            if (\is_array($function) && $function[0] instanceof self) {
                 $function = $function[0]->getClassLoader();
             }
 
@@ -149,7 +149,7 @@ class DebugClassLoader
                     }
                 }
             } else {
-                call_user_func($this->classLoader, $class);
+                \call_user_func($this->classLoader, $class);
                 $file = false;
             }
         } finally {
@@ -289,10 +289,10 @@ class DebugClassLoader
             }
             if (self::$caseCheck) {
                 $real = explode('\\', $class.strrchr($file, '.'));
-                $tail = explode(DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $file));
+                $tail = explode(\DIRECTORY_SEPARATOR, str_replace('/', \DIRECTORY_SEPARATOR, $file));
 
-                $i = count($tail) - 1;
-                $j = count($real) - 1;
+                $i = \count($tail) - 1;
+                $j = \count($real) - 1;
 
                 while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
                     --$i;
@@ -302,8 +302,8 @@ class DebugClassLoader
                 array_splice($tail, 0, $i + 1);
             }
             if (self::$caseCheck && $tail) {
-                $tail = DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $tail);
-                $tailLen = strlen($tail);
+                $tail = \DIRECTORY_SEPARATOR.implode(\DIRECTORY_SEPARATOR, $tail);
+                $tailLen = \strlen($tail);
                 $real = $refl->getFileName();
 
                 if (2 === self::$caseCheck) {
@@ -328,7 +328,7 @@ class DebugClassLoader
 
                             $dir = $real;
                             $k = $kDir;
-                            $i = strlen($dir) - 1;
+                            $i = \strlen($dir) - 1;
                             while (!isset(self::$darwinCache[$k])) {
                                 self::$darwinCache[$k] = array($dir, array());
                                 self::$darwinCache[$dir] = &self::$darwinCache[$k];

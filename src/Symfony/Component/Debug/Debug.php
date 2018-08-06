@@ -42,7 +42,7 @@ class Debug
             error_reporting(E_ALL);
         }
 
-        if (!\in_array(PHP_SAPI, array('cli', 'phpdbg'), true)) {
+        if (!\in_array(\PHP_SAPI, array('cli', 'phpdbg'), true)) {
             ini_set('display_errors', 0);
             ExceptionHandler::register();
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {

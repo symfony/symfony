@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * SecurityHelper provides read-only access to the security checker.

@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 
 class ControllerResolverTest extends TestCase
 {
@@ -146,8 +146,8 @@ class ControllerResolverTest extends TestCase
     public function getStaticControllers()
     {
         return array(
-            array(AbstractController::class.'::staticAction', 'foo'),
-            array(array(AbstractController::class, 'staticAction'), 'foo'),
+            array(TestAbstractController::class.'::staticAction', 'foo'),
+            array(array(TestAbstractController::class, 'staticAction'), 'foo'),
             array(PrivateConstructorController::class.'::staticAction', 'bar'),
             array(array(PrivateConstructorController::class, 'staticAction'), 'bar'),
         );
@@ -238,7 +238,7 @@ class InvokableController
     }
 }
 
-abstract class AbstractController
+abstract class TestAbstractController
 {
     public static function staticAction()
     {

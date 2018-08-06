@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Monolog\Processor\ProcessorInterface;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -22,6 +23,9 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -63,6 +67,7 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\ChainSender;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -78,8 +83,8 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
-use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -91,6 +96,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * FrameworkExtension.
@@ -115,7 +121,7 @@ class FrameworkExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
         $loader->load('web.xml');
         $loader->load('services.xml');
@@ -320,8 +326,16 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
-        $container->registerForAutoconfiguration(ResettableInterface::class)
+        $container->registerForAutoconfiguration(ResetInterface::class)
             ->addTag('kernel.reset', array('method' => 'reset'));
+
+        if (!interface_exists(MarshallerInterface::class)) {
+            $container->registerForAutoconfiguration(ResettableInterface::class)
+                ->addTag('kernel.reset', array('method' => 'reset'));
+        }
+
+        $container->registerForAutoconfiguration(ProcessorInterface::class)
+            ->addTag('monolog.processor');
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
@@ -592,7 +606,9 @@ class FrameworkExtension extends Extension
             $guard = new Definition(Workflow\EventListener\GuardListener::class);
             $guard->setPrivate(true);
             $configuration = array();
-            foreach ($workflow['transitions'] as $transitionName => $config) {
+            foreach ($workflow['transitions'] as $config) {
+                $transitionName = $config['name'];
+
                 if (!isset($config['guard'])) {
                     continue;
                 }
@@ -682,6 +698,9 @@ class FrameworkExtension extends Extension
 
         $loader->load('routing.xml');
 
+        if ($config['utf8']) {
+            $container->getDefinition('routing.loader')->replaceArgument(2, array('utf8' => true));
+        }
         if (!interface_exists(ContainerBagInterface::class)) {
             $container->getDefinition('router.default')
                 ->replaceArgument(0, new Reference('service_container'))
@@ -788,7 +807,7 @@ class FrameworkExtension extends Extension
             $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
 
             // Use a delegation unless only a single loader was registered
-            if (1 === count($loaders)) {
+            if (1 === \count($loaders)) {
                 $container->setAlias('templating.loader', (string) reset($loaders))->setPrivate(true);
             } else {
                 $container->getDefinition('templating.loader.chain')->addArgument($loaders);
@@ -810,7 +829,7 @@ class FrameworkExtension extends Extension
         $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
         // Use a delegation unless only a single engine was registered
-        if (1 === count($engines)) {
+        if (1 === \count($engines)) {
             $container->setAlias('templating', (string) reset($engines))->setPublic(true);
         } else {
             $templateEngineDefinition = $container->getDefinition('templating.engine.delegating');
@@ -826,7 +845,7 @@ class FrameworkExtension extends Extension
         ;
 
         // configure the PHP engine if needed
-        if (in_array('php', $config['engines'], true)) {
+        if (\in_array('php', $config['engines'], true)) {
             $loader->load('templating_php.xml');
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
@@ -958,17 +977,17 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
-            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
+            $dirs[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
@@ -1088,7 +1107,7 @@ class FrameworkExtension extends Extension
 
         if (interface_exists('Symfony\Component\Form\FormInterface')) {
             $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
-            $fileRecorder('xml', dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
+            $fileRecorder('xml', \dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
         }
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
@@ -1283,7 +1302,7 @@ class FrameworkExtension extends Extension
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {
-            $definition = new Definition(in_array($extension, array('yaml', 'yml')) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($path));
+            $definition = new Definition(\in_array($extension, array('yaml', 'yml')) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($path));
             $definition->setPublic(false);
             $serializerLoaders[] = $definition;
         };
@@ -1361,7 +1380,7 @@ class FrameworkExtension extends Extension
         $loader->load('lock.xml');
 
         foreach ($config['resources'] as $resourceName => $resourceStores) {
-            if (0 === count($resourceStores)) {
+            if (0 === \count($resourceStores)) {
                 continue;
             }
 
@@ -1402,7 +1421,7 @@ class FrameworkExtension extends Extension
             }
 
             // Wrap array of stores with CombinedStore
-            if (count($storeDefinitions) > 1) {
+            if (\count($storeDefinitions) > 1) {
                 $combinedDefinition = new ChildDefinition('lock.store.combined.abstract');
                 $combinedDefinition->replaceArgument(0, $storeDefinitions);
                 $container->setDefinition('lock.'.$resourceName.'.store', $combinedDefinition);
@@ -1482,7 +1501,7 @@ class FrameworkExtension extends Extension
             }
 
             $container->setParameter($busId.'.middleware', $middleware);
-            $container->setDefinition($busId, (new Definition(MessageBus::class, array(array())))->addTag('messenger.bus'));
+            $container->register($busId, MessageBus::class)->addArgument(array())->addTag('messenger.bus');
 
             if ($busId === $config['default_bus']) {
                 $container->setAlias('message_bus', $busId);
@@ -1494,17 +1513,7 @@ class FrameworkExtension extends Extension
             throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
         }
 
-        $messageToSenderIdsMapping = array();
-        foreach ($config['routing'] as $message => $messageConfiguration) {
-            if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
-            }
-
-            $messageToSenderIdsMapping[$message] = $messageConfiguration['senders'];
-        }
-
-        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
-
+        $senderAliases = array();
         foreach ($config['transports'] as $name => $transport) {
             if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
                 throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
@@ -1516,15 +1525,45 @@ class FrameworkExtension extends Extension
                 ->addTag('messenger.receiver', array('alias' => $name))
                 ->addTag('messenger.sender', array('alias' => $name))
             ;
-            $container->setDefinition('messenger.transport.'.$name, $transportDefinition);
+            $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
+            $senderAliases[$name] = $transportId;
         }
+
+        $messageToSenderIdMapping = array();
+        $messageToSendAndHandleMapping = array();
+        foreach ($config['routing'] as $message => $messageConfiguration) {
+            if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
+                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
+            }
+
+            if (1 < \count($messageConfiguration['senders'])) {
+                $senders = array_map(function ($sender) use ($senderAliases) {
+                    return new Reference($senderAliases[$sender] ?? $sender);
+                }, $messageConfiguration['senders']);
+                $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
+                $chainSenderDefinition->addTag('messenger.sender');
+                $chainSenderId = '.messenger.chain_sender.'.$message;
+                $container->setDefinition($chainSenderId, $chainSenderDefinition);
+                $messageToSenderIdMapping[$message] = $chainSenderId;
+            } else {
+                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
+            }
+
+            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
+        }
+
+        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
+        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
     {
+        if (!class_exists(DefaultMarshaller::class)) {
+            $container->removeDefinition('cache.default_marshaller');
+        }
+
         $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
-        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
         if (isset($config['prefix_seed'])) {
@@ -1534,7 +1573,7 @@ class FrameworkExtension extends Extension
             // Inline any env vars referenced in the parameter
             $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
         }
-        foreach (array('doctrine', 'psr6', 'redis', 'memcached') as $name) {
+        foreach (array('doctrine', 'psr6', 'redis', 'memcached', 'pdo') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }
@@ -1543,12 +1582,31 @@ class FrameworkExtension extends Extension
             $config['pools']['cache.'.$name] = array(
                 'adapter' => $config[$name],
                 'public' => true,
+                'tags' => false,
             );
         }
         foreach ($config['pools'] as $name => $pool) {
+            if ($config['pools'][$pool['adapter']]['tags'] ?? false) {
+                $pool['adapter'] = '.'.$pool['adapter'].'.inner';
+            }
             $definition = new ChildDefinition($pool['adapter']);
+
+            if ($pool['tags']) {
+                if ($config['pools'][$pool['tags']]['tags'] ?? false) {
+                    $pool['tags'] = '.'.$pool['tags'].'.inner';
+                }
+                $container->register($name, TagAwareAdapter::class)
+                    ->addArgument(new Reference('.'.$name.'.inner'))
+                    ->addArgument(true !== $pool['tags'] ? new Reference($pool['tags']) : null)
+                    ->setPublic($pool['public'])
+                ;
+
+                $pool['name'] = $name;
+                $pool['public'] = false;
+                $name = '.'.$name.'.inner';
+            }
             $definition->setPublic($pool['public']);
-            unset($pool['adapter'], $pool['public']);
+            unset($pool['adapter'], $pool['public'], $pool['tags']);
 
             $definition->addTag('cache.pool', $pool);
             $container->setDefinition($name, $definition);
@@ -1577,7 +1635,7 @@ class FrameworkExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return dirname(__DIR__).'/Resources/config/schema';
+        return \dirname(__DIR__).'/Resources/config/schema';
     }
 
     public function getNamespace()

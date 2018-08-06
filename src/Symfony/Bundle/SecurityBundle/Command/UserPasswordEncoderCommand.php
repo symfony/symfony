@@ -70,7 +70,7 @@ Suppose that you have the following security configuration in your application:
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
-        AppBundle\Entity\User: bcrypt
+        App\Entity\User: bcrypt
 </comment>
 
 If you execute the command non-interactively, the first available configured
@@ -82,16 +82,16 @@ generated to encode the password:
 Pass the full user class path as the second argument to encode passwords for
 your own entities:
 
-  <info>php %command.full_name% --no-interaction [password] AppBundle\Entity\User</info>
+  <info>php %command.full_name% --no-interaction [password] App\Entity\User</info>
 
 Executing the command interactively allows you to generate a random salt for
 encoding the password:
 
-  <info>php %command.full_name% [password] AppBundle\Entity\User</info>
+  <info>php %command.full_name% [password] App\Entity\User</info>
 
 In case your encoder doesn't require a salt, add the <comment>empty-salt</comment> option:
 
-  <info>php %command.full_name% --empty-salt [password] AppBundle\Entity\User</info>
+  <info>php %command.full_name% --empty-salt [password] App\Entity\User</info>
 
 EOF
             )
@@ -147,7 +147,7 @@ EOF
         $encodedPassword = $encoder->encodePassword($password, $salt);
 
         $rows = array(
-            array('Encoder used', get_class($encoder)),
+            array('Encoder used', \get_class($encoder)),
             array('Encoded password', $encodedPassword),
         );
         if (!$emptySalt) {
@@ -156,7 +156,7 @@ EOF
         $io->table(array('Key', 'Value'), $rows);
 
         if (!$emptySalt) {
-            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
+            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));
         } elseif ($saltlessWithoutEmptySalt) {
             $errorIo->note('Self-salting encoder used: the encoder generated its own built-in salt.');
         }
@@ -195,7 +195,7 @@ EOF
             throw new RuntimeException('There are no configured encoders for the "security" extension.');
         }
 
-        if (!$input->isInteractive() || 1 === count($this->userClasses)) {
+        if (!$input->isInteractive() || 1 === \count($this->userClasses)) {
             return reset($this->userClasses);
         }
 

@@ -13,8 +13,8 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -303,5 +303,15 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
         $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\d+" of route "foo" in "%srequirements_without_placeholder_name.yml"?
+     */
+    public function testRequirementsWithoutPlaceholderName()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('requirements_without_placeholder_name.yml');
     }
 }

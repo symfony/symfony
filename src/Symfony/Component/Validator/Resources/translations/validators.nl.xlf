@@ -316,7 +316,7 @@
             </trans-unit>
             <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
-                <target>Deze waarde is geen geldige UUID waarde.</target>
+                <target>Dit is geen geldige UUID.</target>
             </trans-unit>
         </body>
     </file>

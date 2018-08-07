@@ -130,10 +130,10 @@ EOF
         $document->schemaValidate(__DIR__.'/../Resources/schemas/xliff-core-1.2-strict.xsd');
         foreach (libxml_get_errors() as $xmlError) {
             $errors[] = array(
-                    'line' => $xmlError->line,
-                    'column' => $xmlError->column,
-                    'message' => trim($xmlError->message),
-                );
+                'line' => $xmlError->line,
+                'column' => $xmlError->column,
+                'message' => trim($xmlError->message),
+            );
         }
 
         libxml_clear_errors();

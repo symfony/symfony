@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Dany Maillard <danymaillard93b@gmail.com>
  */
 class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface, SerializerAwareInterface
 {
@@ -226,6 +227,13 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return false;
     }
 
+    final protected function appendComment(\DOMNode $node, string $data): bool
+    {
+        $node->appendChild($this->dom->createComment($data));
+
+        return true;
+    }
+
     /**
      * Checks the name is a valid xml element name.
      */
@@ -366,6 +374,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data);
+                } elseif ('#comment' === $key) {
+                    $append = $this->appendComment($parentNode, $data);
                 } elseif (\is_array($data) && false === is_numeric($key)) {
                     // Is this array fully numeric keys?
                     if (ctype_digit(implode('', array_keys($data)))) {

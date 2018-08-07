@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * `AbstractNormalizer::handleCircularReference` is now final, and receives two optional extra arguments: the format and the context
+* added support for XML comment encoding (encoding `['#comment' => ' foo ']` results `<!-- foo -->`)
 
 4.1.0
 -----

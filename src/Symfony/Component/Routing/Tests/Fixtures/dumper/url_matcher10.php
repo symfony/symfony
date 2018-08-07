@@ -2821,7 +2821,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 $offset += strlen($m);
             }
         }
-        if ('/' === $pathinfo && !$allow) {
+        if ('/' === $pathinfo && !$allow && !$allowSchemes) {
             throw new Symfony\Component\Routing\Exception\NoConfigurationException();
         }
 

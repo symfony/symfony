@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-06T20:31:02Z
+
+deps=low goes from [10 minutes](https://travis-ci.org/symfony/symfony/jobs/412814312) to [2 minutes](https://travis-ci.org/symfony/symfony/jobs/412996824).
+
+> resolved package versions for lowest deps depends only on the root composer.json
+
+oh, and on other components' composer.json when the lowest version is an unreleased one.
+Not sure yet how to account for that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-07T08:06:18Z
+
+> [depends] on other components' composer.json when the lowest version is an unreleased one
+
+now handled: a new `.github/rm-invalid-lowest-lock-files.php` script checks that cross dependencies are in sync.
+
+PR ready.

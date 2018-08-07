@@ -23,6 +23,9 @@
     "require-dev": {
         "symfony/config": "~3.4|~4.0"
     },
+    "conflict": {
+        "zendframework/zend-eventmanager": "2.6.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" },
         "exclude-from-classmap": [

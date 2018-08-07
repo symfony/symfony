@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by MrMitch at 2018-08-02T11:37:09Z
+
+I based this on `master`, let me know if it should be based on something else.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-08-02T11:37:58Z
+
+You should rebase it, so that it can be merged into 4.1 – as bugfix. 👍
+
+---------------------------------------------------------------------------
+
+by MrMitch at 2018-08-02T12:23:07Z
+
+@apfelbox rebase done, thank you. Should this PR target `4.1` instead of `master`, too ?
+
+---------------------------------------------------------------------------
+
+by MrMitch at 2018-08-02T12:27:05Z
+
+rebased on 4.1, PR target changed to 4.1 and description updated
+
+---------------------------------------------------------------------------
+
+by MrMitch at 2018-08-02T13:45:28Z
+
+Not sure why appveyor build fails, this seems unrelated (it's in the SecurityBundle, which this PR doesn't change) :
+![image](https://user-images.githubusercontent.com/576772/43587643-f4ab52a4-966a-11e8-8cd9-22c5944d8cff.png)
+ ref: https://ci.appveyor.com/project/fabpot/symfony/build/1.0.39156#L1059
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-07T08:49:58Z
+
+Is this legit at the semantic level? Could this be a BC break? Can't we get rid of the whitespace by removing the blank characters between tags?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-08-07T08:51:35Z
+
+@nicolas-grekas see my comments in #28116 that should explain why this is a bugfix (I sent the same changes in a PR just minutes after this one).

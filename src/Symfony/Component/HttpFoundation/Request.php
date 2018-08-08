@@ -1941,10 +1941,16 @@ class Request
             $forwardedValues = array();
             $param = self::$forwardedParams[$type];
             foreach ($parts as $subParts) {
-                $assoc = HeaderUtils::combine($subParts);
-                if (isset($assoc[$param])) {
-                    $forwardedValues[] = self::HEADER_X_FORWARDED_PORT === $type ? substr_replace($assoc[$param], '0.0.0.0', 0, strrpos($assoc[$param], ':')) : $assoc[$param];
+                if (null === $v = HeaderUtils::combine($subParts)[$param] ?? null) {
+                    continue;
                 }
+                if (self::HEADER_X_FORWARDED_PORT === $type) {
+                    if (']' === substr($v, -1) || false === $v = strrchr($v, ':')) {
+                        $v = $this->isSecure() ? ':443' : ':80';
+                    }
+                    $v = '0.0.0.0'.$v;
+                }
+                $forwardedValues[] = $v;
             }
         }
 

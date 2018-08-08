@@ -26,6 +26,7 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     use Traits\PublicTrait;
     use Traits\ShareTrait;
     use Traits\TagTrait;
+    use Traits\BindTrait;
 
     /**
      * Defines an instanceof-conditional to be applied to following service definitions.

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
+
 /**
  * This abstract session handler provides a generic implementation
  * of the PHP 7.0 SessionUpdateTimestampHandlerInterface,
@@ -121,31 +123,13 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
             if (!$this->sessionName) {
                 throw new \LogicException(sprintf('Session name cannot be empty, did you forget to call "parent::open()" in "%s"?.', \get_class($this)));
             }
-            $sessionCookie = sprintf(' %s=', urlencode($this->sessionName));
-            $sessionCookieWithId = sprintf('%s%s;', $sessionCookie, urlencode($sessionId));
-            $sessionCookieFound = false;
-            $otherCookies = array();
-            foreach (headers_list() as $h) {
-                if (0 !== stripos($h, 'Set-Cookie:')) {
-                    continue;
-                }
-                if (11 === strpos($h, $sessionCookie, 11)) {
-                    $sessionCookieFound = true;
-
-                    if (11 !== strpos($h, $sessionCookieWithId, 11)) {
-                        $otherCookies[] = $h;
-                    }
+            $cookie = SessionUtils::popSessionCookie($this->sessionName, $sessionId);
+            if (null === $cookie) {
+                if (\PHP_VERSION_ID < 70300) {
+                    setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));
                 } else {
-                    $otherCookies[] = $h;
+                    setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'), ini_get('session.cookie_samesite'));
                 }
-            }
-            if ($sessionCookieFound) {
-                header_remove('Set-Cookie');
-                foreach ($otherCookies as $h) {
-                    header($h, false);
-                }
-            } else {
-                setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));
             }
         }
 

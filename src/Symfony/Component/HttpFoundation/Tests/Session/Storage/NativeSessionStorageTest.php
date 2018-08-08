@@ -171,6 +171,10 @@ class NativeSessionStorageTest extends TestCase
             'cookie_httponly' => false,
         );
 
+        if (\PHP_VERSION_ID >= 70300) {
+            $options['cookie_samesite'] = 'lax';
+        }
+
         $this->getStorage($options);
         $temp = session_get_cookie_params();
         $gco = array();

@@ -29,6 +29,7 @@ CHANGELOG
  * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
  * The `container.service_locator` tag of `ServiceLocator`s is now autoconfigured.
  * Add the ability to search a route in `debug:router`.
+ * Add the ability to use SameSite cookies for sessions.
 
 4.0.0
 -----

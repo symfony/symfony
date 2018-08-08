@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -49,6 +50,11 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
+     * @var string|null
+     */
+    private $emulateSameSite;
+
+    /**
      * Depending on how you want the storage driver to behave you probably
      * want to override this constructor entirely.
      *
@@ -67,6 +73,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * cookie_lifetime, "0"
      * cookie_path, "/"
      * cookie_secure, ""
+     * cookie_samesite, null
      * gc_divisor, "100"
      * gc_maxlifetime, "1440"
      * gc_probability, "1"
@@ -141,6 +148,13 @@ class NativeSessionStorage implements SessionStorageInterface
         // ok to try and start the session
         if (!session_start()) {
             throw new \RuntimeException('Failed to start the session');
+        }
+
+        if (null !== $this->emulateSameSite) {
+            $originalCookie = SessionUtils::popSessionCookie(session_name(), session_id());
+            if (null !== $originalCookie) {
+                header(sprintf('%s; SameSite=%s', $originalCookie, $this->emulateSameSite));
+            }
         }
 
         $this->loadSession();
@@ -347,7 +361,7 @@ class NativeSessionStorage implements SessionStorageInterface
 
         $validOptions = array_flip(array(
             'cache_expire', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
-            'cookie_lifetime', 'cookie_path', 'cookie_secure',
+            'cookie_lifetime', 'cookie_path', 'cookie_secure', 'cookie_samesite',
             'gc_divisor', 'gc_maxlifetime', 'gc_probability',
             'lazy_write', 'name', 'referer_check',
             'serialize_handler', 'use_strict_mode', 'use_cookies',
@@ -359,6 +373,12 @@ class NativeSessionStorage implements SessionStorageInterface
 
         foreach ($options as $key => $value) {
             if (isset($validOptions[$key])) {
+                if ('cookie_samesite' === $key && \PHP_VERSION_ID < 70300) {
+                    // PHP < 7.3 does not support same_site cookies. We will emulate it in
+                    // the start() method instead.
+                    $this->emulateSameSite = $value;
+                    continue;
+                }
                 ini_set('url_rewriter.tags' !== $key ? 'session.'.$key : $key, $value);
             }
         }

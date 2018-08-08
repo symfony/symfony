@@ -42,14 +42,14 @@ Form
 
  * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered.
    Instead of expecting such calls to return empty strings, check if the field has already been rendered.
- 
+
    Before:
    ```twig
    {% for field in fieldsWithPotentialDuplicates %}
       {{ form_widget(field) }}
    {% endfor %}
    ```
-   
+
    After:
    ```twig
    {% for field in fieldsWithPotentialDuplicates if not field.rendered %}
@@ -83,6 +83,7 @@ FrameworkBundle
    is UTF-8 (see kernel's `getCharset()` method), it is recommended to set it to `true`:
    this will generate 404s for non-UTF-8 URLs, which are incompatible with you app anyway,
    and will allow dumping optimized routers and using Unicode classes in requirements.
+ * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
 
 Messenger
 ---------

@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -484,6 +485,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_domain')->end()
                         ->enumNode('cookie_secure')->values(array(true, false, 'auto'))->end()
                         ->booleanNode('cookie_httponly')->defaultTrue()->end()
+                        ->enumNode('cookie_samesite')->values(array(null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT))->defaultNull()->end()
                         ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->defaultValue(1)->end()

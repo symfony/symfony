@@ -58,7 +58,7 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
         $seen = array();
         while ($container->hasAlias($id)) {
             if (isset($seen[$id])) {
-                throw new ServiceCircularReferenceException($id, array_keys($seen));
+                throw new ServiceCircularReferenceException($id, array_merge(array_keys($seen), array($id)));
             }
             $seen[$id] = true;
             $id = (string) $container->getAlias($id);

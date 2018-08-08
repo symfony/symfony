@@ -121,7 +121,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $autoconfiguredInstanceof = array();
 
     private $removedIds = array();
-    private $alreadyLoading = array();
 
     private static $internalTypes = array(
         'int' => true,
@@ -555,20 +554,30 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->doGet($id, $invalidBehavior);
     }
 
-    private function doGet($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = array())
+    private function doGet($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = null, $isConstructorArgument = false)
     {
         if (isset($inlineServices[$id])) {
             return $inlineServices[$id];
         }
-        if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
-            return parent::get($id, $invalidBehavior);
+        if (null === $inlineServices) {
+            $isConstructorArgument = true;
+            $inlineServices = array();
         }
-        if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
-            return $service;
+        try {
+            if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
+                return parent::get($id, $invalidBehavior);
+            }
+            if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+                return $service;
+            }
+        } catch (ServiceCircularReferenceException $e) {
+            if ($isConstructorArgument) {
+                throw $e;
+            }
         }
 
         if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->doGet((string) $this->aliasDefinitions[$id], $invalidBehavior, $inlineServices);
+            return $this->doGet((string) $this->aliasDefinitions[$id], $invalidBehavior, $inlineServices, $isConstructorArgument);
         }
 
         try {
@@ -585,16 +594,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new RuntimeException(reset($e));
         }
 
-        $loading = isset($this->alreadyLoading[$id]) ? 'loading' : 'alreadyLoading';
-        $this->{$loading}[$id] = true;
-
-        try {
-            $service = $this->createService($definition, $inlineServices, $id);
-        } finally {
-            unset($this->{$loading}[$id]);
+        if ($isConstructorArgument) {
+            $this->loading[$id] = true;
         }
 
-        return $service;
+        try {
+            return $this->createService($definition, $inlineServices, $isConstructorArgument, $id);
+        } finally {
+            if ($isConstructorArgument) {
+                unset($this->loading[$id]);
+            }
+        }
     }
 
     /**
@@ -1050,7 +1060,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, array &$inlineServices, $id = null, $tryProxy = true)
+    private function createService(Definition $definition, array &$inlineServices, $isConstructorArgument = false, $id = null, $tryProxy = true)
     {
         if (null === $id && isset($inlineServices[$h = spl_object_hash($definition)])) {
             return $inlineServices[$h];
@@ -1068,16 +1078,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             @trigger_error($definition->getDeprecationMessage($id), E_USER_DEPRECATED);
         }
 
-        if ($tryProxy && $definition->isLazy()) {
-            $proxy = $this
-                ->getProxyInstantiator()
-                ->instantiateProxy(
-                    $this,
-                    $definition,
-                    $id, function () use ($definition, &$inlineServices, $id) {
-                        return $this->createService($definition, $inlineServices, $id, false);
-                    }
-                );
+        if ($tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator) || $proxy instanceof RealServiceInstantiator) {
+            $proxy = $proxy->instantiateProxy(
+                $this,
+                $definition,
+                $id, function () use ($definition, &$inlineServices, $id) {
+                    return $this->createService($definition, $inlineServices, true, $id, false);
+                }
+            );
             $this->shareService($definition, $proxy, $id, $inlineServices);
 
             return $proxy;
@@ -1089,19 +1097,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             require_once $parameterBag->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())), $inlineServices);
+        $arguments = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())), $inlineServices, $isConstructorArgument);
+
+        if (null !== $factory = $definition->getFactory()) {
+            if (\is_array($factory)) {
+                $factory = array($this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlineServices, $isConstructorArgument), $factory[1]);
+            } elseif (!\is_string($factory)) {
+                throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
+            }
+        }
 
         if (null !== $id && $definition->isShared() && isset($this->services[$id]) && ($tryProxy || !$definition->isLazy())) {
             return $this->services[$id];
         }
 
-        if (null !== $factory = $definition->getFactory()) {
-            if (\is_array($factory)) {
-                $factory = array($this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlineServices), $factory[1]);
-            } elseif (!\is_string($factory)) {
-                throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
-            }
-
+        if (null !== $factory) {
             $service = \call_user_func_array($factory, $arguments);
 
             if (!$definition->isDeprecated() && \is_array($factory) && \is_string($factory[0])) {
@@ -1169,11 +1179,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->doResolveServices($value);
     }
 
-    private function doResolveServices($value, array &$inlineServices = array())
+    private function doResolveServices($value, array &$inlineServices = array(), $isConstructorArgument = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
-                $value[$k] = $this->doResolveServices($v, $inlineServices);
+                $value[$k] = $this->doResolveServices($v, $inlineServices, $isConstructorArgument);
             }
         } elseif ($value instanceof ServiceClosureArgument) {
             $reference = $value->getValues()[0];
@@ -1216,9 +1226,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $count;
             });
         } elseif ($value instanceof Reference) {
-            $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices);
+            $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Definition) {
-            $value = $this->createService($value, $inlineServices);
+            $value = $this->createService($value, $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Parameter) {
             $value = $this->getParameter((string) $value);
         } elseif ($value instanceof Expression) {
@@ -1511,18 +1521,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
-    /**
-     * Retrieves the currently set proxy instantiator or instantiates one.
-     */
-    private function getProxyInstantiator(): InstantiatorInterface
-    {
-        if (!$this->proxyInstantiator) {
-            $this->proxyInstantiator = new RealServiceInstantiator();
-        }
-
-        return $this->proxyInstantiator;
-    }
-
     private function callMethod($service, $call, array &$inlineServices)
     {
         foreach (self::getServiceConditionals($call[1]) as $s) {
@@ -1552,7 +1550,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (null !== $id && $definition->isShared()) {
             $this->services[$id] = $service;
-            unset($this->loading[$id], $this->alreadyLoading[$id]);
+            unset($this->loading[$id]);
         }
     }
 

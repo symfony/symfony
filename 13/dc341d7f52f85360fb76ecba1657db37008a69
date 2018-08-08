@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-07-03T14:18:40Z
+
+Ah, so this basically allows a library to enable an optional "bind" based on an interface e.g. IF a user's service implements `ProcessInterface`, then "bind" any `TokenStorageInterface` arguments.
+
+But, I don't understand the exact use you're describing. In #27801, you make it possible to configure the [TokenProcessor](https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Monolog/Processor/TokenProcessor.php) with zero config (autoconfigure + autowiring will take care of everything). But then in this PR, you bind `TokenStorageInterface` to `security.actual_token_storage`... I'm not sure what difference that makes. And what is `security.actual_token_storage`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-03T15:57:58Z
+
+> bind TokenStorageInterface to security.actual_token_storage... I'm not sure what difference that makes. And what is security.actual_token_storage
+
+The goal is to *not* trigger authentication by adding the user to the logs as this would defeat the very purpose of lazy authentication. `security.actual_token_storage` is the storage when the token is actually stored :)  After ##27817, `security.token_storage` will be a wrapper around `security.actual_token_storage` that calls the authentication stack when` getToken()` is called. Here, we do not want to trigger this stack, so we get direct access to the storage backend, and if there is a token there we use it. If not we don't trigger the stack.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-11T08:40:52Z
+
+I removed the unrelated bits, PR ready to vote+merge.

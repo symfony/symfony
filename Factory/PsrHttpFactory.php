@@ -50,7 +50,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
     {
         $request = $this->serverRequestFactory->createServerRequest(
             $symfonyRequest->getMethod(),
-            $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getRequestUri(),
+            $symfonyRequest->getUri(),
             $symfonyRequest->server->all()
         );
 
@@ -126,7 +126,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
      */
     public function createResponse(Response $symfonyResponse)
     {
-        $response = $this->responseFactory->createResponse($symfonyResponse->getStatusCode());
+        $response = $this->responseFactory->createResponse($symfonyResponse->getStatusCode(), Response::$statusTexts[$symfonyResponse->getStatusCode()] ?? '');
 
         if ($symfonyResponse instanceof BinaryFileResponse) {
             $stream = $this->streamFactory->createStreamFromFile(

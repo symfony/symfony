@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -139,29 +140,19 @@ class PhpDumper extends Dumper
         $this->initializeMethodNamesMap('Container' === $baseClass ? Container::class : $baseClass);
 
         if ($this->getProxyDumper() instanceof NullDumper) {
-            (new AnalyzeServiceReferencesPass(true))->process($this->container);
-            $this->circularReferences = array();
-            $checkedNodes = array();
-            foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
-                $currentPath = array($id => $id);
-                $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
-            }
-            foreach ($this->circularReferences as $parent => $ids) {
-                $path = array($parent);
-                while (!isset($ids[$parent])) {
-                    foreach ($ids as $id) {
-                        $path[] = $id;
-                        $ids = $this->circularReferences[$id];
-                        break;
-                    }
-                }
-                $path[] = $parent.'". Try running "composer require symfony/proxy-manager-bridge';
+            (new AnalyzeServiceReferencesPass(true, false))->process($this->container);
+            try {
+                (new CheckCircularReferencesPass())->process($this->container);
+            } catch (ServiceCircularReferenceException $e) {
+                $path = $e->getPath();
+                end($path);
+                $path[key($path)] .= '". Try running "composer require symfony/proxy-manager-bridge';
 
-                throw new ServiceCircularReferenceException($parent, $path);
+                throw new ServiceCircularReferenceException($e->getServiceId(), $path);
             }
         }
 
-        (new AnalyzeServiceReferencesPass())->process($this->container);
+        (new AnalyzeServiceReferencesPass(false, !$this->getProxyDumper() instanceof NullDumper))->process($this->container);
         $this->circularReferences = array();
         $checkedNodes = array();
         foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
@@ -367,7 +358,7 @@ EOTXT;
             $node = $edge->getDestNode();
             $id = $node->getId();
 
-            if ($node->getValue() && (($edge->isLazy() && !$this->getProxyDumper() instanceof NullDumper) || $edge->isWeak())) {
+            if ($node->getValue() && ($edge->isLazy() || $edge->isWeak())) {
                 // no-op
             } elseif (isset($currentPath[$id])) {
                 foreach (array_reverse($currentPath) as $parentId) {

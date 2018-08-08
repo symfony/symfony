@@ -1,49 +1,66 @@
 language: php
-
 sudo: false
-
 cache:
     directories:
         - $HOME/.composer/cache/files
         - $HOME/symfony-bridge/.phpunit
 
+env:
+    global:
+        - PHPUNIT_FLAGS="-v"
+        - SYMFONY_PHPUNIT_DIR="$HOME/symfony-bridge/.phpunit"
+        - DEPENDENCIES="zendframework/zend-diactoros:^1.4.1"
+
 matrix:
+    fast_finish: true
     include:
+          # Minimum supported dependencies with the latest and oldest PHP version
+        - php: 7.2
+          env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" SYMFONY_DEPRECATIONS_HELPER="weak_vendors"
         - php: 5.3
           dist: 'precise'
+          env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" SYMFONY_DEPRECATIONS_HELPER="weak_vendors" DEPENDENCIES=""
+
+          # Test the latest stable release
+        - php: 5.3
+          dist: 'precise'
+          env: DEPENDENCIES=""
         - php: 5.4
         - php: 5.5
         - php: 5.6
-        - php: 5.3
-          dist: 'precise'
-          env: COMPOSER_OPTIONS="--prefer-lowest --prefer-stable" SYMFONY_DEPRECATIONS_HELPER=weak
-        - php: 5.6
-          env: COMPOSER_OPTIONS="" SYMFONY_DEPRECATIONS_HELPER=weak
         - php: 7.0
-        - php: hhvm
-    allow_failures:
-        - php: hhvm
-    fast_finish: true
+        - php: 7.1
+        - php: 7.2
+          env: COVERAGE=true PHPUNIT_FLAGS="-v --coverage-text"
 
-env:
-    global:
-        - deps=no
-        - SYMFONY_DEPRECATIONS_HELPER=strict
-        - SYMFONY_PHPUNIT_DIR="$HOME/symfony-bridge/.phpunit"
-        - COMPOSER_OPTIONS="--prefer-stable"
+          # Test LTS versions. This makes sure we do not use Symfony packages with version greater
+          # than 2 or 3 respectively.
+        - php: 7.2
+          env: DEPENDENCIES="symfony/lts:^2 symfony/force-lowest:~2.8.0 zendframework/zend-diactoros:^1.4.1"
+        - php: 7.2
+          env: DEPENDENCIES="symfony/lts:^3 symfony/force-lowest:~3.4.0 zendframework/zend-diactoros:^1.4.1"
+
+          # Latest commit to master
+        - php: 7.2
+          env: STABILITY="dev"
+
+    allow_failures:
+          # Dev-master is allowed to fail.
+        - env: STABILITY="dev"
 
 before_install:
-    - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
-    - composer self-update
-    - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;
-    # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built
-    - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
+    - if [[ $COVERAGE != true ]]; then phpenv config-rm xdebug.ini || true; fi
+    - if ! [ -z "$STABILITY" ]; then composer config minimum-stability ${STABILITY}; fi;
+    - if ! [ -v "$DEPENDENCIES" ]; then composer require --no-update ${DEPENDENCIES}; fi;
 
 install:
-    - if [ "$TRAVIS_PHP_VERSION" != "5.3" ]; then composer require --no-update zendframework/zend-diactoros; fi;
-    - composer update --prefer-source $COMPOSER_OPTIONS
-    - vendor/bin/simple-phpunit install
+    # To be removed when this issue will be resolved: https://github.com/composer/composer/issues/5355
+    - if [[ "$COMPOSER_FLAGS" == *"--prefer-lowest"* ]]; then composer update --prefer-dist --no-interaction --prefer-stable --quiet; fi
+    - composer update ${COMPOSER_FLAGS} --prefer-dist --no-interaction
+    - ./vendor/bin/simple-phpunit install
 
 script:
-    - vendor/bin/simple-phpunit
+    - composer validate --strict --no-check-lock
+    # simple-phpunit is the PHPUnit wrapper provided by the PHPUnit Bridge component and
+    # it helps with testing legacy code and deprecations (composer require symfony/phpunit-bridge)
+    - ./vendor/bin/simple-phpunit $PHPUNIT_FLAGS

@@ -104,6 +104,17 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $clientFileName = $psrUploadedFile->getClientFilename();
         }
 
+        if (class_exists('Symfony\Component\HttpFoundation\HeaderUtils')) {
+            // Symfony 4.1+
+            return new UploadedFile(
+                $temporaryPath,
+                null === $clientFileName ? '' : $clientFileName,
+                $psrUploadedFile->getClientMediaType(),
+                $psrUploadedFile->getError(),
+                true
+            );
+        }
+
         return new UploadedFile(
             $temporaryPath,
             null === $clientFileName ? '' : $clientFileName,

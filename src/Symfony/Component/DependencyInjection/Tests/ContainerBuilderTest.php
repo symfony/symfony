@@ -1379,6 +1379,12 @@ class ContainerBuilderTest extends TestCase
 
         $foo5 = $container->get('foo5');
         $this->assertSame($foo5, $foo5->bar->foo);
+
+        $manager = $container->get('manager');
+        $this->assertEquals(new \stdClass(), $manager);
+
+        $manager = $container->get('manager2');
+        $this->assertEquals(new \stdClass(), $manager);
     }
 
     public function provideAlmostCircular()

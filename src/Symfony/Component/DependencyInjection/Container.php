@@ -294,7 +294,7 @@ class Container implements ResettableContainerInterface
             }
 
             if (isset($this->loading[$id])) {
-                throw new ServiceCircularReferenceException($id, array_keys($this->loading));
+                throw new ServiceCircularReferenceException($id, array_merge(array_keys($this->loading), array($id)));
             }
 
             $this->loading[$id] = true;

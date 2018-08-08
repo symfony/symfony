@@ -134,10 +134,10 @@ EOF
 
         foreach (XliffUtils::validateSchema($document) as $xmlError) {
             $errors[] = array(
-                    'line' => $xmlError['line'],
-                    'column' => $xmlError['column'],
-                    'message' => $xmlError['message'],
-                );
+                'line' => $xmlError['line'],
+                'column' => $xmlError['column'],
+                'message' => $xmlError['message'],
+            );
         }
 
         return array('file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors);

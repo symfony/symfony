@@ -32,6 +32,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     private $graph;
     private $currentDefinition;
     private $onlyConstructorArguments;
+    private $hasProxyDumper;
     private $lazy;
     private $definitions;
     private $aliases;
@@ -39,9 +40,10 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     /**
      * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
      */
-    public function __construct(bool $onlyConstructorArguments = false)
+    public function __construct(bool $onlyConstructorArguments = false, bool $hasProxyDumper = true)
     {
         $this->onlyConstructorArguments = $onlyConstructorArguments;
+        $this->hasProxyDumper = $hasProxyDumper;
         $this->enableExpressionProcessing();
     }
 
@@ -98,7 +100,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                 $targetId,
                 $targetDefinition,
                 $value,
-                $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                $this->lazy || ($this->hasProxyDumper && $targetDefinition && $targetDefinition->isLazy()),
                 ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior()
             );
 

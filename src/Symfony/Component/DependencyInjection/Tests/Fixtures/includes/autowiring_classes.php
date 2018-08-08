@@ -373,6 +373,13 @@ class Decorator implements DecoratorInterface
     }
 }
 
+class DecoratedDecorator implements DecoratorInterface
+{
+    public function __construct(DecoratorInterface $decorator)
+    {
+    }
+}
+
 class NonAutowirableDecorator implements DecoratorInterface
 {
     public function __construct(LoggerInterface $logger, DecoratorInterface $decorated1, DecoratorInterface $decorated2)

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -26,6 +27,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -1222,6 +1224,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainer(array('kernel.debug' => false));
         (new FrameworkExtension())->load(array(), $container);
         $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
+    }
+
+    public function testLoggerAwareRegistration()
+    {
+        $container = $this->createContainerFromFile('full', array(), true, false);
+        $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
+        $container->register('foo', LoggerAwareInterface::class)
+            ->setAutoconfigured(true);
+        $container->compile();
+
+        $calls = $container->findDefinition('foo')->getMethodCalls();
+
+        $this->assertCount(1, $calls, 'Definition should contain 1 method call');
+        $this->assertSame('setLogger', $calls[0][0], 'Method name should be "setLogger"');
+        $this->assertInstanceOf(Reference::class, $calls[0][1][0]);
+        $this->assertSame('logger', (string) $calls[0][1][0], 'Argument should be a reference to "logger"');
     }
 
     protected function createContainer(array $data = array())

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\StreamConnection;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
@@ -51,5 +52,12 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
             'password' => null,
         );
         $this->assertSame($params, $connection->getParameters()->toArray());
+
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/1', array('class' => \Predis\Client::class, 'timeout' => 3));
+        $this->assertInstanceOf(\Predis\Client::class, $redis);
+
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'?predis_options[cluster]=redis');
+        $this->assertInstanceOf(\Predis\Client::class, $redis);
+        $this->assertInstanceOf(RedisCluster::class, $redis->getOptions()->cluster);
     }
 }

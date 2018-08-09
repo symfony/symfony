@@ -73,6 +73,23 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     }
 
     /**
+     * @dataProvider provideInvalidDSNCreateConnection
+     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid connection option: "predis_options" provided but provided class "\SomeClass" is not an instance of \Predis\Client
+     */
+    public function testInvalidDSNFailedConnection($dsn)
+    {
+        RedisAdapter::createConnection($dsn);
+    }
+
+    public function provideInvalidDSNCreateConnection()
+    {
+        return array(
+            array('redis://localhost?predis_options[cluster]=redis&class=\SomeClass'),
+        );
+    }
+
+    /**
      * @dataProvider provideInvalidCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid Redis DSN

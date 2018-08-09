@@ -86,4 +86,14 @@ class ProjectServiceContainer extends Container
             'baz' => array('privates', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition', 'getCustomDefinitionService', false),
         )))->withContext('foo_service', $this));
     }
+
+    /**
+     * Gets the private 'Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition
+     */
+    protected function getCustomDefinitionService()
+    {
+        return $this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition();
+    }
 }

@@ -11,6 +11,8 @@ CHANGELOG
    or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
  * Added `Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass`
  * Added `json_login_ldap` authentication provider to use LDAP authentication with a REST API.
+ * Added a `Symfony\Bundle\SecurityBundle\Security\TargetPathHelper` class
+   and service to help saving or getting the target path from the session.
  
 4.1.0
 -----

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2018-07-23T19:17:33Z
+
+@nicolas-grekas Great job on making this shorter ! Is there any performance impact to "reprocess" everything everytime you generate an url ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T20:05:21Z
+
+> performance impact to "reprocess
+
+the only impact this can have are at most two extra calls to strstr. I think that's OK :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-10T06:49:21Z
+
+(please fix fabbot issues)

@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Marshaller;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\PhpMarshaller;
+use Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 class DoctrineProviderTest extends TestCase
@@ -20,28 +21,74 @@ class DoctrineProviderTest extends TestCase
     use VarDumperTestTrait;
 
     /**
+     * @expectedException \ReflectionException
+     * @expectedExceptionMessage Class SomeNotExistingClass does not exist
+     */
+    public function testPhpIncompleteClassesAreForbidden()
+    {
+        $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
+        try {
+            Registry::__set_state(array('O:20:"SomeNotExistingClass":0:{}'));
+        } finally {
+            $this->assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
+        }
+    }
+
+    /**
+     * @dataProvider provideFailingSerialization
+     * @expectedException \Exception
+     * @expectedExceptionMessageRegexp Serialization of '.*' is not allowed
+     */
+    public function testFailingSerialization($value)
+    {
+        $expectedDump = $this->getDump($value);
+        try {
+            PhpMarshaller::marshall($value);
+        } finally {
+            $this->assertDumpEquals(rtrim($expectedDump), $value);
+        }
+    }
+
+    public function provideFailingSerialization()
+    {
+        yield array(hash_init('md5'));
+        yield array(new \ReflectionClass('stdClass'));
+        yield array((new \ReflectionFunction(function (): int {}))->getReturnType());
+        yield array(new \ReflectionGenerator((function () { yield 123; })()));
+        yield array(function () {});
+        yield array(function () { yield 123; });
+        yield array(new \SplFileInfo(__FILE__));
+        yield array($h = fopen(__FILE__, 'r'));
+        yield array(array($h));
+
+        $a = array(null, $h);
+        $a[0] = &$a;
+
+        yield array($a);
+    }
+
+    /**
      * @dataProvider provideMarshall
      */
-    public function testMarshall(string $testName, $value, int $expectedObjectsCount)
+    public function testMarshall(string $testName, $value, bool $staticValueExpected = false)
     {
-        $objectsCount = 0;
-        $marshalledValue = PhpMarshaller::marshall($value, $objectsCount);
+        $serializedValue = serialize($value);
+        $isStaticValue = true;
+        $marshalledValue = PhpMarshaller::marshall($value, $isStaticValue);
 
-        $this->assertSame($expectedObjectsCount, $objectsCount);
+        $this->assertSame($staticValueExpected, $isStaticValue);
+        $this->assertSame($serializedValue, serialize($value));
 
-        $dump = '<?php return '.var_export($marshalledValue, true).";\n";
+        $dump = '<?php return '.$marshalledValue.";\n";
         $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
-        if ($objectsCount) {
-            $marshalledValue = include $fixtureFile;
-            $this->assertDumpEquals($value, $marshalledValue);
+        if ('incomplete-class' === $testName) {
+            return;
+        }
+        $marshalledValue = include $fixtureFile;
 
-            $dump = PhpMarshaller::optimize($dump);
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.optimized.php';
-            $this->assertStringEqualsFile($fixtureFile, $dump);
-
-            $marshalledValue = include $fixtureFile;
+        if (!$isStaticValue) {
             $this->assertDumpEquals($value, $marshalledValue);
         } else {
             $this->assertSame($value, $marshalledValue);
@@ -50,23 +97,23 @@ class DoctrineProviderTest extends TestCase
 
     public function provideMarshall()
     {
-        yield array('bool', true, 0);
-        yield array('simple-array', array(123, array('abc')), 0);
-        yield array('datetime', \DateTime::createFromFormat('U', 0), 1);
+        yield array('bool', true, true);
+        yield array('simple-array', array(123, array('abc')), true);
+        yield array('datetime', \DateTime::createFromFormat('U', 0));
 
         $value = new \ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
 
-        yield array('array-object', $value, 3);
+        yield array('array-object', $value);
 
-        yield array('array-iterator', new \ArrayIterator(array(123), 1), 1);
-        yield array('array-object-custom', new MyArrayObject(array(234)), 1);
+        yield array('array-iterator', new \ArrayIterator(array(123), 1));
+        yield array('array-object-custom', new MyArrayObject(array(234)));
 
         $value = new MySerializable();
 
-        yield array('serializable', array($value, $value), 2);
+        yield array('serializable', array($value, $value));
 
         $value = new MyWakeup();
         $value->sub = new MyWakeup();
@@ -74,16 +121,29 @@ class DoctrineProviderTest extends TestCase
         $value->sub->bis = 123;
         $value->sub->baz = 123;
 
-        yield array('wakeup', $value, 2);
+        yield array('wakeup', $value);
 
-        yield array('clone', array(new MyCloneable(), new MyNotCloneable()), 2);
+        yield array('clone', array(new MyCloneable(), new MyNotCloneable()));
 
-        yield array('private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)), 2);
+        yield array('private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)));
 
         $value = new \SplObjectStorage();
         $value[new \stdClass()] = 345;
 
-        yield array('spl-object-storage', $value, 2);
+        yield array('spl-object-storage', $value);
+
+        yield array('incomplete-class', unserialize('O:20:"SomeNotExistingClass":0:{}'));
+
+        $value = array((object) array());
+        $value[1] = &$value[0];
+        $value[2] = $value[0];
+
+        yield array('hard-references', $value);
+
+        $value = array();
+        $value[0] = &$value;
+
+        yield array('hard-references-recursive', $value);
     }
 }
 

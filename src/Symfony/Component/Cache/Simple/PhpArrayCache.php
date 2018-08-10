@@ -13,7 +13,6 @@ namespace Symfony\Component\Cache\Simple;
 
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
@@ -28,8 +27,6 @@ use Symfony\Component\Cache\Traits\PhpArrayTrait;
 class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInterface
 {
     use PhpArrayTrait;
-
-    private $marshaller;
 
     /**
      * @param string         $file         The PHP file were values are cached
@@ -80,13 +77,6 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         if ($value instanceof \Closure) {
             try {
                 return $value();
-            } catch (\Throwable $e) {
-                return $default;
-            }
-        }
-        if (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-            try {
-                return ($this->marshaller ?? $this->marshaller = new DefaultMarshaller())->unmarshall($value);
             } catch (\Throwable $e) {
                 return $default;
             }
@@ -240,12 +230,6 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
                 } elseif ($value instanceof \Closure) {
                     try {
                         yield $key => $value();
-                    } catch (\Throwable $e) {
-                        yield $key => $default;
-                    }
-                } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                    try {
-                        yield $key => unserialize($value);
                     } catch (\Throwable $e) {
                         yield $key => $default;
                     }

@@ -3,7 +3,8 @@
   Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry::__set_state(array(
      '0' => 'ArrayIterator',
   )),
-   '1' => 
+   '1' => NULL,
+   '2' => 
   array (
     'ArrayIterator' => 
     array (
@@ -20,11 +21,9 @@
       ),
     ),
   ),
-   '2' => 
-  Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference::__set_state(array(
-     '0' => 0,
-  )),
    '3' => 
+  Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry::$objects[0],
+   '4' => 
   array (
   ),
 ));

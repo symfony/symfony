@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-20T15:53:25Z
+
+See https://github.com/symfony/symfony/pull/20980#issuecomment-269467562 :)
+
+---------------------------------------------------------------------------
+
+by thePanz at 2018-07-20T21:35:41Z
+
+Damn, didn't find that PR before opening this one @ro0NL! Sorry for the duplicated MR!
+So I guess the only way to use a `resource` with `Filesystem::dumpFile()` is to copy its code somewhere else :(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T10:53:01Z
+
+Should we reconsider since this works? If we really want a string, we should maybe throw a deprecation? That will force us to consider which alternative we should provide to ppl hit by the notice (and maybe make use realize it's simpler to just accept what already works?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-26T09:28:38Z
+
+(could you rebase on latest 2.8 please to get rid of the CS fixes?)
+
+---------------------------------------------------------------------------
+
+by thePanz at 2018-07-26T11:17:20Z
+
+@nicolas-grekas Rebased, cleaned-up and pushed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-26T15:19:01Z
+
+Note in 3.4 there's also `appendToFile()` which should be updated as well IMHO
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-02T09:44:16Z
+
+I'm 👎 on this change for the reasons expressed in the linked PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-07T09:14:54Z
+
+I reverted the docblock change but kept the test case so that we don't accidentally break BC.
+Removing support for array|resource would need a deprecation layer.
+
+:+1:

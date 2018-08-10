@@ -70,10 +70,11 @@
         </service>
 
         <service id="console.command.messenger_consume_messages" class="Symfony\Component\Messenger\Command\ConsumeMessagesCommand">
-            <argument type="service" id="message_bus" />
+            <argument /> <!-- Message bus locator -->
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument>null</argument> <!-- Default receiver name -->
+            <argument type="collection" /> <!-- Message buses names -->
 
             <tag name="console.command" command="messenger:consume-messages" />
         </service>

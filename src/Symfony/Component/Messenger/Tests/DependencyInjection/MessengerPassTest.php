@@ -241,10 +241,11 @@ class MessengerPassTest extends TestCase
     {
         $container = $this->getContainerBuilder();
         $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
-            new Reference('message_bus'),
+            null,
             new Reference('messenger.receiver_locator'),
             null,
             null,
+            null
         ));
 
         $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
@@ -253,6 +254,7 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertSame(array('amqp', 'dummy'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
+        $this->assertSame(array('message_bus'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4));
     }
 
     public function testItRegistersSenders()

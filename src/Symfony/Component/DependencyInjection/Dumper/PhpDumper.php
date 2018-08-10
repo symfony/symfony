@@ -207,7 +207,7 @@ class PhpDumper extends Dumper
 
         $code =
             $this->startClass($options['class'], $baseClass, $baseClassWithNamespace).
-            $this->addServices().
+            $this->addServices($services).
             $this->addDefaultParametersMethod()
         ;
 
@@ -238,7 +238,7 @@ EOF;
                 $files['removed-ids.php'] = $c .= ");\n";
             }
 
-            foreach ($this->generateServiceFiles() as $file => $c) {
+            foreach ($this->generateServiceFiles($services) as $file => $c) {
                 $files[$file] = $fileStart.$c;
             }
             foreach ($this->generateProxyClasses() as $file => $c) {
@@ -708,7 +708,7 @@ EOTXT
         return sprintf("        %s(\$%s);\n", $callable, $variableName);
     }
 
-    private function addService(string $id, Definition $definition, string &$file = null): string
+    private function addService(string $id, Definition $definition): array
     {
         $this->definitionVariables = new \SplObjectStorage();
         $this->referenceVariables = array();
@@ -759,6 +759,7 @@ EOTXT
             $file = $methodName.'.php';
             $code = "        // Returns the $public '$id'$shared$autowired service.\n\n";
         } else {
+            $file = null;
             $code = <<<EOF
 
     /*{$this->docStar}
@@ -825,36 +826,38 @@ EOF;
         $this->definitionVariables = null;
         $this->referenceVariables = null;
 
-        return $code;
+        return array($file, $code);
     }
 
-    private function addServices(): string
+    private function addServices(array &$services = null): string
     {
         $publicServices = $privateServices = '';
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if ($definition->isSynthetic() || ($this->asFiles && !$this->isHotPath($definition))) {
+            $services[$id] = $definition->isSynthetic() ? null : $this->addService($id, $definition);
+        }
+
+        foreach ($definitions as $id => $definition) {
+            if (!(list($file, $code) = $services[$id]) || null !== $file) {
                 continue;
             }
             if ($definition->isPublic()) {
-                $publicServices .= $this->addService($id, $definition);
+                $publicServices .= $code;
             } elseif (!$this->isTrivialInstance($definition) || isset($this->locatedIds[$id])) {
-                $privateServices .= $this->addService($id, $definition);
+                $privateServices .= $code;
             }
         }
 
         return $publicServices.$privateServices;
     }
 
-    private function generateServiceFiles()
+    private function generateServiceFiles(array $services)
     {
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && !$this->isHotPath($definition) && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
-                $code = $this->addService($id, $definition, $file);
-
+            if ((list($file, $code) = $services[$id]) && null !== $file && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
                 if (!$definition->isShared()) {
                     $i = strpos($code, "\n\ninclude_once ");
                     if (false !== $i && false !== $i = strpos($code, "\n\n", 2 + $i)) {

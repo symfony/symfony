@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by ProgMiner at 2018-07-23T20:51:05Z
+
+I think `LoaderLoadExcepton` is better than `LoadException`, because other exceptions is named too like a "class + exception".
+I have an another one question: is we have to use `class_alias` if `FileLoaderLoadException` is simply can extends `LoaderLoadException` and be deprecated?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T21:02:57Z
+
+> FileLoaderLoadException is simply can extends LoaderLoadException
+
+That wouldn't work: now that we throw the new kind, doing this would break existing catch and instanceof blocks that check for thrown exceptions.
+
+---------------------------------------------------------------------------
+
+by ProgMiner at 2018-07-23T21:41:10Z
+
+Ok, thanks. Is it all that needed for merge?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T21:46:46Z
+
+It needs more people reviewing before, but basically yes :)

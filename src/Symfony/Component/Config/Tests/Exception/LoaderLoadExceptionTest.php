@@ -12,37 +12,37 @@
 namespace Symfony\Component\Config\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 
-class FileLoaderLoadExceptionTest extends TestCase
+class LoaderLoadExceptionTest extends TestCase
 {
     public function testMessageCannotLoadResource()
     {
-        $exception = new FileLoaderLoadException('resource', null);
+        $exception = new LoaderLoadException('resource', null);
         $this->assertEquals('Cannot load resource "resource".', $exception->getMessage());
     }
 
     public function testMessageCannotLoadResourceWithType()
     {
-        $exception = new FileLoaderLoadException('resource', null, null, null, 'foobar');
+        $exception = new LoaderLoadException('resource', null, null, null, 'foobar');
         $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
     }
 
     public function testMessageCannotLoadResourceWithAnnotationType()
     {
-        $exception = new FileLoaderLoadException('resource', null, null, null, 'annotation');
+        $exception = new LoaderLoadException('resource', null, null, null, 'annotation');
         $this->assertEquals('Cannot load resource "resource". Make sure annotations are installed and enabled.', $exception->getMessage());
     }
 
     public function testMessageCannotImportResourceFromSource()
     {
-        $exception = new FileLoaderLoadException('resource', 'sourceResource');
+        $exception = new LoaderLoadException('resource', 'sourceResource');
         $this->assertEquals('Cannot import resource "resource" from "sourceResource".', $exception->getMessage());
     }
 
     public function testMessageCannotImportBundleResource()
     {
-        $exception = new FileLoaderLoadException('@resource', 'sourceResource');
+        $exception = new LoaderLoadException('@resource', 'sourceResource');
         $this->assertEquals(
             'Cannot import resource "@resource" from "sourceResource". '.
             'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
@@ -53,7 +53,7 @@ class FileLoaderLoadExceptionTest extends TestCase
 
     public function testMessageHasPreviousErrorWithDotAndUnableToLoad()
     {
-        $exception = new FileLoaderLoadException(
+        $exception = new LoaderLoadException(
             'resource',
             null,
             null,
@@ -67,7 +67,7 @@ class FileLoaderLoadExceptionTest extends TestCase
 
     public function testMessageHasPreviousErrorWithoutDotAndUnableToLoad()
     {
-        $exception = new FileLoaderLoadException(
+        $exception = new LoaderLoadException(
             'resource',
             null,
             null,
@@ -81,7 +81,7 @@ class FileLoaderLoadExceptionTest extends TestCase
 
     public function testMessageHasPreviousErrorAndUnableToLoadBundle()
     {
-        $exception = new FileLoaderLoadException(
+        $exception = new LoaderLoadException(
             '@resource',
             null,
             null,

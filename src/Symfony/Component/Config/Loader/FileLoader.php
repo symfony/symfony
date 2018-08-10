@@ -12,8 +12,8 @@
 namespace Symfony\Component\Config\Loader;
 
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\GlobResource;
@@ -66,7 +66,7 @@ abstract class FileLoader extends Loader
      *
      * @return mixed
      *
-     * @throws FileLoaderLoadException
+     * @throws LoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
@@ -161,11 +161,11 @@ abstract class FileLoader extends Loader
         } catch (\Exception $e) {
             if (!$ignoreErrors) {
                 // prevent embedded imports from nesting multiple exceptions
-                if ($e instanceof FileLoaderLoadException) {
+                if ($e instanceof LoaderLoadException) {
                     throw $e;
                 }
 
-                throw new FileLoaderLoadException($resource, $sourceResource, null, $e, $type);
+                throw new LoaderLoadException($resource, $sourceResource, null, $e, $type);
             }
         }
     }

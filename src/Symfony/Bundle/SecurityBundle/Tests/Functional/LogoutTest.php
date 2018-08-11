@@ -49,4 +49,14 @@ class LogoutTest extends WebTestCase
 
         $this->assertFalse($client->getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
     }
+
+    public function testAccessControlDoesNotApplyOnLogout()
+    {
+        $client = $this->createClient(array('test_case' => 'LogoutAccess', 'root_config' => 'config.yml'));
+
+        $client->request('POST', '/login', array('_username' => 'johannes', '_password' => 'test'));
+        $client->request('GET', '/logout');
+
+        $this->assertRedirect($client->getResponse(), '/');
+    }
 }

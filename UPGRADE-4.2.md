@@ -88,7 +88,9 @@ Messenger
 ---------
 
  * The `handle` method of the `Symfony\Component\Messenger\Middleware\ValidationMiddleware` and `Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware` middlewares now requires an `Envelope` object to be given (because they implement the `EnvelopeAwareInterface`). When using these middleware with the provided `MessageBus`, you will not have to do anything. If you use the middlewares any other way, you can use `Envelope::wrap($message)` to create an envelope for your message.
-
+ * The method `getConnectionCredentials` of the AMQP transport class `Symfony\Component\Messenger\Transport\AmqpExt\Connection`
+   has been renamed to `getConnectionConfiguration`.
+ 
 Security
 --------
 

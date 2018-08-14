@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-08-11T19:38:21Z
+
+@lyrixx please review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-08-11T20:01:22Z
+
+For 3.4?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-08-11T21:23:34Z
+
+@chalasr you're right, I misread the summary of the commit, it should be ok now, thanks!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-08-12T20:01:54Z
+
+If 3.4 instead of master you should change the Branch value in the table header, shouldn’t you?

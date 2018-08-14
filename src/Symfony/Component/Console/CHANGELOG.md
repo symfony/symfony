@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added method `preventRedrawFasterThan()` and `forceRedrawSlowerThan()` on `ProgressBar`
+
 4.3.0
 -----
 

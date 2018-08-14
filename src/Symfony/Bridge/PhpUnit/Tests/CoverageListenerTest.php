@@ -16,7 +16,7 @@ class CoverageListenerTest extends TestCase
             $this->markTestSkipped('This test cannot be run on HHVM.');
         }
 
-        exec('type phpdbg', $output, $returnCode);
+        exec('type phpdbg 2> /dev/null', $output, $returnCode);
 
         if (\PHP_VERSION_ID >= 70000 && 0 === $returnCode) {
             $php = 'phpdbg -qrr';

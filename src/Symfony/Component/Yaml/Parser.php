@@ -549,11 +549,6 @@ class Parser
     private function getNextEmbedBlock($indentation = null, $inSequence = false)
     {
         $oldLineIndentation = $this->getCurrentLineIndentation();
-        $blockScalarIndentations = array();
-
-        if ($this->isBlockScalarHeader()) {
-            $blockScalarIndentations[] = $oldLineIndentation;
-        }
 
         if (!$this->moveToNextLine()) {
             return;
@@ -612,29 +607,8 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
 
-        if (empty($blockScalarIndentations) && $this->isBlockScalarHeader()) {
-            $blockScalarIndentations[] = $this->getCurrentLineIndentation();
-        }
-
-        $previousLineIndentation = $this->getCurrentLineIndentation();
-
         while ($this->moveToNextLine()) {
             $indent = $this->getCurrentLineIndentation();
-
-            // terminate all block scalars that are more indented than the current line
-            if (!empty($blockScalarIndentations) && $indent < $previousLineIndentation && '' !== trim($this->currentLine)) {
-                foreach ($blockScalarIndentations as $key => $blockScalarIndentation) {
-                    if ($blockScalarIndentation >= $indent) {
-                        unset($blockScalarIndentations[$key]);
-                    }
-                }
-            }
-
-            if (empty($blockScalarIndentations) && !$this->isCurrentLineComment() && $this->isBlockScalarHeader()) {
-                $blockScalarIndentations[] = $indent;
-            }
-
-            $previousLineIndentation = $indent;
 
             if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
                 $this->moveToPreviousLine();
@@ -1052,16 +1026,6 @@ class Parser
     private function isStringUnIndentedCollectionItem()
     {
         return '-' === rtrim($this->currentLine) || 0 === strpos($this->currentLine, '- ');
-    }
-
-    /**
-     * Tests whether or not the current line is the header of a block scalar.
-     *
-     * @return bool
-     */
-    private function isBlockScalarHeader()
-    {
-        return (bool) self::preg_match('~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~', $this->currentLine);
     }
 
     /**

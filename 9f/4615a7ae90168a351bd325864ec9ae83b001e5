@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by colinodell at 2018-07-26T19:57:40Z
+
+The AppVeyor failure seems to be unrelated to this change.
+
+---------------------------------------------------------------------------
+
+by colinodell at 2018-08-09T19:28:25Z
+
+Thanks Ryan!  I'm currently using this in an application with a "time spent" field which only accepts 0.25 hour increments.  I feel like having a `modulus == 0` constraint like this would round out Symfony's other comparison constrains nicely.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-10T06:46:01Z
+
+What renaming to `DivisibleBy`? I first read `MultipleOf` as something like `SeveralOf`, which made no sense.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-08-10T07:45:59Z
+
+I agree with Nicolas. And since the test in Twig is named the same that would feel more consistent.
+
+---------------------------------------------------------------------------
+
+by colinodell at 2018-08-10T12:28:56Z
+
+Thanks for the feedback @nicolas-grekas!  I have renamed the constraint and updated the docs PR accordingly.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-08-13T12:50:21Z
+
+For Dutch (nl):
+```xml
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Deze waarde moet een veelvoud zijn van {{ compared_value }}.</target>
+            </trans-unit>
+```
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-08-13T13:07:55Z
+
+For German (de):
+
+```
+Dieser Wert sollte ein Vielfaches von {{ compared_value }} sein.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-08-13T13:16:32Z
+
+@dmaicher Though we need to capitalise the `V` (see https://www.duden.de/rechtschreibung/Vielfaches):
+
+> Dieser Wert sollte ein Vielfaches von {{ compared_value }} sein.
+
+---------------------------------------------------------------------------
+
+by colinodell at 2018-08-13T13:31:25Z
+
+I have added the two translations (but now fabbot is failing due to an existing translation)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-08-13T13:37:10Z
+
+The correction is wrong. @fabpot you should probably exempt `.xlf` files from typo checks in fabbot if it only searches for English typos   😉
+
+---------------------------------------------------------------------------
+
+by colinodell at 2018-08-14T19:19:00Z
+
+Thanks for the feedback @nicolas-grekas! I have made the comparison strict and added the French translation.

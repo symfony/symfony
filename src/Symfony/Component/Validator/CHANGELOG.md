@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `DivisibleBy` constraint
+
 4.1.0
 -----
 

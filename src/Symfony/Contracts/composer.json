@@ -18,8 +18,12 @@
     "require": {
         "php": "^7.1.3"
     },
+    "require-dev": {
+        "psr/container": "^1.0"
+    },
     "suggest": {
-        "psr/cache": "When using the Cache contract"
+        "psr/cache": "When using the Cache contracts",
+        "psr/container": "When using the Service contracts"
     },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\": "" },

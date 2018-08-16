@@ -11,52 +11,16 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Tests\Service\ServiceLocatorTest as BaseServiceLocatorTest;
 
-class ServiceLocatorTest extends TestCase
+class ServiceLocatorTest extends BaseServiceLocatorTest
 {
-    public function testHas()
+    public function getServiceLocator(array $factories)
     {
-        $locator = new ServiceLocator(array(
-            'foo' => function () { return 'bar'; },
-            'bar' => function () { return 'baz'; },
-            function () { return 'dummy'; },
-        ));
-
-        $this->assertTrue($locator->has('foo'));
-        $this->assertTrue($locator->has('bar'));
-        $this->assertFalse($locator->has('dummy'));
-    }
-
-    public function testGet()
-    {
-        $locator = new ServiceLocator(array(
-            'foo' => function () { return 'bar'; },
-            'bar' => function () { return 'baz'; },
-        ));
-
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame('baz', $locator->get('bar'));
-    }
-
-    public function testGetDoesNotMemoize()
-    {
-        $i = 0;
-        $locator = new ServiceLocator(array(
-            'foo' => function () use (&$i) {
-                ++$i;
-
-                return 'bar';
-            },
-        ));
-
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame(2, $i);
+        return new ServiceLocator($factories);
     }
 
     /**
@@ -65,7 +29,7 @@ class ServiceLocatorTest extends TestCase
      */
     public function testGetThrowsOnUndefinedService()
     {
-        $locator = new ServiceLocator(array(
+        $locator = $this->getServiceLocator(array(
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
         ));
@@ -74,31 +38,12 @@ class ServiceLocatorTest extends TestCase
     }
 
     /**
-     * @expectedException        \Psr\Container\NotFoundExceptionInterface
-     * @expectedExceptionMessage The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.
-     */
-    public function testThrowsOnUndefinedInternalService()
-    {
-        $locator = new ServiceLocator(array(
-            'foo' => function () use (&$locator) { return $locator->get('bar'); },
-        ));
-
-        $locator->get('foo');
-    }
-
-    /**
      * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @expectedExceptionMessage Circular reference detected for service "bar", path: "bar -> baz -> bar".
      */
     public function testThrowsOnCircularReference()
     {
-        $locator = new ServiceLocator(array(
-            'foo' => function () use (&$locator) { return $locator->get('bar'); },
-            'bar' => function () use (&$locator) { return $locator->get('baz'); },
-            'baz' => function () use (&$locator) { return $locator->get('bar'); },
-        ));
-
-        $locator->get('foo');
+        parent::testThrowsOnCircularReference();
     }
 
     /**
@@ -110,7 +55,7 @@ class ServiceLocatorTest extends TestCase
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
-        $subscriber->container = new ServiceLocator(array('bar' => function () {}));
+        $subscriber->container = $this->getServiceLocator(array('bar' => function () {}));
         $subscriber->container = $subscriber->container->withContext('caller', $container);
 
         $subscriber->getFoo();
@@ -118,7 +63,7 @@ class ServiceLocatorTest extends TestCase
 
     public function testInvoke()
     {
-        $locator = new ServiceLocator(array(
+        $locator = $this->getServiceLocator(array(
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
         ));
@@ -126,20 +71,6 @@ class ServiceLocatorTest extends TestCase
         $this->assertSame('bar', $locator('foo'));
         $this->assertSame('baz', $locator('bar'));
         $this->assertNull($locator('dummy'), '->__invoke() should return null on invalid service');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid service "foo" required by "external-id".
-     */
-    public function testRuntimeException()
-    {
-        $locator = new ServiceLocator(array(
-            'foo' => function () { throw new RuntimeException('Invalid service ".service_locator.abcdef".'); },
-        ));
-
-        $locator = $locator->withContext('external-id', new Container());
-        $locator->get('foo');
     }
 }
 

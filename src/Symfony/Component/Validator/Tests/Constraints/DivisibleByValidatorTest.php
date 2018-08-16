@@ -46,6 +46,8 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
             array(42, 21),
             array(3.25, 0.25),
             array('100', '10'),
+            array(4.1, 0.1),
+            array(-4.1, 0.1),
         );
     }
 
@@ -69,6 +71,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
             array(10, '10', 3, '3', 'integer'),
             array(10, '10', 0, '0', 'integer'),
             array(42, '42', INF, 'INF', 'double'),
+            array(4.15, '4.15', 0.1, '0.1', 'double'),
             array('22', '"22"', '10', '"10"', 'string'),
         );
     }

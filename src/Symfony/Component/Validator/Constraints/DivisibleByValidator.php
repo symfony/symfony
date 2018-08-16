@@ -23,7 +23,29 @@ class DivisibleByValidator extends AbstractComparisonValidator
      */
     protected function compareValues($value1, $value2)
     {
-        return (float) 0 === fmod($value1, $value2);
+        $value1 = \abs($value1);
+        $value2 = \abs($value2);
+        $epsilon = 0.0000001;
+
+        // can't divide by 0
+        if ($value2 < $epsilon)
+        {
+            return false;
+        }
+
+        // 0 is divisible by everything
+        if ($value1 < $epsilon)
+        {
+            return true;
+        }
+
+        // if the divisor is larger than the dividend, it will never cleanly divide
+        if ($value2 > $value1)
+        {
+            return false;
+        }
+
+        return \abs($value1 - round($value1 / $value2) * $value2) < $epsilon;
     }
 
     /**

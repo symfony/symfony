@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class TestServiceSubscriber implements ServiceSubscriberInterface
 {

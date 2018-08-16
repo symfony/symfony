@@ -10,6 +10,8 @@ CHANGELOG
  * added `ServiceLocatorArgument` and `!service_locator` config tag for creating optimized service-locators
  * added support for autoconfiguring bindings
  * added `%env(key:...)%` processor to fetch a specific key from an array
+ * deprecated `ServiceSubscriberInterface`, use the same interface from the `Symfony\Contracts\Service` namespace instead
+ * deprecated `ResettableContainerInterface`, use `Symfony\Contracts\Service\ResetInterface` instead
 
 4.1.0
 -----

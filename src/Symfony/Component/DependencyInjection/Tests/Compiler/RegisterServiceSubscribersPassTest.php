@@ -38,7 +38,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Service "foo" must implement interface "Symfony\Component\DependencyInjection\ServiceSubscriberInterface".
+     * @expectedExceptionMessage Service "foo" must implement interface "Symfony\Contracts\Service\ServiceSubscriberInterface".
      */
     public function testInvalidClass()
     {

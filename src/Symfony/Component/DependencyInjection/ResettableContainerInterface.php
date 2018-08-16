@@ -19,6 +19,8 @@ use Symfony\Contracts\Service\ResetInterface;
  * not needed anymore.
  *
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @deprecated since Symfony 4.2, use "Symfony\Contracts\Service\ResetInterface" instead.
  */
 interface ResettableContainerInterface extends ContainerInterface, ResetInterface
 {

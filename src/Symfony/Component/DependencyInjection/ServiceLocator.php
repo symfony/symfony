@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Contracts\Service\ServiceLocatorTrait;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
@@ -22,51 +26,22 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class ServiceLocator implements PsrContainerInterface
 {
-    private $factories;
-    private $loading = array();
+    use ServiceLocatorTrait {
+        get as private doGet;
+    }
+
     private $externalId;
     private $container;
 
-    /**
-     * @param callable[] $factories
-     */
-    public function __construct(array $factories)
-    {
-        $this->factories = $factories;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function has($id)
-    {
-        return isset($this->factories[$id]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get($id)
     {
-        if (!isset($this->factories[$id])) {
-            throw new ServiceNotFoundException($id, end($this->loading) ?: null, null, array(), $this->createServiceNotFoundMessage($id));
+        if (!$this->externalId) {
+            return $this->doGet($id);
         }
 
-        if (isset($this->loading[$id])) {
-            $ids = array_values($this->loading);
-            $ids = \array_slice($this->loading, array_search($id, $ids));
-            $ids[] = $id;
-
-            throw new ServiceCircularReferenceException($id, $ids);
-        }
-
-        $this->loading[$id] = $id;
         try {
-            return $this->factories[$id]();
+            return $this->doGet($id);
         } catch (RuntimeException $e) {
-            if (!$this->externalId) {
-                throw $e;
-            }
             $what = sprintf('service "%s" required by "%s"', $id, $this->externalId);
             $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
 
@@ -79,8 +54,6 @@ class ServiceLocator implements PsrContainerInterface
             $r->setValue($e, $message);
 
             throw $e;
-        } finally {
-            unset($this->loading[$id]);
         }
     }
 
@@ -101,14 +74,16 @@ class ServiceLocator implements PsrContainerInterface
         return $locator;
     }
 
-    private function createServiceNotFoundMessage($id)
+    private function createNotFoundException(string $id): NotFoundExceptionInterface
     {
         if ($this->loading) {
-            return sprintf('The service "%s" has a dependency on a non-existent service "%s". This locator %s', end($this->loading), $id, $this->formatAlternatives());
+            $msg = sprintf('The service "%s" has a dependency on a non-existent service "%s". This locator %s', end($this->loading), $id, $this->formatAlternatives());
+
+            return new ServiceNotFoundException($id, end($this->loading) ?: null, null, array(), $msg);
         }
 
-        $class = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        $class = isset($class[2]['object']) ? \get_class($class[2]['object']) : null;
+        $class = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+        $class = isset($class[3]['object']) ? \get_class($class[3]['object']) : null;
         $externalId = $this->externalId ?: $class;
 
         $msg = sprintf('Service "%s" not found: ', $id);
@@ -143,7 +118,12 @@ class ServiceLocator implements PsrContainerInterface
             $msg .= 'Try using dependency injection instead.';
         }
 
-        return $msg;
+        return new ServiceNotFoundException($id, end($this->loading) ?: null, null, array(), $msg);
+    }
+
+    private function createCircularReferenceException(string $id, array $path): ContainerExceptionInterface
+    {
+        return new ServiceCircularReferenceException($id, $path);
     }
 
     private function formatAlternatives(array $alternatives = null, $separator = 'and')

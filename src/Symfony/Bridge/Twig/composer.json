@@ -29,7 +29,7 @@
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
-        "symfony/translation": "~3.4|~4.0",
+        "symfony/translation": "~4.2",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/security": "~3.4|~4.0",
         "symfony/security-acl": "~2.8|~3.0",
@@ -41,8 +41,9 @@
         "symfony/workflow": "~3.4|~4.0"
     },
     "conflict": {
+        "symfony/console": "<3.4",
         "symfony/form": "<4.1.2",
-        "symfony/console": "<3.4"
+        "symfony/translation": "<4.2"
     },
     "suggest": {
         "symfony/finder": "",

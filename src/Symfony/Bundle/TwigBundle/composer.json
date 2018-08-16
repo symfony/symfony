@@ -41,7 +41,8 @@
     },
     "conflict": {
         "symfony/dependency-injection": "<4.1",
-        "symfony/framework-bundle": "<4.1"
+        "symfony/framework-bundle": "<4.1",
+        "symfony/translation": "<4.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },

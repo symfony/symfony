@@ -33,7 +33,7 @@
         "symfony/http-foundation": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/security-csrf": "~3.4|~4.0",
-        "symfony/translation": "~3.4|~4.0",
+        "symfony/translation": "~4.2",
         "symfony/var-dumper": "~3.4|~4.0"
     },
     "conflict": {
@@ -42,6 +42,7 @@
         "symfony/doctrine-bridge": "<3.4",
         "symfony/framework-bundle": "<3.4",
         "symfony/http-kernel": "<3.4",
+        "symfony/translation": "<4.2",
         "symfony/twig-bridge": "<3.4.5|<4.0.5,>=4.0"
     },
     "suggest": {

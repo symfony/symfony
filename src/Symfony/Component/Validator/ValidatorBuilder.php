@@ -15,8 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
-use Symfony\Component\Translation\IdentityTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
@@ -28,16 +27,22 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.2
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
     private $initializers = array();
+    private $loaders = array();
     private $xmlMappings = array();
     private $yamlMappings = array();
     private $methodMappings = array();
@@ -249,9 +254,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(LegacyTranslatorInterface $translator)
     {
-        $this->translator = $translator;
+        $this->translator = $translator instanceof LegacyTranslatorProxy ? $translator->getTranslator() : $translator;
 
         return $this;
     }
@@ -262,6 +267,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function setTranslationDomain($translationDomain)
     {
         $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addLoader(LoaderInterface $loader)
+    {
+        $this->loaders[] = $loader;
 
         return $this;
     }
@@ -289,7 +304,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $loaders[] = new AnnotationLoader($this->annotationReader);
         }
 
-        return $loaders;
+        return array_merge($loaders, $this->loaders);
     }
 
     /**
@@ -316,7 +331,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $translator = $this->translator;
 
         if (null === $translator) {
-            $translator = new IdentityTranslator();
+            $translator = new class() implements TranslatorInterface {
+                use TranslatorTrait;
+            };
             // Force the locale to be 'en' when no translator is provided rather than relying on the Intl default locale
             // This avoids depending on Intl or the stub implementation being available. It also ensures that Symfony
             // validation messages are pluralized properly even when the default locale gets changed because they are in

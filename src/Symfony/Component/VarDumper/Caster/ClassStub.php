@@ -28,12 +28,6 @@ class ClassStub extends ConstStub
     {
         $this->value = $identifier;
 
-        if (0 < $i = strrpos($identifier, '\\')) {
-            $this->attr['ellipsis'] = \strlen($identifier) - $i;
-            $this->attr['ellipsis-type'] = 'class';
-            $this->attr['ellipsis-tail'] = 1;
-        }
-
         try {
             if (null !== $callable) {
                 if ($callable instanceof \Closure) {
@@ -61,6 +55,12 @@ class ClassStub extends ConstStub
                 }
             }
 
+            if (false !== strpos($identifier, "class@anonymous\0")) {
+                $this->value = $identifier = preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', function ($m) {
+                    return \class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
+                }, $identifier);
+            }
+
             if (null !== $callable && $r instanceof \ReflectionFunctionAbstract) {
                 $s = ReflectionCaster::castFunctionAbstract($r, array(), new Stub(), true);
                 $s = ReflectionCaster::getSignature($s);
@@ -76,6 +76,12 @@ class ClassStub extends ConstStub
             }
         } catch (\ReflectionException $e) {
             return;
+        } finally {
+            if (0 < $i = strrpos($identifier, '\\')) {
+                $this->attr['ellipsis'] = \strlen($identifier) - $i;
+                $this->attr['ellipsis-type'] = 'class';
+                $this->attr['ellipsis-tail'] = 1;
+            }
         }
 
         if ($f = $r->getFileName()) {

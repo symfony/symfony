@@ -1004,6 +1004,37 @@ HTML;
         }
     }
 
+    public function testFilteredChildren()
+    {
+        $html = <<<'HTML'
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div id="foo">
+        <div class="lorem">
+            <p class="lorem"></p>
+        </div>
+        <div class="lorem">
+            <span class="lorem"></span>
+        </div>
+        <span class="ipsum"></span>
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = new Crawler($html);
+        $foo = $crawler->filter('#foo');
+
+        $this->assertEquals(3, $foo->children()->count());
+        $this->assertEquals(2, $foo->children('.lorem')->count());
+        $this->assertEquals(2, $foo->children('div')->count());
+        $this->assertEquals(2, $foo->children('div.lorem')->count());
+        $this->assertEquals(1, $foo->children('span')->count());
+        $this->assertEquals(1, $foo->children('span.ipsum')->count());
+        $this->assertEquals(1, $foo->children('.ipsum')->count());
+    }
+
     public function testParents()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');

@@ -501,14 +501,26 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the children nodes of the current selection.
      *
+     * @param string|null $selector An optional CSS selector to filter children
+     *
      * @return self
      *
      * @throws \InvalidArgumentException When current node is empty
+     * @throws \RuntimeException         If the CssSelector Component is not available and $selector is provided
      */
-    public function children()
+    public function children(/* string $selector = null */)
     {
+        $selector = 0 < \func_num_args() ? func_get_arg(0) : null;
+
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        if (null !== $selector) {
+            $converter = $this->createCssSelectorConverter();
+            $xpath = $converter->toXPath($selector, 'child::');
+
+            return $this->filterRelativeXPath($xpath);
         }
 
         $node = $this->getNode(0)->firstChild;
@@ -691,11 +703,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function filter($selector)
     {
-        if (!class_exists(CssSelectorConverter::class)) {
-            throw new \RuntimeException('To filter with a CSS selector, install the CssSelector component ("composer require symfony/css-selector"). Or use filterXpath instead.');
-        }
-
-        $converter = new CssSelectorConverter($this->isHtml);
+        $converter = $this->createCssSelectorConverter();
 
         // The CssSelector already prefixes the selector with descendant-or-self::
         return $this->filterRelativeXPath($converter->toXPath($selector));
@@ -1147,5 +1155,17 @@ class Crawler implements \Countable, \IteratorAggregate
         $crawler->namespaces = $this->namespaces;
 
         return $crawler;
+    }
+
+    /**
+     * @throws \RuntimeException If the CssSelector Component is not available
+     */
+    private function createCssSelectorConverter(): CssSelectorConverter
+    {
+        if (!class_exists(CssSelectorConverter::class)) {
+            throw new \RuntimeException('To filter with a CSS selector, install the CssSelector component ("composer require symfony/css-selector"). Or use filterXpath instead.');
+        }
+
+        return new CssSelectorConverter($this->isHtml);
     }
 }

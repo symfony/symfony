@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Http\Firewall\AccessListener;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
@@ -55,20 +56,31 @@ class Firewall implements EventSubscriberInterface
             $listeners[2] = null;
         }
 
-        $authenticationListeners = $listeners[0];
-        $exceptionListener = $listeners[1];
-        $logoutListener = $listeners[2];
+        $accessListener = null;
+        $authenticationListeners = array();
 
-        if (null !== $exceptionListener) {
+        foreach ($listeners[0] as $listener) {
+            if ($listener instanceof AccessListener) {
+                $accessListener = $listener;
+            } else {
+                $authenticationListeners[] = $listener;
+            }
+        }
+
+        if (null !== $exceptionListener = $listeners[1]) {
             $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
             $exceptionListener->register($this->dispatcher);
         }
 
-        $this->handleRequest($event, $authenticationListeners);
-
-        if (null !== $logoutListener) {
-            $logoutListener->handle($event);
+        if (null !== $logoutListener = $listeners[2]) {
+            $authenticationListeners[] = $logoutListener;
         }
+
+        if (null !== $accessListener) {
+            $authenticationListeners[] = $accessListener;
+        }
+
+        $this->handleRequest($event, $authenticationListeners);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)

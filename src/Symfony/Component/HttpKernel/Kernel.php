@@ -244,19 +244,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         $isResource = 0 === strpos($path, 'Resources') && null !== $dir;
         $overridePath = substr($path, 9);
-        $resourceBundle = null;
         $bundle = $this->getBundle($bundleName);
         $files = array();
 
         if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
-            if (null !== $resourceBundle) {
-                throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
-                    $file,
-                    $resourceBundle,
-                    $dir.'/'.$bundle->getName().$overridePath
-                ));
-            }
-
             $files[] = $file;
         }
 
@@ -265,7 +256,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 return $file;
             }
             $files[] = $file;
-            $resourceBundle = $bundle->getName();
         }
 
         if (\count($files) > 0) {

@@ -10,6 +10,7 @@ init:
     - SET PATH=c:\php;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
+    - SET "SYMFONY_REQUIRE=>=2.8"
     - SET ANSICON=121x90 (121x90)
     - SET SYMFONY_PHPUNIT_VERSION=4.8
     - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
@@ -51,9 +52,10 @@ install:
     - copy /Y php.ini-min php.ini
     - echo extension=php_openssl.dll >> php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://getcomposer.org/download/1.3.0/composer.phar)
+    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/1.7.1/composer.phar)
     - php composer.phar self-update
     - copy /Y .composer\* %APPDATA%\Composer\
+    - php composer.phar global require --no-progress symfony/flex dev-master
     - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
     - php composer.phar config platform.php 5.3.9

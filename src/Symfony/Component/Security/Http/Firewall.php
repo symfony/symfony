@@ -50,31 +50,12 @@ class Firewall implements EventSubscriberInterface
         // register listeners for this firewall
         $listeners = $this->map->getListeners($event->getRequest());
 
-        $accessListener = null;
-        $authenticationListeners = array();
-
-        foreach ($listeners[0] as $listener) {
-            if ($listener instanceof AccessListener) {
-                $accessListener = $listener;
-            } else {
-                $authenticationListeners[] = $listener;
-            }
-        }
-
         if (null !== $exceptionListener = $listeners[1]) {
             $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
             $exceptionListener->register($this->dispatcher);
         }
 
-        if (null !== $logoutListener = isset($listeners[2]) ? $listeners[2] : null) {
-            $authenticationListeners[] = $logoutListener;
-        }
-
-        if (null !== $accessListener) {
-            $authenticationListeners[] = $accessListener;
-        }
-
-        $this->handleRequest($event, $authenticationListeners);
+        $this->handleRequest($event, array($listeners[0], isset($listeners[2]) ? $listeners[2] : null));
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
@@ -100,12 +81,28 @@ class Firewall implements EventSubscriberInterface
 
     protected function handleRequest(GetResponseEvent $event, $listeners)
     {
+        list($listeners, $logoutListener) = $listeners;
+        $accessListener = null;
+
         foreach ($listeners as $listener) {
+            if ($listener instanceof AccessListener) {
+                $accessListener = $listener;
+                continue;
+            }
+
             $listener->handle($event);
 
             if ($event->hasResponse()) {
                 break;
             }
+        }
+
+        if (null !== $logoutListener) {
+            $logoutListener->handle($event);
+        }
+
+        if (!$event->hasResponse() && null !== $accessListener) {
+            $accessListener->handle($event);
         }
     }
 }

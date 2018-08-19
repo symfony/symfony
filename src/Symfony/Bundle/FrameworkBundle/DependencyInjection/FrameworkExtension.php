@@ -1507,7 +1507,7 @@ class FrameworkExtension extends Extension
             $container->register($busId, MessageBus::class)->addArgument(array())->addTag('messenger.bus');
 
             if ($busId === $config['default_bus']) {
-                $container->setAlias('message_bus', $busId);
+                $container->setAlias('message_bus', $busId)->setPublic(true);
                 $container->setAlias(MessageBusInterface::class, $busId);
             }
         }

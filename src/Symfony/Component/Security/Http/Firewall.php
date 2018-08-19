@@ -56,31 +56,38 @@ class Firewall implements EventSubscriberInterface
             $listeners[2] = null;
         }
 
-        $accessListener = null;
-        $authenticationListeners = array();
+        $authenticationListeners = $listeners[0];
+        $exceptionListener = $listeners[1];
+        $logoutListener = $listeners[2];
 
-        foreach ($listeners[0] as $listener) {
-            if ($listener instanceof AccessListener) {
-                $accessListener = $listener;
-            } else {
-                $authenticationListeners[] = $listener;
-            }
-        }
-
-        if (null !== $exceptionListener = $listeners[1]) {
+        if (null !== $exceptionListener) {
             $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
             $exceptionListener->register($this->dispatcher);
         }
 
-        if (null !== $logoutListener = $listeners[2]) {
-            $authenticationListeners[] = $logoutListener;
-        }
+        $authenticationListeners = function () use ($authenticationListeners, $logoutListener) {
+            $accessListener = null;
 
-        if (null !== $accessListener) {
-            $authenticationListeners[] = $accessListener;
-        }
+            foreach ($authenticationListeners as $listener) {
+                if ($listener instanceof AccessListener) {
+                    $accessListener = $listener;
 
-        $this->handleRequest($event, $authenticationListeners);
+                    continue;
+                }
+
+                yield $listener;
+            }
+
+            if (null !== $logoutListener) {
+                yield $logoutListener;
+            }
+
+            if (null !== $accessListener) {
+                yield $accessListener;
+            }
+        };
+
+        $this->handleRequest($event, $authenticationListeners());
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)

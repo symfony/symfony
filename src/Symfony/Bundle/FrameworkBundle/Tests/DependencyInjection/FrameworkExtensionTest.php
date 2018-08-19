@@ -530,6 +530,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('messenger');
         $this->assertTrue($container->hasAlias('message_bus'));
+        $this->assertTrue($container->getAlias('message_bus')->isPublic());
         $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());

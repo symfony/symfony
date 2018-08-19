@@ -50,7 +50,7 @@ abstract class ObjectRouteLoader extends Loader
         }
 
         $parts = explode('::', $resource);
-        if (2 != \count($parts)) {
+        if (2 !== \count($parts)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service::method"', $resource));
         }
 

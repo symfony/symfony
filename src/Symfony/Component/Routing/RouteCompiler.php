@@ -252,8 +252,8 @@ class RouteCompiler implements RouteCompilerInterface
      */
     private static function findNextSeparator(string $pattern, bool $useUtf8): string
     {
-        if ('' == $pattern) {
-            // return empty string if pattern is empty or false (false which can be returned by substr)
+        if ('' === $pattern) {
+            // return empty string if pattern is empty
             return '';
         }
         // first remove all placeholders from the pattern so we can find the next real static character
@@ -295,7 +295,7 @@ class RouteCompiler implements RouteCompilerInterface
                     // matched the optional subpattern is not passed back.
                     $regexp = "(?:$regexp";
                     $nbTokens = \count($tokens);
-                    if ($nbTokens - 1 == $index) {
+                    if ($nbTokens - 1 === $index) {
                         // Close the optional subpatterns
                         $regexp .= str_repeat(')?', $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
                     }

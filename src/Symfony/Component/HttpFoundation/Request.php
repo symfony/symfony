@@ -1902,7 +1902,7 @@ class Request
      */
     private function getUrlencodedPrefix(string $string, string $prefix)
     {
-        if (0 !== strpos(rawurldecode($string), $prefix)) {
+        if (0 !== stripos(rawurldecode($string), $prefix)) {
             return false;
         }
 

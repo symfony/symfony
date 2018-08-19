@@ -16,12 +16,19 @@ namespace Symfony\Component\Cache\Marshaller\PhpMarshaller;
  *
  * @internal
  */
-class Reference
+class Values
 {
-    public $id;
-
-    public function __construct(int $id)
+    public function __construct(array $values)
     {
-        $this->id = $id;
+        foreach ($values as $i => $v) {
+            $this->$i = $v;
+        }
+    }
+
+    public static function __set_state($values)
+    {
+        foreach ($values as $i => $v) {
+            Registry::$references[$i] = $v;
+        }
     }
 }

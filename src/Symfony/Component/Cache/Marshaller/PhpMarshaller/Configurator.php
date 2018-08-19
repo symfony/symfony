@@ -20,19 +20,20 @@ class Configurator
 {
     public static $configurators = array();
 
-    public function __construct(Registry $registry, array $properties, $value, array $wakeups)
+    public function __construct(?Registry $registry, ?Values $values, array $properties, $value, array $wakeups)
     {
         $this->{0} = $registry;
-        $this->{1} = $properties;
-        $this->{2} = $value;
-        $this->{3} = $wakeups;
+        $this->{1} = $values;
+        $this->{2} = $properties;
+        $this->{3} = $value;
+        $this->{4} = $wakeups;
     }
 
     public static function __set_state($state)
     {
         $objects = Registry::$objects;
-        Registry::$objects = \array_pop(Registry::$stack);
-        list(, $properties, $value, $wakeups) = $state;
+        list(Registry::$objects, Registry::$references) = \array_pop(Registry::$stack);
+        list(, , $properties, $value, $wakeups) = $state;
 
         foreach ($properties as $class => $vars) {
             (self::$configurators[$class] ?? self::getConfigurator($class))($vars, $objects);

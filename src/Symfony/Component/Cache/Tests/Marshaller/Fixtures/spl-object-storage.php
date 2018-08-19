@@ -4,7 +4,8 @@
      '0' => 'SplObjectStorage',
      '1' => 'stdClass',
   )),
-   '1' => 
+   '1' => NULL,
+   '2' => 
   array (
     'SplObjectStorage' => 
     array (
@@ -13,19 +14,15 @@
         0 => 
         array (
           0 => 
-          Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference::__set_state(array(
-             '0' => 1,
-          )),
+          Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry::$objects[1],
           1 => 345,
         ),
       ),
     ),
   ),
-   '2' => 
-  Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference::__set_state(array(
-     '0' => 0,
-  )),
    '3' => 
+  Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry::$objects[0],
+   '4' => 
   array (
   ),
 ));

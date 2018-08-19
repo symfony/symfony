@@ -16,7 +16,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\GetTrait;
@@ -35,7 +34,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     use GetTrait;
 
     private $createCacheItem;
-    private $marshaller;
 
     /**
      * @param string           $file         The PHP file were values are cached
@@ -106,9 +104,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
             if ($value instanceof \Closure) {
                 return $value();
             }
-            if (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                return ($this->marshaller ?? $this->marshaller = new DefaultMarshaller())->unmarshall($value);
-            }
         } catch (\Throwable $e) {
             unset($this->keys[$key]);
             goto get_from_pool;
@@ -140,13 +135,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         } elseif ($value instanceof \Closure) {
             try {
                 $value = $value();
-            } catch (\Throwable $e) {
-                $value = null;
-                $isHit = false;
-            }
-        } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-            try {
-                $value = unserialize($value);
             } catch (\Throwable $e) {
                 $value = null;
                 $isHit = false;
@@ -281,12 +269,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
                 } elseif ($value instanceof \Closure) {
                     try {
                         yield $key => $f($key, $value(), true);
-                    } catch (\Throwable $e) {
-                        yield $key => $f($key, null, false);
-                    }
-                } elseif (\is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                    try {
-                        yield $key => $f($key, $this->unserializeValue($value), true);
                     } catch (\Throwable $e) {
                         yield $key => $f($key, null, false);
                     }

@@ -4,21 +4,18 @@
      '0' => 'Symfony\\Component\\Cache\\Tests\\Marshaller\\MyCloneable',
      '1' => 'Symfony\\Component\\Cache\\Tests\\Marshaller\\MyNotCloneable',
   )),
-   '1' => 
-  array (
-  ),
+   '1' => NULL,
    '2' => 
   array (
-    0 => 
-    Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference::__set_state(array(
-       '0' => 0,
-    )),
-    1 => 
-    Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference::__set_state(array(
-       '0' => 1,
-    )),
   ),
    '3' => 
+  array (
+    0 => 
+    Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry::$objects[0],
+    1 => 
+    Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry::$objects[1],
+  ),
+   '4' => 
   array (
   ),
 ));

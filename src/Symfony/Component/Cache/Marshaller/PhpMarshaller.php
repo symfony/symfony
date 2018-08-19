@@ -12,8 +12,10 @@
 namespace Symfony\Component\Cache\Marshaller;
 
 use Symfony\Component\Cache\Marshaller\PhpMarshaller\Configurator;
+use Symfony\Component\Cache\Marshaller\PhpMarshaller\Marshaller;
 use Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference;
 use Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry;
+use Symfony\Component\Cache\Marshaller\PhpMarshaller\Values;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -27,14 +29,31 @@ use Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry;
  */
 class PhpMarshaller
 {
-    public static function marshall($value, int &$objectsCount)
+    public static function marshall($value, bool &$isStaticValue = null): string
     {
-        if (!\is_object($value) && !\is_array($value)) {
-            return $value;
+        $isStaticValue = true;
+
+        if (!\is_object($value) && !(\is_array($value) && $value) && !$value instanceof \__PHP_Incomplete_Class && !\is_resource($value)) {
+            return var_export($value, true);
         }
+
         $objectsPool = new \SplObjectStorage();
-        $value = array($value);
-        $objectsCount = self::doMarshall($value, $objectsPool);
+        $refsPool = array();
+        $objectsCount = 0;
+
+        try {
+            $value = Marshaller::marshall(array($value), $objectsPool, $refsPool, $objectsCount, $isStaticValue)[0];
+        } finally {
+            $references = array();
+            foreach ($refsPool as $i => $v) {
+                $v[0] = $v[1];
+                $references[1 + $i] = $v[2];
+            }
+        }
+
+        if ($isStaticValue) {
+            return var_export($value, true);
+        }
 
         $classes = array();
         $values = array();
@@ -46,6 +65,7 @@ class PhpMarshaller
             }
         }
         ksort($wakeups);
+
         $properties = array();
         foreach ($values as $i => $vars) {
             foreach ($vars as $class => $values) {
@@ -54,131 +74,14 @@ class PhpMarshaller
                 }
             }
         }
-        if (!$classes) {
-            return $value[0];
-        }
 
-        return new Configurator(new Registry($classes), $properties, $value[0], $wakeups);
-    }
+        $value = new Configurator($classes ? new Registry($classes) : null, $references ? new Values($references) : null, $properties, $value, $wakeups);
+        $value = var_export($value, true);
 
-    public static function optimize(string $exportedValue)
-    {
-        return preg_replace(sprintf("{%s::__set_state\(array\(\s++'0' => (\d+),\s++\)\)}", preg_quote(Reference::class)), Registry::class.'::$objects[$1]', $exportedValue);
-    }
+        $regexp = sprintf("{%s::__set_state\(array\(\s++'id' => %%s(\d+),\s++\)\)}", preg_quote(Reference::class));
+        $value = preg_replace(sprintf($regexp, ''), Registry::class.'::$objects[$1]', $value);
+        $value = preg_replace(sprintf($regexp, '-'), '&'.Registry::class.'::$references[$1]', $value);
 
-    private static function doMarshall(array &$array, \SplObjectStorage $objectsPool): int
-    {
-        $objectsCount = 0;
-
-        foreach ($array as &$value) {
-            if (\is_array($value) && $value) {
-                $objectsCount += self::doMarshall($value, $objectsPool);
-            }
-            if (!\is_object($value)) {
-                continue;
-            }
-            if (isset($objectsPool[$value])) {
-                ++$objectsCount;
-                $value = new Reference($objectsPool[$value][0]);
-                continue;
-            }
-            $class = \get_class($value);
-            $properties = array();
-            $sleep = null;
-            $arrayValue = (array) $value;
-            $proto = (Registry::$reflectors[$class] ?? Registry::getClassReflector($class))->newInstanceWithoutConstructor();
-
-            if ($value instanceof \ArrayIterator || $value instanceof \ArrayObject) {
-                // ArrayIterator and ArrayObject need special care because their "flags"
-                // option changes the behavior of the (array) casting operator.
-                $reflector = $value instanceof \ArrayIterator ? 'ArrayIterator' : 'ArrayObject';
-                $reflector = Registry::$reflectors[$reflector] ?? Registry::getClassReflector($reflector);
-
-                $properties = array(
-                    $arrayValue,
-                    $reflector->getMethod('getFlags')->invoke($value),
-                    $value instanceof \ArrayObject ? $reflector->getMethod('getIteratorClass')->invoke($value) : 'ArrayIterator',
-                );
-
-                $reflector = $reflector->getMethod('setFlags');
-                $reflector->invoke($proto, \ArrayObject::STD_PROP_LIST);
-
-                if ($properties[1] & \ArrayObject::STD_PROP_LIST) {
-                    $reflector->invoke($value, 0);
-                    $properties[0] = (array) $value;
-                } else {
-                    $reflector->invoke($value, \ArrayObject::STD_PROP_LIST);
-                    $arrayValue = (array) $value;
-                }
-                $reflector->invoke($value, $properties[1]);
-
-                if (array(array(), 0, 'ArrayIterator') === $properties) {
-                    $properties = array();
-                } else {
-                    if ('ArrayIterator' === $properties[2]) {
-                        unset($properties[2]);
-                    }
-                    $properties = array($reflector->class => array("\0" => $properties));
-                }
-            } elseif ($value instanceof \SplObjectStorage) {
-                foreach (clone $value as $v) {
-                    $properties[] = $v;
-                    $properties[] = $value[$v];
-                }
-                $properties = array('SplObjectStorage' => array("\0" => $properties));
-            } elseif ($value instanceof \Serializable) {
-                ++$objectsCount;
-                $objectsPool[$value] = array($id = \count($objectsPool), serialize($value), array(), 0);
-                $value = new Reference($id);
-                continue;
-            }
-
-            if (\method_exists($class, '__sleep')) {
-                if (!\is_array($sleep = $value->__sleep())) {
-                    trigger_error('serialize(): __sleep should return an array only containing the names of instance-variables to serialize', E_USER_NOTICE);
-                    $value = null;
-                    continue;
-                }
-                $sleep = array_flip($sleep);
-            }
-
-            $proto = (array) $proto;
-
-            foreach ($arrayValue as $name => $v) {
-                $k = (string) $name;
-                if ('' === $k || "\0" !== $k[0]) {
-                    $c = $class;
-                } elseif ('*' === $k[1]) {
-                    $c = $class;
-                    $k = substr($k, 3);
-                } else {
-                    $i = strpos($k, "\0", 2);
-                    $c = substr($k, 1, $i - 1);
-                    $k = substr($k, 1 + $i);
-                }
-                if (null === $sleep) {
-                    $properties[$c][$k] = $v;
-                } elseif (isset($sleep[$k]) && $c === $class) {
-                    $properties[$c][$k] = $v;
-                    unset($sleep[$k]);
-                }
-                if (\array_key_exists($name, $proto) && $proto[$name] === $v) {
-                    unset($properties[$c][$k]);
-                }
-            }
-            if ($sleep) {
-                foreach ($sleep as $k => $v) {
-                    trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $k), E_USER_NOTICE);
-                }
-            }
-
-            $objectsPool[$value] = array($id = \count($objectsPool));
-            $objectsCount += 1 + self::doMarshall($properties, $objectsPool);
-            $objectsPool[$value] = array($id, $class, $properties, \method_exists($class, '__wakeup') ? $objectsCount : 0);
-
-            $value = new Reference($id);
-        }
-
-        return $objectsCount;
+        return $value;
     }
 }

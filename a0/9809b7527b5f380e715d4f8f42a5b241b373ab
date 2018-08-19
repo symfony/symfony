@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-08-17T12:11:29Z
+
+ControllerTrait deals with a service locator, services provided by a service locator do not need to be public (and should not).
+I see no good reason for making the command bus public, container aware stuff make no sense anymore (really since 4.1).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-08-17T12:13:43Z
+
+hmm, ControllerTrait is used by the FrameworkBundle's `Controller` class...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-17T12:20:53Z
+
+It's time to deprecate `Controller` :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-08-17T14:00:44Z
+
+In the meantime... this is still a bug to fix 🙃
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2018-08-17T20:21:26Z
+
+What would be the consequence of removing `Controller` ? Would impacted controllers have to use `ControllerTrait` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-17T20:26:39Z
+
+ControllerTrait is internal. The consequence would be to ask people to use AbstractController instead.

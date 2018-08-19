@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-08T11:59:19Z
+
+Which is the lowest branch where this applies? This should be the target branch.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-08T12:07:35Z
+
+2.8 is supposed to be the lowest branch, but before that, can you ensure me it's actually a bug and not a feature ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-08T12:10:48Z
+
+I cannot. Why do you think it's supposed to work this way?
+From the code, this would work: `$data = array('#' => ' foo ');`. Isn't it enough?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-08T12:13:06Z
+
+>  From the code, this would work: $data = array('#' => ' foo ');.
+
+Actually not, which means this is a new feature, now a bug fix, isn't it?
+It should be done in a BC-safe way, not sure that's the case right now, is it?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-08T12:33:15Z
+
+> From the code, this would work: $data = array('#' => ' foo ');.
+
+Encoding `['#' => ' foo ']` works as expected (generates the value of the current node), but encoding `['#comment' => ' foo ']` doesn't work (is supposed to generate a comment node).
+
+I meant : encoding of XML comment wasn't handled before this PR. It's why we can see that as a new feature. On the other hand, the encoding and the decoding of a XML comment behave differently, it's why we also can see that as a bug.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-15T21:03:52Z
+
+As we said it's a bug fix, I rebased on 2.8.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-16T06:33:14Z
+
+I don't see a big fix here but a new feature.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-16T10:30:32Z
+
+@fabpot IMO, we should get an output equal to the input after decoding and then encoding it. Said differently, if this the condition below isn't respected, I think it's a bug :
+
+```php
+$encoded === $encoder->encode($encoder->decode($encoded, $format), $format))
+```
+In this case, without this PR, the result it's like :
+
+```php
+'<a><!-- b --></a>' === '<a><item key="#comment"> b </item></a>'
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-18T07:04:40Z
+
+When the feature was added to the decoder, nobody thought about adding it to the decoder as well. That's sad we didn't think about this before. I still see it as a new feature (a missing one and a very welcome one for sure).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-18T10:26:05Z
+
+Ok @fabpot, let's see it as a (missing) new feature. I'll soon rebase on master.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-18T15:49:25Z
+
+Rebase done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-18T15:53:07Z
+
+Can you add a note in the CHANGELOG of the component?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-19T10:45:05Z
+
+Note added.

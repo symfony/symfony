@@ -1,1 +1,0 @@
-<?php return true;

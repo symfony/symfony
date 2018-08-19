@@ -9,32 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Marshaller;
+namespace Symfony\Component\VarExporter;
 
-use Symfony\Component\Cache\Marshaller\PhpMarshaller\Configurator;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller\Marshaller;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller\Reference;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller\Values;
+use Symfony\Component\VarExporter\Internal\Configurator;
+use Symfony\Component\VarExporter\Internal\Exporter;
+use Symfony\Component\VarExporter\Internal\Reference;
+use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Internal\Values;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+ * Exports serializable PHP values to PHP code.
  *
- * PhpMarshaller allows serializing PHP data structures using var_export()
- * while preserving all the semantics associated to serialize().
+ * VarExporter allows serializing PHP data structures to plain PHP code (like var_export())
+ * while preserving all the semantics associated with serialize() (unlike var_export()).
  *
  * By leveraging OPcache, the generated PHP code is faster than doing the same with unserialize().
  *
- * @internal
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class PhpMarshaller
+final class VarExporter
 {
-    public static function marshall($value, bool &$isStaticValue = null): string
+    /**
+     * Exports a serializable PHP value to PHP code.
+     *
+     * @param mixed $value          The value to export
+     * @param bool  &$isStaticValue Set to true after execution if the provided value is static, false otherwise
+     *
+     * @return string The value exported as PHP code
+     *
+     * @throws \Exception When the provided value cannot be serialized
+     */
+    public static function export($value, bool &$isStaticValue = null): string
     {
         $isStaticValue = true;
 
         if (!\is_object($value) && !(\is_array($value) && $value) && !$value instanceof \__PHP_Incomplete_Class && !\is_resource($value)) {
-            return var_export($value, true);
+            return Exporter::export($value);
         }
 
         $objectsPool = new \SplObjectStorage();
@@ -42,7 +52,7 @@ class PhpMarshaller
         $objectsCount = 0;
 
         try {
-            $value = Marshaller::marshall(array($value), $objectsPool, $refsPool, $objectsCount, $isStaticValue)[0];
+            $value = Exporter::prepare(array($value), $objectsPool, $refsPool, $objectsCount, $isStaticValue)[0];
         } finally {
             $references = array();
             foreach ($refsPool as $i => $v) {
@@ -52,7 +62,7 @@ class PhpMarshaller
         }
 
         if ($isStaticValue) {
-            return var_export($value, true);
+            return Exporter::export($value);
         }
 
         $classes = array();
@@ -75,13 +85,8 @@ class PhpMarshaller
             }
         }
 
-        $value = new Configurator($classes ? new Registry($classes) : null, $references ? new Values($references) : null, $properties, $value, $wakeups);
-        $value = var_export($value, true);
+        $value = new Configurator(new Registry($classes), $references ? new Values($references) : null, $properties, $value, $wakeups);
 
-        $regexp = sprintf("{%s::__set_state\(array\(\s++'id' => %%s(\d+),\s++\)\)}", preg_quote(Reference::class));
-        $value = preg_replace(sprintf($regexp, ''), Registry::class.'::$objects[$1]', $value);
-        $value = preg_replace(sprintf($regexp, '-'), '&'.Registry::class.'::$references[$1]', $value);
-
-        return $value;
+        return Exporter::export($value);
     }
 }

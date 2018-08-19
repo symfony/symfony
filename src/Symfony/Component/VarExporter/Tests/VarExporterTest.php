@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Marshaller;
+namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller\Registry;
+use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-class DoctrineProviderTest extends TestCase
+class VarExporterTest extends TestCase
 {
     use VarDumperTestTrait;
 
@@ -28,7 +28,7 @@ class DoctrineProviderTest extends TestCase
     {
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
-            Registry::__set_state(array('O:20:"SomeNotExistingClass":0:{}'));
+            Registry::push(array(), array(), array('O:20:"SomeNotExistingClass":0:{}'));
         } finally {
             $this->assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
         }
@@ -43,7 +43,7 @@ class DoctrineProviderTest extends TestCase
     {
         $expectedDump = $this->getDump($value);
         try {
-            PhpMarshaller::marshall($value);
+            VarExporter::export($value);
         } finally {
             $this->assertDumpEquals(rtrim($expectedDump), $value);
         }
@@ -74,12 +74,12 @@ class DoctrineProviderTest extends TestCase
     {
         $serializedValue = serialize($value);
         $isStaticValue = true;
-        $marshalledValue = PhpMarshaller::marshall($value, $isStaticValue);
+        $marshalledValue = VarExporter::export($value, $isStaticValue);
 
         $this->assertSame($staticValueExpected, $isStaticValue);
         $this->assertSame($serializedValue, serialize($value));
 
-        $dump = '<?php return '.$marshalledValue.";\n";
+        $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
@@ -97,6 +97,8 @@ class DoctrineProviderTest extends TestCase
 
     public function provideMarshall()
     {
+        yield array('multiline-string', array("\0\0\r\nA" => "B\rC\n\n"), true);
+
         yield array('bool', true, true);
         yield array('simple-array', array(123, array('abc')), true);
         yield array('datetime', \DateTime::createFromFormat('U', 0));

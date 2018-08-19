@@ -81,6 +81,7 @@
         "symfony/twig-bundle": "self.version",
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",
+        "symfony/var-exporter": "self.version",
         "symfony/web-link": "self.version",
         "symfony/web-profiler-bundle": "self.version",
         "symfony/web-server-bundle": "self.version",

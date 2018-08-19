@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * @author Piotr Stankowski <git@trakos.pl>
@@ -166,7 +166,7 @@ trait PhpFilesTrait
                 $value = "'N;'";
             } elseif (\is_object($value) || \is_array($value)) {
                 try {
-                    $value = PhpMarshaller::marshall($value, $isStaticValue);
+                    $value = VarExporter::export($value, $isStaticValue);
                 } catch (\Exception $e) {
                     throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \is_object($value) ? \get_class($value) : 'array'), 0, $e);
                 }
@@ -183,7 +183,8 @@ trait PhpFilesTrait
             }
 
             if (!$isStaticValue) {
-                $value = "static function () {\n\nreturn {$value};\n\n}";
+                $value = str_replace("\n", "\n    ", $value);
+                $value = "static function () {\n\n    return {$value};\n\n}";
             }
 
             $file = $this->files[$key] = $this->getFile($key, true);

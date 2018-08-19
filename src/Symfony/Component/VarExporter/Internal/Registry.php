@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Marshaller\PhpMarshaller;
+namespace Symfony\Component\VarExporter\Internal;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -33,44 +33,35 @@ class Registry
         }
     }
 
-    public static function __set_state($classes)
+    public static function push($reflectors, $objects, $serializables)
     {
-        $unserializeCallback = null;
         self::$stack[] = array(self::$objects, self::$references);
-        self::$objects = $classes;
         self::$references = array();
-        try {
-            foreach (self::$objects as &$class) {
-                if (':' === ($class[1] ?? null)) {
-                    if (null === $unserializeCallback) {
-                        $unserializeCallback = ini_set('unserialize_callback_func', __CLASS__.'::getClassReflector');
-                    }
-                    $class = \unserialize($class);
-                    continue;
-                }
-                $r = self::$reflectors[$class] ?? self::getClassReflector($class);
 
-                if (self::$cloneable[$class]) {
-                    $class = clone self::$prototypes[$class];
-                } else {
-                    $class = self::$instantiableWithoutConstructor[$class] ? $r->newInstanceWithoutConstructor() : $r->newInstance();
-                }
+        if (!$serializables) {
+            return self::$objects = $objects;
+        }
+        $unserializeCallback = ini_set('unserialize_callback_func', __CLASS__.'::getClassReflector');
+
+        try {
+            foreach ($serializables as $k => $v) {
+                $objects[$k] = unserialize($v);
             }
         } catch (\Throwable $e) {
-            list(self::$objects, self::$references) = \array_pop(self::$stack);
+            list(self::$objects, self::$references) = array_pop(self::$stack);
             throw $e;
         } finally {
-            if (null !== $unserializeCallback) {
-                ini_set('unserialize_callback_func', $unserializeCallback);
-            }
+            ini_set('unserialize_callback_func', $unserializeCallback);
         }
+
+        return self::$objects = $objects;
     }
 
-    public static function getClassReflector($class)
+    public static function getClassReflector($class, $instantiableWithoutConstructor = null, $cloneable = null)
     {
         $reflector = new \ReflectionClass($class);
 
-        if (self::$instantiableWithoutConstructor[$class] = !$reflector->isFinal() || !$reflector->isInternal()) {
+        if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor ?? (!$reflector->isFinal() || !$reflector->isInternal())) {
             $proto = $reflector->newInstanceWithoutConstructor();
         } else {
             try {
@@ -80,14 +71,23 @@ class Registry
             }
         }
 
-        if ($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType) {
+        if (null !== $cloneable) {
+            self::$prototypes[$class] = $proto;
+            self::$cloneable[$class] = $cloneable;
+
+            return self::$reflectors[$class] = $reflector;
+        }
+
+        if ($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) {
             if (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup')) {
                 throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
             }
+            self::$cloneable[$class] = false;
+        } else {
+            self::$cloneable[$class] = !$reflector->hasMethod('__clone');
         }
 
         self::$prototypes[$class] = $proto;
-        self::$cloneable[$class] = !$reflector->hasMethod('__clone');
 
         if ($proto instanceof \Throwable) {
             static $trace;

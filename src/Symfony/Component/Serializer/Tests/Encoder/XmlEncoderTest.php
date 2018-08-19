@@ -760,6 +760,19 @@ XML;
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
 
+    public function testEncodeComment()
+    {
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response><!-- foo --></response>
+
+XML;
+
+        $data = array('#comment' => ' foo ');
+
+        $this->assertEquals($expected, $this->encoder->encode($data, 'xml'));
+    }
+
     /**
      * @return XmlEncoder
      */

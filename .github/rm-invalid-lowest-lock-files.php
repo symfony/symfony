@@ -79,7 +79,13 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
             continue 2;
         }
 
-        foreach (array('minimum-stability', 'prefer-stable', 'repositories') as $key) {
+        if (isset($composerJsons[$name][2]['repositories']) && !isset($lockedJson[$key]['repositories'])) {
+            // the locked package has been patched locally but the lock references a commit,
+            // which means the referencing package itself is not modified
+            continue;
+        }
+
+        foreach (array('minimum-stability', 'prefer-stable') as $key) {
             if (array_key_exists($key, $composerJsons[$name][2])) {
                 $lockedJson[$key] = $composerJsons[$name][2][$key];
             }
@@ -92,7 +98,9 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
             continue 2;
         }
 
-        $referencedCommits[$name][$lockedJson['source']['reference']][] = $dir;
+        if ($lockedJson['dist']['reference']) {
+            $referencedCommits[$name][$lockedJson['dist']['reference']][] = $dir;
+        }
     }
 }
 

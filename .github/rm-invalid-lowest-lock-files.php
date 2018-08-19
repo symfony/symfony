@@ -1,5 +1,11 @@
 <?php
 
+error_reporting(-1);
+set_error_handler(function ($type, $message, $file, $line) {
+    if (error_reporting()) {
+        throw new \ErrorException($message, 0, $type, $file, $line);
+    }
+});
 array_shift($_SERVER['argv']);
 $dirs = $_SERVER['argv'];
 
@@ -59,6 +65,8 @@ foreach ($dirs as $dir) {
     $composerJsons[$composerJson['name']] = array($dir, $composerLock['packages'], getRelevantContent($composerJson));
 }
 
+$referencedCommits = array();
+
 foreach ($composerJsons as list($dir, $lockedPackages)) {
     foreach ($lockedPackages as $lockedJson) {
         if (0 !== strpos($version = $lockedJson['version'], 'dev-') && '-dev' !== substr($version, -4)) {
@@ -82,6 +90,62 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
             echo "$dir/composer.lock is not in sync with $name.\n";
             @unlink($dir.'/composer.lock');
             continue 2;
+        }
+
+        $referencedCommits[$name][$lockedJson['source']['reference']][] = $dir;
+    }
+}
+
+if (!$referencedCommits || (isset($_SERVER['TRAVIS_PULL_REQUEST']) && 'false' !== $_SERVER['TRAVIS_PULL_REQUEST'])) {
+    // cached commits cannot be stale for PRs
+    return;
+}
+
+@mkdir($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org', 0777, true);
+
+$ch = null;
+$mh = curl_multi_init();
+$sh = curl_share_init();
+curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
+$chs = array();
+
+foreach ($referencedCommits as $name => $dirsByCommit) {
+    $chs[] = $ch = array(curl_init(), fopen($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '$').'.json', 'wb'));
+    curl_setopt($ch[0], CURLOPT_URL, 'https://repo.packagist.org/p/'.$name.'.json');
+    curl_setopt($ch[0], CURLOPT_FILE, $ch[1]);
+    curl_setopt($ch[0], CURLOPT_SHARE, $sh);
+    curl_multi_add_handle($mh, $ch[0]);
+}
+
+do {
+    curl_multi_exec($mh, $active);
+    curl_multi_select($mh);
+} while ($active);
+
+foreach ($chs as list($ch, $fd)) {
+    curl_multi_remove_handle($mh, $ch);
+    curl_close($ch);
+    fclose($fd);
+}
+
+foreach ($referencedCommits as $name => $dirsByCommit) {
+    $repo = file_get_contents($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '$').'.json');
+    $repo = json_decode($repo, true);
+
+    foreach ($repo['packages'][$name] as $version) {
+        unset($referencedCommits[$name][$version['source']['reference']]);
+    }
+}
+
+foreach ($referencedCommits as $name => $dirsByCommit) {
+    foreach ($dirsByCommit as $dirs) {
+        foreach ($dirs as $dir) {
+            if (file_exists($dir.'/composer.lock')) {
+                echo "$dir/composer.lock references old commit for $name.\n";
+                @unlink($dir.'/composer.lock');
+            }
         }
     }
 }

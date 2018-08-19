@@ -142,8 +142,10 @@ foreach ($referencedCommits as $name => $dirsByCommit) {
 foreach ($referencedCommits as $name => $dirsByCommit) {
     foreach ($dirsByCommit as $dirs) {
         foreach ($dirs as $dir) {
-            echo "$dir/composer.lock references old commit for $name.\n";
-            @unlink($dir.'/composer.lock');
+            if (file_exists($dir.'/composer.lock')) {
+                echo "$dir/composer.lock references old commit for $name.\n";
+                @unlink($dir.'/composer.lock');
+            }
         }
     }
 }

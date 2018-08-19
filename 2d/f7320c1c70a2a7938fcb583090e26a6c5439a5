@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-13T14:51:41Z
+
+PR is green and ready.
+By making `PhpMarshaller` handle arbitrary PHP values, we also simplify the PHP-based adapters \o/.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-13T15:12:44Z
+
+What is the goal of extracting the Marshaller class out of PhpMarshaller ? This makes review harder (as it is much harder to see which code was changed when moving it) and I don't see any usage out of PhpMarshaller
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-13T15:16:59Z
+
+The goal is allowing extra performance by making the old "doMarshall" method public and type-hint-less (see my reply to your previous comment.)
+About helping reviews, I agree, but this is not-released code so we should do all design changes now.

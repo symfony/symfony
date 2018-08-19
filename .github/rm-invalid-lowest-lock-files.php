@@ -96,7 +96,7 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
     }
 }
 
-if (!$referencedCommits || (isset($_SERVER['TRAVIS_PULL_REQUEST']) && 'false' === $_SERVER['TRAVIS_PULL_REQUEST'])) {
+if (!$referencedCommits || (isset($_SERVER['TRAVIS_PULL_REQUEST']) && 'false' !== $_SERVER['TRAVIS_PULL_REQUEST'])) {
     // cached commits cannot be stale for PRs
     return;
 }

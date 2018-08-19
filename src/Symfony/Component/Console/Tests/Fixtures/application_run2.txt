@@ -8,8 +8,8 @@ Arguments:
   namespace            The namespace name
 
 Options:
-      --raw            To output raw command list
       --format=FORMAT  The output format (txt, xml, json, or md) [default: "txt"]
+      --raw            To output raw command list
 
 Help:
   The list command lists all commands:

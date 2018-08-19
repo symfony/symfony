@@ -136,7 +136,7 @@ class JsonDescriptor extends Descriptor
     private function getInputDefinitionData(InputDefinition $definition)
     {
         $inputArguments = array();
-        foreach ($definition->getArguments() as $name => $argument) {
+        foreach ($this->sortByName($definition->getArguments()) as $name => $argument) {
             $inputArguments[$name] = $this->getInputArgumentData($argument);
         }
 

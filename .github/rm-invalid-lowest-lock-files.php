@@ -96,7 +96,7 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
     }
 }
 
-if (!$referencedCommits || (isset($_SERVER['TRAVIS_PULL_REQUEST']) && 'false' === $_SERVER['TRAVIS_PULL_REQUEST'])) {
+if (!$referencedCommits || (isset($_SERVER['TRAVIS_PULL_REQUEST']) && 'false' !== $_SERVER['TRAVIS_PULL_REQUEST'])) {
     // cached commits cannot be stale for PRs
     return;
 }
@@ -142,8 +142,10 @@ foreach ($referencedCommits as $name => $dirsByCommit) {
 foreach ($referencedCommits as $name => $dirsByCommit) {
     foreach ($dirsByCommit as $dirs) {
         foreach ($dirs as $dir) {
-            echo "$dir/composer.lock references old commit for $name.\n";
-            @unlink($dir.'/composer.lock');
+            if (file_exists($dir.'/composer.lock')) {
+                echo "$dir/composer.lock references old commit for $name.\n";
+                @unlink($dir.'/composer.lock');
+            }
         }
     }
 }

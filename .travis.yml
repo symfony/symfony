@@ -194,7 +194,7 @@ install:
       else
           export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
       fi
-      composer global require symfony/flex dev-master
+      composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number than the next one

@@ -93,7 +93,7 @@ class AutowirePass extends AbstractRecursivePass
                 $this->container->register($id = sprintf('.errored.%s.%s', $this->currentId, (string) $value), $value->getType())
                     ->addError($message);
 
-                return new TypedReference($id, $value->getType(), $value->getInvalidBehavior());
+                return new TypedReference($id, $value->getType(), $value->getInvalidBehavior(), $value->getName());
             }
             $this->container->log($this, $message);
         }
@@ -221,7 +221,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $getValue = function () use ($type, $parameter, $class, $method) {
-                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type))) {
+                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $parameter->name))) {
                     $failureMessage = $this->createTypeNotFoundMessage($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                     if ($parameter->isDefaultValueAvailable()) {
@@ -281,8 +281,26 @@ class AutowirePass extends AbstractRecursivePass
         $this->lastFailure = null;
         $type = $reference->getType();
 
-        if ($type !== (string) $reference || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
+        if ($type !== (string) $reference) {
             return $reference;
+        }
+
+        if (null !== $name = $reference->getName()) {
+            if ($this->container->has($alias = $type.' $'.$name) && !$this->container->findDefinition($alias)->isAbstract()) {
+                return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+            }
+
+            if ($this->container->has($name) && !$this->container->findDefinition($name)->isAbstract()) {
+                foreach ($this->container->getAliases() as $id => $alias) {
+                    if ($name === (string) $alias && 0 === strpos($id, $type.' $')) {
+                        return new TypedReference($name, $type, $reference->getInvalidBehavior());
+                    }
+                }
+            }
+        }
+
+        if ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract()) {
+            return new TypedReference($type, $type, $reference->getInvalidBehavior());
         }
     }
 

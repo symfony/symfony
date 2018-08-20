@@ -172,7 +172,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     }
 
                     $target = ltrim($target, '\\');
-                    $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior) : new Reference($target, $invalidBehavior);
+                    $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, $p->name) : new Reference($target, $invalidBehavior);
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-08-19T11:55:20Z
+
+Looks great. 👍
+I am uncomfortable with directly comparing floats, though. Do you think using the "standard epsilon" approach might catch more edge cases?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-19T12:21:20Z
+
+The sprintf does rounding up to the 12th decimal, which means it's like your epsilon comparison, but also that is copes with the scale of the number, thanks to using the scientific notation for the rounding.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-08-20T06:33:14Z
+
+> The sprintf does rounding up to the 12th decimal, which means it's like your epsilon comparison, but also that is copes with the scale of the number, thanks to using the scientific notation for the rounding.
+
+Yeah, but afterwards we still convert both to a float and do a direct comparison.
+I am currently not sure whether that works out in all cases, but I trust you, if you say that this is enough. 😉
+
+So 👍  for the PR, as it is simpler and more readable
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-20T14:32:03Z
+
+I improved precision a bit for integers and rounded both operands to the 12th decimal for floats.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-08-20T14:34:24Z
+
+Looks great, thank you! 👍

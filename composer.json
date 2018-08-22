@@ -28,6 +28,7 @@
         "psr/link": "^1.0",
         "psr/log": "~1.0",
         "psr/simple-cache": "^1.0",
+        "symfony/contracts": "^1.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
@@ -39,7 +40,6 @@
         "symfony/cache": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
-        "symfony/contracts": "1.0.0",
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",
         "symfony/debug": "self.version",
@@ -122,8 +122,7 @@
             "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
-            "Symfony\\Component\\": "src/Symfony/Component/",
-            "Symfony\\Contracts\\": "src/Symfony/Contracts/"
+            "Symfony\\Component\\": "src/Symfony/Component/"
         },
         "classmap": [
             "src/Symfony/Component/Intl/Resources/stubs"

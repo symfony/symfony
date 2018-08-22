@@ -30,15 +30,17 @@ class HttpUtils
     private $urlGenerator;
     private $urlMatcher;
     private $domainRegexp;
+    private $secureDomainRegexp;
 
     /**
-     * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
-     * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The URL or Request matcher
-     * @param string|null                                 $domainRegexp A regexp that the target of HTTP redirections must match, scheme included
+     * @param UrlGeneratorInterface                       $urlGenerator       A UrlGeneratorInterface instance
+     * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher         The URL or Request matcher
+     * @param string|null                                 $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
+     * @param string|null                                 $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, $domainRegexp = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, string $domainRegexp = null, string $secureDomainRegexp = null)
     {
         $this->urlGenerator = $urlGenerator;
         if (null !== $urlMatcher && !$urlMatcher instanceof UrlMatcherInterface && !$urlMatcher instanceof RequestMatcherInterface) {
@@ -46,6 +48,7 @@ class HttpUtils
         }
         $this->urlMatcher = $urlMatcher;
         $this->domainRegexp = $domainRegexp;
+        $this->secureDomainRegexp = $secureDomainRegexp;
     }
 
     /**
@@ -59,6 +62,9 @@ class HttpUtils
      */
     public function createRedirectResponse(Request $request, $path, $status = 302)
     {
+        if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?://[^/]++#i', $path, $host) && !preg_match(sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
+            $path = '/';
+        }
         if (null !== $this->domainRegexp && preg_match('#^https?://[^/]++#i', $path, $host) && !preg_match(sprintf($this->domainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
         }

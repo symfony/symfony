@@ -96,6 +96,26 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://pirate.com/foo'));
     }
 
+    public function testSessionAutoSecure()
+    {
+        $container = $this->createContainer(array('cookie_domain' => '.symfony.com.', 'cookie_secure' => 'auto'));
+
+        $utils = $container->get('security.http_utils');
+        $request = Request::create('/', 'get');
+
+        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
+        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+
+        $container->get('router.request_context')->setScheme('https');
+
+        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
+        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+    }
+
     private function createContainer($sessionStorageOptions)
     {
         $container = new ContainerBuilder();
@@ -121,7 +141,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         );
 
         $ext = new FrameworkExtension();
-        $ext->load(array('framework' => array('csrf_protection' => false)), $container);
+        $ext->load(array('framework' => array('csrf_protection' => false, 'router' => array('resource' => 'dummy'))), $container);
 
         $ext = new SecurityExtension();
         $ext->load($config, $container);

@@ -91,6 +91,7 @@ FrameworkBundle
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.
  * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is not supported anymore.
  * The `RequestDataCollector` class has been removed. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
+ * Removed `Symfony\Bundle\FrameworkBundle\Controller\Controller`. Use `Symfony\Bundle\FrameworkBundle\Controller\AbstractController` instead.
 
 HttpFoundation
 --------------

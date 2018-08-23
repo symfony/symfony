@@ -186,6 +186,10 @@ class UniqueEntityValidator extends ConstraintValidator
             return $this->formatValue($value, self::PRETTY_DATE);
         }
 
+        if (\method_exists($value, '__toString')) {
+            return (string) $value;
+        }
+
         if ($class->getName() !== $idClass = \get_class($value)) {
             // non unique value might be a composite PK that consists of other entity objects
             if ($em->getMetadataFactory()->hasMetadataFor($idClass)) {

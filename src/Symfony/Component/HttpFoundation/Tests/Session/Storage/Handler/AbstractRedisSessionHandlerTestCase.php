@@ -33,11 +33,6 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     protected $redisClient;
 
     /**
-     * @var \Redis
-     */
-    protected $validator;
-
-    /**
      * @return \Redis|\RedisArray|\RedisCluster|\Predis\Client
      */
     abstract protected function createRedisClient(string $host);
@@ -51,9 +46,6 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         }
 
         $host = getenv('REDIS_HOST') ?: 'localhost';
-
-        $this->validator = new \Redis();
-        $this->validator->connect($host);
 
         $this->redisClient = $this->createRedisClient($host);
         $this->storage = new RedisSessionHandler(
@@ -154,24 +146,24 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     protected function setFixture($key, $value, $ttl = null)
     {
         if (null !== $ttl) {
-            $this->validator->setex($key, $ttl, $value);
+            $this->redisClient->setex($key, $ttl, $value);
         } else {
-            $this->validator->set($key, $value);
+            $this->redisClient->set($key, $value);
         }
     }
 
     protected function getFixture($key)
     {
-        return $this->validator->get($key);
+        return $this->redisClient->get($key);
     }
 
     protected function hasFixture($key): bool
     {
-        return $this->validator->exists($key);
+        return $this->redisClient->exists($key);
     }
 
     protected function fixtureTtl($key): int
     {
-        return $this->validator->ttl($key);
+        return $this->redisClient->ttl($key);
     }
 }

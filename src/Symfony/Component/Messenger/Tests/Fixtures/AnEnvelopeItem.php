@@ -15,19 +15,4 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
 
 class AnEnvelopeItem implements EnvelopeItemInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        // noop
-    }
 }

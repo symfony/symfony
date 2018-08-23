@@ -24,7 +24,6 @@ class SerializerConfigurationTest extends TestCase
     {
         $config = new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('Default', 'Extra')));
 
-        $this->assertTrue(is_subclass_of(SerializerConfiguration::class, \Serializable::class, true));
         $this->assertEquals($config, unserialize(serialize($config)));
     }
 }

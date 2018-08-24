@@ -2010,7 +2010,7 @@ class Request
                 if ($i) {
                     $clientIps[$key] = $clientIp = substr($clientIp, 0, $i);
                 }
-            } elseif ('[' == $clientIp[0]) {
+            } elseif (0 === strpos($clientIp, '[')) {
                 // Strip brackets and :port from IPv6 addresses.
                 $i = strpos($clientIp, ']', 1);
                 $clientIps[$key] = $clientIp = substr($clientIp, 1, $i - 1);

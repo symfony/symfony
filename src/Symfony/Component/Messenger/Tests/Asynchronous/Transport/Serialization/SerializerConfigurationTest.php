@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 class SerializerConfigurationTest extends TestCase
 {
-    public function testSerialiazable()
+    public function testSerializable()
     {
         $config = new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('Default', 'Extra')));
 

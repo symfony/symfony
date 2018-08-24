@@ -29,7 +29,7 @@ class ValidationConfigurationTest extends TestCase
         $this->assertSame($groups, $config->getGroups());
     }
 
-    public function testSerialiazable()
+    public function testSerializable()
     {
         $this->assertTrue(is_subclass_of(ValidationConfiguration::class, \Serializable::class, true));
         $this->assertEquals($config = new ValidationConfiguration(array('Default', 'Extra')), unserialize(serialize($config)));

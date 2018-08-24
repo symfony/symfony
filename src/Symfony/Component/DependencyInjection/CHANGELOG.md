@@ -4,8 +4,12 @@ CHANGELOG
 4.2.0
 -----
 
- * added `ServiceSubscriberTrait`
- * added `ServiceLocatorArgument` for creating optimized service-locators
+ * added `ContainerBuilder::registerAliasForArgument()` to support autowiring by type+name
+ * added support for binding by type+name
+ * added `ServiceSubscriberTrait` to ease implementing `ServiceSubscriberInterface` using methods' return types
+ * added `ServiceLocatorArgument` and `!service_locator` config tag for creating optimized service-locators
+ * added support for autoconfiguring bindings
+ * added `%env(key:...)%` processor to fetch a specific key from an array
 
 4.1.0
 -----

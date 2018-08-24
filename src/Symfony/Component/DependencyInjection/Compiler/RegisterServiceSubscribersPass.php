@@ -74,8 +74,9 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $type = substr($type, 1);
                 $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             }
-            if (\is_int($key)) {
+            if (\is_int($name = $key)) {
                 $key = $type;
+                $name = null;
             }
             if (!isset($serviceMap[$key])) {
                 if (!$autowire) {
@@ -84,7 +85,13 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $serviceMap[$key] = new Reference($type);
             }
 
-            $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+            if (false !== $i = strpos($name, '::get')) {
+                $name = lcfirst(substr($name, 5 + $i));
+            } elseif (false !== strpos($name, '::')) {
+                $name = null;
+            }
+
+            $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $name);
             unset($serviceMap[$key]);
         }
 

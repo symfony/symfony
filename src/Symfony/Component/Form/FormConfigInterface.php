@@ -99,7 +99,7 @@ interface FormConfigInterface
     /**
      * Returns the data mapper of the form.
      *
-     * @return DataMapperInterface The data mapper
+     * @return DataMapperInterface|null The data mapper
      */
     public function getDataMapper();
 

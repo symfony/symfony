@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Einenlum at 2018-08-19T14:53:30Z
+
+Thank you very much for your feedbacks @nicolas-grekas :).
+I fixed your comments.
+A test is broken on 7.2 on Travis, but it seems it's not related to this PR ([link](https://travis-ci.org/symfony/symfony/jobs/417901863)).
+
+---------------------------------------------------------------------------
+
+by Einenlum at 2018-08-19T16:34:05Z
+
+Thanks @nicolas-grekas :). Fixed.
+
+---------------------------------------------------------------------------
+
+by Einenlum at 2018-08-20T13:39:01Z
+
+@stof Thank you for your feedback. I fixed it.

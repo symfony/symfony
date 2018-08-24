@@ -43,6 +43,7 @@ class SubRequestHandler
         if (!IpUtils::checkIp($remoteAddr, $trustedProxies)) {
             foreach (array_filter($trustedHeaders) as $name) {
                 $request->headers->remove($name);
+                $request->server->remove('HTTP_'.strtoupper(str_replace('-', '_', $name)));
             }
         }
 
@@ -61,13 +62,16 @@ class SubRequestHandler
         // set trusted values, reusing as much as possible the global trusted settings
         if ($name = $trustedHeaders[Request::HEADER_FORWARDED]) {
             $trustedValues[0] .= sprintf(';host="%s";proto=%s', $request->getHttpHost(), $request->getScheme());
-            $request->headers->set($name, implode(', ', $trustedValues));
+            $request->headers->set($name, $v = implode(', ', $trustedValues));
+            $request->server->set('HTTP_'.strtoupper(str_replace('-', '_', $name)), $v);
         }
         if ($name = $trustedHeaders[Request::HEADER_CLIENT_IP]) {
-            $request->headers->set($name, implode(', ', $trustedIps));
+            $request->headers->set($name, $v = implode(', ', $trustedIps));
+            $request->server->set('HTTP_'.strtoupper(str_replace('-', '_', $name)), $v);
         }
         if (!$name && !$trustedHeaders[Request::HEADER_FORWARDED]) {
-            $request->headers->set('X-Forwarded-For', implode(', ', $trustedIps));
+            $request->headers->set('X-Forwarded-For', $v = implode(', ', $trustedIps));
+            $request->server->set('HTTP_X_FORWARDED_FOR', $v);
             Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, 'X_FORWARDED_FOR');
         }
 

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by dontub at 2018-07-07T18:06:52Z
+
+The test fails because `ClockMock` is used from the vendor directory. Shall I add `require_once(__DIR__ . '/../ClockMock.php');` to `ClockMockTest.php` to avoid this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-08T09:00:34Z
+
+Thanks for the PR @dontub
+Since this is a new feature, it should be submitted on master.
+That may help on the test suite (not sure, let's see)
+
+---------------------------------------------------------------------------
+
+by dontub at 2018-07-09T09:43:51Z
+
+I thought it is more bug fix than feature because it fixes unexpected behaviour, though I can understand if you see it as feature.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2018-07-12T12:11:46Z
+
+Hi @nicolas-grekas and @dontub I detected a small bug in the microtime(false) function (it should have 8 decimal positions instead of 6). I don't know if I should send a specific PR just for that bug or add it to this one? Also...I have the problem of running the tests, it uses the ClockMock of the vendor directory, how did you end up fixing it?
+
+https://3v4l.org/GYacF
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by dontub at 2018-07-13T06:44:08Z
+
+@acasademont I also noticed this issue (see end of the initial comment). You can run the tests for the phpunit bridge directly from the Bridge/PhpUnit/ directory. Just run `composer install` there and then `./bin/simple-phpunit`.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2018-08-22T11:31:16Z
+
+Oops sorry, missed the comment. @nicolas-grekas should we also fix that? I believe it might depend on the OS PHP is installed in? On Mac/LInux is 8 decimal positions
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-22T11:38:59Z
+
+@acasademont fix welcome (it's always 8 decimals on all OSes so it's safe fixing unconditionally.)
+
+---------------------------------------------------------------------------
+
+by acasademont at 2018-08-24T12:08:55Z
+
+@nicolas-grekas sure no problem! I was waiting for this one to be merged so that I could reuse the newly created tests. Although it's such a small fix maybe @dontub can include it in this PR...

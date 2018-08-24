@@ -48,7 +48,6 @@ $composerJsons = array();
 
 foreach ($dirs as $dir) {
     if (!file_exists($dir.'/composer.lock') || !$composerLock = @json_decode(file_get_contents($dir.'/composer.lock'), true)) {
-        echo "$dir/composer.lock not found or invalid.\n";
         @unlink($dir.'/composer.lock');
         continue;
     }
@@ -62,7 +61,8 @@ foreach ($dirs as $dir) {
         @unlink($dir.'/composer.lock');
         continue;
     }
-    $composerJsons[$composerJson['name']] = array($dir, $composerLock['packages'], getRelevantContent($composerJson));
+    $composerLock += array('packages' => array(), 'packages-dev' => array());
+    $composerJsons[$composerJson['name']] = array($dir, $composerLock['packages'] + $composerLock['packages-dev'], getRelevantContent($composerJson));
 }
 
 $referencedCommits = array();

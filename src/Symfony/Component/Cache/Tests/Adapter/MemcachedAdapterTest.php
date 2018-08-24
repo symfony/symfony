@@ -89,6 +89,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
         $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
+        $this->assertSame(1, $client->getOption(\Memcached::OPT_TCP_NODELAY));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
     }
 

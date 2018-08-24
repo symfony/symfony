@@ -538,6 +538,17 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTime expected.');
     }
 
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "DateTime", "NULL" given
+     */
+    public function testThrowTypeErrorWithNullArgument()
+    {
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'date', null);
+    }
+
     public function testSetTypeHint()
     {
         $date = new \DateTime();
@@ -578,5 +589,17 @@ class PropertyAccessorTest extends TestCase
         $object = new ReturnTyped();
 
         $this->propertyAccessor->setValue($object, 'foos', array(new \DateTime()));
+    }
+
+    /**
+     * @requires PHP 7
+     *
+     * @expectedException \TypeError
+     */
+    public function testDoNotDiscardReturnTypeErrorWhenWriterMethodIsMisconfigured()
+    {
+        $object = new ReturnTyped();
+
+        $this->propertyAccessor->setValue($object, 'name', 'foo');
     }
 }

@@ -361,33 +361,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         $params = array_merge($params, $data[$paramName]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    $parameterData = $data[$key];
-                    if (null === $parameterData && $constructorParameter->allowsNull()) {
-                        $params[] = null;
-                        // Don't run set for a parameter passed to the constructor
-                        unset($data[$key]);
-                        continue;
-                    }
-                    try {
-                        if (null !== $constructorParameter->getClass()) {
-                            if (!$this->serializer instanceof DenormalizerInterface) {
-                                throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), static::class));
-                            }
-                            $parameterClass = $constructorParameter->getClass()->getName();
-                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $paramName));
-                        }
-                    } catch (\ReflectionException $e) {
-                        throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
-                    } catch (MissingConstructorArgumentsException $e) {
-                        if (!$constructorParameter->getType()->allowsNull()) {
-                            throw $e;
-                        }
-                        $parameterData = null;
-                    }
-
-                    // Don't run set for a parameter passed to the constructor
-                    $params[] = $parameterData;
-                    unset($data[$key]);
+                    $params[] = $this->createConstructorArgument($data, $key, $constructorParameter, $context, $format);
                 } elseif (isset($context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key])) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
@@ -405,6 +379,51 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         return new $class();
+    }
+
+    /**
+     * @param array                $data
+     * @param string               $key
+     * @param \ReflectionParameter $constructorParameter
+     * @param array                $context
+     * @param string|null          $format
+     *
+     * @return mixed value of constructor parameter - an argument
+     *
+     * @throws LogicException
+     * @throws RuntimeException
+     * @throws MissingConstructorArgumentsException
+     */
+    protected function createConstructorArgument(array &$data, string $key, \ReflectionParameter $constructorParameter, array &$context, string $format = null)
+    {
+        $parameterData = $data[$key];
+        if (null === $parameterData && $constructorParameter->allowsNull()) {
+            // Don't run set for a parameter passed to the constructor
+            unset($data[$key]);
+
+            return null;
+        }
+        try {
+            if (null !== $constructorParameter->getClass()) {
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), static::class));
+                }
+                $parameterClass = $constructorParameter->getClass()->getName();
+                $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $constructorParameter->name));
+            }
+        } catch (\ReflectionException $e) {
+            throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
+        } catch (MissingConstructorArgumentsException $e) {
+            if (!$constructorParameter->getType()->allowsNull()) {
+                throw $e;
+            }
+            $parameterData = null;
+        }
+
+        // Don't run set for a parameter passed to the constructor
+        unset($data[$key]);
+
+        return $parameterData;
     }
 
     /**

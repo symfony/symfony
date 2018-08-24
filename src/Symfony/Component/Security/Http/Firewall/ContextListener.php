@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -154,6 +155,8 @@ class ContextListener implements ListenerInterface
                 }
 
                 return $token;
+            } catch (InvalidArgumentException $e) {
+                // let's try the next user provider
             } catch (UnsupportedUserException $e) {
                 // let's try the next user provider
             } catch (UsernameNotFoundException $e) {

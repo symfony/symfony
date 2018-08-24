@@ -906,7 +906,7 @@ class RequestTest extends TestCase
 
     public function getClientIpsProvider()
     {
-        //        $expected                   $remoteAddr                $httpForwardedFor            $trustedProxies
+        //        $expected                          $remoteAddr                 $httpForwardedFor            $trustedProxies
         return array(
             // simple IPv4
             array(array('88.88.88.88'),              '88.88.88.88',              null,                        null),
@@ -920,8 +920,8 @@ class RequestTest extends TestCase
 
             // forwarded for with remote IPv4 addr not trusted
             array(array('127.0.0.1'),                '127.0.0.1',                '88.88.88.88',               null),
-            // forwarded for with remote IPv4 addr trusted
-            array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88',               array('127.0.0.1')),
+            // forwarded for with remote IPv4 addr trusted + comma
+            array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88,',              array('127.0.0.1')),
             // forwarded for with remote IPv4 and all FF addrs trusted
             array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88',               array('127.0.0.1', '88.88.88.88')),
             // forwarded for with remote IPv4 range trusted

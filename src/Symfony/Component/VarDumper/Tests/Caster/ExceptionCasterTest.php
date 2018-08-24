@@ -227,4 +227,21 @@ EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
     }
+
+    public function testAnonymous()
+    {
+        $e = new \Exception(sprintf('Boo "%s" ba.', \get_class(new class('Foo') extends \Exception {
+        })));
+
+        $expectedDump = <<<'EODUMP'
+Exception {
+  #message: "Boo "Exception@anonymous" ba."
+  #code: 0
+  #file: "%sExceptionCasterTest.php"
+  #line: %d
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
+    }
 }

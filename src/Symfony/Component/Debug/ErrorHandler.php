@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
@@ -405,7 +406,11 @@ class ErrorHandler
             $context = $e;
         }
 
-        $logMessage = $this->levels[$type].': '.$message;
+        if (false !== strpos($message, "class@anonymous\0")) {
+            $logMessage = $this->levels[$type].': '.(new FlattenException())->setMessage($message)->getMessage();
+        } else {
+            $logMessage = $this->levels[$type].': '.$message;
+        }
 
         if (null !== self::$toStringException) {
             $errorAsException = self::$toStringException;
@@ -518,21 +523,24 @@ class ErrorHandler
         $handlerException = null;
 
         if (($this->loggedErrors & $type) || $exception instanceof FatalThrowableError) {
+            if (false !== strpos($message = $exception->getMessage(), "class@anonymous\0")) {
+                $message = (new FlattenException())->setMessage($message)->getMessage();
+            }
             if ($exception instanceof FatalErrorException) {
                 if ($exception instanceof FatalThrowableError) {
                     $error = array(
                         'type' => $type,
-                        'message' => $message = $exception->getMessage(),
+                        'message' => $message,
                         'file' => $exception->getFile(),
                         'line' => $exception->getLine(),
                     );
                 } else {
-                    $message = 'Fatal '.$exception->getMessage();
+                    $message = 'Fatal '.$message;
                 }
             } elseif ($exception instanceof \ErrorException) {
-                $message = 'Uncaught '.$exception->getMessage();
+                $message = 'Uncaught '.$message;
             } else {
-                $message = 'Uncaught Exception: '.$exception->getMessage();
+                $message = 'Uncaught Exception: '.$message;
             }
         }
         if ($this->loggedErrors & $type) {

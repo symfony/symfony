@@ -333,6 +333,19 @@ class FlattenExceptionTest extends TestCase
         $this->assertNotContains('*value1*', $serializeTrace);
     }
 
+    public function testAnonymousClass()
+    {
+        $flattened = FlattenException::create(new class() extends \RuntimeException {
+        });
+
+        $this->assertSame('RuntimeException@anonymous', $flattened->getClass());
+
+        $flattened = FlattenException::create(new \Exception(sprintf('Class "%s" blah.', \get_class(new class() extends \RuntimeException {
+        }))));
+
+        $this->assertSame('Class "RuntimeException@anonymous" blah.', $flattened->getMessage());
+    }
+
     private function createException($foo)
     {
         return new \Exception();

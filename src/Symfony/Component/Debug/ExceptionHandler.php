@@ -253,7 +253,8 @@ EOF
         } catch (\Exception $e) {
             // something nasty happened and we cannot throw an exception anymore
             if ($this->debug) {
-                $title = sprintf('Exception thrown when handling an exception (%s: %s)', \get_class($e), $this->escapeHtml($e->getMessage()));
+                $e = FlattenException::create($e);
+                $title = sprintf('Exception thrown when handling an exception (%s: %s)', $e->getClass(), $this->escapeHtml($e->getMessage()));
             } else {
                 $title = 'Whoops, looks like something went wrong.';
             }

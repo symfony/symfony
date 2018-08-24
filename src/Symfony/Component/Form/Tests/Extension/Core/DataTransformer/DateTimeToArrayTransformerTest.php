@@ -39,12 +39,12 @@ class DateTimeToArrayTransformerTest extends TestCase
         $transformer = new DateTimeToArrayTransformer();
 
         $output = array(
-            'year' => '',
-            'month' => '',
-            'day' => '',
-            'hour' => '',
-            'minute' => '',
-            'second' => '',
+            'year' => null,
+            'month' => null,
+            'day' => null,
+            'hour' => null,
+            'minute' => null,
+            'second' => null,
         );
 
         $this->assertSame($output, $transformer->transform(null));
@@ -55,9 +55,9 @@ class DateTimeToArrayTransformerTest extends TestCase
         $transformer = new DateTimeToArrayTransformer(null, null, array('year', 'minute', 'second'));
 
         $output = array(
-            'year' => '',
-            'minute' => '',
-            'second' => '',
+            'year' => null,
+            'minute' => null,
+            'second' => null,
         );
 
         $this->assertSame($output, $transformer->transform(null));

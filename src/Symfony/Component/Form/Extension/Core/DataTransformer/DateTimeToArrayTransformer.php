@@ -60,12 +60,12 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     {
         if (null === $dateTime) {
             return array_intersect_key(array(
-                'year' => '',
-                'month' => '',
-                'day' => '',
-                'hour' => '',
-                'minute' => '',
-                'second' => '',
+                'year' => null,
+                'month' => null,
+                'day' => null,
+                'hour' => null,
+                'minute' => null,
+                'second' => null,
             ), array_flip($this->fields));
         }
 

@@ -160,7 +160,12 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     private static function throwInvalidArgumentException($message, $trace, $i, $propertyPath)
     {
-        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && isset($trace[$i]['args'][0])) {
+        // the type mismatch is not caused by invalid arguments (but e.g. by an incompatible return type hint of the writer method)
+        if (0 !== strpos($message, 'Argument ')) {
+            return;
+        }
+
+        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && array_key_exists(0, $trace[$i]['args'])) {
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
             $pos += \strlen($delim);
             $type = $trace[$i]['args'][0];

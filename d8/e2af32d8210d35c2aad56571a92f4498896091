@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-21T10:06:04Z
+
+Now with a new `ContainerBuilder::registerAliasForArgument()` method used in FrameworkExtension to create such aliases for cache pool, lock resources and messenger buses.
+E.g. type hint `public function __construct(MessageBusInterface $commandBus)` to get the bus declared as "command_bus" in your config.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-08-22T17:39:10Z
+
+I really like it!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-23T09:49:09Z
+
+> add a test for a service named some_service
+
+done as `ContainerBuilderTest::testRegisterAliasForArgument()`

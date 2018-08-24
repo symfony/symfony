@@ -57,6 +57,7 @@ class SubRequestHandler
             foreach ($trustedHeaders as $key => $name) {
                 if ($trustedHeaderSet & $key) {
                     $request->headers->remove($name);
+                    $request->server->remove('HTTP_'.strtoupper(str_replace('-', '_', $name)));
                 }
             }
         }
@@ -76,13 +77,16 @@ class SubRequestHandler
         // set trusted values, reusing as much as possible the global trusted settings
         if (Request::HEADER_FORWARDED & $trustedHeaderSet) {
             $trustedValues[0] .= sprintf(';host="%s";proto=%s', $request->getHttpHost(), $request->getScheme());
-            $request->headers->set($trustedHeaders[Request::HEADER_FORWARDED], implode(', ', $trustedValues));
+            $request->headers->set($name = $trustedHeaders[Request::HEADER_FORWARDED], $v = implode(', ', $trustedValues));
+            $request->server->set('HTTP_'.strtoupper(str_replace('-', '_', $name)), $v);
         }
         if (Request::HEADER_X_FORWARDED_FOR & $trustedHeaderSet) {
-            $request->headers->set($trustedHeaders[Request::HEADER_X_FORWARDED_FOR], implode(', ', $trustedIps));
+            $request->headers->set($name = $trustedHeaders[Request::HEADER_X_FORWARDED_FOR], $v = implode(', ', $trustedIps));
+            $request->server->set('HTTP_'.strtoupper(str_replace('-', '_', $name)), $v);
         } elseif (!(Request::HEADER_FORWARDED & $trustedHeaderSet)) {
             Request::setTrustedProxies($trustedProxies, $trustedHeaderSet | Request::HEADER_X_FORWARDED_FOR);
-            $request->headers->set($trustedHeaders[Request::HEADER_X_FORWARDED_FOR], implode(', ', $trustedIps));
+            $request->headers->set($name = $trustedHeaders[Request::HEADER_X_FORWARDED_FOR], $v = implode(', ', $trustedIps));
+            $request->server->set('HTTP_'.strtoupper(str_replace('-', '_', $name)), $v);
         }
 
         // fix the client IP address by setting it to 127.0.0.1,

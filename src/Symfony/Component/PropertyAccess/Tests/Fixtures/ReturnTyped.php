@@ -28,4 +28,9 @@ class ReturnTyped
     public function removeFoo(\DateTime $dateTime)
     {
     }
+
+    public function setName($name): self
+    {
+        return 'This does not respect the return type on purpose.';
+    }
 }

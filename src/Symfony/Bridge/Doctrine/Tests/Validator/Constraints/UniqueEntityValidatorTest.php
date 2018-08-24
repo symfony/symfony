@@ -482,7 +482,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
-            ->setParameter('{{ value }}', 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity") identified by (id => 1)')
+            ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue($entity1)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause(array($associated, $associated2))

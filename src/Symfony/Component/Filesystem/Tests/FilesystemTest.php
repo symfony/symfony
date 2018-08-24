@@ -1155,6 +1155,37 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(745, $filename);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     * @expectedExceptionMessageRegExp /^The parent path of ".*" is a file\.$/
+     */
+    public function testDumpFailsIfParentDirectoryIsAnExistingFile()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'foo';
+        $target = $file.DIRECTORY_SEPARATOR.'bar';
+        touch($file);
+
+        $this->filesystem->dumpFile($target, 'baz');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     * @expectedExceptionMessageRegExp /^The parent path of ".*" is a symlink to a nonexistent directory\.$/
+     */
+    public function testDumpFailsIfTargetIsSymlinkAndSymlinkTargetDoesNotExist()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'foo';
+        mkdir($dir);
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'bar';
+        symlink($dir, $link);
+        rmdir($dir);
+        $target = $link.DIRECTORY_SEPARATOR.'baz';
+
+        $this->filesystem->dumpFile($target, 'baz');
+    }
+
     public function testCopyShouldKeepExecutionPermission()
     {
         $this->markAsSkippedIfChmodIsMissing();

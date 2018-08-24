@@ -536,6 +536,14 @@ class Filesystem
         $dir = dirname($filename);
 
         if (!is_dir($dir)) {
+            if (is_file($dir)) {
+                throw new IOException(sprintf('The parent path of "%s" is a file.', $dir));
+            }
+
+            if (is_link($dir)) {
+                throw new IOException(sprintf('The parent path of "%s" is a symlink to a nonexistent directory.', $dir));
+            }
+
             $this->mkdir($dir);
         }
 

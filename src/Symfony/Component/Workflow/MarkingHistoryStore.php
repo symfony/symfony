@@ -37,7 +37,7 @@ final class MarkingHistoryStore
      * @param $marking Marking
      * @param $workflowName string
      */
-    public function updateMarkingHistory($subject, Transition $transition, Marking $marking, $workflowName)
+    public function updateMarkingHistory($subject, Transition $transition, Marking $marking, string $workflowName)
     {
         // get existing state history for this object
         $existingHistory = $this->historyPropertyAccessor->getValue($subject, $this->historyProperty) ?? array();

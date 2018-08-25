@@ -42,7 +42,6 @@ final class MarkingHistoryStore
         // get existing state history for this object
         $existingHistory = $this->historyPropertyAccessor->getValue($subject, $this->historyProperty) ?? array();
 
-
         // build the array to append to the log, using the workflow name as the log's key
         $arr = array();
         $dt = new \DateTime();

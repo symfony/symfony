@@ -85,4 +85,10 @@ interface WorkflowInterface
     public function getMarkingStore();
 
     public function getMetadataStore(): MetadataStoreInterface;
+    
+    /**
+     * Returns the optional Marking History Store for logging the state history on the entity
+     * @return null|MarkingHistoryStore
+     */
+    public function getMarkingHistoryStore() : ?MarkingHistoryStore;
 }

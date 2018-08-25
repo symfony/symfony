@@ -34,7 +34,7 @@ final class MarkingHistoryStore
     /**
      * @param $subject
      * @param $transition Transition
-     * @param $marking string
+     * @param $marking Marking
      * @param $workflowName string
      */
     public function updateMarkingHistory($subject, Transition $transition, Marking $marking, $workflowName)

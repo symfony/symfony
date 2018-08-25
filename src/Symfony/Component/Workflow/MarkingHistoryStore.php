@@ -40,7 +40,7 @@ final class MarkingHistoryStore
     public function updateMarkingHistory($subject, Transition $transition, Marking $marking, $workflowName)
     {
         // get existing state history for this object
-        $existingHistory = $this->historyPropertyAccessor->getValue($subject, $this->historyProperty) ?? [];
+        $existingHistory = $this->historyPropertyAccessor->getValue($subject, $this->historyProperty) ?? array();
 
 
         // build the array to append to the log, using the workflow name as the log's key
@@ -50,7 +50,7 @@ final class MarkingHistoryStore
         $arr['marking'] = $marking->getPlaces();
         $arr['transition'] = $transition->getName();
 
-        if ($this->memoProperty !== null) {
+        if (null !== $this->memoProperty) {
             $arr['memo'] = $this->memoPropertyAccessor->getValue($subject, $this->memoProperty) ?? '';  // an optional memo
         }
 

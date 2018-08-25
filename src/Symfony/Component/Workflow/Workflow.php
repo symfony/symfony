@@ -162,8 +162,7 @@ class Workflow implements WorkflowInterface
 
             $this->markingStore->setMarking($subject, $marking);
             
-            if ($this->markingHistoryStore !== null)
-            {
+            if ($this->markingHistoryStore !== null) {
                 $this->markingHistoryStore->updateMarkingHistory($subject, $transition, $marking, $this->getName());
             }
 
@@ -371,7 +370,7 @@ class Workflow implements WorkflowInterface
         }
     }
     
-    public function getMarkingHistoryStore() : ?MarkingHistoryStore
+    public function getMarkingHistoryStore(): ?MarkingHistoryStore
     {
         return $this->markingHistoryStore;
     }

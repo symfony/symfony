@@ -12,16 +12,20 @@
             <argument type="constant">null</argument> <!-- marking store -->
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
             <argument /> <!-- name -->
+            <argument type="constant">null</argument> <!-- marking history -->
         </service>
         <service id="state_machine.abstract" class="Symfony\Component\Workflow\StateMachine" abstract="true" public="true">
             <argument /> <!-- workflow definition -->
             <argument type="constant">null</argument> <!-- marking store -->
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
             <argument /> <!-- name -->
+            <argument type="constant">null</argument> <!-- marking history -->
         </service>
 
         <service id="workflow.marking_store.multiple_state" class="Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore" abstract="true" />
         <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
+
+        <service id="workflow.marking_history_store" class="Symfony\Component\Workflow\MarkingHistoryStore" abstract="true" />
 
         <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />
         <service id="Symfony\Component\Workflow\Registry" alias="workflow.registry" />

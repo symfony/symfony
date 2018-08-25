@@ -32,13 +32,15 @@ class Workflow implements WorkflowInterface
     private $markingStore;
     private $dispatcher;
     private $name;
+    private $markingHistoryStore;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed')
+    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', MarkingHistoryStore $markingHistoryStore = null)
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
+        $this->markingHistoryStore = $markingHistoryStore;
     }
 
     /**
@@ -159,6 +161,11 @@ class Workflow implements WorkflowInterface
             $this->enter($subject, $transition, $marking);
 
             $this->markingStore->setMarking($subject, $marking);
+            
+            if ($this->markingHistoryStore !== null)
+            {
+                $this->markingHistoryStore->updateMarkingHistory($subject, $transition, $marking, $this->getName());
+            }
 
             $this->entered($subject, $transition, $marking);
 
@@ -362,5 +369,10 @@ class Workflow implements WorkflowInterface
         foreach ($this->getEnabledTransitions($subject) as $transition) {
             $this->dispatcher->dispatch(sprintf('workflow.%s.announce.%s', $this->name, $transition->getName()), $event);
         }
+    }
+    
+    public function getMarkingHistoryStore() : ?MarkingHistoryStore
+    {
+        return $this->markingHistoryStore;
     }
 }

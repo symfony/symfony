@@ -11,8 +11,8 @@ use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
  */
 class StateMachine extends Workflow
 {
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed')
+    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', MarkingHistoryStore $markingHistoryStore = null)
     {
-        parent::__construct($definition, $markingStore ?: new SingleStateMarkingStore(), $dispatcher, $name);
+        parent::__construct($definition, $markingStore ?: new SingleStateMarkingStore(), $dispatcher, $name, $markingHistoryStore);
     }
 }

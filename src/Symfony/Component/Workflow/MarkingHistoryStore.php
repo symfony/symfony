@@ -14,9 +14,6 @@ namespace Symfony\Component\Workflow;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-/**
- *
- */
 final class MarkingHistoryStore
 {
     private $historyProperty;
@@ -30,7 +27,7 @@ final class MarkingHistoryStore
         $this->historyProperty = $historyProperty;
         $this->memoProperty = $memoProperty;
 
-        $this->historyPropertyAccessor = $historyPropertyAccessor ?? PropertyAccess::createPropertyAccessor();;
+        $this->historyPropertyAccessor = $historyPropertyAccessor ?? PropertyAccess::createPropertyAccessor();
         $this->memoPropertyAccessor = $memoPropertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
@@ -47,21 +44,20 @@ final class MarkingHistoryStore
 
 
         // build the array to append to the log, using the workflow name as the log's key
-        $arr = [];
+        $arr = array();
         $dt = new \DateTime();
         $arr['timestamp'] = $dt->format('Y-m-d H:i:s');
         $arr['marking'] = $marking->getPlaces();
         $arr['transition'] = $transition->getName();
 
-        if ($this->memoProperty !== null)
-        {
+        if ($this->memoProperty !== null) {
             $arr['memo'] = $this->memoPropertyAccessor->getValue($subject, $this->memoProperty) ?? '';  // an optional memo
         }
 
         // the key is used to allow logging the history of multiple workflows
         $key = $workflowName;
         if (!array_key_exists($key, $existingHistory)) {
-            $existingHistory[$key] = [];
+            $existingHistory[$key] = array();
         }
         $existingHistory[$key][] = $arr;
 
@@ -71,5 +67,4 @@ final class MarkingHistoryStore
         // finally, clear out the memo field now that it's been logged
         $this->memoPropertyAccessor->setValue($subject, $this->memoProperty, null);
     }
-
 }

@@ -573,8 +573,7 @@ class FrameworkExtension extends Extension
             }
 
             // create Marking History Store for optionally logging state history
-            if (isset($workflow['marking_history_store']))
-            {
+            if (isset($workflow['marking_history_store'])) {
                 $historyProperty = $workflow['marking_history_store']['history_property'];
                 $memoProperty = $workflow['marking_history_store']['memo_property'];
 
@@ -583,7 +582,7 @@ class FrameworkExtension extends Extension
                 $markingHistoryDefinition->addArgument($historyProperty);
                 $markingHistoryDefinition->addArgument($memoProperty);
             }
-            
+
             // Create Workflow
             $workflowId = sprintf('%s.%s', $type, $name);
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));

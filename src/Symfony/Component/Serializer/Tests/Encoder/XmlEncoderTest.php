@@ -773,6 +773,15 @@ XML;
         $this->assertEquals($expected, $this->encoder->encode($data, 'xml'));
     }
 
+    public function testEncodeWithoutPI()
+    {
+        $encoder = new XmlEncoder('response', null, array(), array(XML_PI_NODE));
+
+        $expected = '<response/>';
+
+        $this->assertEquals($expected, $encoder->encode(array(), 'xml'));
+    }
+
     /**
      * @return XmlEncoder
      */

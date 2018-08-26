@@ -31,8 +31,8 @@ class BinaryFileResponse extends Response
      * @var File
      */
     protected $file;
-    protected $offset;
-    protected $maxlen;
+    protected $offset = 0;
+    protected $maxlen = -1;
     protected $deleteFileAfterSend = false;
 
     /**
@@ -193,9 +193,6 @@ class BinaryFileResponse extends Response
         }
 
         $this->ensureIEOverSSLCompatibility($request);
-
-        $this->offset = 0;
-        $this->maxlen = -1;
 
         if (false === $fileSize = $this->file->getSize()) {
             return $this;

@@ -208,6 +208,21 @@ class BinaryFileResponseTest extends ResponseTestCase
         );
     }
 
+    public function testUnpreparedResponseSendsFullFile()
+    {
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif', 200);
+
+        $file = fopen(__DIR__.'/File/Fixtures/test.gif', 'r');
+        $data = fread($file, 35);
+        fclose($file);
+
+        $this->expectOutputString($data);
+        $response = clone $response;
+        $response->sendContent();
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     /**
      * @dataProvider provideInvalidRanges
      */

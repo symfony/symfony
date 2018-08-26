@@ -37,6 +37,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
 
     private $propertyTypeExtractor;
+    private $typesCache = array();
     private $attributesCache = array();
 
     /**
@@ -366,23 +367,30 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return null;
         }
 
+        $key = $currentClass.'::'.$attribute;
+        if (isset($this->typesCache[$key])) {
+            return false === $this->typesCache[$key] ? null : $this->typesCache[$key];
+        }
+
         if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
-            return $types;
+            return $this->typesCache[$key] = $types;
         }
 
         if (null !== $this->classDiscriminatorResolver && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($currentClass)) {
             if ($discriminatorMapping->getTypeProperty() === $attribute) {
-                return array(
+                return $this->typesCache[$key] = array(
                     new Type(Type::BUILTIN_TYPE_STRING),
                 );
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
                 if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute)) {
-                    return $types;
+                    return $this->typesCache[$key] = $types;
                 }
             }
         }
+
+        $this->typesCache[$key] = false;
 
         return null;
     }

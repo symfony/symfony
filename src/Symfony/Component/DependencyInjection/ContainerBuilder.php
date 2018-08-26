@@ -1350,7 +1350,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name ?? $id))));
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Invalid argument name "%s" for service "%s": the first character must be a letter.', $name, $id));
+            throw new InvalidArgumentException(sprintf('Invalid argument name "%s" for service "%s": the first character must be a letter.', $name, $id));
         }
 
         return $this->setAlias($type.' $'.$name, $id);

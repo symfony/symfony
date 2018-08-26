@@ -66,8 +66,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
         $this->propertyAccessor->setValue($subject, $this->property, key($marking->getPlaces()));
 
         // set date / time
-        if (null !== $this->timestampProperty)
-        {
+        if (null !== $this->timestampProperty) {
             $this->timestampPropertyAccessor->setValue($subject, $this->timestampProperty, new \DateTime());
         }
     }
@@ -80,4 +79,3 @@ class SingleStateMarkingStore implements MarkingStoreInterface
         return $this->property;
     }
 }
-

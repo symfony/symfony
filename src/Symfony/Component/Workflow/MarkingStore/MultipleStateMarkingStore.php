@@ -61,8 +61,7 @@ class MultipleStateMarkingStore implements MarkingStoreInterface
         $this->propertyAccessor->setValue($subject, $this->property, $marking->getPlaces());
 
         // set date / time
-        if (null !== $this->timestampProperty)
-        {
+        if (null !== $this->timestampProperty) {
             $this->timestampPropertyAccessor->setValue($subject, $this->timestampProperty, new \DateTime());
         }
     }
@@ -75,4 +74,3 @@ class MultipleStateMarkingStore implements MarkingStoreInterface
         return $this->property;
     }
 }
-

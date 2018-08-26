@@ -57,6 +57,7 @@ class ConsumeMessagesCommand extends Command
     protected function configure(): void
     {
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
+        $defaultBusName = 1 === \count($this->busNames) ? current($this->busNames) : null;
 
         $this
             ->setDefinition(array(
@@ -64,7 +65,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
-                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched', 'message_bus'),
+                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched', $defaultBusName),
             ))
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -107,11 +108,12 @@ EOF
             }
         }
 
-
         $busName = $input->getOption('bus');
-
-        if ($busName && $this->busNames && !$this->busLocator->has($busName) && $alternatives = $this->findAlternatives($busName, $this->busNames)) {
-            if ($alternatives = $this->findAlternatives($busName, $this->busNames)) {
+        if ($this->busNames && !$this->busLocator->has($busName)) {
+            if (null === $busName) {
+                $style->block('Missing bus argument.', null, 'error', ' ', true);
+                $input->setOption('bus', $style->choice('Select one of the available buses', $this->busNames));
+            } elseif ($alternatives = $this->findAlternatives($busName, $this->busNames)) {
                 $style->block(sprintf('Bus "%s" is not defined.', $busName), null, 'error', ' ', true);
 
                 if (1 === \count($alternatives)) {
@@ -135,7 +137,7 @@ EOF
         }
 
         if (!$this->busLocator->has($busName = $input->getOption('bus'))) {
-            throw new RuntimeException(sprintf('Bus "%s" does not exist.', $receiverName));
+            throw new RuntimeException(sprintf('Bus "%s" does not exist.', $busName));
         }
 
         $receiver = $this->receiverLocator->get($receiverName);

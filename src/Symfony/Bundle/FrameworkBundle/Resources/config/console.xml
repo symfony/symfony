@@ -74,7 +74,7 @@
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument>null</argument> <!-- Default receiver name -->
-            <argument type="collection" /> <!-- Message buses names -->
+            <argument type="collection" /> <!-- Message bus names -->
 
             <tag name="console.command" command="messenger:consume-messages" />
         </service>

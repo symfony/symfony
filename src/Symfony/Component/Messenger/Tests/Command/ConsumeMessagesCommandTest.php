@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
-use Symfony\Component\Messenger\MessageBus;
 
 class ConsumeMessagesCommandTest extends TestCase
 {

@@ -195,7 +195,6 @@ class MessengerPass implements CompilerPassInterface
                 ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
                 ->replaceArgument(4, $busIds);
         }
-
     }
 
     private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId): iterable

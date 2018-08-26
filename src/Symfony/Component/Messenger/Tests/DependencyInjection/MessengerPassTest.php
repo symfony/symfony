@@ -245,7 +245,7 @@ class MessengerPassTest extends TestCase
             new Reference('messenger.receiver_locator'),
             null,
             null,
-            null
+            null,
         ));
 
         $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));

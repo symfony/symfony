@@ -74,8 +74,8 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testReadSession()
     {
-        $this->setFixture(self::PREFIX.'id1', null);
-        $this->setFixture(self::PREFIX.'id2', 'abc123');
+        $this->redisClient->set(self::PREFIX.'id1', null);
+        $this->redisClient->set(self::PREFIX.'id2', 'abc123');
 
         $this->assertEquals('', $this->storage->read('id1'));
         $this->assertEquals('abc123', $this->storage->read('id2'));
@@ -85,14 +85,14 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     {
         $this->assertTrue($this->storage->write('id', 'data'));
 
-        $this->assertTrue($this->hasFixture(self::PREFIX.'id'));
-        $this->assertEquals('data', $this->getFixture(self::PREFIX.'id'));
+        $this->assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));
+        $this->assertEquals('data', $this->redisClient->get(self::PREFIX.'id'));
     }
 
     public function testUseSessionGcMaxLifetimeAsTimeToLive()
     {
         $this->storage->write('id', 'data');
-        $ttl = $this->fixtureTtl(self::PREFIX.'id');
+        $ttl = $this->redisClient->ttl(self::PREFIX.'id');
 
         $this->assertLessThanOrEqual(ini_get('session.gc_maxlifetime'), $ttl);
         $this->assertGreaterThanOrEqual(0, $ttl);
@@ -100,11 +100,11 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testDestroySession()
     {
-        $this->setFixture(self::PREFIX.'id', 'foo');
+        $this->redisClient->set(self::PREFIX.'id', 'foo');
 
-        $this->assertTrue($this->hasFixture(self::PREFIX.'id'));
+        $this->assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));
         $this->assertTrue($this->storage->destroy('id'));
-        $this->assertFalse($this->hasFixture(self::PREFIX.'id'));
+        $this->assertFalse((bool) $this->redisClient->exists(self::PREFIX.'id'));
     }
 
     public function testGcSession()
@@ -114,12 +114,12 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testUpdateTimestamp()
     {
-        $lowTTL = 10;
+        $lowTtl = 10;
 
-        $this->setFixture(self::PREFIX.'id', 'foo', $lowTTL);
+        $this->redisClient->setex(self::PREFIX.'id', $lowTtl, 'foo');
         $this->storage->updateTimestamp('id', array());
 
-        $this->assertGreaterThan($lowTTL, $this->fixtureTtl(self::PREFIX.'id'));
+        $this->assertGreaterThan($lowTtl, $this->redisClient->ttl(self::PREFIX.'id'));
     }
 
     /**
@@ -141,29 +141,5 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
             array(array('prefix' => 'session'), true),
             array(array('prefix' => 'sfs', 'foo' => 'bar'), false),
         );
-    }
-
-    protected function setFixture($key, $value, $ttl = null)
-    {
-        if (null !== $ttl) {
-            $this->redisClient->setex($key, $ttl, $value);
-        } else {
-            $this->redisClient->set($key, $value);
-        }
-    }
-
-    protected function getFixture($key)
-    {
-        return $this->redisClient->get($key);
-    }
-
-    protected function hasFixture($key): bool
-    {
-        return $this->redisClient->exists($key);
-    }
-
-    protected function fixtureTtl($key): int
-    {
-        return $this->redisClient->ttl($key);
     }
 }

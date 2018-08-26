@@ -44,8 +44,7 @@ final class MarkingHistoryStore
 
         // build the array to append to the log, using the workflow name as the log's key
         $arr = array();
-        $dt = new \DateTime();
-        $arr['timestamp'] = $dt->format('Y-m-d H:i:s');
+        $arr['timestamp'] = date('Y-m-d H:i:s');
         $arr['marking'] = $marking->getPlaces();
         $arr['transition'] = $transition->getName();
 

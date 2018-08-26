@@ -43,7 +43,7 @@ class Serializer implements DecoderInterface, EncoderInterface
             throw new \InvalidArgumentException('Encoded envelope does not have a `type` header.');
         }
 
-        $envelopeItems = isset($encodedEnvelope['headers']['X-Message-Envelope-Items']) ? unserialize($encodedEnvelope['headers']['X-Message-Envelope-Items']) : array();
+        $envelopeItems = $this->decodeEnvelopeItems($encodedEnvelope);
 
         $context = $this->context;
         /** @var SerializerConfiguration|null $serializerConfig */
@@ -67,14 +67,39 @@ class Serializer implements DecoderInterface, EncoderInterface
             $context = $serializerConfig->getContext() + $context;
         }
 
-        $headers = array('type' => \get_class($envelope->getMessage()));
-        if ($configurations = $envelope->all()) {
-            $headers['X-Message-Envelope-Items'] = serialize($configurations);
-        }
+        $headers = array('type' => \get_class($envelope->getMessage())) + $this->encodeEnvelopeItems($envelope);
 
         return array(
             'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
             'headers' => $headers,
         );
+    }
+
+    private function decodeEnvelopeItems($encodedEnvelope)
+    {
+        $items = array();
+        foreach ($encodedEnvelope['headers'] as $name => $value) {
+            if (0 !== strpos($name, $prefix = 'X-Message-Envelope-')) {
+                continue;
+            }
+
+            $items[] = $this->serializer->deserialize($value, substr($name, \strlen($prefix)), $this->format, $this->context);
+        }
+
+        return $items;
+    }
+
+    private function encodeEnvelopeItems(Envelope $envelope)
+    {
+        if (!$configurations = $envelope->all()) {
+            return array();
+        }
+
+        $headers = array();
+        foreach ($configurations as $configuration) {
+            $headers['X-Message-Envelope-'.\get_class($configuration)] = $this->serializer->serialize($configuration, $this->format, $this->context);
+        }
+
+        return $headers;
     }
 }

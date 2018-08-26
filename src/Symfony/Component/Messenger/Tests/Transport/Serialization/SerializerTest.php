@@ -80,15 +80,17 @@ class SerializerTest extends TestCase
         $this->assertSame($message, $decoded->getMessage());
     }
 
-    public function testEncodedWithSerializationConfiguration()
+    public function testEncodedWithSymfonySerializerForItems()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder())),
+            'json',
+            array()
         );
 
         $envelope = Envelope::wrap(new DummyMessage('Hello'))
-            ->with(new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
-            ->with(new ValidationConfiguration(array('foo', 'bar')))
+            ->with($serializerConfiguration = new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
+            ->with($validationConfiguration = new ValidationConfiguration(array('foo', 'bar')))
         ;
 
         $encoded = $serializer->encode($envelope);
@@ -96,8 +98,12 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('body', $encoded);
         $this->assertArrayHasKey('headers', $encoded);
         $this->assertArrayHasKey('type', $encoded['headers']);
-        $this->assertEquals(DummyMessage::class, $encoded['headers']['type']);
-        $this->assertArrayHasKey('X-Message-Envelope-Items', $encoded['headers']);
-        $this->assertSame('a:2:{s:75:"Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration";O:75:"Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration":1:{s:84:"'."\0".'Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration'."\0".'context";a:1:{s:6:"groups";a:1:{i:0;s:3:"foo";}}}s:76:"Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration";O:76:"Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration":1:{s:84:"'."\0".'Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration'."\0".'groups";a:2:{i:0;s:3:"foo";i:1;s:3:"bar";}}}', $encoded['headers']['X-Message-Envelope-Items']);
+        $this->assertArrayHasKey('X-Message-Envelope-Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration', $encoded['headers']);
+        $this->assertArrayHasKey('X-Message-Envelope-Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration', $encoded['headers']);
+
+        $decoded = $serializer->decode($encoded);
+
+        $this->assertEquals($serializerConfiguration, $decoded->get(SerializerConfiguration::class));
+        $this->assertEquals($validationConfiguration, $decoded->get(ValidationConfiguration::class));
     }
 }

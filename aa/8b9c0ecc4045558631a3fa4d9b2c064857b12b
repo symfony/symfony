@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T10:23:54Z
+
+@michaelperrin I added a Redis cluster in #28255. Can you please rebase and add a test case by taking inspiration from this PR?
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2018-08-24T16:34:09Z
+
+Thank you very much @nicolas-grekas, that is indeed useful to have a Redis cluster for tests.
+
+I updated tests in order to use it for tests using `RedisSessionHandler`.
+
+I didn't get why an extra `Redis` instance was created to make checks after values are written, instead of using the same Redis connection instance.
+The "validator" instance was always using the `Redis` class connecting to a given host (thus not working when using RedisCluster).
+
+To make everything work, I removed the validator in tests and used instead the `redisClient` instance, which is of the correct type whatever the test.
+
+Maybe you or @dkarlovi will know purpose of the `validator` Redis instance.
+
+Could you make sure that my changes are alright then? If everything looks fine, I will squash commits into one.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-08-24T17:02:19Z
+
+Validator is supposed to be used to connect to the test version of Redis and confirm the intended action happened regardless of the adapter used. Probably shouldn't be changed, but you be the judge, I'm on mobile.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-24T17:09:41Z
+
+@dkarlovi but shouldn't this `redisClient` be used to connect to redis ? That way, it works for RedisCluster too (otherwise, you would connect to the wrong redis)
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2018-08-24T17:10:17Z
+
+Thanks @dkarlovi for your insight :) I better understand now why you added this other instance.
+I would say that it may not be necessary as it is like testing if the Redis libraries work correctly, but I would prefer to be sure.
+
+If we decide it is better to keep the "validator" instance, I will override the other methods in the new `RedisClusterSessionHandlerTest` class to make things work.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-08-24T17:22:32Z
+
+The idea is to have a stand-alone instance which independently confirms the intended action happened. Otherwise the adapter is testing itself and we're supposed to trust it implicitly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T18:21:39Z
+
+> it is like testing if the Redis libraries work correctly
+
+I agree with this statement, so I'm fine with a single Redis connection personally.

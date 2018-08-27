@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-18T07:01:15Z
+
+IMHO, this is a new "feature".
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-20T16:18:00Z
+
+The fact that infos in the toolbar are displayed using `inline-block` rather than `inline` means that they get hidden in block rather than truncated only at the max length (at least in firefox).
+/cc @javiereguiluz as you are the one who developed most of the toolbar styles IIRC.
+
+I agree that this should go in master.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-08-23T22:26:14Z
+
+Allright, master then.

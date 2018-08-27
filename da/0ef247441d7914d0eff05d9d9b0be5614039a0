@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by tolry at 2018-08-20T07:58:00Z
+
+since the naming is similar/identical it might be a good idea to distinguish this from the php core function http://php.net/manual/de/function.var-export.php ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-20T11:41:52Z
+
+@tolry we have the `VarDumper` component that provides a better `var_dump()` function. I think that the `VarExporter` name conveys what it should: this is a better `var_export()`.
+
+---------------------------------------------------------------------------
+
+by tolry at 2018-08-20T11:55:21Z
+
+@nicolas-grekas I guessed so, just thought it might be easier to grasp, if the explanation mentioned var_export explicitely. Ah, I see it's in there now - did you add it or did I miss it before? :grin:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-20T14:16:21Z
+
+@tolry  yes, I updated the description.
+
+PR is ready IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T11:31:55Z
+
+> Note that it's very likely it will require more maintenance than when it was internal.
+
+That's why I added more tests for more cases (and fixes) ;)
+
+Comments addressed, thanks for the review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-27T16:34:39Z
+
+Comments addressed thanks.

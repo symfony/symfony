@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Marshaller\PhpMarshaller;
+namespace Symfony\Component\VarExporter\Internal;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -20,20 +20,24 @@ class Configurator
 {
     public static $configurators = array();
 
+    public $registry;
+    public $values;
+    public $properties;
+    public $value;
+    public $wakeups;
+
     public function __construct(?Registry $registry, ?Values $values, array $properties, $value, array $wakeups)
     {
-        $this->{0} = $registry;
-        $this->{1} = $values;
-        $this->{2} = $properties;
-        $this->{3} = $value;
-        $this->{4} = $wakeups;
+        $this->registry = $registry;
+        $this->values = $values;
+        $this->properties = $properties;
+        $this->value = $value;
+        $this->wakeups = $wakeups;
     }
 
-    public static function __set_state($state)
+    public static function pop($objects, $values, $properties, $value, $wakeups)
     {
-        $objects = Registry::$objects;
         list(Registry::$objects, Registry::$references) = \array_pop(Registry::$stack);
-        list(, , $properties, $value, $wakeups) = $state;
 
         foreach ($properties as $class => $vars) {
             (self::$configurators[$class] ?? self::getConfigurator($class))($vars, $objects);

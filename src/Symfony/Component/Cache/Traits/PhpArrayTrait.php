@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Marshaller\PhpMarshaller;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
@@ -76,7 +76,7 @@ EOF;
                 $value = "'N;'";
             } elseif (\is_object($value) || \is_array($value)) {
                 try {
-                    $value = PhpMarshaller::marshall($value, $isStaticValue);
+                    $value = VarExporter::export($value, $isStaticValue);
                 } catch (\Exception $e) {
                     throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, \is_object($value) ? \get_class($value) : 'array'), 0, $e);
                 }
@@ -93,7 +93,8 @@ EOF;
             }
 
             if (!$isStaticValue) {
-                $value = "static function () {\nreturn {$value};\n}";
+                $value = str_replace("\n", "\n    ", $value);
+                $value = "static function () {\n    return {$value};\n}";
             }
             $hash = hash('md5', $value);
 

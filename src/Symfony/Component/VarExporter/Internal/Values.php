@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Marshaller\PhpMarshaller;
+namespace Symfony\Component\VarExporter\Internal;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
-class Reference
+class Values
 {
-    public $id;
+    public $values;
 
-    public function __construct(int $id)
+    public function __construct(array $values)
     {
-        $this->id = $id;
+        $this->values = $values;
     }
 }

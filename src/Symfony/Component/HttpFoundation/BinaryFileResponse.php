@@ -31,8 +31,8 @@ class BinaryFileResponse extends Response
      * @var File
      */
     protected $file;
-    protected $offset;
-    protected $maxlen;
+    protected $offset = 0;
+    protected $maxlen = -1;
     protected $deleteFileAfterSend = false;
 
     /**

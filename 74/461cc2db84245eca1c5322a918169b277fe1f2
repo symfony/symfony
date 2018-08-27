@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T11:45:34Z
+
+> this option should only be set when framework.session.cookie_secure === auto
+
+Which is already the case because "session_storage" is passed to "session.listener" only when `framework.session.cookie_secure === auto`. I added a note in the docblock of `SessionListener` about this.

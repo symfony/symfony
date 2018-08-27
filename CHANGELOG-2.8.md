@@ -7,6 +7,16 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.45 (2018-08-27)
+
+ * bug #28278 [HttpFoundation] Fix unprepared BinaryFileResponse sends empty file (wackymole)
+ * bug #28241 [HttpKernel] fix forwarding trusted headers as server parameters (nicolas-grekas)
+ * bug #28220 [PropertyAccess] fix type error handling when writing values (xabbuh)
+ * bug #28100 [Security] Call AccessListener after LogoutListener (chalasr)
+ * bug #28144 [HttpFoundation] fix false-positive ConflictingHeadersException (nicolas-grekas)
+ * bug #28055 [PropertyInfo] Allow nested collections (jderusse)
+ * bug #28083 Remove the Expires header when calling Response::expire() (javiereguiluz)
+
 * 2.8.44 (2018-08-01)
 
  * security #cve-2018-14774 [HttpKernel] fix trusted headers management in HttpCache and InlineFragmentRenderer (nicolas-grekas)

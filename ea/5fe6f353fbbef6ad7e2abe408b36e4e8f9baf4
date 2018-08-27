@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-08-24T10:34:14Z
+
+The outcome is interesting as well: it means we can't PR a change on the contract and in the code at the same time without Travis to fail (which is good).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T10:36:57Z
+
+Yes we can, as we create local packages for each modified components (including Contracts.)

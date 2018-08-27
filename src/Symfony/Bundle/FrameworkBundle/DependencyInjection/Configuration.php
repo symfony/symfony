@@ -482,7 +482,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_lifetime')->end()
                         ->scalarNode('cookie_path')->end()
                         ->scalarNode('cookie_domain')->end()
-                        ->booleanNode('cookie_secure')->end()
+                        ->enumNode('cookie_secure')->values(array(true, false, 'auto'))->end()
                         ->booleanNode('cookie_httponly')->defaultTrue()->end()
                         ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()

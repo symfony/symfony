@@ -423,6 +423,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
+
+        $expected = array('session', 'initialized_session');
+        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
     public function testRequest()
@@ -1241,6 +1244,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setLogger', $calls[0][0], 'Method name should be "setLogger"');
         $this->assertInstanceOf(Reference::class, $calls[0][1][0]);
         $this->assertSame('logger', (string) $calls[0][1][0], 'Argument should be a reference to "logger"');
+    }
+
+    public function testSessionCookieSecureAuto()
+    {
+        $container = $this->createContainerFromFile('session_cookie_secure_auto');
+
+        $expected = array('session', 'initialized_session', 'session_storage', 'request_stack');
+        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
     protected function createContainer(array $data = array())

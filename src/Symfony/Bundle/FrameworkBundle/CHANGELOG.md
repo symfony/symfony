@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead
  * Deprecated processing of services tagged `security.expression_language_provider` in favor of a new `AddExpressionLanguageProvidersPass` in SecurityBundle.
  * Enabled autoconfiguration for `Psr\Log\LoggerAwareInterface`
+ * Added new "auto" mode for `framework.session.cookie_secure` to turn it on when HTTPS is used
 
 4.1.0
 -----

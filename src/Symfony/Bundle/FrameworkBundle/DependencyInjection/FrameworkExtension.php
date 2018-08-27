@@ -765,6 +765,14 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if ('auto' === ($options['cookie_secure'] ?? null)) {
+            $locator = $container->getDefinition('session_listener')->getArgument(0);
+            $locator->setValues($locator->getValues() + array(
+                'session_storage' => new Reference('session.storage', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                'request_stack' => new Reference('request_stack'),
+            ));
+        }
+
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)

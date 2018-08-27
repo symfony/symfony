@@ -112,7 +112,7 @@
         <xsd:attribute name="cookie-lifetime" type="xsd:string" />
         <xsd:attribute name="cookie-path" type="xsd:string" />
         <xsd:attribute name="cookie-domain" type="xsd:string" />
-        <xsd:attribute name="cookie-secure" type="xsd:boolean" />
+        <xsd:attribute name="cookie-secure" type="cookie_secure" />
         <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
         <xsd:attribute name="use-cookies" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
@@ -328,6 +328,16 @@
             <xsd:any minOccurs="0" processContents="lax"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:simpleType name="cookie_secure">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="true" />
+            <xsd:enumeration value="false" />
+            <xsd:enumeration value="1" />
+            <xsd:enumeration value="0" />
+            <xsd:enumeration value="auto" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:simpleType name="workflow_type">
         <xsd:restriction base="xsd:string">

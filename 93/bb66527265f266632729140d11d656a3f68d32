@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-08-23T12:42:00Z
+
+Should this be done in 5.0 for other classes as well? I haven't done a full search across the codebase, but I know that at least the TokenInterface does this.
+
+https://github.com/symfony/symfony/blob/6a4de2278721d60deb42064764fcf72ee80446fd/src/Symfony/Component/Security/Core/Authentication/Token/TokenInterface.php#L22
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-23T12:52:59Z
+
+@iltar yep, but unfortunately those are not experimental anymore. I'd love to remove the "extends" also. Can we?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-08-23T13:13:58Z
+
+I'm not sure if the serialize/unserialize methods will be called _without_ the interface. What we _could_ do, is implement the methods in the interface extending `\Serializable` and mark it as deprecated in there. In any core-class extending this class, we can also throw a deprecation during serializing/unserializing. Downside is that you can't fix this deprecation until you've upgraded to the next major. Perhaps there are other solutions, but those won't be pretty (run-time class generation etc)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T11:37:20Z
+
+CHANGELOG & UPGRADE updated

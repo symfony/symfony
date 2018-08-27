@@ -378,7 +378,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif ('#comment' === $key) {
-                    $append = $this->appendComment($parentNode, $data);
+                    if (!\in_array(XML_COMMENT_NODE, $this->encoderIgnoredNodeTypes, true)) {
+                        $append = $this->appendComment($parentNode, $data);
+                    }
                 } elseif (\is_array($data) && false === is_numeric($key)) {
                     // Is this array fully numeric keys?
                     if (ctype_digit(implode('', array_keys($data)))) {

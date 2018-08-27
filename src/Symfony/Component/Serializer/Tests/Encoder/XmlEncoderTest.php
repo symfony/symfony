@@ -782,6 +782,21 @@ XML;
         $this->assertEquals($expected, $encoder->encode(array(), 'xml'));
     }
 
+    public function testEncodeWithoutComment()
+    {
+        $encoder = new XmlEncoder('response', null, array(), array(XML_COMMENT_NODE));
+
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response/>
+
+XML;
+
+        $data = array('#comment' => ' foo ');
+
+        $this->assertEquals($expected, $encoder->encode($data, 'xml'));
+    }
+
     /**
      * @return XmlEncoder
      */

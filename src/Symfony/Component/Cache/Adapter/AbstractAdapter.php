@@ -64,7 +64,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             null,
             CacheItem::class
         );
-        $getId = function ($key) { return $this->getId((string) $key); };
+        $getId = \Closure::fromCallable(array($this, 'getId'));
         $this->mergeByLifetime = \Closure::bind(
             function ($deferred, $namespace, &$expiredIds) use ($getId) {
                 $byLifetime = array();
@@ -72,6 +72,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                 $expiredIds = array();
 
                 foreach ($deferred as $key => $item) {
+                    $key = (string) $key;
                     if (null === $item->expiry) {
                         $ttl = 0 < $item->defaultLifetime ? $item->defaultLifetime : 0;
                     } elseif (0 >= $ttl = (int) ($item->expiry - $now)) {

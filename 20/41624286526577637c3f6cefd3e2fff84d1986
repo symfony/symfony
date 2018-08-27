@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by kevinjhappy at 2018-08-27T15:35:43Z
+
+Apparently with the option --no-dev, the option --no-suggest is skipped
+https://github.com/composer/composer/issues/2066
+So the change is great :+1:

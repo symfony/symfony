@@ -31,16 +31,4 @@ final class SerializerConfiguration implements EnvelopeItemInterface
     {
         return $this->context;
     }
-
-    public function serialize()
-    {
-        return serialize(array('context' => $this->context));
-    }
-
-    public function unserialize($serialized)
-    {
-        list('context' => $context) = unserialize($serialized, array('allowed_classes' => false));
-
-        $this->__construct($context);
-    }
 }

@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
 
 /**
  * Marker config for a received message.
+ *
  * This is mainly used by the `SendMessageMiddleware` middleware to identify
  * a message should not be sent if it was just received.
  *
@@ -25,13 +26,4 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
  */
 final class ReceivedMessage implements EnvelopeItemInterface
 {
-    public function serialize()
-    {
-        return '';
-    }
-
-    public function unserialize($serialized)
-    {
-        // noop
-    }
 }

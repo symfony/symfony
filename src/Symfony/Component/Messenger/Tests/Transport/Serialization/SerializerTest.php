@@ -98,6 +98,6 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('type', $encoded['headers']);
         $this->assertEquals(DummyMessage::class, $encoded['headers']['type']);
         $this->assertArrayHasKey('X-Message-Envelope-Items', $encoded['headers']);
-        $this->assertSame('a:2:{s:75:"Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration";C:75:"Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration":59:{a:1:{s:7:"context";a:1:{s:6:"groups";a:1:{i:0;s:3:"foo";}}}}s:76:"Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration";C:76:"Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration":82:{a:2:{s:6:"groups";a:2:{i:0;s:3:"foo";i:1;s:3:"bar";}s:17:"is_group_sequence";b:0;}}}', $encoded['headers']['X-Message-Envelope-Items']);
+        $this->assertSame('a:2:{s:75:"Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration";O:75:"Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration":1:{s:84:"'."\0".'Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration'."\0".'context";a:1:{s:6:"groups";a:1:{i:0;s:3:"foo";}}}s:76:"Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration";O:76:"Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration":1:{s:84:"'."\0".'Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration'."\0".'groups";a:2:{i:0;s:3:"foo";i:1;s:3:"bar";}}}', $encoded['headers']['X-Message-Envelope-Items']);
     }
 }

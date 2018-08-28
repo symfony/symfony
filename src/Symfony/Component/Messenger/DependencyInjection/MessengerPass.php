@@ -97,6 +97,7 @@ class MessengerPass implements CompilerPassInterface
                 $handlerBuses = (array) ($tag['bus'] ?? $busIds);
 
                 foreach ($handles as $messageClass => $method) {
+                    $buses = $handlerBuses;
                     if (\is_int($messageClass)) {
                         $messageClass = $method;
                         $method = '__invoke';
@@ -110,8 +111,30 @@ class MessengerPass implements CompilerPassInterface
                     }
 
                     if (\is_array($method)) {
-                        $messagePriority = $method[1];
-                        $method = $method[0];
+                        if (isset($method[0]) && isset($method[1])) {
+                            $messagePriority = $method[1];
+                            $method = $method[0];
+                        } elseif (isset($method['method']) || isset($method['bus'])) {
+                            if (isset($method['bus'])) {
+                                if (!\in_array($method['bus'], $busIds)) {
+                                    $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : $r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
+
+                                    throw new RuntimeException(sprintf('Invalid configuration %s for message "%s": bus "%s" does not exist.', $messageClassLocation, $messageClass, $method['bus']));
+                                }
+
+                                $buses = array($method['bus']);
+                            }
+
+                            if (isset($method['priority'])) {
+                                $messagePriority = $method['priority'];
+                            }
+
+                            $method = $method['method'] ?? '__invoke';
+                        } else {
+                            $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : $r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
+
+                            throw new RuntimeException(sprintf('Invalid configuration %s for message "%s".', $messageClassLocation, $messageClass));
+                        }
                     }
 
                     if (!\class_exists($messageClass)) {
@@ -132,7 +155,7 @@ class MessengerPass implements CompilerPassInterface
                         $definitionId = $serviceId;
                     }
 
-                    foreach ($handlerBuses as $handlerBus) {
+                    foreach ($buses as $handlerBus) {
                         $handlersByBusAndMessage[$handlerBus][$messageClass][$messagePriority][] = $definitionId;
                     }
                 }

@@ -144,6 +144,9 @@ EOF
 
             if (WebServer::STARTED === $server->start($config, $input->getOption('pidfile'))) {
                 $io->success(sprintf('Server listening on http://%s', $config->getAddress()));
+                if (ini_get('xdebug.profiler_enable_trigger')) {
+                    $io->comment('Xdebug profiler trigger enabled.');
+                }
             }
         } catch (\Exception $e) {
             $io->error($e->getMessage());

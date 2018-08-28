@@ -7,6 +7,21 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.15 (2018-08-28)
+
+ * bug #28278 [HttpFoundation] Fix unprepared BinaryFileResponse sends empty file (wackymole)
+ * bug #28284 [PhpUnitBridge] keep compat with composer 1.0 (nicolas-grekas)
+ * bug #28241 [HttpKernel] fix forwarding trusted headers as server parameters (nicolas-grekas)
+ * bug #28220 [PropertyAccess] fix type error handling when writing values (xabbuh)
+ * bug #28249 [Cache] enable Memcached::OPT_TCP_NODELAY to fix perf of misses (nicolas-grekas)
+ * bug #28252 [DoctrineBridge] support __toString as documented for UniqueEntityValidator (dmaicher)
+ * bug #28100 [Security] Call AccessListener after LogoutListener (chalasr)
+ * bug #28060 [DI] Fix false-positive circular ref leading to wrong exceptions or infinite loops at runtime (nicolas-grekas)
+ * bug #28144 [HttpFoundation] fix false-positive ConflictingHeadersException (nicolas-grekas)
+ * bug #28012 [PropertyInfo] Allow nested collections (jderusse)
+ * bug #28055 [PropertyInfo] Allow nested collections (jderusse)
+ * bug #28083 Remove the Expires header when calling Response::expire() (javiereguiluz)
+
 * 3.4.14 (2018-08-01)
 
  * security #cve-2018-14774 [HttpKernel] fix trusted headers management in HttpCache and InlineFragmentRenderer (nicolas-grekas)

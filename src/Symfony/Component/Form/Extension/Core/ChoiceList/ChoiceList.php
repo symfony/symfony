@@ -28,11 +28,9 @@ use Symfony\Component\Form\FormConfigBuilder;
  * can be stored in the array key pointing to the nested array. The topmost
  * level of the hierarchy may also be a \Traversable.
  *
- * <code>
- * $choices = array(true, false);
- * $labels = array('Agree', 'Disagree');
- * $choiceList = new ArrayChoiceList($choices, $labels);
- * </code>
+ *     $choices = array(true, false);
+ *     $labels = array('Agree', 'Disagree');
+ *     $choiceList = new ArrayChoiceList($choices, $labels);
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

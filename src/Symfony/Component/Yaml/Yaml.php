@@ -23,11 +23,10 @@ class Yaml
     /**
      * Parses YAML into a PHP value.
      *
-     *  Usage:
-     *  <code>
-     *   $array = Yaml::parse(file_get_contents('config.yml'));
-     *   print_r($array);
-     *  </code>
+     * Usage:
+     *
+     *     $array = Yaml::parse(file_get_contents('config.yml'));
+     *     print_r($array);
      *
      * As this method accepts both plain strings and file names as an input,
      * you must validate the input before calling this method. Passing a file

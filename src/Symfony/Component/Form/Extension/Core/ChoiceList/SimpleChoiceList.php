@@ -22,12 +22,10 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  * creating nested arrays. The title of the sub-hierarchy can be stored in the
  * array key pointing to the nested array.
  *
- * <code>
- * $choiceList = new SimpleChoiceList(array(
- *     'creditcard' => 'Credit card payment',
- *     'cash' => 'Cash payment',
- * ));
- * </code>
+ *     $choiceList = new SimpleChoiceList(array(
+ *         'creditcard' => 'Credit card payment',
+ *         'cash' => 'Cash payment',
+ *     ));
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

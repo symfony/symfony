@@ -33,11 +33,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * A service can also be defined by creating a method named
  * getXXXService(), where XXX is the camelized version of the id:
  *
- * <ul>
- *   <li>request -> getRequestService()</li>
- *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
- *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
- * </ul>
+ *  * request -> getRequestService()
+ *  * mysql_session_storage -> getMysqlSessionStorageService()
+ *  * symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()
  *
  * The container can have three possible behaviors when a service does not exist:
  *

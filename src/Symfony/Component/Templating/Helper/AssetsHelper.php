@@ -21,9 +21,7 @@ use Symfony\Component\Templating\Asset\UrlPackage;
  *
  * Usage:
  *
- * <code>
- *   <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
- * </code>
+ *     <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>

@@ -29,10 +29,8 @@ interface OptionsResolverInterface
      * evaluate the option value lazily. These closures must have one
      * of the following signatures:
      *
-     * <code>
-     * function (Options $options)
-     * function (Options $options, $value)
-     * </code>
+     *     function (Options $options)
+     *     function (Options $options, $value)
      *
      * The second parameter passed to the closure is the previously
      * set default value, in case you are overwriting an existing
@@ -154,9 +152,7 @@ interface OptionsResolverInterface
      *
      * The normalizers should be closures with the following signature:
      *
-     * <code>
-     * function (Options $options, $value)
-     * </code>
+     *     function (Options $options, $value)
      *
      * The second parameter passed to the closure is the value of
      * the option.

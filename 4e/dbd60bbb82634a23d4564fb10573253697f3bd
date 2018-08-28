@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-08-23T10:12:27Z
+
+aren't we running our testsuite with the DebugClassLoader enabled ? If no, it means that any deprecation coming from DebugClassLoader would be missed (and DebugClassLoader is the best place to report some of them, which is why we have this logic in it).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-23T10:37:00Z
+
+Nope, we're not, and there is a good reason to it: we always add runtime deprecation notices. And then, *IF* there is some `Symfony\*` class that must implement/extend some interface/class for BC, then we remove the runtime notice *so that our own code is deprecation free* in the phpunit report. As you can see, making `DebugClassLoader` report these would defeat the whole process.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T10:13:06Z
+
+See tests :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-08-26T12:11:58Z
+
+Updated; needed some tweaks since we trigger the depreciation when the file is loaded.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-08-26T17:06:10Z
+
+UPGRADE-4.2 needs to be updated
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-08-27T18:13:30Z
+
+@fabpot wording updated 👍

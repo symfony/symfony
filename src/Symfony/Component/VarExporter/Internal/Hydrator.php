@@ -16,9 +16,9 @@ namespace Symfony\Component\VarExporter\Internal;
  *
  * @internal
  */
-class Configurator
+class Hydrator
 {
-    public static $configurators = array();
+    public static $hydrators = array();
 
     public $registry;
     public $values;
@@ -35,12 +35,10 @@ class Configurator
         $this->wakeups = $wakeups;
     }
 
-    public static function pop($objects, $values, $properties, $value, $wakeups)
+    public static function hydrate($objects, $values, $properties, $value, $wakeups)
     {
-        list(Registry::$objects, Registry::$references) = \array_pop(Registry::$stack);
-
         foreach ($properties as $class => $vars) {
-            (self::$configurators[$class] ?? self::getConfigurator($class))($vars, $objects);
+            (self::$hydrators[$class] ?? self::getHydrator($class))($vars, $objects);
         }
         foreach ($wakeups as $i) {
             $objects[$i]->__wakeup();
@@ -49,18 +47,22 @@ class Configurator
         return $value;
     }
 
-    public static function getConfigurator($class)
+    public static function getHydrator($class)
     {
-        $classReflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
-
-        if (!$classReflector->isInternal()) {
-            return self::$configurators[$class] = \Closure::bind(function ($properties, $objects) {
+        if ('*' === $class) {
+            return self::$hydrators[$class] = static function ($properties, $objects) {
                 foreach ($properties as $name => $values) {
                     foreach ($values as $i => $v) {
                         $objects[$i]->$name = $v;
                     }
                 }
-            }, null, $class);
+            };
+        }
+
+        $classReflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
+
+        if (!$classReflector->isInternal()) {
+            return self::$hydrators[$class] = (self::$hydrators['*'] ?? self::getHydrator('*'))->bindTo(null, $class);
         }
 
         switch ($class) {
@@ -68,7 +70,7 @@ class Configurator
             case 'ArrayObject':
                 $constructor = $classReflector->getConstructor();
 
-                return self::$configurators[$class] = static function ($properties, $objects) use ($constructor) {
+                return self::$hydrators[$class] = static function ($properties, $objects) use ($constructor) {
                     foreach ($properties as $name => $values) {
                         if ("\0" !== $name) {
                             foreach ($values as $i => $v) {
@@ -81,8 +83,16 @@ class Configurator
                     }
                 };
 
+            case 'ErrorException':
+                return self::$hydrators[$class] = (self::$hydrators['*'] ?? self::getHydrator('*'))->bindTo(null, new class() extends \ErrorException {
+                });
+
+            case 'TypeError':
+                return self::$hydrators[$class] = (self::$hydrators['*'] ?? self::getHydrator('*'))->bindTo(null, new class() extends \Error {
+                });
+
             case 'SplObjectStorage':
-                return self::$configurators[$class] = static function ($properties, $objects) {
+                return self::$hydrators[$class] = static function ($properties, $objects) {
                     foreach ($properties as $name => $values) {
                         if ("\0" === $name) {
                             foreach ($values as $i => $v) {
@@ -100,23 +110,18 @@ class Configurator
         }
 
         $propertyReflectors = array();
-        foreach ($classReflector->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE) as $propertyReflector) {
+        foreach ($classReflector->getProperties() as $propertyReflector) {
             if (!$propertyReflector->isStatic()) {
                 $propertyReflector->setAccessible(true);
                 $propertyReflectors[$propertyReflector->name] = $propertyReflector;
             }
         }
 
-        return self::$configurators[$class] = static function ($properties, $objects) use ($propertyReflectors) {
+        return self::$hydrators[$class] = static function ($properties, $objects) use ($propertyReflectors) {
             foreach ($properties as $name => $values) {
-                if (isset($propertyReflectors[$name])) {
-                    foreach ($values as $i => $v) {
-                        $propertyReflectors[$name]->setValue($objects[$i], $v);
-                    }
-                } else {
-                    foreach ($values as $i => $v) {
-                        $objects[$i]->$name = $v;
-                    }
+                $p = $propertyReflectors[$name];
+                foreach ($values as $i => $v) {
+                    $p->setValue($objects[$i], $v);
                 }
             }
         };

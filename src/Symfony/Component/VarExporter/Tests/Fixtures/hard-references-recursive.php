@@ -1,15 +1,16 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Configurator::pop(
-    \Symfony\Component\VarExporter\Internal\Registry::push([], [], []),
+return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
+    $o = [],
     [
-        \Symfony\Component\VarExporter\Internal\Registry::$references[1] = [
-            &\Symfony\Component\VarExporter\Internal\Registry::$references[1],
+        $r = [],
+        $r[1] = [
+            &$r[1],
         ],
     ],
     [],
     [
-        &\Symfony\Component\VarExporter\Internal\Registry::$references[1],
+        &$r[1],
     ],
     []
 );

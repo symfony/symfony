@@ -1,12 +1,9 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Configurator::pop(
-    \Symfony\Component\VarExporter\Internal\Registry::push([
-        \Symfony\Component\VarExporter\Internal\Registry::$reflectors[\ArrayIterator::class] ?? \Symfony\Component\VarExporter\Internal\Registry::getClassReflector(\ArrayIterator::class, true, true),
-    ], [
-        clone \Symfony\Component\VarExporter\Internal\Registry::$prototypes[\ArrayIterator::class],
-    ], [
-    ]),
+return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
+    $o = [
+        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\ArrayIterator::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\ArrayIterator::class, true)),
+    ],
     null,
     [
         \ArrayIterator::class => [
@@ -20,6 +17,6 @@ return \Symfony\Component\VarExporter\Internal\Configurator::pop(
             ],
         ],
     ],
-    \Symfony\Component\VarExporter\Internal\Registry::$objects[0],
+    $o[0],
     []
 );

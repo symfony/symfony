@@ -12,9 +12,9 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\VarExporter\VarExporter;
-use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 class VarExporterTest extends TestCase
 {
@@ -28,7 +28,7 @@ class VarExporterTest extends TestCase
     {
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
-            Registry::push(array(), array(), array('O:20:"SomeNotExistingClass":0:{}'));
+            Registry::unserialize(array(), array('O:20:"SomeNotExistingClass":0:{}'));
         } finally {
             $this->assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
         }
@@ -80,10 +80,11 @@ class VarExporterTest extends TestCase
         $this->assertSame($serializedValue, serialize($value));
 
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
+        $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
         $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
-        if ('incomplete-class' === $testName) {
+        if ('incomplete-class' === $testName || 'external-references' === $testName) {
             return;
         }
         $marshalledValue = include $fixtureFile;
@@ -146,6 +147,24 @@ class VarExporterTest extends TestCase
         $value[0] = &$value;
 
         yield array('hard-references-recursive', $value);
+
+        static $value = array(123);
+
+        yield array('external-references', array(&$value), true);
+
+        unset($value);
+
+        $value = new \Error();
+
+        $r = new \ReflectionProperty('Error', 'trace');
+        $r->setAccessible(true);
+        $r->setValue($value, array('file' => __FILE__, 'line' => 123));
+
+        $r = new \ReflectionProperty('Error', 'line');
+        $r->setAccessible(true);
+        $r->setValue($value, 234);
+
+        yield array('error', $value);
     }
 }
 

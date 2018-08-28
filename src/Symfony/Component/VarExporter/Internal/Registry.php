@@ -18,11 +18,9 @@ namespace Symfony\Component\VarExporter\Internal;
  */
 class Registry
 {
-    public static $stack = array();
-    public static $objects = array();
-    public static $references = array();
     public static $reflectors = array();
     public static $prototypes = array();
+    public static $factories = array();
     public static $cloneable = array();
     public static $instantiableWithoutConstructor = array();
 
@@ -33,28 +31,33 @@ class Registry
         }
     }
 
-    public static function push($reflectors, $objects, $serializables)
+    public static function unserialize($objects, $serializables)
     {
-        self::$stack[] = array(self::$objects, self::$references);
-        self::$references = array();
-
-        if (!$serializables) {
-            return self::$objects = $objects;
-        }
         $unserializeCallback = ini_set('unserialize_callback_func', __CLASS__.'::getClassReflector');
 
         try {
             foreach ($serializables as $k => $v) {
                 $objects[$k] = unserialize($v);
             }
-        } catch (\Throwable $e) {
-            list(self::$objects, self::$references) = array_pop(self::$stack);
-            throw $e;
         } finally {
             ini_set('unserialize_callback_func', $unserializeCallback);
         }
 
-        return self::$objects = $objects;
+        return $objects;
+    }
+
+    public static function p($class, $instantiableWithoutConstructor)
+    {
+        self::getClassReflector($class, $instantiableWithoutConstructor, true);
+
+        return self::$prototypes[$class];
+    }
+
+    public static function f($class, $instantiableWithoutConstructor)
+    {
+        $reflector = self::$reflectors[$class] ?? self::getClassReflector($class, $instantiableWithoutConstructor, false);
+
+        return self::$factories[$class] = \Closure::fromCallable(array($reflector, $instantiableWithoutConstructor ? 'newInstanceWithoutConstructor' : 'newInstance'));
     }
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = null, $cloneable = null)

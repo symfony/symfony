@@ -48,10 +48,11 @@ class Exporter
                 $refs[$k] = $value = $values[$k];
                 if ($value instanceof Reference && 0 > $value->id) {
                     $valuesAreStatic = false;
+                    ++$value->count;
                     continue;
                 }
                 $refsPool[] = array(&$refs[$k], $value, &$value);
-                $refs[$k] = $values[$k] = new Reference(-\count($refsPool));
+                $refs[$k] = $values[$k] = new Reference(-\count($refsPool), $value);
             }
 
             if (\is_array($value)) {
@@ -80,12 +81,13 @@ class Exporter
                 Registry::getClassReflector($class);
                 serialize(Registry::$prototypes[$class]);
             }
+            $reflector = Registry::$reflectors[$class];
             $proto = Registry::$prototypes[$class];
 
             if ($value instanceof \ArrayIterator || $value instanceof \ArrayObject) {
                 // ArrayIterator and ArrayObject need special care because their "flags"
                 // option changes the behavior of the (array) casting operator.
-                $proto = Registry::$cloneable[$class] ? clone Registry::$prototypes[$class] : Registry::$reflectors[$class]->newInstanceWithoutConstructor();
+                $proto = Registry::$cloneable[$class] ? clone Registry::$prototypes[$class] : $reflector->newInstanceWithoutConstructor();
                 $properties = self::getArrayObjectProperties($value, $arrayValue, $proto);
             } elseif ($value instanceof \SplObjectStorage) {
                 // By implementing Serializable, SplObjectStorage breaks internal references,
@@ -116,20 +118,29 @@ class Exporter
             foreach ($arrayValue as $name => $v) {
                 $n = (string) $name;
                 if ('' === $n || "\0" !== $n[0]) {
-                    $c = $class;
+                    $c = '*';
+                    $properties[$c][$n] = $v;
+                    unset($sleep[$n]);
                 } elseif ('*' === $n[1]) {
-                    $c = $class;
                     $n = substr($n, 3);
+                    $c = $reflector->getProperty($n)->class;
+                    if ('Error' === $c) {
+                        $c = 'TypeError';
+                    } elseif ('Exception' === $c) {
+                        $c = 'ErrorException';
+                    }
+                    $properties[$c][$n] = $v;
+                    unset($sleep[$n]);
                 } else {
                     $i = strpos($n, "\0", 2);
                     $c = substr($n, 1, $i - 1);
                     $n = substr($n, 1 + $i);
-                }
-                if (null === $sleep) {
-                    $properties[$c][$n] = $v;
-                } elseif (isset($sleep[$n]) && $c === $class) {
-                    $properties[$c][$n] = $v;
-                    unset($sleep[$n]);
+                    if (null === $sleep) {
+                        $properties[$c][$n] = $v;
+                    } elseif (isset($sleep[$n]) && $c === $class) {
+                        $properties[$c][$n] = $v;
+                        unset($sleep[$n]);
+                    }
                 }
                 if (\array_key_exists($name, $proto) && $proto[$name] === $v) {
                     unset($properties[$c][$n]);
@@ -173,11 +184,14 @@ class Exporter
 
         if ($value instanceof Reference) {
             if (0 <= $value->id) {
-                return '\\'.Registry::class.'::$objects['.$value->id.']';
+                return '$o['.$value->id.']';
+            }
+            if (!$value->count) {
+                return self::export($value->value, $indent);
             }
             $value = -$value->id;
 
-            return '&\\'.Registry::class.'::$references['.$value.']';
+            return '&$r['.$value.']';
         }
         $subIndent = $indent.'    ';
 
@@ -213,9 +227,11 @@ class Exporter
             $code = '';
             foreach ($value as $k => $v) {
                 $code .= $subIndent;
-                if ($k !== ++$j) {
+                if (!\is_int($k) || 1 !== $k - $j) {
                     $code .= self::export($k, $subIndent).' => ';
-                    $j = INF;
+                }
+                if (\is_int($k)) {
+                    $j = $k;
                 }
                 $code .= self::export($v, $subIndent).",\n";
             }
@@ -224,82 +240,110 @@ class Exporter
         }
 
         if ($value instanceof Values) {
-            $code = '';
+            $code = $subIndent."\$r = [],\n";
             foreach ($value->values as $k => $v) {
-                $code .= $subIndent.'\\'.Registry::class.'::$references['.$k.'] = '.self::export($v, $subIndent).",\n";
+                $code .= $subIndent.'$r['.$k.'] = '.self::export($v, $subIndent).",\n";
             }
 
             return "[\n".$code.$indent.']';
         }
 
         if ($value instanceof Registry) {
-            $code = '';
-            $reflectors = array();
-            $serializables = array();
-
-            foreach ($value as $k => $class) {
-                if (':' === ($class[1] ?? null)) {
-                    $serializables[$k] = $class;
-                    continue;
-                }
-                $c = '\\'.$class.'::class';
-                $reflectors[$class] = '\\'.Registry::class.'::$reflectors['.$c.'] ?? \\'.Registry::class.'::getClassReflector('.$c.', '
-                    .self::export(Registry::$instantiableWithoutConstructor[$class]).', '
-                    .self::export(Registry::$cloneable[$class])
-                .')';
-
-                if (Registry::$cloneable[$class]) {
-                    $code .= $subIndent.'clone \\'.Registry::class.'::$prototypes['.$c."],\n";
-                } elseif (Registry::$instantiableWithoutConstructor[$class]) {
-                    $code .= $subIndent.'\\'.Registry::class.'::$reflectors['.$c."]->newInstanceWithoutConstructor(),\n";
-                } else {
-                    $code .= $subIndent.'\\'.Registry::class.'::$reflectors['.$c."]->newInstance(),\n";
-                }
-            }
-
-            if ($reflectors) {
-                $code = "[\n".$subIndent.implode(",\n".$subIndent, $reflectors).",\n".$indent."], [\n".$code.$indent.'], ';
-                $code .= !$serializables ? "[\n".$indent.']' : self::export($serializables, $indent);
-            } else {
-                $code = '[], []';
-                $code .= ', '.self::export($serializables, $indent);
-            }
-
-            return '\\'.Registry::class.'::push('.$code.')';
+            return self::exportRegistry($value, $indent, $subIndent);
         }
 
-        if ($value instanceof Configurator) {
-            $code = '';
-            foreach ($value->properties as $class => $properties) {
-                $code .= $subIndent.'    \\'.$class.'::class => '.self::export($properties, $subIndent.'    ').",\n";
-            }
-
-            $code = array(
-                self::export($value->registry, $subIndent),
-                self::export($value->values, $subIndent),
-                '' !== $code ? "[\n".$code.$subIndent.']' : '[]',
-                self::export($value->value, $subIndent),
-                self::export($value->wakeups, $subIndent),
-            );
-
-            return '\\'.\get_class($value)."::pop(\n".$subIndent.implode(",\n".$subIndent, $code)."\n".$indent.')';
+        if ($value instanceof Hydrator) {
+            return self::exportHydrator($value, $indent, $subIndent);
         }
 
         throw new \UnexpectedValueException(sprintf('Cannot export value of type "%s".', \is_object($value) ? \get_class($value) : \gettype($value)));
     }
 
+    private static function exportRegistry(Registry $value, string $indent, string $subIndent): string
+    {
+        $code = '';
+        $reflectors = array();
+        $serializables = array();
+        $seen = array();
+        $prototypesAccess = 0;
+        $factoriesAccess = 0;
+        $r = '\\'.Registry::class;
+        $j = -1;
+
+        foreach ($value as $k => $class) {
+            if (':' === ($class[1] ?? null)) {
+                $serializables[$k] = $class;
+                continue;
+            }
+            $code .= $subIndent.(1 !== $k - $j ? $k.' => ' : '');
+            $j = $k;
+            $eol = ",\n";
+            $c = '[\\'.$class.'::class]';
+
+            if ($seen[$class] ?? false) {
+                if (Registry::$cloneable[$class]) {
+                    ++$prototypesAccess;
+                    $code .= 'clone $p'.$c;
+                } else {
+                    ++$factoriesAccess;
+                    $code .= '$f'.$c.'()';
+                }
+            } else {
+                $seen[$class] = true;
+                if (Registry::$cloneable[$class]) {
+                    $code .= 'clone ('.($prototypesAccess++ ? '$p' : '($p =& '.$r.'::$prototypes)').$c.' ?? '.$r.'::p';
+                } else {
+                    $code .= '('.($factoriesAccess++ ? '$f' : '($f =& '.$r.'::$factories)').$c.' ?? '.$r.'::f';
+                    $eol = '()'.$eol;
+                }
+                $code .= '('.substr($c, 1, -1).', '.self::export(Registry::$instantiableWithoutConstructor[$class]).'))';
+            }
+            $code .= $eol;
+        }
+
+        if (1 === $prototypesAccess) {
+            $code = str_replace('($p =& '.$r.'::$prototypes)', $r.'::$prototypes', $code);
+        }
+        if (1 === $factoriesAccess) {
+            $code = str_replace('($f =& '.$r.'::$factories)', $r.'::$factories', $code);
+        }
+        if ('' !== $code) {
+            $code = "\n".$code.$indent;
+        }
+
+        if ($serializables) {
+            $code = $r.'::unserialize(['.$code.'], '.self::export($serializables, $indent).')';
+        } else {
+            $code = '['.$code.']';
+        }
+
+        return '$o = '.$code;
+    }
+
+    private static function exportHydrator(Hydrator $value, string $indent, string $subIndent): string
+    {
+        $code = '';
+        foreach ($value->properties as $class => $properties) {
+            $c = '*' !== $class ? '\\'.$class.'::class' : "'*'";
+            $code .= $subIndent.'    '.$c.' => '.self::export($properties, $subIndent.'    ').",\n";
+        }
+
+        $code = array(
+            self::export($value->registry, $subIndent),
+            self::export($value->values, $subIndent),
+            '' !== $code ? "[\n".$code.$subIndent.']' : '[]',
+            self::export($value->value, $subIndent),
+            self::export($value->wakeups, $subIndent),
+        );
+
+        return '\\'.\get_class($value)."::hydrate(\n".$subIndent.implode(",\n".$subIndent, $code)."\n".$indent.')';
+    }
+
     /**
-     * Extracts the state of an ArrayIterator or ArrayObject instance.
-     *
-     * For performance this method is public and has no type-hints.
-     *
      * @param \ArrayIterator|\ArrayObject $value
-     * @param array                       &$arrayValue
-     * @param object                      $proto
-     *
-     * @return array
+     * @param \ArrayIterator|\ArrayObject $proto
      */
-    public static function getArrayObjectProperties($value, &$arrayValue, $proto)
+    private static function getArrayObjectProperties($value, array &$arrayValue, $proto): array
     {
         $reflector = $value instanceof \ArrayIterator ? 'ArrayIterator' : 'ArrayObject';
         $reflector = Registry::$reflectors[$reflector] ?? Registry::getClassReflector($reflector);

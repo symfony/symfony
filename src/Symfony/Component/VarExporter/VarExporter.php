@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\VarExporter;
 
-use Symfony\Component\VarExporter\Internal\Configurator;
 use Symfony\Component\VarExporter\Internal\Exporter;
-use Symfony\Component\VarExporter\Internal\Reference;
+use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\VarExporter\Internal\Values;
 
@@ -56,8 +55,10 @@ final class VarExporter
         } finally {
             $references = array();
             foreach ($refsPool as $i => $v) {
+                if ($v[0]->count) {
+                    $references[1 + $i] = $v[2];
+                }
                 $v[0] = $v[1];
-                $references[1 + $i] = $v[2];
             }
         }
 
@@ -85,7 +86,11 @@ final class VarExporter
             }
         }
 
-        $value = new Configurator(new Registry($classes), $references ? new Values($references) : null, $properties, $value, $wakeups);
+        if ($classes || $references) {
+            $value = new Hydrator(new Registry($classes), $references ? new Values($references) : null, $properties, $value, $wakeups);
+        } else {
+            $isStaticValue = true;
+        }
 
         return Exporter::export($value);
     }

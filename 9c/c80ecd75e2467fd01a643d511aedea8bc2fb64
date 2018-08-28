@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-28T15:58:32Z
+
+what's the lowest branch for this patch? bug fix should target the lowest maintained branch;
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-08-03T02:31:10Z
+
+I'd describe `sr_Latn` etc as bugs (fallbacks changing scripts), but did originally consider this a feature.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-08-05T18:12:14Z
+
+Looking at previous ICU updates, the data is merged into patch releases so future changes here will presumably do the same.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-27T16:40:25Z
+
+That's a new feature. Can you add a note in the CHANGELOG ?
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-08-27T18:27:54Z
+
+Travis failure is unrelated.

@@ -721,9 +721,7 @@ class PrioritizedHandler implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array(
-            array(SecondMessage::class, 10),
-        );
+        yield SecondMessage::class => array('priority' => 10);
     }
 
     public function __invoke()
@@ -735,10 +733,8 @@ class HandlerMappingMethods implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array(
-            DummyMessage::class => 'dummyMethod',
-            SecondMessage::class => array('secondMessage', 20),
-        );
+        yield DummyMessage::class => 'dummyMethod';
+        yield SecondMessage::class => array('method' => 'secondMessage', 'priority' => 20);
     }
 
     public function dummyMethod()

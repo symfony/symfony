@@ -74,6 +74,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $configCacheFactory;
 
     /**
+     * @var array|null
+     */
+    private $parentLocales;
+
+    /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
     public function __construct(?string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false)
@@ -392,6 +397,10 @@ EOF
 
     protected function computeFallbackLocales($locale)
     {
+        if (null === $this->parentLocales) {
+            $parentLocales = \json_decode(\file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
+        }
+
         $locales = array();
         foreach ($this->fallbackLocales as $fallback) {
             if ($fallback === $locale) {
@@ -401,8 +410,20 @@ EOF
             $locales[] = $fallback;
         }
 
-        if (false !== strrchr($locale, '_')) {
-            array_unshift($locales, substr($locale, 0, -\strlen(strrchr($locale, '_'))));
+        while ($locale) {
+            $parent = $parentLocales[$locale] ?? null;
+
+            if (!$parent && false !== strrchr($locale, '_')) {
+                $locale = substr($locale, 0, -\strlen(strrchr($locale, '_')));
+            } elseif ('root' !== $parent) {
+                $locale = $parent;
+            } else {
+                $locale = null;
+            }
+
+            if (null !== $locale) {
+                array_unshift($locales, $locale);
+            }
         }
 
         return array_unique($locales);

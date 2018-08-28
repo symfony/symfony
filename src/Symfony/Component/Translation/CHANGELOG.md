@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * Started using ICU parent locales as fallback locales.
+
 4.1.0
 -----
 

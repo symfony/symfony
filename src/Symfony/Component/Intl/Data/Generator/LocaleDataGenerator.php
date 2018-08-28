@@ -57,6 +57,7 @@ class LocaleDataGenerator
 
         $locales = $localeScanner->scanLocales($config->getSourceDir().'/locales');
         $aliases = $localeScanner->scanAliases($config->getSourceDir().'/locales');
+        $parents = $localeScanner->scanParents($config->getSourceDir().'/locales');
 
         // Flip to facilitate lookup
         $flippedLocales = array_flip($locales);
@@ -134,6 +135,12 @@ class LocaleDataGenerator
                 'Aliases' => $aliases,
             ));
         }
+
+        // Write parents locale file for the Translation component
+        \file_put_contents(
+            __DIR__.'/../../../Translation/Resources/data/parents.json',
+            \json_encode($parents, \JSON_PRETTY_PRINT).\PHP_EOL
+        );
     }
 
     private function generateLocaleName($locale, $displayLocale)

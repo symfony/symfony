@@ -112,7 +112,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Boots the current kernel.
+     * {@inheritdoc}
      */
     public function boot()
     {

@@ -8,6 +8,7 @@ CHANGELOG
  * Allowed configuring PDO-based cache pools via a new `cache.adapter.pdo` abstract service
  * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead
  * Deprecated processing of services tagged `security.expression_language_provider` in favor of a new `AddExpressionLanguageProvidersPass` in SecurityBundle.
+ * Deprecated the `Symfony\Bundle\FrameworkBundle\Controller\Controller` class in favor of `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`.
  * Enabled autoconfiguration for `Psr\Log\LoggerAwareInterface`
  * Added new "auto" mode for `framework.session.cookie_secure` to turn it on when HTTPS is used
 

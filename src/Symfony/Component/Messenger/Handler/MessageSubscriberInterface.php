@@ -25,21 +25,24 @@ interface MessageSubscriberInterface extends MessageHandlerInterface
      *
      * It returns a list of messages like in the following example:
      *
-     *     return [MyMessage::class];
+     *     yield MyMessage::class;
      *
      * It can also change the priority per classes.
      *
-     *     return [
-     *         [FirstMessage::class, 0],
-     *         [SecondMessage::class, -10],
+     *     yield FirstMessage::class => ['priority' => 0];
+     *     yield SecondMessage::class => ['priority => -10];
+     *
+     * It can also specify a method, a priority and/or a bus per message:
+     *
+     *     yield FirstMessage::class => ['method' => 'firstMessageMethod'];
+     *     yield SecondMessage::class => [
+     *         'method' => 'secondMessageMethod',
+     *         'priority' => 20,
+     *         'bus' => 'my_bus_name',
      *     ];
      *
-     * It can also specify a method and/or a priority per message:
-     *
-     *     return [
-     *         FirstMessage::class => 'firstMessageMethod',
-     *         SecondMessage::class => ['secondMessageMethod', 20],
-     *     ];
+     * The benefit of using `yield` instead of returning an array is that you can `yield` multiple times the
+     * same key and therefore subscribe to the same message multiple times with different options.
      *
      * The `__invoke` method of the handler will be called as usual with the message to handle.
      */

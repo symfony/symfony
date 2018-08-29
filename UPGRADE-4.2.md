@@ -89,6 +89,37 @@ Messenger
 
  * `EnvelopeItemInterface` doesn't extend `Serializable` anymore
  * The `handle` method of the `Symfony\Component\Messenger\Middleware\ValidationMiddleware` and `Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware` middlewares now requires an `Envelope` object to be given (because they implement the `EnvelopeAwareInterface`). When using these middleware with the provided `MessageBus`, you will not have to do anything. If you use the middlewares any other way, you can use `Envelope::wrap($message)` to create an envelope for your message.
+ * `MessageSubscriberInterface::getHandledMessages()` return value has changed. The value of an array item
+   needs to be an associative array or the method name. 
+   
+   Before:
+   ```php
+   return [
+      [FirstMessage::class, 0],
+      [SecondMessage::class, -10],
+   ];
+   ```
+   
+   After:
+   ```php
+   yield FirstMessage::class => ['priority' => 0];
+   yield SecondMessage::class => ['priority => -10];
+   ```
+   
+   Before:
+   ```php
+   return [
+       SecondMessage::class => ['secondMessageMethod', 20],
+   ];
+   ```
+   
+   After:
+   ```php
+   yield SecondMessage::class => [
+       'method' => 'secondMessageMethod',
+       'priority' => 20,
+   ];
+   ```
 
 Security
 --------

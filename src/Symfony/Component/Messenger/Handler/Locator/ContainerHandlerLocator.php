@@ -30,12 +30,39 @@ class ContainerHandlerLocator implements HandlerLocatorInterface
     public function resolve($message): callable
     {
         $messageClass = \get_class($message);
-        $handlerKey = 'handler.'.$messageClass;
 
-        if (!$this->container->has($handlerKey)) {
+        if (null === $handler = $this->resolveFromClass($messageClass)) {
             throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $messageClass));
         }
 
-        return $this->container->get($handlerKey);
+        return $handler;
+    }
+
+    private function resolveFromClass($class): ?callable
+    {
+        if ($handler = $this->getHandler($class)) {
+            return $handler;
+        }
+
+        foreach (class_implements($class, false) as $interface) {
+            if ($handler = $this->getHandler($interface)) {
+                return $handler;
+            }
+        }
+
+        foreach (class_parents($class, false) as $parent) {
+            if ($handler = $this->getHandler($parent)) {
+                return $handler;
+            }
+        }
+
+        return null;
+    }
+
+    private function getHandler($class)
+    {
+        $handlerKey = 'handler.'.$class;
+
+        return $this->container->has($handlerKey) ? $this->container->get($handlerKey) : null;
     }
 }

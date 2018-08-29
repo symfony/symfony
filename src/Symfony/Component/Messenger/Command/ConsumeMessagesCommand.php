@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMemoryUsageIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenMessageCountIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenTimeLimitIsReachedReceiver;
@@ -35,17 +34,19 @@ class ConsumeMessagesCommand extends Command
 {
     protected static $defaultName = 'messenger:consume-messages';
 
-    private $bus;
+    private $busLocator;
     private $receiverLocator;
     private $logger;
     private $receiverNames;
+    private $busNames;
 
-    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = array())
+    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = array(), array $busNames = array())
     {
-        $this->bus = $bus;
+        $this->busLocator = $busLocator;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
+        $this->busNames = $busNames;
 
         parent::__construct();
     }
@@ -56,6 +57,7 @@ class ConsumeMessagesCommand extends Command
     protected function configure(): void
     {
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
+        $defaultBusName = 1 === \count($this->busNames) ? current($this->busNames) : null;
 
         $this
             ->setDefinition(array(
@@ -63,6 +65,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
+                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched', $defaultBusName),
             ))
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -91,18 +94,35 @@ EOF
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->receiverNames || $this->receiverLocator->has($receiverName = $input->getArgument('receiver'))) {
-            return;
+        $style = new SymfonyStyle($input, $output);
+
+        if ($this->receiverNames && !$this->receiverLocator->has($receiverName = $input->getArgument('receiver'))) {
+            if (null === $receiverName) {
+                $style->block('Missing receiver argument.', null, 'error', ' ', true);
+                $input->setArgument('receiver', $style->choice('Select one of the available receivers', $this->receiverNames));
+            } elseif ($alternatives = $this->findAlternatives($receiverName, $this->receiverNames)) {
+                $style->block(sprintf('Receiver "%s" is not defined.', $receiverName), null, 'error', ' ', true);
+                if ($style->confirm(sprintf('Do you want to receive from "%s" instead? ', $alternatives[0]), false)) {
+                    $input->setArgument('receiver', $alternatives[0]);
+                }
+            }
         }
 
-        $style = new SymfonyStyle($input, $output);
-        if (null === $receiverName) {
-            $style->block('Missing receiver argument.', null, 'error', ' ', true);
-            $input->setArgument('receiver', $style->choice('Select one of the available receivers', $this->receiverNames));
-        } elseif ($alternatives = $this->findAlternatives($receiverName, $this->receiverNames)) {
-            $style->block(sprintf('Receiver "%s" is not defined.', $receiverName), null, 'error', ' ', true);
-            if ($style->confirm(sprintf('Do you want to receive from "%s" instead? ', $alternatives[0]), false)) {
-                $input->setArgument('receiver', $alternatives[0]);
+        $busName = $input->getOption('bus');
+        if ($this->busNames && !$this->busLocator->has($busName)) {
+            if (null === $busName) {
+                $style->block('Missing bus argument.', null, 'error', ' ', true);
+                $input->setOption('bus', $style->choice('Select one of the available buses', $this->busNames));
+            } elseif ($alternatives = $this->findAlternatives($busName, $this->busNames)) {
+                $style->block(sprintf('Bus "%s" is not defined.', $busName), null, 'error', ' ', true);
+
+                if (1 === \count($alternatives)) {
+                    if ($style->confirm(sprintf('Do you want to dispatch to "%s" instead? ', $alternatives[0]), true)) {
+                        $input->setOption('bus', $alternatives[0]);
+                    }
+                } else {
+                    $input->setOption('bus', $style->choice('Did you mean one of the following buses instead?', $alternatives, $alternatives[0]));
+                }
             }
         }
     }
@@ -116,7 +136,12 @@ EOF
             throw new RuntimeException(sprintf('Receiver "%s" does not exist.', $receiverName));
         }
 
+        if (!$this->busLocator->has($busName = $input->getOption('bus'))) {
+            throw new RuntimeException(sprintf('Bus "%s" does not exist.', $busName));
+        }
+
         $receiver = $this->receiverLocator->get($receiverName);
+        $bus = $this->busLocator->get($busName);
 
         if ($limit = $input->getOption('limit')) {
             $receiver = new StopWhenMessageCountIsExceededReceiver($receiver, $limit, $this->logger);
@@ -130,7 +155,7 @@ EOF
             $receiver = new StopWhenTimeLimitIsReachedReceiver($receiver, $timeLimit, $this->logger);
         }
 
-        $worker = new Worker($receiver, $this->bus);
+        $worker = new Worker($receiver, $bus);
         $worker->run();
     }
 

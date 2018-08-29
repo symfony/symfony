@@ -634,7 +634,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             if ($this->isMethodAccessible($reflClass, $setter, 1)) {
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
                 $access[self::ACCESS_NAME] = $setter;
-            } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)) {
+            } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)
+                      || $this->isMethodAccessible($reflClass, $getsetter, 0)) {
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
                 $access[self::ACCESS_NAME] = $getsetter;
             } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {

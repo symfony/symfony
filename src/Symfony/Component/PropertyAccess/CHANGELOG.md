@@ -12,6 +12,11 @@ CHANGELOG
  * deprecated the `StringUtil` class, use `Symfony\Component\Inflector\Inflector`
    instead
 
+2.8.0
+------
+
+* Fixed a public propertyName() not being recognized when declared without parameters.
+
 2.7.0
 ------
 

@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetterGetter;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
@@ -419,6 +420,30 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor(true);
 
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
+    }
+
+    public function testIsWritableRecognizesSetterGetter()
+    {
+        $this->propertyAccessor = new PropertyAccessor();
+        $sg = new TestClassSetterGetter();
+        $this->assertTrue($this->propertyAccessor->isWritable($sg, 'withSignature'), 'setterGetter($j = null)');
+        $this->assertTrue($this->propertyAccessor->isWritable($sg, 'emptySignature'), 'setterGetter()');
+    }
+
+    public function testSetterGetterRead()
+    {
+        $sg = (new TestClassSetterGetter)->withSignature('cake')->emptySignature('cake');
+        $this->assertEquals('cake', $this->propertyAccessor->getValue($sg, 'withSignature'));
+        $this->assertEquals('cake', $this->propertyAccessor->getValue($sg, 'emptySignature'));
+    }
+
+    public function testSetterGetterWrite()
+    {
+        $sg = new TestClassSetterGetter;
+        $this->propertyAccessor->setValue($sg, 'withSignature', 'cake');
+        $this->propertyAccessor->setValue($sg, 'emptySignature', 'cake');
+        $this->assertEquals('cake', $sg->withSignature());
+        $this->assertEquals('cake', $sg->emptySignature());
     }
 
     /**

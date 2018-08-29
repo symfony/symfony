@@ -35,23 +35,21 @@ abstract class Bundle implements BundleInterface
     protected $path;
 
     /**
-     * Boots the Bundle.
+     * {@inheritdoc}
      */
     public function boot()
     {
     }
 
     /**
-     * Shutdowns the Bundle.
+     * {@inheritdoc}
      */
     public function shutdown()
     {
     }
 
     /**
-     * Builds the bundle.
-     *
-     * It is only ever called once when the cache is empty.
+     * {@inheritdoc}
      *
      * This method can be overridden to register compilation passes,
      * other extensions, ...
@@ -61,9 +59,7 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Sets the container.
-     *
-     * @param ContainerInterface|null $container A ContainerInterface instance or null
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -71,9 +67,7 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Returns the bundle's container extension.
-     *
-     * @return ExtensionInterface|null The container extension
+     * {@inheritdoc}
      *
      * @throws \LogicException
      */
@@ -110,9 +104,7 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Gets the Bundle namespace.
-     *
-     * @return string The Bundle namespace
+     * {@inheritdoc}
      */
     public function getNamespace()
     {
@@ -122,9 +114,7 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Gets the Bundle directory path.
-     *
-     * @return string The Bundle absolute path
+     * {@inheritdoc}
      */
     public function getPath()
     {
@@ -137,18 +127,14 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Returns the bundle parent name.
-     *
-     * @return string|null The Bundle parent name it overrides or null if no parent
+     * {@inheritdoc}
      */
     public function getParent()
     {
     }
 
     /**
-     * Returns the bundle name (the class short name).
-     *
-     * @return string The Bundle name
+     * {@inheritdoc}
      */
     final public function getName()
     {

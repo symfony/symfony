@@ -1,6 +1,11 @@
 UPGRADE FROM 4.1 to 4.2
 =======================
 
+BrowserKit
+----------
+
+ * The `Client::submit()` method will have a new `$serverParameters` argument in version 5.0, not defining it is deprecated.
+
 Cache
 -----
 
@@ -36,6 +41,16 @@ DoctrineBridge
 
  * The `lazy` attribute on `doctrine.event_listener` tags was removed.
    Listeners are now lazy by default. So any `lazy` attributes can safely be removed from those tags.
+
+DomCrawler
+----------
+
+ * The `Crawler::children()` method will have a new `$selector` argument in version 5.0, not defining it is deprecated.
+
+Finder
+------
+
+ * The `Finder::sortByName()` method will have a new `$useNaturalSort` argument in version 5.0, not defining it is deprecated.
 
 Form
 ----
@@ -123,6 +138,11 @@ Messenger
    ];
    ```
 
+Monolog
+-------
+
+ * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()` and `Logger::countErrors()` will have a new `$request` argument in version 5.0, not defining it is deprecated.
+
 Security
 --------
 
@@ -149,8 +169,9 @@ SecurityBundle
 Serializer
 ----------
 
- * Relying on the default value (false) of the "as_collection" option is deprecated since 4.2.
+ * Relying on the default value (false) of the "as_collection" option is deprecated.
    You should set it to false explicitly instead as true will be the default value in 5.0.
+ * The `AbstractNormalizer::handleCircularReference()` method will have two new `$format` and `$context` arguments in version 5.0, not defining them is deprecated.
 
 Translation
 -----------

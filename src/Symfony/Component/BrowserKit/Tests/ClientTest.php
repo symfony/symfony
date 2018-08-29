@@ -16,6 +16,7 @@ use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
+use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
 
 class SpecialResponse extends Response
 {
@@ -876,5 +877,43 @@ class ClientTest extends TestCase
     {
         $client = new TestClient();
         $this->assertNull($client->getInternalRequest());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\BrowserKit\Client::submit()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallSubmitWithTwoArguments()
+    {
+        $clientChild = new ClassThatInheritClient();
+        $clientChild->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $clientChild->submit($clientChild->request('GET', 'http://www.example.com/foo/foobar')->filter('input')->form());
+    }
+}
+
+class ClassThatInheritClient extends Client
+{
+    protected $nextResponse = null;
+
+    public function setNextResponse(Response $response)
+    {
+        $this->nextResponse = $response;
+    }
+
+    protected function doRequest($request)
+    {
+        if (null === $this->nextResponse) {
+            return new Response();
+        }
+
+        $response = $this->nextResponse;
+        $this->nextResponse = null;
+
+        return $response;
+    }
+
+    public function submit(DomCrawlerForm $form, array $values = array())
+    {
+        return parent::submit($form, $values);
     }
 }

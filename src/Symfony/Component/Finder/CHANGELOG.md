@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added $useNaturalSort option to Finder::sortByName() method
+ * The `Finder::sortByName()` method will have a new `$useNaturalSort` 
+   argument in version 5.0, not defining it is deprecated since version 4.2.
 
 4.0.0
 -----

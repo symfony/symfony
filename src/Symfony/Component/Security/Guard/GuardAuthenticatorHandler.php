@@ -54,10 +54,8 @@ class GuardAuthenticatorHandler
      *
      * @param string $providerKey The name of the provider/firewall being used for authentication
      */
-    public function authenticateWithToken(TokenInterface $token, Request $request/*, string $providerKey */)
+    public function authenticateWithToken(TokenInterface $token, Request $request, string $providerKey = null)
     {
-        $providerKey = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         $this->migrateSession($request, $token, $providerKey);
         $this->tokenStorage->setToken($token);
 

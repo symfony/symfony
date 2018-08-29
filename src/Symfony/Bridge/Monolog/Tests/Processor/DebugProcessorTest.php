@@ -60,6 +60,26 @@ class DebugProcessorTest extends TestCase
         $this->assertSame(1, $processor->countErrors($request));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::getLogs()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallGetLogsWithoutArgument()
+    {
+        $debugProcessorChild = new ClassThatInheritDebugProcessor();
+        $debugProcessorChild->getLogs();
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::countErrors()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallCountErrorsWithoutArgument()
+    {
+        $debugProcessorChild = new ClassThatInheritDebugProcessor();
+        $debugProcessorChild->countErrors();
+    }
+
     private function getRecord($level = Logger::WARNING, $message = 'test')
     {
         return array(
@@ -71,5 +91,18 @@ class DebugProcessorTest extends TestCase
             'datetime' => new \DateTime(),
             'extra' => array(),
         );
+    }
+}
+
+class ClassThatInheritDebugProcessor extends DebugProcessor
+{
+    public function getLogs()
+    {
+        parent::getLogs();
+    }
+
+    public function countErrors()
+    {
+        parent::countErrors();
     }
 }

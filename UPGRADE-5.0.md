@@ -1,6 +1,11 @@
 UPGRADE FROM 4.x to 5.0
 =======================
 
+BrowserKit
+----------
+
+ * The `Client::submit()` method has a new `$serverParameters` argument.
+
 Cache
 -----
 
@@ -49,10 +54,20 @@ DoctrineBridge
  * Deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`, an instance of `EntityManagerInterface` should be
    injected instead
 
+DomCrawler
+----------
+
+ * The `Crawler::children()` method has a new `$selector` argument.
+
 EventDispatcher
 ---------------
 
  * The `TraceableEventDispatcherInterface` has been removed.
+
+Finder
+------
+
+ * The `Finder::sortByName()` method has a new `$useNaturalSort` argument.
 
 FrameworkBundle
 ---------------
@@ -101,6 +116,11 @@ HttpFoundation
  * The `getClientSize()` method of the `UploadedFile` class has been removed.
  * The `getSession()` method of the `Request` class throws an exception when session is null.
 
+Monolog
+-------
+
+ * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()` and `Logger::countErrors()` have a new `$request` argument.
+
 Process
 -------
 
@@ -141,6 +161,11 @@ SecurityBundle
    now throws a `\TypeError`, pass a `LogoutListener` instance instead.
  * The `security.authentication.trust_resolver.anonymous_class` parameter has been removed.
  * The `security.authentication.trust_resolver.rememberme_class` parameter has been removed.
+
+Serializer
+----------
+
+ * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
 
 Translation
 -----------

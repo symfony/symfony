@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-28T21:59:43Z
+
+Annex question: many ways are currently used to make a PHPDoc code example, namely 4 spaces of indentation, `<code>` tag and markdown syntax. Would it be interesting to standardise that or not at all ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-29T09:03:53Z
+
+I would standardize to using 4 space indentation (which is Markdown right?).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-29T09:12:39Z
+
+Markdown is different from 4 spaces indentation. An example here :
+
+https://github.com/symfony/symfony/blob/6c539e1408769e3de8766d238b11770c95e016a5/src/Symfony/Component/OptionsResolver/OptionsResolver.php#L413-L417
+
+Do I standardize it in this PR ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-29T12:27:54Z
+
+That's not Markdown, but something added by Github. Anyway, 4 spaces indentations seems the best to me. If you can do it in this PR, that would be wonderful. I think that we also need to update the docs regarding our CS.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-29T13:16:33Z
+
+Done : 4 spaces indentation used everywhere now.
+
+> I think that we also need to update the docs regarding our CS.
+
+Btw, a new php cs fixer rule could be interesting here.
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-08-29T18:21:21Z
+
+`bug` label looks wrong
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-29T18:35:05Z
+
+@keradus Some of the code examples were like normal text description and it broke the PHPDoc render.
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-08-29T18:55:12Z
+
+Still, docs only, nothing that is not working for Sf users in their project and now will be fixed for them.
+label was automatically assigned only as there was a keyword in PR title ;)
+
+nothing to focus on, just saying

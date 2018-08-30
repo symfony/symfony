@@ -26,12 +26,10 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * Supports generation of choice labels, choice groups and choice values
  * by calling getters of the object (or associated objects).
  *
- * <code>
- * $choices = array($user1, $user2);
+ *     $choices = array($user1, $user2);
  *
- * // call getName() to determine the choice labels
- * $choiceList = new ObjectChoiceList($choices, 'name');
- * </code>
+ *     // call getName() to determine the choice labels
+ *     $choiceList = new ObjectChoiceList($choices, 'name');
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

@@ -20,11 +20,11 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * Usage:
  *
- * $output = new StreamOutput(fopen('php://stdout', 'w'));
+ *     $output = new StreamOutput(fopen('php://stdout', 'w'));
  *
  * As `StreamOutput` can use any stream, you can also use a file:
  *
- * $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
+ *     $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

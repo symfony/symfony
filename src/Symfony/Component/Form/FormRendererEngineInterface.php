@@ -53,11 +53,9 @@ interface FormRendererEngineInterface
      * and continues with the child of that root, the child of that child etc.
      * The following is an example for a block hierarchy:
      *
-     * <code>
-     * form_widget
-     * text_widget
-     * url_widget
-     * </code>
+     *     form_widget
+     *     text_widget
+     *     url_widget
      *
      * In this example, "url_widget" is the most specific block, while the other
      * blocks are its ancestors in the hierarchy.
@@ -91,11 +89,9 @@ interface FormRendererEngineInterface
      * and continues with the child of that root, the child of that child etc.
      * The following is an example for a block hierarchy:
      *
-     * <code>
-     * form_widget
-     * text_widget
-     * url_widget
-     * </code>
+     *     form_widget
+     *     text_widget
+     *     url_widget
      *
      * The second parameter $hierarchyLevel determines the level of the hierarchy
      * that should be rendered.

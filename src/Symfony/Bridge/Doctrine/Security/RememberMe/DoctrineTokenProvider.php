@@ -27,13 +27,14 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  * and to do the conversion of the datetime column.
  *
  * In order to use this class, you need the following table in your database:
- * CREATE TABLE `rememberme_token` (
- *  `series`   char(88)     UNIQUE PRIMARY KEY NOT NULL,
- *  `value`    char(88)     NOT NULL,
- *  `lastUsed` datetime     NOT NULL,
- *  `class`    varchar(100) NOT NULL,
- *  `username` varchar(200) NOT NULL
- * );
+ *
+ *     CREATE TABLE `rememberme_token` (
+ *         `series`   char(88)     UNIQUE PRIMARY KEY NOT NULL,
+ *         `value`    char(88)     NOT NULL,
+ *         `lastUsed` datetime     NOT NULL,
+ *         `class`    varchar(100) NOT NULL,
+ *         `username` varchar(200) NOT NULL
+ *     );
  */
 class DoctrineTokenProvider implements TokenProviderInterface
 {

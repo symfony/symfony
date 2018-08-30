@@ -579,7 +579,7 @@ class Crawler extends \SplObjectStorage
      *
      * Example:
      *
-     * $crawler->filter('h1 a')->extract(array('_text', 'href'));
+     *     $crawler->filter('h1 a')->extract(array('_text', 'href'));
      *
      * @param array $attributes An array of attributes
      *
@@ -787,7 +787,7 @@ class Crawler extends \SplObjectStorage
      * Escaped characters are: quotes (") and apostrophe (').
      *
      *  Examples:
-     *  <code>
+     *
      *     echo Crawler::xpathLiteral('foo " bar');
      *     //prints 'foo " bar'
      *
@@ -796,7 +796,7 @@ class Crawler extends \SplObjectStorage
      *
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
-     *  </code>
+     *
      *
      * @param string $s String to be escaped
      *

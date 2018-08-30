@@ -16,21 +16,17 @@ namespace Symfony\Component\Validator;
  *
  * For example, let's validate the following object graph:
  *
- * <pre>
- * (Person)---($firstName: string)
- *      \
- *   ($address: Address)---($street: string)
- * </pre>
+ *     (Person)---($firstName: string)
+ *          \
+ *       ($address: Address)---($street: string)
  *
  * We validate the <tt>Person</tt> instance, which becomes the "root" of the
  * validation run (see {@link getRoot}). The state of the context after the
  * first step will be like this:
  *
- * <pre>
- * (Person)---($firstName: string)
- *    ^ \
- *   ($address: Address)---($street: string)
- * </pre>
+ *     (Person)---($firstName: string)
+ *        ^ \
+ *       ($address: Address)---($street: string)
  *
  * The validator is stopped at the <tt>Person</tt> node, both the root and the
  * value (see {@link getValue}) of the context point to the <tt>Person</tt>
@@ -41,11 +37,9 @@ namespace Symfony\Component\Validator;
  * After advancing to the property <tt>$firstName</tt> of the <tt>Person</tt>
  * instance, the state of the context looks like this:
  *
- * <pre>
- * (Person)---($firstName: string)
- *      \              ^
- *   ($address: Address)---($street: string)
- * </pre>
+ *     (Person)---($firstName: string)
+ *          \              ^
+ *       ($address: Address)---($street: string)
  *
  * The validator is stopped at the property <tt>$firstName</tt>. The root still
  * points to the <tt>Person</tt> instance, because this is where the validation
@@ -56,12 +50,10 @@ namespace Symfony\Component\Validator;
  * <tt>$street</tt> property of the <tt>Address</tt> instance, the context state
  * looks like this:
  *
- * <pre>
- * (Person)---($firstName: string)
- *      \
- *   ($address: Address)---($street: string)
- *                               ^
- * </pre>
+ *     (Person)---($firstName: string)
+ *          \
+ *       ($address: Address)---($street: string)
+ *                                   ^
  *
  * The validator is stopped at the property <tt>$street</tt>. The root still
  * points to the <tt>Person</tt> instance, but the property path is now
@@ -128,19 +120,14 @@ interface ExecutionContextInterface
      * argument which is appended to the current property path when a violation
      * is created. For example, take the following object graph:
      *
-     * <pre>
-     * (Person)---($address: Address)---($phoneNumber: PhoneNumber)
-     *                     ^
-     * </pre>
+     *     (Person)---($address: Address)---($phoneNumber: PhoneNumber)
      *
      * When the execution context stops at the <tt>Person</tt> instance, the
      * property path is "address". When you validate the <tt>PhoneNumber</tt>
      * instance now, pass "phoneNumber" as sub path to correct the property path
      * to "address.phoneNumber":
      *
-     * <pre>
-     * $context->validate($address->phoneNumber, 'phoneNumber');
-     * </pre>
+     *     $context->validate($address->phoneNumber, 'phoneNumber');
      *
      * Any violations generated during the validation will be added to the
      * violation list that you can access with {@link getViolations}.
@@ -167,19 +154,14 @@ interface ExecutionContextInterface
      * Use the parameter <tt>$subPath</tt> to adapt the property path for the
      * validated value. For example, take the following object graph:
      *
-     * <pre>
-     * (Person)---($address: Address)---($street: string)
-     *                     ^
-     * </pre>
+     *     (Person)---($address: Address)---($street: string)
      *
      * When the validator validates the <tt>Address</tt> instance, the
      * property path stored in the execution context is "address". When you
      * manually validate the property <tt>$street</tt> now, pass the sub path
      * "street" to adapt the full property path to "address.street":
      *
-     * <pre>
-     * $context->validate($address->street, new NotNull(), 'street');
-     * </pre>
+     *     $context->validate($address->street, new NotNull(), 'street');
      *
      * @param mixed                   $value       The value to validate
      * @param Constraint|Constraint[] $constraints The constraint(s) to validate against
@@ -290,9 +272,7 @@ interface ExecutionContextInterface
      *
      * For example, take the following object graph:
      *
-     * <pre>
-     * (Person)---($address: Address)---($street: string)
-     * </pre>
+     *     (Person)---($address: Address)---($street: string)
      *
      * When the <tt>Person</tt> instance is passed to the validator, the
      * property path is initially empty. When the <tt>$address</tt> property

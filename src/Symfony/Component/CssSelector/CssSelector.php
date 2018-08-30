@@ -17,7 +17,7 @@ namespace Symfony\Component\CssSelector;
  * CssSelector is the main entry point of the component and can convert CSS
  * selectors to XPath expressions.
  *
- * $xpath = CssSelector::toXpath('h1.foo');
+ *     $xpath = CssSelector::toXpath('h1.foo');
  *
  * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.

@@ -29,16 +29,14 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  *
  * Example:
  *
- * ```php
- * $choices = array('' => 'Don\'t know', 0 => 'No', 1 => 'Yes');
- * $choiceList = new ArrayKeyChoiceList(array_keys($choices));
+ *     $choices = array('' => 'Don\'t know', 0 => 'No', 1 => 'Yes');
+ *     $choiceList = new ArrayKeyChoiceList(array_keys($choices));
  *
- * $values = $choiceList->getValues()
- * // => array('', '0', '1')
+ *     $values = $choiceList->getValues()
+ *     // => array('', '0', '1')
  *
- * $selectedValues = $choiceList->getValuesForChoices(array(true));
- * // => array('1')
- * ```
+ *     $selectedValues = $choiceList->getValuesForChoices(array(true));
+ *     // => array('1')
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

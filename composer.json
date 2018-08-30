@@ -25,7 +25,8 @@
     },
     "suggest": {
         "psr/http-message-implementation": "To use the HttpFoundation factory",
-        "zendframework/zend-diactoros": "To use the Zend Diactoros factory"
+        "zendframework/zend-diactoros": "To use the Zend Diactoros factory",
+        "psr/http-factory-implementation": "To use the PSR-17 factory"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" }

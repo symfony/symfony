@@ -11,6 +11,10 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -18,24 +22,25 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Zend\Diactoros\Response as DiactorosResponse;
-use Zend\Diactoros\ServerRequest;
-use Zend\Diactoros\ServerRequestFactory as DiactorosRequestFactory;
-use Zend\Diactoros\Stream as DiactorosStream;
-use Zend\Diactoros\UploadedFile as DiactorosUploadedFile;
 
 /**
- * Builds Psr\HttpMessage instances using the Zend Diactoros implementation.
+ * Builds Psr\HttpMessage instances using a PSR-17 implementation.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antonio J. García Lagar <aj@garcialagar.es>
  */
-class DiactorosFactory implements HttpMessageFactoryInterface
+class PsrHttpFactory implements HttpMessageFactoryInterface
 {
-    public function __construct()
+    private $serverRequestFactory;
+    private $streamFactory;
+    private $uploadedFileFactory;
+    private $responseFactory;
+
+    public function __construct(ServerRequestFactoryInterface $serverRequestFactory, StreamFactoryInterface $streamFactory, UploadedFileFactoryInterface $uploadedFileFactory, ResponseFactoryInterface $responseFactory)
     {
-        if (!class_exists('Zend\Diactoros\ServerRequestFactory')) {
-            throw new \RuntimeException('Zend Diactoros must be installed to use the DiactorosFactory.');
-        }
+        $this->serverRequestFactory = $serverRequestFactory;
+        $this->streamFactory = $streamFactory;
+        $this->uploadedFileFactory = $uploadedFileFactory;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -43,30 +48,29 @@ class DiactorosFactory implements HttpMessageFactoryInterface
      */
     public function createRequest(Request $symfonyRequest)
     {
-        $server = DiactorosRequestFactory::normalizeServer($symfonyRequest->server->all());
-        $headers = $symfonyRequest->headers->all();
-
-        if (PHP_VERSION_ID < 50600) {
-            $body = new DiactorosStream('php://temp', 'wb+');
-            $body->write($symfonyRequest->getContent());
-        } else {
-            $body = new DiactorosStream($symfonyRequest->getContent(true));
-        }
-
-        $request = new ServerRequest(
-            $server,
-            DiactorosRequestFactory::normalizeFiles($this->getFiles($symfonyRequest->files->all())),
-            $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getRequestUri(),
+        $request = $this->serverRequestFactory->createServerRequest(
             $symfonyRequest->getMethod(),
-            $body,
-            $headers
+            $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getRequestUri(),
+            $symfonyRequest->server->all()
         );
 
+        foreach ($symfonyRequest->headers->all() as $name => $value) {
+            $request = $request->withHeader($name, $value);
+        }
+
+        if (PHP_VERSION_ID < 50600) {
+            $body = $this->streamFactory->createStreamFromFile('php://temp', 'wb+');
+            $body->write($symfonyRequest->getContent());
+        } else {
+            $body = $this->streamFactory->createStreamFromResource($symfonyRequest->getContent(true));
+        }
+
         $request = $request
+            ->withBody($body)
+            ->withUploadedFiles($this->getFiles($symfonyRequest->files->all()))
             ->withCookieParams($symfonyRequest->cookies->all())
             ->withQueryParams($symfonyRequest->query->all())
             ->withParsedBody($symfonyRequest->request->all())
-            ->withRequestTarget($symfonyRequest->getRequestUri())
         ;
 
         foreach ($symfonyRequest->attributes->all() as $key => $value) {
@@ -89,7 +93,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
 
         foreach ($uploadedFiles as $key => $value) {
             if (null === $value) {
-                $files[$key] = new DiactorosUploadedFile(null, 0, UPLOAD_ERR_NO_FILE, null, null);
+                $files[$key] = $this->uploadedFileFactory->createUploadedFile($this->streamFactory->createStream(), 0, UPLOAD_ERR_NO_FILE);
                 continue;
             }
             if ($value instanceof UploadedFile) {
@@ -111,8 +115,10 @@ class DiactorosFactory implements HttpMessageFactoryInterface
      */
     private function createUploadedFile(UploadedFile $symfonyUploadedFile)
     {
-        return new DiactorosUploadedFile(
-            $symfonyUploadedFile->getRealPath(),
+        return $this->uploadedFileFactory->createUploadedFile(
+            $this->streamFactory->createStreamFromFile(
+                $symfonyUploadedFile->getRealPath()
+            ),
             (int) $symfonyUploadedFile->getSize(),
             $symfonyUploadedFile->getError(),
             $symfonyUploadedFile->getClientOriginalName(),
@@ -125,10 +131,14 @@ class DiactorosFactory implements HttpMessageFactoryInterface
      */
     public function createResponse(Response $symfonyResponse)
     {
+        $response = $this->responseFactory->createResponse($symfonyResponse->getStatusCode());
+
         if ($symfonyResponse instanceof BinaryFileResponse) {
-            $stream = new DiactorosStream($symfonyResponse->getFile()->getPathname(), 'r');
+            $stream = $this->streamFactory->createStreamFromFile(
+                $symfonyResponse->getFile()->getPathname()
+            );
         } else {
-            $stream = new DiactorosStream('php://temp', 'wb+');
+            $stream = $this->streamFactory->createStreamFromFile('php://temp', 'wb+');
             if ($symfonyResponse instanceof StreamedResponse) {
                 ob_start(function ($buffer) use ($stream) {
                     $stream->write($buffer);
@@ -143,27 +153,24 @@ class DiactorosFactory implements HttpMessageFactoryInterface
             }
         }
 
+        $response = $response->withBody($stream);
+
         $headers = $symfonyResponse->headers->all();
-        if (!isset($headers['Set-Cookie']) && !isset($headers['set-sookie'])) {
-            $cookies = $symfonyResponse->headers->getCookies();
-            if (!empty($cookies)) {
-                $headers['Set-Cookie'] = array();
-                foreach ($cookies as $cookie) {
-                    $headers['Set-Cookie'][] = $cookie->__toString();
-                }
+        $cookies = $symfonyResponse->headers->getCookies();
+        if (!empty($cookies)) {
+            $headers['Set-Cookie'] = array();
+
+            foreach ($cookies as $cookie) {
+                $headers['Set-Cookie'][] = $cookie->__toString();
             }
         }
 
-        $response = new DiactorosResponse(
-            $stream,
-            $symfonyResponse->getStatusCode(),
-            $headers
-        );
+        foreach ($headers as $name => $value) {
+            $response = $response->withHeader($name, $value);
+        }
 
         $protocolVersion = $symfonyResponse->getProtocolVersion();
-        if ('1.1' !== $protocolVersion) {
-            $response = $response->withProtocolVersion($protocolVersion);
-        }
+        $response = $response->withProtocolVersion($protocolVersion);
 
         return $response;
     }

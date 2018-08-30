@@ -699,7 +699,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param mixed $iterator
+     * @param iterable $iterator
      *
      * @return $this
      *
@@ -751,7 +751,7 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param $dir
+     * @param string $dir
      *
      * @return \Iterator
      */

@@ -513,6 +513,16 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The value of the "parent" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").
+     */
+    public function testChildDefinitionWithWrongSyntaxThrowsException()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_parent.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").
      */
     public function testDecoratedServicesWithWrongSyntaxThrowsException()

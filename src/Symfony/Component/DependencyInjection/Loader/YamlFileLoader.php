@@ -378,6 +378,10 @@ class YamlFileLoader extends FileLoader
                 }
             }
 
+            if ('' !== $service['parent'] && '@' === $service['parent'][0]) {
+                throw new InvalidArgumentException(sprintf('The value of the "parent" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['parent'], substr($service['parent'], 1)));
+            }
+
             $definition = new ChildDefinition($service['parent']);
         } else {
             $definition = new Definition();

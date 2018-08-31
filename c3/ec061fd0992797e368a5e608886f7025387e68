@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-08-27T08:54:36Z
+
+Do you have some benchmark ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-27T09:49:14Z
+
+Yes: https://blackfire.io/profiles/compare/8faaebbb-ced2-49e2-a043-ac9d6361d97e/graph
+
+![image](https://user-images.githubusercontent.com/243674/44653460-205c5500-a9ef-11e8-9c14-7fc49e5fe052.png)
+
+From 1.6s to 1.4s on a simple multifetch done 10k times (Blackfire disabled).

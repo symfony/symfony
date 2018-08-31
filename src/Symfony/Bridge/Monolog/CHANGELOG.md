@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `ConsoleCommandProcessor`: monolog processor that adds command name and arguments
+ * added `RouteProcessor`: monolog processor that adds route name, controller::action and route params
+
 4.2.0
 -----
 

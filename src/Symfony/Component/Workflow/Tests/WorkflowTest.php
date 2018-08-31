@@ -345,6 +345,25 @@ class WorkflowTest extends TestCase
         $this->assertTrue($marking->has('d'));
     }
 
+    public function testApplyWithSameNameTransition3()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1);
+
+        $places = range('a', 'd');
+        $transitions = array();
+        $transitions[] = new Transition('t', 'a', 'b');
+        $transitions[] = new Transition('t', 'b', 'c');
+        $transitions[] = new Transition('t', 'c', 'd');
+        $definition = new Definition($places, $transitions);
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $marking = $workflow->apply($subject, 't');
+        // We want to make sure we do not end up in "d"
+        $this->assertTrue($marking->has('b'));
+        $this->assertFalse($marking->has('d'));
+    }
+
     public function testApplyWithEventDispatcher()
     {
         $definition = $this->createComplexWorkflowDefinition();

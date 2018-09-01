@@ -48,7 +48,7 @@ class SunnyInterface_1eff735 implements \ProxyManager\Proxy\VirtualProxyInterfac
     {
         static $reflection;
 
-        $reflection = $reflection ?: $reflection = new \ReflectionClass(__CLASS__);
+        $reflection = $reflection ?? $reflection = new \ReflectionClass(__CLASS__);
         $instance = $reflection->newInstanceWithoutConstructor();
 
         $instance->initializer1eff735 = $initializer;
@@ -61,7 +61,7 @@ class SunnyInterface_1eff735 implements \ProxyManager\Proxy\VirtualProxyInterfac
         static $reflection;
 
         if (! $this->valueHolder1eff735) {
-            $reflection = $reflection ?: new \ReflectionClass(__CLASS__);
+            $reflection = $reflection ?? new \ReflectionClass(__CLASS__);
             $this->valueHolder1eff735 = $reflection->newInstanceWithoutConstructor();
         }
     }

@@ -40,5 +40,6 @@ class MessengerCommandsPassTest extends TestCase
         (new MessengerCommandsPass())->process($container);
 
         $this->assertSame(array('amqp', 'dummy'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
+        $this->assertSame(array('my_bus_name'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4));
     }
 }

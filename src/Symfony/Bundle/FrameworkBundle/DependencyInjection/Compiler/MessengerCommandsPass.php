@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
@@ -37,7 +38,9 @@ class MessengerCommandsPass implements CompilerPassInterface
 
         $container
             ->getDefinition('console.command.messenger_consume_messages')
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
             ->replaceArgument(3, $this->findReceiverNames($container))
+            ->replaceArgument(4, array_keys($buses))
         ;
     }
 

@@ -35,14 +35,14 @@ class AttributeMetadataTest extends TestCase
     public function testAccessor()
     {
         $attributeMetadata = new AttributeMetadata('name');
-        $this->assertNull($attributeMetadata->getAccessorGetter());
-        $this->assertNull($attributeMetadata->getAccessorSetter());
+        $this->assertNull($attributeMetadata->getMethodsAccessor());
+        $this->assertNull($attributeMetadata->getMethodsMutator());
 
-        $attributeMetadata->setAccessorGetter('getter');
-        $this->assertEquals('getter', $attributeMetadata->getAccessorGetter());
+        $attributeMetadata->setMethodsAccessor('getter');
+        $this->assertEquals('getter', $attributeMetadata->getMethodsAccessor());
 
-        $attributeMetadata->setAccessorSetter('setter');
-        $this->assertEquals('setter', $attributeMetadata->getAccessorSetter());
+        $attributeMetadata->setMethodsMutator('setter');
+        $this->assertEquals('setter', $attributeMetadata->getMethodsMutator());
     }
 
     public function testExclude()
@@ -128,8 +128,8 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata2 = new AttributeMetadata('a2');
         $attributeMetadata2->addGroup('a');
         $attributeMetadata2->addGroup('c');
-        $attributeMetadata2->setAccessorGetter('getter');
-        $attributeMetadata2->setAccessorSetter('setter');
+        $attributeMetadata2->setMethodsAccessor('getter');
+        $attributeMetadata2->setMethodsMutator('setter');
         $attributeMetadata2->setExclude(true);
         $attributeMetadata2->setExpose(false);
         $attributeMetadata2->setMaxDepth(2);
@@ -140,8 +140,8 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata1->merge($attributeMetadata2);
 
         $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
-        $this->assertEquals('getter', $attributeMetadata1->getAccessorGetter());
-        $this->assertEquals('setter', $attributeMetadata1->getAccessorSetter());
+        $this->assertEquals('getter', $attributeMetadata1->getMethodsAccessor());
+        $this->assertEquals('setter', $attributeMetadata1->getMethodsMutator());
         $this->assertEquals(true, $attributeMetadata1->getExclude());
         $this->assertEquals(false, $attributeMetadata1->getExpose());
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
@@ -158,8 +158,8 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->addGroup('a');
         $attributeMetadata1->addGroup('b');
-        $attributeMetadata1->setAccessorGetter('getter');
-        $attributeMetadata1->setAccessorSetter('setter');
+        $attributeMetadata1->setMethodsAccessor('getter');
+        $attributeMetadata1->setMethodsMutator('setter');
         $attributeMetadata1->setExclude(true);
         $attributeMetadata1->setExpose(false);
         $attributeMetadata1->setMaxDepth(2);
@@ -170,8 +170,8 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata2 = new AttributeMetadata('a2');
         $attributeMetadata2->addGroup('a');
         $attributeMetadata2->addGroup('c');
-        $attributeMetadata2->setAccessorGetter('getter2');
-        $attributeMetadata2->setAccessorSetter('setter2');
+        $attributeMetadata2->setMethodsAccessor('getter2');
+        $attributeMetadata2->setMethodsMutator('setter2');
         $attributeMetadata2->setExclude(false);
         $attributeMetadata2->setExpose(true);
         $attributeMetadata2->setMaxDepth(3);
@@ -182,8 +182,8 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata1->merge($attributeMetadata2);
 
         $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
-        $this->assertEquals('getter', $attributeMetadata1->getAccessorGetter());
-        $this->assertEquals('setter', $attributeMetadata1->getAccessorSetter());
+        $this->assertEquals('getter', $attributeMetadata1->getMethodsAccessor());
+        $this->assertEquals('setter', $attributeMetadata1->getMethodsMutator());
         $this->assertEquals(true, $attributeMetadata1->getExclude());
         $this->assertEquals(false, $attributeMetadata1->getExpose());
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());

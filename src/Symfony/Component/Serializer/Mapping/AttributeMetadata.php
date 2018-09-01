@@ -32,7 +32,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.
      */
-    public $accessorGetter;
+    public $methodsAccessor;
 
     /**
      * @var string
@@ -41,7 +41,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.
      */
-    public $accessorSetter;
+    public $methodsMutator;
 
     /**
      * @var bool
@@ -120,19 +120,19 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * @return string
      */
-    public function getAccessorGetter()
+    public function getMethodsAccessor()
     {
-        return $this->accessorGetter;
+        return $this->methodsAccessor;
     }
 
     /**
-     * @param string $accessorGetter
+     * @param string $methodsAccessor
      *
      * @return AttributeMetadata
      */
-    public function setAccessorGetter($accessorGetter)
+    public function setMethodsAccessor($methodsAccessor)
     {
-        $this->accessorGetter = $accessorGetter;
+        $this->methodsAccessor = $methodsAccessor;
 
         return $this;
     }
@@ -140,19 +140,19 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * @return string
      */
-    public function getAccessorSetter()
+    public function getMethodsMutator()
     {
-        return $this->accessorSetter;
+        return $this->methodsMutator;
     }
 
     /**
-     * @param string $accessorSetter
+     * @param string $mutator
      *
      * @return AttributeMetadata
      */
-    public function setAccessorSetter($accessorSetter)
+    public function setMethodsMutator($mutator)
     {
-        $this->accessorSetter = $accessorSetter;
+        $this->methodsMutator = $mutator;
 
         return $this;
     }
@@ -294,18 +294,18 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(AttributeMetadataInterface $attributeMetadata)
+    public function merge(self $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {
             $this->addGroup($group);
         }
 
         // Overwrite only if not defined
-        if (null === $this->accessorGetter) {
-            $this->accessorGetter = $attributeMetadata->getAccessorGetter();
+        if (null === $this->methodsAccessor) {
+            $this->methodsAccessor = $attributeMetadata->getMethodsAccessor();
         }
-        if (null === $this->accessorSetter) {
-            $this->accessorSetter = $attributeMetadata->getAccessorSetter();
+        if (null === $this->methodsMutator) {
+            $this->methodsMutator = $attributeMetadata->getMethodsAccessor();
         }
         if (null === $this->exclude) {
             $this->exclude = $attributeMetadata->getExclude();

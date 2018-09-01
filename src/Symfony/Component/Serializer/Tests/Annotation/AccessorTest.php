@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
-use Symfony\Component\Serializer\Annotation\Accessor;
+use Symfony\Component\Serializer\Annotation\Methods;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -23,7 +23,7 @@ class AccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testNoParameter()
     {
-        new Accessor(array());
+        new Methods(array());
     }
 
     /**
@@ -31,7 +31,7 @@ class AccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidParameter()
     {
-        new Accessor(array('value' => 'Foobar'));
+        new Methods(array('value' => 'Foobar'));
     }
 
     /**
@@ -39,7 +39,7 @@ class AccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetterParameter()
     {
-        new Accessor(array('setter' => new \stdClass()));
+        new Methods(array('setter' => new \stdClass()));
     }
 
     /**
@@ -47,13 +47,13 @@ class AccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidGetterParameter()
     {
-        new Accessor(array('getter' => array()));
+        new Methods(array('getter' => array()));
     }
 
     public function testAccessorParameters()
     {
-        $accessor = new Accessor(array('setter' => 'Foo', 'getter' => 'Bar'));
-        $this->assertEquals('Bar', $accessor->getGetter());
-        $this->assertEquals('Foo', $accessor->getSetter());
+        $accessor = new Methods(array('setter' => 'Foo', 'getter' => 'Bar'));
+        $this->assertEquals('Bar', $accessor->getAccessor());
+        $this->assertEquals('Foo', $accessor->getMutator());
     }
 }

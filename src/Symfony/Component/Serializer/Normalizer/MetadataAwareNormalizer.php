@@ -89,7 +89,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
         $classMetadata = $this->classMetadataFactory->getMetadataFor($object);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
 
-        if (null !== $function = $attributeMetadata[$attribute]->getAccessorGetter()) {
+        if (null !== $function = $attributeMetadata[$attribute]->getMethodsAccessor()) {
             return $object->$function();
         }
 
@@ -105,7 +105,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
         $classMetadata = $this->classMetadataFactory->getMetadataFor($object);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
 
-        if (null !== $function = $attributeMetadata[$attribute]->getAccessorSetter()) {
+        if (null !== $function = $attributeMetadata[$attribute]->getMethodsMutator()) {
             return $object->$function($value);
         }
 

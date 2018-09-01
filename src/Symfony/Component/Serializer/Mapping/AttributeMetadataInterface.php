@@ -35,28 +35,28 @@ interface AttributeMetadataInterface
      *
      * @return string|null
      */
-    public function getAccessorGetter();
+    public function getMethodsAccessor();
 
     /**
      * Set the getter for this attribute.
      *
      * @param string|null
      */
-    public function setAccessorGetter($function);
+    public function setMethodsAccessor($function);
 
     /**
      * Get the setter for this attribute.
      *
      * @return string|null
      */
-    public function getAccessorSetter();
+    public function getMethodsMutator();
 
     /**
      * Set the setter for this attribute.
      *
      * @param string|null
      */
-    public function setAccessorSetter($function);
+    public function setMethodsMutator($function);
 
     /**
      * True if this attribute should be excluded.

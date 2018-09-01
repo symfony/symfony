@@ -60,9 +60,9 @@ class BetterAnnotationLoader implements LoaderInterface
                         foreach ($annotation->getGroups() as $group) {
                             $attributesMetadata[$property->name]->addGroup($group);
                         }
-                    } elseif ($annotation instanceof Annotation\Accessor) {
-                        $attributesMetadata[$property->name]->setAccessorGetter($annotation->getGetter());
-                        $attributesMetadata[$property->name]->setAccessorSetter($annotation->getSetter());
+                    } elseif ($annotation instanceof Annotation\Methods) {
+                        $attributesMetadata[$property->name]->setMethodsAccessor($annotation->getAccessor());
+                        $attributesMetadata[$property->name]->setMethodsMutator($annotation->getMutator());
                     } elseif ($annotation instanceof Annotation\Exclude) {
                         $attributesMetadata[$property->name]->setExclude($annotation->getValue());
                     } elseif ($annotation instanceof Annotation\Expose) {
@@ -99,7 +99,7 @@ class BetterAnnotationLoader implements LoaderInterface
             $classMetadata->addAttributeMetadata($attributeMetadata);
 
             // Add default values for methods
-            $attributeMetadata->setAccessorGetter($methodName);
+            $attributeMetadata->setMethodsAccessor($methodName);
             $attributeMetadata->setExclude(true);
             $attributeMetadata->setReadOnly(true);
 

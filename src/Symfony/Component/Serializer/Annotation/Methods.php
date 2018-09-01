@@ -10,16 +10,17 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-final class Accessor
+final class Methods
 {
     /**
      * @var string
      */
-    private $getter;
+    private $accessor;
+
     /**
      * @var string
      */
-    private $setter;
+    private $mutator;
 
     /**
      * @param array $data
@@ -42,24 +43,18 @@ final class Accessor
             $this->$parameter = $data[$parameter];
         }
 
-        if (null === $this->getter && null === $this->setter) {
+        if (null === $this->accessor && null === $this->mutator) {
             throw new InvalidArgumentException(sprintf('Either option "getter" or "setter" must be given for annotation %s', get_class($this)));
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getGetter()
+    public function getAccessor(): ?string
     {
-        return $this->getter;
+        return $this->accessor;
     }
 
-    /**
-     * @return string
-     */
-    public function getSetter()
+    public function getMutator(): ?string
     {
-        return $this->setter;
+        return $this->mutator;
     }
 }

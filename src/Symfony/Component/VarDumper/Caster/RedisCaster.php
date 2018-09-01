@@ -105,7 +105,8 @@ class RedisCaster
      */
     private static function getRedisOptions($redis, array $options = array()): EnumStub
     {
-        if (\is_array($serializer = $redis->getOption(\Redis::OPT_SERIALIZER))) {
+        $serializer = $redis->getOption(\Redis::OPT_SERIALIZER);
+        if (\is_array($serializer)) {
             foreach ($serializer as &$v) {
                 if (isset(self::$serializer[$v])) {
                     $v = new ConstStub(self::$serializer[$v], $v);
@@ -115,7 +116,8 @@ class RedisCaster
             $serializer = new ConstStub(self::$serializer[$serializer], $serializer);
         }
 
-        if (\is_array($compression = \defined('Redis::OPT_COMPRESSION') ? $redis->getOption(\Redis::OPT_COMPRESSION) : 0)) {
+        $compression = \defined('Redis::OPT_COMPRESSION') ? $redis->getOption(\Redis::OPT_COMPRESSION) : 0;
+        if (\is_array($compression)) {
             foreach ($compression as &$v) {
                 if (isset(self::$compression[$v])) {
                     $v = new ConstStub(self::$compression[$v], $v);
@@ -125,7 +127,8 @@ class RedisCaster
             $compression = new ConstStub(self::$compression[$compression], $compression);
         }
 
-        if (\is_array($retry = \defined('Redis::OPT_SCAN') ? $redis->getOption(\Redis::OPT_SCAN) : 0)) {
+        $retry = \defined('Redis::OPT_SCAN') ? $redis->getOption(\Redis::OPT_SCAN) : 0;
+        if (\is_array($retry)) {
             foreach ($retry as &$v) {
                 $v = new ConstStub($v ? 'RETRY' : 'NORETRY', $v);
             }

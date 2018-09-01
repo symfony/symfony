@@ -6,6 +6,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
  * @Serializer\ExclusionPolicy("all")
+ *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class ExclusionPolicyAllDummy

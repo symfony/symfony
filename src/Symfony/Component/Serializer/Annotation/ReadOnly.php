@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Annotation;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -25,8 +34,8 @@ final class ReadOnly
             return;
         }
 
-        if (!is_bool($data['value'])) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a boolean.', get_class($this)));
+        if (!\is_bool($data['value'])) {
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a boolean.', \get_class($this)));
         }
 
         $this->readOnly = $data['value'];

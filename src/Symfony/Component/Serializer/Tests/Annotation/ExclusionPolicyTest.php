@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\ExclusionPolicy;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ExclusionPolicyTest extends \PHPUnit_Framework_TestCase
+class ExclusionPolicyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

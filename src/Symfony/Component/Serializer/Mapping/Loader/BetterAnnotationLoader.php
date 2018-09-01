@@ -29,9 +29,6 @@ class BetterAnnotationLoader implements LoaderInterface
      */
     private $reader;
 
-    /**
-     * @param Reader $reader
-     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;

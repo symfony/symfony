@@ -30,7 +30,7 @@ class ClassMetadata implements ClassMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
+     *           {@link getExclusionPolicy()} instead.
      */
     public $exclusionPolicy;
 
@@ -39,7 +39,7 @@ class ClassMetadata implements ClassMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
+     *           {@link getReadOnly()} instead.
      */
     public $readOnly;
 

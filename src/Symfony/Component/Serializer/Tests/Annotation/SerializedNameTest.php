@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class SerializedNameTest extends \PHPUnit_Framework_TestCase
+class SerializedNameTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Methods;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class AccessorTest extends \PHPUnit_Framework_TestCase
+class AccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

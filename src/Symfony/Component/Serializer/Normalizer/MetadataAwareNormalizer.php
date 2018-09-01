@@ -11,36 +11,35 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Annotation\ExclusionPolicy;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\PropertyManager\ReflectionPropertyAccess;
 
 /**
  * Converts between objects and arrays using the Reflection and respect the metadata.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class MetadataAwareNormalizer extends AbstractObjectNormalizer
+final class MetadataAwareNormalizer extends AbstractObjectNormalizer
 {
     /**
-     * @var ReflectionPropertyAccess
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
-    public function __construct(
-        ClassMetadataFactoryInterface $classMetadataFactory = null,
-        NameConverterInterface $nameConverter = null,
-        PropertyAccessorInterface $propertyAccessor = null,
-        PropertyTypeExtractorInterface $propertyTypeExtractor = null)
-    {
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor);
-
-        $this->propertyAccessor = new ReflectionPropertyAccess();
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, PropertyAccessorInterface $propertyAccessor = null) {
+        if (null === $propertyAccessor) {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+        $this->propertyAccessor = $propertyAccessor;
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver);
     }
+
 
     /**
      * {@inheritdoc}
@@ -54,7 +53,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
         $reflClass = new \ReflectionClass($object);
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
             if (
-                $reflMethod->getNumberOfRequiredParameters() !== 0 ||
+                0 !== $reflMethod->getNumberOfRequiredParameters() ||
                 $reflMethod->isStatic() ||
                 $reflMethod->isConstructor() ||
                 $reflMethod->isDestructor()
@@ -136,7 +135,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
             return true;
         }
 
-        if ($classMetadata->getExclusionPolicy() === ExclusionPolicy::ALL) {
+        if (ExclusionPolicy::ALL === $classMetadata->getExclusionPolicy()) {
             return false;
         }
 
@@ -149,7 +148,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        if (!is_object($data)) {
+        if (!\is_object($data)) {
             return false;
         }
 
@@ -161,37 +160,20 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
-    {
-        if (
-            isset($context[AbstractNormalizer::OBJECT_TO_POPULATE]) &&
-            is_object($context[AbstractNormalizer::OBJECT_TO_POPULATE]) &&
-            $context[AbstractNormalizer::OBJECT_TO_POPULATE] instanceof $class
-        ) {
-            $object = $context[AbstractNormalizer::OBJECT_TO_POPULATE];
-            unset($context[AbstractNormalizer::OBJECT_TO_POPULATE]);
-
-            return $object;
-        }
-
-        $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-        if (!$constructor) {
-            return new $class();
-        }
-
-        return $reflectionClass->newInstanceWithoutConstructor();
-    }
-
-    /**
      * Update data for normalization.
      *
      * {@inheritdoc}
      */
-    protected function updateData(array $data, $attribute, $attributeValue, $object)
+    protected function updateData(array $data, string  $attribute, $attributeValue/*, $object*/): array
     {
+        if (3 === \func_num_args()) {
+            @trigger_error('Fourth argument to MetadataAwareNormalizer must be the object.', E_USER_DEPRECATED);
+
+            return $data;
+        }
+        $object = func_get_arg(3);
+
+
         /** @var ClassMetadataInterface $classMetadata */
         $classMetadata = $this->classMetadataFactory->getMetadataFor($object);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
@@ -212,19 +194,29 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
      *
      * {@inheritdoc}
      */
-    protected function prepareForDenormalization($data, $class)
+    protected function prepareForDenormalization($data/*, string $class*/)
     {
+        if (1 === \func_num_args()) {
+            @trigger_error('Second argument to MetadataAwareNormalizer must be the class name', E_USER_DEPRECATED);
+            return (array) $data;
+        }
+
+        $class =  func_get_arg(1);
         $preparedData = array();
         $data = (array) $data;
         /** @var ClassMetadataInterface $classMetadata */
         $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
-        $classReadOnly = true === $classMetadata->getReadOnly();
+
+        // We should not do anything if the class is read only.
+        if (true === $classMetadata->getReadOnly()) {
+            return array();
+        }
 
         $validSerializedKeys = array();
         foreach ($attributeMetadata as $attributeName => $metadata) {
             $attributeReadOnly = $metadata->getReadOnly();
-            if ($attributeReadOnly === true || ($classReadOnly && $attributeReadOnly !== false)) {
+            if (true === $attributeReadOnly || false !== $attributeReadOnly) {
                 // This is not a valid key
                 continue;
             }
@@ -246,7 +238,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
 
         $validSerializedKeyNames = array_keys($validSerializedKeys);
         foreach ($data as $serializedKeyName => $value) {
-            if (in_array($serializedKeyName, $validSerializedKeyNames)) {
+            if (\in_array($serializedKeyName, $validSerializedKeyNames)) {
                 // Replace with the keys for the serialized attribute
                 $preparedData[$validSerializedKeys[$serializedKeyName]] = $value;
             }

@@ -53,7 +53,7 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->serializer = $this->getMock(__NAMESPACE__.'\MetadataObjectSerializerNormalizer');
         $classMetadataFactory = new ClassMetadataFactory(new BetterAnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new MetadataAwareNormalizer($classMetadataFactory, null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
+        $this->normalizer = new MetadataAwareNormalizer($classMetadataFactory, null, null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -305,7 +305,7 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $serializer = $this->getMock(__NAMESPACE__.'\MetadataObjectSerializerNormalizer');
         $classMetadataFactory = new ClassMetadataFactory(new BetterAnnotationLoader(new AnnotationReader()));
-        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
+        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
         $normalizer->setSerializer($serializer);
 
         $data = ['super_model' => 'model_val', 'car_size' => 'size_val', 'color' => 'color_val'];
@@ -323,7 +323,7 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $serializer = $this->getMock(__NAMESPACE__.'\MetadataObjectSerializerNormalizer');
         $classMetadataFactory = new ClassMetadataFactory(new BetterAnnotationLoader(new AnnotationReader()));
-        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
+        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
         $normalizer->setSerializer($serializer);
 
         $data = ['model' => 'model_val', 'carSize' => 'size_val', 'color' => 'color_val'];

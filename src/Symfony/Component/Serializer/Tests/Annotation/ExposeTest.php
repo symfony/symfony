@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Expose;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ExposeTest extends \PHPUnit_Framework_TestCase
+class ExposeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\ReadOnly;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ReadOnlyTest extends \PHPUnit_Framework_TestCase
+class ReadOnlyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

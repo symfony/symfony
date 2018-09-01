@@ -30,7 +30,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getMethodsAccessor()} instead.
      */
     public $methodsAccessor;
 
@@ -39,7 +39,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getMethodsMutator()} instead.
      */
     public $methodsMutator;
 
@@ -48,7 +48,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getExclude()} instead.
      */
     public $exclude;
 
@@ -57,7 +57,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getExpose()} instead.
      */
     public $expose;
 
@@ -82,7 +82,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getReadOnly()} instead.
      */
     public $readOnly;
 
@@ -91,7 +91,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getSerializedName()} instead.
      */
     public $serializedName;
 
@@ -100,7 +100,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getType()} instead.
      */
     public $type;
 

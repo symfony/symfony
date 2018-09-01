@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Type;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class TypeTest extends \PHPUnit_Framework_TestCase
+class TypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

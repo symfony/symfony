@@ -340,8 +340,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
                 }
 
-                if (!is_array($data) && !$data instanceof \Traversable) {
-                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because the value is "%s", expected array', $attribute, $class, gettype($data)));
+                if (!\is_array($data) && !$data instanceof \Traversable) {
+                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because the value is "%s", expected array', $attribute, $class, \gettype($data)));
                 }
 
                 $denormalizedData = array();
@@ -418,6 +418,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * Sets an attribute and apply the name converter if necessary.
      *
      * @param mixed $attributeValue
+     *
      * @internal
      */
     protected function updateData(array $data, string $attribute, $attributeValue): array

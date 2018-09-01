@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Exclude;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ExcludeTest extends \PHPUnit_Framework_TestCase
+class ExcludeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\PropertyManager;
 
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -83,7 +92,7 @@ class MetadataAwarePropertyTypeExtractor implements PropertyTypeExtractorInterfa
      */
     private function getPhpTypeAndClass($docType)
     {
-        if (in_array($docType, Type::$builtinTypes)) {
+        if (\in_array($docType, Type::$builtinTypes)) {
             return array($docType, null);
         }
 

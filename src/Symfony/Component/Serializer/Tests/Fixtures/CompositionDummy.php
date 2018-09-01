@@ -24,11 +24,13 @@ class CompositionDummy
         }
     }
 
-    /**
-     * @return Car
-     */
     public function getChild()
     {
         return $this->child;
+    }
+
+    public function setChild(CompositionChildDummy $child)
+    {
+        $this->child = $child;
     }
 }

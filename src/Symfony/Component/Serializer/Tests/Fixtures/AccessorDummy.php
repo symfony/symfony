@@ -7,7 +7,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 class AccessorDummy
 {
     /**
-     * @Serializer\Accessor(getter="getModel", setter="setModel")
+     * @Serializer\Methods(accessor="getModel", mutator="setModel")
      */
     public $model = 'defaultValue';
 

@@ -294,7 +294,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(self $attributeMetadata)
+    public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {
             $this->addGroup($group);
@@ -305,7 +305,7 @@ class AttributeMetadata implements AttributeMetadataInterface
             $this->methodsAccessor = $attributeMetadata->getMethodsAccessor();
         }
         if (null === $this->methodsMutator) {
-            $this->methodsMutator = $attributeMetadata->getMethodsAccessor();
+            $this->methodsMutator = $attributeMetadata->getMethodsMutator();
         }
         if (null === $this->exclude) {
             $this->exclude = $attributeMetadata->getExclude();
@@ -336,8 +336,8 @@ class AttributeMetadata implements AttributeMetadataInterface
     {
         return array(
             'name',
-            'accessorGetter',
-            'accessorSetter',
+            'methodsAccessor',
+            'methodsMutator',
             'exclude',
             'expose',
             'groups',

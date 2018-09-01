@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\Serializer\Mapping\Loader\BetterAnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -38,7 +40,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
+class MetadataAwareNormalizerTest extends TestCase
 {
     /**
      * @var MetadataAwareNormalizer
@@ -51,9 +53,9 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock(__NAMESPACE__.'\MetadataObjectSerializerNormalizer');
+        $this->serializer = $this->getMockBuilder(__NAMESPACE__.'\MetadataObjectSerializerNormalizer')->getMock();
         $classMetadataFactory = new ClassMetadataFactory(new BetterAnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new MetadataAwareNormalizer($classMetadataFactory, null, null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
+        $this->normalizer = new MetadataAwareNormalizer($classMetadataFactory, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -91,7 +93,7 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
         $serializer = new MicroSerializer($this->normalizer);
         $this->normalizer->setSerializer($serializer);
 
-        $data = json_decode('{"name":"Foobar","child":{"super_model":"val_model","car_size":"val_size","color":"val_color"}}', true);
+        $data = json_decode('{"name":"Foobar","child":{"super_model":"val_model","carSize":"val_size","color":"val_color"}}', true);
         $obj = $this->normalizer->denormalize($data, CompositionDummy::class);
 
         $this->assertEquals('Foobar', $obj->name);
@@ -287,7 +289,7 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
         $data = ['model' => 'model_value', 'size' => 'size_value', 'color' => 'color_value'];
         $obj = $this->normalizer->denormalize($data, ReadOnlyClassDummy::class);
 
-        $this->assertEquals('model_value', $obj->model);
+        $this->assertEquals(null, $obj->model);
         $this->assertEquals(null, $obj->size);
         $this->assertEquals(null, $obj->color);
     }
@@ -303,9 +305,9 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializedNameDenormalize()
     {
-        $serializer = $this->getMock(__NAMESPACE__.'\MetadataObjectSerializerNormalizer');
+        $serializer = $this->getMockBuilder(__NAMESPACE__.'\MetadataObjectSerializerNormalizer')->getMock();
         $classMetadataFactory = new ClassMetadataFactory(new BetterAnnotationLoader(new AnnotationReader()));
-        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
+        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(),  new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
         $normalizer->setSerializer($serializer);
 
         $data = ['super_model' => 'model_val', 'car_size' => 'size_val', 'color' => 'color_val'];
@@ -321,9 +323,9 @@ class MetadataAwareNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerializedNameDenormalizeWhenIgnoringSerializedName()
     {
-        $serializer = $this->getMock(__NAMESPACE__.'\MetadataObjectSerializerNormalizer');
+        $serializer = $this->getMockBuilder(__NAMESPACE__.'\MetadataObjectSerializerNormalizer')->getMock();
         $classMetadataFactory = new ClassMetadataFactory(new BetterAnnotationLoader(new AnnotationReader()));
-        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
+        $normalizer = new MetadataAwareNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), new MetadataAwarePropertyTypeExtractor($classMetadataFactory));
         $normalizer->setSerializer($serializer);
 
         $data = ['model' => 'model_val', 'carSize' => 'size_val', 'color' => 'color_val'];

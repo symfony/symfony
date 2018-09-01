@@ -18,14 +18,6 @@ use Symfony\Component\Serializer\Annotation\Expose;
  */
 class ExposeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
-    public function testInvalidParameter()
-    {
-        new Expose(array('value' => 'Foobar'));
-    }
-
     public function testExpose()
     {
         $expose = new Expose();

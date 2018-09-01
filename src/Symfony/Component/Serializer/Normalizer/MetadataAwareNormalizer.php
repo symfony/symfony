@@ -127,12 +127,14 @@ final class MetadataAwareNormalizer extends AbstractObjectNormalizer
         $classMetadata = $this->classMetadataFactory->getMetadataFor($classOrObject);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
 
-        if (true === $attributeMetadata[$attribute]->getExclude()) {
-            return false;
-        }
+        if (isset($attributeMetadata[$attribute])) {
+            if (true === $attributeMetadata[$attribute]->getExclude()) {
+                return false;
+            }
 
-        if (true === $attributeMetadata[$attribute]->getExpose()) {
-            return true;
+            if (true === $attributeMetadata[$attribute]->getExpose()) {
+                return true;
+            }
         }
 
         if (ExclusionPolicy::ALL === $classMetadata->getExclusionPolicy()) {
@@ -216,7 +218,7 @@ final class MetadataAwareNormalizer extends AbstractObjectNormalizer
         $validSerializedKeys = array();
         foreach ($attributeMetadata as $attributeName => $metadata) {
             $attributeReadOnly = $metadata->getReadOnly();
-            if (true === $attributeReadOnly || false !== $attributeReadOnly) {
+            if (true === $attributeReadOnly) {
                 // This is not a valid key
                 continue;
             }

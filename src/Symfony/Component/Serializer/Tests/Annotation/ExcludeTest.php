@@ -18,14 +18,6 @@ use Symfony\Component\Serializer\Annotation\Exclude;
  */
 class ExcludeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
-    public function testInvalidParameter()
-    {
-        new Exclude(array('value' => 'Foobar'));
-    }
-
     public function testExclude()
     {
         $exclude = new Exclude();

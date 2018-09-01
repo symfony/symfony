@@ -52,7 +52,7 @@ class AccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testAccessorParameters()
     {
-        $accessor = new Methods(array('setter' => 'Foo', 'getter' => 'Bar'));
+        $accessor = new Methods(array('mutator' => 'Foo', 'accessor' => 'Bar'));
         $this->assertEquals('Bar', $accessor->getAccessor());
         $this->assertEquals('Foo', $accessor->getMutator());
     }

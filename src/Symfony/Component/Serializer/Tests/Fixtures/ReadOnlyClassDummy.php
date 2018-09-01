@@ -10,16 +10,10 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  */
 class ReadOnlyClassDummy
 {
-    /**
-     * @Serializer\ReadOnly(false)
-     */
     public $model;
 
     public $size;
 
-    /**
-     * @Serializer\ReadOnly()
-     */
     public $color;
 
     public function __construct($withValues = false)

@@ -189,7 +189,7 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
-        if ($container->hasDefinition('console.command.messenger_debug')) {
+        if ($container->hasDefinitgion('console.command.messenger_debug')) {
             $debugCommandMapping = $handlersByBusAndMessage;
             foreach ($busIds as $bus) {
                 if (!isset($debugCommandMapping[$bus])) {
@@ -197,17 +197,6 @@ class MessengerPass implements CompilerPassInterface
                 }
             }
             $container->getDefinition('console.command.messenger_debug')->replaceArgument(0, $debugCommandMapping);
-        }
-
-        if ($container->hasDefinition('console.command.messenger_consume_messages')) {
-            $buses = array();
-            foreach ($busIds as $busId) {
-                $buses[$busId] = new Reference($busId);
-            }
-            $container
-                ->getDefinition('console.command.messenger_consume_messages')
-                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
-                ->replaceArgument(4, $busIds);
         }
     }
 

@@ -52,7 +52,6 @@ class YamlFileLoader extends FileLoader
         }
 
         $yaml = $this->classes[$classMetadata->getName()];
-
         if (isset($yaml['attributes']) && \is_array($yaml['attributes'])) {
             $attributesMetadata = $classMetadata->getAttributesMetadata();
 
@@ -78,6 +77,44 @@ class YamlFileLoader extends FileLoader
                     }
                 }
 
+                if (isset($data['methods'])) {
+                    if (!\is_array($data['methods'])) {
+                        throw new MappingException(sprintf('The "methods" key must be an array in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    foreach ($data['methods'] as $methods) {
+                        if (isset($methods['accessor'])) {
+                            if (!\is_string($methods['accessor'])) {
+                                throw new MappingException(sprintf('The value of "methods.accessor" must be a in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                            }
+                            $attributeMetadata->setMethodsAccessor($methods['accessor']);
+                        }
+
+                        if (isset($methods['mutator'])) {
+                            if (!\is_string($methods['mutator'])) {
+                                throw new MappingException(sprintf('The value of "methods.mutator" must be a in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                            }
+                            $attributeMetadata->setMethodsAccessor($methods['mutator']);
+                        }
+                    }
+                }
+
+                if (isset($data['exclude'])) {
+                    if (!\is_bool($data['exclude'])) {
+                        throw new MappingException(sprintf('The "exclude" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setExclude($data['exclude']);
+                }
+
+                if (isset($data['expose'])) {
+                    if (!\is_bool($data['expose'])) {
+                        throw new MappingException(sprintf('The "expose" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setExpose($data['expose']);
+                }
+
                 if (isset($data['max_depth'])) {
                     if (!\is_int($data['max_depth'])) {
                         throw new MappingException(sprintf('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
@@ -85,7 +122,46 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setMaxDepth($data['max_depth']);
                 }
+
+                if (isset($data['read_only'])) {
+                    if (!\is_bool($data['read_only'])) {
+                        throw new MappingException(sprintf('The "read_only" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setReadOnly($data['read_only']);
+                }
+
+                if (isset($data['serialized_name'])) {
+                    if (!\is_string($data['serialized_name'])) {
+                        throw new MappingException(sprintf('The "serialized_name" value must be a string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setReadOnly($data['serialized_name']);
+                }
+
+                if (isset($data['type'])) {
+                    if (!\is_string($data['type'])) {
+                        throw new MappingException(sprintf('The "type" value must be a string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setReadOnly($data['type']);
+                }
             }
+        }
+
+        if (isset($yaml['exclusion_policy'])) {
+            if (!\is_string($yaml['exclusion_policy'])) {
+                throw new MappingException(sprintf('The "exclusion_policy" value must be a string in "%s" for the class "%s".', $this->file, $classMetadata->getName()));
+            }
+
+            $classMetadata->setExclusionPolicy($yaml['exclusion_policy']);
+        }
+        if (isset($yaml['read_only'])) {
+            if (!\is_bool($yaml['read_only'])) {
+                throw new MappingException(sprintf('The "read_only" value must be a boolean in "%s" for the class "%s".', $this->file, $classMetadata->getName()));
+            }
+
+            $classMetadata->setReadOnly($yaml['read_only']);
         }
 
         if (isset($yaml['discriminator_map'])) {

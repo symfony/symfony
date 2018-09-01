@@ -135,6 +135,12 @@
     "autoload-dev": {
         "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "src/Symfony/Contracts"
+        }
+    ],
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

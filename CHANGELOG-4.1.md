@@ -7,6 +7,30 @@ in 4.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.1.0...v4.1.1
 
+* 4.1.4 (2018-08-28)
+
+ * bug #28278 [HttpFoundation] Fix unprepared BinaryFileResponse sends empty file (wackymole)
+ * bug #28284 [PhpUnitBridge] keep compat with composer 1.0 (nicolas-grekas)
+ * bug #28251 [HttpFoundation] Allow RedisCluster class for RedisSessionHandler (michaelperrin)
+ * bug #28241 [HttpKernel] fix forwarding trusted headers as server parameters (nicolas-grekas)
+ * bug #28220 [PropertyAccess] fix type error handling when writing values (xabbuh)
+ * bug #28249 [Cache] enable Memcached::OPT_TCP_NODELAY to fix perf of misses (nicolas-grekas)
+ * bug #28252 [DoctrineBridge] support __toString as documented for UniqueEntityValidator (dmaicher)
+ * bug #28216 [FrameworkBundle] `message_bus` alias public (sroze)
+ * bug #28113 [Form] Add help texts for checkboxes in horizontal bootstrap 4 forms (apfelbox)
+ * bug #28100 [Security] Call AccessListener after LogoutListener (chalasr)
+ * bug #28174 Remove the HTML5 validation from the profiler URL search form (Soullivaneuh)
+ * bug #28159 [DI] Fix autowire inner service (hason)
+ * bug #28060 [DI] Fix false-positive circular ref leading to wrong exceptions or infinite loops at runtime (nicolas-grekas)
+ * bug #28144 [HttpFoundation] fix false-positive ConflictingHeadersException (nicolas-grekas)
+ * bug #28152 [Translation] fix perf of lint:xliff command (nicolas-grekas)
+ * bug #28115 [Form] Remove extra .form-group wrapper around file widget in bootstrap 4 (MrMitch)
+ * bug #28120 [Routing] Fixed scheme redirecting for root path (twoleds)
+ * bug #28112 Fix CSS property typo (AhmedAbdulrahman)
+ * bug #28012 [PropertyInfo] Allow nested collections (jderusse)
+ * bug #28055 [PropertyInfo] Allow nested collections (jderusse)
+ * bug #28083 Remove the Expires header when calling Response::expire() (javiereguiluz)
+
 * 4.1.3 (2018-08-01)
 
  * security #cve-2018-14774 [HttpKernel] fix trusted headers management in HttpCache and InlineFragmentRenderer (nicolas-grekas)

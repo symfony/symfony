@@ -18,11 +18,9 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
@@ -35,12 +33,12 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQuery;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 class MessengerPassTest extends TestCase
 {
@@ -235,26 +233,6 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertEquals(array(AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
-    }
-
-    public function testItRegistersMultipleReceiversAndSetsTheReceiverNamesOnTheCommand()
-    {
-        $container = $this->getContainerBuilder();
-        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
-            null,
-            new Reference('messenger.receiver_locator'),
-            null,
-            null,
-            null,
-        ));
-
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
-        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', array('alias' => 'dummy'));
-
-        (new MessengerPass())->process($container);
-
-        $this->assertSame(array('amqp', 'dummy'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
-        $this->assertSame(array('message_bus'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4));
     }
 
     public function testItRegistersSenders()
@@ -627,20 +605,6 @@ class MessengerPassTest extends TestCase
 class DummyHandler
 {
     public function __invoke(DummyMessage $message): void
-    {
-    }
-}
-
-class DummyReceiver implements ReceiverInterface
-{
-    public function receive(callable $handler): void
-    {
-        for ($i = 0; $i < 3; ++$i) {
-            $handler(Envelope::wrap(new DummyMessage("Dummy $i")));
-        }
-    }
-
-    public function stop(): void
     {
     }
 }

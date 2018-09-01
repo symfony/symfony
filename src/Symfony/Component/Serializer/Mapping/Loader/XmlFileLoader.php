@@ -63,9 +63,47 @@ class XmlFileLoader extends FileLoader
                     $attributeMetadata->addGroup((string) $group);
                 }
 
+                foreach ($attribute->methods as $methods) {
+                    if (isset($methods['accessor'])) {
+                        $attributeMetadata->setMethodsAccessor((string) $methods['accessor']);
+                    }
+
+                    if (isset($methods['mutator'])) {
+                        $attributeMetadata->setMethodsMutator((string) $methods['mutator']);
+                    }
+                }
+
+                if (isset($attribute['exclude'])) {
+                    $attributeMetadata->setExclude((bool) $attribute['exclude']);
+                }
+
+                if (isset($attribute['expose'])) {
+                    $attributeMetadata->setExpose((bool) $attribute['expose']);
+                }
+
                 if (isset($attribute['max-depth'])) {
                     $attributeMetadata->setMaxDepth((int) $attribute['max-depth']);
                 }
+
+                if (isset($attribute['read-only'])) {
+                    $attributeMetadata->setReadOnly((bool) $attribute['read-only']);
+                }
+
+                if (isset($attribute['serialized-name'])) {
+                    $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
+                }
+
+                if (isset($attribute['type'])) {
+                    $attributeMetadata->setType((string) $attribute['type']);
+                }
+            }
+
+            if (isset($xml['exclusion-policy'])) {
+                $classMetadata->setExclusionPolicy((string) $xml['exclusion-policy']);
+            }
+
+            if (isset($xml['read-only'])) {
+                $classMetadata->setReadOnly((bool) $xml['read-only']);
             }
 
             if (isset($xml->{'discriminator-map'})) {

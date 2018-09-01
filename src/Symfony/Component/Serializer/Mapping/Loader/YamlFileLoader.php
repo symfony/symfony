@@ -156,6 +156,7 @@ class YamlFileLoader extends FileLoader
 
             $classMetadata->setExclusionPolicy($yaml['exclusion_policy']);
         }
+
         if (isset($yaml['read_only'])) {
             if (!\is_bool($yaml['read_only'])) {
                 throw new MappingException(sprintf('The "read_only" value must be a boolean in "%s" for the class "%s".', $this->file, $classMetadata->getName()));

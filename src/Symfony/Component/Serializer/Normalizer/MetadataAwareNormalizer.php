@@ -32,14 +32,14 @@ final class MetadataAwareNormalizer extends AbstractObjectNormalizer
      */
     protected $propertyAccessor;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, PropertyAccessorInterface $propertyAccessor = null) {
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, PropertyAccessorInterface $propertyAccessor = null)
+    {
         if (null === $propertyAccessor) {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
         $this->propertyAccessor = $propertyAccessor;
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver);
     }
-
 
     /**
      * {@inheritdoc}
@@ -173,7 +173,6 @@ final class MetadataAwareNormalizer extends AbstractObjectNormalizer
         }
         $object = func_get_arg(3);
 
-
         /** @var ClassMetadataInterface $classMetadata */
         $classMetadata = $this->classMetadataFactory->getMetadataFor($object);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
@@ -198,10 +197,11 @@ final class MetadataAwareNormalizer extends AbstractObjectNormalizer
     {
         if (1 === \func_num_args()) {
             @trigger_error('Second argument to MetadataAwareNormalizer must be the class name', E_USER_DEPRECATED);
+
             return (array) $data;
         }
 
-        $class =  func_get_arg(1);
+        $class = func_get_arg(1);
         $preparedData = array();
         $data = (array) $data;
         /** @var ClassMetadataInterface $classMetadata */

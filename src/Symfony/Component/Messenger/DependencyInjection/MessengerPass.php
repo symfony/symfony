@@ -189,7 +189,7 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
-        if ($container->hasDefinitgion('console.command.messenger_debug')) {
+        if ($container->hasDefinition('console.command.messenger_debug')) {
             $debugCommandMapping = $handlersByBusAndMessage;
             foreach ($busIds as $bus) {
                 if (!isset($debugCommandMapping[$bus])) {

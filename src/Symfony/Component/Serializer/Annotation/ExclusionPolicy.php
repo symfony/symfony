@@ -20,9 +20,6 @@ final class ExclusionPolicy
      */
     private $policy;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         if (!isset($data['value']) || !$data['value']) {
@@ -40,10 +37,7 @@ final class ExclusionPolicy
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getPolicy()
+    public function getPolicy(): string
     {
         return $this->policy;
     }

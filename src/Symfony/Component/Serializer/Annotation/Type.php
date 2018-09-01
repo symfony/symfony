@@ -17,9 +17,6 @@ final class Type
      */
     private $type;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         if (!isset($data['value']) || !$data['value']) {
@@ -42,10 +39,7 @@ final class Type
         $this->type = $data['value'];
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }

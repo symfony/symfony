@@ -17,9 +17,6 @@ final class ReadOnly
      */
     private $readOnly;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data = array())
     {
         if (empty($data) || !isset($data['value'])) {
@@ -35,10 +32,7 @@ final class ReadOnly
         $this->readOnly = $data['value'];
     }
 
-    /**
-     * @return bool
-     */
-    public function getReadOnly()
+    public function getReadOnly(): bool
     {
         return $this->readOnly;
     }

@@ -17,9 +17,6 @@ final class SerializedName
      */
     private $name;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         if (!isset($data['value']) || !$data['value']) {
@@ -33,7 +30,7 @@ final class SerializedName
         $this->name = $data['value'];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

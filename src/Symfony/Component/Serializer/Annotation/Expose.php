@@ -12,20 +12,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 final class Expose
 {
-    /**
-     * @param array $data
-     */
-    public function __construct(array $data = array())
-    {
-        if (!empty($data)) {
-            throw new InvalidArgumentException(sprintf('No parameter is allowed for annotation "%s".', get_class($this)));
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public function getValue()
+    public function getValue(): bool
     {
         return true;
     }

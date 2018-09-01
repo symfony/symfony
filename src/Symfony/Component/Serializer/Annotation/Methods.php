@@ -13,18 +13,15 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 final class Methods
 {
     /**
-     * @var string
+     * @var null|string
      */
     private $accessor;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $mutator;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         if (empty($data)) {

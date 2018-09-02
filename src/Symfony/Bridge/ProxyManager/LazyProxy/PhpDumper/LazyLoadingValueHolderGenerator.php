@@ -41,6 +41,8 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
                 $method->getBody()
             );
             $body = str_replace('(new \ReflectionClass(get_class()))', '$reflection', $body);
+            $body = str_replace('$reflection = $reflection ?: ', '$reflection = $reflection ?? ', $body);
+            $body = str_replace('$reflection ?? $reflection = ', '$reflection ?? ', $body);
 
             if ($originalClass->isInterface()) {
                 $body = str_replace('get_parent_class($this)', var_export($originalClass->name, true), $body);

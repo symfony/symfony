@@ -156,7 +156,6 @@ EOPHP;
         $implem = preg_replace('#\n    /\*\*.*?\*/#s', '', $implem);
         $implem = str_replace('getWrappedValueHolderValue() : ?object', 'getWrappedValueHolderValue()', $implem);
         $implem = str_replace("array(\n        \n    );", "[\n        \n    ];", $implem);
-        $implem = str_replace('$reflection ?: $reflection', '$reflection ?? $reflection', $implem);
         $this->assertStringEqualsFile(__DIR__.'/Fixtures/proxy-implem.php', $implem);
         $this->assertStringEqualsFile(__DIR__.'/Fixtures/proxy-factory.php', $factory);
 

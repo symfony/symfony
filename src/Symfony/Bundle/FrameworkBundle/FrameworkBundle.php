@@ -21,7 +21,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPrunerP
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\MessengerCommandsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
@@ -120,7 +119,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, MessengerPass::class);
-        $container->addCompilerPass(new MessengerCommandsPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);

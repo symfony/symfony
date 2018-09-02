@@ -224,18 +224,14 @@ class FormHelper extends Helper
      * Use this helper for CSRF protection without the overhead of creating a
      * form.
      *
-     * <code>
-     * echo $view['form']->csrfToken('rm_user_'.$user->getId());
-     * </code>
+     *     echo $view['form']->csrfToken('rm_user_'.$user->getId());
      *
      * Check the token in your action using the same CSRF token id.
      *
-     * <code>
-     * // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
-     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
-     *     throw new \RuntimeException('CSRF attack detected.');
-     * }
-     * </code>
+     *     // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
+     *     if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *         throw new \RuntimeException('CSRF attack detected.');
+     *     }
      *
      * @param string $tokenId The CSRF token id of the protected action
      *

@@ -71,18 +71,14 @@ interface FormRendererInterface
      * Use this helper for CSRF protection without the overhead of creating a
      * form.
      *
-     * <code>
-     * <input type="hidden" name="token" value="<?php $renderer->renderCsrfToken('rm_user_'.$user->getId()) ?>">
-     * </code>
+     *     <input type="hidden" name="token" value="<?php $renderer->renderCsrfToken('rm_user_'.$user->getId()) ?>">
      *
      * Check the token in your action using the same token ID.
      *
-     * <code>
-     * // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
-     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
-     *     throw new \RuntimeException('CSRF attack detected.');
-     * }
-     * </code>
+     *     // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
+     *     if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *         throw new \RuntimeException('CSRF attack detected.');
+     *     }
      *
      * @param string $tokenId The ID of the CSRF token
      *

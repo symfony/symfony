@@ -410,11 +410,9 @@ class OptionsResolver implements Options
      *
      * The normalizer should be a closure with the following signature:
      *
-     * ```php
-     * function (Options $options, $value) {
-     *     // ...
-     * }
-     * ```
+     *     function (Options $options, $value) {
+     *         // ...
+     *     }
      *
      * The closure is invoked when {@link resolve()} is called. The closure
      * has access to the resolved values of other options through the passed

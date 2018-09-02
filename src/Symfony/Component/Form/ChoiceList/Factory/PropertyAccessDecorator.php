@@ -24,18 +24,14 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * Pass the decorated factory to the constructor:
  *
- * ```php
- * $decorator = new PropertyAccessDecorator($factory);
- * ```
+ *     $decorator = new PropertyAccessDecorator($factory);
  *
  * You can now pass property paths for generating choice values, labels, view
  * indices, HTML attributes and for determining the preferred choices and the
  * choice groups:
  *
- * ```php
- * // extract values from the $value property
- * $list = $createListFromChoices($objects, 'value');
- * ```
+ *     // extract values from the $value property
+ *     $list = $createListFromChoices($objects, 'value');
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

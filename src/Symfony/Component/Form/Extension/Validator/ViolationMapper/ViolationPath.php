@@ -198,9 +198,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      *
      * Consider the following violation path:
      *
-     * <code>
-     * children[address].children[office].data.street
-     * </code>
+     *     children[address].children[office].data.street
      *
      * In this example, "address" and "office" map to forms, while
      * "street does not.

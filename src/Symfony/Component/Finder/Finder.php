@@ -31,7 +31,7 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
  *
  * All methods return the current Finder object to allow easy chaining:
  *
- * $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
+ *     $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -105,9 +105,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * Usage:
      *
-     *   $finder->depth('> 1') // the Finder will start matching at level 1.
-     *   $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
-     *   $finder->depth(['>= 1', '< 3'])
+     *     $finder->depth('> 1') // the Finder will start matching at level 1.
+     *     $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
+     *     $finder->depth(['>= 1', '< 3'])
      *
      * @param string|int|string[]|int[] $levels The depth level expression or an array of depth levels
      *
@@ -130,11 +130,11 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * The date must be something that strtotime() is able to parse:
      *
-     *   $finder->date('since yesterday');
-     *   $finder->date('until 2 days ago');
-     *   $finder->date('> now - 2 hours');
-     *   $finder->date('>= 2005-10-15');
-     *   $finder->date(['>= 2005-10-15', '<= 2006-05-27']);
+     *     $finder->date('since yesterday');
+     *     $finder->date('until 2 days ago');
+     *     $finder->date('> now - 2 hours');
+     *     $finder->date('>= 2005-10-15');
+     *     $finder->date(['>= 2005-10-15', '<= 2006-05-27']);
      *
      * @param string|string[] $dates A date range string or an array of date ranges
      *
@@ -158,10 +158,16 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * You can use patterns (delimited with / sign), globs or simple strings.
      *
+<<<<<<< HEAD
      * $finder->name('*.php')
      * $finder->name('/\.php$/') // same as above
      * $finder->name('test.php')
      * $finder->name(['test.py', 'test.php'])
+=======
+     *     $finder->name('*.php')
+     *     $finder->name('/\.php$/') // same as above
+     *     $finder->name('test.php')
+>>>>>>> 4.1
      *
      * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
      *
@@ -197,9 +203,14 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * Strings or PCRE patterns can be used:
      *
+<<<<<<< HEAD
      * $finder->contains('Lorem ipsum')
      * $finder->contains('/Lorem ipsum/i')
      * $finder->contains(['dolor', '/ipsum/i'])
+=======
+     *     $finder->contains('Lorem ipsum')
+     *     $finder->contains('/Lorem ipsum/i')
+>>>>>>> 4.1
      *
      * @param string|string[] $patterns A pattern (string or regexp) or an array of patterns
      *
@@ -219,9 +230,14 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * Strings or PCRE patterns can be used:
      *
+<<<<<<< HEAD
      * $finder->notContains('Lorem ipsum')
      * $finder->notContains('/Lorem ipsum/i')
      * $finder->notContains(['lorem', '/dolor/i'])
+=======
+     *     $finder->notContains('Lorem ipsum')
+     *     $finder->notContains('/Lorem ipsum/i')
+>>>>>>> 4.1
      *
      * @param string|string[] $patterns A pattern (string or regexp) or an array of patterns
      *
@@ -241,9 +257,14 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * You can use patterns (delimited with / sign) or simple strings.
      *
+<<<<<<< HEAD
      * $finder->path('some/special/dir')
      * $finder->path('/some\/special\/dir/') // same as above
      * $finder->path(['some dir', 'another/dir'])
+=======
+     *     $finder->path('some/special/dir')
+     *     $finder->path('/some\/special\/dir/') // same as above
+>>>>>>> 4.1
      *
      * Use only / as dirname separator.
      *
@@ -265,9 +286,14 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * You can use patterns (delimited with / sign) or simple strings.
      *
+<<<<<<< HEAD
      * $finder->notPath('some/special/dir')
      * $finder->notPath('/some\/special\/dir/') // same as above
      * $finder->notPath(['some/file.txt', 'another/file.log'])
+=======
+     *     $finder->notPath('some/special/dir')
+     *     $finder->notPath('/some\/special\/dir/') // same as above
+>>>>>>> 4.1
      *
      * Use only / as dirname separator.
      *
@@ -287,10 +313,16 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Adds tests for file sizes.
      *
+<<<<<<< HEAD
      * $finder->size('> 10K');
      * $finder->size('<= 1Ki');
      * $finder->size(4);
      * $finder->size(['> 10K', '< 20K'])
+=======
+     *     $finder->size('> 10K');
+     *     $finder->size('<= 1Ki');
+     *     $finder->size(4);
+>>>>>>> 4.1
      *
      * @param string|int|string[]|int[] $sizes A size range string or an integer or an array of size ranges
      *
@@ -607,7 +639,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param mixed $iterator
+     * @param iterable $iterator
      *
      * @return $this
      *

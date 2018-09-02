@@ -220,7 +220,30 @@ class MessengerPass implements CompilerPassInterface
 
     private function registerReceivers(ContainerBuilder $container)
     {
-        $receiverMapping = self::findReceivers($container, $this->receiverTag);
+        $receiverMapping = array();
+
+        foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
+            $receiverClass = $container->findDefinition($id)->getClass();
+            if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
+                throw new RuntimeException(sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));
+            }
+
+            $receiverMapping[$id] = new Reference($id);
+
+            foreach ($tags as $tag) {
+                if (isset($tag['alias'])) {
+                    $receiverMapping[$tag['alias']] = $receiverMapping[$id];
+                }
+            }
+        }
+
+        if ($container->hasDefinition('console.command.messenger_consume_messages')) {
+            $receiverNames = array();
+            foreach ($receiverMapping as $name => $reference) {
+                $receiverNames[(string) $reference] = $name;
+            }
+            $container->getDefinition('console.command.messenger_consume_messages')->replaceArgument(3, array_values($receiverNames));
+        }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
     }
@@ -288,30 +311,5 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition($busId)->replaceArgument(0, $middlewareReferences);
-    }
-
-    /**
-     * @internal
-     */
-    public static function findReceivers(ContainerBuilder $container, string $receiverTag)
-    {
-        $receiverMapping = array();
-
-        foreach ($container->findTaggedServiceIds($receiverTag) as $id => $tags) {
-            $receiverClass = $container->findDefinition($id)->getClass();
-            if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
-                throw new RuntimeException(sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));
-            }
-
-            $receiverMapping[$id] = new Reference($id);
-
-            foreach ($tags as $tag) {
-                if (isset($tag['alias'])) {
-                    $receiverMapping[$tag['alias']] = $receiverMapping[$id];
-                }
-            }
-        }
-
-        return $receiverMapping;
     }
 }

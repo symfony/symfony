@@ -342,27 +342,31 @@ class PrototypedArrayNode extends ArrayNode
      * one is same as this->keyAttribute and the other is 'value', then the prototype will be different.
      *
      * For example, assume $this->keyAttribute is 'name' and the value array is as follows:
-     * array(
+     *
      *     array(
-     *         'name' => 'name001',
-     *         'value' => 'value001'
+     *         array(
+     *             'name' => 'name001',
+     *             'value' => 'value001'
+     *         )
      *     )
-     * )
      *
      * Now, the key is 0 and the child node is:
-     * array(
-     *    'name' => 'name001',
-     *    'value' => 'value001'
-     * )
+     *
+     *     array(
+     *        'name' => 'name001',
+     *        'value' => 'value001'
+     *     )
      *
      * When normalizing the value array, the 'name' element will removed from the child node
      * and its value becomes the new key of the child node:
-     * array(
-     *     'name001' => array('value' => 'value001')
-     * )
+     *
+     *     array(
+     *         'name001' => array('value' => 'value001')
+     *     )
      *
      * Now only 'value' element is left in the child node which can be further simplified into a string:
-     * array('name001' => 'value001')
+     *
+     *     array('name001' => 'value001')
      *
      * Now, the key becomes 'name001' and the child node becomes 'value001' and
      * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.

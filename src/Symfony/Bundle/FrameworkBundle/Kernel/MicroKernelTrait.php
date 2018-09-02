@@ -39,17 +39,17 @@ trait MicroKernelTrait
      *
      * You can register extensions:
      *
-     * $c->loadFromExtension('framework', array(
-     *     'secret' => '%secret%'
-     * ));
+     *     $c->loadFromExtension('framework', array(
+     *         'secret' => '%secret%'
+     *     ));
      *
      * Or services:
      *
-     * $c->register('halloween', 'FooBundle\HalloweenProvider');
+     *     $c->register('halloween', 'FooBundle\HalloweenProvider');
      *
      * Or parameters:
      *
-     * $c->setParameter('halloween', 'lot of fun');
+     *     $c->setParameter('halloween', 'lot of fun');
      *
      * @param ContainerBuilder $c
      * @param LoaderInterface  $loader

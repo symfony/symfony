@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `Dotenv::overload()` and `$overrideExistingVars` as optional parameter of `Dotenv::populate()`
+
 3.3.0
 -----
 

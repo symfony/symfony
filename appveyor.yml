@@ -1,5 +1,5 @@
 build: false
-clone_depth: 1
+clone_depth: 2
 clone_folder: c:\projects\symfony
 
 cache:

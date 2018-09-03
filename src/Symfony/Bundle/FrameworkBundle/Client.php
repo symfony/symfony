@@ -161,19 +161,19 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
-        $kernel = str_replace("'", "\\'", serialize($this->kernel));
-        $request = str_replace("'", "\\'", serialize($request));
+        $kernel = var_export(serialize($this->kernel), true);
+        $request = var_export(serialize($request), true);
 
         $r = new \ReflectionObject($this->kernel);
 
         $autoloader = \dirname($r->getFileName()).'/autoload.php';
         if (is_file($autoloader)) {
-            $autoloader = str_replace("'", "\\'", $autoloader);
+            $autoloader = var_export($autoloader, true);
         } else {
-            $autoloader = '';
+            $autoloader = 'false';
         }
 
-        $path = str_replace("'", "\\'", $r->getFileName());
+        $path = var_export($r->getFileName(), true);
 
         $profilerCode = '';
         if ($this->profiler) {
@@ -187,16 +187,16 @@ class Client extends BaseClient
 
 error_reporting($errorReporting);
 
-if ('$autoloader') {
-    require_once '$autoloader';
+if ($autoloader) {
+    require_once $autoloader;
 }
-require_once '$path';
+require_once $path;
 
-\$kernel = unserialize('$kernel');
+\$kernel = unserialize($kernel);
 \$kernel->boot();
 $profilerCode
 
-\$request = unserialize('$request');
+\$request = unserialize($request);
 EOF;
 
         return $code.$this->getHandleScript();

@@ -7,7 +7,6 @@ use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
@@ -37,13 +36,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export(array(__CLASS__), true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
-        $fallbackPool = new ArrayAdapter();
-        $warmer = new AnnotationsCacheWarmer(
-            $reader,
-            $cacheFile,
-            $fallbackPool,
-            null
-        );
+        $warmer = new AnnotationsCacheWarmer($reader, $cacheFile);
         $warmer->warmUp($this->cacheDir);
         $this->assertFileExists($cacheFile);
 
@@ -63,14 +56,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export(array(__CLASS__), true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
-        $fallbackPool = new ArrayAdapter();
-        $warmer = new AnnotationsCacheWarmer(
-            $reader,
-            $cacheFile,
-            $fallbackPool,
-            null,
-            true
-        );
+        $warmer = new AnnotationsCacheWarmer($reader, $cacheFile, null, true);
         $warmer->warmUp($this->cacheDir);
         $this->assertFileExists($cacheFile);
         // Assert cache is valid

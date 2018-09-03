@@ -90,7 +90,6 @@
         <service id="serializer.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer">
             <argument type="collection" /><!-- Loaders injected by the extension -->
             <argument>%serializer.mapping.cache.file%</argument>
-            <argument type="service" id="cache.serializer" />
             <tag name="kernel.cache_warmer" />
         </service>
 

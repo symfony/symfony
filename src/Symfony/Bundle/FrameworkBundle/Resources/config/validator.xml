@@ -35,7 +35,6 @@
         <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
             <argument type="service" id="validator.builder" />
             <argument>%validator.mapping.cache.file%</argument>
-            <argument type="service" id="cache.validator" />
             <tag name="kernel.cache_warmer" />
         </service>
 

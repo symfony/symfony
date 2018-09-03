@@ -54,9 +54,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $resources = array();
 
     /**
-     * @var MessageFormatterInterface[]
+     * @var MessageFormatterInterface
      */
-    private $formatters;
+    private $formatter;
 
     /**
      * @var string
@@ -89,7 +89,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $formatter = new MessageFormatter();
         }
 
-        $this->formatters['_default'] = $formatter;
+        $this->formatter = $formatter;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
@@ -135,11 +135,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         } else {
             unset($this->catalogues[$locale]);
         }
-    }
-
-    public function addFormatter(string $domain, MessageFormatterInterface $formatter): void
-    {
-        $this->formatters[$domain] = $formatter;
     }
 
     /**
@@ -197,7 +192,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $domain = 'messages';
         }
 
-        return $this->getFormatter($domain)->format($this->getCatalogue($locale)->get((string) $id, $domain), $locale, $parameters);
+        return $this->formatter->format($this->getCatalogue($locale)->get((string) $id, $domain), $locale, $parameters);
     }
 
     /**
@@ -205,13 +200,12 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (null === $domain) {
-            $domain = 'messages';
+        if (!$this->formatter instanceof ChoiceMessageFormatterInterface) {
+            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($this->formatter)));
         }
 
-        $formatter = $this->getFormatter($domain);
-        if (!$formatter instanceof ChoiceMessageFormatterInterface) {
-            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($formatter)));
+        if (null === $domain) {
+            $domain = 'messages';
         }
 
         $id = (string) $id;
@@ -226,7 +220,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             }
         }
 
-        return $formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);
+        return $this->formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);
     }
 
     /**
@@ -460,10 +454,5 @@ EOF
         }
 
         return $this->configCacheFactory;
-    }
-
-    private function getFormatter(string $domain): MessageFormatterInterface
-    {
-        return $this->formatters[$domain] ?? $this->formatters['_default'];
     }
 }

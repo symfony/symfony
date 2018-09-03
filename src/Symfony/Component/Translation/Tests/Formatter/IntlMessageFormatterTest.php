@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Translation\Tests\Formatter;
 
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\IntlMessageFormatter;
 
 class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped(
               'The Intl extension is not available.'
             );
@@ -30,6 +31,12 @@ class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
     public function testFormat($expected, $message, $arguments)
     {
         $this->assertEquals($expected, trim($this->getMessageFormatter()->format($message, 'en', $arguments)));
+    }
+
+    public function testInvalidFormat()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->getMessageFormatter()->format('{foo', 'en', array(2));
     }
 
     public function testFormatWithNamedArguments()

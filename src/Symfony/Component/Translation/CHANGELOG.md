@@ -7,8 +7,7 @@ CHANGELOG
  * Started using ICU parent locales as fallback locales.
  * deprecated `TranslatorInterface` in favor of `Symfony\Contracts\Translation\TranslatorInterface`
  * deprecated `MessageSelector`, `Interval` and `PluralizationRules`; use `IdentityTranslator` instead
- * Added intl message formatter.
- * Added support for one formatter per domain
+ * Added `IntlMessageFormatter` and`FallbackMessageFormatter`
 
 4.1.0
 -----

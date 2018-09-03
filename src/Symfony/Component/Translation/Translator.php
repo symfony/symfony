@@ -205,17 +205,13 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (!$this->formatter instanceof ChoiceMessageFormatterInterface) {
-            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($this->formatter)));
-        }
-
         if (null === $domain) {
             $domain = 'messages';
         }
 
         $formatter = $this->getFormatter($domain);
         if (!$formatter instanceof ChoiceMessageFormatterInterface) {
-            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', get_class($formatter)));
+            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($formatter)));
         }
 
         $id = (string) $id;

@@ -15,7 +15,7 @@ namespace Symfony\Component\Translation\Formatter;
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class IntlMessageFormatter implements MessageFormatterInterface, ChoiceMessageFormatterInterface
+class IntlMessageFormatter implements MessageFormatterInterface
 {
     /**
      * {@inheritdoc}
@@ -37,13 +37,5 @@ class IntlMessageFormatter implements MessageFormatterInterface, ChoiceMessageFo
         }
 
         return $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function choiceFormat($message, $number, $locale, array $parameters = array())
-    {
-        return $this->format($message, $locale, $parameters);
     }
 }

@@ -174,7 +174,7 @@ install:
     - |
       # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
       if [[ ! $deps ]]; then
-          php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit
+          php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
       else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&

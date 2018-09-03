@@ -45,7 +45,7 @@ install:
     - php composer.phar self-update
     - copy /Y .composer\* %APPDATA%\Composer\
     - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
-    - php .github/build-packages.php %APPVEYOR_REPO_COMMIT%^^ src\Symfony\Bridge\PhpUnit
+    - php .github/build-packages.php %APPVEYOR_REPO_COMMIT%^^ src\Symfony\Bridge\PhpUnit src\Symfony\Contracts
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
     - php composer.phar update --no-progress --no-suggest --ansi
     - php phpunit install

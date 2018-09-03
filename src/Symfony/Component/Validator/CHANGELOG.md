@@ -5,6 +5,9 @@ CHANGELOG
 -----
 
  * added `DivisibleBy` constraint
+ * decoupled from `symfony/translation` by using `Symfony\Contracts\Translation\TranslatorInterface`
+ * deprecated `ValidatorBuilderInterface`
+ * made `ValidatorBuilder` final
 
 4.1.0
 -----

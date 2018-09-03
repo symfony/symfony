@@ -13,11 +13,13 @@ namespace Symfony\Component\Translation;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
+class LoggingTranslator implements LegacyTranslatorInterface, TranslatorBagInterface
 {
     /**
      * @var TranslatorInterface|TranslatorBagInterface

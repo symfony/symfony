@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Loader\ArrayLoader;
@@ -33,7 +34,7 @@ class TwigExtractorTest extends TestCase
             'cache' => false,
             'autoescape' => false,
         ));
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
@@ -82,7 +83,7 @@ class TwigExtractorTest extends TestCase
     public function testExtractSyntaxError($resources)
     {
         $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
 
         $extractor = new TwigExtractor($twig);
 
@@ -124,7 +125,7 @@ class TwigExtractorTest extends TestCase
             'cache' => false,
             'autoescape' => false,
         ));
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');

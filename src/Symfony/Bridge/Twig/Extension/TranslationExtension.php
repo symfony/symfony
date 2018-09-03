@@ -16,7 +16,7 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\NodeVisitor\NodeVisitorInterface;
 use Twig\TokenParser\AbstractTokenParser;

@@ -13,8 +13,12 @@ namespace Symfony\Component\Validator\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
+use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 class AddValidatorInitializersPassTest extends TestCase
 {
@@ -41,4 +45,34 @@ class AddValidatorInitializersPassTest extends TestCase
             $container->getDefinition('validator.builder')->getMethodCalls()
         );
     }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyTranslatorProxy()
+    {
+        $translator = new TestTranslator();
+        $proxy = new LegacyTranslatorProxy($translator);
+        $this->assertSame($translator, $proxy->getTranslator());
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('validator.builder')
+            ->addMethodCall('setTranslator', array(new Reference('translator')))
+        ;
+
+        $container->register('translator', TestTranslator::class);
+
+        (new AddValidatorInitializersPass())->process($container);
+
+        $this->assertEquals(
+            array(array('setTranslator', array((new Definition(LegacyTranslatorProxy::class))->addArgument(new Reference('translator'))))),
+            $container->getDefinition('validator.builder')->removeMethodCall('addObjectInitializers')->getMethodCalls()
+        );
+    }
+}
+
+class TestTranslator implements TranslatorInterface
+{
+    use TranslatorTrait;
 }

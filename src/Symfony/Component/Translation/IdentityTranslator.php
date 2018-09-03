@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Contracts\Translation\TranslatorTrait;
+
 /**
  * IdentityTranslator does not translate anything.
  *
@@ -18,39 +20,22 @@ namespace Symfony\Component\Translation;
  */
 class IdentityTranslator implements TranslatorInterface
 {
+    use TranslatorTrait {
+        transChoice as private doTransChoice;
+    }
+
     private $selector;
-    private $locale;
 
     /**
      * @param MessageSelector|null $selector The message selector for pluralization
      */
     public function __construct(MessageSelector $selector = null)
     {
-        $this->selector = $selector ?: new MessageSelector();
-    }
+        $this->selector = $selector;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocale()
-    {
-        return $this->locale ?: \Locale::getDefault();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
-    {
-        return strtr((string) $id, $parameters);
+        if (\get_class($this) !== __CLASS__) {
+            @trigger_error(sprintf('Calling "%s()" is deprecated since Symfony 4.2.'), E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -58,6 +43,15 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
+        if ($this->selector) {
+            return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
+        }
+
+        return $this->doTransChoice($id, $number, $parameters, $domain, $locale);
+    }
+
+    private function getPluralizationRule(int $number, string $locale): int
+    {
+        return PluralizationRules::get($number, $locale, false);
     }
 }

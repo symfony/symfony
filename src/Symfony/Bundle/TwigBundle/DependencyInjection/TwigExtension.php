@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Translation\Translator;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -48,7 +49,7 @@ class TwigExtension extends Extension
             $loader->load('console.xml');
         }
 
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
+        if (!class_exists(Translator::class)) {
             $container->removeDefinition('twig.translation.extractor');
         }
 

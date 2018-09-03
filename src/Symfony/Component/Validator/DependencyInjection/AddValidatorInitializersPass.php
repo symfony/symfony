@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Validator\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -42,5 +46,27 @@ class AddValidatorInitializersPass implements CompilerPassInterface
         }
 
         $container->getDefinition($this->builderService)->addMethodCall('addObjectInitializers', array($initializers));
+
+        // @deprecated logic, to be removed in Symfony 5.0
+        $builder = $container->getDefinition($this->builderService);
+        $calls = [];
+
+        foreach ($builder->getMethodCalls() as list($method, $arguments)) {
+            if ('setTranslator' === $method) {
+                $translator = $arguments[0] instanceof Reference ? $container->findDefinition($arguments[0]) : $arguments[0];
+
+                while (!($class = $translator->getClass()) && $translator instanceof ChildDefinition) {
+                    $translator = $translator->getParent();
+                }
+
+                if (!is_subclass_of($class, LegacyTranslatorInterface::class)) {
+                    $arguments[0] = (new Definition(LegacyTranslatorProxy::class))->addArgument($arguments[0]);
+                }
+            }
+
+            $calls[] = array($method, $arguments);
+        }
+
+        $builder->setMethodCalls($calls);
     }
 }

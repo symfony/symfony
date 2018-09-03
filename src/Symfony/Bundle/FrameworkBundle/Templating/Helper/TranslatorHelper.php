@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

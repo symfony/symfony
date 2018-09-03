@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A test case to ease testing Constraint Validators.
@@ -95,7 +96,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
     protected function createContext()
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
         $contextualValidator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
 

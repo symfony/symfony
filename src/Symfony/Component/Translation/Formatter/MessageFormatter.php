@@ -11,21 +11,29 @@
 
 namespace Symfony\Component\Translation\Formatter;
 
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\MessageSelector;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
 class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormatterInterface
 {
-    private $selector;
+    private $translator;
 
     /**
-     * @param MessageSelector|null $selector The message selector for pluralization
+     * @param TranslatorInterface|null $translator An identity translator to use as selector for pluralization
      */
-    public function __construct(MessageSelector $selector = null)
+    public function __construct($translator = null)
     {
-        $this->selector = $selector ?: new MessageSelector();
+        if ($translator instanceof MessageSelector) {
+            $translator = new IdentityTranslator($translator);
+        } elseif (null !== $translator && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+        }
+
+        $this->translator = $translator ?? new IdentityTranslator();
     }
 
     /**
@@ -43,6 +51,6 @@ class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormat
     {
         $parameters = array_merge(array('%count%' => $number), $parameters);
 
-        return $this->format($this->selector->choose($message, (int) $number, $locale), $locale, $parameters);
+        return $this->format($this->translator->transChoice($message, $number, array(), null, $locale), $locale, $parameters);
     }
 }

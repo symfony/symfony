@@ -149,3 +149,15 @@ Serializer
 
  * Relying on the default value (false) of the "as_collection" option is deprecated since 4.2.
    You should set it to false explicitly instead as true will be the default value in 5.0.
+
+Translation
+-----------
+
+ * The `TranslatorInterface` has been deprecated in favor of `Symfony\Contracts\Translation\TranslatorInterface`
+ * The `MessageSelector`, `Interval` and `PluralizationRules` classes have been deprecated, use `IdentityTranslator` instead
+
+Validator
+---------
+
+ * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
+ * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final

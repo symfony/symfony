@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Context;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -22,6 +21,7 @@ use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The context used and created by {@link ExecutionContextFactory}.

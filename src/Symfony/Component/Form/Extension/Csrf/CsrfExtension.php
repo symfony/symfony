@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Csrf;
 
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This extension protects forms by using a CSRF token.

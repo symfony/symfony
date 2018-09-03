@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Context;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Creates new {@link ExecutionContext} instances.

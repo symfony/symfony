@@ -146,6 +146,8 @@ Translation
 
  * The `FileDumper::setBackup()` method has been removed.
  * The `TranslationWriter::disableBackup()` method has been removed.
+ * The `TranslatorInterface` has been removed in favor of `Symfony\Contracts\Translation\TranslatorInterface`
+ * The `MessageSelector`, `Interval` and `PluralizationRules` classes have been removed, use `IdentityTranslator` instead
 
 TwigBundle
 ----------
@@ -158,6 +160,8 @@ Validator
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
  * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.
  * Removed the `checkDNS` and `dnsMessage` options from the `Url` constraint.
+ * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
+ * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final
 
 Workflow
 --------

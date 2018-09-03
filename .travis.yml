@@ -4,7 +4,7 @@ dist: trusty
 sudo: false
 
 git:
-    depth: 1
+    depth: 2
 
 addons:
     apt_packages:

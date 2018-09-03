@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-01T18:28:01Z
+
+Note that this means ppl that have OPcache disabled won't have a warm cache.
+See https://github.com/symfony/symfony/blob/604c68999eae89aaa5d019d8c1f5268df9e6f9e2/src/Symfony/Component/Cache/Adapter/PhpArrayAdapter.php#L71
+But we don't care IMHO.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-03T15:29:14Z
+
+I don't fully understand this proposal, so I'd like to ask you about it with a real example. If I browse some pages of Symfony Demo app in `prod`, the `cache/pools/` ends up with 405 files and 791 KB.
+
+So, would this PR remove most (all?) of those files in `cache/pools/*` ? Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-03T15:32:50Z
+
+One of these pools is the fallback annotations cache. After this change, this folder would end up with a lot less files.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-03T15:47:42Z
+
+I agree that not having a warmed up cache for people not having OPCache is something we don't care about. People disabling OPCache in prod cannot complain to us about the app being slower due to having cache misses (it is also a lot slower due to not optimizing PHP anyway).

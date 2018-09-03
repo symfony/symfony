@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-08-16T16:00:25Z
+
+However, note that I'm not sure it is the right extension point anyway, as an implementation based on the ICU message format would not be able to split this (it would not have `transChoice` at all btw)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-16T16:18:08Z
+
+> This is removing an extension point, as your translator is now performing replacements of parameters instead of separating the choice of the pluralization variant from the formatting of parameters (which was the reason to create MessageFormatter and MessageSelector)
+
+`MessageFormatter` will remain as extensible as it is currently: you can pass it an identity translator of your own to resolve the plural rules.
+You're correct about `IdentityTranslator`: it would make no sense to make its selector logic extensible when creating a custom identity translator is precisely the way to define a custom selector logic now.
+
+Note that if we really want an interoperable interface, the parsing of choices needs to be in Contracts. That's why `TranslatorTrait` exists in the first place since its logic is far from being trivial to implement.
+
+There is another extension point that this plans to remove: `PluralizationRules::set()`. Honestly, I don't think we need to make this extensible (and I don't know how to make it extensible if we really need to BTW. Could be figured out later IMHO, *if* someone comes with a use case.)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-16T16:26:41Z
+
+> There is another extension point that this plans to remove: PluralizationRules::set(). Honestly, I don't think we need to make this extensible (and I don't know how to make it extensible if we really need to BTW. Could be figured out later IMHO, if someone comes with a use case.)
+
+I think we're fine with deprecating this. If the rules for an existing locale are wrong, people should contribute a fix in Symfony instead of fixing it in their own project. And custom locales would be weird.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-16T20:37:03Z
+
+TODO list completed and tests green. Ready for final review.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-17T08:07:53Z
+
+should we actually use `class_alias` for the BC layer ? This makes it impossible to throw a deprecation warning for people using the old name (and so we cannot really remove it)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-17T08:27:54Z
+
+> Older version of the component do not implement the new interface
+
+It works because this uses `class_alias()`, but see below.
+
+> should we actually use class_alias for the BC layer ? This makes it impossible to throw a deprecation warning for people using the old name (and so we cannot really remove it)
+
+Whatever the deprecation layer, we cannot throw a deprecation, because our own implementations would trigger it. We've already done like that before I think. The deprecation will be triggered by `DebugClassLoader` actually so the forward path is fine.
+
+What worries me more is the `class_alias` in `Contracts`: we won't ever be able to remove it.
+All the complexity resolves around finding a BC path to preserve the type-hint of `ValidatorBuilder::setTranslator()`.
+But in the end, I'm wondering if we shouldn't just break BC here: nobody reasonably implements this interface nor extends this class. Don't you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-08-17T08:31:08Z
+
+> But in the end, I'm wondering if we shouldn't just break BC here: nobody reasonably implements this interface nor extends this class. Don't you think?
+
+yeah, we might end up with this option (and deprecating the interface and marking the class as `@final` maybe too ?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-17T09:35:45Z
+
+I found https://github.com/tomazahlin/symfony-core-bundle/blob/master/src/Ahlin/Bundle/CoreBundle/Tests/Mock/ValidatorBuilderMock.php and https://github.com/oro-subtree/EntityExtendBundle/blob/master/Validator/ValidatorBuilder.php that implement `ValidatorBuilderInterface`.
+I think both could extend `ValidatorBuilder` instead.
+
+Which means we should maybe not make the class final. Let's just deprecate the interface (it's really not a type we need) and do the BC break on the type hint. The listed use cases will need to extend `ValidatorBuilder` instead and remove the custom implementation for `setTranslator` at least. That would provide them with a way to keep compatibility with all versions of the Translation component. OK for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-17T12:13:30Z
+
+It took me a while, but I finally figured out a way to move forward without breaking BC.
+See `LegacyTranslatorProxy` and `AddValidatorInitializersPass`.
+
+PR green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-30T13:09:26Z
+
+thanks (just rebased to fix a minor conflict, ready)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T08:16:56Z
+
+Comments addressed thanks.

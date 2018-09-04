@@ -19,6 +19,7 @@ Definitions
 
 ### service_container
 
+- Description: `ContainerInterface is the interface implemented by service container classes.`
 - Class: `Symfony\Component\DependencyInjection\ContainerInterface`
 - Public: yes
 - Synthetic: yes

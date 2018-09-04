@@ -76,6 +76,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "description": "ContainerInterface is the interface implemented by service container classes.",
             "arguments": [],
             "file": null,
             "tags": []

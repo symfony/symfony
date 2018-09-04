@@ -58,7 +58,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /** @var CombinedStore */
     private $store;
 
-    public function setup()
+    protected function setUp()
     {
         $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
         $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();

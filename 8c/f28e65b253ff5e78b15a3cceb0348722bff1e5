@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by gimler at 2018-08-23T13:24:18Z
+
+@nicolas-grekas @ro0NL can you please re-review the PR.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-08-24T17:09:51Z
+
+This is a really interesting idea - using the phpdoc as the service description. What if a class extends some base class? Like, the actual class is a Debug wrapper, and the real description is on the parent?

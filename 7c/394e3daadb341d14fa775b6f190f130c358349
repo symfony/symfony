@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-08-29T16:27:52Z
+
+Can we verify the same usecase is OK with PHPUnit?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-08-29T18:07:07Z
+
+Seems support has been added in https://github.com/sebastianbergmann/phpunit-mock-objects/pull/402
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T08:28:45Z
+
+This has been reverted because it breaks BC as demonstrated by Prophecy and PHPUnit. There could be other packages/projects out there with the same issues.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-04T08:33:45Z
+
+I also think this provides little to no benefit and the BC risk is proven already.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-09-04T08:46:31Z
+
+It provides benefits if you're using a static code analysis tool which notes you're trying to catch non-throwable exceptions.
+
+I'd argue that the BC issue highlighted deeper issues in Prophecy and PHPUnit, not that it was Symfony's fault.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T08:51:18Z
+
+What is a non-throwable exception? Any is throwable, the interface does not add any more "power" to the exception class... or I'm missing something.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-09-04T08:55:07Z
+
+If you're using the exception marker interface as intended (to catch any package's exception), you're doing something like:
+
+```php
+try {
+} catch (ExceptionInterface $exception) {
+}
+```
+
+This code is marked invalid by static code analysis as the interface is not throwable, as in the fact it can be thrown at all is circumstantial.
+
+Relying on the concrete implementation to make the interface throwable doesn't rely on the interface but the concrete implementation, making the marker interface pretty much useless.
+
+Real example: https://github.com/dkarlovi/xezilaires/blob/60ca197333b0974d543c2e4a88f94e7d1878d3d7/src/Xezilaires/Metadata/Mapping.php#L61
+
+Requires:
+https://github.com/dkarlovi/xezilaires/blob/60ca197333b0974d543c2e4a88f94e7d1878d3d7/psalm.xml.dist#L30-L35
+
+---------------------------------------------------------------------------
+
+by ondrejmirtes at 2018-09-04T09:19:07Z
+
+I don't think it's exactly a BC break, it just showed there's a bug in Prophecy that didn't allow mocking Throwable interfaces...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T15:49:11Z
+
+Sorry, but unfortunately I'm too dumb to understand the issue. I will let the other @symfony/deciders team members decide.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-04T16:01:31Z
+
+@ostrolucky I'm also having problems trying to understand the necessity of this change. Could you please explain very briefly (or with a small code example) what does this change allow to do that wasn't possible before? Thanks!
+
+---------------------------------------------------------------------------
+
+by ondrejmirtes at 2018-09-04T16:03:42Z
+
+Basically this: https://phpstan.org/r/d90d2b30f1bd1eeb90255e92927e4fdf
+
+You're putting something that might not be an exception into places like `@throws` tag or `catch` block. This prevents user from making an unwanted error because he possibly wanted to write something else.
+
+---------------------------------------------------------------------------
+
+by ondrejmirtes at 2018-09-04T16:05:11Z
+
+So if you intend some interfaces only to be used by exceptions, you can enforce that by extending the interface from `Throwable`.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-09-04T16:17:18Z
+
+> Basically this: https://phpstan.org/r/d90d2b30f1bd1eeb90255e92927e4fdf
+
+As opposed to https://phpstan.org/r/e4e2c496c15be8d8ec2fcc55e7b29051
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-09-04T16:23:33Z
+
+Same issue with Psalm:
+
+https://getpsalm.org/r/c6195f9342
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-04T16:33:17Z
+
+The benefit of this PR is indeed for any tool doing static analysis. So this concerns phpstan, psalm, but also IDEs (PHPStorm does not currently has such inspection in its stable version to highlight a mistake, but autocompletion in `catch` clauses is restricted to throwable types).
+
+It won't make a huge difference for developers themselves (if we forget the impact on their tooling), as the only change this makes for PHP is forbidding silly mistakes (implementing something called `ExceptionInterface` on a class not being an exception is certainly a mistake)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T16:48:25Z
+
+Ok, understood now. Thanks for the additional info.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-09-04T16:54:48Z
+
+> It won't make a huge difference for developers themselves (if we forget the impact on their tooling)
+
+I'd argue the "impact on their tooling" is the crucial point here: since the tooling is becoming as prevalent in a modern PHP toolbox. Looking at the pace and value the tools generate, this trend will only increase and changes like these will be just as important as any other bugfix / feature in the future.

@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 
@@ -21,7 +22,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
+class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
 {
     /**
      * {@inheritdoc}
@@ -74,6 +75,14 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     public function getProperties($class, array $context = array())
     {
         $this->assertIsString($class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    {
+        return null;
     }
 
     private function assertIsString($string)

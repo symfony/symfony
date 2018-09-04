@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T14:47:43Z
+
+comments addressed, thanks @stof
+PR ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-01T13:51:10Z
+
+I split the `Exporter::export()` method in 3. Best reviewed [ignoring whitespaces](https://github.com/symfony/symfony/pull/28295/files?w=1) now.

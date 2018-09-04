@@ -114,7 +114,10 @@
         "psr/cache-implementation": "1.0",
         "psr/container-implementation": "1.0",
         "psr/log-implementation": "1.0",
-        "psr/simple-cache-implementation": "1.0"
+        "psr/simple-cache-implementation": "1.0",
+        "symfony/cache-contracts": "1.0",
+        "symfony/service-contracts": "1.0",
+        "symfony/translation-contracts": "1.0"
     },
     "autoload": {
         "psr-4": {

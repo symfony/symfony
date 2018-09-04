@@ -11,31 +11,16 @@
 
 namespace Symfony\Component\Cache;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class CacheItem implements CacheItemInterface
+final class CacheItem implements ItemInterface
 {
-    /**
-     * References the Unix timestamp stating when the item will expire.
-     */
-    const METADATA_EXPIRY = 'expiry';
-
-    /**
-     * References the time the item took to be created, in milliseconds.
-     */
-    const METADATA_CTIME = 'ctime';
-
-    /**
-     * References the list of tags that were assigned to the item, as string[].
-     */
-    const METADATA_TAGS = 'tags';
-
     private const METADATA_EXPIRY_OFFSET = 1527506807;
 
     protected $key;
@@ -118,15 +103,9 @@ final class CacheItem implements CacheItemInterface
     }
 
     /**
-     * Adds a tag to a cache item.
-     *
-     * @param string|string[] $tags A tag or array of tags
-     *
-     * @return static
-     *
-     * @throws InvalidArgumentException When $tag is not valid
+     * {@inheritdoc}
      */
-    public function tag($tags)
+    public function tag($tags): ItemInterface
     {
         if (!$this->isTaggable) {
             throw new LogicException(sprintf('Cache item "%s" comes from a non tag-aware pool: you cannot tag it.', $this->key));
@@ -154,6 +133,14 @@ final class CacheItem implements CacheItemInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    /**
      * Returns the list of tags bound to the value coming from the pool storage if any.
      *
      * @return array
@@ -165,16 +152,6 @@ final class CacheItem implements CacheItemInterface
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->metadata[self::METADATA_TAGS] ?? array();
-    }
-
-    /**
-     * Returns a list of metadata info that were saved alongside with the cached value.
-     *
-     * See public CacheItem::METADATA_* consts for keys potentially found in the returned array.
-     */
-    public function getMetadata(): array
-    {
-        return $this->metadata;
     }
 
     /**

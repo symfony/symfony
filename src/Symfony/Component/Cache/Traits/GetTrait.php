@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\LockRegistry;
 
 /**
@@ -31,6 +32,10 @@ trait GetTrait
      */
     public function get(string $key, callable $callback, float $beta = null)
     {
+        if (0 > $beta) {
+            throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', \get_class($this), $beta));
+        }
+
         return $this->doGet($this, $key, $callback, $beta ?? 1.0);
     }
 

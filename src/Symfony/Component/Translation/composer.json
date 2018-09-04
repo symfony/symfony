@@ -34,6 +34,9 @@
         "symfony/dependency-injection": "<3.4",
         "symfony/yaml": "<3.4"
     },
+    "provide": {
+        "symfony/translation-contracts": "1.0"
+    },
     "suggest": {
         "symfony/config": "",
         "symfony/yaml": "",

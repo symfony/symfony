@@ -46,6 +46,8 @@ class JsonEncodeTest extends TestCase
         return [
             [[], '[]', []],
             [[], '{}', ['json_encode_options' => JSON_FORCE_OBJECT]],
+            [new \ArrayObject(), '{}', []],
+            [new \ArrayObject(['foo' => 'bar']), '{"foo":"bar"}', []],
         ];
     }
 

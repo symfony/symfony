@@ -100,7 +100,7 @@ class FileLinkFormatter implements \Serializable
                 }
 
                 return array(
-                    $request->getSchemeAndHttpHost().$request->getBaseUrl().$this->urlFormat,
+                    $request->getSchemeAndHttpHost().$request->getBasePath().$this->urlFormat,
                     $this->baseDir.\DIRECTORY_SEPARATOR, '',
                 );
             }

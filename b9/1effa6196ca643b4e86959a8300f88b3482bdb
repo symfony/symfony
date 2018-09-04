@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-13T11:14:22Z
+
+@R2c thanks for sending your first contribution to Symfony!
+
+I like this change a lot ... but sadly it's a backward compatibility break. Any existing command that doesn't specify the format gets the output in YML. If we make this change, the output will be XLIFF and things could break.
+
+If we want to make this change, we need to find a way of doing it without breaking existing commands. Thanks!
+
+---------------------------------------------------------------------------
+
+by R2c at 2018-07-13T12:15:42Z
+
+I searched in Symfony, i don't find another command with output format in YML.
+Maybe i'm wrong, but i think this command is clearly manual (dev).
+I don't think people use this command in production, with crontab, etc.
+That's why I put it on master.
+
+I'm opened to make more changes, any idea about the compatibility ?
+- Adding message on the changelog  ?
+- Adding message on the command... Starting at 3.4 - Output format will change in 4.2 to xliff
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-13T13:22:08Z
+
+given ppl expect yaml format today, and with this change, should use `format=yml` in the future... we could deprecate not passing a format, so we can change the default in 5.0
+
+not sure if worth it :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-18T03:38:47Z
+
+As this command is indeed something people run manually, I don't think changing the default is worth it.
+
+---------------------------------------------------------------------------
+
+by R2c at 2018-07-19T08:38:51Z
+
+My constat was :
+
+Starting to use SF4 from the skeleton to look / try every changes. So I try a lot of stuff, when i try to install/use the translation part, i was suprise to see a .yml file? it's not .yaml in SF4 :thinking:
+
+I use SF since a lot of years, but i'm imagining someone who start with it, i'm sure he will not understand why and it's look like a bug.
+
+If we don't change now, it'll never change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T08:29:37Z
+
+I don't see any simple way to change the default value without any BC break either. Which means that yes, it should stay as is forever.
+We could still allow passing "yaml" as output-format?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-28T06:47:19Z
+
+What do we do here? I don't think we have a non-BC break policy on commands (I'm pretty sure we broke some in the past). Documenting the change in the CHANGELOG could be enough?

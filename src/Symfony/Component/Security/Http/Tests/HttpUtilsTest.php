@@ -284,6 +284,29 @@ class HttpUtilsTest extends TestCase
         $this->assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
     }
 
+    public function testCheckRequestPathWithNotMatchingScheme()
+    {
+        $request = $this->getRequest();
+        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $urlMatcher
+            ->expects($this->any())
+            ->method('matchRequest')
+            ->with($request)
+            ->will($this->returnValue(array(
+                '_route' => 'foobar',
+                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
+                'path' => '/foo/bar',
+                'permanent' => true,
+                'scheme' => 'https',
+                'httpPort' => 80,
+                'httpsPortand' => 443,
+            )))
+        ;
+
+        $utils = new HttpUtils(null, $urlMatcher);
+        $this->assertFalse($utils->checkRequestPath($request, 'foobar'));
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage You must provide a UrlGeneratorInterface instance to be able to use routes.

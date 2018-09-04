@@ -113,7 +113,7 @@ class HttpUtils
                     $parameters = $this->urlMatcher->match($request->getPathInfo());
                 }
 
-                return isset($parameters['_route']) && $path === $parameters['_route'];
+                return isset($parameters['_route']) && $path === $parameters['_route'] && (!isset($parameters['scheme']) || $request->getScheme() === $parameters['scheme']);
             } catch (MethodNotAllowedException $e) {
                 return false;
             } catch (ResourceNotFoundException $e) {

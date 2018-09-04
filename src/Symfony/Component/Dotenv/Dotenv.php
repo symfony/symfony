@@ -47,25 +47,30 @@ final class Dotenv
      */
     public function load(string $path, string ...$paths): void
     {
-        array_unshift($paths, $path);
+        $this->doLoad(false, $path, ...$paths);
+    }
 
-        foreach ($paths as $path) {
-            if (!is_readable($path) || is_dir($path)) {
-                throw new PathException($path);
-            }
-
-            $this->populate($this->parse(file_get_contents($path), $path));
-        }
+    /**
+     * Loads one or several .env files and enables override existing vars.
+     *
+     * @param string    $path  A file to load
+     * @param ...string $paths A list of additional files to load
+     *
+     * @throws FormatException when a file has a syntax error
+     * @throws PathException   when a file does not exist or is not readable
+     */
+    public function overload(string $path, string ...$paths): void
+    {
+        $this->doLoad(true, $path, ...$paths);
     }
 
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
-     * Note that existing environment variables are not overridden.
-     *
-     * @param array $values An array of env variables
+     * @param array $values               An array of env variables
+     * @param bool  $overrideExistingVars true when existing environment variables must be overridden
      */
-    public function populate(array $values): void
+    public function populate(array $values, bool $overrideExistingVars = false): void
     {
         $loadedVars = array_flip(explode(',', getenv('SYMFONY_DOTENV_VARS')));
         unset($loadedVars['']);
@@ -73,7 +78,7 @@ final class Dotenv
         foreach ($values as $name => $value) {
             $notHttpName = 0 !== strpos($name, 'HTTP_');
             // don't check existence with getenv() because of thread safety issues
-            if (!isset($loadedVars[$name]) && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName))) {
+            if (!isset($loadedVars[$name]) && (!$overrideExistingVars && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName)))) {
                 continue;
             }
 
@@ -398,5 +403,18 @@ final class Dotenv
     private function createFormatException($message)
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
+    }
+
+    private function doLoad(bool $overrideExistingVars, string $path, string ...$paths): void
+    {
+        array_unshift($paths, $path);
+
+        foreach ($paths as $path) {
+            if (!is_readable($path) || is_dir($path)) {
+                throw new PathException($path);
+            }
+
+            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+        }
     }
 }

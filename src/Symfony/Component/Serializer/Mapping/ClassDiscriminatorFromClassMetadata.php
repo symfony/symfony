@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  */
 class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverInterface
 {
+    use ClassDiscriminatorConfigurationTrait;
+
     /**
      * @var ClassMetadataFactoryInterface
      */
@@ -72,21 +74,5 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         }
 
         return $mapping->getMappedObjectType($object);
-    }
-
-    private function resolveMappingForMappedObject($object)
-    {
-        $reflectionClass = new \ReflectionClass($object);
-        if ($parentClass = $reflectionClass->getParentClass()) {
-            return $this->getMappingForMappedObject($parentClass->getName());
-        }
-
-        foreach ($reflectionClass->getInterfaceNames() as $interfaceName) {
-            if (null !== ($interfaceMapping = $this->getMappingForMappedObject($interfaceName))) {
-                return $interfaceMapping;
-            }
-        }
-
-        return null;
     }
 }

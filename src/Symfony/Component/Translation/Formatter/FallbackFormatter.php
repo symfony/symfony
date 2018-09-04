@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Translation\Formatter;
 
-use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\Exception\LogicException;
 
 class FallbackFormatter implements MessageFormatterInterface, ChoiceMessageFormatterInterface
 {

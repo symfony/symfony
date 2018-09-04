@@ -17,7 +17,6 @@ use Symfony\Component\Translation\Formatter\ChoiceMessageFormatterInterface;
 use Symfony\Component\Translation\Formatter\FallbackFormatter;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 
-
 class FallbackFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormatSame()

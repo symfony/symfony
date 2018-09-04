@@ -88,8 +88,13 @@ class ProfilerController
         $panel = $request->query->get('panel', 'request');
         $page = $request->query->get('page', 'home');
 
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
-            $token = $latest['token'];
+        if ('latest' === $token) {
+            $url = $request->query->get('url', null);
+            $method = $request->query->get('method', null);
+            $ip = $request->query->get('ip', null);
+            if ($same = current($this->profiler->find($ip, $url, 1, $method, null, null))) {
+                $token = $same['token'];
+            }
         }
 
         if (!$profile = $this->profiler->loadProfile($token)) {

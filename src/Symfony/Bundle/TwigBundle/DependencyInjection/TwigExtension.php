@@ -132,6 +132,11 @@ class TwigExtension extends Extension
 
         $container->getDefinition('twig')->replaceArgument(1, $config);
 
+        if (false === $config['cache']) {
+            $container->removeDefinition('twig.cache_warmer');
+            $container->removeDefinition('twig.template_cache_warmer');
+        }
+
         $this->addClassesToCompile(array(
             'Twig_Environment',
             'Twig_Extension',

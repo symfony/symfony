@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-08T07:49:26Z
+
+Now with a `GetForCacheItemPoolTrait` to help implementing the `CacheInterface::get()` method in PSR-6 implementations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-08T07:51:28Z
+
+Also with `ExtendedCacheInterface` + `ExtendedTagAwareCacheInterface` for pools implementing both intrefaces: the proposed ones + PSR-6's `CacheItemPoolInterface`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-30T12:52:56Z
+
+Thanks @Nyholm , PR updated.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-08-30T12:59:38Z
+
+Thank you. Im 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-04T06:46:46Z
+
+(rebased)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-04T06:52:01Z
+
+Addressed, thanks.

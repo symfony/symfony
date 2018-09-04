@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -49,6 +50,11 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
+     * @var string|null
+     */
+    private $emulateSameSite;
+
+    /**
      * Depending on how you want the storage driver to behave you probably
      * want to override this constructor entirely.
      *
@@ -67,6 +73,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * cookie_lifetime, "0"
      * cookie_path, "/"
      * cookie_secure, ""
+     * cookie_samesite, null
      * entropy_file, ""
      * entropy_length, "0"
      * gc_divisor, "100"
@@ -94,9 +101,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
      *
-     * @param array                         $options Session configuration options
-     * @param \SessionHandlerInterface|null $handler
-     * @param MetadataBag                   $metaBag MetadataBag
+     * @param AbstractProxy|\SessionHandlerInterface|null $handler
      */
     public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null)
     {
@@ -148,6 +153,13 @@ class NativeSessionStorage implements SessionStorageInterface
         // ok to try and start the session
         if (!session_start()) {
             throw new \RuntimeException('Failed to start the session');
+        }
+
+        if (null !== $this->emulateSameSite) {
+            $originalCookie = SessionUtils::popSessionCookie(session_name(), session_id());
+            if (null !== $originalCookie) {
+                header(sprintf('%s; SameSite=%s', $originalCookie, $this->emulateSameSite), false);
+            }
         }
 
         $this->loadSession();
@@ -215,6 +227,13 @@ class NativeSessionStorage implements SessionStorageInterface
         // @see https://bugs.php.net/70013
         $this->loadSession();
 
+        if (null !== $this->emulateSameSite) {
+            $originalCookie = SessionUtils::popSessionCookie(session_name(), session_id());
+            if (null !== $originalCookie) {
+                header(sprintf('%s; SameSite=%s', $originalCookie, $this->emulateSameSite), false);
+            }
+        }
+
         return $isRegenerated;
     }
 
@@ -223,6 +242,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function save()
     {
+        // Store a copy so we can restore the bags in case the session was not left empty
         $session = $_SESSION;
 
         foreach ($this->bags as $bag) {
@@ -248,7 +268,11 @@ class NativeSessionStorage implements SessionStorageInterface
             session_write_close();
         } finally {
             restore_error_handler();
-            $_SESSION = $session;
+
+            // Restore only if not empty
+            if ($_SESSION) {
+                $_SESSION = $session;
+            }
         }
 
         $this->closed = true;
@@ -347,7 +371,7 @@ class NativeSessionStorage implements SessionStorageInterface
 
         $validOptions = array_flip([
             'cache_expire', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
-            'cookie_lifetime', 'cookie_path', 'cookie_secure',
+            'cookie_lifetime', 'cookie_path', 'cookie_secure', 'cookie_samesite',
             'entropy_file', 'entropy_length', 'gc_divisor',
             'gc_maxlifetime', 'gc_probability', 'hash_bits_per_character',
             'hash_function', 'lazy_write', 'name', 'referer_check',
@@ -360,6 +384,12 @@ class NativeSessionStorage implements SessionStorageInterface
 
         foreach ($options as $key => $value) {
             if (isset($validOptions[$key])) {
+                if ('cookie_samesite' === $key && \PHP_VERSION_ID < 70300) {
+                    // PHP < 7.3 does not support same_site cookies. We will emulate it in
+                    // the start() method instead.
+                    $this->emulateSameSite = $value;
+                    continue;
+                }
                 ini_set('url_rewriter.tags' !== $key ? 'session.'.$key : $key, $value);
             }
         }
@@ -381,7 +411,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see https://php.net/sessionhandlerinterface
      * @see https://php.net/sessionhandler
      *
-     * @param \SessionHandlerInterface|null $saveHandler
+     * @param AbstractProxy|\SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
      */

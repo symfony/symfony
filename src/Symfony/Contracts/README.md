@@ -15,6 +15,10 @@ Design Principles
  * all contracts must have a proven implementation to enter this repository;
  * they must be backward compatible with existing Symfony components.
 
+Packages that implement specific contracts should list them in the "provide"
+section of their "composer.json" file, using the `symfony/*-contracts`
+convention (e.g. `"provide": { "symfony/cache-contracts": "1.0" }`).
+
 FAQ
 ---
 

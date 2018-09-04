@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-08-31T21:24:41Z
+
+Can we throw a deprecation when it returns null and adjust the signature to `: string` in 5.0? It doesn't make sense to return `null` here, you'd expect an exception in the URL generation.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-01T07:09:06Z
+
+https://github.com/symfony/symfony/blob/d2e9e0bcf3d0860e19f95872ad566763adbc9910/src/Symfony/Component/Routing/Generator/UrlGenerator.php#L159-L167
+
+This is the only case, and AFAIK intended to not throw. Currently `null` allows you to differ this case from a valid `""` URL. However im not sure we should care (it's logged) and perhaps we can always return string then... deprecting null first :angel:
+
+At least in practice i think this null is already casted to string in app code.
+
+https://github.com/symfony/symfony/blob/bc45a0ed82d340c9aba40be3535dc1d7287b6954/src/Symfony/Bridge/Twig/Extension/RoutingExtension.php#L53-L69
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-09-02T20:44:21Z
+
+I agree returning null does not make sense for this method. It could just be changed to an empty string when not strictRequirements
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-03T05:17:33Z
+
+I agree with @Tobion
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-09-03T07:04:35Z
+
+Would this be a bugfix then (target against 2.8 branch)?

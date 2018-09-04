@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-06-08T20:26:39Z
+
+I've rebased this PR and updated according to feedback.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-07-23T18:03:52Z
+
+Anything I can do to help review this?
+
+---------------------------------------------------------------------------
+
+by artursvonda at 2018-08-01T14:33:48Z
+
+Love the change and allowing to get rid of special case of transChoice (over time).
+
+The original PR mentioned something about storing format with the messages and I actually tend to agree with it. The format IS information that's directly coupled with actual messages (basically, a meta information about contents of the file). This becomes even more important if translations are coming from external source and are not part of source files. There already have been talks about allowing different caching mechanisms and sources (like database) so coupling domain to format in config would not allow for changes in message format without deployment (and would make syncing changes hard anyway).
+Catalogues already support metadata so we can add formatter as additional key there and maybe think about making formatter metadata part of actual message which would allow even more granular transition of messages from one format to another.
+Architecture wise this would mean a bigger change long term with messages probably being objects (or structs) containing metadata but short term we can just use similar strategy as in this PR but configure domain => formatter relation automatically based on metadata in translation files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-24T21:27:13Z
+
+Added to project "Contracts" after comment https://github.com/symfony/symfony/pull/28210#discussion_r212756794
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-30T14:15:16Z
+
+I like it, but I would make the new formatter accessible only through `trans()` and not through `transChoice()` which should support only the Symfony syntax.
+This would pave the way to deprecating transChoice at a later point in time, following [this comment](https://github.com/symfony/symfony/pull/28210#discussion_r212756794) from @Koc.
+I'd suggest to wait for https://github.com/symfony/symfony/pull/28210 to be merged before rebasing this PR and resolving this very comment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T15:18:24Z
+
+Some description of the format here:
+https://messageformat.github.io/messageformat/page-guide
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-03T22:17:55Z
+
+I've updated this PR.
+I did some major changes. I removed support for multiple formatters. Instead, I added a `FallbackFormatter`.
+
+With the fallback formatter we can support both "Symfony style plural" and intl messages at the same time. This will make sure we have a zero config solution for adding support for this new feature while all the old formats still works as expected.
+
+Possible update: I could make the `FallbackFormatter` less generic by using the following constructor signature: `FallbackFormatter::__construct(IntlMessageFormatter $first, MessageFormatter $second)`. The logic will be simpler if I do this change.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-04T05:36:51Z
+
+Thank you for the review, Ive updated the PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-04T06:48:54Z
+
+> In a followup PR, we should deprecate the old way, deprecate transChoice and probably try to write a script that converts our proprietary format to the intl one
+
+:100: for both!
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-04T06:59:39Z
+
+Thank you. PR updated.
+
+I agree to deprecate transChoice

@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by jfredon at 2018-07-16T20:57:41Z
+
+I'm not very proud of how i changed the tests, i think i used a dirty trick.
+The `FileValidator::factorizeSizes()` method is private and so difficult to use in test.
+What is the best way of doing this sort of thing ?
+Should i change the visibility of the method? Maybe extract the method in a helper object?

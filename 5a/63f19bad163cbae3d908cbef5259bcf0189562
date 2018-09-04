@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-08-27T12:02:51Z
+
+Rational in original PR was that envelop items are a thing specific to the Symfony Messenger component in order to configure transport & middleware and would not be used by third party systems. So there is no interop required (or that would mean 3rd party systems would have to implement features the same way Symfony Messenger does. Not likely to happen IMHO).
+
+Mentioned use-case in #28270 is about adding headers to the transport layer. Hence this is the transport responsibility. Using directly envelop items for this and relying on the fact those are serialized in `X-Message-Envelope-Items` looks wrong to me. Instead, I'd say an envelope item should allow configuring headers and our Messenger Serializer use it to add asked headers.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-08-27T18:25:04Z
+
+> So there is no interop required (or that would mean 3rd party systems would have to implement features the same way Symfony Messenger does. Not likely to happen IMHO).
+
+That I don't agree with: even if the envelopes provided by the core are not necessarily aimed to be shared across systems, I don't see why we would enforce their serialization to be obfuscated with PHP's `serialize` mechanism (in this case, for sure, 3rd parties won't do anything with them). For user-defined envelopes, I'm pretty convinced that this is very valuable to have them serialized in an understandable format (i.e. JSON) so that 3rd parties can account for them.
+
+There is another aspect to it: JSON is much better for backward compatibility. BC is pretty important for anything that is asynchronous (because you can't wait for all the messages to be processed when you deploy the workers) and this is this main reason that I believe we should use Symfony Serializer for this.
+
+> Instead, I'd say an envelope item should allow configuring headers and our Messenger Serializer use it to add asked headers.
+
+I definitely do agree with this though: we should add an envelope which could be named _MessageHeaderEnvelope_ that is understood by the `Serializer` class (in Messenger, obsly) to add custom headers to the messages.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-30T16:51:35Z
+
+👍  for using plain JSON via Symfony Serializer (we are moving away from PHP serializer anyway).
+👎 for keeping BC with 4.1. The component is marked as experimental for this very reason: allow us to break BC.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T08:24:27Z
+
+@sroze Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-09-04T08:25:46Z
+
+@fabpot what a nice timing. Just pushed the rebased and updated version without the `serialize` fallback 😉

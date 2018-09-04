@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-23T07:18:04Z
+
+You might have missed #23831 :)
+Unless you think it's another convenient approach. But it mixes real output & dumps in CLI and #23831 answers other user-cases.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-23T07:28:12Z
+
+Indeed I've missed #23831 and it looks very interesting but I don't think that it addresses the same use case.
+This patch is intended for quick & dirty debugging, for instance for a command written in PHP not using Symfony at all, you just install `var_dumper` (or have it installed) globally and you can still get the HTML output by just prepending an env var.
+
+> it mixes real output
+
+Yes it's intended (just as do the CLI formatter by default).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-23T08:35:20Z
+
+It's always quick & dirty ;) Just trying to make it a bit more clean.
+With #23831, you won't even need an env var. Just run your command and if the server is up it'll collect dumps.
+Next steps for #23831 could be to provide a simple `ServerDumper::register(string $host = null, bool $swallow = true)` static method executing the manual wiring described in the PR description with default values so you just have to add one line to your app, and ship the `symfony/var-dumper` component with a simple script allowing to start the server.
+
+But of course I also understand how a simple env var to prepend is convenient for punctual dumps, so I'm not against this feature at all.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-11-23T12:38:50Z
+
+@dunglas I also think you can replace `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome tmp.html` by `open tmp.html` which will use the default browser ;)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-23T13:30:31Z
+
+@theofidry unfortunately I can't because my default browser is Firefox, and Firefox is very bad at reusing an existing instance (it usually ends up by an error).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-23T13:31:55Z
+
+```sh
+open -a "Google Chrome" tmp.html
+```
+
+? 😄
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-23T13:38:19Z
+
+@ogizanagi great thanks! This one works with Firefox too (but why, it's another topic).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-31T09:23:12Z
+
+Are you ok to merge this one @symfony/deciders? I miss it almost every day 😄.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-22T17:44:09Z
+
+Note: it's related to #23442
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-30T07:43:08Z
+
+PR tweaked to be able to select any format, env var renamed to `VAR_DUMPER_FORMAT`.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-02T09:51:08Z
+
+I thinks I only works when using the dumper directly.
+In a symfony app, the dumper is configured in the bundle.
+IMHO this line should be updated too: https://github.com/symfony/symfony/blob/9efa5551910a0389644bde012db300a82ecb75a7/src/Symfony/Component/HttpKernel/DataCollector/DumpDataCollector.php#L207
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-13T11:46:27Z
+
+@lyrixx done

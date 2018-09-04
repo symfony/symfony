@@ -16,12 +16,10 @@ use Symfony\Component\Translation\Formatter\IntlMessageFormatter;
 
 class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped(
-              'The Intl extension is not available.'
-            );
+            $this->markTestSkipped('The Intl extension is not available.');
         }
     }
 
@@ -30,13 +28,13 @@ class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormat($expected, $message, $arguments)
     {
-        $this->assertEquals($expected, trim($this->getMessageFormatter()->format($message, 'en', $arguments)));
+        $this->assertEquals($expected, trim((new IntlMessageFormatter())->format($message, 'en', $arguments)));
     }
 
     public function testInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->getMessageFormatter()->format('{foo', 'en', array(2));
+        (new IntlMessageFormatter())->format('{foo', 'en', array(2));
     }
 
     public function testFormatWithNamedArguments()
@@ -64,8 +62,7 @@ class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
      other {{host} invites {guest} as one of the # people invited to their party.}}}}
 _MSG_;
 
-        $formatter = $this->getMessageFormatter();
-        $message = $formatter->format($chooseMessage, 'en', array(
+        $message = (new IntlMessageFormatter())->format($chooseMessage, 'en', array(
             'gender_of_host' => 'male',
             'num_guests' => 10,
             'host' => 'Fabien',
@@ -89,10 +86,5 @@ _MSG_;
                 array(4560, 123, 4560 / 123),
             ),
         );
-    }
-
-    private function getMessageFormatter()
-    {
-        return new IntlMessageFormatter();
     }
 }

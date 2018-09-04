@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Translation\Formatter;
 
 use Symfony\Component\Translation\Exception\LogicException;
@@ -73,6 +71,6 @@ class FallbackFormatter implements MessageFormatterInterface, ChoiceMessageForma
             return $this->secondFormatter->choiceFormat($message, $number, $locale, $parameters);
         }
 
-        throw new LogicException(sprintf('The no formatter support plural translations.'));
+        throw new LogicException(sprintf('No formatters support plural translations.'));
     }
 }

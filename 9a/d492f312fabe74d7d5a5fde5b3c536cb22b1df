@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by MaksSlesarenko at 2018-04-16T11:17:27Z
+
+updated pr.
+I don't mind adding couple tests, but I'm not seeing any for lock component in framework bundle to begin with
+
+---------------------------------------------------------------------------
+
+by MaksSlesarenko at 2018-04-20T11:11:52Z
+
+up
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-20T11:14:54Z
+
+see fabbot failure :)
+
+---------------------------------------------------------------------------
+
+by MaksSlesarenko at 2018-05-08T10:31:33Z
+
+Is there anything else I forgot to fix?
+
+---------------------------------------------------------------------------
+
+by MaksSlesarenko at 2018-05-21T10:26:43Z
+
+up

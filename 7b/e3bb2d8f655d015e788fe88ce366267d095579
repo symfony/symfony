@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-08-16T17:08:07Z
+
+I've added the `cookie_samesite` option to `\Symfony\Component\HttpFoundation\Tests\Session\Storage\NativeSessionStorageTest`, only I've set it to the value of "lax" instead of "" as I think that's a more solid test; any string can be empty, getting a specific value is harder.
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-08-20T11:52:45Z
+
+I've just added the change to `CHANGELOG.md` and created a PR for the docs: https://github.com/symfony/symfony-docs/pull/10202
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-08-28T18:34:58Z
+
+I'm not sure why Travis is failing now. It seems to be missing the `symfony/var-dumper` package. Maybe that's broken on master now?

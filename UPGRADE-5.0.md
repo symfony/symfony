@@ -92,6 +92,7 @@ FrameworkBundle
  * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is not supported anymore.
  * The `RequestDataCollector` class has been removed. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\Controller`. Use `Symfony\Bundle\FrameworkBundle\Controller\AbstractController` instead.
+ * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
 
 HttpFoundation
 --------------

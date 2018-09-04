@@ -47,7 +47,7 @@ final class Dotenv
      */
     public function load(string $path, string ...$paths): void
     {
-        $this->doLoad(false, $path, ...$paths);
+        $this->doLoad(false, $path, $paths);
     }
 
     /**
@@ -61,7 +61,7 @@ final class Dotenv
      */
     public function overload(string $path, string ...$paths): void
     {
-        $this->doLoad(true, $path, ...$paths);
+        $this->doLoad(true, $path, $paths);
     }
 
     /**
@@ -405,7 +405,7 @@ final class Dotenv
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }
 
-    private function doLoad(bool $overrideExistingVars, string $path, string ...$paths): void
+    private function doLoad(bool $overrideExistingVars, string $path, array $paths): void
     {
         array_unshift($paths, $path);
 

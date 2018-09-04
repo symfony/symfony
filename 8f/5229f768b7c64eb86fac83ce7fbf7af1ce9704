@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fmata at 2018-04-08T11:27:51Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fmata at 2018-07-09T15:41:07Z
+
+@nicolas-grekas rebased & comments addressed.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-12T08:41:24Z
+
+I was looking for how did other similar libraries solved this:
+
+* PHP `vlucas/phpdotenv` defines two methods: `load()` (doesn't overwrite) and `overload()` (overwrites) https://github.com/vlucas/phpdotenv#immutability
+* Ruby `bkeepers/dotenv` defines two methods: `load` and `overload` https://github.com/bkeepers/dotenv#why-is-it-not-overriding-existing-env-variables
+* NodeJS `motdotla/dotenv` doesn't allow to override in any way. You must do it yourself. https://github.com/motdotla/dotenv#what-happens-to-environment-variables-that-were-already-set
+* .NET `tonerdo/dotnet-env` overwrites by default, but you can pass a fourth boolean argument to prevent that: `DotNetEnv.Env.Load(false, false, false, false)` https://github.com/tonerdo/dotnet-env
+* Python `theskumar/python-dotenv` allows overriding passing an argument to load method: `load_dotenv(find_dotenv(), override=True)` https://github.com/theskumar/python-dotenv/pull/63/files#diff-88b99bb28683bd5b7e3a204826ead112
+* Go `joho/godotenv` defines two methods `Load` and `Overload` https://github.com/joho/godotenv/blob/1709ab122c988931ad53508747b3c061400c2984/godotenv.go#L64
+* Haskell `stackbuilders/dotenv-hs` defines a `override` option in the `load` method https://github.com/stackbuilders/dotenv-hs/blob/92ca78c14f0423c91a5897e761d81378aca3f2a0/app/Main.hs#L26
+
+The most popular option seems to be to define two methods called `load()` and `overload()`. Maybe we can do the same here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-07T09:01:50Z
+
+Lets' add `overload()` then?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-28T06:50:15Z
+
+I would also prefer to add another method.
+
+---------------------------------------------------------------------------
+
+by fmata at 2018-09-02T09:30:49Z
+
+I added `Dotenv::overload()` method but I had to add an optional parameter in `Dotenv::populate()` too because this method is public (I don't know why).
+
+Tests failed are unrelated.

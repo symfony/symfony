@@ -288,7 +288,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * Get class description from doc block.
+     * Gets class description from a docblock.
      *
      * @param string $class
      *

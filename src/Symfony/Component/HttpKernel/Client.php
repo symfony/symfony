@@ -71,12 +71,12 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
-        $kernel = str_replace("'", "\\'", serialize($this->kernel));
-        $request = str_replace("'", "\\'", serialize($request));
+        $kernel = var_export(serialize($this->kernel), true);
+        $request = var_export(serialize($request), true);
 
         $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
-        $requirePath = str_replace("'", "\\'", $r->getFileName());
-        $symfonyPath = str_replace("'", "\\'", \dirname(\dirname(\dirname(__DIR__))));
+        $requirePath = var_export($r->getFileName(), true);
+        $symfonyPath = var_export(\dirname(\dirname(\dirname(__DIR__))), true);
         $errorReporting = error_reporting();
 
         $code = <<<EOF
@@ -84,14 +84,14 @@ class Client extends BaseClient
 
 error_reporting($errorReporting);
 
-require_once '$requirePath';
+require_once $requirePath;
 
 \$loader = new Symfony\Component\ClassLoader\ClassLoader();
-\$loader->addPrefix('Symfony', '$symfonyPath');
+\$loader->addPrefix('Symfony', $symfonyPath);
 \$loader->register();
 
-\$kernel = unserialize('$kernel');
-\$request = unserialize('$request');
+\$kernel = unserialize($kernel);
+\$request = unserialize($request);
 EOF;
 
         return $code.$this->getHandleScript();

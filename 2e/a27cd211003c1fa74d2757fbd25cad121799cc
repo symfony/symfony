@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-09-25T19:21:49Z
+
+The `json_array` can store a lot of things that aren't arrays so I'm :-1: for adding it.
+
+---------------------------------------------------------------------------
+
+by iluuu1994 at 2017-09-25T19:28:04Z
+
+@jvasseur Not according to the [docs](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/types.html#json-array). The type will be casted to an `array`, at least when you're reading from the DB. `json` can be any type.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-09-25T19:48:34Z
+
+The docs are wrong here, the code (https://github.com/doctrine/dbal/blob/2.5/lib/Doctrine/DBAL/Types/JsonArrayType.php#L63) shows that any non-null (database null, you can still get a null result with a json containing `"null") `value is just decoded. This means that a `json_array` type can be used to store booleans/strings/nulls. In fact the only difference between the `json_array` and `json` type is that the `json` type convert database nulls as php nulls instead of empty arrays.
+
+And `json_array` columns can contains associative arrays that probably shouldn't be mapped to a collection type.
+
+The `array` type to BTW can contains a lot more than arrays (even more than the `json_array` type) since it can convert anything that pass the php `serialize` function.
+
+---------------------------------------------------------------------------
+
+by iluuu1994 at 2017-09-26T20:01:53Z
+
+@jvasseur Point taken.
+
+To be fair, the guesser uses `MEDIUM_CONFIDENCE` so it's not like we're claiming with absolute certainty that the type is going to be an array. But there's a pretty good change it is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:38:15Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by iluuu1994 at 2017-10-08T16:47:50Z
+
+@nicolas-grekas Done. When will the 4.0 branch be created?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:55:13Z
+
+Branch 4.0 will be created a few days before its release, so end of november.
+Then, master will become the next 4.1.
+
+---------------------------------------------------------------------------
+
+by iluuu1994 at 2017-10-08T16:57:40Z
+
+@nicolas-grekas Ok! 👍
+
+---------------------------------------------------------------------------
+
+by iluuu1994 at 2018-09-04T16:08:59Z
+
+Removed support for `json_array` and rebased onto master.

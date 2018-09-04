@@ -17,6 +17,7 @@ use Symfony\Component\Translation\Formatter\ChoiceMessageFormatterInterface;
 use Symfony\Component\Translation\Formatter\FallbackFormatter;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 
+
 class FallbackFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormatSame()
@@ -71,6 +72,23 @@ class FallbackFormatterTest extends \PHPUnit\Framework\TestCase
             ->with('foo', 'en', array(2))
             ->willReturn('bar');
 
+        $this->assertEquals('bar', (new FallbackFormatter($first, $second))->format('foo', 'en', array(2)));
+    }
+
+    public function testFormatExceptionUnknown()
+    {
+        $first = $this->getMockBuilder(MessageFormatterInterface::class)->setMethods(array('format'))->getMock();
+        $first
+            ->expects($this->once())
+            ->method('format')
+            ->willThrowException(new \RuntimeException());
+
+        $second = $this->getMockBuilder(MessageFormatterInterface::class)->setMethods(array('format'))->getMock();
+        $second
+            ->expects($this->exactly(0))
+            ->method('format');
+
+        $this->expectException(\RuntimeException::class);
         $this->assertEquals('bar', (new FallbackFormatter($first, $second))->format('foo', 'en', array(2)));
     }
 

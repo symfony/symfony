@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Formatter;
 
 use Symfony\Component\Translation\Exception\LogicException;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 class FallbackFormatter implements MessageFormatterInterface, ChoiceMessageFormatterInterface
 {
@@ -35,7 +36,7 @@ class FallbackFormatter implements MessageFormatterInterface, ChoiceMessageForma
     {
         try {
             $result = $this->firstFormatter->format($message, $locale, $parameters);
-        } catch (\Throwable $e) {
+        } catch (InvalidArgumentException $e) {
             return $this->secondFormatter->format($message, $locale, $parameters);
         }
 
@@ -52,7 +53,7 @@ class FallbackFormatter implements MessageFormatterInterface, ChoiceMessageForma
         if ($this->firstFormatter instanceof ChoiceMessageFormatterInterface && $this->secondFormatter instanceof ChoiceMessageFormatterInterface) {
             try {
                 $result = $this->firstFormatter->choiceFormat($message, $number, $locale, $parameters);
-            } catch (\Throwable $e) {
+            } catch (InvalidArgumentException $e) {
                 return $this->secondFormatter->choiceFormat($message, $number, $locale, $parameters);
             }
 

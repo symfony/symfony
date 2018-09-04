@@ -87,4 +87,14 @@ class OptionsResolverIntrospector
     {
         return \call_user_func($this->get, 'normalizers', $option, sprintf('No normalizer was set for the "%s" option.', $option));
     }
+
+    /**
+     * @return string|\Closure
+     *
+     * @throws NoConfigurationException on no configured deprecation
+     */
+    public function getDeprecationMessage(string $option)
+    {
+        return \call_user_func($this->get, 'deprecated', $option, sprintf('No deprecation was set for the "%s" option.', $option));
+    }
 }

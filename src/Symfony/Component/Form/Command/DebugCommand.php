@@ -58,6 +58,7 @@ class DebugCommand extends Command
             ->setDefinition(array(
                 new InputArgument('class', InputArgument::OPTIONAL, 'The form type class'),
                 new InputArgument('option', InputArgument::OPTIONAL, 'The form type option'),
+                new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
             ))
             ->setDescription('Displays form type information')
@@ -66,14 +67,22 @@ The <info>%command.name%</info> command displays information about form types.
 
   <info>php %command.full_name%</info>
 
-The command lists all built-in types, services types, type extensions and guessers currently available.
+The command lists all built-in types, services types, type extensions and 
+guessers currently available.
 
   <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
   <info>php %command.full_name% ChoiceType</info>
 
-The command lists all defined options that contains the given form type, as well as their parents and type extensions.
+The command lists all defined options that contains the given form type, 
+as well as their parents and type extensions.
 
   <info>php %command.full_name% ChoiceType choice_value</info>
+
+Use the <info>--show-deprecated</info> option to display form types with 
+deprecated options or the deprecated options of the given form type:
+
+  <info>php %command.full_name% --show-deprecated</info>
+  <info>php %command.full_name% ChoiceType --show-deprecated</info>
 
 The command displays the definition of the given option name.
 
@@ -96,6 +105,10 @@ EOF
             $object = null;
             $options['core_types'] = $this->getCoreTypes();
             $options['service_types'] = array_values(array_diff($this->types, $options['core_types']));
+            if ($input->getOption('show-deprecated')) {
+                $options['core_types'] = $this->filterTypesByDeprecated($options['core_types']);
+                $options['service_types'] = $this->filterTypesByDeprecated($options['service_types']);
+            }
             $options['extensions'] = $this->extensions;
             $options['guessers'] = $this->guessers;
             foreach ($options as $k => $list) {
@@ -114,7 +127,7 @@ EOF
                     $message = sprintf('Option "%s" is not defined in "%s".', $option, \get_class($resolvedType->getInnerType()));
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
-                        if (1 == \count($alternatives)) {
+                        if (1 === \count($alternatives)) {
                             $message .= "\n\nDid you mean this?\n    ";
                         } else {
                             $message .= "\n\nDid you mean one of these?\n    ";
@@ -134,6 +147,7 @@ EOF
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
+        $options['show_deprecated'] = $input->getOption('show-deprecated');
         $helper->describe($io, $object, $options);
     }
 
@@ -152,7 +166,7 @@ EOF
 
             $allTypes = array_merge($this->getCoreTypes(), $this->types);
             if ($alternatives = $this->findAlternatives($shortClassName, $allTypes)) {
-                if (1 == \count($alternatives)) {
+                if (1 === \count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
                 } else {
                     $message .= "\n\nDid you mean one of these?\n    ";
@@ -182,6 +196,22 @@ EOF
         sort($coreTypes);
 
         return $coreTypes;
+    }
+
+    private function filterTypesByDeprecated(array $types): array
+    {
+        $typesWithDeprecatedOptions = array();
+        foreach ($types as $class) {
+            $optionsResolver = $this->formRegistry->getType($class)->getOptionsResolver();
+            foreach ($optionsResolver->getDefinedOptions() as $option) {
+                if ($optionsResolver->isDeprecated($option)) {
+                    $typesWithDeprecatedOptions[] = $class;
+                    break;
+                }
+            }
+        }
+
+        return $typesWithDeprecatedOptions;
     }
 
     private function findAlternatives($name, array $collection)

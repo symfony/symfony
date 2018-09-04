@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-19T11:23:44Z
+
+rebase needed (and some comments to address)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-30T09:00:37Z
+
+rebased and comments addressed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-13T11:51:06Z
+
+Rebased, I suggest to keep the current name as there are no consensus on another name.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T09:54:26Z
+
+@dunglas Do you have time to have a look at my comments?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-04T11:01:14Z
+
+@fabpot done
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-04T11:11:07Z
+
+CI errors look unrelated.

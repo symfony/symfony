@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-23T14:06:31Z
+
+This part should be updated as well:
+https://github.com/symfony/symfony/blob/e7f50768f107fa951f4c80dc447b893502cf2e89/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php#L52-L55
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T08:38:35Z
+
+@xabbuh Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-04T08:50:51Z
+
+comments should be addressed now

@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -860,6 +861,24 @@ class ObjectNormalizerTest extends TestCase
                 'bar' => array('foo'),
             ),
         )));
+    }
+
+    public function testAdvancedNameConverter()
+    {
+        $nameConverter = new class() implements AdvancedNameConverterInterface {
+            public function normalize($propertyName, string $class = null, string $format = null, array $context = array())
+            {
+                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+            }
+
+            public function denormalize($propertyName, string $class = null, string $format = null, array $context = array())
+            {
+                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, $nameConverter);
+        $this->assertArrayHasKey('foo-Symfony\Component\Serializer\Tests\Normalizer\ObjectDummy-json-bar', $normalizer->normalize(new ObjectDummy(), 'json', array('foo' => 'bar')));
     }
 }
 

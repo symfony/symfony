@@ -9,26 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Tests;
+namespace Symfony\Contracts\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberTrait;
+use Symfony\Contracts\Service\ServiceLocatorTrait;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 class ServiceSubscriberTraitTest extends TestCase
 {
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
-        $expected = array(TestService::class.'::aService' => '?Symfony\Component\DependencyInjection\Tests\Service2');
+        $expected = array(TestService::class.'::aService' => '?Symfony\Contracts\Tests\Service\Service2');
 
         $this->assertEquals($expected, ChildTestService::getSubscribedServices());
     }
 
     public function testSetContainerIsCalledOnParent()
     {
-        $container = new Container();
+        $container = new class(array()) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
 
         $this->assertSame($container, (new TestService())->setContainer($container));
     }

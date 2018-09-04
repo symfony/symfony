@@ -16,27 +16,6 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PropertyAccessExtractorInterface
+interface PropertyAccessExtractorInterface extends PropertyAccessReadableInterface, PropertyAccessWritableInterface
 {
-    /**
-     * Is the property readable?
-     *
-     * @param string $class
-     * @param string $property
-     * @param array  $context
-     *
-     * @return bool|null
-     */
-    public function isReadable($class, $property, array $context = array());
-
-    /**
-     * Is the property writable?
-     *
-     * @param string $class
-     * @param string $property
-     * @param array  $context
-     *
-     * @return bool|null
-     */
-    public function isWritable($class, $property, array $context = array());
 }

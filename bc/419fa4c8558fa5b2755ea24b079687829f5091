@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-06-21T07:16:44Z
+
+Will it be possible to use this command to find _all_ form types that have a deprecated option, and see which of those options are deprecated per type? That would make fixing them a walk in the park!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-21T12:56:02Z
+
+@iltar sure, I'll add an option `--show-deprecated` to filter the result on `debug:form` and `debug:form <type>`.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-24T22:21:52Z
+
+Added `--show-deprecated` option to the comand:
+
+> Use the <info>--show-deprecated</info> option to display form types with deprecated options or the deprecated options of the given form type:
+>
+>  <info>php %command.full_name% --show-deprecated</info>
+  <info>php %command.full_name% ChoiceType --show-deprecated</info>
+
+Status: Needs Review
+
+(Travis failures aren't related)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-07T12:36:06Z
+
+Any update about this?
+
+@ogizanagi you're working on this command in the past, so will be great to have your opinion on this! thanks. :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-15T18:36:08Z
+
+Thanks for the review @ogizanagi! I've fixed most comments. (AppVeyor & Travis failures are unrelated)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-30T20:19:29Z
+
+Rebased and ready.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-04T14:34:26Z
+
+@fabpot comments addressed, thanks! (AppVeyor failure is unrelated)

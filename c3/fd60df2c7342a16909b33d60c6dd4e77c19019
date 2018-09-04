@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-07T13:39:13Z
+
+Approach updated.. not sure this makes sense either :P but im concerning users extending from `OutputFormatter` as well as implementing `OutputFormatterInterface`.
+
+Guess i like the `format($message, $width = 0)` api.. but maybe the new interface should simply define `wrapAndFormat($message, $width)` or so.. and let `format()` forward.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T15:58:58Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-31T06:09:45Z
+
+@ro0NL Can you tell us the status of this PR? Looks like it should be rebased.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-31T08:52:16Z
+
+@fabpot is the current upgrade path OK? If so, suggestions for naming `WrappableOutputFormatterInterface` welcome :)
+
+but i was hoping we eventually dont need this interface and have `OutputInterface::format($message, $width = 0)` API... but the current BC policy doesnt allow that right? Hence we're stuck with this interface.
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-04T16:09:58Z
+
+I think the upgrade path is OK now. But i need to have a 2nd look at the fix.. cause im getting different results now as before.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-04T16:15:46Z
+
+OK something spiffy is going on
+
+![image](https://user-images.githubusercontent.com/1047696/38320119-f93ac272-3833-11e8-9622-42a47c8ff947.png)
+
+without any src changes etc. in between.. in PHPstorm it seems to consistently format wrong.
+
+Curious if this can be confirmed on some other terminal also.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-04-04T16:16:49Z
+
+It seems to break as soon as it breaks out the window, thus creates a scrollbar. WTF :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T15:41:32Z
+
+@ro0NL What do we do here? Any ideas how to move forward?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-04T16:50:33Z
+
+@fabpot rebased. The breaking format is unrelated (#27832), so if tests are still passing im :+1: to merge. But let me add some rendering tests tomorrow.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-04T16:54:21Z
+
+And perhaps rethink `WrappableOutputFormatterInterface`, overriding the definition of `OutputFormatterInterface::format()`.
+
+Perhaps more explicit `WrappableOutputFormatterInterface::formatAndWrap(string $message, int $width)` and let the implementation forward to `format($message, $width)`, where `OutputFormatter::format()` still supports the 2nd arg, but not as part of the interface..
+
+Then again, currently it allows to update `OutputFormatterInterface::format()` with the 2nd arg in 5.0 IIUC
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-04T17:06:31Z
+
+Updated. Much cleaner IMHO.

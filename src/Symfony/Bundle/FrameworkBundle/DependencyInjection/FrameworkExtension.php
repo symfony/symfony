@@ -64,6 +64,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -1404,6 +1405,14 @@ class FrameworkExtension extends Extension
                 switch (true) {
                     case 'flock' === $storeDsn:
                         $storeDefinition = new Reference('lock.store.flock');
+                        break;
+                    case 0 === strpos($storeDsn, 'flock://'):
+                        $flockPath = substr($storeDsn, 8);
+
+                        $storeDefinitionId = '.lock.flock.store.'.$container->hash($storeDsn);
+                        $container->register($storeDefinitionId, FlockStore::class)->addArgument($flockPath);
+
+                        $storeDefinition = new Reference($storeDefinitionId);
                         break;
                     case 'semaphore' === $storeDsn:
                         $storeDefinition = new Reference('lock.store.semaphore');

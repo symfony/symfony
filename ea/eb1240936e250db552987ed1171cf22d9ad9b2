@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-13T20:16:41Z
+
+Any update about this?
+
+@stof do you still think this solution is wrong? what is your suggestion? thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-19T06:59:15Z
+
+@stof How can we move forward on this?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-01T05:50:45Z
+
+Can we move forward by providing some facts?
+
+About the issue, this is [the bug reproducer](https://github.com/yceruto/template-iterator-bug-reproducer) (see `README.md` for instructions).
+
+As for the fix: add the missing default Twig path in `TemplateIterator` to find templates in this directory (to cache them later) seemed like a fast merge 2 months ago.
+
+> that's the wrong fix, because that's not the template name.
+
+It is the template name according to the test case. There is no `TwigBundle` configured here, I just reuse an existing path. Also (as we know) for Twig, the template class for `bundles/TwigBundle/layout.html.twig` is the same as `@Twig/layout.html.twig` (if this is the correct template name you expect), both refer to the same filename `templates/bundles/TwigBundle/layout.html.twig` hence same cache key and same cache file (taking the symfony-demo project as example).
+
+I hope this helps to unlock the status of this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-04T15:26:27Z
+
+@yceruto but if you warmup the cache using `bundles/TwigBundle/layout.html.twig`, `_self` in it will refer to `bundles/TwigBundle/layout.html.twig`, not to `@Twig/layout.html.twig` (and also many error messages), which might create confusion (as the expected usage of this template is through the namespaced notation).
+I actually think that the fact that our bundle-override path for template is actually a subpath of the main namespace is a drawback of the new structure (one we haven't identified earlier unfortunately) as it means these templates have 2 different names
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-04T15:28:29Z
+
+an alternative might be to exclude `%twig.default_path%/bundles` from the locator for the main namespace (as that's a convention handled by the bundle anyway). These templates would then be located using their actual expected name.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-04T17:01:58Z
+
+@stof thanks for clarifying, you're right about `_self` inside templates. I made the changes accordingly your last suggestion.
+
+Sorry for the firing of reviews on rebasing.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T17:03:21Z
+
+@stof Can you review one last time before I merge? Thank you.

@@ -219,6 +219,7 @@ Translation
 -----------
 
  * The `TranslatorInterface` has been deprecated in favor of `Symfony\Contracts\Translation\TranslatorInterface`
+ * The `Translator::transChoice()` has been deprecated in favor of using `Translator::trans()` with intl message format
  * The `MessageSelector`, `Interval` and `PluralizationRules` classes have been deprecated, use `IdentityTranslator` instead
  * The `Translator::getFallbackLocales()` and `TranslationDataCollector::getFallbackLocales()` method have been marked as internal
 

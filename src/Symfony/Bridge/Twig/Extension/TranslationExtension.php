@@ -16,6 +16,8 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Component\Translation\LegacyTranslatorTrait;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
@@ -34,6 +36,9 @@ class TranslationExtension extends AbstractExtension
         getLocale as private;
         setLocale as private;
         trans as private doTrans;
+    }
+
+    use LegacyTranslatorTrait {
         transChoice as private doTransChoice;
     }
 
@@ -107,7 +112,7 @@ class TranslationExtension extends AbstractExtension
 
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
-        if (null === $this->translator) {
+        if (null === $this->translator || !$this->translator instanceof LegacyTranslatorInterface) {
             return $this->doTransChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
         }
 

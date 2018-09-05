@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Util;
 
+use Symfony\Component\Translation\LegacyTranslatorTrait;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -19,6 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LegacyTranslatorProxy implements LegacyTranslatorInterface
 {
+    use LegacyTranslatorTrait {
+        transChoice as private doTransChoice;
+    }
     private $translator;
 
     public function __construct(TranslatorInterface $translator)
@@ -60,6 +64,10 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        if ($this->translator instanceof LegacyTranslatorInterface) {
+            return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        }
+
+        $this->doTransChoice($id, $number, $parameters, $domain, $locale);
     }
 }

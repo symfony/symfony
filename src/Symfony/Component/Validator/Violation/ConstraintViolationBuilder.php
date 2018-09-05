@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Violation;
 
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -141,7 +142,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
      */
     public function addViolation()
     {
-        if (null === $this->plural) {
+        if (null === $this->plural || !$this->translator instanceof LegacyTranslatorInterface) {
             $translatedMessage = $this->translator->trans(
                 $this->message,
                 $this->parameters,

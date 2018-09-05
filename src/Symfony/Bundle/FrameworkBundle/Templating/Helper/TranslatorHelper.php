@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Translation\LegacyTranslatorTrait;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
@@ -24,6 +26,9 @@ class TranslatorHelper extends Helper
         getLocale as private;
         setLocale as private;
         trans as private doTrans;
+    }
+
+    use LegacyTranslatorTrait {
         transChoice as private doTransChoice;
     }
 
@@ -51,7 +56,7 @@ class TranslatorHelper extends Helper
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        if (null === $this->translator) {
+        if (null === $this->translator || !$this->translator instanceof LegacyTranslatorInterface) {
             return $this->doTransChoice($id, $number, $parameters, $domain, $locale);
         }
 

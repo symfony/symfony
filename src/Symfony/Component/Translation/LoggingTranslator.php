@@ -21,6 +21,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LoggingTranslator implements LegacyTranslatorInterface, TranslatorBagInterface
 {
+    use LegacyTranslatorTrait {
+        transChoice as private doTransChoice;
+    }
+
     /**
      * @var TranslatorInterface|TranslatorBagInterface
      */
@@ -58,7 +62,12 @@ class LoggingTranslator implements LegacyTranslatorInterface, TranslatorBagInter
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        if ($this->translator instanceof LegacyTranslatorInterface) {
+            $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        } else {
+            $trans = $this->doTransChoice($id, $number, $parameters, $domain, $locale);
+        }
+
         $this->log($id, $domain, $locale);
 
         return $trans;

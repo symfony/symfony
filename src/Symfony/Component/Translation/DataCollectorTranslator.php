@@ -20,6 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBagInterface
 {
+    use LegacyTranslatorTrait {
+        transChoice as private doTransChoice;
+    }
+
     const MESSAGE_DEFINED = 0;
     const MESSAGE_MISSING = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
@@ -59,7 +63,12 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBa
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        if ($this->translator instanceof LegacyTranslatorInterface) {
+            $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        } else {
+            $trans = $this->doTransChoice($id, $number, $parameters, $domain, $locale);
+        }
+
         $this->collectMessage($locale, $domain, $id, $trans, $parameters, $number);
 
         return $trans;

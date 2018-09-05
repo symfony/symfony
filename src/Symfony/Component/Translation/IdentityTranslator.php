@@ -20,7 +20,8 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  */
 class IdentityTranslator implements TranslatorInterface
 {
-    use TranslatorTrait {
+    use TranslatorTrait;
+    use LegacyTranslatorTrait {
         transChoice as private doTransChoice;
     }
 
@@ -43,15 +44,11 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "trans()" method with intl formatted messages instead.', __METHOD__), E_USER_DEPRECATED);
         if ($this->selector) {
-            return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
+            return strtr($this->selector->choose((string) $id, $number, $locale ?: $this->getLocale()), $parameters);
         }
 
         return $this->doTransChoice($id, $number, $parameters, $domain, $locale);
-    }
-
-    private function getPluralizationRule(int $number, string $locale): int
-    {
-        return PluralizationRules::get($number, $locale, false);
     }
 }

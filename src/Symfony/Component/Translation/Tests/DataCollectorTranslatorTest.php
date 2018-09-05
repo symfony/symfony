@@ -25,7 +25,6 @@ class DataCollectorTranslatorTest extends TestCase
 
         $collector->trans('foo');
         $collector->trans('bar');
-        $collector->transChoice('choice', 0);
         $collector->trans('bar_ru');
         $collector->trans('bar_ru', array('foo' => 'bar'));
 
@@ -49,15 +48,6 @@ class DataCollectorTranslatorTest extends TestCase
             'transChoiceNumber' => null,
         );
         $expectedMessages[] = array(
-            'id' => 'choice',
-            'translation' => 'choice',
-            'locale' => 'en',
-            'domain' => 'messages',
-            'state' => DataCollectorTranslator::MESSAGE_MISSING,
-            'parameters' => array(),
-            'transChoiceNumber' => 0,
-        );
-        $expectedMessages[] = array(
             'id' => 'bar_ru',
             'translation' => 'bar (ru)',
             'locale' => 'ru',
@@ -74,6 +64,30 @@ class DataCollectorTranslatorTest extends TestCase
             'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
             'parameters' => array('foo' => 'bar'),
             'transChoiceNumber' => null,
+        );
+
+        $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectMessagesTransChoice()
+    {
+        $collector = $this->createCollector();
+        $collector->setFallbackLocales(array('fr', 'ru'));
+        $collector->transChoice('choice', 0);
+
+        $expectedMessages = array();
+
+        $expectedMessages[] = array(
+              'id' => 'choice',
+              'translation' => 'choice',
+              'locale' => 'en',
+              'domain' => 'messages',
+              'state' => DataCollectorTranslator::MESSAGE_MISSING,
+              'parameters' => array(),
+              'transChoiceNumber' => 0,
         );
 
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());

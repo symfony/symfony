@@ -139,6 +139,7 @@ class Workflow implements WorkflowInterface
 
         $transitionBlockerList = null;
         $applied = false;
+        $approvedTransitionQueue = array();
 
         foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $transitionName) {
@@ -149,7 +150,10 @@ class Workflow implements WorkflowInterface
             if (!$transitionBlockerList->isEmpty()) {
                 continue;
             }
+            $approvedTransitionQueue[] = $transition;
+        }
 
+        foreach ($approvedTransitionQueue as $transition) {
             $applied = true;
 
             $this->leave($subject, $transition, $marking);

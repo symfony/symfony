@@ -528,7 +528,7 @@ EOTXT
 
             $code .= $this->addNewInstance($def, '        $'.$name.' = ', $id);
 
-            if (!$this->hasReference($id, array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator()), true)) {
+            if (!$this->hasReference($id, array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator()), true, $inlinedDefinitions)) {
                 $code .= $this->addServiceProperties($def, $name);
                 $code .= $this->addServiceMethodCalls($def, $name);
                 $code .= $this->addServiceConfigurator($def, $name);
@@ -657,7 +657,7 @@ EOTXT
     {
         $code = '';
         foreach ($inlinedDefinitions as $def) {
-            if ($definition === $def || !$this->hasReference($id, array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator()), true)) {
+            if ($definition === $def || !$this->hasReference($id, array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator()), true, $inlinedDefinitions)) {
                 continue;
             }
 
@@ -775,6 +775,7 @@ EOF;
 
         $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));
         $constructorDefinitions = $this->getDefinitionsFromArguments(array($definition->getArguments(), $definition->getFactory()));
+        unset($constructorDefinitions[$definition]); // ensures $definition will be last
         $otherDefinitions = new \SplObjectStorage();
         $serviceCalls = array();
 
@@ -1091,6 +1092,9 @@ EOF;
             $ids = array_keys($ids);
             sort($ids);
             foreach ($ids as $id) {
+                if (preg_match('/^\.\d+_[^~]++~[._a-zA-Z\d]{7}$/', $id)) {
+                    continue;
+                }
                 $code .= '            '.$this->doExport($id)." => true,\n";
             }
 
@@ -1450,7 +1454,7 @@ EOF;
         return $definitions;
     }
 
-    private function hasReference(string $id, array $arguments, bool $deep = false, array &$visited = array()): bool
+    private function hasReference(string $id, array $arguments, bool $deep = false, \SplObjectStorage $inlinedDefinitions = null, array &$visited = array()): bool
     {
         if (!isset($this->circularReferences[$id])) {
             return false;
@@ -1458,7 +1462,7 @@ EOF;
 
         foreach ($arguments as $argument) {
             if (\is_array($argument)) {
-                if ($this->hasReference($id, $argument, $deep, $visited)) {
+                if ($this->hasReference($id, $argument, $deep, $inlinedDefinitions, $visited)) {
                     return true;
                 }
 
@@ -1477,6 +1481,9 @@ EOF;
 
                 $service = $this->container->getDefinition($argumentId);
             } elseif ($argument instanceof Definition) {
+                if (isset($inlinedDefinitions[$argument])) {
+                    return true;
+                }
                 $service = $argument;
             } else {
                 continue;
@@ -1488,7 +1495,7 @@ EOF;
                 continue;
             }
 
-            if ($this->hasReference($id, array($service->getArguments(), $service->getFactory(), $service->getProperties(), $service->getMethodCalls(), $service->getConfigurator()), $deep, $visited)) {
+            if ($this->hasReference($id, array($service->getArguments(), $service->getFactory(), $service->getProperties(), $service->getMethodCalls(), $service->getConfigurator()), $deep, $inlinedDefinitions, $visited)) {
                 return true;
             }
         }

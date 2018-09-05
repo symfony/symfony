@@ -19,11 +19,6 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
-
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
@@ -62,12 +57,6 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
         );
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
     }
 
     public function compile()

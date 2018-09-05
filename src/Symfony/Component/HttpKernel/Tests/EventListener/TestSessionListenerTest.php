@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -142,15 +141,6 @@ class TestSessionListenerTest extends TestCase
         $this->sessionMustNotBeSaved();
 
         $this->filterResponse(new Request());
-    }
-
-    public function testDoesNotImplementServiceSubscriberInterface()
-    {
-        $this->assertTrue(interface_exists(ServiceSubscriberInterface::class));
-        $this->assertTrue(class_exists(SessionListener::class));
-        $this->assertTrue(class_exists(TestSessionListener::class));
-        $this->assertFalse(is_subclass_of(SessionListener::class, ServiceSubscriberInterface::class), 'Implementing ServiceSubscriberInterface would create a dep on the DI component, which eg Silex cannot afford');
-        $this->assertFalse(is_subclass_of(TestSessionListener::class, ServiceSubscriberInterface::class, 'Implementing ServiceSubscriberInterface would create a dep on the DI component, which eg Silex cannot afford'));
     }
 
     public function testDoesNotThrowIfRequestDoesNotHaveASession()

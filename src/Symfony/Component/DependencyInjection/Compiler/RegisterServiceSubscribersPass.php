@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Compiler pass to register tagged services that require a service locator.

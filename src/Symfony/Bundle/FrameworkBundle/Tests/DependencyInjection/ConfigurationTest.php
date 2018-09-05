@@ -189,7 +189,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class),
                 'fallbacks' => array('en'),
                 'logging' => false,
-                'formatter' => 'translator.formatter.default',
+                'formatter' => \class_exists('MessageFormatter') ? 'translator.formatter.default' : 'translator.formatter.symfony',
                 'paths' => array(),
                 'default_path' => '%kernel.project_dir%/translations',
             ),

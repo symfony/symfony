@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T10:33:33Z
+
+Should it be a dedicated command or an option on the `debug:twig` one?
+I'm not sure growing the list of commands with this one is justified (it's a "minor" command, isn't it?)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-23T14:52:00Z
+
+IMHO the `name` argument doesn't seem like an option, but an argument that represents a pure action (find the path of the template name).
+
+At first I thought about adding it to `debug:twig` but this already has a main argument (`filter`) for the general info of Twig (functions, filters, tests, globals), I thought that adding this new feature would be a mess or it would require a complete refactor of the command (including passing the argument `filter` to option ` --filter` and making `name` as the main argument of the command).
+
+I'd also like to have everything in one command, but its initial design should change then. I imagine something like this:
+```bash
+$ b/c debug:twig # show general info
+
+# proposal 1 (without refactor)
+$ b/c debug:twig escape # filter the general info
+$ b/c debug:twig --find=@Twig/Exception/error.html.twig # find the template path
+
+# proposal 2 (with refactor) much better to me.
+$ b/c debug:twig @Twig/Exception/error.html.twig # find the template path
+$ b/c debug:twig --filter=escape # filter the general info
+```
+Do you prefer this?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-02T01:52:03Z
+
+@nicolas-grekas I added a second commit with your suggestion and `# proposal 2`. I also added a missing (minor) feature.
+
+ MINOR FEATURE:
+ * allowed `--filter` with `--format=json`
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-02T11:17:49Z
+
+Fixing AppVeyor failure...
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-02T13:18:56Z
+
+(Travis failures unrelated)
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-28T14:21:08Z
+
+Status: Needs Review

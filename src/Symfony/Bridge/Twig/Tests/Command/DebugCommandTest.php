@@ -29,51 +29,224 @@ class DebugCommandTest extends TestCase
         $this->assertContains('Functions', trim($tester->getDisplay()));
     }
 
-    public function testLineSeparatorInLoaderPaths()
+    public function testFilterAndJsonFormatOptions()
     {
-        // these paths aren't realistic,
-        // they're configured to force the line separator
-        $tester = $this->createCommandTester(array(
-            'Acme' => array('extractor', 'extractor'),
-            '!Acme' => array('extractor', 'extractor'),
-            FilesystemLoader::MAIN_NAMESPACE => array('extractor', 'extractor'),
-        ));
-        $ret = $tester->execute(array(), array('decorated' => false));
-        $ds = \DIRECTORY_SEPARATOR;
-        $loaderPaths = <<<TXT
-Loader Paths
-------------
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array('--filter' => 'abs', '--format' => 'json'), array('decorated' => false));
 
- ----------- ------------ 
-  Namespace   Paths       
- ----------- ------------ 
-  @Acme       extractor$ds  
-              extractor$ds  
-                          
-  @!Acme      extractor$ds  
-              extractor$ds  
-                          
-  (None)      extractor$ds  
-              extractor$ds  
- ----------- ------------
-TXT;
+        $expected = array(
+            'filters' => array('abs' => array()),
+        );
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains($loaderPaths, trim($tester->getDisplay(true)));
+        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
     }
 
-    private function createCommandTester(array $paths = array())
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Malformed namespaced template name "@foo" (expecting "@namespace/template_name").
+     */
+    public function testMalformedTemplateName()
     {
-        $filesystemLoader = new FilesystemLoader(array(), \dirname(__DIR__).'/Fixtures');
-        foreach ($paths as $namespace => $relDirs) {
-            foreach ($relDirs as $relDir) {
-                $filesystemLoader->addPath($relDir, $namespace);
+        $this->createCommandTester()->execute(array('name' => '@foo'));
+    }
+
+    /**
+     * @dataProvider getDebugTemplateNameTestData
+     */
+    public function testDebugTemplateName(array $input, string $output, array $paths)
+    {
+        $tester = $this->createCommandTester($paths);
+        $ret = $tester->execute($input, array('decorated' => false));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringMatchesFormat($output, $tester->getDisplay(true));
+    }
+
+    public function getDebugTemplateNameTestData()
+    {
+        $defaultPaths = array(
+            'templates/' => null,
+            'templates/bundles/TwigBundle/' => 'Twig',
+            'vendors/twig-bundle/Resources/views/' => 'Twig',
+        );
+
+        yield 'no template paths configured for your application' => array(
+            'input' => array('name' => 'base.html.twig'),
+            'output' => <<<TXT
+
+Matched File
+------------
+
+ Template name "base.html.twig" not found%A
+
+Configured Paths
+----------------
+
+ No template paths configured for your application%s
+
+ ----------- -------------------------------------%A
+  Namespace   Paths%A
+ ----------- -------------------------------------%A
+  @Twig       vendors/twig-bundle/Resources/views%e%A
+ ----------- -------------------------------------%A
+
+
+TXT
+            ,
+            'paths' => array('vendors/twig-bundle/Resources/views/' => 'Twig'),
+        );
+
+        yield 'no matched template' => array(
+            'input' => array('name' => '@App/foo.html.twig'),
+            'output' => <<<TXT
+
+Matched File
+------------
+
+ Template name "@App/foo.html.twig" not found%A
+
+Configured Paths
+----------------
+
+ No template paths configured for "@App" namespace%A
+
+ ----------- -------------------------------------%A
+  Namespace   Paths%A
+ ----------- -------------------------------------%A
+  (None)      templates%e%A
+  %A
+  @Twig       templates/bundles/TwigBundle%e%A
+              vendors/twig-bundle/Resources/views%e%A 
+ ----------- -------------------------------------%A
+
+
+TXT
+            ,
+            'paths' => $defaultPaths,
+        );
+
+        yield 'matched file' => array(
+            'input' => array('name' => 'base.html.twig'),
+            'output' => <<<TXT
+
+Matched File
+------------
+
+ [OK] templates%ebase.html.twig%A
+
+Configured Paths
+----------------
+
+ ----------- ------------%A
+  Namespace   Paths%A
+ ----------- ------------%A
+  (None)      templates%e%A
+ ----------- ------------%A
+
+
+TXT
+            ,
+            'paths' => $defaultPaths,
+        );
+
+        yield 'overridden files' => array(
+            'input' => array('name' => '@Twig/error.html.twig'),
+            'output' => <<<TXT
+
+Matched File
+------------
+
+ [OK] templates%ebundles%eTwigBundle%eerror.html.twig%A
+
+Overridden Files
+----------------
+
+ * vendors%etwig-bundle%eResources%eviews%eerror.html.twig
+
+Configured Paths
+----------------
+
+ ----------- -------------------------------------- 
+  Namespace   Paths%A
+ ----------- -------------------------------------- 
+  @Twig       templates/bundles/TwigBundle%e%A
+              vendors/twig-bundle/Resources/views%e%A
+ ----------- -------------------------------------- 
+
+
+TXT
+            ,
+            'paths' => $defaultPaths,
+        );
+
+        yield 'template namespace alternative' => array(
+            'input' => array('name' => '@Twg/error.html.twig'),
+            'output' => <<<TXT
+
+Matched File
+------------
+
+ Template name "@Twg/error.html.twig" not found%A
+
+Configured Paths
+----------------
+
+ No template paths configured for "@Twg" namespace%A
+%A
+%wDid you mean this?%A
+%w@Twig%A
+
+
+TXT
+            ,
+            'paths' => $defaultPaths,
+        );
+
+        yield 'template name alternative' => array(
+            'input' => array('name' => '@Twig/eror.html.twig'),
+            'output' => <<<TXT
+
+Matched File
+------------
+
+ Template name "@Twig/eror.html.twig" not found%A
+%A
+%wDid you mean one of these?%A
+%w@Twig/base.html.twig%A
+%w@Twig/error.html.twig%A
+
+Configured Paths
+----------------
+
+ ----------- -------------------------------------- 
+  Namespace   Paths                                 
+ ----------- -------------------------------------- 
+  @Twig       templates/bundles/TwigBundle%e%A
+              vendors/twig-bundle/Resources/views%e%A
+ ----------- -------------------------------------- 
+
+
+TXT
+            ,
+            'paths' => $defaultPaths,
+        );
+    }
+
+    private function createCommandTester(array $paths = array()): CommandTester
+    {
+        $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $loader = new FilesystemLoader(array(), $projectDir);
+        foreach ($paths as $path => $namespace) {
+            if (null === $namespace) {
+                $loader->addPath($path);
+            } else {
+                $loader->addPath($path, $namespace);
             }
         }
-        $command = new DebugCommand(new Environment($filesystemLoader));
 
         $application = new Application();
-        $application->add($command);
+        $application->add(new DebugCommand(new Environment($loader), $projectDir));
         $command = $application->find('debug:twig');
 
         return new CommandTester($command);

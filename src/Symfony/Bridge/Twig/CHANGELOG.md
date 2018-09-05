@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * add bundle name suggestion on wrongly overridden templates paths
+* added `name` argument in `debug:twig` command and changed `filter` argument as `--filter` option
 
 4.1.0
 -----

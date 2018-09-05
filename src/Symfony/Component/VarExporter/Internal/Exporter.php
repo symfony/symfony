@@ -80,6 +80,9 @@ class Exporter
                 // Might throw Exception("Serialization of '...' is not allowed")
                 Registry::getClassReflector($class);
                 serialize(Registry::$prototypes[$class]);
+                if (\method_exists($class, '__sleep')) {
+                    Registry::getClassReflector($class, Registry::$instantiableWithoutConstructor[$class], Registry::$cloneable[$class]);
+                }
             }
             $reflector = Registry::$reflectors[$class];
             $proto = Registry::$prototypes[$class];
@@ -109,6 +112,11 @@ class Exporter
                     trigger_error('serialize(): __sleep should return an array only containing the names of instance-variables to serialize', E_USER_NOTICE);
                     $value = null;
                     goto handle_value;
+                }
+                foreach ($sleep as $name) {
+                    if (\property_exists($value, $name) && !$reflector->hasProperty($name)) {
+                        $arrayValue[$name] = $value->$name;
+                    }
                 }
                 $sleep = array_flip($sleep);
             }

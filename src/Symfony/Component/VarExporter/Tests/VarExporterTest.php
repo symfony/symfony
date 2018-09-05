@@ -72,12 +72,14 @@ class VarExporterTest extends TestCase
      */
     public function testMarshall(string $testName, $value, bool $staticValueExpected = false)
     {
-        $serializedValue = serialize($value);
+        $dumpedValue = $this->getDump($value);
         $isStaticValue = true;
         $marshalledValue = VarExporter::export($value, $isStaticValue);
 
         $this->assertSame($staticValueExpected, $isStaticValue);
-        $this->assertSame($serializedValue, serialize($value));
+        if ('var-on-sleep' !== $testName) {
+            $this->assertDumpEquals($dumpedValue, $value);
+        }
 
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
@@ -165,6 +167,8 @@ class VarExporterTest extends TestCase
         $r->setValue($value, 234);
 
         yield array('error', $value);
+
+        yield array('var-on-sleep', new GoodNight());
     }
 }
 
@@ -246,5 +250,15 @@ class MyArrayObject extends \ArrayObject
     public function setFlags($flags)
     {
         throw new \BadMethodCallException('Calling MyArrayObject::setFlags() is forbidden');
+    }
+}
+
+class GoodNight
+{
+    public function __sleep()
+    {
+        $this->good = 'night';
+
+        return array('good');
     }
 }

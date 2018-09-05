@@ -74,14 +74,9 @@ class Registry
             }
         }
 
-        if (null !== $cloneable) {
-            self::$prototypes[$class] = $proto;
-            self::$cloneable[$class] = $cloneable;
-
-            return self::$reflectors[$class] = $reflector;
-        }
-
-        if ($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) {
+        if (null !== self::$cloneable[$class] = $cloneable) {
+            // no-op
+        } elseif ($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) {
             if (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup')) {
                 throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
             }

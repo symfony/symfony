@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-09-04T16:05:59Z
+
+I'm wondering whether we should move the `unshift` into both public methods. That would avoid creating a copy of the array, but the copy might not be a big issue (it is unlikely to pass a huge array there)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-05T08:40:50Z
+
+Moving `array_unshift()` into the calling methods would at least improve the readability of `doLoad()` IMO. But that's not a blocker to me.

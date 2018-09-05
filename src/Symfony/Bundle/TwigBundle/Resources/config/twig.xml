@@ -41,6 +41,7 @@
             <argument type="service" id="kernel" />
             <argument>%kernel.root_dir%</argument>
             <argument type="collection" /> <!-- Twig paths -->
+            <argument>%twig.default_path%</argument>
         </service>
 
         <service id="twig.template_cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer">

@@ -166,6 +166,11 @@ class TwigExtension extends Extension
         $container->registerForAutoconfiguration(LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');
 
+        if (false === $config['cache']) {
+            $container->removeDefinition('twig.cache_warmer');
+            $container->removeDefinition('twig.template_cache_warmer');
+        }
+
         if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Twig_Environment',

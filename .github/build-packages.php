@@ -6,15 +6,20 @@ if (3 > $_SERVER['argc']) {
 }
 chdir(dirname(__DIR__));
 
+$json = ltrim(file_get_contents('composer.json'));
+if ($json !== $package = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s', '', $json)) {
+    file_put_contents('composer.json', $package);
+}
+
 $dirs = $_SERVER['argv'];
 array_shift($dirs);
-$mergeBase = trim(shell_exec(sprintf('git merge-base %s HEAD', array_shift($dirs))));
+$mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($dirs))));
 
 $packages = array();
 $flags = \PHP_VERSION_ID >= 50400 ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
 
 foreach ($dirs as $k => $dir) {
-    if (!system("git diff --name-only \"$mergeBase\" -- $dir", $exitStatus)) {
+    if (!system("git diff --name-only $mergeBase -- $dir", $exitStatus)) {
         if ($exitStatus) {
             exit($exitStatus);
         }
@@ -74,7 +79,6 @@ if ($dirs) {
         'type' => 'composer',
         'url' => 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)).'/',
     ));
-    $json = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s', '', $json);
     $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
     file_put_contents('composer.json', $json);
 }

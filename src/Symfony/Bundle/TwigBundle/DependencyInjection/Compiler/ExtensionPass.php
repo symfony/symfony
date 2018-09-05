@@ -47,10 +47,15 @@ class ExtensionPass implements CompilerPassInterface
             $coreThemePath = \dirname(\dirname($reflClass->getFileName())).'/Resources/views/Form';
             $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array($coreThemePath));
 
-            $paths = $container->getDefinition('twig.cache_warmer')->getArgument(2);
+            $paths = $container->getDefinition('twig.template_iterator')->getArgument(2);
             $paths[$coreThemePath] = null;
-            $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $paths);
             $container->getDefinition('twig.template_iterator')->replaceArgument(2, $paths);
+
+            if ($container->hasDefinition('twig.cache_warmer')) {
+                $paths = $container->getDefinition('twig.cache_warmer')->getArgument(2);
+                $paths[$coreThemePath] = null;
+                $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $paths);
+            }
         }
 
         if ($container->has('router')) {

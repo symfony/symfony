@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Container is a dependency injection container.
@@ -42,6 +43,7 @@ class Container implements ResettableContainerInterface
 {
     protected $parameterBag;
     protected $services = array();
+    protected $privates = array();
     protected $fileMap = array();
     protected $methodMap = array();
     protected $factories = array();
@@ -301,7 +303,18 @@ class Container implements ResettableContainerInterface
      */
     public function reset()
     {
-        $this->services = $this->factories = array();
+        $services = $this->services + $this->privates;
+        $this->services = $this->factories = $this->privates = array();
+
+        foreach ($services as $service) {
+            try {
+                if ($service instanceof ResetInterface) {
+                    $service->reset();
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
     }
 
     /**

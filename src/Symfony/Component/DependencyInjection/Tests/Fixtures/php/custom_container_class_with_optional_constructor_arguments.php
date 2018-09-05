@@ -21,11 +21,6 @@ class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tes
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
-
     public function __construct()
     {
         parent::__construct();
@@ -34,12 +29,6 @@ class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tes
         $this->services = $this->privates = array();
 
         $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
     }
 
     public function compile()

@@ -960,11 +960,6 @@ class $class extends $baseClass
     private \$parameters;
     private \$targetDirs = array();
 
-    /*{$this->docStar}
-     * @internal but protected for BC on cache:clear
-     */
-    protected \$privates = array();
-
     public function __construct()
     {
 
@@ -1009,12 +1004,6 @@ EOF;
         $code .= $this->addAliases();
         $code .= $this->addInlineRequires();
         $code .= <<<EOF
-    }
-
-    public function reset()
-    {
-        \$this->privates = array();
-        parent::reset();
     }
 
     public function compile()

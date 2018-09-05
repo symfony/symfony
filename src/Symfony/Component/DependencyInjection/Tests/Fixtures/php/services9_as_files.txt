@@ -377,11 +377,6 @@ class ProjectServiceContainer extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
-
     public function __construct(array $buildParameters = array(), $containerDir = __DIR__)
     {
         $dir = $this->targetDirs[0] = \dirname($containerDir);
@@ -430,12 +425,6 @@ class ProjectServiceContainer extends Container
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
         );
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
     }
 
     public function compile()

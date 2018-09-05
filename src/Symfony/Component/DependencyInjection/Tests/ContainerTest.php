@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Contracts\Service\ResetInterface;
 
 class ContainerTest extends TestCase
 {
@@ -317,11 +318,19 @@ class ContainerTest extends TestCase
     public function testReset()
     {
         $c = new Container();
-        $c->set('bar', new \stdClass());
+        $c->set('bar', $bar = new class() implements ResetInterface {
+            public $resetCounter = 0;
+
+            public function reset()
+            {
+                ++$this->resetCounter;
+            }
+        });
 
         $c->reset();
 
         $this->assertNull($c->get('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        $this->assertSame(1, $bar->resetCounter);
     }
 
     /**

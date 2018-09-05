@@ -142,7 +142,7 @@ class YamlFileLoader extends FileLoader
 
         // services
         $this->anonymousServicesCount = 0;
-        $this->anonymousServicesSuffix = ContainerBuilder::hash($path);
+        $this->anonymousServicesSuffix = '~'.ContainerBuilder::hash($path);
         $this->setCurrentDir(\dirname($path));
         try {
             $this->parseDefinitions($content, $path);

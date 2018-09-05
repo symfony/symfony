@@ -1,0 +1,24 @@
+
+services:
+    foo:
+        class: c1
+        public: true
+        arguments:
+            - '@bar'
+            - !service
+                class: c2
+                properties:
+                    p2: !service
+                        class: c3
+                        properties:
+                            p3: !service
+                                class: c4
+
+    bar:
+        class: c5
+        public: true
+        properties:
+            p5: !service
+                class: c6
+                arguments: ['@foo']
+

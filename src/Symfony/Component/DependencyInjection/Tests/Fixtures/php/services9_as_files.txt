@@ -75,6 +75,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 $this->services['configured_service'] = $instance = new \stdClass();
 
 $a = new \ConfClass();
+
 $a->setFoo(($this->services['baz'] ?? $this->load('getBazService.php')));
 
 $a->configureStdClass($instance);
@@ -294,6 +295,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 // Returns the public 'new_factory_service' shared service.
 
 $a = new \FactoryClass();
+
 $a->foo = 'bar';
 
 $this->services['new_factory_service'] = $instance = $a->getInstance();

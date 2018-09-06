@@ -121,6 +121,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         $this->services['connection'] = $instance = new \stdClass($a, $b);
 
         $a->subscriber = ${($_ = isset($this->services['subscriber']) ? $this->services['subscriber'] : $this->getSubscriberService()) && false ?: '_'};
+
         $b->logger = ${($_ = isset($this->services['logger']) ? $this->services['logger'] : $this->getLoggerService()) && false ?: '_'};
 
         return $instance;
@@ -135,17 +136,19 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     {
         $a = new \stdClass();
 
-        $b = new \stdClass();
+        $c = new \stdClass();
 
-        $this->services['connection2'] = $instance = new \stdClass($a, $b);
+        $this->services['connection2'] = $instance = new \stdClass($a, $c);
 
-        $c = ${($_ = isset($this->services['manager2']) ? $this->services['manager2'] : $this->getManager2Service()) && false ?: '_'};
+        $b = ${($_ = isset($this->services['manager2']) ? $this->services['manager2'] : $this->getManager2Service()) && false ?: '_'};
+
+        $a->subscriber2 = new \stdClass($b);
 
         $d = new \stdClass($instance);
 
-        $a->subscriber2 = new \stdClass($c);
-        $d->handler2 = new \stdClass($c);
-        $b->logger2 = $d;
+        $d->handler2 = new \stdClass($b);
+
+        $c->logger2 = $d;
 
         return $instance;
     }

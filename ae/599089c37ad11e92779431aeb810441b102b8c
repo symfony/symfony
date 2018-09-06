@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-06T10:03:22Z
+
+@Saphyel thanks for this contribution! Changes look OK to me 👍  but I have a question.
+
+Is the `max_line_length` limit a hard one? Because most of our lines comply with it, but sometimes we use very long lines (because we never split `sprintf()` calls into multiple lines). Thanks!
+
+---------------------------------------------------------------------------
+
+by Saphyel at 2018-09-06T10:08:05Z
+
+@nicolas-grekas thanks! updated

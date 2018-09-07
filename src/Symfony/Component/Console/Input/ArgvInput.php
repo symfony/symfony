@@ -121,7 +121,7 @@ class ArgvInput extends Input
         $len = \strlen($name);
         for ($i = 0; $i < $len; ++$i) {
             if (!$this->definition->hasShortcut($name[$i])) {
-                throw new RuntimeException(sprintf('The "-%s" option does not exist.', $name[$i]));
+                throw new RuntimeException(sprintf('The "-%s" option does not exist.', \mb_substr($name, $i, 1)));
             }
 
             $option = $this->definition->getOptionForShortcut($name[$i]);

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-06T08:16:16Z
+
+Hello, can you rebase+retarget on 2.8 please, and also keep only the fixed modes?
+The `b` is already the default mode since PHP4.soemthing, it is not needed to make it explicit.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2018-09-06T17:13:20Z
+
+sure thing @nicolas-grekas :+1:
+leaves a very small PR though, sorry for that

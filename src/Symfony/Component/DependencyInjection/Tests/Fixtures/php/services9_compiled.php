@@ -171,6 +171,7 @@ class ProjectServiceContainer extends Container
         $this->services['configured_service'] = $instance = new \stdClass();
 
         $a = new \ConfClass();
+
         $a->setFoo(($this->services['baz'] ?? $this->getBazService()));
 
         $a->configureStdClass($instance);
@@ -365,6 +366,7 @@ class ProjectServiceContainer extends Container
     protected function getNewFactoryServiceService()
     {
         $a = new \FactoryClass();
+
         $a->foo = 'bar';
 
         $this->services['new_factory_service'] = $instance = $a->getInstance();

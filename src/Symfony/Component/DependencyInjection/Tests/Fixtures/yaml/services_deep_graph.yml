@@ -1,24 +1,24 @@
 
 services:
     foo:
-        class: c1
+        class: Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph
         public: true
         arguments:
             - '@bar'
             - !service
-                class: c2
+                class: stdClass
                 properties:
                     p2: !service
-                        class: c3
+                        class: stdClass
                         properties:
                             p3: !service
-                                class: c4
+                                class: stdClass
 
     bar:
-        class: c5
+        class: stdClass
         public: true
         properties:
             p5: !service
-                class: c6
+                class: stdClass
                 arguments: ['@foo']
 

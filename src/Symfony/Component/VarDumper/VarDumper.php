@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper;
 
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 // Load the global dump() function
@@ -37,6 +38,26 @@ class VarDumper
             }
 
             self::$handler = function ($var) use ($cloner, $dumper) {
+                (function () {
+                    list('name' => $name, 'file' => $file, 'line' => $line) = (new SourceContextProvider())->getContext();
+
+                    $attr = array();
+                    if ($this instanceof HtmlDumper) {
+                        if (\is_string($file)) {
+                            $attr = array(
+                              'file' => $file,
+                              'line' => $line,
+                              'title' => $file,
+                            );
+                        }
+                    } else {
+                        $name = $file;
+                    }
+
+                    $this->line = $this->style('meta', $name, $attr).' on line '.$this->style('meta', $line).':';
+                    $this->dumpLine(0);
+                })->bindTo($dumper, $dumper)();
+
                 $dumper->dump($cloner->cloneVar($var));
             };
         }

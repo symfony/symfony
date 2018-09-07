@@ -163,34 +163,36 @@ class Client extends BaseClient
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
+        $errorReporting = error_reporting();
 
-        $r = new \ReflectionObject($this->kernel);
-
-        $autoloader = \dirname($r->getFileName()).'/autoload.php';
-        if (is_file($autoloader)) {
-            $autoloader = var_export($autoloader, true);
-        } else {
-            $autoloader = 'false';
+        $requires = '';
+        foreach (get_declared_classes() as $class) {
+            if (0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $file = \dirname(\dirname($r->getFileName())).'/autoload.php';
+                if (file_exists($file)) {
+                    $requires .= 'require_once '.var_export($file, true).";\n";
+                }
+            }
         }
 
-        $path = var_export($r->getFileName(), true);
+        if (!$requires) {
+            throw new \RuntimeException('Composer autoloader not found.');
+        }
+
+        $requires .= 'require_once '.var_export((new \ReflectionObject($this->kernel))->getFileName(), true).";\n";
 
         $profilerCode = '';
         if ($this->profiler) {
             $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
         }
 
-        $errorReporting = error_reporting();
-
         $code = <<<EOF
 <?php
 
 error_reporting($errorReporting);
 
-if ($autoloader) {
-    require_once $autoloader;
-}
-require_once $path;
+$requires
 
 \$kernel = unserialize($kernel);
 \$kernel->boot();

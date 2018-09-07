@@ -16,16 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": "^7.1.3",
         "ext-xml": "*",
-        "symfony/http-kernel": "~2.6|~3.0.0",
-        "symfony/twig-bridge": "~2.6|~3.0.0",
-        "symfony/var-dumper": "~2.6|~3.0.0"
+        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/twig-bridge": "~3.4|~4.0",
+        "symfony/var-dumper": "^4.1.1"
     },
     "require-dev": {
-        "symfony/config": "~2.3|~3.0.0",
-        "symfony/dependency-injection": "~2.3|~3.0.0",
-        "symfony/web-profiler-bundle": "~2.3|~3.0.0"
+        "symfony/config": "~4.2",
+        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/web-profiler-bundle": "~3.4|~4.0"
+    },
+    "conflict": {
+        "symfony/config": "<4.2",
+        "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
         "symfony/config": "For service container configuration",
@@ -40,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

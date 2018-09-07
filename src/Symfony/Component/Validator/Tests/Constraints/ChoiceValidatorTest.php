@@ -13,26 +13,26 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 function choice_callback()
 {
     return array('foo', 'bar');
 }
 
-class ChoiceValidatorTest extends AbstractConstraintValidatorTest
+class ChoiceValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new ChoiceValidator();
     }
 
     public static function staticCallback()
+    {
+        return array('foo', 'bar');
+    }
+
+    public function objectMethodCallback()
     {
         return array('foo', 'bar');
     }
@@ -52,7 +52,14 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Choice(array('choices' => array('foo', 'bar'))));
+        $this->validator->validate(
+            null,
+            new Choice(
+                array(
+                    'choices' => array('foo', 'bar'),
+                )
+            )
+        );
 
         $this->assertNoViolation();
     }
@@ -93,9 +100,13 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidChoiceCallbackClosure()
     {
-        $constraint = new Choice(array('callback' => function () {
-            return array('foo', 'bar');
-        }));
+        $constraint = new Choice(
+            array(
+                'callback' => function () {
+                    return array('foo', 'bar');
+                },
+            )
+        );
 
         $this->validator->validate('bar', $constraint);
 
@@ -117,6 +128,18 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->setObject($this);
 
         $constraint = new Choice(array('callback' => 'staticCallback'));
+
+        $this->validator->validate('bar', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidChoiceCallbackContextObjectMethod()
+    {
+        // search $this for "objectMethodCallback"
+        $this->setObject($this);
+
+        $constraint = new Choice(array('callback' => 'objectMethodCallback'));
 
         $this->validator->validate('bar', $constraint);
 
@@ -230,24 +253,10 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    public function testNonStrict()
-    {
-        $constraint = new Choice(array(
-            'choices' => array(1, 2),
-            'strict' => false,
-        ));
-
-        $this->validator->validate('2', $constraint);
-        $this->validator->validate(2, $constraint);
-
-        $this->assertNoViolation();
-    }
-
     public function testStrictAllowsExactValue()
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2),
-            'strict' => true,
         ));
 
         $this->validator->validate(2, $constraint);
@@ -259,7 +268,6 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2),
-            'strict' => true,
             'message' => 'myMessage',
         ));
 
@@ -271,25 +279,11 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    public function testNonStrictWithMultipleChoices()
-    {
-        $constraint = new Choice(array(
-            'choices' => array(1, 2, 3),
-            'multiple' => true,
-            'strict' => false,
-        ));
-
-        $this->validator->validate(array('2', 3), $constraint);
-
-        $this->assertNoViolation();
-    }
-
     public function testStrictWithMultipleChoices()
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2, 3),
             'multiple' => true,
-            'strict' => true,
             'multipleMessage' => 'myMessage',
         ));
 

@@ -25,7 +25,7 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
     /**
      * @param bool $ignorePasswordCase Compare password case-insensitive
      */
-    public function __construct($ignorePasswordCase = false)
+    public function __construct(bool $ignorePasswordCase = false)
     {
         $this->ignorePasswordCase = $ignorePasswordCase;
     }

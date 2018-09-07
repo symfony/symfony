@@ -15,16 +15,6 @@ class PasswordTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\PasswordType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('password');
-
-        $this->assertSame('password', $form->getConfig()->getType()->getName());
-    }
-
     public function testEmptyIfNotSubmitted()
     {
         $form = $this->factory->create(static::TESTED_TYPE);

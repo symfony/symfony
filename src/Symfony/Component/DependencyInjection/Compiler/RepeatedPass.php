@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', RepeatedPass::class), E_USER_DEPRECATED);
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
@@ -18,6 +20,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * A pass that might be run repeatedly.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 4.2.
  */
 class RepeatedPass implements CompilerPassInterface
 {

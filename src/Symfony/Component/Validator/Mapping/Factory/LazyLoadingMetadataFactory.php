@@ -14,8 +14,6 @@ namespace Symfony\Component\Validator\Mapping\Factory;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 /**
@@ -126,7 +124,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 
         $interfaces = $metadata->getReflectionClass()->getInterfaces();
 
-        $interfaces = array_filter($interfaces, function ($interface) use ($parent, $interfaces) {
+        $interfaces = array_filter($interfaces, function (\ReflectionClass $interface) use ($parent, $interfaces) {
             $interfaceName = $interface->getName();
 
             if ($parent && $parent->implementsInterface($interfaceName)) {

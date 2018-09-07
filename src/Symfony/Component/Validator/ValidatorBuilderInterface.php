@@ -12,14 +12,17 @@
 namespace Symfony\Component\Validator;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * A configurable builder for ValidatorInterface objects.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since Symfony 4.2, use the ValidatorBuilder class instead
  */
 interface ValidatorBuilderInterface
 {
@@ -147,30 +150,6 @@ interface ValidatorBuilderInterface
      * @return $this
      */
     public function setTranslationDomain($translationDomain);
-
-    /**
-     * Sets the property accessor for resolving property paths.
-     *
-     * @param PropertyAccessorInterface $propertyAccessor The property accessor
-     *
-     * @return $this
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
-    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
-
-    /**
-     * Sets the API version that the returned validator should support.
-     *
-     * @param int $apiVersion The required API version
-     *
-     * @return $this
-     *
-     * @see Validation::API_VERSION_2_5
-     * @see Validation::API_VERSION_2_5_BC
-     * @deprecated since version 2.7, to be removed in 3.0.
-     */
-    public function setApiVersion($apiVersion);
 
     /**
      * Builds and returns a new validator object.

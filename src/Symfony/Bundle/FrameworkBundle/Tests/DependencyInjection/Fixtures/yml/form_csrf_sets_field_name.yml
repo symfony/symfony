@@ -1,5 +1,0 @@
-framework:
-    csrf_protection:
-        field_name: _custom
-    form: ~
-    session: ~

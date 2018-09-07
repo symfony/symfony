@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\BrowserKit\Client as BaseClient;
-use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request as DomRequest;
@@ -26,12 +25,13 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @method Request|null  getRequest()  A Request instance
- * @method Response|null getResponse() A Response instance
+ * @method Request  getRequest()  A Request instance
+ * @method Response getResponse() A Response instance
  */
 class Client extends BaseClient
 {
     protected $kernel;
+    private $catchExceptions = true;
 
     /**
      * @param HttpKernelInterface $kernel    An HttpKernel instance
@@ -49,13 +49,23 @@ class Client extends BaseClient
     }
 
     /**
+     * Sets whether to catch exceptions when the kernel is handling a request.
+     *
+     * @param bool $catchExceptions Whether to catch exceptions
+     */
+    public function catchExceptions($catchExceptions)
+    {
+        $this->catchExceptions = $catchExceptions;
+    }
+
+    /**
      * Makes a request.
      *
      * @return Response A Response instance
      */
     protected function doRequest($request)
     {
-        $response = $this->kernel->handle($request);
+        $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $this->catchExceptions);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($request, $response);
@@ -74,21 +84,29 @@ class Client extends BaseClient
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
 
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
-        $requirePath = var_export($r->getFileName(), true);
-        $symfonyPath = var_export(\dirname(\dirname(\dirname(__DIR__))), true);
         $errorReporting = error_reporting();
+
+        $requires = '';
+        foreach (get_declared_classes() as $class) {
+            if (0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $file = \dirname(\dirname($r->getFileName())).'/autoload.php';
+                if (file_exists($file)) {
+                    $requires .= 'require_once '.var_export($file, true).";\n";
+                }
+            }
+        }
+
+        if (!$requires) {
+            throw new \RuntimeException('Composer autoloader not found.');
+        }
 
         $code = <<<EOF
 <?php
 
 error_reporting($errorReporting);
 
-require_once $requirePath;
-
-\$loader = new Symfony\Component\ClassLoader\ClassLoader();
-\$loader->addPrefix('Symfony', $symfonyPath);
-\$loader->register();
+$requires
 
 \$kernel = unserialize($kernel);
 \$request = unserialize($request);
@@ -151,7 +169,6 @@ EOF;
                         '',
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
-                        0,
                         UPLOAD_ERR_INI_SIZE,
                         true
                     );
@@ -160,7 +177,6 @@ EOF;
                         $value->getPathname(),
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
-                        $value->getClientSize(),
                         $value->getError(),
                         true
                     );
@@ -178,20 +194,11 @@ EOF;
      */
     protected function filterResponse($response)
     {
-        $headers = $response->headers->all();
-        if ($response->headers->getCookies()) {
-            $cookies = array();
-            foreach ($response->headers->getCookies() as $cookie) {
-                $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-            }
-            $headers['Set-Cookie'] = $cookies;
-        }
-
         // this is needed to support StreamedResponse
         ob_start();
         $response->sendContent();
         $content = ob_get_clean();
 
-        return new DomResponse($content, $response->getStatusCode(), $headers);
+        return new DomResponse($content, $response->getStatusCode(), $response->headers->all());
     }
 }

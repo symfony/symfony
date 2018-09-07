@@ -29,6 +29,10 @@ class HttpCacheTestCase extends TestCase
     protected $responses;
     protected $catch;
     protected $esi;
+
+    /**
+     * @var Store
+     */
     protected $store;
 
     protected function setUp()

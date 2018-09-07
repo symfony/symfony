@@ -32,14 +32,14 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private $allowIfEqualGrantedDeniedDecisions;
 
     /**
-     * @param VoterInterface[] $voters                             An array of VoterInterface instances
-     * @param string           $strategy                           The vote strategy
-     * @param bool             $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
-     * @param bool             $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
+     * @param iterable|VoterInterface[] $voters                             An array or an iterator of VoterInterface instances
+     * @param string                    $strategy                           The vote strategy
+     * @param bool                      $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
+     * @param bool                      $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(iterable $voters = array(), string $strategy = self::STRATEGY_AFFIRMATIVE, bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
         if (!\is_callable(array($this, $strategyMethod))) {
@@ -48,18 +48,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->voters = $voters;
         $this->strategy = $strategyMethod;
-        $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
-        $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
-    }
-
-    /**
-     * Configures the voters.
-     *
-     * @param VoterInterface[] $voters An array of VoterInterface instances
-     */
-    public function setVoters(array $voters)
-    {
-        $this->voters = $voters;
+        $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
+        $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
     }
 
     /**
@@ -68,38 +58,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
         return $this->{$this->strategy}($token, $attributes, $object);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since Symfony 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsAttribute($attribute)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since Symfony 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsClass($class)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -192,8 +150,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private function decideUnanimous(TokenInterface $token, array $attributes, $object = null)
     {
         $grant = 0;
-        foreach ($attributes as $attribute) {
-            foreach ($this->voters as $voter) {
+        foreach ($this->voters as $voter) {
+            foreach ($attributes as $attribute) {
                 $result = $voter->vote($token, $object, array($attribute));
 
                 switch ($result) {

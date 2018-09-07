@@ -302,4 +302,32 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(array('PUT'), $routea->getMethods());
         $this->assertEquals(array('PUT'), $routeb->getMethods());
     }
+
+    public function testAddNamePrefix()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', $foo = new Route('/foo'));
+        $collection->add('bar', $bar = new Route('/bar'));
+        $collection->add('api_foo', $apiFoo = new Route('/api/foo'));
+        $collection->addNamePrefix('api_');
+
+        $this->assertEquals($foo, $collection->get('api_foo'));
+        $this->assertEquals($bar, $collection->get('api_bar'));
+        $this->assertEquals($apiFoo, $collection->get('api_api_foo'));
+        $this->assertNull($collection->get('foo'));
+        $this->assertNull($collection->get('bar'));
+    }
+
+    public function testAddNamePrefixCanonicalRouteName()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo', array('_canonical_route' => 'foo')));
+        $collection->add('bar', new Route('/bar', array('_canonical_route' => 'bar')));
+        $collection->add('api_foo', new Route('/api/foo', array('_canonical_route' => 'api_foo')));
+        $collection->addNamePrefix('api_');
+
+        $this->assertEquals('api_foo', $collection->get('api_foo')->getDefault('_canonical_route'));
+        $this->assertEquals('api_bar', $collection->get('api_bar')->getDefault('_canonical_route'));
+        $this->assertEquals('api_api_foo', $collection->get('api_api_foo')->getDefault('_canonical_route'));
+    }
 }

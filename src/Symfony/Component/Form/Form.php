@@ -20,7 +20,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -59,7 +58,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Form implements \IteratorAggregate, FormInterface
+class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
     /**
      * The form's configuration.
@@ -506,10 +505,6 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function submit($submittedData, $clearMissing = true)
     {
-        if ($submittedData instanceof Request) {
-            @trigger_error('Passing a Symfony\Component\HttpFoundation\Request object to the '.__CLASS__.'::bind and '.__METHOD__.' methods is deprecated since Symfony 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::handleRequest method instead. If you want to test whether the form was submitted separately, you can use the '.__CLASS__.'::isSubmitted method.', E_USER_DEPRECATED);
-        }
-
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
         }
@@ -674,23 +669,6 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Alias of {@link submit()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link submit()} instead.
-     */
-    public function bind($submittedData)
-    {
-        // This method is deprecated for Request too, but the error is
-        // triggered in Form::submit() method.
-        if (!$submittedData instanceof Request) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::submit method instead.', E_USER_DEPRECATED);
-        }
-
-        return $this->submit($submittedData);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function addError(FormError $error)
@@ -713,19 +691,6 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isSubmitted()
     {
-        return $this->submitted;
-    }
-
-    /**
-     * Alias of {@link isSubmitted()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link isSubmitted()} instead.
-     */
-    public function isBound()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::isSubmitted method instead.', E_USER_DEPRECATED);
-
         return $this->submitted;
     }
 
@@ -769,7 +734,7 @@ class Form implements \IteratorAggregate, FormInterface
     public function isValid()
     {
         if (!$this->submitted) {
-            return false;
+            throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() before Form::isValid().');
         }
 
         if ($this->isDisabled()) {
@@ -831,22 +796,24 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns a string representation of all form errors (including children errors).
+     * {@inheritdoc}
      *
-     * This method should only be used to help debug a form.
-     *
-     * @param int $level The indentation level (used internally)
-     *
-     * @return string A string representation of all errors
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     *             Use {@link getErrors()} instead and cast the result to a string.
+     * @return $this
      */
-    public function getErrorsAsString($level = 0)
+    public function clearErrors(bool $deep = false): self
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0. Use (string) Form::getErrors(true, false) instead.', E_USER_DEPRECATED);
+        $this->errors = array();
 
-        return self::indent((string) $this->getErrors(true, false), $level);
+        if ($deep) {
+            // Clear errors from children
+            foreach ($this as $child) {
+                if ($child instanceof ClearableErrorsInterface) {
+                    $child->clearErrors(true);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -1196,20 +1163,5 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
-    }
-
-    /**
-     * Utility function for indenting multi-line strings.
-     *
-     * @param string $string The string
-     * @param int    $level  The number of spaces to use for indentation
-     *
-     * @return string The indented string
-     */
-    private static function indent($string, $level)
-    {
-        $indentation = str_repeat(' ', $level);
-
-        return rtrim($indentation.str_replace("\n", "\n".$indentation, $string), ' ');
     }
 }

@@ -27,7 +27,7 @@ class_exists('Twig\Node\Expression\ArrayExpression');
  */
 class TransNode extends Node
 {
-    public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, $lineno = 0, $tag = null)
+    public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, int $lineno = 0, string $tag = null)
     {
         $nodes = array('body' => $body);
         if (null !== $domain) {

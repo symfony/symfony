@@ -13,22 +13,24 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Not able to guess anything.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
+class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getShortDescription($class, $property, array $context = array())
     {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
     }
 
     /**
@@ -36,6 +38,8 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
      */
     public function getLongDescription($class, $property, array $context = array())
     {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
     }
 
     /**
@@ -43,6 +47,8 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
      */
     public function getTypes($class, $property, array $context = array())
     {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
     }
 
     /**
@@ -50,6 +56,8 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
      */
     public function isReadable($class, $property, array $context = array())
     {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
     }
 
     /**
@@ -57,6 +65,8 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
      */
     public function isWritable($class, $property, array $context = array())
     {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
     }
 
     /**
@@ -64,5 +74,21 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
      */
     public function getProperties($class, array $context = array())
     {
+        $this->assertIsString($class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    {
+        return null;
+    }
+
+    private function assertIsString($string)
+    {
+        if (!\is_string($string)) {
+            throw new \InvalidArgumentException(sprintf('"%s" expects strings, given "%s".', __CLASS__, \gettype($string)));
+        }
     }
 }

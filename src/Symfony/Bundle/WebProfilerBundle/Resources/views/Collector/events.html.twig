@@ -45,6 +45,39 @@
                     {% endif %}
                 </div>
             </div>
+
+            <div class="tab">
+                <h3 class="tab-title">Orphaned events <span class="badge">{{ collector.orphanedEvents|length }}</span></h3>
+                <div class="tab-content">
+                    {% if collector.orphanedEvents is empty %}
+                        <div class="empty">
+                            <p>
+                                <strong>There are no orphaned events</strong>.
+                            </p>
+                            <p>
+                                All dispatched events were handled or an error occurred
+                                when trying to collect orphaned events (in which case check the
+                                logs to get more information).
+                            </p>
+                        </div>
+                    {% else %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in collector.orphanedEvents %}
+                                    <tr>
+                                        <td class="font-normal">{{ event }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     {% endif %}
 {% endblock %}
@@ -75,38 +108,7 @@
 
             <tr>
                 <td class="text-right nowrap">{{ listener.priority|default('-') }}</td>
-                <td class="font-normal">
-                    {% if listener.type == 'Closure' %}
-
-                        Closure
-                        <span class="text-muted text-small">(there is no class or file information)</span>
-
-                    {% elseif listener.type == 'Function' %}
-
-                        {% set link = listener.file|file_link(listener.line) %}
-                        {% if link %}
-                            <a href="{{ link }}">{{ listener.function }}()</a>
-                            <span class="text-muted text-small">({{ listener.file }})</span>
-                        {% else %}
-                            {{ listener.function }}()
-                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
-                        {% endif %}
-
-                    {% elseif listener.type == "Method" %}
-
-                        {% set link = listener.file|file_link(listener.line) %}
-                        {% set class_namespace = listener.class|split('\\', -1)|join('\\') %}
-
-                        {% if link %}
-                            <a href="{{ link }}"><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()</a>
-                            <span class="text-muted text-small">({{ listener.class }})</span>
-                        {% else %}
-                            <span>{{ class_namespace }}\</span><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()
-                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
-                        {% endif %}
-
-                    {% endif %}
-                </td>
+                <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
             </tr>
 
             {% if loop.last %}

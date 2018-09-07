@@ -25,14 +25,9 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
     protected $httpUtils;
     protected $targetUrl;
 
-    /**
-     * @param HttpUtils $httpUtils
-     * @param string    $targetUrl
-     */
-    public function __construct(HttpUtils $httpUtils, $targetUrl = '/')
+    public function __construct(HttpUtils $httpUtils, string $targetUrl = '/')
     {
         $this->httpUtils = $httpUtils;
-
         $this->targetUrl = $targetUrl;
     }
 

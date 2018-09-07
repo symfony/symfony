@@ -20,7 +20,7 @@ use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
  */
 class TemplateReference extends BaseTemplateReference
 {
-    public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null)
+    public function __construct(string $bundle = null, string $controller = null, string $name = null, string $format = null, string $engine = null)
     {
         $this->parameters = array(
             'bundle' => $bundle,

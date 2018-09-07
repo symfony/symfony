@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
@@ -29,12 +30,14 @@ class ExceptionController
     protected $twig;
     protected $debug;
     protected $profiler;
+    private $fileLinkFormat;
 
-    public function __construct(Profiler $profiler = null, Environment $twig, $debug)
+    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->debug = $debug;
+        $this->fileLinkFormat = $fileLinkFormat;
     }
 
     /**
@@ -58,7 +61,7 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->twig->getLoader()->exists($template)) {
-            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset());
+            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
             return new Response($handler->getContent($exception), 200, array('Content-Type' => 'text/html'));
         }
@@ -98,7 +101,7 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->templateExists($template)) {
-            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset());
+            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
             return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
         }

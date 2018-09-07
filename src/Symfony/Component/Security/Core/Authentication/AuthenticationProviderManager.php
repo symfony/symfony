@@ -35,25 +35,19 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     private $eventDispatcher;
 
     /**
-     * @param AuthenticationProviderInterface[] $providers        An array of AuthenticationProviderInterface instances
-     * @param bool                              $eraseCredentials Whether to erase credentials after authentication or not
+     * @param iterable|AuthenticationProviderInterface[] $providers        An iterable with AuthenticationProviderInterface instances as values
+     * @param bool                                       $eraseCredentials Whether to erase credentials after authentication or not
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $providers, $eraseCredentials = true)
+    public function __construct(iterable $providers, bool $eraseCredentials = true)
     {
         if (!$providers) {
             throw new \InvalidArgumentException('You must at least add one authentication provider.');
         }
 
-        foreach ($providers as $provider) {
-            if (!$provider instanceof AuthenticationProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', \get_class($provider)));
-            }
-        }
-
         $this->providers = $providers;
-        $this->eraseCredentials = (bool) $eraseCredentials;
+        $this->eraseCredentials = $eraseCredentials;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
@@ -70,6 +64,10 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $result = null;
 
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof AuthenticationProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', \get_class($provider)));
+            }
+
             if (!$provider->supports($token)) {
                 continue;
             }

@@ -114,19 +114,6 @@ class EntityTypeTest extends BaseTypeTest
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-        ));
-
-        $this->assertSame('entity', $field->getConfig()->getType()->getName());
-    }
-
-    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
     public function testClassOptionIsRequired()
@@ -1240,54 +1227,6 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
         $this->assertSame($choiceLoader1, $choiceLoader2);
         $this->assertSame($choiceLoader1, $choiceLoader3);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCacheChoiceLists()
-    {
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-
-        $this->persist(array($entity1));
-
-        $field1 = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'choice_label' => 'name',
-        ));
-
-        $field2 = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'choice_label' => 'name',
-        ));
-
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $field1->getConfig()->getOption('choice_loader'));
-        $this->assertSame($field1->getConfig()->getOption('choice_loader'), $field2->getConfig()->getOption('choice_loader'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPropertyOption()
-    {
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-        $entity2 = new SingleIntIdEntity(2, 'Bar');
-
-        $this->persist(array($entity1, $entity2));
-
-        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'property' => 'name',
-        ))
-            ->createView();
-
-        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $view->vars['choices']);
     }
 
     protected function createRegistryMock($name, $em)

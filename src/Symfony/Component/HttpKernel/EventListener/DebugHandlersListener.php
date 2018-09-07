@@ -35,6 +35,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $throwAt;
     private $scream;
     private $fileLinkFormat;
+    private $scope;
     private $firstCall = true;
     private $hasTerminatedWithException;
 
@@ -44,16 +45,18 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param array|int            $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param int|null             $throwAt          Thrown errors in a bit field of E_* constants, or null to keep the current value
      * @param bool                 $scream           Enables/disables screaming mode, where even silenced errors are logged
-     * @param string               $fileLinkFormat   The format for links to source files
+     * @param string|array         $fileLinkFormat   The format for links to source files
+     * @param bool                 $scope            Enables/disables scoping mode
      */
-    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $throwAt = -1, $scream = true, $fileLinkFormat = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
-        $this->levels = $levels;
-        $this->throwAt = is_numeric($throwAt) ? (int) $throwAt : (null === $throwAt ? null : ($throwAt ? -1 : null));
-        $this->scream = (bool) $scream;
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->levels = null === $levels ? E_ALL : $levels;
+        $this->throwAt = \is_int($throwAt) ? $throwAt : (null === $throwAt ? null : ($throwAt ? E_ALL : null));
+        $this->scream = $scream;
+        $this->fileLinkFormat = $fileLinkFormat;
+        $this->scope = $scope;
     }
 
     /**
@@ -75,15 +78,20 @@ class DebugHandlersListener implements EventSubscriberInterface
                 if ($this->logger) {
                     $handler->setDefaultLogger($this->logger, $this->levels);
                     if (\is_array($this->levels)) {
-                        $scream = 0;
+                        $levels = 0;
                         foreach ($this->levels as $type => $log) {
-                            $scream |= $type;
+                            $levels |= $type;
                         }
                     } else {
-                        $scream = null === $this->levels ? E_ALL | E_STRICT : $this->levels;
+                        $levels = $this->levels;
                     }
                     if ($this->scream) {
-                        $handler->screamAt($scream);
+                        $handler->screamAt($levels);
+                    }
+                    if ($this->scope) {
+                        $handler->scopeAt($levels & ~E_USER_DEPRECATED & ~E_DEPRECATED);
+                    } else {
+                        $handler->scopeAt(0, true);
                     }
                     $this->logger = $this->levels = null;
                 }
@@ -139,7 +147,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     {
         $events = array(KernelEvents::REQUEST => array('configure', 2048));
 
-        if (\defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
+        if ('cli' === \PHP_SAPI && \defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
             $events[ConsoleEvents::COMMAND] = array('configure', 2048);
         }
 

@@ -37,6 +37,31 @@ class ArrayNodeTest extends TestCase
         $node->normalize(array('foo' => 'bar'));
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Did you mean "alpha1", "alpha2"?
+     */
+    public function testNormalizeWithProposals()
+    {
+        $node = new ArrayNode('root');
+        $node->addChild(new ArrayNode('alpha1'));
+        $node->addChild(new ArrayNode('alpha2'));
+        $node->addChild(new ArrayNode('beta'));
+        $node->normalize(array('alpha3' => 'foo'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Available options are "alpha1", "alpha2".
+     */
+    public function testNormalizeWithoutProposals()
+    {
+        $node = new ArrayNode('root');
+        $node->addChild(new ArrayNode('alpha1'));
+        $node->addChild(new ArrayNode('alpha2'));
+        $node->normalize(array('beta' => 'foo'));
+    }
+
     public function ignoreAndRemoveMatrixProvider()
     {
         $unrecognizedOptionException = new InvalidConfigurationException('Unrecognized option "foo" under "root"');
@@ -215,5 +240,37 @@ class ArrayNodeTest extends TestCase
     {
         $node = new ArrayNode('foo');
         $node->getDefaultValue();
+    }
+
+    public function testSetDeprecated()
+    {
+        $childNode = new ArrayNode('foo');
+        $childNode->setDeprecated('"%node%" is deprecated');
+
+        $this->assertTrue($childNode->isDeprecated());
+        $this->assertSame('"foo" is deprecated', $childNode->getDeprecationMessage($childNode->getName(), $childNode->getPath()));
+
+        $node = new ArrayNode('root');
+        $node->addChild($childNode);
+
+        $deprecationTriggered = false;
+        $deprecationHandler = function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
+            if (E_USER_DEPRECATED === $level) {
+                return $deprecationTriggered = true;
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
+        };
+
+        $prevErrorHandler = set_error_handler($deprecationHandler);
+        $node->finalize(array());
+        restore_error_handler();
+
+        $this->assertFalse($deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
+
+        $prevErrorHandler = set_error_handler($deprecationHandler);
+        $node->finalize(array('foo' => array()));
+        restore_error_handler();
+        $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 }

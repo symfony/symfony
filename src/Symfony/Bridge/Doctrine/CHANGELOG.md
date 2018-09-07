@@ -1,6 +1,53 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`,
+   an instance of `EntityManagerInterface` should be injected instead
+ * added support for `simple_array` type
+
+4.1.0
+-----
+
+ * added support for datetime immutable types in form type guesser
+
+4.0.0
+-----
+
+ * the first constructor argument of the `DoctrineChoiceLoader` class must be
+   an `ObjectManager` implementation
+ * removed the `MergeDoctrineCollectionListener::onBind()` method
+ * trying to reset a non-lazy manager service using the `ManagerRegistry::resetService()`
+   method throws an exception
+ * removed the `DoctrineParserCache` class
+
+3.4.0
+-----
+
+ * added support for doctrine/dbal v2.6 types
+ * added cause of UniqueEntity constraint violation
+ * deprecated `DbalSessionHandler` and `DbalSessionHandlerSchema` in favor of
+   `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler`
+
+3.1.0
+-----
+
+ * added "{{ value }}" message placeholder to UniqueEntityValidator
+ * deprecated `MergeDoctrineCollectionListener::onBind` in favor of
+   `MergeDoctrineCollectionListener::onSubmit`
+ * deprecated passing `ChoiceListFactoryInterface` as first argument of
+   `DoctrineChoiceLoader`'s constructor
+
+3.0.0
+-----
+
+ * removed `EntityChoiceList`
+ * removed `$manager` (2nd) and `$class` (3th) arguments of `ORMQueryBuilderLoader`
+ * removed passing a query builder closure to `ORMQueryBuilderLoader`
+ * removed `loader` and `property` options of the `DoctrineType`
+
 2.8.0
 -----
 

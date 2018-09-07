@@ -5,7 +5,7 @@
       <tool tool-id="foo" tool-name="foo" tool-version="0.0" tool-company="Foo"/>
     </header>
     <body>
-      <trans-unit id="acbd18db4cc2f85cedef654fccc4a4d8" resname="foo">
+      <trans-unit id="LCa0a2j" resname="foo">
         <source>foo</source>
         <target>bar</target>
       </trans-unit>

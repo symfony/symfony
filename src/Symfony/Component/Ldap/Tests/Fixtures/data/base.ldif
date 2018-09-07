@@ -1,0 +1,4 @@
+dn: dc=symfony,dc=com
+objectClass: dcObject
+objectClass: organizationalUnit
+ou: Organization

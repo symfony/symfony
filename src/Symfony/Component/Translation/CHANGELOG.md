@@ -1,6 +1,59 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * Started using ICU parent locales as fallback locales.
+ * deprecated `TranslatorInterface` in favor of `Symfony\Contracts\Translation\TranslatorInterface`
+ * deprecated `MessageSelector`, `Interval` and `PluralizationRules`; use `IdentityTranslator` instead
+ * Added `IntlMessageFormatter` and `FallbackMessageFormatter`
+
+4.1.0
+-----
+
+ * The `FileDumper::setBackup()` method is deprecated.
+ * The `TranslationWriter::disableBackup()` method is deprecated.
+ * The `XliffFileDumper` will write "name" on the "unit" node when dumping XLIFF 2.0.
+
+4.0.0
+-----
+
+ * removed the backup feature of the `FileDumper` class
+ * removed `TranslationWriter::writeTranslations()` method
+ * removed support for passing `MessageSelector` instances to the constructor of the `Translator` class
+
+3.4.0
+-----
+
+ * Added `TranslationDumperPass`
+ * Added `TranslationExtractorPass`
+ * Added `TranslatorPass`
+ * Added `TranslationReader` and `TranslationReaderInterface`
+ * Added `<notes>` section to the Xliff 2.0 dumper.
+ * Improved Xliff 2.0 loader to load `<notes>` section.
+ * Added `TranslationWriterInterface`
+ * Deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
+ * added support for adding custom message formatter and decoupling the default one.
+ * Added `PhpExtractor`
+ * Added `PhpStringTokenParser`
+
+3.2.0
+-----
+
+ * Added support for escaping `|` in plural translations with double pipe.
+
+3.1.0
+-----
+
+ * Deprecated the backup feature of the file dumper classes.
+
+3.0.0
+-----
+
+ * removed `FileDumper::format()` method.
+ * Changed the visibility of the locale property in `Translator` from protected to private.
+
 2.8.0
 -----
 

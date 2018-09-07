@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Form\Tests\Fixtures\LegacyFooType;
+use Symfony\Component\Form\Tests\Fixtures\FooType;
 
 class FormFactoryBuilderTest extends TestCase
 {
@@ -28,7 +28,7 @@ class FormFactoryBuilderTest extends TestCase
         $this->registry->setAccessible(true);
 
         $this->guesser = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
-        $this->type = new LegacyFooType();
+        $this->type = new FooType();
     }
 
     public function testAddType()
@@ -41,7 +41,7 @@ class FormFactoryBuilderTest extends TestCase
         $extensions = $registry->getExtensions();
 
         $this->assertCount(1, $extensions);
-        $this->assertTrue($extensions[0]->hasType($this->type->getName()));
+        $this->assertTrue($extensions[0]->hasType(\get_class($this->type)));
         $this->assertNull($extensions[0]->getTypeGuesser());
     }
 

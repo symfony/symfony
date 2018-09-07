@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Person">
+        <property name="gender">
+            <constraint name="Choice">
+                <option name="choices">
+                    <value>male</value>
+                    <value>female</value>
+                    <value>other</value>
+                </option>
+                <option name="message">Choose a valid gender.</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Article">
+        <property name="category">
+            <constraint name="Choice">
+                <option name="choices">
+                    <value>other</value>
+                </option>
+                <option name="message">This should be ignored.</option>
+            </constraint>
+        </property>
+    </class>
+</constraint-mapping>

@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -22,42 +21,68 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterface
+class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $container;
-    private $sourceId;
+    private $serviceLocatorContextIds = array();
 
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
-        $this->container = $container;
+        $this->serviceLocatorContextIds = array();
+        foreach ($container->findTaggedServiceIds('container.service_locator_context') as $id => $tags) {
+            $this->serviceLocatorContextIds[$id] = $tags[0]['id'];
+            $container->getDefinition($id)->clearTag('container.service_locator_context');
+        }
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            $this->sourceId = $id;
-            $this->processDefinition($definition);
+        try {
+            return parent::process($container);
+        } finally {
+            $this->serviceLocatorContextIds = array();
         }
     }
 
-    private function processDefinition(Definition $definition)
+    protected function processValue($value, $isRoot = false)
     {
-        $this->processReferences($definition->getArguments());
-        $this->processReferences($definition->getMethodCalls());
-        $this->processReferences($definition->getProperties());
-    }
+        if (!$value instanceof Reference) {
+            return parent::processValue($value, $isRoot);
+        }
+        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has($id = (string) $value)) {
+            return $value;
+        }
 
-    private function processReferences(array $arguments)
-    {
-        foreach ($arguments as $argument) {
-            if (\is_array($argument)) {
-                $this->processReferences($argument);
-            } elseif ($argument instanceof Definition) {
-                $this->processDefinition($argument);
-            } elseif ($argument instanceof Reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $argument->getInvalidBehavior()) {
-                $destId = (string) $argument;
+        $currentId = $this->currentId;
+        $graph = $this->container->getCompiler()->getServiceReferenceGraph();
 
-                if (!$this->container->has($destId)) {
-                    throw new ServiceNotFoundException($destId, $this->sourceId);
+        if (isset($this->serviceLocatorContextIds[$currentId])) {
+            $currentId = $this->serviceLocatorContextIds[$currentId];
+            $locator = $this->container->getDefinition($this->currentId)->getFactory()[0];
+
+            foreach ($locator->getArgument(0) as $k => $v) {
+                if ($v->getValues()[0] === $value) {
+                    if ($k !== $id) {
+                        $currentId = $k.'" in the container provided to "'.$currentId;
+                    }
+                    throw new ServiceNotFoundException($id, $currentId);
                 }
             }
         }
+
+        if ('.' === $currentId[0] && $graph->hasNode($currentId)) {
+            foreach ($graph->getNode($currentId)->getInEdges() as $edge) {
+                if (!$edge->getValue() instanceof Reference || ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $edge->getValue()->getInvalidBehavior()) {
+                    continue;
+                }
+                $sourceId = $edge->getSourceNode()->getId();
+
+                if ('.' !== $sourceId[0]) {
+                    $currentId = $sourceId;
+                    break;
+                }
+            }
+        }
+
+        throw new ServiceNotFoundException($id, $currentId);
     }
 }

@@ -13,8 +13,10 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * YAML File Loader.
@@ -38,26 +40,11 @@ class YamlFileLoader extends FileLoader
     public function loadClassMetadata(ClassMetadataInterface $classMetadata)
     {
         if (null === $this->classes) {
-            if (!stream_is_local($this->file)) {
-                throw new MappingException(sprintf('This is not a local file "%s".', $this->file));
-            }
+            $this->classes = $this->getClassesFromYaml();
+        }
 
-            if (null === $this->yamlParser) {
-                $this->yamlParser = new Parser();
-            }
-
-            $classes = $this->yamlParser->parse(file_get_contents($this->file));
-
-            if (empty($classes)) {
-                return false;
-            }
-
-            // not an array
-            if (!\is_array($classes)) {
-                throw new MappingException(sprintf('The file "%s" must contain a YAML array.', $this->file));
-            }
-
-            $this->classes = $classes;
+        if (!$this->classes) {
+            return false;
         }
 
         if (!isset($this->classes[$classMetadata->getName()])) {
@@ -90,9 +77,69 @@ class YamlFileLoader extends FileLoader
                         $attributeMetadata->addGroup($group);
                     }
                 }
+
+                if (isset($data['max_depth'])) {
+                    if (!\is_int($data['max_depth'])) {
+                        throw new MappingException(sprintf('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    $attributeMetadata->setMaxDepth($data['max_depth']);
+                }
             }
         }
 
+        if (isset($yaml['discriminator_map'])) {
+            if (!isset($yaml['discriminator_map']['type_property'])) {
+                throw new MappingException(sprintf('The "type_property" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
+            }
+
+            if (!isset($yaml['discriminator_map']['mapping'])) {
+                throw new MappingException(sprintf('The "mapping" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
+            }
+
+            $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
+                $yaml['discriminator_map']['type_property'],
+                $yaml['discriminator_map']['mapping']
+            ));
+        }
+
         return true;
+    }
+
+    /**
+     * Return the names of the classes mapped in this file.
+     *
+     * @return string[] The classes names
+     */
+    public function getMappedClasses()
+    {
+        if (null === $this->classes) {
+            $this->classes = $this->getClassesFromYaml();
+        }
+
+        return array_keys($this->classes);
+    }
+
+    private function getClassesFromYaml()
+    {
+        if (!stream_is_local($this->file)) {
+            throw new MappingException(sprintf('This is not a local file "%s".', $this->file));
+        }
+
+        if (null === $this->yamlParser) {
+            $this->yamlParser = new Parser();
+        }
+
+        $classes = $this->yamlParser->parseFile($this->file, Yaml::PARSE_CONSTANT);
+
+        if (empty($classes)) {
+            return array();
+        }
+
+        if (!\is_array($classes)) {
+            throw new MappingException(sprintf('The file "%s" must contain a YAML array.', $this->file));
+        }
+
+        return $classes;
     }
 }

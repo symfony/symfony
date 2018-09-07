@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
 
-    <twig:config>
+    <twig:config strict-variables="false">
         <twig:date format="Y-m-d" interval-format="%d" timezone="Europe/Berlin" />
         <twig:number-format decimals="2" decimal-point="," thousands-separator="." />
     </twig:config>

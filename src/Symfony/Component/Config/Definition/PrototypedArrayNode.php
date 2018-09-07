@@ -371,11 +371,9 @@ class PrototypedArrayNode extends ArrayNode
      * Now, the key becomes 'name001' and the child node becomes 'value001' and
      * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.
      *
-     * @param string $key The key of the child node
-     *
      * @return mixed The prototype instance
      */
-    private function getPrototypeForChild($key)
+    private function getPrototypeForChild(string $key)
     {
         $prototype = isset($this->valuePrototypes[$key]) ? $this->valuePrototypes[$key] : $this->prototype;
         $prototype->setName($key);

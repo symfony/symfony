@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class FunctionNode extends Node
 {
-    public function __construct($name, Node $arguments)
+    public function __construct(string $name, Node $arguments)
     {
         parent::__construct(
             array('arguments' => $arguments),
@@ -48,5 +48,20 @@ class FunctionNode extends Node
         }
 
         return \call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
+    }
+
+    public function toArray()
+    {
+        $array = array();
+        $array[] = $this->attributes['name'];
+
+        foreach ($this->nodes['arguments']->nodes as $node) {
+            $array[] = ', ';
+            $array[] = $node;
+        }
+        $array[1] = '(';
+        $array[] = ')';
+
+        return $array;
     }
 }

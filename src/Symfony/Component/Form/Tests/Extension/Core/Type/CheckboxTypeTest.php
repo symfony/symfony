@@ -17,16 +17,6 @@ class CheckboxTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CheckboxType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('checkbox');
-
-        $this->assertSame('checkbox', $form->getConfig()->getType()->getName());
-    }
-
     public function testDataIsFalseByDefault()
     {
         $form = $this->factory->create(static::TESTED_TYPE);
@@ -181,6 +171,38 @@ class CheckboxTypeTest extends BaseTypeTest
             array('checked', true),
             array('unchecked', false),
         );
+    }
+
+    /**
+     * @dataProvider provideCustomFalseValues
+     */
+    public function testCustomFalseValues($falseValue)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'false_values' => array($falseValue),
+        ));
+        $form->submit($falseValue);
+        $this->assertFalse($form->getData());
+    }
+
+    public function provideCustomFalseValues()
+    {
+        return array(
+            array(''),
+            array('false'),
+            array('0'),
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testDontAllowNonArrayFalseValues()
+    {
+        $this->expectExceptionMessageRegExp('/"false_values" with value "invalid" is expected to be of type "array"/');
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'false_values' => 'invalid',
+        ));
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

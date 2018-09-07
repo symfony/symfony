@@ -11,14 +11,32 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
@@ -313,6 +331,147 @@ class SerializerTest extends TestCase
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model[]', 'json')
         );
     }
+
+    public function testNormalizerAware()
+    {
+        $normalizerAware = $this->getMockBuilder(NormalizerAwareInterface::class)->getMock();
+        $normalizerAware->expects($this->once())
+            ->method('setNormalizer')
+            ->with($this->isInstanceOf(NormalizerInterface::class));
+
+        new Serializer(array($normalizerAware));
+    }
+
+    public function testDenormalizerAware()
+    {
+        $denormalizerAware = $this->getMockBuilder(DenormalizerAwareInterface::class)->getMock();
+        $denormalizerAware->expects($this->once())
+            ->method('setDenormalizer')
+            ->with($this->isInstanceOf(DenormalizerInterface::class));
+
+        new Serializer(array($denormalizerAware));
+    }
+
+    public function testDeserializeObjectConstructorWithObjectTypeHint()
+    {
+        $jsonData = '{"bar":{"value":"baz"}}';
+
+        $serializer = new Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()));
+
+        $this->assertEquals(new Foo(new Bar('baz')), $serializer->deserialize($jsonData, Foo::class, 'json'));
+    }
+
+    public function testDeserializeAndSerializeAbstractObjectsWithTheClassMetadataDiscriminatorResolver()
+    {
+        $example = new AbstractDummyFirstChild('foo-value', 'bar-value');
+
+        $loaderMock = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
+        $loaderMock->method('hasMetadataFor')->will($this->returnValueMap(array(
+            array(
+                AbstractDummy::class,
+                true,
+            ),
+        )));
+
+        $loaderMock->method('getMetadataFor')->will($this->returnValueMap(array(
+            array(
+                AbstractDummy::class,
+                new ClassMetadata(
+                    AbstractDummy::class,
+                    new ClassDiscriminatorMapping('type', array(
+                        'first' => AbstractDummyFirstChild::class,
+                        'second' => AbstractDummySecondChild::class,
+                    ))
+                ),
+            ),
+        )));
+
+        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
+        $serializer = new Serializer(array(new ObjectNormalizer(null, null, null, null, $discriminatorResolver)), array('json' => new JsonEncoder()));
+
+        $jsonData = '{"type":"first","bar":"bar-value","foo":"foo-value"}';
+
+        $deserialized = $serializer->deserialize($jsonData, AbstractDummy::class, 'json');
+        $this->assertEquals($example, $deserialized);
+
+        $serialized = $serializer->serialize($deserialized, 'json');
+        $this->assertEquals($jsonData, $serialized);
+    }
+
+    public function testDeserializeAndSerializeInterfacedObjectsWithTheClassMetadataDiscriminatorResolver()
+    {
+        $example = new DummyMessageNumberOne();
+        $example->one = 1;
+
+        $jsonData = '{"type":"one","one":1,"two":null}';
+
+        $serializer = $this->serializerWithClassDiscriminator();
+        $deserialized = $serializer->deserialize($jsonData, DummyMessageInterface::class, 'json');
+        $this->assertEquals($example, $deserialized);
+
+        $serialized = $serializer->serialize($deserialized, 'json');
+        $this->assertEquals($jsonData, $serialized);
+    }
+
+    public function testDeserializeAndSerializeInterfacedObjectsWithTheClassMetadataDiscriminatorResolverAndGroups()
+    {
+        $example = new DummyMessageNumberOne();
+        $example->two = 2;
+
+        $serializer = $this->serializerWithClassDiscriminator();
+        $deserialized = $serializer->deserialize('{"type":"one","one":1,"two":2}', DummyMessageInterface::class, 'json', array(
+            'groups' => array('two'),
+        ));
+
+        $this->assertEquals($example, $deserialized);
+
+        $serialized = $serializer->serialize($deserialized, 'json', array(
+            'groups' => array('two'),
+        ));
+
+        $this->assertEquals('{"two":2,"type":"one"}', $serialized);
+    }
+
+    public function testDeserializeAndSerializeNestedInterfacedObjectsWithTheClassMetadataDiscriminator()
+    {
+        $nested = new DummyMessageNumberOne();
+        $nested->one = 'foo';
+
+        $example = new DummyMessageNumberTwo();
+        $example->setNested($nested);
+
+        $serializer = $this->serializerWithClassDiscriminator();
+
+        $serialized = $serializer->serialize($example, 'json');
+        $deserialized = $serializer->deserialize($serialized, DummyMessageInterface::class, 'json');
+
+        $this->assertEquals($example, $deserialized);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
+     * @expectedExceptionMessage The type "second" has no mapped class for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"
+     */
+    public function testExceptionWhenTypeIsNotKnownInDiscriminator()
+    {
+        $this->serializerWithClassDiscriminator()->deserialize('{"type":"second","one":1}', DummyMessageInterface::class, 'json');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
+     * @expectedExceptionMessage Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"
+     */
+    public function testExceptionWhenTypeIsNotInTheBodyToDeserialiaze()
+    {
+        $this->serializerWithClassDiscriminator()->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
+    }
+
+    private function serializerWithClassDiscriminator()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        return new Serializer(array(new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))), array('json' => new JsonEncoder()));
+    }
 }
 
 class Model
@@ -356,5 +515,25 @@ class Model
     public function toArray()
     {
         return array('title' => $this->title, 'numbers' => $this->numbers);
+    }
+}
+
+class Foo
+{
+    private $bar;
+
+    public function __construct(Bar $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class Bar
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
     }
 }

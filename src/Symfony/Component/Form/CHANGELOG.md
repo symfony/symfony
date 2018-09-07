@@ -1,6 +1,87 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `Symfony\Component\Form\ClearableErrorsInterface`
+ * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+
+4.1.0
+-----
+
+ * added `input=datetime_immutable` to `DateType`, `TimeType`, `DateTimeType`
+ * added `rounding_mode` option to `MoneyType`
+ * added `choice_translation_locale` option to `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * deprecated the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * added `input=datetime_immutable` to DateType, TimeType, DateTimeType
+ * added `rounding_mode` option to MoneyType
+
+4.0.0
+-----
+
+ * using the `choices` option in `CountryType`, `CurrencyType`, `LanguageType`,
+   `LocaleType`, and `TimezoneType` when the `choice_loader` option is not `null`
+   is not supported anymore and the configured choices will be ignored
+ * callable strings that are passed to the options of the `ChoiceType` are
+   treated as property paths
+ * the `choices_as_values` option of the `ChoiceType` has been removed
+ * removed the support for caching loaded choice lists in `LazyChoiceList`,
+   cache the choice list in the used `ChoiceLoaderInterface` implementation
+   instead
+ * removed the support for objects implementing both `\Traversable` and `\ArrayAccess` in `ResizeFormListener::preSubmit()`
+ * removed the ability to use `FormDataCollector` without the `symfony/var-dumper` component
+ * removed passing a `ValueExporter` instance to the `FormDataExtractor::__construct()` method
+ * removed passing guesser services ids as the fourth argument of `DependencyInjectionExtension::__construct()`
+ * removed the ability to validate an unsubmitted form.
+ * removed `ChoiceLoaderInterface` implementation in `TimezoneType`
+ * added the `false_values` option to the `CheckboxType` which allows to configure custom values which will be treated as `false` during submission
+
+3.4.0
+-----
+
+ * added `DebugCommand`
+ * deprecated `ChoiceLoaderInterface` implementation in `TimezoneType`
+ * added options "input" and "regions" to `TimezoneType`
+ * added an option to ``Symfony\Component\Form\FormRendererEngineInterface::setTheme()`` and
+   ``Symfony\Component\Form\FormRendererInterface::setTheme()`` to disable usage of default themes when rendering a form
+
+3.3.0
+-----
+
+ * deprecated using "choices" option in ``CountryType``, ``CurrencyType``, ``LanguageType``, ``LocaleType``, and
+   ``TimezoneType`` when "choice_loader" is not ``null``
+ * added `Symfony\Component\Form\FormErrorIterator::findByCodes()`
+ * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
+ * added `FormPass`
+
+3.2.0
+-----
+
+ * added `CallbackChoiceLoader`
+ * implemented `ChoiceLoaderInterface` in children of `ChoiceType`
+
+3.1.0
+-----
+
+ * deprecated the "choices_as_values" option of ChoiceType
+ * deprecated support for data objects that implements both `Traversable` and
+   `ArrayAccess` in `ResizeFormListener::preSubmit` method
+ * Using callable strings as choice options in `ChoiceType` has been deprecated
+   and will be used as `PropertyPath` instead of callable in Symfony 4.0.
+ * implemented `DataTransformerInterface` in `TextType`
+ * deprecated caching loaded choice list in `LazyChoiceList::$loadedList`
+
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
 2.8.0
 -----
 

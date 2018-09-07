@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="workflow.abstract" class="Symfony\Component\Workflow\Workflow" abstract="true" public="true">
+            <argument /> <!-- workflow definition -->
+            <argument type="constant">null</argument> <!-- marking store -->
+            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+            <argument /> <!-- name -->
+        </service>
+        <service id="state_machine.abstract" class="Symfony\Component\Workflow\StateMachine" abstract="true" public="true">
+            <argument /> <!-- workflow definition -->
+            <argument type="constant">null</argument> <!-- marking store -->
+            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+            <argument /> <!-- name -->
+        </service>
+
+        <service id="workflow.marking_store.multiple_state" class="Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore" abstract="true" />
+        <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
+
+        <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />
+        <service id="Symfony\Component\Workflow\Registry" alias="workflow.registry" />
+
+        <service id="workflow.security.expression_language" class="Symfony\Component\Workflow\EventListener\ExpressionLanguage" />
+    </services>
+</container>

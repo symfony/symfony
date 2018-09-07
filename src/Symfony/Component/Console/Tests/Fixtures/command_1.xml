@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<command id="descriptor:command1" name="descriptor:command1">
+<command id="descriptor:command1" name="descriptor:command1" hidden="0">
   <usages>
     <usage>descriptor:command1</usage>
     <usage>alias1</usage>

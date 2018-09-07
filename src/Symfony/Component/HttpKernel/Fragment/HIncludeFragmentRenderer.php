@@ -38,7 +38,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * @param string                      $globalDefaultTemplate The global default content (it can be a template name or the content)
      * @param string                      $charset
      */
-    public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null, $charset = 'utf-8')
+    public function __construct($templating = null, UriSigner $signer = null, string $globalDefaultTemplate = null, string $charset = 'utf-8')
     {
         $this->setTemplating($templating);
         $this->globalDefaultTemplate = $globalDefaultTemplate;
@@ -108,11 +108,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (\count($attributes) > 0) {
-            if (\PHP_VERSION_ID >= 50400) {
-                $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-            } else {
-                $flags = ENT_QUOTES;
-            }
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',
@@ -125,12 +121,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
     }
 
-    /**
-     * @param string $template
-     *
-     * @return bool
-     */
-    private function templateExists($template)
+    private function templateExists(string $template): bool
     {
         if ($this->templating instanceof EngineInterface) {
             try {

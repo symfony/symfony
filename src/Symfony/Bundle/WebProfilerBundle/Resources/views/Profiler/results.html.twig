@@ -1,5 +1,13 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% macro profile_search_filter(request, result, property) %}
+    {%- if request.hasSession -%}
+        <a href="{{ path('_profiler_search_results', request.query.all|merge({token: result.token})|merge({ (property): result[property] })) }}" title="Search"><span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span></a>
+    {%- endif -%}
+{% endmacro %}
+
+{% import _self as helper %}
+
 {% block summary %}
     <div class="status">
         <div class="container">
@@ -32,28 +40,14 @@
                             <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
                         </td>
                         <td>
-                            <span class="nowrap">{{ result.ip }}</span>
-                            {% if request.session is not null %}
-                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'ip': result.ip, 'token': result.token})) }}" title="Search">
-                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
-                                </a>
-                            {% endif %}
+                            <span class="nowrap">{{ result.ip }} {{ helper.profile_search_filter(request, result, 'ip') }}</span>
                         </td>
                         <td>
-                            {{ result.method }}
-                            {% if request.session is not null %}
-                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'method': result.method, 'token': result.token})) }}" title="Search">
-                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
-                                </a>
-                            {% endif %}
+                            <span class="nowrap">{{ result.method }} {{ helper.profile_search_filter(request, result, 'method') }}</span>
                         </td>
                         <td class="break-long-words">
                             {{ result.url }}
-                            {% if request.session is not null %}
-                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'url': result.url, 'token': result.token})) }}" title="Search">
-                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
-                                </a>
-                            {% endif %}
+                            {{ helper.profile_search_filter(request, result, 'url') }}
                         </td>
                         <td class="text-small">
                             <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>

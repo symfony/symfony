@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
@@ -27,7 +28,7 @@ trait MicroKernelTrait
      * Add or import routes into your application.
      *
      *     $routes->import('config/routing.yml');
-     *     $routes->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
+     *     $routes->add('/admin', 'App\Controller\AdminController::dashboard', 'admin_dashboard');
      *
      * @param RouteCollectionBuilder $routes
      */
@@ -63,10 +64,18 @@ trait MicroKernelTrait
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', array(
                 'router' => array(
-                    'resource' => 'kernel:loadRoutes',
+                    'resource' => 'kernel::loadRoutes',
                     'type' => 'service',
                 ),
             ));
+
+            if ($this instanceof EventSubscriberInterface) {
+                $container->register('kernel', static::class)
+                    ->setSynthetic(true)
+                    ->setPublic(true)
+                    ->addTag('kernel.event_subscriber')
+                ;
+            }
 
             $this->configureContainer($container, $loader);
 

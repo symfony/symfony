@@ -1,4 +1,4 @@
-<info>My Symfony application</info> version <comment>v1.0</comment>
+My Symfony application <info>v1.0</info>
 
 <comment>Usage:</comment>
   command [options] [arguments]
@@ -13,10 +13,9 @@
   <info>-v|vv|vvv, --verbose</info>  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 <comment>Available commands:</comment>
-  <info>alias1</info>               command 1 description
-  <info>alias2</info>               command 1 description
   <info>help</info>                 Displays help for a command
   <info>list</info>                 Lists commands
  <comment>descriptor</comment>
-  <info>descriptor:command1</info>  command 1 description
+  <info>descriptor:command1</info>  [alias1|alias2] command 1 description
   <info>descriptor:command2</info>  command 2 description
+  <info>descriptor:command4</info>  [descriptor:alias_command4|command4:descriptor]

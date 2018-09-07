@@ -1,0 +1,4 @@
+framework:
+    serializer:
+        enabled: true
+        cache: foo

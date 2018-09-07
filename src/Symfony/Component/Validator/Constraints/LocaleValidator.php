@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -41,22 +40,19 @@ class LocaleValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string) $value;
-        $locales = Intl::getLocaleBundle()->getLocaleNames();
-        $aliases = Intl::getLocaleBundle()->getAliases();
+        $inputValue = (string) $value;
+        $value = $inputValue;
+        if ($constraint->canonicalize) {
+            $value = \Locale::canonicalize($value);
+        }
+        $localeBundle = Intl::getLocaleBundle();
+        $locales = $localeBundle->getLocaleNames();
 
-        if (!isset($locales[$value]) && !\in_array($value, $aliases)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
-                    ->addViolation();
-            }
+        if (!isset($locales[$value]) && !\in_array($value, $localeBundle->getAliases(), true)) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($inputValue))
+                ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+                ->addViolation();
         }
     }
 }

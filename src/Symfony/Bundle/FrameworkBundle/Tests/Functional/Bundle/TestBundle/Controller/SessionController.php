@@ -11,13 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SessionController extends ContainerAware
+class SessionController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     public function welcomeAction(Request $request, $name = null)
     {
         $session = $request->getSession();
@@ -38,6 +41,14 @@ class SessionController extends ContainerAware
         $name = $session->get('name');
 
         return new Response(sprintf('Welcome back %s, nice to meet you.', $name));
+    }
+
+    public function cacheableAction()
+    {
+        $response = new Response('all good');
+        $response->setSharedMaxAge(100);
+
+        return $response;
     }
 
     public function logoutAction(Request $request)

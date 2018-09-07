@@ -64,25 +64,6 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertSame(array('value'), $this->factory->createListFromChoices($choices, new PropertyPath('property')));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCreateFromFlippedChoices()
-    {
-        // Property paths are not supported here, because array keys can never
-        // be objects anyway
-        $choices = array('a' => 'A');
-        $value = 'foobar';
-        $list = new \stdClass();
-
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromFlippedChoices')
-            ->with($choices, $value)
-            ->will($this->returnValue($list));
-
-        $this->assertSame($list, $this->factory->createListFromFlippedChoices($choices, $value));
-    }
-
     public function testCreateFromLoaderPropertyPath()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();

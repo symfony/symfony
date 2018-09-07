@@ -23,34 +23,14 @@ final class PropertyAccess
      *
      * @return PropertyAccessor
      */
-    public static function createPropertyAccessor()
+    public static function createPropertyAccessor(): PropertyAccessor
     {
         return self::createPropertyAccessorBuilder()->getPropertyAccessor();
     }
 
-    /**
-     * Creates a property accessor builder.
-     *
-     * @return PropertyAccessorBuilder
-     */
-    public static function createPropertyAccessorBuilder()
+    public static function createPropertyAccessorBuilder(): PropertyAccessorBuilder
     {
         return new PropertyAccessorBuilder();
-    }
-
-    /**
-     * Alias of {@link createPropertyAccessor}.
-     *
-     * @return PropertyAccessor
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link createPropertyAccessor()} instead.
-     */
-    public static function getPropertyAccessor()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the createPropertyAccessor() method instead.', E_USER_DEPRECATED);
-
-        return self::createPropertyAccessor();
     }
 
     /**

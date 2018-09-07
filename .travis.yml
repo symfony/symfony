@@ -10,23 +10,24 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
+        - ldap-utils
+        - slapd
+        - librabbitmq-dev
 
 env:
     global:
-        - MIN_PHP=5.4.9
-        - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/versions/5.6/bin/php
+        - MIN_PHP=7.1.3
+        - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
+        - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
 
 matrix:
     include:
-        - php: hhvm-3.18
-          sudo: required
-          group: edge
-        - php: 5.4
-          env: php_extra="5.5 5.6 7.0"
+        - php: 7.1
         - php: 7.1
           env: deps=high
         - php: 7.2
           env: deps=low
+
     fast_finish: true
 
 cache:
@@ -35,29 +36,33 @@ cache:
         - php-$MIN_PHP
         - ~/php-ext
 
-services: mongodb
+services:
+    - memcached
+    - mongodb
+    - redis-server
+    - rabbitmq
+    - docker
 
 before_install:
+    - |
+      # Start Redis cluster
+      docker pull grokzen/redis-cluster:4.0.8
+      docker run -d -p 7000:7000 -p 7001:7001 -p 7002:7002 -p 7003:7003 -p 7004:7004 -p 7005:7005 --name redis-cluster grokzen/redis-cluster:4.0.8
+      export REDIS_CLUSTER_HOSTS='localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
+
     - |
       # General configuration
       set -e
       stty cols 120
+      mkdir /tmp/slapd
+      slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
       [ -d ~/.composer ] || mkdir ~/.composer
       cp .composer/* ~/.composer/
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
-      export COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+      export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       find ~/.phpenv -name xdebug.ini -delete
-
-      if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then
-          composer () {
-              $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer config platform.php $(echo ' <?php echo preg_replace("/-.*/", "", PHP_VERSION);' | php /dev/stdin)
-              $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer $*
-          }
-          export -f composer
-          ~/.phpenv/versions/7.1/bin/composer self-update
-      fi
 
       nanoseconds () {
           local cmd="date"
@@ -116,58 +121,60 @@ before_install:
     - |
       # Install sigchild-enabled PHP to test the Process component on the lowest PHP matrix line
       if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then
-          wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj &&
+          wget http://php.net/get/php-$MIN_PHP.tar.bz2/from/this/mirror -O - | tar -xj &&
           (cd php-$MIN_PHP && ./configure --enable-sigchild --enable-pcntl && make -j2)
       fi
 
     - |
       # php.ini configuration
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          if [[ $PHP = hhvm* ]]; then
-              INI=/etc/hhvm/php.ini
-          else
-              phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
-              INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
-          fi
+          phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
+          INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           echo date.timezone = Europe/Paris >> $INI
           echo memory_limit = -1 >> $INI
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
-          echo hhvm.jit = 0 >> $INI
           echo apc.enable_cli = 1 >> $INI
-          [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI
-          if [[ $PHP = 5.* ]]; then
-              echo extension = mongo.so >> $INI
-          fi
+          echo extension = redis.so >> $INI
+          echo extension = memcached.so >> $INI
       done
 
     - |
       # Install extra PHP extensions
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          if [[ $PHP = hhvm* ]]; then
-              continue
-          fi
           export PHP=$PHP
           phpenv global $PHP
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
-          if [[ $PHP = 5.* ]]; then
-              tfold ext.memcached tpecl memcached-2.1.0 memcached.so $INI
-              tfold ext.apcu tpecl apcu-4.0.11 apcu.so $INI
-              [[ $deps ]] && continue
-              ext_cache=~/php-ext/$(php -r "echo basename(ini_get('extension_dir'));")/symfony_debug.so
-              [[ -e $ext_cache ]] || (tfold ext.symfony_debug "cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && mv modules/symfony_debug.so $ext_cache && phpize --clean")
-              echo extension = $ext_cache >> $INI
-          elif [[ $PHP = 7.* ]]; then
-              tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-              tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
-          fi
+
+          # Install librabbitmq
+          wget http://ftp.debian.org/debian/pool/main/libr/librabbitmq/librabbitmq-dev_0.5.2-2_amd64.deb
+          wget http://ftp.debian.org/debian/pool/main/libr/librabbitmq/librabbitmq1_0.5.2-2_amd64.deb
+          sudo dpkg -i librabbitmq1_0.5.2-2_amd64.deb librabbitmq-dev_0.5.2-2_amd64.deb
+
+          # install libsodium
+          sudo add-apt-repository ppa:ondrej/php -y
+          sudo apt-get update -q
+          sudo apt-get install libsodium-dev -y
+
+          tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
+          tfold ext.libsodium tpecl libsodium sodium.so $INI
+          tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
+          tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
+          tfold ext.igbinary tpecl igbinary-2.0.6 igbinary.so $INI
       done
+
+    - |
+      # Load fixtures
+      if [[ ! $skip ]]; then
+          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif &&
+          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
+      fi
 
 install:
     - |
       # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
       if [[ ! $deps ]]; then
-          php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit
+          php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
       else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&
@@ -183,7 +190,7 @@ install:
           SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//) &&
           git fetch origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
-          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+          COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       else
           SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
       fi
@@ -204,9 +211,7 @@ install:
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi
 
-    - |
-      # phpinfo
-      if [[ ! $TRAVIS_PHP_VERSION = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+    - php -i
 
     - |
       run_tests () {
@@ -216,16 +221,10 @@ install:
               echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
               break
           fi
-          phpenv global ${PHP/hhvm*/hhvm}
-          if [[ $PHP = 7.* ]]; then
-              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.0; composer require --dev --no-update mongodb/mongodb)
-          fi
+          phpenv global $PHP
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
           tfold 'composer update' $COMPOSER_UP
-          if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then
-              tfold 'phpunit install' 'composer global remove symfony/flex && ./phpunit install && composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master'
-          else
-              tfold 'phpunit install' ./phpunit install
-          fi
+          tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then
@@ -234,14 +233,12 @@ install:
               php .github/rm-invalid-lowest-lock-files.php $COMPONENTS
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
-          elif [[ $PHP = hhvm* ]]; then
-              $PHPUNIT --exclude-group no-hhvm,benchmark,intl-data
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
-                  echo -e "1\\n0" | xargs -I{} bash -c "tfold src/Symfony/Component/Process.sigchild{} SYMFONY_DEPRECATIONS_HELPER=weak ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/"
+                  tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/
               fi
           fi
       }

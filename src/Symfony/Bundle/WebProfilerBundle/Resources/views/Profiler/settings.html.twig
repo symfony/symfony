@@ -1,0 +1,160 @@
+<style>
+#open-settings {
+    color: var(--text-muted);
+    display: block;
+    margin: 15px 15px 5px;
+}
+
+.modal-wrap {
+    -webkit-transition: all 0.3s ease-in-out;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    opacity: 1;
+    overflow: auto;
+    position: fixed;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+    visibility: hidden;
+    width: 100%;
+    z-index: 100000;
+}
+.modal-wrap.visible {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-wrap .modal-container {
+    box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    color: var(--base-6);
+    margin: 1em;
+    max-width: 94%;
+    width: 600px;
+}
+
+.modal-wrap .modal-header {
+    align-items: center;
+    background: var(--table-header);
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+}
+.modal-wrap .modal-header h3 {
+    color: var(--base-6);
+    margin: 0;
+}
+.modal-wrap .modal-header .close-modal {
+    background: transparent;
+    border: 0;
+    color: var(--base-4);
+    cursor: pointer;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.modal-wrap .modal-header .close-modal:hover { opacity: 1; }
+
+.modal-wrap .modal-content {
+  background: var(--base-1);
+  margin: 0;
+  padding: 15px 30px;
+  width: 100%;
+  z-index: 100000;
+}
+.modal-content h4 {
+    border-bottom: var(--border);
+    margin: 0 0 15px;
+    padding: 0 0 5px;
+}
+.modal-content input, .modal-content .form-help {
+    margin-left: 15px;
+}
+.modal-content label {
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 3px;
+}
+.modal-content .form-help {
+    color: var(--color-muted);
+    font-size: 14px;
+    margin: 5px 0 15px 33px;
+}
+.modal-content .form-help + h4 {
+    margin-top: 45px;
+}
+</style>
+
+<a href="#" id="open-settings" data-triger="profiler-settings">Settings</a>
+
+<div class="modal-wrap" id="profiler-settings">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Configuration Settings</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+
+        <div class="modal-content">
+            <h4>Theme</h4>
+
+            <input class="config-option" type="radio" name="theme" value="light" id="settings-theme-light">
+            <label for="settings-theme-light">Light</label>
+            <p class="form-help">Default theme. Improves readability.</p>
+
+            <input class="config-option" type="radio" name="theme" value="dark" id="settings-theme-dark">
+            <label for="settings-theme-dark">Dark</label>
+            <p class="form-help">Reduces eye fatigue. Ideal for low light conditions.</p>
+
+            <h4>Page Width</h4>
+
+            <input class="config-option" type="radio" name="width" value="light" id="settings-width-normal">
+            <label for="settings-width-normal">Normal</label>
+            <p class="form-help">Fixed page width. Improves readability.</p>
+
+            <input class="config-option" type="radio" name="width" value="dark" id="settings-width-full">
+            <label for="settings-width-full">Full-page</label>
+            <p class="form-help">Dynamic page width. As wide as the browser window.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    let configOptions = document.querySelectorAll('.config-option');
+    let oppositeValues = { 'light': 'dark', 'dark': 'light', 'normal': 'full', 'full': 'normal' };
+    [...configOptions].forEach(option => {
+        option.addEventListener('click', function (event) {
+            let optionParts = option.id.split('-');
+            let optionName = optionParts[1];
+            let optionValue = optionParts[2];
+
+            document.body.classList.remove(optionName + '-' + oppositeValues[optionValue]);
+            document.body.classList.add(optionName + '-' + optionValue);
+            localStorage.setItem('symfony/profiler/' + optionName, optionName + '-' + optionValue);
+        });
+    });
+
+    let openModalButton = document.getElementById('open-settings');
+    let modalWindow = document.getElementById('profiler-settings');
+    let closeModalButton = document.getElementsByClassName('close-modal')[0];
+    let modalWrapper = document.getElementsByClassName('modal-wrap')[0]
+
+    openModalButton.addEventListener('click', function(event) {
+        document.getElementById('settings-' + localStorage.getItem('symfony/profiler/theme')).checked = 'checked';
+        document.getElementById('settings-' + localStorage.getItem('symfony/profiler/width')).checked = 'checked';
+
+        modalWindow.classList.toggle('visible');
+        event.preventDefault();
+    });
+
+    closeModalButton.addEventListener('click', function() {
+        modalWindow.classList.remove('visible');
+    });
+    modalWrapper.addEventListener('click', function(event) {
+        if (event.target == event.currentTarget) {
+            modalWindow.classList.remove('visible');
+        }
+    });
+})();
+</script>

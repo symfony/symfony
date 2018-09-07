@@ -1,16 +1,16 @@
 
+In Foo3Command.php line 26:
                                               
-  [Exception]                                 
   Third exception <fg=blue;bg=red>comment</>  
                                               
 
+In Foo3Command.php line 23:
                                                
-  [Exception]                                  
   Second exception <comment>comment</comment>  
                                                
 
+In Foo3Command.php line 21:
                                        
-  [Exception]                          
   First exception <p>this is html</p>  
                                        
 

@@ -39,7 +39,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      * @param int    $iterations         The number of iterations to use to stretch the password hash
      * @param int    $length             Length of derived key to create
      */
-    public function __construct($algorithm = 'sha512', $encodeHashAsBase64 = true, $iterations = 1000, $length = 40)
+    public function __construct(string $algorithm = 'sha512', bool $encodeHashAsBase64 = true, int $iterations = 1000, int $length = 40)
     {
         $this->algorithm = $algorithm;
         $this->encodeHashAsBase64 = $encodeHashAsBase64;

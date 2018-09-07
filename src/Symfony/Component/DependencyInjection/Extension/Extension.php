@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Extension;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
@@ -26,6 +25,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
+    private $processedConfigs = array();
+
     /**
      * {@inheritdoc}
      */
@@ -78,25 +79,45 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        $reflected = new \ReflectionClass($this);
-        $namespace = $reflected->getNamespaceName();
+        $class = \get_class($this);
+        $class = substr_replace($class, '\Configuration', strrpos($class, '\\'));
+        $class = $container->getReflectionClass($class);
 
-        $class = $namespace.'\\Configuration';
-        if (class_exists($class)) {
-            $r = new \ReflectionClass($class);
-            $container->addResource(new FileResource($r->getFileName()));
-
-            if (!method_exists($class, '__construct')) {
-                return new $class();
-            }
+        if (!$class) {
+            return null;
         }
+
+        if (!$class->implementsInterface(ConfigurationInterface::class)) {
+            @trigger_error(sprintf('Not implementing "%s" in the extension configuration class "%s" is deprecated since Symfony 4.1.', ConfigurationInterface::class, $class->getName()), E_USER_DEPRECATED);
+            //throw new LogicException(sprintf('The extension configuration class "%s" must implement "%s".', $class->getName(), ConfigurationInterface::class));
+
+            return null;
+        }
+
+        if (!($constructor = $class->getConstructor()) || !$constructor->getNumberOfRequiredParameters()) {
+            return $class->newInstance();
+        }
+
+        return null;
     }
 
     final protected function processConfiguration(ConfigurationInterface $configuration, array $configs)
     {
         $processor = new Processor();
 
-        return $processor->processConfiguration($configuration, $configs);
+        return $this->processedConfigs[] = $processor->processConfiguration($configuration, $configs);
+    }
+
+    /**
+     * @internal
+     */
+    final public function getProcessedConfigs()
+    {
+        try {
+            return $this->processedConfigs;
+        } finally {
+            $this->processedConfigs = array();
+        }
     }
 
     /**

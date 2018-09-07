@@ -1,7 +1,7 @@
-**argument_name:**
+#### `argument_name`
 
-* Name: argument_name
+argument description
+
 * Is required: no
 * Is array: no
-* Description: argument description
 * Default: `'default_value'`

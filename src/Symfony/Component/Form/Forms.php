@@ -28,7 +28,6 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *         ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
  *         ->add('gender', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
  *             'choices' => array('Male' => 'm', 'Female' => 'f'),
- *             'choices_as_values' => true,
  *         ))
  *         ->getForm();
  *
@@ -94,7 +93,7 @@ final class Forms
      *
      * @return FormFactoryInterface The form factory
      */
-    public static function createFormFactory()
+    public static function createFormFactory(): FormFactoryInterface
     {
         return self::createFormFactoryBuilder()->getFormFactory();
     }
@@ -104,7 +103,7 @@ final class Forms
      *
      * @return FormFactoryBuilderInterface The form factory builder
      */
-    public static function createFormFactoryBuilder()
+    public static function createFormFactoryBuilder(): FormFactoryBuilderInterface
     {
         $builder = new FormFactoryBuilder();
         $builder->addExtension(new CoreExtension());

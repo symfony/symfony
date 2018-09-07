@@ -15,28 +15,29 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * The ProcessHelper class provides helpers to run external processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.2
  */
 class ProcessHelper extends Helper
 {
     /**
      * Runs an external process.
      *
-     * @param OutputInterface      $output    An OutputInterface instance
-     * @param string|array|Process $cmd       An instance of Process or an array of arguments to escape and run or a command to run
-     * @param string|null          $error     An error message that must be displayed if something went wrong
-     * @param callable|null        $callback  A PHP callback to run whenever there is some
-     *                                        output available on STDOUT or STDERR
-     * @param int                  $verbosity The threshold for verbosity
+     * @param OutputInterface $output    An OutputInterface instance
+     * @param array|Process   $cmd       An instance of Process or an array of the command and arguments
+     * @param string|null     $error     An error message that must be displayed if something went wrong
+     * @param callable|null   $callback  A PHP callback to run whenever there is some
+     *                                   output available on STDOUT or STDERR
+     * @param int             $verbosity The threshold for verbosity
      *
      * @return Process The process that ran
      */
-    public function run(OutputInterface $output, $cmd, $error = null, $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
+    public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -44,12 +45,23 @@ class ProcessHelper extends Helper
 
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        if (\is_array($cmd)) {
-            $process = ProcessBuilder::create($cmd)->getProcess();
-        } elseif ($cmd instanceof Process) {
-            $process = $cmd;
-        } else {
+        if ($cmd instanceof Process) {
+            $cmd = array($cmd);
+        }
+
+        if (!\is_array($cmd)) {
+            @trigger_error(sprintf('Passing a command as a string to "%s()" is deprecated since Symfony 4.2, pass it the command as an array of arguments instead.', __METHOD__), E_USER_DEPRECATED);
+            $cmd = array(\method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline($cmd) : new Process($cmd));
+        }
+
+        if (\is_string($cmd[0] ?? null)) {
             $process = new Process($cmd);
+            $cmd = array();
+        } elseif (($cmd[0] ?? null) instanceof Process) {
+            $process = $cmd[0];
+            unset($cmd[0]);
+        } else {
+            throw new \InvalidArgumentException(sprintf('Invalid command provided to "%s()": the command should an array whose first is element is either the path to the binary to run of a "Process" object.', __METHOD__));
         }
 
         if ($verbosity <= $output->getVerbosity()) {
@@ -60,7 +72,7 @@ class ProcessHelper extends Helper
             $callback = $this->wrapCallback($output, $process, $callback);
         }
 
-        $process->run($callback);
+        $process->run($callback, $cmd);
 
         if ($verbosity <= $output->getVerbosity()) {
             $message = $process->isSuccessful() ? 'Command ran successfully' : sprintf('%s Command did not run successfully', $process->getExitCode());
@@ -92,7 +104,7 @@ class ProcessHelper extends Helper
      *
      * @see run()
      */
-    public function mustRun(OutputInterface $output, $cmd, $error = null, $callback = null)
+    public function mustRun(OutputInterface $output, $cmd, $error = null, callable $callback = null)
     {
         $process = $this->run($output, $cmd, $error, $callback);
 
@@ -112,7 +124,7 @@ class ProcessHelper extends Helper
      *
      * @return callable
      */
-    public function wrapCallback(OutputInterface $output, Process $process, $callback = null)
+    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -120,10 +132,8 @@ class ProcessHelper extends Helper
 
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        $that = $this;
-
-        return function ($type, $buffer) use ($output, $process, $callback, $formatter, $that) {
-            $output->write($formatter->progress(spl_object_hash($process), $that->escapeString($buffer), Process::ERR === $type));
+        return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
+            $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
                 \call_user_func($callback, $type, $buffer);
@@ -131,12 +141,7 @@ class ProcessHelper extends Helper
         };
     }
 
-    /**
-     * This method is public for PHP 5.3 compatibility, it should be private.
-     *
-     * @internal
-     */
-    public function escapeString($str)
+    private function escapeString($str)
     {
         return str_replace('<', '\\<', $str);
     }

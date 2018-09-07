@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
@@ -108,7 +109,6 @@ class DateTimeType extends AbstractType
                 'years',
                 'months',
                 'days',
-                'empty_value',
                 'placeholder',
                 'choice_translation_domain',
                 'required',
@@ -124,7 +124,6 @@ class DateTimeType extends AbstractType
                 'seconds',
                 'with_minutes',
                 'with_seconds',
-                'empty_value',
                 'placeholder',
                 'choice_translation_domain',
                 'required',
@@ -138,8 +137,16 @@ class DateTimeType extends AbstractType
                 $dateOptions['widget'] = $options['date_widget'];
             }
 
+            if (null !== $options['date_label']) {
+                $dateOptions['label'] = $options['date_label'];
+            }
+
             if (null !== $options['time_widget']) {
                 $timeOptions['widget'] = $options['time_widget'];
+            }
+
+            if (null !== $options['time_label']) {
+                $timeOptions['label'] = $options['time_label'];
             }
 
             if (null !== $options['date_format']) {
@@ -162,7 +169,9 @@ class DateTimeType extends AbstractType
             ;
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime_immutable' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
             ));
@@ -234,12 +243,13 @@ class DateTimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'date_label' => null,
+            'time_label' => null,
         ));
 
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
         $resolver->setDefined(array(
-            'empty_value', // deprecated
             'placeholder',
             'choice_translation_domain',
             'years',
@@ -252,6 +262,7 @@ class DateTimeType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetime_immutable',
             'string',
             'timestamp',
             'array',
@@ -275,14 +286,6 @@ class DateTimeType extends AbstractType
             'text',
             'choice',
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**

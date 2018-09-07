@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
@@ -21,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
@@ -34,7 +33,7 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 class GuardAuthenticationProvider implements AuthenticationProviderInterface
 {
     /**
-     * @var GuardAuthenticatorInterface[]
+     * @var AuthenticatorInterface[]
      */
     private $guardAuthenticators;
     private $userProvider;
@@ -42,12 +41,12 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     private $userChecker;
 
     /**
-     * @param GuardAuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
-     * @param UserProviderInterface         $userProvider        The user provider
-     * @param string                        $providerKey         The provider (i.e. firewall) key
-     * @param UserCheckerInterface          $userChecker
+     * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
+     * @param UserProviderInterface             $userProvider        The user provider
+     * @param string                            $providerKey         The provider (i.e. firewall) key
+     * @param UserCheckerInterface              $userChecker
      */
-    public function __construct(array $guardAuthenticators, UserProviderInterface $userProvider, $providerKey, UserCheckerInterface $userChecker)
+    public function __construct($guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
@@ -97,7 +96,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         return $this->authenticateViaGuard($guardAuthenticator, $token);
     }
 
-    private function authenticateViaGuard(GuardAuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
+    private function authenticateViaGuard($guardAuthenticator, PreAuthenticationGuardToken $token)
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);

@@ -35,4 +35,12 @@ class IntegerNode extends NumericNode
             throw $ex;
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getValidPlaceholderTypes(): array
+    {
+        return array('int');
+    }
 }

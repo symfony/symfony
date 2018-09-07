@@ -39,7 +39,7 @@ class GetterMetadata extends MemberMetadata
      *
      * @throws ValidatorException
      */
-    public function __construct($class, $property, $method = null)
+    public function __construct(string $class, string $property, string $method = null)
     {
         if (null === $method) {
             $getMethod = 'get'.ucfirst($property);

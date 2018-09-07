@@ -16,23 +16,38 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-php55": "~1.0"
+        "php": "^7.1.3",
+        "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/yaml": "^2.0.5|~3.0.0",
-        "symfony/config": "~2.2|~3.0.0",
-        "symfony/property-access": "~2.3|~3.0.0",
+        "symfony/yaml": "~3.4|~4.0",
+        "symfony/config": "~3.4|~4.0",
+        "symfony/property-access": "~3.4|~4.0",
+        "symfony/http-foundation": "~3.4|~4.0",
+        "symfony/cache": "~3.4|~4.0",
+        "symfony/property-info": "~3.4|~4.0",
+        "symfony/validator": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",
-        "doctrine/cache": "~1.0"
+        "symfony/dependency-injection": "~3.4|~4.0",
+        "doctrine/cache": "~1.0",
+        "phpdocumentor/reflection-docblock": "^3.0|^4.0"
+    },
+    "conflict": {
+        "phpdocumentor/type-resolver": "<0.2.1",
+        "symfony/dependency-injection": "<3.4",
+        "symfony/property-access": "<3.4",
+        "symfony/property-info": "<3.4",
+        "symfony/yaml": "<3.4"
     },
     "suggest": {
-        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
-        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+        "psr/cache-implementation": "For using the metadata cache.",
+        "symfony/property-info": "To deserialize relations.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
-        "symfony/property-access": "For using the ObjectNormalizer."
+        "symfony/property-access": "For using the ObjectNormalizer.",
+        "symfony/http-foundation": "To use the DataUriNormalizer.",
+        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" },
@@ -43,7 +58,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

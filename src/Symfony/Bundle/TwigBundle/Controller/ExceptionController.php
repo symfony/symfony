@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -35,7 +35,7 @@ class ExceptionController
      * @param Environment $twig
      * @param bool        $debug Show error (false) or exception (true) pages by default
      */
-    public function __construct(Environment $twig, $debug)
+    public function __construct(Environment $twig, bool $debug)
     {
         $this->twig = $twig;
         $this->debug = $debug;

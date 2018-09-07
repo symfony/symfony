@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `ProcessorInterface`: an optional interface to allow autoconfiguration of Monolog processors
+
+4.1.0
+-----
+
+ * `WebProcessor` now implements `EventSubscriberInterface` in order to be easily autoconfigured
+
+4.0.0
+-----
+
+ * the `$format`, `$dateFormat`, `$allowInlineLineBreaks`, and `$ignoreEmptyContextAndExtra`
+   constructor arguments of the `ConsoleFormatter` class have been removed, use
+   `$options` instead
+ * the `DebugHandler` class has been removed
+
+3.3.0
+-----
+
+ * Improved the console handler output formatting by adding var-dumper support
+
+3.0.0
+-----
+
+ * deprecated interface `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed
+ * deprecated methods `Logger::crit()`, `Logger::emerg()`, `Logger::err()` and `Logger::warn()` have been removed
+
 2.4.0
 -----
 

@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Adds tagged twig.extension services to twig service.
@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TwigEnvironmentPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('twig')) {
@@ -34,11 +36,22 @@ class TwigEnvironmentPass implements CompilerPassInterface
         // For instance, global variable definitions must be registered
         // afterward. If not, the globals from the extensions will never
         // be registered.
-        $calls = $definition->getMethodCalls();
-        $definition->setMethodCalls(array());
-        foreach ($container->findTaggedServiceIds('twig.extension') as $id => $attributes) {
-            $definition->addMethodCall('addExtension', array(new Reference($id)));
+        $currentMethodCalls = $definition->getMethodCalls();
+        $twigBridgeExtensionsMethodCalls = array();
+        $othersExtensionsMethodCalls = array();
+        foreach ($this->findAndSortTaggedServices('twig.extension', $container) as $extension) {
+            $methodCall = array('addExtension', array($extension));
+            $extensionClass = $container->getDefinition((string) $extension)->getClass();
+
+            if (\is_string($extensionClass) && 0 === strpos($extensionClass, 'Symfony\Bridge\Twig\Extension')) {
+                $twigBridgeExtensionsMethodCalls[] = $methodCall;
+            } else {
+                $othersExtensionsMethodCalls[] = $methodCall;
+            }
         }
-        $definition->setMethodCalls(array_merge($definition->getMethodCalls(), $calls));
+
+        if (!empty($twigBridgeExtensionsMethodCalls) || !empty($othersExtensionsMethodCalls)) {
+            $definition->setMethodCalls(array_merge($twigBridgeExtensionsMethodCalls, $othersExtensionsMethodCalls, $currentMethodCalls));
+        }
     }
 }

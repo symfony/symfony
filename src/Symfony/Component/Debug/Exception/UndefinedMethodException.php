@@ -18,7 +18,7 @@ namespace Symfony\Component\Debug\Exception;
  */
 class UndefinedMethodException extends FatalErrorException
 {
-    public function __construct($message, \ErrorException $previous)
+    public function __construct(string $message, \ErrorException $previous)
     {
         parent::__construct(
             $message,

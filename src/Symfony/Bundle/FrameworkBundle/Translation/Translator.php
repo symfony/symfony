@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
@@ -45,6 +46,8 @@ class Translator extends BaseTranslator implements WarmableInterface
      */
     private $resources = array();
 
+    private $resourceFiles;
+
     /**
      * Constructor.
      *
@@ -54,28 +57,29 @@ class Translator extends BaseTranslator implements WarmableInterface
      *   * debug:     Whether to enable debugging or not (false by default)
      *   * resource_files: List of translation resources available grouped by locale.
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param MessageSelector    $selector  The message selector for pluralization
-     * @param array              $loaderIds An array of loader Ids
-     * @param array              $options   An array of options
+     * @param ContainerInterface        $container     A ContainerInterface instance
+     * @param MessageFormatterInterface $formatter     The message formatter
+     * @param string                    $defaultLocale
+     * @param array                     $loaderIds     An array of loader Ids
+     * @param array                     $options       An array of options
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = array(), array $options = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+            throw new InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
         }
 
         $this->options = array_merge($this->options, $options);
         $this->resourceLocales = array_keys($this->options['resource_files']);
-        $this->addResourceFiles($this->options['resource_files']);
+        $this->resourceFiles = $this->options['resource_files'];
 
-        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**
@@ -101,6 +105,9 @@ class Translator extends BaseTranslator implements WarmableInterface
 
     public function addResource($format, $resource, $locale, $domain = null)
     {
+        if ($this->resourceFiles) {
+            $this->addResourceFiles();
+        }
         $this->resources[] = array($format, $resource, $locale, $domain);
     }
 
@@ -115,6 +122,9 @@ class Translator extends BaseTranslator implements WarmableInterface
 
     protected function initialize()
     {
+        if ($this->resourceFiles) {
+            $this->addResourceFiles();
+        }
         foreach ($this->resources as $key => $params) {
             list($format, $resource, $locale, $domain) = $params;
             parent::addResource($format, $resource, $locale, $domain);
@@ -128,8 +138,11 @@ class Translator extends BaseTranslator implements WarmableInterface
         }
     }
 
-    private function addResourceFiles($filesByLocale)
+    private function addResourceFiles()
     {
+        $filesByLocale = $this->resourceFiles;
+        $this->resourceFiles = array();
+
         foreach ($filesByLocale as $locale => $files) {
             foreach ($files as $key => $file) {
                 // filename is domain.locale.format

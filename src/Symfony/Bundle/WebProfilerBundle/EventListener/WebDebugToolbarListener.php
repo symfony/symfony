@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
+use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,17 +40,17 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $urlGenerator;
     protected $interceptRedirects;
     protected $mode;
-    protected $position;
     protected $excludedAjaxPaths;
+    private $cspHandler;
 
-    public function __construct(Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt')
+    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
-        $this->interceptRedirects = (bool) $interceptRedirects;
-        $this->mode = (int) $mode;
-        $this->position = $position;
+        $this->interceptRedirects = $interceptRedirects;
+        $this->mode = $mode;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
+        $this->cspHandler = $cspHandler;
     }
 
     public function isEnabled()
@@ -76,6 +77,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         if (!$event->isMasterRequest()) {
             return;
         }
+
+        $nonces = $this->cspHandler ? $this->cspHandler->updateResponseHeaders($request, $response) : array();
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
@@ -104,13 +107,13 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        $this->injectToolbar($response, $request);
+        $this->injectToolbar($response, $request, $nonces);
     }
 
     /**
      * Injects the web debug toolbar into the given Response.
      */
-    protected function injectToolbar(Response $response, Request $request)
+    protected function injectToolbar(Response $response, Request $request, array $nonces)
     {
         $content = $response->getContent();
         $pos = strripos($content, '</body>');
@@ -119,10 +122,11 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $toolbar = "\n".str_replace("\n", '', $this->twig->render(
                 '@WebProfiler/Profiler/toolbar_js.html.twig',
                 array(
-                    'position' => $this->position,
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
                     'request' => $request,
+                    'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
+                    'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
                 )
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);

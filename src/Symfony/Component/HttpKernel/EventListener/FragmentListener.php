@@ -38,7 +38,7 @@ class FragmentListener implements EventSubscriberInterface
      * @param UriSigner $signer       A UriSigner instance
      * @param string    $fragmentPath The path that triggers this listener
      */
-    public function __construct(UriSigner $signer, $fragmentPath = '/_fragment')
+    public function __construct(UriSigner $signer, string $fragmentPath = '/_fragment')
     {
         $this->signer = $signer;
         $this->fragmentPath = $fragmentPath;
@@ -88,18 +88,6 @@ class FragmentListener implements EventSubscriberInterface
         }
 
         throw new AccessDeniedHttpException();
-    }
-
-    /**
-     * @deprecated since version 2.3.19, to be removed in 3.0.
-     *
-     * @return string[]
-     */
-    protected function getLocalIpAddresses()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3.19 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return array('127.0.0.1', 'fe80::1', '::1');
     }
 
     public static function getSubscribedEvents()

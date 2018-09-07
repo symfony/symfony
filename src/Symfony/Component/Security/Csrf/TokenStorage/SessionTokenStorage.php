@@ -35,7 +35,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      * @param SessionInterface $session   The user session from which the session ID is returned
      * @param string           $namespace The namespace under which the token is stored in the session
      */
-    public function __construct(SessionInterface $session, $namespace = self::SESSION_NAMESPACE)
+    public function __construct(SessionInterface $session, string $namespace = self::SESSION_NAMESPACE)
     {
         $this->session = $session;
         $this->namespace = $namespace;

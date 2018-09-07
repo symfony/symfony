@@ -1,0 +1,40 @@
+
+Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
+==============================================================================
+
+ --------------------------- -------------------- ------------------------- ----------------------- 
+  Options                     Overridden options   Parent options            Extension options      
+ --------------------------- -------------------- ------------------------- ----------------------- 
+  choice_attr                 FormType             FormType                  FormTypeCsrfExtension  
+  choice_label               -------------------- ------------------------- ----------------------- 
+  choice_loader               compound             action                    csrf_field_name        
+  choice_name                 data_class           attr                      csrf_message           
+  choice_translation_domain   empty_data           auto_initialize           csrf_protection        
+  choice_value                error_bubbling       block_name                csrf_token_id          
+  choices                     trim                 by_reference              csrf_token_manager     
+  expanded                                         data                                             
+  group_by                                         disabled                                         
+  multiple                                         help                                             
+  placeholder                                      inherit_data                                     
+  preferred_choices                                label                                            
+                                                   label_attr                                       
+                                                   label_format                                     
+                                                   mapped                                           
+                                                   method                                           
+                                                   post_max_size_message                            
+                                                   property_path                                    
+                                                   required                                         
+                                                   translation_domain                               
+                                                   upload_max_size_message                          
+ --------------------------- -------------------- ------------------------- ----------------------- 
+
+Parent types
+------------
+
+ * Symfony\Component\Form\Extension\Core\Type\FormType
+
+Type extensions
+---------------
+
+ * Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
+

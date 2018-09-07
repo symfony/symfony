@@ -24,7 +24,7 @@ class RoleHierarchyVoter extends RoleVoter
 {
     private $roleHierarchy;
 
-    public function __construct(RoleHierarchyInterface $roleHierarchy, $prefix = 'ROLE_')
+    public function __construct(RoleHierarchyInterface $roleHierarchy, string $prefix = 'ROLE_')
     {
         $this->roleHierarchy = $roleHierarchy;
 

@@ -1,11 +1,85 @@
 CHANGELOG
 =========
 
-2.8.44
-------
+4.2.0
+-----
+
+ * added `getAcceptableFormats()` for reading acceptable formats based on Accept header
+
+4.1.3
+-----
 
  * [BC BREAK] Support for the IIS-only `X_ORIGINAL_URL` and `X_REWRITE_URL`
    HTTP headers has been dropped for security reasons.
+
+4.1.0
+-----
+
+ * Query string normalization uses `parse_str()` instead of custom parsing logic.
+ * Passing the file size to the constructor of the `UploadedFile` class is deprecated.
+ * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
+ * added `RedisSessionHandler` to use Redis as a session storage
+ * The `get()` method of the `AcceptHeader` class now takes into account the
+   `*` and `*/*` default values (if they are present in the Accept HTTP header)
+   when looking for items.
+ * deprecated `Request::getSession()` when no session has been set. Use `Request::hasSession()` instead.
+ * added `CannotWriteFileException`, `ExtensionFileException`, `FormSizeFileException`,
+   `IniSizeFileException`, `NoFileException`, `NoTmpDirFileException`, `PartialFileException` to
+   handle failed `UploadedFile`.
+ * added `MigratingSessionHandler` for migrating between two session handlers without losing sessions
+ * added `HeaderUtils`.
+
+4.0.0
+-----
+
+ * the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()`
+   methods have been removed
+ * the `Request::HEADER_CLIENT_IP` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_FOR` instead
+ * the `Request::HEADER_CLIENT_HOST` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_HOST` instead
+ * the `Request::HEADER_CLIENT_PROTO` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_PROTO` instead
+ * the `Request::HEADER_CLIENT_PORT` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_PORT` instead
+ * checking for cacheable HTTP methods using the `Request::isMethodSafe()`
+   method (by not passing `false` as its argument) is not supported anymore and
+   throws a `\BadMethodCallException`
+ * the `WriteCheckSessionHandler`, `NativeSessionHandler` and `NativeProxy` classes have been removed
+ * setting session save handlers that do not implement `\SessionHandlerInterface` in
+   `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a
+   `\TypeError`
+
+3.4.0
+-----
+
+ * implemented PHP 7.0's `SessionUpdateTimestampHandlerInterface` with a new
+   `AbstractSessionHandler` base class and a new `StrictSessionHandler` wrapper
+ * deprecated the `WriteCheckSessionHandler`, `NativeSessionHandler` and `NativeProxy` classes
+ * deprecated setting session save handlers that do not implement `\SessionHandlerInterface` in `NativeSessionStorage::setSaveHandler()`
+ * deprecated using `MongoDbSessionHandler` with the legacy mongo extension; use it with the mongodb/mongodb package and ext-mongodb instead
+ * deprecated `MemcacheSessionHandler`; use `MemcachedSessionHandler` instead
+
+3.3.0
+-----
+
+ * the `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument,
+   see http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info,
+ * deprecated the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods,
+ * added `File\Stream`, to be passed to `BinaryFileResponse` when the size of the served file is unknown,
+   disabling `Range` and `Content-Length` handling, switching to chunked encoding instead
+ * added the `Cookie::fromString()` method that allows to create a cookie from a
+   raw header string
+
+3.1.0
+-----
+
+ * Added support for creating `JsonResponse` with a string of JSON data
+
+3.0.0
+-----
+
+ * The precedence of parameters returned from `Request::get()` changed from "GET, PATH, BODY" to "PATH, GET, BODY"
 
 2.8.0
 -----

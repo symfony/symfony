@@ -1,6 +1,6 @@
 
+In ApplicationTest.php line %d:
                                     
-  [InvalidArgumentException]        
   line 1 with extra spaces          
   line 2                            
                                     

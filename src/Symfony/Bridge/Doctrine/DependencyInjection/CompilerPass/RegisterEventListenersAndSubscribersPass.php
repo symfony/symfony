@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -37,7 +38,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      *                                manager's service ID for a connection name
      * @param string $tagPrefix       Tag prefix for listeners and subscribers
      */
-    public function __construct($connections, $managerTemplate, $tagPrefix)
+    public function __construct(string $connections, string $managerTemplate, string $tagPrefix)
     {
         $this->connections = $connections;
         $this->managerTemplate = $managerTemplate;
@@ -64,14 +65,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $taggedSubscribers = $this->findAndSortTags($subscriberTag, $container);
 
         foreach ($taggedSubscribers as $taggedSubscriber) {
-            $id = $taggedSubscriber[0];
-            $taggedSubscriberDef = $container->getDefinition($id);
-
-            if ($taggedSubscriberDef->isAbstract()) {
-                throw new InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event subscriber.', $id));
-            }
-
-            $tag = $taggedSubscriber[1];
+            list($id, $tag) = $taggedSubscriber;
             $connections = isset($tag['connection']) ? array($tag['connection']) : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
@@ -87,15 +81,10 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     {
         $listenerTag = $this->tagPrefix.'.event_listener';
         $taggedListeners = $this->findAndSortTags($listenerTag, $container);
+        $listenerRefs = array();
 
         foreach ($taggedListeners as $taggedListener) {
-            $id = $taggedListener[0];
-            $taggedListenerDef = $container->getDefinition($taggedListener[0]);
-            if ($taggedListenerDef->isAbstract()) {
-                throw new InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event listener.', $id));
-            }
-
-            $tag = $taggedListener[1];
+            list($id, $tag) = $taggedListener;
             if (!isset($tag['event'])) {
                 throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
             }
@@ -105,14 +94,18 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 if (!isset($this->connections[$con])) {
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
                 }
-
-                if ($lazy = !empty($tag['lazy'])) {
-                    $taggedListenerDef->setPublic(true);
-                }
+                $listenerRefs[$con][$id] = new Reference($id);
 
                 // we add one call per event per service so we have the correct order
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', array(array($tag['event']), $lazy ? $id : new Reference($id)));
+                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', array(array($tag['event']), $id));
             }
+        }
+
+        // replace service container argument of event managers with smaller service locator
+        // so services can even remain private
+        foreach ($listenerRefs as $connection => $refs) {
+            $this->getEventManagerDef($container, $connection)
+                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $refs));
         }
     }
 
@@ -144,7 +137,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     {
         $sortedTags = array();
 
-        foreach ($container->findTaggedServiceIds($tagName) as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
             foreach ($tags as $attributes) {
                 $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
                 $sortedTags[$priority][] = array($serviceId, $attributes);

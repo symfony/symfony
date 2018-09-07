@@ -13,10 +13,9 @@ namespace Symfony\Component\HttpKernel\Bundle;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
  * An implementation of BundleInterface that adds a few conventions
@@ -26,13 +25,12 @@ use Symfony\Component\Finder\Finder;
  */
 abstract class Bundle implements BundleInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
+
     protected $name;
     protected $extension;
     protected $path;
+    private $namespace;
 
     /**
      * {@inheritdoc}
@@ -59,15 +57,9 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
+     * Returns the bundle's container extension.
+     *
+     * @return ExtensionInterface|null The container extension
      *
      * @throws \LogicException
      */
@@ -108,9 +100,11 @@ abstract class Bundle implements BundleInterface
      */
     public function getNamespace()
     {
-        $class = \get_class($this);
+        if (null === $this->namespace) {
+            $this->parseClassName();
+        }
 
-        return substr($class, 0, strrpos($class, '\\'));
+        return $this->namespace;
     }
 
     /**
@@ -127,66 +121,21 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-    }
-
-    /**
-     * {@inheritdoc}
+     * Returns the bundle name (the class short name).
+     *
+     * @return string The Bundle name
      */
     final public function getName()
     {
-        if (null !== $this->name) {
-            return $this->name;
+        if (null === $this->name) {
+            $this->parseClassName();
         }
 
-        $name = \get_class($this);
-        $pos = strrpos($name, '\\');
-
-        return $this->name = false === $pos ? $name : substr($name, $pos + 1);
+        return $this->name;
     }
 
-    /**
-     * Finds and registers Commands.
-     *
-     * Override this method if your bundle commands do not follow the conventions:
-     *
-     * * Commands are in the 'Command' sub-directory
-     * * Commands extend Symfony\Component\Console\Command\Command
-     */
     public function registerCommands(Application $application)
     {
-        if (!is_dir($dir = $this->getPath().'/Command')) {
-            return;
-        }
-
-        if (!class_exists('Symfony\Component\Finder\Finder')) {
-            throw new \RuntimeException('You need the symfony/finder component to register bundle commands.');
-        }
-
-        $finder = new Finder();
-        $finder->files()->name('*Command.php')->in($dir);
-
-        $prefix = $this->getNamespace().'\\Command';
-        foreach ($finder as $file) {
-            $ns = $prefix;
-            if ($relativePath = $file->getRelativePath()) {
-                $ns .= '\\'.str_replace('/', '\\', $relativePath);
-            }
-            $class = $ns.'\\'.$file->getBasename('.php');
-            if ($this->container) {
-                $alias = 'console.command.'.strtolower(str_replace('\\', '_', $class));
-                if ($this->container->has($alias)) {
-                    continue;
-                }
-            }
-            $r = new \ReflectionClass($class);
-            if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract() && !$r->getConstructor()->getNumberOfRequiredParameters()) {
-                $application->add($r->newInstance());
-            }
-        }
     }
 
     /**
@@ -210,6 +159,15 @@ abstract class Bundle implements BundleInterface
     {
         if (class_exists($class = $this->getContainerExtensionClass())) {
             return new $class();
+        }
+    }
+
+    private function parseClassName()
+    {
+        $pos = strrpos(static::class, '\\');
+        $this->namespace = false === $pos ? '' : substr(static::class, 0, $pos);
+        if (null === $this->name) {
+            $this->name = false === $pos ? static::class : substr(static::class, $pos + 1);
         }
     }
 }

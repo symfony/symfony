@@ -97,6 +97,10 @@ class SplCaster
             }
         }
 
+        if (isset($a[$prefix.'realPath'])) {
+            $a[$prefix.'realPath'] = new LinkStub($a[$prefix.'realPath']);
+        }
+
         if (isset($a[$prefix.'perms'])) {
             $a[$prefix.'perms'] = new ConstStub(sprintf('0%o', $a[$prefix.'perms']), $a[$prefix.'perms']);
         }
@@ -192,7 +196,7 @@ class SplCaster
 
         if (!($flags & \ArrayObject::STD_PROP_LIST)) {
             $c->setFlags(\ArrayObject::STD_PROP_LIST);
-            $a = Caster::castObject($c, new \ReflectionClass($class));
+            $a = Caster::castObject($c, $class);
             $c->setFlags($flags);
         }
         $a += array(
@@ -200,7 +204,7 @@ class SplCaster
             $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
         );
         if ($c instanceof \ArrayObject) {
-            $a[$prefix.'iteratorClass'] = $c->getIteratorClass();
+            $a[$prefix.'iteratorClass'] = new ClassStub($c->getIteratorClass());
         }
         $a[$prefix.'storage'] = $c->getArrayCopy();
 

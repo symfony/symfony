@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -33,9 +34,6 @@ class ExtensionPass implements CompilerPassInterface
 
         if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
             $container->removeDefinition('twig.extension.routing');
-        }
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
-            $container->removeDefinition('twig.extension.trans');
         }
 
         if (!class_exists('Symfony\Component\Yaml\Yaml')) {
@@ -60,14 +58,6 @@ class ExtensionPass implements CompilerPassInterface
             }
         }
 
-        if ($container->has('fragment.handler')) {
-            $container->getDefinition('twig.extension.actions')->addTag('twig.extension');
-        }
-
-        if ($container->has('translator')) {
-            $container->getDefinition('twig.extension.trans')->addTag('twig.extension');
-        }
-
         if ($container->has('router')) {
             $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
         }
@@ -76,10 +66,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
 
             // inject Twig in the hinclude service if Twig is the only registered templating engine
-            if (
-                !$container->hasParameter('templating.engines')
-                || array('twig') == $container->getParameter('templating.engines')
-            ) {
+            if ((!$container->hasParameter('templating.engines') || array('twig') == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
                 $container->getDefinition('fragment.renderer.hinclude')
                     ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
                     ->replaceArgument(0, new Reference('twig'))
@@ -91,10 +78,6 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.httpfoundation')->addTag('twig.extension');
         }
 
-        if ($container->hasParameter('templating.helper.code.file_link_format')) {
-            $container->getDefinition('twig.extension.code')->replaceArgument(0, $container->getParameter('templating.helper.code.file_link_format'));
-        }
-
         if ($container->getParameter('kernel.debug')) {
             $container->getDefinition('twig.extension.profiler')->addTag('twig.extension');
 
@@ -102,6 +85,10 @@ class ExtensionPass implements CompilerPassInterface
             if (!$container->has('twig.extension.dump')) {
                 $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
             }
+        }
+
+        if ($container->has('web_link.add_link_header_listener')) {
+            $container->getDefinition('twig.extension.weblink')->addTag('twig.extension');
         }
 
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
@@ -119,9 +106,22 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
 
-        if (method_exists('Symfony\Bridge\Twig\AppVariable', 'setContainer')) {
-            // we are on Symfony <3.0, where the setContainer method exists
-            $container->getDefinition('twig.app_variable')->addMethodCall('setContainer', array(new Reference('service_container')));
+        if ($container->hasDefinition('twig.extension.yaml')) {
+            $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
+        }
+
+        if (class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
+            $container->getDefinition('twig.extension.debug.stopwatch')->addTag('twig.extension');
+        }
+
+        if ($container->hasDefinition('twig.extension.expression')) {
+            $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
+        }
+
+        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
+            $container->removeDefinition('workflow.twig_extension');
+        } else {
+            $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
         }
     }
 }

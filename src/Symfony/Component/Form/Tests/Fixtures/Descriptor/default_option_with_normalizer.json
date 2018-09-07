@@ -1,0 +1,11 @@
+{
+    "required": false,
+    "default": true,
+    "is_lazy": false,
+    "allowed_types": [
+        "null",
+        "bool",
+        "string"
+    ],
+    "has_normalizer": true
+}

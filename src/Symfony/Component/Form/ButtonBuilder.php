@@ -53,17 +53,11 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     private $options;
 
     /**
-     * Creates a new button builder.
-     *
-     * @param string $name    The name of the button
-     * @param array  $options The button's options
-     *
      * @throws InvalidArgumentException if the name is empty
      */
-    public function __construct($name, array $options = array())
+    public function __construct(?string $name, array $options = array())
     {
-        $name = (string) $name;
-        if ('' === $name) {
+        if ('' === $name || null === $name) {
             throw new InvalidArgumentException('Buttons cannot have empty names.');
         }
 
@@ -380,23 +374,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $virtual
-     *
-     * @throws BadMethodCallException
-     *
-     * @deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link setInheritData()} instead.
-     */
-    public function setVirtual($virtual)
-    {
-        throw new BadMethodCallException('Buttons cannot be virtual.');
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * This method should not be invoked.
-     *
      * @param bool $compound
      *
      * @throws BadMethodCallException
@@ -575,21 +552,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getByReference()
     {
-        return false;
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * @return bool Always returns false
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link getInheritData()} instead.
-     */
-    public function getVirtual()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\FormConfigBuilder::getInheritData method instead.', E_USER_DEPRECATED);
-
         return false;
     }
 

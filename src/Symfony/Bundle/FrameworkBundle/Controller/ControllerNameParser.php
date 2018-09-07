@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * (Bundle\BlogBundle\Controller\PostController::indexAction).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.1
  */
 class ControllerNameParser
 {
@@ -41,48 +44,42 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
+        if (2 > \func_num_args() || func_get_arg(1)) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         $parts = explode(':', $controller);
         if (3 !== \count($parts) || \in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
         $originalController = $controller;
-        list($bundle, $controller, $action) = $parts;
+        list($bundleName, $controller, $action) = $parts;
         $controller = str_replace('/', '\\', $controller);
-        $bundles = array();
 
         try {
             // this throws an exception if there is no such bundle
-            $allBundles = $this->kernel->getBundle($bundle, false);
+            $bundle = $this->kernel->getBundle($bundleName);
         } catch (\InvalidArgumentException $e) {
             $message = sprintf(
                 'The "%s" (from the _controller value "%s") does not exist or is not enabled in your kernel!',
-                $bundle,
+                $bundleName,
                 $originalController
             );
 
-            if ($alternative = $this->findAlternative($bundle)) {
+            if ($alternative = $this->findAlternative($bundleName)) {
                 $message .= sprintf(' Did you mean "%s:%s:%s"?', $alternative, $controller, $action);
             }
 
             throw new \InvalidArgumentException($message, 0, $e);
         }
 
-        foreach ($allBundles as $b) {
-            $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
-            if (class_exists($try)) {
-                return $try.'::'.$action.'Action';
-            }
-
-            $bundles[] = $b->getName();
-            $msg = sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundle, $controller, $action, $try);
+        $try = $bundle->getNamespace().'\\Controller\\'.$controller.'Controller';
+        if (class_exists($try)) {
+            return $try.'::'.$action.'Action';
         }
 
-        if (\count($bundles) > 1) {
-            $msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $bundles));
-        }
-
-        throw new \InvalidArgumentException($msg);
+        throw new \InvalidArgumentException(sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundleName, $controller, $action, $try));
     }
 
     /**
@@ -96,6 +93,8 @@ class ControllerNameParser
      */
     public function build($controller)
     {
+        @trigger_error(sprintf('The %s class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+
         if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));
         }
@@ -116,14 +115,10 @@ class ControllerNameParser
 
     /**
      * Attempts to find a bundle that is *similar* to the given bundle name.
-     *
-     * @param string $nonExistentBundleName
-     *
-     * @return string
      */
-    private function findAlternative($nonExistentBundleName)
+    private function findAlternative(string $nonExistentBundleName): ?string
     {
-        $bundleNames = array_map(function ($b) {
+        $bundleNames = array_map(function (BundleInterface $b) {
             return $b->getName();
         }, $this->kernel->getBundles());
 

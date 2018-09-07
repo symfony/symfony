@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Translation;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use IdentityTranslator instead.', Interval::class), E_USER_DEPRECATED);
+
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+
 /**
  * Tests if a given number belongs to a given math interval.
  *
@@ -30,6 +34,7 @@ namespace Symfony\Component\Translation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @see    http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
+ * @deprecated since Symfony 4.2, use IdentityTranslator instead
  */
 class Interval
 {
@@ -41,14 +46,14 @@ class Interval
      *
      * @return bool
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function test($number, $interval)
     {
         $interval = trim($interval);
 
         if (!preg_match('/^'.self::getIntervalRegexp().'$/x', $interval, $matches)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
+            throw new InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
         }
 
         if ($matches[1]) {

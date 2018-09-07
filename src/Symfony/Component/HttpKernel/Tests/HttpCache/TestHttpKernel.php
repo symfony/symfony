@@ -14,11 +14,12 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
+class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, ArgumentResolverInterface
 {
     protected $body;
     protected $status;
@@ -34,40 +35,29 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->status = $status;
         $this->headers = $headers;
         $this->customizer = $customizer;
-        $this->trustedHeadersReflector = new \ReflectionProperty('Symfony\Component\HttpFoundation\Request', 'trustedHeaders');
-        $this->trustedHeadersReflector->setAccessible(true);
 
-        parent::__construct(new EventDispatcher(), $this);
+        parent::__construct(new EventDispatcher(), $this, null, $this);
     }
 
     public function assert(\Closure $callback)
     {
-        $trustedConfig = array(Request::getTrustedProxies(), $this->trustedHeadersReflector->getValue());
+        $trustedConfig = array(Request::getTrustedProxies(), Request::getTrustedHeaderSet());
 
-        list($trustedProxies, $trustedHeaders, $backendRequest) = $this->backendRequest;
-        Request::setTrustedProxies($trustedProxies);
-        $this->trustedHeadersReflector->setValue(null, $trustedHeaders);
+        list($trustedProxies, $trustedHeaderSet, $backendRequest) = $this->backendRequest;
+        Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
 
         try {
-            $e = null;
             $callback($backendRequest);
-        } catch (\Throwable $e) {
-        } catch (\Exception $e) {
-        }
-
-        list($trustedProxies, $trustedHeaders) = $trustedConfig;
-        Request::setTrustedProxies($trustedProxies);
-        $this->trustedHeadersReflector->setValue(null, $trustedHeaders);
-
-        if (null !== $e) {
-            throw $e;
+        } finally {
+            list($trustedProxies, $trustedHeaderSet) = $trustedConfig;
+            Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
         }
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
     {
         $this->catch = $catch;
-        $this->backendRequest = array($request::getTrustedProxies(), $this->trustedHeadersReflector->getValue(), $request);
+        $this->backendRequest = array(Request::getTrustedProxies(), Request::getTrustedHeaderSet(), $request);
 
         return parent::handle($request, $type, $catch);
     }

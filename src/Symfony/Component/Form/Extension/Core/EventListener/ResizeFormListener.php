@@ -32,13 +32,13 @@ class ResizeFormListener implements EventSubscriberInterface
     private $deleteEmpty;
 
     /**
-     * @param string $type
-     * @param array  $options
-     * @param bool   $allowAdd    Whether children could be added to the group
-     * @param bool   $allowDelete Whether children could be removed from the group
-     * @param bool   $deleteEmpty
+     * @param string        $type
+     * @param array         $options
+     * @param bool          $allowAdd    Whether children could be added to the group
+     * @param bool          $allowDelete Whether children could be removed from the group
+     * @param bool|callable $deleteEmpty
      */
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    public function __construct(string $type, array $options = array(), bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
@@ -88,7 +88,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+        if (!\is_array($data)) {
             $data = array();
         }
 
@@ -131,14 +131,15 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         if ($this->deleteEmpty) {
-            $previousData = $event->getForm()->getData();
+            $previousData = $form->getData();
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
+                $isEmpty = \is_callable($this->deleteEmpty) ? \call_user_func($this->deleteEmpty, $child->getData()) : $child->isEmpty();
 
                 // $isNew can only be true if allowAdd is true, so we don't
                 // need to check allowAdd again
-                if ($child->isEmpty() && ($isNew || $this->allowDelete)) {
+                if ($isEmpty && ($isNew || $this->allowDelete)) {
                     unset($data[$name]);
                     $form->remove($name);
                 }
@@ -162,31 +163,5 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         $event->setData($data);
-    }
-
-    /**
-     * Alias of {@link preSubmit()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link preSubmit()} instead.
-     */
-    public function preBind(FormEvent $event)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the preSubmit() method instead.', E_USER_DEPRECATED);
-
-        $this->preSubmit($event);
-    }
-
-    /**
-     * Alias of {@link onSubmit()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link onSubmit()} instead.
-     */
-    public function onBind(FormEvent $event)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
-
-        $this->onSubmit($event);
     }
 }

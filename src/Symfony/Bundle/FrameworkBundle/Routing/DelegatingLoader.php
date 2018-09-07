@@ -11,9 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
@@ -28,25 +27,17 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 class DelegatingLoader extends BaseDelegatingLoader
 {
     protected $parser;
-    protected $logger;
     private $loading = false;
+    private $defaultOptions;
 
     /**
-     * Ability to pass a LoggerInterface instance as second argument will be removed in 3.0.
-     *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, $resolver, $r = null)
+    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver, array $defaultOptions = array())
     {
         $this->parser = $parser;
-
-        if (!$resolver instanceof LoaderResolverInterface) {
-            $this->logger = $resolver;
-            $resolver = $r;
-
-            @trigger_error('Passing a LoggerInterface instance as the second argument of the '.__METHOD__.' method is deprecated since Symfony 2.8 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
-        }
+        $this->defaultOptions = $defaultOptions;
 
         parent::__construct($resolver);
     }
@@ -61,7 +52,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             // Here is the scenario:
             // - while routes are being loaded by parent::load() below, a fatal error
             //   occurs (e.g. parse error in a controller while loading annotations);
-            // - PHP abruptly empties the stack trace, bypassing all catch blocks;
+            // - PHP abruptly empties the stack trace, bypassing all catch/finally blocks;
             //   it then calls the registered shutdown functions;
             // - the ErrorHandler catches the fatal error and re-injects it for rendering
             //   thanks to HttpKernel->terminateWithException() (that calls handleException());
@@ -73,31 +64,43 @@ class DelegatingLoader extends BaseDelegatingLoader
             // - this handles the case and prevents the second fatal error
             //   by triggering an exception beforehand.
 
-            throw new FileLoaderLoadException($resource);
+            throw new LoaderLoadException($resource, null, null, null, $type);
         }
         $this->loading = true;
 
         try {
             $collection = parent::load($resource, $type);
-        } catch (\Exception $e) {
+        } finally {
             $this->loading = false;
-            throw $e;
-        } catch (\Throwable $e) {
-            $this->loading = false;
-            throw $e;
         }
 
-        $this->loading = false;
-
         foreach ($collection->all() as $route) {
-            if (!\is_string($controller = $route->getDefault('_controller')) || !$controller) {
+            if ($this->defaultOptions) {
+                $route->setOptions($route->getOptions() + $this->defaultOptions);
+            }
+            if (!\is_string($controller = $route->getDefault('_controller'))) {
                 continue;
             }
 
-            try {
-                $controller = $this->parser->parse($controller);
-            } catch (\InvalidArgumentException $e) {
-                // unable to optimize unknown notation
+            if (false !== strpos($controller, '::')) {
+                continue;
+            }
+
+            if (2 === substr_count($controller, ':')) {
+                $deprecatedNotation = $controller;
+
+                try {
+                    $controller = $this->parser->parse($controller, false);
+
+                    @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1, use "%s" instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
+                } catch (\InvalidArgumentException $e) {
+                    // unable to optimize unknown notation
+                }
+            }
+
+            if (1 === substr_count($controller, ':')) {
+                $nonDeprecatedNotation = str_replace(':', '::', $controller);
+                @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1, use "%s" instead.', $nonDeprecatedNotation), E_USER_DEPRECATED);
             }
 
             $route->setDefault('_controller', $controller);

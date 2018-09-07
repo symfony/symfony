@@ -34,7 +34,7 @@ class YamlExtension extends AbstractExtension
         );
     }
 
-    public function encode($input, $inline = 0, $dumpObjects = false)
+    public function encode($input, $inline = 0, $dumpObjects = 0)
     {
         static $dumper;
 
@@ -43,7 +43,7 @@ class YamlExtension extends AbstractExtension
         }
 
         if (\defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
-            return $dumper->dump($input, $inline, 0, \is_bool($dumpObjects) ? Yaml::DUMP_OBJECT : 0);
+            return $dumper->dump($input, $inline, 0, $dumpObjects);
         }
 
         return $dumper->dump($input, $inline, 0, false, $dumpObjects);

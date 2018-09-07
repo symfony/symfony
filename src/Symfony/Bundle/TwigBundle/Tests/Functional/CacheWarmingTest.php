@@ -89,9 +89,15 @@ class CacheWarmingKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(function ($container) {
-            $container->loadFromExtension('framework', array(
-                'secret' => '$ecret',
-            ));
+            $container
+                ->loadFromExtension('framework', array(
+                    'secret' => '$ecret',
+                    'form' => array('enabled' => false),
+                ))
+                ->loadFromExtension('twig', array( // to be removed in 5.0 relying on default
+                    'strict_variables' => false,
+                ))
+            ;
         });
 
         if ($this->withTemplating) {
@@ -99,10 +105,16 @@ class CacheWarmingKernel extends Kernel
                 $container->loadFromExtension('framework', array(
                     'secret' => '$ecret',
                     'templating' => array('engines' => array('twig')),
-                    'router' => array('resource' => '%kernel.root_dir%/Resources/config/empty_routing.yml'),
+                    'router' => array('resource' => '%kernel.project_dir%/Resources/config/empty_routing.yml'),
+                    'form' => array('enabled' => false),
                 ));
             });
         }
+    }
+
+    public function getProjectDir()
+    {
+        return __DIR__;
     }
 
     public function getCacheDir()

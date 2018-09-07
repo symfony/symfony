@@ -20,16 +20,6 @@ class FileTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('file');
-
-        $this->assertSame('file', $form->getConfig()->getType()->getName());
-    }
-
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()
     {
@@ -198,7 +188,7 @@ class FileTypeTest extends BaseTypeTest
     private function createUploadedFileMock(RequestHandlerInterface $requestHandler, $path, $originalName)
     {
         if ($requestHandler instanceof HttpFoundationRequestHandler) {
-            return new UploadedFile($path, $originalName, null, 10, null, true);
+            return new UploadedFile($path, $originalName, null, null, true);
         }
 
         return array(
@@ -206,7 +196,7 @@ class FileTypeTest extends BaseTypeTest
             'error' => 0,
             'type' => 'text/plain',
             'tmp_name' => $path,
-            'size' => 10,
+            'size' => null,
         );
     }
 }

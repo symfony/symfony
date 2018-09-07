@@ -19,6 +19,51 @@
                             {% endif %}
                         </h2>
 
+                        {% set request_collector = profile.collectors.request|default(false) %}
+                        {% if request_collector and request_collector.redirect -%}
+                            {%- set redirect = request_collector.redirect -%}
+                            {%- set controller = redirect.controller -%}
+                            {%- set redirect_route = '@' ~ redirect.route %}
+                            <dl class="metadata">
+                                <dt>
+                                    <span class="label">{{ redirect.status_code }}</span>
+                                    Redirect from
+                                </dt>
+                                <dd>
+                                    {{ 'GET' != redirect.method ? redirect.method }}
+                                    {% if redirect.controller.class is defined -%}
+                                        {%- set link = controller.file|file_link(controller.line) -%}
+                                        {% if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+                                            {{ redirect_route }}
+                                        {%- if link %}</a>{% endif -%}
+                                    {%- else -%}
+                                            {{ redirect_route }}
+                                    {%- endif %}
+                                    (<a href="{{ path('_profiler', { token: redirect.token, panel: request.query.get('panel', 'request') }) }}">{{ redirect.token }}</a>)
+                                </dd>
+                            </dl>
+                        {%- endif %}
+
+                        {% if request_collector and request_collector.forwardtoken -%}
+                            {% set forward_profile = profile.childByToken(request_collector.forwardtoken) %}
+                            {% set controller = forward_profile ? forward_profile.collector('request').controller : 'n/a' %}
+                            <dl class="metadata">
+                                <dt>Forwarded to</dt>
+                                <dd>
+                                    {% set link = controller.file is defined ? controller.file|file_link(controller.line) : null -%}
+                                    {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+                                        {% if controller.class is defined %}
+                                            {{- controller.class|abbr_class|striptags -}}
+                                            {{- controller.method ? ' :: ' ~ controller.method -}}
+                                        {% else %}
+                                            {{- controller -}}
+                                        {% endif %}
+                                    {%- if link %}</a>{% endif %}
+                                    (<a href="{{ path('_profiler', { token: request_collector.forwardtoken }) }}">{{ request_collector.forwardtoken }}</a>)
+                                </dd>
+                            </dl>
+                        {%- endif %}
+
                         <dl class="metadata">
                             <dt>Method</dt>
                             <dd>{{ profile.method|upper }}</dd>
@@ -27,10 +72,12 @@
                             <dd>{{ status_code }}</dd>
 
                             <dt>IP</dt>
-                            <dd>{{ profile.ip }}</dd>
+                            <dd>
+                                <a href="{{ path('_profiler_search_results', { token: token, limit: 10, ip: profile.ip }) }}">{{ profile.ip }}</a>
+                            </dd>
 
                             <dt>Profiled on</dt>
-                            <dd>{{ profile.time|date('r') }}</dd>
+                            <dd><time datetime="{{ profile.time|date('c') }}">{{ profile.time|date('r') }}</time></dd>
 
                             <dt>Token</dt>
                             <dd>{{ profile.token }}</dd>
@@ -46,7 +93,7 @@
             <div id="sidebar">
                 <div id="sidebar-shortcuts">
                     <div class="shortcuts">
-                        <a href="#" class="visible-small" onclick="Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded'); return false;">
+                        <a href="#" id="sidebarShortcutsMenu" class="visible-small">
                             <span class="icon">{{ include('@WebProfiler/Icon/menu.svg') }}</span>
                         </a>
 
@@ -79,6 +126,8 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+
+                {{ include('@WebProfiler/Profiler/settings.html.twig') }}
             </div>
 
             <div id="collector-wrapper">
@@ -89,4 +138,12 @@
             </div>
         </div>
     </div>
+    <script>
+        (function () {
+            Sfjs.addEventListener(document.getElementById('sidebarShortcutsMenu'), 'click', function (event) {
+                event.preventDefault();
+                Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded');
+            })
+        }());
+    </script>
 {% endblock %}

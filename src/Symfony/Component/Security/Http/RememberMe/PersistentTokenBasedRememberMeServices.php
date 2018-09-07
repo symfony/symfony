@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\RememberMe;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,6 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInter
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
@@ -31,26 +29,8 @@ use Symfony\Component\Security\Core\Util\SecureRandomInterface;
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
+    /** @var TokenProviderInterface */
     private $tokenProvider;
-
-    /**
-     * Note: The $secureRandom parameter is deprecated since version 2.8 and will be removed in 3.0.
-     *
-     * @param array                 $userProviders
-     * @param string                $secret
-     * @param string                $providerKey
-     * @param array                 $options
-     * @param LoggerInterface       $logger
-     * @param SecureRandomInterface $secureRandom
-     */
-    public function __construct(array $userProviders, $secret, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom = null)
-    {
-        if (null !== $secureRandom) {
-            @trigger_error('The $secureRandom parameter in '.__METHOD__.' is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
-        parent::__construct($userProviders, $secret, $providerKey, $options, $logger);
-    }
 
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {
@@ -104,7 +84,9 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 $this->options['path'],
                 $this->options['domain'],
                 $this->options['secure'],
-                $this->options['httponly']
+                $this->options['httponly'],
+                false,
+                $this->options['samesite'] ?? null
             )
         );
 
@@ -137,7 +119,9 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 $this->options['path'],
                 $this->options['domain'],
                 $this->options['secure'],
-                $this->options['httponly']
+                $this->options['httponly'],
+                false,
+                $this->options['samesite'] ?? null
             )
         );
     }

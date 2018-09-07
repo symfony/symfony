@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class HttpCache extends BaseHttpCache
+class HttpCache extends BaseHttpCache
 {
     protected $cacheDir;
     protected $kernel;
@@ -32,7 +32,7 @@ abstract class HttpCache extends BaseHttpCache
      * @param KernelInterface $kernel   A KernelInterface instance
      * @param string          $cacheDir The cache directory (default used if null)
      */
-    public function __construct(KernelInterface $kernel, $cacheDir = null)
+    public function __construct(KernelInterface $kernel, string $cacheDir = null)
     {
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;
@@ -52,9 +52,7 @@ abstract class HttpCache extends BaseHttpCache
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {
         $this->getKernel()->boot();
-        $container = $this->getKernel()->getContainer();
-        $container->set('cache', $this);
-        $container->set($this->getSurrogate()->getName(), $this->getSurrogate());
+        $this->getKernel()->getContainer()->set('cache', $this);
 
         return parent::forward($request, $raw, $entry);
     }
@@ -72,20 +70,6 @@ abstract class HttpCache extends BaseHttpCache
     protected function createSurrogate()
     {
         return new Esi();
-    }
-
-    /**
-     * Creates new ESI instance.
-     *
-     * @return Esi
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
-     */
-    protected function createEsi()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.6 and will be removed in 3.0. Use createSurrogate() instead.', E_USER_DEPRECATED);
-
-        return $this->createSurrogate();
     }
 
     protected function createStore()

@@ -1,0 +1,24 @@
+open
+validateId
+read
+doRead: abc|i:123;
+read
+destroy
+doDestroy
+close
+open
+validateId
+read
+doRead: abc|i:123;
+read
+
+write
+doWrite: abc|i:123;
+close
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=10800, private, must-revalidate
+    [2] => Set-Cookie: sid=random_session_id; path=/; secure; HttpOnly
+)
+shutdown

@@ -100,6 +100,21 @@ class FormThemeTokenParserTest extends TestCase
                     'form_theme'
                 ),
             ),
+            array(
+                '{% form_theme form with ["tpl1", "tpl2"] only %}',
+                new FormThemeNode(
+                    new NameExpression('form', 1),
+                    new ArrayExpression(array(
+                        new ConstantExpression(0, 1),
+                        new ConstantExpression('tpl1', 1),
+                        new ConstantExpression(1, 1),
+                        new ConstantExpression('tpl2', 1),
+                    ), 1),
+                    1,
+                    'form_theme',
+                    true
+                ),
+            ),
         );
     }
 }

@@ -30,6 +30,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * ExceptionListener catches authentication exception and converts them to
@@ -39,6 +40,8 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class ExceptionListener
 {
+    use TargetPathTrait;
+
     private $tokenStorage;
     private $providerKey;
     private $accessDeniedHandler;
@@ -49,7 +52,7 @@ class ExceptionListener
     private $httpUtils;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, string $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, string $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, bool $stateless = false)
     {
         $this->tokenStorage = $tokenStorage;
         $this->accessDeniedHandler = $accessDeniedHandler;
@@ -67,7 +70,7 @@ class ExceptionListener
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
+        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'), 1);
     }
 
     /**
@@ -95,7 +98,7 @@ class ExceptionListener
         } while (null !== $exception = $exception->getPrevious());
     }
 
-    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception)
+    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('An AuthenticationException was thrown; redirecting to authentication entry point.', array('exception' => $exception));
@@ -103,6 +106,7 @@ class ExceptionListener
 
         try {
             $event->setResponse($this->startAuthentication($event->getRequest(), $exception));
+            $event->allowCustomResponseCode();
         } catch (\Exception $e) {
             $event->setException($e);
         }
@@ -146,6 +150,7 @@ class ExceptionListener
                 $subRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $exception);
 
                 $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
+                $event->allowCustomResponseCode();
             }
         } catch (\Exception $e) {
             if (null !== $this->logger) {
@@ -156,19 +161,14 @@ class ExceptionListener
         }
     }
 
-    private function handleLogoutException(LogoutException $exception)
+    private function handleLogoutException(LogoutException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('A LogoutException was thrown.', array('exception' => $exception));
         }
     }
 
-    /**
-     * @return Response
-     *
-     * @throws AuthenticationException
-     */
-    private function startAuthentication(Request $request, AuthenticationException $authException)
+    private function startAuthentication(Request $request, AuthenticationException $authException): Response
     {
         if (null === $this->authenticationEntryPoint) {
             throw $authException;
@@ -191,14 +191,22 @@ class ExceptionListener
             }
         }
 
-        return $this->authenticationEntryPoint->start($request, $authException);
+        $response = $this->authenticationEntryPoint->start($request, $authException);
+
+        if (!$response instanceof Response) {
+            $given = \is_object($response) ? \get_class($response) : \gettype($response);
+
+            throw new \LogicException(sprintf('The %s::start() method must return a Response object (%s returned)', \get_class($this->authenticationEntryPoint), $given));
+        }
+
+        return $response;
     }
 
     protected function setTargetPath(Request $request)
     {
         // session isn't required when using HTTP basic authentication mechanism for example
         if ($request->hasSession() && $request->isMethodSafe(false) && !$request->isXmlHttpRequest()) {
-            $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
+            $this->saveTargetPath($request->getSession(), $this->providerKey, $request->getUri());
         }
     }
 }

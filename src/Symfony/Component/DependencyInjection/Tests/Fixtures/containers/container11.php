@@ -7,6 +7,7 @@ $container = new ContainerBuilder();
 $container->
     register('foo', 'FooClass')->
     addArgument(new Definition('BarClass', array(new Definition('BazClass'))))
+    ->setPublic(true)
 ;
 
 return $container;

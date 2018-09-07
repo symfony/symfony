@@ -41,7 +41,7 @@ class InputOption
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
+    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null)
     {
         if (0 === strpos($name, '--')) {
             $name = substr($name, 2);
@@ -70,7 +70,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif (!\is_int($mode) || $mode > 15 || $mode < 1) {
+        } elseif ($mode > 15 || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 

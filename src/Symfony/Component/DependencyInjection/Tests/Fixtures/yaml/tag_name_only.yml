@@ -1,0 +1,5 @@
+services:
+    foo_service:
+        class: FooClass
+        tags:
+          - foo

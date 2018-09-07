@@ -31,18 +31,6 @@ class RepeatedTypeTest extends BaseTypeTest
         ));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('repeated', array(
-            'type' => 'text',
-        ));
-
-        $this->assertSame('repeated', $form->getConfig()->getType()->getName());
-    }
-
     public function testSetData()
     {
         $this->form->setData('foobar');

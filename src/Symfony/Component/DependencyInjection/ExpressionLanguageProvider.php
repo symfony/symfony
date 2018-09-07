@@ -24,10 +24,17 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
+    private $serviceCompiler;
+
+    public function __construct(callable $serviceCompiler = null)
+    {
+        $this->serviceCompiler = $serviceCompiler;
+    }
+
     public function getFunctions()
     {
         return array(
-            new ExpressionFunction('service', function ($arg) {
+            new ExpressionFunction('service', $this->serviceCompiler ?: function ($arg) {
                 return sprintf('$this->get(%s)', $arg);
             }, function (array $variables, $value) {
                 return $variables['container']->get($value);

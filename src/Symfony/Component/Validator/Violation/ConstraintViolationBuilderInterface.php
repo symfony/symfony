@@ -64,7 +64,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Component\Translation\TranslatorInterface
+     * @see \Symfony\Contracts\Translation\TranslatorInterface
      */
     public function setTranslationDomain($translationDomain);
 
@@ -85,7 +85,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Component\Translation\TranslatorInterface::transChoice()
+     * @see \Symfony\Contracts\Translation\TranslatorInterface::transChoice()
      */
     public function setPlural($number);
 

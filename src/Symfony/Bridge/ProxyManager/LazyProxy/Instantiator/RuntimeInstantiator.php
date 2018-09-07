@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\ProxyManager\LazyProxy\Instantiator;
 
 use ProxyManager\Configuration;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,9 +25,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
  */
 class RuntimeInstantiator implements InstantiatorInterface
 {
-    /**
-     * @var LazyLoadingValueHolderFactory
-     */
     private $factory;
 
     public function __construct()
@@ -36,11 +32,7 @@ class RuntimeInstantiator implements InstantiatorInterface
         $config = new Configuration();
         $config->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
 
-        if (method_exists('ProxyManager\Version', 'getVersion')) {
-            $this->factory = new LazyLoadingValueHolderFactoryV2($config);
-        } else {
-            $this->factory = new LazyLoadingValueHolderFactoryV1($config);
-        }
+        $this->factory = new LazyLoadingValueHolderFactory($config);
     }
 
     /**
@@ -49,7 +41,7 @@ class RuntimeInstantiator implements InstantiatorInterface
     public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
     {
         return $this->factory->createProxy(
-            $definition->getClass(),
+            $this->factory->getGenerator()->getProxifiedClass($definition),
             function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
                 $wrappedInstance = \call_user_func($realInstantiator);
 

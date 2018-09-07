@@ -32,7 +32,7 @@ class LocaleDataProvider
      * @param string                     $path   The path to the directory containing the .res files
      * @param BundleEntryReaderInterface $reader The reader for reading the .res files
      */
-    public function __construct($path, BundleEntryReaderInterface $reader)
+    public function __construct(string $path, BundleEntryReaderInterface $reader)
     {
         $this->path = $path;
         $this->reader = $reader;

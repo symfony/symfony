@@ -110,8 +110,8 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with an optional variable as the first segment with requirements',
                 array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
-                '', '#^/(?P<bar>(foo|bar))?$#sD', array('bar'), array(
-                    array('variable', '/', '(foo|bar)', 'bar'),
+                '', '#^/(?P<bar>(?:foo|bar))?$#sD', array('bar'), array(
+                    array('variable', '/', '(?:foo|bar)', 'bar'),
                 ),
             ),
 
@@ -127,7 +127,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?P<bar>[^/]++)$#sD', array('bar'), array(
+                '/foo-', '#^/foo\-(?P<bar>[^/]++)$#sD', array('bar'), array(
                     array('variable', '-', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 ),
@@ -146,10 +146,10 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
-                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#sD', array('w', 'x', 'y', 'z', '_format'), array(
+                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(?:y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#sD', array('w', 'x', 'y', 'z', '_format'), array(
                     array('variable', '.', '[^/]++', '_format'),
                     array('variable', '', '[^/\.]++', 'z'),
-                    array('variable', '', '(y|Y)', 'y'),
+                    array('variable', '', '(?:y|Y)', 'y'),
                     array('variable', '', '[^/\.]+', 'x'),
                     array('variable', '/', '[^/\.]+', 'w'),
                 ),
@@ -164,6 +164,81 @@ class RouteCompilerTest extends TestCase
                     array('text', '/foo'),
                 ),
             ),
+
+            array(
+                'Static non UTF-8 route',
+                array("/fo\xE9"),
+                "/fo\xE9", "#^/fo\xE9$#sD", array(), array(
+                    array('text', "/fo\xE9"),
+                ),
+            ),
+
+            array(
+                'Route with an explicit UTF-8 requirement',
+                array('/{bar}', array('bar' => null), array('bar' => '.'), array('utf8' => true)),
+                '', '#^/(?P<bar>.)?$#sDu', array('bar'), array(
+                    array('variable', '/', '.', 'bar', true),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider provideCompileImplicitUtf8Data
+     * @expectedException \LogicException
+     */
+    public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
+    {
+        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $route = $r->newInstanceArgs($arguments);
+
+        $compiled = $route->compile();
+        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
+        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+    }
+
+    public function provideCompileImplicitUtf8Data()
+    {
+        return array(
+            array(
+                'Static UTF-8 route',
+                array('/foé'),
+                '/foé', '#^/foé$#sDu', array(), array(
+                    array('text', '/foé'),
+                ),
+                'patterns',
+            ),
+
+            array(
+                'Route with an implicit UTF-8 requirement',
+                array('/{bar}', array('bar' => null), array('bar' => 'é')),
+                '', '#^/(?P<bar>é)?$#sDu', array('bar'), array(
+                    array('variable', '/', 'é', 'bar', true),
+                ),
+                'requirements',
+            ),
+
+            array(
+                'Route with a UTF-8 class requirement',
+                array('/{bar}', array('bar' => null), array('bar' => '\pM')),
+                '', '#^/(?P<bar>\pM)?$#sDu', array('bar'), array(
+                    array('variable', '/', '\pM', 'bar', true),
+                ),
+                'requirements',
+            ),
+
+            array(
+                'Route with a UTF-8 separator',
+                array('/foo/{bar}§{_format}', array(), array(), array('compiler_class' => Utf8RouteCompiler::class)),
+                '/foo', '#^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$#sDu', array('bar', '_format'), array(
+                    array('variable', '§', '[^/]++', '_format', true),
+                    array('variable', '/', '[^/§]++', 'bar', true),
+                    array('text', '/foo'),
+                ),
+                'patterns',
+            ),
         );
     }
 
@@ -173,6 +248,36 @@ class RouteCompilerTest extends TestCase
     public function testRouteWithSameVariableTwice()
     {
         $route = new Route('/{name}/{name}');
+
+        $compiled = $route->compile();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRouteCharsetMismatch()
+    {
+        $route = new Route("/\xE9/{bar}", array(), array('bar' => '.'), array('utf8' => true));
+
+        $compiled = $route->compile();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRequirementCharsetMismatch()
+    {
+        $route = new Route('/foo/{bar}', array(), array('bar' => "\xE9"), array('utf8' => true));
+
+        $compiled = $route->compile();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRouteWithFragmentAsPathParameter()
+    {
+        $route = new Route('/{_fragment}');
 
         $compiled = $route->compile();
     }
@@ -275,4 +380,29 @@ class RouteCompilerTest extends TestCase
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
         $route->compile();
     }
+
+    /**
+     * @dataProvider provideRemoveCapturingGroup
+     */
+    public function testRemoveCapturingGroup($regex, $requirement)
+    {
+        $route = new Route('/{foo}', array(), array('foo' => $requirement));
+
+        $this->assertSame($regex, $route->compile()->getRegex());
+    }
+
+    public function provideRemoveCapturingGroup()
+    {
+        yield array('#^/(?P<foo>a(?:b|c)(?:d|e)f)$#sD', 'a(b|c)(d|e)f');
+        yield array('#^/(?P<foo>a\(b\)c)$#sD', 'a\(b\)c');
+        yield array('#^/(?P<foo>(?:b))$#sD', '(?:b)');
+        yield array('#^/(?P<foo>(?(b)b))$#sD', '(?(b)b)');
+        yield array('#^/(?P<foo>(*F))$#sD', '(*F)');
+        yield array('#^/(?P<foo>(?:(?:foo)))$#sD', '((foo))');
+    }
+}
+
+class Utf8RouteCompiler extends RouteCompiler
+{
+    const SEPARATORS = '/§';
 }

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
-use Symfony\Component\Security\Core\Util\SecureRandomInterface;
-
 /**
  * Generates CSRF tokens.
  *
@@ -27,15 +25,9 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
      *
      * @param int $entropy The amount of entropy collected for each token (in bits)
      */
-    public function __construct($entropy = 256)
+    public function __construct(int $entropy = 256)
     {
-        if ($entropy instanceof SecureRandomInterface || 2 === \func_num_args()) {
-            @trigger_error('The '.__METHOD__.' method now requires the entropy to be given as the first argument. The SecureRandomInterface will be removed in 3.0.', E_USER_DEPRECATED);
-
-            $this->entropy = 2 === \func_num_args() ? func_get_arg(1) : 256;
-        } else {
-            $this->entropy = $entropy;
-        }
+        $this->entropy = $entropy;
     }
 
     /**

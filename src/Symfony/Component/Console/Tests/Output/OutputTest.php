@@ -81,6 +81,19 @@ class OutputTest extends TestCase
         $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
     }
 
+    public function testWriteAnIterableOfMessages()
+    {
+        $output = new TestOutput();
+        $output->writeln($this->generateMessages());
+        $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an iterable of messages to output');
+    }
+
+    private function generateMessages(): iterable
+    {
+        yield 'foo';
+        yield 'bar';
+    }
+
     /**
      * @dataProvider provideWriteArguments
      */

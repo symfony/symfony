@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 
-class TestEventDispatcher extends EventDispatcher implements TraceableEventDispatcherInterface
+class TestEventDispatcher extends TraceableEventDispatcher
 {
     public function getCalledListeners()
     {
@@ -24,5 +23,14 @@ class TestEventDispatcher extends EventDispatcher implements TraceableEventDispa
     public function getNotCalledListeners()
     {
         return array('bar');
+    }
+
+    public function reset()
+    {
+    }
+
+    public function getOrphanedEvents()
+    {
+        return array();
     }
 }

@@ -36,7 +36,7 @@ class WebProcessorTest extends TestCase
 
     public function testUseRequestClientIp()
     {
-        Request::setTrustedProxies(array('192.168.0.1'));
+        Request::setTrustedProxies(array('192.168.0.1'), Request::HEADER_X_FORWARDED_ALL);
         list($event, $server) = $this->createRequestEvent(array('X_FORWARDED_FOR' => '192.168.0.2'));
 
         $processor = new WebProcessor();
@@ -50,7 +50,7 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
 
-        Request::setTrustedProxies(array());
+        Request::setTrustedProxies(array(), -1);
     }
 
     public function testCanBeConstructedWithExtraFields()
@@ -70,10 +70,7 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 
-    /**
-     * @return array
-     */
-    private function createRequestEvent($additionalServerParameters = array())
+    private function createRequestEvent($additionalServerParameters = array()): array
     {
         $server = array_merge(
             array(
@@ -103,13 +100,7 @@ class WebProcessorTest extends TestCase
         return array($event, $server);
     }
 
-    /**
-     * @param int    $level
-     * @param string $message
-     *
-     * @return array Record
-     */
-    private function getRecord($level = Logger::WARNING, $message = 'test')
+    private function getRecord(int $level = Logger::WARNING, string $message = 'test'): array
     {
         return array(
             'message' => $message,

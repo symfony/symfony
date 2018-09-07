@@ -14,18 +14,13 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-abstract class FileValidatorTest extends AbstractConstraintValidatorTest
+abstract class FileValidatorTest extends ConstraintValidatorTestCase
 {
     protected $path;
 
     protected $file;
-
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
 
     protected function createValidator()
     {
@@ -88,7 +83,8 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidUploadedfile()
     {
-        $file = new UploadedFile($this->path, 'originalName', null, null, null, true);
+        file_put_contents($this->path, '1');
+        $file = new UploadedFile($this->path, 'originalName', null, null, true);
         $this->validator->validate($file, new File());
 
         $this->assertNoViolation();
@@ -416,7 +412,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testUploadedFileError($error, $message, array $params = array(), $maxSize = null)
     {
-        $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
+        $file = new UploadedFile(tempnam(sys_get_temp_dir(), 'file-validator-test-'), 'originalName', 'mime', $error);
 
         $constraint = new File(array(
             $message => 'myMessage',

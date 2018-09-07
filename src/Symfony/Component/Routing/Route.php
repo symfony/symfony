@@ -39,6 +39,7 @@ class Route implements \Serializable
      * Available options:
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
+     *  * utf8:           Whether UTF-8 matching is enforced ot not
      *
      * @param string          $path         The path pattern to match
      * @param array           $defaults     An array of default parameter values
@@ -49,21 +50,15 @@ class Route implements \Serializable
      * @param string|string[] $methods      A required HTTP method or an array of restricted methods
      * @param string          $condition    A condition that should evaluate to true for the route to match
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
+    public function __construct(string $path, array $defaults = array(), array $requirements = array(), array $options = array(), ?string $host = '', $schemes = array(), $methods = array(), ?string $condition = '')
     {
         $this->setPath($path);
-        $this->setDefaults($defaults);
-        $this->setRequirements($requirements);
+        $this->addDefaults($defaults);
+        $this->addRequirements($requirements);
         $this->setOptions($options);
         $this->setHost($host);
-        // The conditions make sure that an initial empty $schemes/$methods does not override the corresponding requirement.
-        // They can be removed when the BC layer is removed.
-        if ($schemes) {
-            $this->setSchemes($schemes);
-        }
-        if ($methods) {
-            $this->setMethods($methods);
-        }
+        $this->setSchemes($schemes);
+        $this->setMethods($methods);
         $this->setCondition($condition);
     }
 
@@ -110,38 +105,6 @@ class Route implements \Serializable
     /**
      * Returns the pattern for the path.
      *
-     * @return string The pattern
-     *
-     * @deprecated since version 2.2, to be removed in 3.0. Use getPath instead.
-     */
-    public function getPattern()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.2 and will be removed in 3.0. Use the getPath() method instead.', E_USER_DEPRECATED);
-
-        return $this->path;
-    }
-
-    /**
-     * Sets the pattern for the path.
-     *
-     * This method implements a fluent interface.
-     *
-     * @param string $pattern The path pattern
-     *
-     * @return $this
-     *
-     * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
-     */
-    public function setPattern($pattern)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.2 and will be removed in 3.0. Use the setPath() method instead.', E_USER_DEPRECATED);
-
-        return $this->setPath($pattern);
-    }
-
-    /**
-     * Returns the pattern for the path.
-     *
      * @return string The path pattern
      */
     public function getPath()
@@ -160,6 +123,19 @@ class Route implements \Serializable
      */
     public function setPath($pattern)
     {
+        if (false !== strpbrk($pattern, '?<')) {
+            $pattern = preg_replace_callback('#\{(\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
+                if (isset($m[3][0])) {
+                    $this->setDefault($m[1], '?' !== $m[3] ? substr($m[3], 1) : null);
+                }
+                if (isset($m[2][0])) {
+                    $this->setRequirement($m[1], substr($m[2], 1, -1));
+                }
+
+                return '{'.$m[1].'}';
+            }, $pattern);
+        }
+
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
         $this->path = '/'.ltrim(trim($pattern), '/');
@@ -219,14 +195,6 @@ class Route implements \Serializable
     public function setSchemes($schemes)
     {
         $this->schemes = array_map('strtolower', (array) $schemes);
-
-        // this is to keep BC and will be removed in a future version
-        if ($this->schemes) {
-            $this->requirements['_scheme'] = implode('|', $this->schemes);
-        } else {
-            unset($this->requirements['_scheme']);
-        }
-
         $this->compiled = null;
 
         return $this;
@@ -268,14 +236,6 @@ class Route implements \Serializable
     public function setMethods($methods)
     {
         $this->methods = array_map('strtoupper', (array) $methods);
-
-        // this is to keep BC and will be removed in a future version
-        if ($this->methods) {
-            $this->requirements['_method'] = implode('|', $this->methods);
-        } else {
-            unset($this->requirements['_method']);
-        }
-
         $this->compiled = null;
 
         return $this;
@@ -509,12 +469,6 @@ class Route implements \Serializable
      */
     public function getRequirement($key)
     {
-        if ('_scheme' === $key) {
-            @trigger_error('The "_scheme" requirement is deprecated since Symfony 2.2 and will be removed in 3.0. Use getSchemes() instead.', E_USER_DEPRECATED);
-        } elseif ('_method' === $key) {
-            @trigger_error('The "_method" requirement is deprecated since Symfony 2.2 and will be removed in 3.0. Use getMethods() instead.', E_USER_DEPRECATED);
-        }
-
         return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
     }
 
@@ -610,17 +564,6 @@ class Route implements \Serializable
 
         if ('' === $regex) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
-        }
-
-        // this is to keep BC and will be removed in a future version
-        if ('_scheme' === $key) {
-            @trigger_error('The "_scheme" requirement is deprecated since Symfony 2.2 and will be removed in 3.0. Use the setSchemes() method instead.', E_USER_DEPRECATED);
-
-            $this->setSchemes(explode('|', $regex));
-        } elseif ('_method' === $key) {
-            @trigger_error('The "_method" requirement is deprecated since Symfony 2.2 and will be removed in 3.0. Use the setMethods() method instead.', E_USER_DEPRECATED);
-
-            $this->setMethods(explode('|', $regex));
         }
 
         return $regex;

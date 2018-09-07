@@ -29,68 +29,21 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('twig');
+        $treeBuilder = new TreeBuilder('twig');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
-                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
+                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception::showAction')->end()
             ->end()
         ;
 
-        $this->addFormSection($rootNode);
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
 
         return $treeBuilder;
-    }
-
-    private function addFormSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            // Check deprecation before the config is processed to ensure
-            // the setting has been explicitly defined in a configuration file.
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['form']['resources']); })
-                ->then(function ($v) {
-                    @trigger_error('The twig.form.resources configuration key is deprecated since Symfony 2.6 and will be removed in 3.0. Use the twig.form_themes configuration key instead.', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) {
-                    return \count($v['form']['resources']) > 0;
-                })
-                ->then(function ($v) {
-                    $v['form_themes'] = array_values(array_unique(array_merge($v['form']['resources'], $v['form_themes'])));
-
-                    return $v;
-                })
-            ->end()
-            ->children()
-                ->arrayNode('form')
-                    ->info('Deprecated since version 2.6, to be removed in 3.0. Use twig.form_themes instead')
-                    ->addDefaultsIfNotSet()
-                    ->fixXmlConfig('resource')
-                    ->children()
-                        ->arrayNode('resources')
-                            ->addDefaultChildrenIfNoneSet()
-                            ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
-                            ->example(array('MyBundle::form.html.twig'))
-                            ->validate()
-                                ->ifTrue(function ($v) {return !\in_array('form_div_layout.html.twig', $v); })
-                                ->then(function ($v) {
-                                    return array_merge(array('form_div_layout.html.twig'), $v);
-                                })
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
     }
 
     private function addFormThemesSection(ArrayNodeDefinition $rootNode)
@@ -123,6 +76,7 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
+                        ->normalizeKeys(false)
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {
@@ -174,9 +128,19 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
-                ->booleanNode('strict_variables')->end()
+                ->booleanNode('strict_variables')
+                    ->defaultValue(function () {
+                        @trigger_error('Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.', E_USER_DEPRECATED);
+
+                        return false;
+                    })
+                ->end()
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
+                ->scalarNode('default_path')
+                    ->info('The default path used to load templates')
+                    ->defaultValue('%kernel.project_dir%/templates')
+                ->end()
                 ->arrayNode('paths')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('paths')

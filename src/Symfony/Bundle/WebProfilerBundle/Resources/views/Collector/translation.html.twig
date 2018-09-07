@@ -8,10 +8,16 @@
             {{ include('@WebProfiler/Icon/translation.svg') }}
             {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
-            <span class="sf-toolbar-value">{{ error_count ?: collector.countdefines }}</span>
+            <span class="sf-toolbar-value">{{ error_count ?: collector.countDefines }}</span>
         {% endset %}
 
         {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Locale</b>
+                <span class="sf-toolbar-status">
+                    {{ collector.locale|default('-') }}
+                </span>
+            </div>
             <div class="sf-toolbar-info-piece">
                 <b>Missing messages</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countMissings ? 'red' }}">
@@ -28,7 +34,7 @@
 
             <div class="sf-toolbar-info-piece">
                 <b>Defined messages</b>
-                <span class="sf-toolbar-status">{{ collector.countdefines }}</span>
+                <span class="sf-toolbar-status">{{ collector.countDefines }}</span>
             </div>
         {% endset %}
 
@@ -61,11 +67,12 @@
 {% endblock %}
 
 {% block panelContent %}
-    <h2>Translation Metrics</h2>
+
+    <h2>Translation</h2>
 
     <div class="metrics">
         <div class="metric">
-            <span class="value">{{ collector.countdefines }}</span>
+            <span class="value">{{ collector.countDefines }}</span>
             <span class="label">Defined messages</span>
         </div>
 
@@ -78,9 +85,22 @@
             <span class="value">{{ collector.countMissings }}</span>
             <span class="label">Missing messages</span>
         </div>
+
+        <div class="metric-divider"></div>
+
+        <div class="metric">
+            <span class="value">{{ collector.locale|default('-') }}</span>
+            <span class="label">Locale</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
+            <span class="label">Fallback locale{{ collector.fallbackLocales|length != 1 ? 's' }}</span>
+        </div>
     </div>
 
-    <h2>Translation Messages</h2>
+    <h2>Messages</h2>
+
+    {% block messages %}
 
     {# sort translation messages in groups #}
     {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
@@ -95,8 +115,8 @@
     {% endfor %}
 
     <div class="sf-tabs">
-        <div class="tab">
-            <h3 class="tab-title">Defined <span class="badge">{{ messages_defined|length }}</span></h3>
+        <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
+            <h3 class="tab-title">Defined <span class="badge">{{ collector.countDefines }}</span></h3>
 
             <div class="tab-content">
                 <p class="help">
@@ -108,13 +128,15 @@
                         <p>None of the used translation messages are defined for the given locale.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_defined) }}
+                    {% block defined_messages %}
+                        {{ helper.render_table(messages_defined) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Fallback <span class="badge">{{ messages_fallback|length }}</span></h3>
+            <h3 class="tab-title">Fallback <span class="badge {{ collector.countFallbacks ? 'status-warning' }}">{{ collector.countFallbacks }}</span></h3>
 
             <div class="tab-content">
                 <p class="help">
@@ -127,13 +149,15 @@
                         <p>No fallback translation messages were used.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_fallback) }}
+                    {% block fallback_messages %}
+                        {{ helper.render_table(messages_fallback) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
 
-        <div class="tab">
-            <h3 class="tab-title">Missing <span class="badge">{{ messages_missing|length }}</span></h3>
+        <div class="tab {{ collector.countMissings > 0 ? 'active' }}">
+            <h3 class="tab-title">Missing <span class="badge {{ collector.countMissings ? 'status-error' }}">{{ collector.countMissings }}</span></h3>
 
             <div class="tab-content">
                 <p class="help">
@@ -147,11 +171,16 @@
                         <p>There are no messages of this category.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_missing) }}
+                    {% block missing_messages %}
+                        {{ helper.render_table(messages_missing) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
     </div>
+
+    {% endblock messages %}
+
 {% endblock %}
 
 {% macro render_table(messages) %}
@@ -183,8 +212,7 @@
 
                         <div id="parameters-{{ loop.index }}" class="hidden">
                             {% for parameters in message.parameters %}
-                                {{ profiler_dump(parameters) }}
-                                {% if not loop.last %}<br />{% endif %}
+                                {{ profiler_dump(parameters, maxDepth=1) }}
                             {% endfor %}
                         </div>
                     {% endif %}

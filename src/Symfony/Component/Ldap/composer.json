@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/polyfill-php56": "~1.0",
+        "php": "^7.1.3",
+        "symfony/options-resolver": "~3.4|~4.0",
         "ext-ldap": "*"
     },
     "autoload": {
@@ -29,7 +29,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

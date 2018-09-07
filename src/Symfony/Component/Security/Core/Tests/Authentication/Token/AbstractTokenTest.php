@@ -59,7 +59,6 @@ class ConcreteToken extends AbstractToken
     }
 }
 
-/** @noinspection PhpUndefinedClassInspection */
 class AbstractTokenTest extends TestCase
 {
     public function testGetUsername()
@@ -185,10 +184,8 @@ class AbstractTokenTest extends TestCase
     public function getUsers()
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $advancedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
 
         return array(
-            array($advancedUser),
             array($user),
             array(new TestUser('foo')),
             array('foo'),
@@ -214,51 +211,57 @@ class AbstractTokenTest extends TestCase
     public function getUserChanges()
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+
+        return array(
+            array('foo', 'bar'),
+            array('foo', new TestUser('bar')),
+            array('foo', $user),
+            array($user, 'foo'),
+            array($user, new TestUser('foo')),
+            array(new TestUser('foo'), new TestUser('bar')),
+            array(new TestUser('foo'), 'bar'),
+            array(new TestUser('foo'), $user),
+        );
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider getUserChangesAdvancedUser
+     */
+    public function testSetUserSetsAuthenticatedToFalseWhenUserChangesAdvancedUser($firstUser, $secondUser)
+    {
+        $token = $this->getToken();
+        $token->setAuthenticated(true);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($firstUser);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($secondUser);
+        $this->assertFalse($token->isAuthenticated());
+    }
+
+    public function getUserChangesAdvancedUser()
+    {
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $advancedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
 
         return array(
-            array(
-                'foo', 'bar',
-            ),
-            array(
-                'foo', new TestUser('bar'),
-            ),
-            array(
-                'foo', $user,
-            ),
-            array(
-                'foo', $advancedUser,
-            ),
-            array(
-                $user, 'foo',
-            ),
-            array(
-                $advancedUser, 'foo',
-            ),
-            array(
-                $user, new TestUser('foo'),
-            ),
-            array(
-                $advancedUser, new TestUser('foo'),
-            ),
-            array(
-                new TestUser('foo'), new TestUser('bar'),
-            ),
-            array(
-                new TestUser('foo'), 'bar',
-            ),
-            array(
-                new TestUser('foo'), $user,
-            ),
-            array(
-                new TestUser('foo'), $advancedUser,
-            ),
-            array(
-                $user, $advancedUser,
-            ),
-            array(
-                $advancedUser, $user,
-            ),
+            array('foo', 'bar'),
+            array('foo', new TestUser('bar')),
+            array('foo', $user),
+            array('foo', $advancedUser),
+            array($user, 'foo'),
+            array($advancedUser, 'foo'),
+            array($user, new TestUser('foo')),
+            array($advancedUser, new TestUser('foo')),
+            array(new TestUser('foo'), new TestUser('bar')),
+            array(new TestUser('foo'), 'bar'),
+            array(new TestUser('foo'), $user),
+            array(new TestUser('foo'), $advancedUser),
+            array($user, $advancedUser),
+            array($advancedUser, $user),
         );
     }
 

@@ -11,11 +11,13 @@
 
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Templating\TemplateReference;
+use Twig\Environment;
 use Twig\Error\Error;
 
 /**
@@ -26,7 +28,7 @@ use Twig\Error\Error;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateCacheCacheWarmer implements CacheWarmerInterface
+class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
     protected $container;
     protected $finder;
@@ -87,6 +89,16 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'twig' => Environment::class,
+        );
     }
 
     /**

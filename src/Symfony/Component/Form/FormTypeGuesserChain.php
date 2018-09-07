@@ -23,7 +23,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      *
      * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
      */
-    public function __construct(array $guessers)
+    public function __construct(iterable $guessers)
     {
         foreach ($guessers as $guesser) {
             if (!$guesser instanceof FormTypeGuesserInterface) {

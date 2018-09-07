@@ -355,7 +355,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string   $context The escaper context (html, js, ...)
      * @param callable $escaper A PHP callable
      */
-    public function setEscaper($context, $escaper)
+    public function setEscaper($context, callable $escaper)
     {
         $this->escapers[$context] = $escaper;
         self::$escaperCache[$context] = array();
@@ -417,12 +417,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     protected function initializeEscapers()
     {
-        $that = $this;
-        if (\PHP_VERSION_ID >= 50400) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-        } else {
-            $flags = ENT_QUOTES;
-        }
+        $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
         $this->escapers = array(
             'html' =>
@@ -433,10 +428,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @return string the escaped value
                  */
-                function ($value) use ($that, $flags) {
+                function ($value) use ($flags) {
                     // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return \is_string($value) ? htmlspecialchars($value, $flags, $that->getCharset(), false) : $value;
+                    return \is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value;
                 },
 
             'js' =>
@@ -448,9 +443,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @return string the escaped value
                  */
-                function ($value) use ($that) {
-                    if ('UTF-8' != $that->getCharset()) {
-                        $value = iconv($that->getCharset(), 'UTF-8', $value);
+                function ($value) {
+                    if ('UTF-8' != $this->getCharset()) {
+                        $value = iconv($this->getCharset(), 'UTF-8', $value);
                     }
 
                     $callback = function ($matches) {
@@ -471,8 +466,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                         throw new \InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
                     }
 
-                    if ('UTF-8' != $that->getCharset()) {
-                        $value = iconv('UTF-8', $that->getCharset(), $value);
+                    if ('UTF-8' != $this->getCharset()) {
+                        $value = iconv('UTF-8', $this->getCharset(), $value);
                     }
 
                     return $value;
@@ -480,24 +475,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         );
 
         self::$escaperCache = array();
-    }
-
-    /**
-     * Convert a string from one encoding to another.
-     *
-     * @param string $string The string to convert
-     * @param string $to     The input encoding
-     * @param string $from   The output encoding
-     *
-     * @return string The string with the new encoding
-     *
-     * @deprecated since 2.8, to be removed in 3.0. Use iconv() instead.
-     */
-    public function convertEncoding($string, $to, $from)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0. Use iconv() instead.', E_USER_DEPRECATED);
-
-        return iconv($from, $to, $string);
     }
 
     /**

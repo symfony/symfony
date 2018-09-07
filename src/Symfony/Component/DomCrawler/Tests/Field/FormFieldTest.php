@@ -35,4 +35,38 @@ class FormFieldTest extends FormFieldTestCase
 
         $this->assertTrue($field->hasValue(), '->hasValue() always returns true');
     }
+
+    public function testLabelReturnsNullIfNoneIsDefined()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><form><input type="text" id="foo" name="foo" value="foo" /><input type="submit" /></form></html>');
+
+        $field = new InputFormField($dom->getElementById('foo'));
+        $this->assertNull($field->getLabel(), '->getLabel() returns null if no label is defined');
+    }
+
+    public function testLabelIsAssignedByForAttribute()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><form>
+            <label for="foo">Foo label</label>
+            <input type="text" id="foo" name="foo" value="foo" />
+            <input type="submit" />
+        </form></html>');
+
+        $field = new InputFormField($dom->getElementById('foo'));
+        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
+    }
+
+    public function testLabelIsAssignedByParentingRelation()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><form>
+            <label for="foo">Foo label<input type="text" id="foo" name="foo" value="foo" /></label>
+            <input type="submit" />
+        </form></html>');
+
+        $field = new InputFormField($dom->getElementById('foo'));
+        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the parent label');
+    }
 }

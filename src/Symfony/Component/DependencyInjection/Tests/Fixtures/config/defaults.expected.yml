@@ -1,0 +1,27 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    App\BarService:
+        class: App\BarService
+        public: true
+        arguments: [!service { class: FooClass }]
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
+        public: true
+        tags:
+            - { name: t, a: b }
+        autowire: true
+        autoconfigure: true
+        arguments: ['@bar']
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
+        public: false
+        tags:
+            - { name: t, a: b }
+        autowire: true
+        calls:
+            - [setFoo, ['@bar']]
+

@@ -44,7 +44,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
-    public function __construct(\DOMElement $node, $currentUri, $method = null, $baseHref = null)
+    public function __construct(\DOMElement $node, string $currentUri, string $method = null, string $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
         $this->baseHref = $baseHref;
@@ -221,6 +221,11 @@ class Form extends Link implements \ArrayAccess
 
     protected function getRawUri()
     {
+        // If the form was created from a button rather than the form node, check for HTML5 action overrides
+        if ($this->button !== $this->node && $this->button->getAttribute('formaction')) {
+            return $this->button->getAttribute('formaction');
+        }
+
         return $this->node->getAttribute('action');
     }
 
@@ -235,6 +240,11 @@ class Form extends Link implements \ArrayAccess
     {
         if (null !== $this->method) {
             return $this->method;
+        }
+
+        // If the form was created from a button rather than the form node, check for HTML5 method override
+        if ($this->button !== $this->node && $this->button->getAttribute('formmethod')) {
+            return strtoupper($this->button->getAttribute('formmethod'));
         }
 
         return $this->node->getAttribute('method') ? strtoupper($this->node->getAttribute('method')) : 'GET';

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
@@ -25,11 +25,7 @@ class UploadValidatorExtension extends AbstractTypeExtension
     private $translator;
     private $translationDomain;
 
-    /**
-     * @param TranslatorInterface $translator        The translator for translating error messages
-     * @param null|string         $translationDomain The translation domain for translating
-     */
-    public function __construct(TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(TranslatorInterface $translator, string $translationDomain = null)
     {
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;

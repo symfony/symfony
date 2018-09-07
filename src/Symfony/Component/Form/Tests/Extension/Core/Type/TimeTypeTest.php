@@ -18,16 +18,6 @@ class TimeTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimeType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('time');
-
-        $this->assertSame('time', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitDateTime()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -45,6 +35,28 @@ class TimeTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
+        $this->assertEquals($dateTime, $form->getData());
+        $this->assertEquals($input, $form->getViewData());
+    }
+
+    public function testSubmitDateTimeImmutable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'datetime_immutable',
+        ));
+
+        $input = array(
+            'hour' => '3',
+            'minute' => '4',
+        );
+
+        $form->submit($input);
+
+        $dateTime = new \DateTimeImmutable('1970-01-01 03:04:00 UTC');
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($input, $form->getViewData());
     }
@@ -586,25 +598,6 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty', $view['hour']->vars['placeholder']);
         $this->assertSame('Empty', $view['minute']->vars['placeholder']);
         $this->assertSame('Empty', $view['second']->vars['placeholder']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPassEmptyValueBC()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
-            'empty_value' => 'Empty',
-            'with_seconds' => true,
-        ));
-
-        $view = $form->createView();
-        $this->assertSame('Empty', $view['hour']->vars['placeholder']);
-        $this->assertSame('Empty', $view['minute']->vars['placeholder']);
-        $this->assertSame('Empty', $view['second']->vars['placeholder']);
-        $this->assertSame('Empty', $view['hour']->vars['empty_value']);
-        $this->assertSame('Empty', $view['minute']->vars['empty_value']);
-        $this->assertSame('Empty', $view['second']->vars['empty_value']);
     }
 
     public function testPassPlaceholderAsArray()

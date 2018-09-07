@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* The `$currentUri` constructor argument of the `AbstractUriElement`, `Link` and
+  `Image` classes is now optional.
+
+3.1.0
+-----
+
+* All the URI parsing logic have been abstracted in the `AbstractUriElement` class.
+  The `Link` class is now a child of `AbstractUriElement`.
+* Added an `Image` class to crawl images and parse their `src` attribute,
+  and `selectImage`, `image`, `images` methods in the `Crawler` (the image version of the equivalent `link` methods).
+
 2.5.0
 -----
 

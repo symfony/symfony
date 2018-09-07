@@ -12,12 +12,14 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -25,23 +27,19 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @final
  */
-class RouterDebugCommand extends ContainerAwareCommand
+class RouterDebugCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        if (!$this->getContainer()->has('router')) {
-            return false;
-        }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof RouterInterface) {
-            return false;
-        }
+    protected static $defaultName = 'debug:router';
+    private $router;
 
-        return parent::isEnabled();
+    public function __construct(RouterInterface $router)
+    {
+        parent::__construct();
+
+        $this->router = $router;
     }
 
     /**
@@ -50,10 +48,6 @@ class RouterDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('debug:router')
-            ->setAliases(array(
-                'router:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
@@ -74,26 +68,25 @@ EOF
     /**
      * {@inheritdoc}
      *
-     * @throws \InvalidArgumentException When route does not exist
+     * @throws InvalidArgumentException When route does not exist
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $io->caution('The use of "router:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:router" instead.');
-        }
-
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper();
-        $routes = $this->getContainer()->get('router')->getRouteCollection();
+        $routes = $this->router->getRouteCollection();
 
         if ($name) {
-            if (!$route = $routes->get($name)) {
-                throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
+            if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
+                $default = 1 === \count($matchingRoutes) ? $matchingRoutes[0] : null;
+                $name = $io->choice('Select one of the matching routes', $matchingRoutes, $default);
+                $route = $routes->get($name);
             }
 
-            $this->convertController($route);
+            if (!$route) {
+                throw new InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
+            }
 
             $helper->describe($io, $route, array(
                 'format' => $input->getOption('format'),
@@ -102,10 +95,6 @@ EOF
                 'output' => $io,
             ));
         } else {
-            foreach ($routes as $route) {
-                $this->convertController($route);
-            }
-
             $helper->describe($io, $routes, array(
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
@@ -115,14 +104,15 @@ EOF
         }
     }
 
-    private function convertController(Route $route)
+    private function findRouteNameContaining(string $name, RouteCollection $routes): array
     {
-        $nameParser = $this->getContainer()->get('controller_name_converter');
-        if ($route->hasDefault('_controller')) {
-            try {
-                $route->setDefault('_controller', $nameParser->build($route->getDefault('_controller')));
-            } catch (\InvalidArgumentException $e) {
+        $foundRoutesNames = array();
+        foreach ($routes as $routeName => $route) {
+            if (false !== stripos($routeName, $name)) {
+                $foundRoutesNames[] = $routeName;
             }
         }
+
+        return $foundRoutesNames;
     }
 }

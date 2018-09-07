@@ -4,18 +4,21 @@
 
 {% if colors is not defined %}
     {% set colors = {
-        'default':                '#999',
-        'section':                '#444',
+        'default':                '#777',
+        'section':                '#999',
         'event_listener':         '#00B8F5',
         'template':               '#66CC00',
         'doctrine':               '#FF6633',
     } %}
 {% endif %}
 
+
 {% block toolbar %}
-    {% set total_time = collector.events|length ? '%.0f'|format(collector.duration) : 'n/a' %}
+    {% set has_time_events = collector.events|length > 0 %}
+
+    {% set total_time = has_time_events ? '%.0f'|format(collector.duration) : 'n/a' %}
     {% set initialization_time = collector.events|length ? '%.0f'|format(collector.inittime) : 'n/a' %}
-    {% set status_color = collector.events|length and collector.duration > 1000 ? 'yellow' : '' %}
+    {% set status_color = has_time_events and collector.duration > 1000 ? 'yellow' : '' %}
 
     {% set icon %}
         {{ include('@WebProfiler/Icon/time.svg') }}
@@ -45,6 +48,7 @@
 {% endblock %}
 
 {% block panel %}
+    {% set has_time_events = collector.events|length > 0 %}
     <h2>Performance metrics</h2>
 
     <div class="metrics">
@@ -73,10 +77,14 @@
                 <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }}</span>
             </div>
 
-            {% set subrequests_time = 0 %}
-            {% for child in profile.children %}
-                {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
-            {% endfor %}
+            {% if has_time_events %}
+                {% set subrequests_time = 0 %}
+                {% for child in profile.children %}
+                    {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
+                {% endfor %}
+            {% else %}
+                {% set subrequests_time = 'n/a' %}
+            {% endif %}
 
             <div class="metric">
                 <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
@@ -89,7 +97,7 @@
 
     {% if collector.events is empty %}
         <div class="empty">
-            <p>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</p>
+            <p>No timing events have been recorded. Check that symfony/stopwatch is installed and debugging enabled in the kernel.</p>
         </div>
     {% else %}
         {{ block('panelContent') }}
@@ -105,8 +113,8 @@
     </form>
 
     {% if profile.parent %}
-        <h3>
-            Sub-Request {{ profile.getcollector('request').requestattributes.get('_controller') }}
+        <h3 class="dump-inline">
+            Sub-Request {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
             <small>
                 {{ collector.events.__section__.duration }} ms
                 <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>
@@ -118,7 +126,7 @@
         </h3>
     {% endif %}
 
-    {{ helper.display_timeline('timeline_' ~ token, collector.events, colors) }}
+    {{ helper.display_timeline('timeline_' ~ token, colors) }}
 
     {% if profile.children|length %}
         <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
@@ -128,11 +136,11 @@
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h4>
-                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>
+                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').identifier }}</a>
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 
-            {{ helper.display_timeline('timeline_' ~ child.token, events, colors) }}
+            {{ helper.display_timeline('timeline_' ~ child.token, colors) }}
         {% endfor %}
     {% endif %}
 
@@ -212,6 +220,11 @@
                 return query('#collector-content h2').clientWidth;
             }
 
+            function getCssVarValue(varName)
+            {
+                return getComputedStyle(document.querySelector('body')).getPropertyValue(varName);
+            }
+
             /**
              * Draw one canvas.
              *
@@ -264,7 +277,11 @@
                 ctx.lineWidth = 0;
 
                 // For each event, draw a line.
-                ctx.strokeStyle = "#CCC";
+                ctx.strokeStyle = getCssVarValue('--table-border');
+
+                // set the background color of the canvas
+                ctx.fillStyle = getCssVarValue('--table-background');
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 drawableEvents.forEach(function(event) {
                     event.periods.forEach(function(period) {
@@ -371,31 +388,31 @@
                 // For each event, draw the label.
                 mainEvents.forEach(function(event) {
 
-                    ctx.fillStyle = "#444";
+                    ctx.fillStyle = getCssVarValue('--color-text');
                     ctx.font = "12px sans-serif";
                     text = event.name;
                     ms = "  " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
-                        ctx.fillStyle = "#777";
+                        ctx.fillStyle = getCssVarValue('--color-muted');
                         xc = x + event.endtime * ratio - 1;
                         ctx.fillText(ms, xc, h);
 
                         xc -= ctx.measureText(ms).width;
                         ctx.font = "12px sans-serif";
-                        ctx.fillStyle = "#222";
+                        ctx.fillStyle = getCssVarValue('--color-text');
                         ctx.fillText(text, xc, h);
                     } else {
                         ctx.textAlign = "start";
                         ctx.font = "13px sans-serif";
-                        ctx.fillStyle = "#222";
+                        ctx.fillStyle = getCssVarValue('--color-text');
                         xc = x + event.starttime * ratio + 1;
                         ctx.fillText(text, xc, h);
 
                         xc += ctx.measureText(text).width;
                         ctx.font = "11px sans-serif";
-                        ctx.fillStyle = "#777";
+                        ctx.fillStyle = getCssVarValue('--color-muted');
                         ctx.fillText(ms, xc, h);
                     }
 
@@ -453,12 +470,12 @@
         var requests_data = {
             "max": {{ "%F"|format(collector.events.__section__.endtime) }},
             "requests": [
-{{ helper.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
+{{ helper.dump_request_data(token, collector.events, collector.events.__section__.origin) }}
 
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ helper.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{{ helper.dump_request_data(child.token, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]
@@ -496,7 +513,7 @@
     //]]>{% endautoescape %}</script>
 {% endblock %}
 
-{% macro dump_request_data(token, profile, events, origin) %}
+{% macro dump_request_data(token, events, origin) %}
 {% autoescape 'js' %}
 {% from _self import dump_events %}
                 {
@@ -532,7 +549,7 @@
 {% endautoescape %}
 {% endmacro %}
 
-{% macro display_timeline(id, events, colors) %}
+{% macro display_timeline(id, colors) %}
     <div class="sf-profiler-timeline">
         <div class="legends">
             {% for category, color in colors %}

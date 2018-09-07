@@ -26,6 +26,14 @@ class EsiFragmentRendererTest extends TestCase
         $strategy->render('/', Request::create('/'));
     }
 
+    public function testRenderFallbackWithScalar()
+    {
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true), new UriSigner('foo'));
+        $request = Request::create('/');
+        $reference = new ControllerReference('main_controller', array('foo' => array(true)), array());
+        $strategy->render($reference, $request);
+    }
+
     public function testRender()
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());

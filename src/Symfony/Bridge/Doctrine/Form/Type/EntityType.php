@@ -54,15 +54,7 @@ class EntityType extends DoctrineType
      */
     public function getLoader(ObjectManager $manager, $queryBuilder, $class)
     {
-        return new ORMQueryBuilderLoader($queryBuilder, $manager, $class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
+        return new ORMQueryBuilderLoader($queryBuilder);
     }
 
     /**

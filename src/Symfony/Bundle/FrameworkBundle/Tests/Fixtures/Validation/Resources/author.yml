@@ -1,0 +1,4 @@
+Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Author:
+    properties:
+        gender:
+            - Choice: { choices: [male, female, other], message: Choose a valid gender. }

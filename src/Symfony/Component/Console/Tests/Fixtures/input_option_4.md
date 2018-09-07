@@ -1,9 +1,8 @@
-**option_name:**
+#### `--option_name|-o`
 
-* Name: `--option_name`
-* Shortcut: `-o`
+option description
+
 * Accept value: yes
 * Is value required: no
 * Is multiple: yes
-* Description: option description
 * Default: `array ()`

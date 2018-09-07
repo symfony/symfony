@@ -1,6 +1,60 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `DivisibleBy` constraint
+ * decoupled from `symfony/translation` by using `Symfony\Contracts\Translation\TranslatorInterface`
+ * deprecated `ValidatorBuilderInterface`
+ * made `ValidatorBuilder` final
+
+4.1.0
+-----
+
+ * Deprecated the `checkDNS` and `dnsMessage` options of the `Url` constraint.
+ * added a `values` option to the `Expression` constraint
+ * Deprecated use of `Locale` constraint without setting `true` at "canonicalize" option, which will be the default value in 5.0
+
+4.0.0
+-----
+
+ * Setting the `strict` option of the `Choice` constraint to anything but `true`
+   is not supported anymore.
+ * removed the `DateTimeValidator::PATTERN` constant
+ * removed the `AbstractConstraintValidatorTest` class
+ * removed support for setting the `checkDNS` option of the `Url` constraint to `true`
+
+3.4.0
+-----
+
+ * added support for validation groups to the `Valid` constraint
+ * not setting the `strict` option of the `Choice` constraint to `true` is
+   deprecated and will throw an exception in Symfony 4.0
+ * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of
+   the `Url::CHECK_DNS_TYPE_*` constants values and will throw an exception in Symfony 4.0
+ * added min/max amount of pixels check to `Image` constraint via `minPixels` and `maxPixels`
+ * added a new "propertyPath" option to comparison constraints in order to get the value to compare from an array or object
+
+3.3.0
+-----
+
+ * added `AddValidatorInitializersPass`
+ * added `AddConstraintValidatorsPass`
+ * added `ContainerConstraintValidatorFactory`
+
+3.2.0
+-----
+
+ * deprecated `Tests\Constraints\AbstractContraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
+ * added support for PHP constants in YAML configuration files
+
+3.1.0
+-----
+
+ * deprecated `DateTimeValidator::PATTERN` constant
+ * added a `format` option to the `DateTime` constraint
+
 2.8.0
 -----
 

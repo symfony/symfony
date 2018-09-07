@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="fr-FR" trgLang="en-US">
   <file id="messages.en_US">
-    <unit id="acbd18db4cc2f85cedef654fccc4a4d8">
+    <unit id="LCa0a2j" name="foo">
       <segment>
         <source>foo</source>
         <target>bar</target>
       </segment>
     </unit>
-    <unit id="3c6e0b8a9c15224a8228b9a98ca1531d">
+    <unit id="LHDhK3o" name="key">
       <segment>
         <source>key</source>
         <target order="1"></target>
       </segment>
     </unit>
-    <unit id="18e6a493872558d949b4c16ea1fa6ab6">
+    <unit id="2DA_bnh" name="key.with.cdata">
       <segment>
         <source>key.with.cdata</source>
         <target><![CDATA[<source> & <target>]]></target>

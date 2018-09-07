@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Facto
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -107,7 +108,7 @@ class GuardAuthenticationFactoryTest extends TestCase
 
         $providerDefinition = $container->getDefinition('security.authentication.provider.guard.my_firewall');
         $this->assertEquals(array(
-            'index_0' => array(new Reference('authenticator123')),
+            'index_0' => new IteratorArgument(array(new Reference('authenticator123'))),
             'index_1' => new Reference('my_user_provider'),
             'index_2' => 'my_firewall',
             'index_3' => new Reference('security.user_checker.my_firewall'),
@@ -115,7 +116,7 @@ class GuardAuthenticationFactoryTest extends TestCase
 
         $listenerDefinition = $container->getDefinition('security.authentication.listener.guard.my_firewall');
         $this->assertEquals('my_firewall', $listenerDefinition->getArgument(2));
-        $this->assertEquals(array(new Reference('authenticator123')), $listenerDefinition->getArgument(3));
+        $this->assertEquals(array(new Reference('authenticator123')), $listenerDefinition->getArgument(3)->getValues());
     }
 
     public function testExistingDefaultEntryPointUsed()

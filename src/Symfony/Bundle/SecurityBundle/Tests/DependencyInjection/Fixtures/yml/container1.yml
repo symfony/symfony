@@ -1,5 +1,4 @@
 security:
-    acl: ~
     encoders:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:
@@ -44,13 +43,12 @@ security:
     firewalls:
         simple: { pattern: /login, security: false }
         secure:
+            provider: default
             stateless: true
             http_basic: true
-            http_digest:
-                secret: TheSecret
             form_login: true
             anonymous: true
-            switch_user: true
+            switch_user:
             x509: true
             remote_user: true
             logout: true
@@ -59,6 +57,7 @@ security:
             user_checker: ~
 
         host:
+            provider: default
             pattern: /test
             host: foo\.example\.org
             methods: [GET,POST]
@@ -66,6 +65,7 @@ security:
             http_basic: true
 
         with_user_checker:
+            provider: default
             anonymous: ~
             http_basic: ~
             user_checker: app.user_checker

@@ -1,11 +1,12 @@
-descriptor:command1
--------------------
+`descriptor:command1`
+---------------------
 
-* Description: command 1 description
-* Usage:
+command 1 description
 
-  * `descriptor:command1`
-  * `alias1`
-  * `alias2`
+### Usage
+
+* `descriptor:command1`
+* `alias1`
+* `alias2`
 
 command 1 help

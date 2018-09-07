@@ -21,6 +21,17 @@ class LocaleTest extends AbstractLocaleTest
         $this->call('acceptFromHttp', 'pt-br,en-us;q=0.7,en;q=0.5');
     }
 
+    public function testCanonicalize()
+    {
+        $this->assertSame('en', $this->call('canonicalize', ''));
+        $this->assertSame('en', $this->call('canonicalize', '.utf8'));
+        $this->assertSame('fr_FR', $this->call('canonicalize', 'FR-fr'));
+        $this->assertSame('fr_FR', $this->call('canonicalize', 'FR-fr.utf8'));
+        $this->assertSame('uz_Latn', $this->call('canonicalize', 'UZ-lATN'));
+        $this->assertSame('uz_Cyrl_UZ', $this->call('canonicalize', 'UZ-cYRL-uz'));
+        $this->assertSame('123', $this->call('canonicalize', 123));
+    }
+
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
      */

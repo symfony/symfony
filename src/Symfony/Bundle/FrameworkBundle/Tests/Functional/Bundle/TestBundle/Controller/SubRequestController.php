@@ -11,17 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
-class SubRequestController extends ContainerAware
+class SubRequestController implements ContainerAwareInterface
 {
-    public function indexAction()
-    {
-        $handler = $this->container->get('fragment.handler');
+    use ContainerAwareTrait;
 
+    public function indexAction($handler)
+    {
         $errorUrl = $this->generateUrl('subrequest_fragment_error', array('_locale' => 'fr', '_format' => 'json'));
         $altUrl = $this->generateUrl('subrequest_fragment', array('_locale' => 'fr', '_format' => 'json'));
 
@@ -32,7 +33,7 @@ class SubRequestController extends ContainerAware
         // ...to check that the FragmentListener still references the right Request
         // when rendering another fragment after the error occurred
         // should render en/html instead of fr/json
-        $content .= $handler->render(new ControllerReference('TestBundle:SubRequest:fragment'));
+        $content .= $handler->render(new ControllerReference(self::class.'::fragmentAction'));
 
         // forces the LocaleListener to set fr for the locale...
         // should render fr/json

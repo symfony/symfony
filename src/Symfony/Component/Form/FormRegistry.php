@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -35,11 +36,6 @@ class FormRegistry implements FormRegistryInterface
     private $types = array();
 
     /**
-     * @var string[]
-     */
-    private $legacyNames = array();
-
-    /**
      * @var FormTypeGuesserInterface|false|null
      */
     private $guesser = false;
@@ -48,6 +44,8 @@ class FormRegistry implements FormRegistryInterface
      * @var ResolvedFormTypeFactoryInterface
      */
     private $resolvedTypeFactory;
+
+    private $checkedTypes = array();
 
     /**
      * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
@@ -94,11 +92,7 @@ class FormRegistry implements FormRegistryInterface
                 $type = new $name();
             }
 
-            $this->resolveAndAddType($type);
-        }
-
-        if (isset($this->legacyNames[$name])) {
-            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since Symfony 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, \get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
+            $this->types[$name] = $this->resolveType($type);
         }
 
         return $this->types[$name];
@@ -112,50 +106,34 @@ class FormRegistry implements FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The resolved type
      */
-    private function resolveAndAddType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type)
     {
         $typeExtensions = array();
         $parentType = $type->getParent();
         $fqcn = \get_class($type);
-        $name = $type->getName();
-        $hasCustomName = $name !== $fqcn;
 
-        if ($parentType instanceof FormTypeInterface) {
-            @trigger_error(sprintf('Returning a FormTypeInterface from %s::getParent() is deprecated since Symfony 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', $fqcn), E_USER_DEPRECATED);
-
-            $this->resolveAndAddType($parentType);
-            $parentType = $parentType->getName();
+        if (isset($this->checkedTypes[$fqcn])) {
+            $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($fqcn)));
+            throw new LogicException(sprintf('Circular reference detected for form type "%s" (%s).', $fqcn, $types));
         }
 
-        if ($hasCustomName) {
+        $this->checkedTypes[$fqcn] = true;
+
+        try {
             foreach ($this->extensions as $extension) {
-                if ($x = $extension->getTypeExtensions($name)) {
-                    @trigger_error(sprintf('Returning a type name from %s::getExtendedType() is deprecated since Symfony 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', \get_class($x[0])), E_USER_DEPRECATED);
-
-                    $typeExtensions = array_merge($typeExtensions, $x);
-                }
+                $typeExtensions = array_merge(
+                    $typeExtensions,
+                    $extension->getTypeExtensions($fqcn)
+                );
             }
-        }
 
-        foreach ($this->extensions as $extension) {
-            $typeExtensions = array_merge(
+            return $this->resolvedTypeFactory->createResolvedType(
+                $type,
                 $typeExtensions,
-                $extension->getTypeExtensions($fqcn)
+                $parentType ? $this->getType($parentType) : null
             );
-        }
-
-        $resolvedType = $this->resolvedTypeFactory->createResolvedType(
-            $type,
-            $typeExtensions,
-            $parentType ? $this->getType($parentType) : null
-        );
-
-        $this->types[$fqcn] = $resolvedType;
-
-        if ($hasCustomName) {
-            // Enable access by the explicit type name until Symfony 3.0
-            $this->types[$name] = $resolvedType;
-            $this->legacyNames[$name] = true;
+        } finally {
+            unset($this->checkedTypes[$fqcn]);
         }
     }
 
@@ -164,10 +142,6 @@ class FormRegistry implements FormRegistryInterface
      */
     public function hasType($name)
     {
-        if (isset($this->legacyNames[$name])) {
-            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since Symfony 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, \get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
-        }
-
         if (isset($this->types[$name])) {
             return true;
         }

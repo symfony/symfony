@@ -66,7 +66,7 @@ class AcceptHeaderItemTest extends TestCase
             ),
             array(
                 'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
-                'text/plain;charset=utf-8;param="this;should,not=matter";footnotes=true',
+                'text/plain; charset=utf-8; param="this;should,not=matter"; footnotes=true',
             ),
         );
     }

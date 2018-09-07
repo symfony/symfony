@@ -1,0 +1,21 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    esi: true
+    ssi: true
+    fragments: true
+    profiler: true
+    router: true
+    session: true
+    request: true
+    templating:
+        enabled: true
+        engines: ['php']
+    assets: true
+    translator: true
+    validation: true
+    serializer: true
+    property_info: true
+    csrf_protection: true
+    form: true

@@ -3,7 +3,7 @@
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tests\Style\SymfonyStyleWithForcedLineLength;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 //Ensure formatting tables when using multiple headers with TableCell
 return function (InputInterface $input, OutputInterface $output) {
@@ -21,6 +21,6 @@ return function (InputInterface $input, OutputInterface $output) {
         array('978-0804169127', 'Divine Comedy'),
     );
 
-    $output = new SymfonyStyleWithForcedLineLength($input, $output);
+    $output = new SymfonyStyle($input, $output);
     $output->table($headers, $rows);
 };

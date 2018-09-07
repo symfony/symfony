@@ -23,7 +23,7 @@ class QuarterTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         $month = (int) $dateTime->format('n');
         $quarter = (int) floor(($month - 1) / 3) + 1;
@@ -43,7 +43,7 @@ class QuarterTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         switch ($length) {
             case 1:
@@ -59,7 +59,7 @@ class QuarterTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array();
     }

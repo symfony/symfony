@@ -49,9 +49,6 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         $output = '- Path: '.$route->getPath()
             ."\n".'- Path Regex: '.$route->compile()->getRegex()
             ."\n".'- Host: '.('' !== $route->getHost() ? $route->getHost() : 'ANY')
@@ -60,7 +57,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.\get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
-            ."\n".'- Requirements: '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM')
+            ."\n".'- Requirements: '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')
             ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
 
         $this->write(isset($options['name'])
@@ -85,10 +82,10 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $this->write("Container tags\n==============");
 
-        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+        foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
             $this->write("\n\n".$tag."\n".str_repeat('-', \strlen($tag)));
             foreach ($definitions as $serviceId => $definition) {
                 $this->write("\n\n");
@@ -100,16 +97,16 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $childOptions = array('id' => $options['id'], 'as_array' => true);
+        $childOptions = array_merge($options, array('id' => $options['id'], 'as_array' => true));
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $childOptions);
+            $this->describeContainerAlias($service, $childOptions, $builder);
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
@@ -122,27 +119,33 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
-        $title = $showPrivate ? 'Public and private services' : 'Public services';
+        $title = $showHidden ? 'Hidden services' : 'Services';
         if (isset($options['tag'])) {
             $title .= ' with tag `'.$options['tag'].'`';
         }
         $this->write($title."\n".str_repeat('=', \strlen($title)));
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = array('definitions' => array(), 'aliases' => array(), 'services' => array());
+
+        if (isset($options['filter'])) {
+            $serviceIds = array_filter($serviceIds, $options['filter']);
+        }
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
+            if ($showHidden xor '.' === ($serviceId[0] ?? null)) {
+                continue;
+            }
+
             if ($service instanceof Alias) {
                 $services['aliases'][$serviceId] = $service;
             } elseif ($service instanceof Definition) {
-                if (($showPrivate || $service->isPublic())) {
-                    $services['definitions'][$serviceId] = $service;
-                }
+                $services['definitions'][$serviceId] = $service;
             } else {
                 $services['services'][$serviceId] = $service;
             }
@@ -152,7 +155,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, array('id' => $id));
+                $this->describeContainerDefinition($service, array('id' => $id, 'show_arguments' => $showArguments));
             }
         }
 
@@ -178,35 +181,28 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        $output = '- Class: `'.$definition->getClass().'`'
-            ."\n".'- Scope: `'.$definition->getScope(false).'`'
-            ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
+        $output = '';
+
+        if ('' !== $classDescription = $this->getClassDescription($definition->getClass())) {
+            $output .= '- Description: `'.$classDescription.'`'."\n";
+        }
+
+        $output .= '- Class: `'.$definition->getClass().'`'
+            ."\n".'- Public: '.($definition->isPublic() && !$definition->isPrivate() ? 'yes' : 'no')
             ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
             ."\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no')
-            ."\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no')
             ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no')
             ."\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no')
+            ."\n".'- Autoconfigured: '.($definition->isAutoconfigured() ? 'yes' : 'no')
         ;
 
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
-            $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
+        if (isset($options['show_arguments']) && $options['show_arguments']) {
+            $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
         }
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass(false).'`';
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService(false).'`';
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod(false).'`';
         }
 
         if ($factory = $definition->getFactory()) {
@@ -222,6 +218,11 @@ class MarkdownDescriptor extends Descriptor
             } else {
                 $output .= "\n".'- Factory Function: `'.$factory.'`';
             }
+        }
+
+        $calls = $definition->getMethodCalls();
+        foreach ($calls as $callData) {
+            $output .= "\n".'- Call: `'.$callData[0].'`';
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
@@ -241,12 +242,23 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
         $output = '- Service: `'.$alias.'`'
-            ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
+            ."\n".'- Public: '.($alias->isPublic() && !$alias->isPrivate() ? 'yes' : 'no');
 
-        $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
+        if (!isset($options['id'])) {
+            return $this->write($output);
+        }
+
+        $this->write(sprintf("### %s\n\n%s\n", $options['id'], $output));
+
+        if (!$builder) {
+            return;
+        }
+
+        $this->write("\n");
+        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, array('id' => (string) $alias)));
     }
 
     /**

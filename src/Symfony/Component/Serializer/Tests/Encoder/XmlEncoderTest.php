@@ -144,6 +144,28 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
     }
 
+    public function testEncodeRemovingEmptyTags()
+    {
+        $array = array('person' => array('firstname' => 'Peter', 'lastname' => null));
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n";
+
+        $context = array('remove_empty_tags' => true);
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
+    }
+
+    public function testEncodeNotRemovingEmptyTags()
+    {
+        $array = array('person' => array('firstname' => 'Peter', 'lastname' => null));
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname><lastname/></person></response>'."\n";
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
+    }
+
     public function testContext()
     {
         $array = array('person' => array('name' => 'George Abitbol'));
@@ -260,6 +282,28 @@ XML;
 XML;
 
         $this->assertSame(array('@index' => -12.11, '#' => 'Name'), $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testNoTypeCastAttribute()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document a="018" b="-12.11">
+    <node a="018" b="-12.11"/>
+</document>
+XML;
+
+        $data = $this->encoder->decode($source, 'xml', array('xml_type_cast_attributes' => false));
+        $expected = array(
+            '@a' => '018',
+            '@b' => '-12.11',
+            'node' => array(
+                '@a' => '018',
+                '@b' => '-12.11',
+                '#' => '',
+            ),
+        );
+        $this->assertSame($expected, $data);
     }
 
     public function testEncode()
@@ -471,6 +515,89 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeIgnoreComments()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<!-- This comment should not become the root node. -->
+<people>
+    <person>
+        <!-- Even if the first comment didn't become the root node, we don't
+             want this comment either. -->
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+
+        $expected = array('person' => array(
+          array('firstname' => 'Benjamin', 'lastname' => 'Alexandre'),
+          array('firstname' => 'Damien', 'lastname' => 'Clay'),
+        ));
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testDecodePreserveComments()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<people>
+    <person>
+        <!-- This comment should be decoded. -->
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+
+        $this->encoder = new XmlEncoder('people', null, array(XML_PI_NODE));
+        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
+        $this->encoder->setSerializer($serializer);
+
+        $expected = array('person' => array(
+          array('firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '),
+          array('firstname' => 'Damien', 'lastname' => 'Clay'),
+        ));
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testDecodeAlwaysAsCollection()
+    {
+        $this->encoder = new XmlEncoder('response', null);
+        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
+        $this->encoder->setSerializer($serializer);
+
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<order_rows nodeType="order_row" virtualEntity="true">
+    <order_row>
+        <id><![CDATA[16]]></id>
+        <test><![CDATA[16]]></test>
+    </order_row>
+</order_rows>
+XML;
+        $expected = array(
+            '@nodeType' => 'order_row',
+            '@virtualEntity' => 'true',
+            'order_row' => array(array(
+                'id' => array(16),
+                'test' => array(16),
+            )),
+        );
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', array('as_collection' => true)));
+    }
+
     public function testDecodeWithoutItemHash()
     {
         $obj = new ScalarDummy();
@@ -631,6 +758,43 @@ XML;
         $actualXml = $xmlEncoder->encode(array('foo' => array('@dateTime' => new \DateTime($this->exampleDateTimeString))), 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
+    }
+
+    public function testEncodeComment()
+    {
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response><!-- foo --></response>
+
+XML;
+
+        $data = array('#comment' => ' foo ');
+
+        $this->assertEquals($expected, $this->encoder->encode($data, 'xml'));
+    }
+
+    public function testEncodeWithoutPI()
+    {
+        $encoder = new XmlEncoder('response', null, array(), array(XML_PI_NODE));
+
+        $expected = '<response/>';
+
+        $this->assertEquals($expected, $encoder->encode(array(), 'xml'));
+    }
+
+    public function testEncodeWithoutComment()
+    {
+        $encoder = new XmlEncoder('response', null, array(), array(XML_COMMENT_NODE));
+
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response/>
+
+XML;
+
+        $data = array('#comment' => ' foo ');
+
+        $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
     /**

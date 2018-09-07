@@ -7,10 +7,8 @@
                         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:csrf-protection field-name="_custom" />
-        <framework:form>
-            <framework:csrf-protection field-name="_custom_form" />
-        </framework:form>
+        <framework:csrf-protection field-name="_custom_form" />
+        <framework:form />
         <framework:session />
     </framework:config>
 </container>

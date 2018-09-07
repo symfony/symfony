@@ -27,7 +27,7 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     private $httpPort;
     private $httpsPort;
 
-    public function __construct($httpPort = 80, $httpsPort = 443)
+    public function __construct(int $httpPort = 80, int $httpsPort = 443)
     {
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;

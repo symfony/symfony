@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -23,14 +25,18 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     private $anonymousClass;
     private $rememberMeClass;
 
-    /**
-     * @param string $anonymousClass
-     * @param string $rememberMeClass
-     */
-    public function __construct($anonymousClass, $rememberMeClass)
+    public function __construct(?string $anonymousClass = null, ?string $rememberMeClass = null)
     {
         $this->anonymousClass = $anonymousClass;
         $this->rememberMeClass = $rememberMeClass;
+
+        if (null !== $anonymousClass && !is_a($anonymousClass, AnonymousToken::class, true)) {
+            @trigger_error(sprintf('Configuring a custom anonymous token class is deprecated since Symfony 4.2; have the "%s" class extend the "%s" class instead, and remove the "%s" constructor argument.', $anonymousClass, AnonymousToken::class, self::class), E_USER_DEPRECATED);
+        }
+
+        if (null !== $rememberMeClass && !is_a($rememberMeClass, RememberMeToken::class, true)) {
+            @trigger_error(sprintf('Configuring a custom remember me token class is deprecated since Symfony 4.2; have the "%s" class extend the "%s" class instead, and remove the "%s" constructor argument.', $rememberMeClass, RememberMeToken::class, self::class), E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -42,7 +48,11 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
             return false;
         }
 
-        return $token instanceof $this->anonymousClass;
+        if (null !== $this->anonymousClass) {
+            return $token instanceof $this->anonymousClass;
+        }
+
+        return $token instanceof AnonymousToken;
     }
 
     /**
@@ -54,7 +64,11 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
             return false;
         }
 
-        return $token instanceof $this->rememberMeClass;
+        if (null !== $this->rememberMeClass) {
+            return $token instanceof $this->rememberMeClass;
+        }
+
+        return $token instanceof RememberMeToken;
     }
 
     /**

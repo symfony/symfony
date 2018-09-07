@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -27,11 +28,22 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
 {
+    private $entityManager;
     private $classMetadataFactory;
 
-    public function __construct(ClassMetadataFactory $classMetadataFactory)
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct($entityManager)
     {
-        $this->classMetadataFactory = $classMetadataFactory;
+        if ($entityManager instanceof EntityManagerInterface) {
+            $this->entityManager = $entityManager;
+        } elseif ($entityManager instanceof ClassMetadataFactory) {
+            @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), E_USER_DEPRECATED);
+            $this->classMetadataFactory = $entityManager;
+        } else {
+            throw new \InvalidArgumentException(sprintf('$entityManager must be an instance of "%s", "%s" given.', EntityManagerInterface::class, \is_object($entityManager) ? \get_class($entityManager) : \gettype($entityManager)));
+        }
     }
 
     /**
@@ -40,7 +52,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     public function getProperties($class, array $context = array())
     {
         try {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class);
+            $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
             return;
         } catch (OrmMappingException $exception) {
@@ -66,7 +78,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     public function getTypes($class, $property, array $context = array())
     {
         try {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class);
+            $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
             return;
         } catch (OrmMappingException $exception) {
@@ -96,7 +108,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 if (isset($associationMapping['indexBy'])) {
                     $indexProperty = $associationMapping['indexBy'];
                     /** @var ClassMetadataInfo $subMetadata */
-                    $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                    $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
                     $typeOfField = $subMetadata->getTypeOfField($indexProperty);
 
                     if (null === $typeOfField) {
@@ -104,7 +116,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
                         /** @var ClassMetadataInfo $subMetadata */
                         $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($indexProperty);
-                        $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                        $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
                         $typeOfField = $subMetadata->getTypeOfField($indexProperty);
                     }
 
@@ -138,6 +150,15 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 case DBALType::TIME:
                     return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime'));
 
+                case 'date_immutable':
+                case 'datetime_immutable':
+                case 'datetimetz_immutable':
+                case 'time_immutable':
+                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable'));
+
+                case 'dateinterval':
+                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval'));
+
                 case DBALType::TARRAY:
                     return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true));
 
@@ -158,13 +179,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * Determines whether an association is nullable.
      *
-     * @param array $associationMapping
-     *
-     * @return bool
-     *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
-    private function isAssociationNullable(array $associationMapping)
+    private function isAssociationNullable(array $associationMapping): bool
     {
         if (isset($associationMapping['id']) && $associationMapping['id']) {
             return false;
@@ -186,12 +203,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
     /**
      * Gets the corresponding built-in PHP type.
-     *
-     * @param string $doctrineType
-     *
-     * @return string|null
      */
-    private function getPhpType($doctrineType)
+    private function getPhpType(string $doctrineType): ?string
     {
         switch ($doctrineType) {
             case DBALType::SMALLINT:
@@ -218,5 +231,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             case DBALType::OBJECT:
                 return Type::BUILTIN_TYPE_OBJECT;
         }
+
+        return null;
     }
 }

@@ -31,6 +31,13 @@ class FunctionNodeTest extends AbstractNodeTest
         );
     }
 
+    public function getDumpData()
+    {
+        return array(
+            array('foo("bar")', new FunctionNode('foo', new Node(array(new ConstantNode('bar')))), array('foo' => $this->getCallables())),
+        );
+    }
+
     protected function getCallables()
     {
         return array(

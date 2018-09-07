@@ -34,13 +34,15 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function load($path, $type = null)
     {
-        $dir = $this->locator->locate($path);
+        if (!is_dir($dir = $this->locator->locate($path))) {
+            return parent::supports($path, $type) ? parent::load($path, $type) : new RouteCollection();
+        }
 
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
         $files = iterator_to_array(new \RecursiveIteratorIterator(
-            new RecursiveCallbackFilterIterator(
-                new \RecursiveDirectoryIterator($dir),
+            new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                 function (\SplFileInfo $current) {
                     return '.' !== substr($current->getBasename(), 0, 1);
                 }
@@ -74,47 +76,18 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function supports($resource, $type = null)
     {
-        if (!\is_string($resource)) {
+        if ('annotation' === $type) {
+            return true;
+        }
+
+        if ($type || !\is_string($resource)) {
             return false;
         }
 
         try {
-            $path = $this->locator->locate($resource);
+            return is_dir($this->locator->locate($resource));
         } catch (\Exception $e) {
             return false;
         }
-
-        return is_dir($path) && (!$type || 'annotation' === $type);
-    }
-}
-
-/**
- * @internal To be removed as RecursiveCallbackFilterIterator is available since PHP 5.4
- */
-class RecursiveCallbackFilterIterator extends \FilterIterator implements \RecursiveIterator
-{
-    private $iterator;
-    private $callback;
-
-    public function __construct(\RecursiveIterator $iterator, $callback)
-    {
-        $this->iterator = $iterator;
-        $this->callback = $callback;
-        parent::__construct($iterator);
-    }
-
-    public function accept()
-    {
-        return \call_user_func($this->callback, $this->current(), $this->key(), $this->iterator);
-    }
-
-    public function hasChildren()
-    {
-        return $this->iterator->hasChildren();
-    }
-
-    public function getChildren()
-    {
-        return new static($this->iterator->getChildren(), $this->callback);
     }
 }

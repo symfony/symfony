@@ -17,7 +17,6 @@ use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperIn
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -36,20 +35,8 @@ class ValidationListener implements EventSubscriberInterface
         return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
-    /**
-     * @param ValidatorInterface|LegacyValidatorInterface $validator
-     * @param ViolationMapperInterface                    $violationMapper
-     */
-    public function __construct($validator, ViolationMapperInterface $violationMapper)
+    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
     {
-        if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
-        }
-
-        if (!$validator instanceof ValidatorInterface) {
-            @trigger_error('Passing an instance of Symfony\Component\Validator\ValidatorInterface as argument to the '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0. Use an implementation of Symfony\Component\Validator\Validator\ValidatorInterface instead', E_USER_DEPRECATED);
-        }
-
         $this->validator = $validator;
         $this->violationMapper = $violationMapper;
     }

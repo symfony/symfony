@@ -29,7 +29,7 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
     private $providerKey;
     private $userChecker;
 
-    public function __construct(SimpleAuthenticatorInterface $simpleAuthenticator, UserProviderInterface $userProvider, $providerKey, UserCheckerInterface $userChecker = null)
+    public function __construct(SimpleAuthenticatorInterface $simpleAuthenticator, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker = null)
     {
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->userProvider = $userProvider;

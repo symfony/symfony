@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Exception;
  * Exception class for when a resource cannot be loaded or imported.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @deprecated since Symfony 4.2, use LoaderLoadException instead.
  */
 class FileLoaderLoadException extends \Exception
 {
@@ -23,8 +25,9 @@ class FileLoaderLoadException extends \Exception
      * @param string     $sourceResource The original resource importing the new resource
      * @param int        $code           The error code
      * @param \Exception $previous       A previous exception
+     * @param string     $type           The type of resource
      */
-    public function __construct($resource, $sourceResource = null, $code = null, $previous = null)
+    public function __construct(string $resource, string $sourceResource = null, int $code = null, \Exception $previous = null, string $type = null)
     {
         $message = '';
         if ($previous) {
@@ -60,6 +63,13 @@ class FileLoaderLoadException extends \Exception
             $bundle = substr($parts[0], 1);
             $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
             $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
+        } elseif (null !== $type) {
+            // maybe there is no loader for this specific type
+            if ('annotation' === $type) {
+                $message .= ' Make sure annotations are installed and enabled.';
+            } else {
+                $message .= sprintf(' Make sure there is a loader supporting the "%s" type.', $type);
+            }
         }
 
         parent::__construct($message, $code, $previous);

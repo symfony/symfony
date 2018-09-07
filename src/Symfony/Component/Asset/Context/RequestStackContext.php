@@ -21,10 +21,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class RequestStackContext implements ContextInterface
 {
     private $requestStack;
+    private $basePath;
+    private $secure;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, string $basePath = '', bool $secure = false)
     {
         $this->requestStack = $requestStack;
+        $this->basePath = $basePath;
+        $this->secure = $secure;
     }
 
     /**
@@ -33,7 +37,7 @@ class RequestStackContext implements ContextInterface
     public function getBasePath()
     {
         if (!$request = $this->requestStack->getMasterRequest()) {
-            return '';
+            return $this->basePath;
         }
 
         return $request->getBasePath();
@@ -45,7 +49,7 @@ class RequestStackContext implements ContextInterface
     public function isSecure()
     {
         if (!$request = $this->requestStack->getMasterRequest()) {
-            return false;
+            return $this->secure;
         }
 
         return $request->isSecure();

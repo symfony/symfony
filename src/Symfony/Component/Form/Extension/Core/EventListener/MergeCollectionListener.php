@@ -28,7 +28,7 @@ class MergeCollectionListener implements EventSubscriberInterface
      * @param bool $allowAdd    Whether values might be added to the collection
      * @param bool $allowDelete Whether values might be removed from the collection
      */
-    public function __construct($allowAdd = false, $allowDelete = false)
+    public function __construct(bool $allowAdd = false, bool $allowDelete = false)
     {
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
@@ -109,18 +109,5 @@ class MergeCollectionListener implements EventSubscriberInterface
         }
 
         $event->setData($dataToMergeInto);
-    }
-
-    /**
-     * Alias of {@link onSubmit()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link onSubmit()} instead.
-     */
-    public function onBind(FormEvent $event)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
-
-        $this->onSubmit($event);
     }
 }

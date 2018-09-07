@@ -11,28 +11,46 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
+use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
+use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
+use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SecurityDataCollector extends DataCollector
+class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $tokenStorage;
     private $roleHierarchy;
     private $logoutUrlGenerator;
+    private $accessDecisionManager;
+    private $firewallMap;
+    private $firewall;
+    private $hasVarDumper;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
+        $this->accessDecisionManager = $accessDecisionManager;
+        $this->firewallMap = $firewallMap;
+        $this->firewall = $firewall;
+        $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
     /**
@@ -44,6 +62,10 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled' => false,
                 'authenticated' => false,
+                'impersonated' => false,
+                'impersonator_user' => null,
+                'impersonation_exit_path' => null,
+                'token' => null,
                 'token_class' => null,
                 'logout_url' => null,
                 'user' => '',
@@ -55,6 +77,10 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => false,
+                'impersonated' => false,
+                'impersonator_user' => null,
+                'impersonation_exit_path' => null,
+                'token' => null,
                 'token_class' => null,
                 'logout_url' => null,
                 'user' => '',
@@ -65,6 +91,14 @@ class SecurityDataCollector extends DataCollector
         } else {
             $inheritedRoles = array();
             $assignedRoles = $token->getRoles();
+
+            $impersonatorUser = null;
+            foreach ($assignedRoles as $role) {
+                if ($role instanceof SwitchUserRole) {
+                    $impersonatorUser = $role->getSource()->getUsername();
+                    break;
+                }
+            }
 
             if (null !== $this->roleHierarchy) {
                 $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
@@ -87,14 +121,82 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
-                'token_class' => \get_class($token),
+                'impersonated' => null !== $impersonatorUser,
+                'impersonator_user' => $impersonatorUser,
+                'impersonation_exit_path' => null,
+                'token' => $token,
+                'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
-                'roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $assignedRoles),
-                'inherited_roles' => array_unique(array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles)),
+                'roles' => array_map(function (Role $role) { return $role->getRole(); }, $assignedRoles),
+                'inherited_roles' => array_unique(array_map(function (Role $role) { return $role->getRole(); }, $inheritedRoles)),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }
+
+        // collect voters and access decision manager information
+        if ($this->accessDecisionManager instanceof TraceableAccessDecisionManager) {
+            $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
+            $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
+
+            foreach ($this->accessDecisionManager->getVoters() as $voter) {
+                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(\get_class($voter)) : \get_class($voter);
+            }
+        } else {
+            $this->data['access_decision_log'] = array();
+            $this->data['voter_strategy'] = 'unknown';
+            $this->data['voters'] = array();
+        }
+
+        // collect firewall context information
+        $this->data['firewall'] = null;
+        if ($this->firewallMap instanceof FirewallMap) {
+            $firewallConfig = $this->firewallMap->getFirewallConfig($request);
+            if (null !== $firewallConfig) {
+                $this->data['firewall'] = array(
+                    'name' => $firewallConfig->getName(),
+                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
+                    'request_matcher' => $firewallConfig->getRequestMatcher(),
+                    'security_enabled' => $firewallConfig->isSecurityEnabled(),
+                    'stateless' => $firewallConfig->isStateless(),
+                    'provider' => $firewallConfig->getProvider(),
+                    'context' => $firewallConfig->getContext(),
+                    'entry_point' => $firewallConfig->getEntryPoint(),
+                    'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
+                    'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
+                    'user_checker' => $firewallConfig->getUserChecker(),
+                    'listeners' => $firewallConfig->getListeners(),
+                );
+
+                // generate exit impersonation path from current request
+                if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
+                    $exitPath = $request->getRequestUri();
+                    $exitPath .= null === $request->getQueryString() ? '?' : '&';
+                    $exitPath .= sprintf('%s=%s', urlencode($switchUserConfig['parameter']), SwitchUserListener::EXIT_VALUE);
+
+                    $this->data['impersonation_exit_path'] = $exitPath;
+                }
+            }
+        }
+
+        // collect firewall listeners information
+        $this->data['listeners'] = array();
+        if ($this->firewall) {
+            $this->data['listeners'] = $this->firewall->getWrappedListeners();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = array();
+    }
+
+    public function lateCollect()
+    {
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**
@@ -158,6 +260,21 @@ class SecurityDataCollector extends DataCollector
         return $this->data['authenticated'];
     }
 
+    public function isImpersonated()
+    {
+        return $this->data['impersonated'];
+    }
+
+    public function getImpersonatorUser()
+    {
+        return $this->data['impersonator_user'];
+    }
+
+    public function getImpersonationExitPath()
+    {
+        return $this->data['impersonation_exit_path'];
+    }
+
     /**
      * Get the class name of the security token.
      *
@@ -169,6 +286,16 @@ class SecurityDataCollector extends DataCollector
     }
 
     /**
+     * Get the full security token class as Data object.
+     *
+     * @return Data
+     */
+    public function getToken()
+    {
+        return $this->data['token'];
+    }
+
+    /**
      * Get the logout URL.
      *
      * @return string The logout URL
@@ -176,6 +303,51 @@ class SecurityDataCollector extends DataCollector
     public function getLogoutUrl()
     {
         return $this->data['logout_url'];
+    }
+
+    /**
+     * Returns the FQCN of the security voters enabled in the application.
+     *
+     * @return string[]
+     */
+    public function getVoters()
+    {
+        return $this->data['voters'];
+    }
+
+    /**
+     * Returns the strategy configured for the security voters.
+     *
+     * @return string
+     */
+    public function getVoterStrategy()
+    {
+        return $this->data['voter_strategy'];
+    }
+
+    /**
+     * Returns the log of the security decisions made by the access decision manager.
+     *
+     * @return array
+     */
+    public function getAccessDecisionLog()
+    {
+        return $this->data['access_decision_log'];
+    }
+
+    /**
+     * Returns the configuration of the current firewall context.
+     *
+     * @return array
+     */
+    public function getFirewall()
+    {
+        return $this->data['firewall'];
+    }
+
+    public function getListeners()
+    {
+        return $this->data['listeners'];
     }
 
     /**

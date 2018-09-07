@@ -27,10 +27,6 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
      */
     protected $engine;
 
-    protected $testableFeatures = array(
-        'choice_attr',
-    );
-
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -102,18 +98,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->engine->get('form')->form($view, $vars);
     }
 
-    protected function renderEnctype(FormView $view)
-    {
-        if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
-            $this->markTestSkipped(sprintf('Deprecated method %s->enctype() is not implemented.', \get_class($form)));
-        }
-
-        return (string) $form->enctype($view);
-    }
-
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
         return (string) $this->engine->get('form')->label($view, $label, $vars);
+    }
+
+    protected function renderHelp(FormView $view)
+    {
+        return (string) $this->engine->get('form')->help($view);
     }
 
     protected function renderErrors(FormView $view)
@@ -146,9 +138,9 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->engine->get('form')->end($view, $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
     {
-        $this->engine->get('form')->setTheme($view, $themes);
+        $this->engine->get('form')->setTheme($view, $themes, $useDefaultThemes);
     }
 
     public static function themeBlockInheritanceProvider()

@@ -29,48 +29,48 @@ class PhpProcess extends Process
      * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
      * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
      * @param int         $timeout The timeout in seconds
-     * @param array       $options An array of options for proc_open
+     * @param array|null  $php     Path to the PHP binary to use with any additional arguments
      */
-    public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = array())
+    public function __construct(string $script, string $cwd = null, array $env = null, int $timeout = 60, array $php = null)
     {
         $executableFinder = new PhpExecutableFinder();
-        if (false === $php = $executableFinder->find()) {
+        if (false === $php = $php ?? $executableFinder->find(false)) {
             $php = null;
+        } else {
+            $php = array_merge(array($php), $executableFinder->findArguments());
         }
         if ('phpdbg' === \PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');
             file_put_contents($file, $script);
             register_shutdown_function('unlink', $file);
-            $php .= ' '.ProcessUtils::escapeArgument($file);
+            $php[] = $file;
             $script = null;
         }
-        if ('\\' !== \DIRECTORY_SEPARATOR && null !== $php) {
-            // exec is mandatory to deal with sending a signal to the process
-            // see https://github.com/symfony/symfony/issues/5030 about prepending
-            // command with exec
-            $php = 'exec '.$php;
-        }
 
-        parent::__construct($php, $cwd, $env, $script, $timeout, $options);
+        parent::__construct($php, $cwd, $env, $script, $timeout);
     }
 
     /**
      * Sets the path to the PHP binary to use.
+     *
+     * @deprecated since Symfony 4.2, use the $php argument of the constructor instead.
      */
     public function setPhpBinary($php)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the $php argument of the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+
         $this->setCommandLine($php);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function start($callback = null)
+    public function start(callable $callback = null, array $env = array())
     {
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');
         }
 
-        parent::start($callback);
+        parent::start($callback, $env);
     }
 }

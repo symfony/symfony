@@ -78,9 +78,6 @@ class JsonEncoderTest extends TestCase
         $this->encoder->encode($arr, 'json');
     }
 
-    /**
-     * @requires PHP 5.5
-     */
     public function testEncodeNotUtf8WithPartialOnError()
     {
         $context = array('json_encode_options' => JSON_PARTIAL_OUTPUT_ON_ERROR);

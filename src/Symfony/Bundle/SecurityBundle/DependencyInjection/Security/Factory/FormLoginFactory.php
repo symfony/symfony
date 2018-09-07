@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -48,36 +48,6 @@ class FormLoginFactory extends AbstractFactory
         parent::addConfiguration($node);
 
         $node
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
-                ->thenInvalid("You should define a value for only one of 'csrf_provider' and 'csrf_token_generator' on a security firewall. Use 'csrf_token_generator' as this replaces 'csrf_provider'.")
-            ->end()
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
-                ->thenInvalid("You should define a value for only one of 'intention' and 'csrf_token_id' on a security firewall. Use 'csrf_token_id' as this replaces 'intention'.")
-            ->end()
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['csrf_provider']); })
-                ->then(function ($v) {
-                    @trigger_error("Setting the 'csrf_provider' configuration key on a security firewall is deprecated since Symfony 2.8 and will be removed in 3.0. Use the 'csrf_token_generator' configuration key instead.", E_USER_DEPRECATED);
-
-                    $v['csrf_token_generator'] = $v['csrf_provider'];
-                    unset($v['csrf_provider']);
-
-                    return $v;
-                })
-            ->end()
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['intention']); })
-                ->then(function ($v) {
-                    @trigger_error("Setting the 'intention' configuration key on a security firewall is deprecated since Symfony 2.8 and will be removed in 3.0. Use the 'csrf_token_id' key instead.", E_USER_DEPRECATED);
-
-                    $v['csrf_token_id'] = $v['intention'];
-                    unset($v['intention']);
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
             ->end()
@@ -93,7 +63,7 @@ class FormLoginFactory extends AbstractFactory
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
@@ -118,7 +88,7 @@ class FormLoginFactory extends AbstractFactory
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))
+            ->setDefinition($entryPointId, new ChildDefinition('security.authentication.form_entry_point'))
             ->addArgument(new Reference('security.http_utils'))
             ->addArgument($config['login_path'])
             ->addArgument($config['use_forward'])

@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class SplCasterTest extends VarDumperTestCase
+class SplCasterTest extends TestCase
 {
+    use VarDumperTestTrait;
+
     public function getCastFileInfoTests()
     {
         return array(
@@ -163,9 +166,6 @@ EOTXT;
 
     public function testCastArrayObject()
     {
-        if (\defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM as different internal details.');
-        }
         $var = new \ArrayObject(array(123));
         $var->foo = 234;
 
@@ -185,9 +185,6 @@ EOTXT;
 
     public function testArrayIterator()
     {
-        if (\defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM as different internal details.');
-        }
         $var = new MyArrayIterator(array(234));
 
         $expected = <<<EOTXT

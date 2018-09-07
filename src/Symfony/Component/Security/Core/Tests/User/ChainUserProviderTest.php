@@ -172,6 +172,26 @@ class ChainUserProviderTest extends TestCase
         $this->assertFalse($provider->supportsClass('foo'));
     }
 
+    public function testAcceptsTraversable()
+    {
+        $provider1 = $this->getProvider();
+        $provider1
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->throwException(new UnsupportedUserException('unsupported')))
+        ;
+
+        $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->returnValue($account = $this->getAccount()))
+        ;
+
+        $provider = new ChainUserProvider(new \ArrayObject(array($provider1, $provider2)));
+        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
+    }
+
     protected function getAccount()
     {
         return $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationEvent;
@@ -36,9 +37,9 @@ class AuthenticationProviderManagerTest extends TestCase
      */
     public function testAuthenticateWithProvidersWithIncorrectInterface()
     {
-        new AuthenticationProviderManager(array(
+        (new AuthenticationProviderManager(array(
             new \stdClass(),
-        ));
+        )))->authenticate($this->getMockBuilder(TokenInterface::class)->getMock());
     }
 
     public function testAuthenticateWhenNoProviderSupportsToken()

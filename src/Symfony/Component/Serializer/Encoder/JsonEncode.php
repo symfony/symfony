@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
  * Encodes JSON data.
@@ -21,27 +21,10 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 class JsonEncode implements EncoderInterface
 {
     private $options;
-    private $lastError = JSON_ERROR_NONE;
 
-    public function __construct($bitmask = 0)
+    public function __construct(int $bitmask = 0)
     {
         $this->options = $bitmask;
-    }
-
-    /**
-     * Returns the last encoding error (if any).
-     *
-     * @return int
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     *             The {@self encode()} throws an exception if error found.
-     * @see http://php.net/manual/en/function.json-last-error.php json_last_error
-     */
-    public function getLastError()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0. Catch the exception raised by the encode() method instead to get the last JSON encoding error.', E_USER_DEPRECATED);
-
-        return $this->lastError;
     }
 
     /**
@@ -55,9 +38,8 @@ class JsonEncode implements EncoderInterface
 
         $encodedJson = json_encode($data, $context['json_encode_options']);
 
-        $this->lastError = json_last_error();
-        if (JSON_ERROR_NONE !== $this->lastError && (false === $encodedJson || \PHP_VERSION_ID < 50500 || !($context['json_encode_options'] & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-            throw new UnexpectedValueException(json_last_error_msg());
+        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($context['json_encode_options'] & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
+            throw new NotEncodableValueException(json_last_error_msg());
         }
 
         return $encodedJson;

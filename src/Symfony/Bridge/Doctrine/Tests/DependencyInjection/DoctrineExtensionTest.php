@@ -175,23 +175,20 @@ class DoctrineExtensionTest extends TestCase
     {
         return array(
             array('doctrine.orm.cache.apc.class',       array('type' => 'apc')),
+            array('doctrine.orm.cache.apcu.class',      array('type' => 'apcu')),
             array('doctrine.orm.cache.array.class',     array('type' => 'array')),
             array('doctrine.orm.cache.xcache.class',    array('type' => 'xcache')),
             array('doctrine.orm.cache.wincache.class',  array('type' => 'wincache')),
             array('doctrine.orm.cache.zenddata.class',  array('type' => 'zenddata')),
             array('doctrine.orm.cache.redis.class',     array('type' => 'redis'),     array('setRedis')),
-            array('doctrine.orm.cache.memcache.class',  array('type' => 'memcache'),  array('setMemcache')),
             array('doctrine.orm.cache.memcached.class', array('type' => 'memcached'), array('setMemcached')),
         );
     }
 
     /**
-     * @param string $class
-     * @param array  $config
-     *
      * @dataProvider providerBasicDrivers
      */
-    public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = array())
+    public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = array())
     {
         $container = $this->createContainer();
         $cacheName = 'metadata_cache';
@@ -207,9 +204,7 @@ class DoctrineExtensionTest extends TestCase
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
         $defCalls = $definition->getMethodCalls();
         $expectedCalls[] = 'setNamespace';
-        $actualCalls = array_map(function ($call) {
-            return $call[0];
-        }, $defCalls);
+        $actualCalls = array_column($defCalls, 0);
 
         $this->assertFalse($definition->isPublic());
         $this->assertEquals("%$class%", $definition->getClass());

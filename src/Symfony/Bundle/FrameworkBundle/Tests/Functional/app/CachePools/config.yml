@@ -1,0 +1,26 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    cache:
+        pools:
+            cache.pool1:
+                public: true
+                adapter: cache.system
+            cache.pool2:
+                public: true
+                adapter: cache.pool3
+            cache.pool3:
+                clearer: ~
+            cache.pool4:
+                tags: true
+                public: true
+            cache.pool5:
+                tags: cache.pool2
+                public: true
+            cache.pool6:
+                tags: cache.pool4
+                public: true
+            cache.pool7:
+                adapter: cache.pool4
+                public: true

@@ -11,19 +11,18 @@
 
 namespace Symfony\Component\Validator\Violation;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Util\PropertyPath;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ConstraintViolationBuilderInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal You should not instantiate or use this class. Code against
- *           {@link ConstraintViolationBuilderInterface} instead.
+ * @internal since version 2.5. Code against ConstraintViolationBuilderInterface instead.
  */
 class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
 {

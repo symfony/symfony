@@ -1,0 +1,12 @@
+services:
+    _instanceof:
+        FooInterface:
+            autowire: true
+
+    parent_service:
+        class: stdClass
+        public: true
+
+    child_service:
+        class: stdClass
+        parent: parent_service

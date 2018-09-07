@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Twig\Environment;
 use Twig\Error\Error;
-use Twig\FileExtensionEscapingStrategy;
 
 /**
  * This engine renders Twig templates.
@@ -35,28 +34,6 @@ class TwigEngine extends BaseEngine implements EngineInterface
         parent::__construct($environment, $parser);
 
         $this->locator = $locator;
-    }
-
-    /**
-     * @deprecated since version 2.7, to be removed in 3.0.
-     *             Inject the escaping strategy on Twig instead.
-     */
-    public function setDefaultEscapingStrategy($strategy)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0. Inject the escaping strategy in the Twig\Environment object instead.', E_USER_DEPRECATED);
-
-        $this->environment->getExtension('Twig\Extension\EscaperExtension')->setDefaultStrategy($strategy);
-    }
-
-    /**
-     * @deprecated since version 2.7, to be removed in 3.0.
-     *             Use the 'name' strategy instead.
-     */
-    public function guessDefaultEscapingStrategy($name)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0. Use the Twig\FileExtensionEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
-
-        return FileExtensionEscapingStrategy::guess($name);
     }
 
     /**

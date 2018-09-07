@@ -19,7 +19,7 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
-abstract class AbstractGuardAuthenticator implements GuardAuthenticatorInterface
+abstract class AbstractGuardAuthenticator implements AuthenticatorInterface
 {
     /**
      * Shortcut to create a PostAuthenticationGuardToken for you, if you don't really

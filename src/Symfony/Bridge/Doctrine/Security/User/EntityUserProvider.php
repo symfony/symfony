@@ -33,7 +33,7 @@ class EntityUserProvider implements UserProviderInterface
     private $class;
     private $property;
 
-    public function __construct(ManagerRegistry $registry, $classOrAlias, $property = null, $managerName = null)
+    public function __construct(ManagerRegistry $registry, string $classOrAlias, string $property = null, string $managerName = null)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;
@@ -51,11 +51,7 @@ class EntityUserProvider implements UserProviderInterface
             $user = $repository->findOneBy(array($this->property => $username));
         } else {
             if (!$repository instanceof UserLoaderInterface) {
-                if (!$repository instanceof UserProviderInterface) {
-                    throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, \get_class($repository)));
-                }
-
-                @trigger_error('Implementing Symfony\Component\Security\Core\User\UserProviderInterface in a Doctrine repository when using the entity provider is deprecated since Symfony 2.8 and will not be supported in 3.0. Make the repository implement Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface instead.', E_USER_DEPRECATED);
+                throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, \get_class($repository)));
             }
 
             $user = $repository->loadUserByUsername($username);

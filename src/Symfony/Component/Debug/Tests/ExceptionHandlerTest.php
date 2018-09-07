@@ -39,8 +39,8 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new \RuntimeException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('<h1>Whoops, looks like something went wrong.</h1>', $response);
-        $this->assertNotContains('<h2 class="block_exception clear_fix">', $response);
+        $this->assertContains('Whoops, looks like something went wrong.', $response);
+        $this->assertNotContains('<div class="trace trace-as-html">', $response);
 
         $handler = new ExceptionHandler(true);
 
@@ -48,8 +48,8 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new \RuntimeException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('<h1>Whoops, looks like something went wrong.</h1>', $response);
-        $this->assertContains('<h2 class="block_exception clear_fix">', $response);
+        $this->assertContains('Whoops, looks like something went wrong.', $response);
+        $this->assertContains('<div class="trace trace-as-html">', $response);
     }
 
     public function testStatusCode()
@@ -94,7 +94,7 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new \RuntimeException('Foo', 0, new \RuntimeException('Bar')));
         $response = ob_get_clean();
 
-        $this->assertStringMatchesFormat('%A<span class="exception_message">Foo</span>%A<span class="exception_message">Bar</span>%A', $response);
+        $this->assertStringMatchesFormat('%A<p class="break-long-words trace-message">Foo</p>%A<p class="break-long-words trace-message">Bar</p>%A', $response);
     }
 
     public function testHandle()
@@ -108,9 +108,8 @@ class ExceptionHandlerTest extends TestCase
 
         $handler->handle($exception);
 
-        $that = $this;
-        $handler->setHandler(function ($e) use ($exception, $that) {
-            $that->assertSame($exception, $e);
+        $handler->setHandler(function ($e) use ($exception) {
+            $this->assertSame($exception, $e);
         });
 
         $handler->handle($exception);
@@ -125,9 +124,8 @@ class ExceptionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('sendPhpResponse');
 
-        $that = $this;
-        $handler->setHandler(function ($e) use ($that) {
-            $that->fail('OutOfMemoryException should bypass the handler');
+        $handler->setHandler(function ($e) {
+            $this->fail('OutOfMemoryException should bypass the handler');
         });
 
         $handler->handle($exception);

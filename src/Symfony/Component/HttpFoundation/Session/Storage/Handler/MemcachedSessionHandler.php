@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcachedSessionHandler implements \SessionHandlerInterface
+class MemcachedSessionHandler extends AbstractSessionHandler
 {
     private $memcached;
 
@@ -38,7 +38,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
      *
      * List of available options:
      *  * prefix: The prefix to use for the memcached keys in order to avoid collision
-     *  * expiretime: The time to live in seconds
+     *  * expiretime: The time to live in seconds.
      *
      * @param \Memcached $memcached A \Memcached instance
      * @param array      $options   An associative array of Memcached options
@@ -62,14 +62,6 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionName)
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function close()
     {
         return true;
@@ -78,7 +70,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function read($sessionId)
+    protected function doRead($sessionId)
     {
         return $this->memcached->get($this->prefix.$sessionId) ?: '';
     }
@@ -86,7 +78,17 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function write($sessionId, $data)
+    public function updateTimestamp($sessionId, $data)
+    {
+        $this->memcached->touch($this->prefix.$sessionId, time() + $this->ttl);
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doWrite($sessionId, $data)
     {
         return $this->memcached->set($this->prefix.$sessionId, $data, time() + $this->ttl);
     }
@@ -94,7 +96,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function destroy($sessionId)
+    protected function doDestroy($sessionId)
     {
         $result = $this->memcached->delete($this->prefix.$sessionId);
 

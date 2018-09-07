@@ -23,12 +23,12 @@ class Debug
     /**
      * Enables the debug tools.
      *
-     * This method registers an error handler, an exception handler and a special class loader.
+     * This method registers an error handler and an exception handler.
      *
      * @param int  $errorReportingLevel The level of error reporting you want
      * @param bool $displayErrors       Whether to display errors (for development) or just log them (for production)
      */
-    public static function enable($errorReportingLevel = null, $displayErrors = true)
+    public static function enable($errorReportingLevel = E_ALL, $displayErrors = true)
     {
         if (static::$enabled) {
             return;
@@ -39,7 +39,7 @@ class Debug
         if (null !== $errorReportingLevel) {
             error_reporting($errorReportingLevel);
         } else {
-            error_reporting(-1);
+            error_reporting(E_ALL);
         }
 
         if (!\in_array(\PHP_SAPI, array('cli', 'phpdbg'), true)) {

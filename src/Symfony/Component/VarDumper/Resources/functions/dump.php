@@ -15,10 +15,31 @@ if (!function_exists('dump')) {
     /**
      * @author Nicolas Grekas <p@tchwork.com>
      */
-    function dump($var)
+    function dump($var, ...$moreVars)
     {
-        foreach (func_get_args() as $var) {
+        VarDumper::dump($var);
+
+        foreach ($moreVars as $var) {
             VarDumper::dump($var);
         }
+
+        if (1 < func_num_args()) {
+            return func_get_args();
+        }
+
+        return $var;
+    }
+}
+
+if (!function_exists('dd')) {
+    function dd($var, ...$moreVars)
+    {
+        VarDumper::dump($var);
+
+        foreach ($moreVars as $var) {
+            VarDumper::dump($var);
+        }
+
+        exit(1);
     }
 }

@@ -61,24 +61,6 @@ class TemplateManager
     }
 
     /**
-     * Gets the templates for a given profile.
-     *
-     * @return Template[]
-     *
-     * @deprecated not used anymore internally
-     */
-    public function getTemplates(Profile $profile)
-    {
-        $templates = $this->getNames($profile);
-
-        foreach ($templates as $name => $template) {
-            $templates[$name] = $this->twig->loadTemplate($template);
-        }
-
-        return $templates;
-    }
-
-    /**
      * Gets template names of templates that are present in the viewed profile.
      *
      * @return array

@@ -11,31 +11,36 @@
 
 namespace Symfony\Component\DependencyInjection\Exception;
 
+use Psr\Container\NotFoundExceptionInterface;
+
 /**
  * This exception is thrown when a non-existent parameter is used.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ParameterNotFoundException extends InvalidArgumentException
+class ParameterNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
     private $key;
     private $sourceId;
     private $sourceKey;
     private $alternatives;
+    private $nonNestedAlternative;
 
     /**
-     * @param string     $key          The requested parameter key
-     * @param string     $sourceId     The service id that references the non-existent parameter
-     * @param string     $sourceKey    The parameter key that references the non-existent parameter
-     * @param \Exception $previous     The previous exception
-     * @param string[]   $alternatives Some parameter name alternatives
+     * @param string      $key                  The requested parameter key
+     * @param string      $sourceId             The service id that references the non-existent parameter
+     * @param string      $sourceKey            The parameter key that references the non-existent parameter
+     * @param \Exception  $previous             The previous exception
+     * @param string[]    $alternatives         Some parameter name alternatives
+     * @param string|null $nonNestedAlternative The alternative parameter name when the user expected dot notation for nested parameters
      */
-    public function __construct($key, $sourceId = null, $sourceKey = null, \Exception $previous = null, array $alternatives = array())
+    public function __construct(string $key, string $sourceId = null, string $sourceKey = null, \Exception $previous = null, array $alternatives = array(), string $nonNestedAlternative = null)
     {
         $this->key = $key;
         $this->sourceId = $sourceId;
         $this->sourceKey = $sourceKey;
         $this->alternatives = $alternatives;
+        $this->nonNestedAlternative = $nonNestedAlternative;
 
         parent::__construct('', 0, $previous);
 
@@ -59,6 +64,8 @@ class ParameterNotFoundException extends InvalidArgumentException
                 $this->message .= ' Did you mean one of these: "';
             }
             $this->message .= implode('", "', $this->alternatives).'"?';
+        } elseif (null !== $this->nonNestedAlternative) {
+            $this->message .= ' You cannot access nested array items, do you want to inject "'.$this->nonNestedAlternative.'" instead?';
         }
     }
 

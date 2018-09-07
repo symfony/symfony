@@ -1,0 +1,4 @@
+services:
+    AppBundle\Foo:
+        arguments:
+            - !service {class: AppBundle\Bar }

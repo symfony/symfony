@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+      <defaults public="true"/>
+      <service id="bar" class="stdClass"/>
+      <service id="Bar" class="stdClass">
+          <property name="bar" type="service" id="bar"/>
+      </service>
+      <service id="BAR" class="Bar\FooClass">
+          <argument type="service" id="Bar"/>
+          <call method="setBar">
+              <argument type="service" id="bar"/>
+          </call>
+      </service>
+  </services>
+</container>

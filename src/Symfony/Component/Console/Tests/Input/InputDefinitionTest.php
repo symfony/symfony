@@ -374,8 +374,9 @@ class InputDefinitionTest extends TestCase
 
             array(new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED))), '<foo>', 'puts arguments in angle brackets'),
             array(new InputDefinition(array(new InputArgument('foo'))), '[<foo>]', 'puts optional arguments in square brackets'),
-            array(new InputDefinition(array(new InputArgument('foo', InputArgument::IS_ARRAY))), '[<foo>]...', 'uses an ellipsis for array arguments'),
-            array(new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY))), '<foo> (<foo>)...', 'uses parenthesis and ellipsis for required array arguments'),
+            array(new InputDefinition(array(new InputArgument('foo'), new InputArgument('bar'))), '[<foo> [<bar>]]', 'chains optional arguments inside brackets'),
+            array(new InputDefinition(array(new InputArgument('foo', InputArgument::IS_ARRAY))), '[<foo>...]', 'uses an ellipsis for array arguments'),
+            array(new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY))), '<foo>...', 'uses an ellipsis for required array arguments'),
 
             array(new InputDefinition(array(new InputOption('foo'), new InputArgument('foo', InputArgument::REQUIRED))), '[--foo] [--] <foo>', 'puts [--] between options and arguments'),
         );
@@ -385,41 +386,6 @@ class InputDefinitionTest extends TestCase
     {
         $definition = new InputDefinition(array(new InputOption('foo'), new InputOption('bar'), new InputArgument('cat')));
         $this->assertEquals('[options] [--] [<cat>]', $definition->getSynopsis(true), '->getSynopsis(true) groups options in [options]');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsText()
-    {
-        $definition = new InputDefinition(array(
-            new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),
-            new InputArgument('baz', InputArgument::OPTIONAL, 'The baz argument', true),
-            new InputArgument('bar', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The bar argument', array('http://foo.com/')),
-            new InputOption('foo', 'f', InputOption::VALUE_REQUIRED, 'The foo option'),
-            new InputOption('baz', null, InputOption::VALUE_OPTIONAL, 'The baz option', false),
-            new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL, 'The bar option', 'bar'),
-            new InputOption('qux', '', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The qux option', array('http://foo.com/', 'bar')),
-            new InputOption('qux2', '', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The qux2 option', array('foo' => 'bar')),
-        ));
-
-        $this->assertStringEqualsFile(self::$fixtures.'/definition_astext.txt', $definition->asText(), '->asText() returns a textual representation of the InputDefinition');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsXml()
-    {
-        $definition = new InputDefinition(array(
-            new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),
-            new InputArgument('baz', InputArgument::OPTIONAL, 'The baz argument', true),
-            new InputArgument('bar', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The bar argument', array('bar')),
-            new InputOption('foo', 'f', InputOption::VALUE_REQUIRED, 'The foo option'),
-            new InputOption('baz', null, InputOption::VALUE_OPTIONAL, 'The baz option', false),
-            new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL, 'The bar option', 'bar'),
-        ));
-        $this->assertXmlStringEqualsXmlFile(self::$fixtures.'/definition_asxml.txt', $definition->asXml(), '->asXml() returns an XML representation of the InputDefinition');
     }
 
     protected function initializeArguments()

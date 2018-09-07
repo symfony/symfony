@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * AnonymousToken represents an anonymous token.
@@ -23,11 +23,11 @@ class AnonymousToken extends AbstractToken
     private $secret;
 
     /**
-     * @param string          $secret A secret used to make sure the token is created by the app and not by a malicious client
-     * @param string|object   $user   The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
-     * @param RoleInterface[] $roles  An array of roles
+     * @param string        $secret A secret used to make sure the token is created by the app and not by a malicious client
+     * @param string|object $user   The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
+     * @param Role[]        $roles  An array of roles
      */
-    public function __construct($secret, $user, array $roles = array())
+    public function __construct(string $secret, $user, array $roles = array())
     {
         parent::__construct($roles);
 
@@ -42,16 +42,6 @@ class AnonymousToken extends AbstractToken
     public function getCredentials()
     {
         return '';
-    }
-
-    /**
-     * @deprecated Since version 2.8, to be removed in 3.0. Use getSecret() instead.
-     */
-    public function getKey()
-    {
-        @trigger_error(__METHOD__.'() is deprecated since Symfony 2.8 and will be removed in 3.0. Use getSecret() instead.', E_USER_DEPRECATED);
-
-        return $this->getSecret();
     }
 
     /**

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
@@ -23,41 +23,13 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 class LazyLoadingFragmentHandler extends FragmentHandler
 {
     private $container;
-    private $rendererIds = array();
+    private $initialized = array();
 
-    /**
-     * RequestStack will become required in 3.0.
-     *
-     * @param ContainerInterface $container    A container
-     * @param RequestStack       $requestStack The Request stack that controls the lifecycle of requests
-     * @param bool               $debug        Whether the debug mode is enabled or not
-     */
-    public function __construct(ContainerInterface $container, $requestStack = null, $debug = false)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, bool $debug = false)
     {
         $this->container = $container;
 
-        if ((null !== $requestStack && !$requestStack instanceof RequestStack) || $debug instanceof RequestStack) {
-            $tmp = $debug;
-            $debug = $requestStack;
-            $requestStack = \func_num_args() < 3 ? null : $tmp;
-
-            @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as second argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
-        } elseif (!$requestStack instanceof RequestStack) {
-            @trigger_error('The '.__METHOD__.' method now requires a RequestStack instance as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
-        }
-
         parent::__construct($requestStack, array(), $debug);
-    }
-
-    /**
-     * Adds a service as a fragment renderer.
-     *
-     * @param string $name     The service name
-     * @param string $renderer The render service id
-     */
-    public function addRendererService($name, $renderer)
-    {
-        $this->rendererIds[$name] = $renderer;
     }
 
     /**
@@ -65,10 +37,9 @@ class LazyLoadingFragmentHandler extends FragmentHandler
      */
     public function render($uri, $renderer = 'inline', array $options = array())
     {
-        if (isset($this->rendererIds[$renderer])) {
-            $this->addRenderer($this->container->get($this->rendererIds[$renderer]));
-
-            unset($this->rendererIds[$renderer]);
+        if (!isset($this->initialized[$renderer]) && $this->container->has($renderer)) {
+            $this->addRenderer($this->container->get($renderer));
+            $this->initialized[$renderer] = true;
         }
 
         return parent::render($uri, $renderer, $options);

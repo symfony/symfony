@@ -1,0 +1,11 @@
+services:
+    _defaults: {public: true}
+    bar:
+        class: stdClass
+    Bar:
+        class: stdClass
+        properties: { bar: '@bar' }
+    BAR:
+        class: Bar\FooClass
+        arguments: ['@Bar']
+        calls: [[setBar, ['@bar']]]

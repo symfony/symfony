@@ -13,8 +13,8 @@ namespace Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 /**
  * EntityFactory creates services for Doctrine user provider.
@@ -27,7 +27,7 @@ class EntityFactory implements UserProviderFactoryInterface
     private $key;
     private $providerId;
 
-    public function __construct($key, $providerId)
+    public function __construct(string $key, string $providerId)
     {
         $this->key = $key;
         $this->providerId = $providerId;
@@ -36,7 +36,7 @@ class EntityFactory implements UserProviderFactoryInterface
     public function create(ContainerBuilder $container, $id, $config)
     {
         $container
-            ->setDefinition($id, new DefinitionDecorator($this->providerId))
+            ->setDefinition($id, new ChildDefinition($this->providerId))
             ->addArgument($config['class'])
             ->addArgument($config['property'])
             ->addArgument($config['manager_name'])

@@ -46,8 +46,6 @@ class ParameterBagTest extends TestCase
         ));
         $bag->remove('foo');
         $this->assertEquals(array('bar' => 'bar'), $bag->all(), '->remove() removes a parameter');
-        $bag->remove('BAR');
-        $this->assertEquals(array(), $bag->all(), '->remove() converts key to lowercase before removing');
     }
 
     public function testGetSet()
@@ -59,10 +57,6 @@ class ParameterBagTest extends TestCase
         $bag->set('foo', 'baz');
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
 
-        $bag->set('Foo', 'baz1');
-        $this->assertEquals('baz1', $bag->get('foo'), '->set() converts the key to lowercase');
-        $this->assertEquals('baz1', $bag->get('FOO'), '->get() converts the key to lowercase');
-
         try {
             $bag->get('baba');
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
@@ -72,45 +66,60 @@ class ParameterBagTest extends TestCase
         }
     }
 
-    public function testGetThrowParameterNotFoundException()
+    /**
+     * @dataProvider provideGetThrowParameterNotFoundExceptionData
+     */
+    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage)
     {
         $bag = new ParameterBag(array(
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
+            'fiz' => array('bar' => array('boo' => 12)),
         ));
 
-        try {
-            $bag->get('foo1');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "foo1". Did you mean this: "foo"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(ParameterNotFoundException::class);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->setExpectedException(ParameterNotFoundException::class, $exceptionMessage);
         }
 
-        try {
-            $bag->get('bag');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
-        }
+        $bag->get($parameterKey);
+    }
 
-        try {
-            $bag->get('');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "".', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
-        }
+    public function provideGetThrowParameterNotFoundExceptionData()
+    {
+        return array(
+            array('foo1', 'You have requested a non-existent parameter "foo1". Did you mean this: "foo"?'),
+            array('bag', 'You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz"?'),
+            array('', 'You have requested a non-existent parameter "".'),
+
+            array('fiz.bar.boo', 'You have requested a non-existent parameter "fiz.bar.boo". You cannot access nested array items, do you want to inject "fiz" instead?'),
+        );
     }
 
     public function testHas()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
-        $this->assertTrue($bag->has('Foo'), '->has() converts the key to lowercase');
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
+    }
+
+    public function testMixedCase()
+    {
+        $bag = new ParameterBag(array(
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'BAR' => 'baz',
+        ));
+
+        $bag->remove('BAR');
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $bag->all());
+
+        $bag->set('Foo', 'baz1');
+        $this->assertEquals('foo', $bag->get('foo'));
+        $this->assertEquals('baz1', $bag->get('Foo'));
     }
 
     public function testResolveValue()

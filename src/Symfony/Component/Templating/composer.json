@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": "^7.1.3",
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
@@ -34,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

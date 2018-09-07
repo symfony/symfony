@@ -21,23 +21,14 @@ final class GitRepository
 {
     private $path;
 
-    /**
-     * @param string $path
-     */
-    public function __construct($path)
+    public function __construct(string $path)
     {
         $this->path = $path;
 
         $this->getUrl();
     }
 
-    /**
-     * @param string $remote
-     * @param string $targetDir
-     *
-     * @return GitRepository
-     */
-    public static function download($remote, $targetDir)
+    public static function download(string $remote, string $targetDir): self
     {
         self::exec('which git', 'The command "git" is not installed.');
 

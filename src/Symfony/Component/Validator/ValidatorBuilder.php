@@ -15,31 +15,34 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Translation\IdentityTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
-use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
+use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.2
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
     private $initializers = array();
+    private $loaders = array();
     private $xmlMappings = array();
     private $yamlMappings = array();
     private $methodMappings = array();
@@ -73,11 +76,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var null|string
      */
     private $translationDomain;
-
-    /**
-     * @var PropertyAccessorInterface|null
-     */
-    private $propertyAccessor;
 
     /**
      * {@inheritdoc}
@@ -248,10 +246,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
-        if (null !== $this->propertyAccessor) {
-            throw new ValidatorException('You cannot set a validator factory after setting a custom property accessor. Remove the call to setPropertyAccessor() if you want to call setConstraintValidatorFactory().');
-        }
-
         $this->validatorFactory = $validatorFactory;
 
         return $this;
@@ -260,9 +254,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(LegacyTranslatorInterface $translator)
     {
-        $this->translator = $translator;
+        $this->translator = $translator instanceof LegacyTranslatorProxy ? $translator->getTranslator() : $translator;
 
         return $this;
     }
@@ -278,38 +272,39 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     *             The validator will function without a property accessor.
+     * @return $this
      */
-    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    public function addLoader(LoaderInterface $loader)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
-
-        if (null !== $this->validatorFactory) {
-            throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');
-        }
-
-        $this->propertyAccessor = $propertyAccessor;
+        $this->loaders[] = $loader;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @return LoaderInterface[]
      */
-    public function setApiVersion($apiVersion)
+    public function getLoaders()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        $loaders = array();
 
-        if (!\in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
-            throw new InvalidArgumentException(sprintf('The requested API version is invalid: "%s"', $apiVersion));
+        foreach ($this->xmlMappings as $xmlMapping) {
+            $loaders[] = new XmlFileLoader($xmlMapping);
         }
 
-        return $this;
+        foreach ($this->yamlMappings as $yamlMappings) {
+            $loaders[] = new YamlFileLoader($yamlMappings);
+        }
+
+        foreach ($this->methodMappings as $methodName) {
+            $loaders[] = new StaticMethodLoader($methodName);
+        }
+
+        if ($this->annotationReader) {
+            $loaders[] = new AnnotationLoader($this->annotationReader);
+        }
+
+        return array_merge($loaders, $this->loaders);
     }
 
     /**
@@ -320,28 +315,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $metadataFactory = $this->metadataFactory;
 
         if (!$metadataFactory) {
-            $loaders = array();
-
-            if (\count($this->xmlMappings) > 1) {
-                $loaders[] = new XmlFilesLoader($this->xmlMappings);
-            } elseif (1 === \count($this->xmlMappings)) {
-                $loaders[] = new XmlFileLoader($this->xmlMappings[0]);
-            }
-
-            if (\count($this->yamlMappings) > 1) {
-                $loaders[] = new YamlFilesLoader($this->yamlMappings);
-            } elseif (1 === \count($this->yamlMappings)) {
-                $loaders[] = new YamlFileLoader($this->yamlMappings[0]);
-            }
-
-            foreach ($this->methodMappings as $methodName) {
-                $loaders[] = new StaticMethodLoader($methodName);
-            }
-
-            if ($this->annotationReader) {
-                $loaders[] = new AnnotationLoader($this->annotationReader);
-            }
-
+            $loaders = $this->getLoaders();
             $loader = null;
 
             if (\count($loaders) > 1) {
@@ -353,11 +327,13 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->metadataCache);
         }
 
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
+        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
         $translator = $this->translator;
 
         if (null === $translator) {
-            $translator = new IdentityTranslator();
+            $translator = new class() implements TranslatorInterface {
+                use TranslatorTrait;
+            };
             // Force the locale to be 'en' when no translator is provided rather than relying on the Intl default locale
             // This avoids depending on Intl or the stub implementation being available. It also ensures that Symfony
             // validation messages are pluralized properly even when the default locale gets changed because they are in

@@ -71,7 +71,6 @@ class AnnotationLoader implements LoaderInterface
                 foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
                     if ($constraint instanceof Callback) {
                         $constraint->callback = $method->getName();
-                        $constraint->methods = null;
 
                         $metadata->addConstraint($constraint);
                     } elseif ($constraint instanceof Constraint) {

@@ -79,7 +79,7 @@ class StopwatchTest extends TestCase
         $event = $stopwatch->stop('foo');
 
         $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+        $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
     }
 
     /**
@@ -98,6 +98,18 @@ class StopwatchTest extends TestCase
     {
         $stopwatch = new Stopwatch();
         $stopwatch->stop('foo');
+    }
+
+    public function testMorePrecision()
+    {
+        $stopwatch = new Stopwatch(true);
+
+        $stopwatch->start('foo');
+        $event = $stopwatch->stop('foo');
+
+        $this->assertInternalType('float', $event->getStartTime());
+        $this->assertInternalType('float', $event->getEndTime());
+        $this->assertInternalType('float', $event->getDuration());
     }
 
     public function testSection()
@@ -152,5 +164,17 @@ class StopwatchTest extends TestCase
     {
         $stopwatch = new Stopwatch();
         $stopwatch->openSection('section');
+    }
+
+    public function testReset()
+    {
+        $stopwatch = new Stopwatch();
+
+        $stopwatch->openSection();
+        $stopwatch->start('foo', 'cat');
+
+        $stopwatch->reset();
+
+        $this->assertEquals(new Stopwatch(), $stopwatch);
     }
 }

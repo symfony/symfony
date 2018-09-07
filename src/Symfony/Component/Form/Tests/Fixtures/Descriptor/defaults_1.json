@@ -1,0 +1,14 @@
+{
+    "builtin_form_types": [
+        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType"
+    ],
+    "service_form_types": [
+        "Symfony\\Bridge\\Doctrine\\Form\\Type\\EntityType"
+    ],
+    "type_extensions": [
+        "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension"
+    ],
+    "type_guessers": [
+        "Symfony\\Component\\Form\\Extension\\Validator\\ValidatorTypeGuesser"
+    ]
+}

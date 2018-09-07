@@ -28,12 +28,21 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('translator.default', '%translator.class%');
         $container->register('translator.logging', '%translator.class%');
         $container->setAlias('translator', 'translator.default');
-        $translationWarmerDefinition = $container->register('translation.warmer')->addArgument(new Reference('translator'));
+        $translationWarmerDefinition = $container->register('translation.warmer')
+            ->addArgument(new Reference('translator'))
+            ->addTag('container.service_subscriber', array('id' => 'translator'))
+            ->addTag('container.service_subscriber', array('id' => 'foo'));
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
 
-        $this->assertEquals(new Reference('translator.logging.inner'), $translationWarmerDefinition->getArgument(0));
+        $this->assertEquals(
+            array('container.service_subscriber' => array(
+                array('id' => 'foo'),
+                array('key' => 'translator', 'id' => 'translator.logging.inner'),
+            )),
+            $translationWarmerDefinition->getTags()
+        );
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition()
@@ -42,11 +51,15 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('identity_translator');
         $container->setAlias('translator', 'identity_translator');
 
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
+
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
 
-        // we just check that the compiler pass does not break if a logger is not registered
-        $this->addToAssertionCount(1);
+        // the container is untouched (i.e. no new definitions or aliases)
+        $this->assertCount($definitionsBefore, $container->getDefinitions());
+        $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition()
@@ -55,10 +68,14 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('monolog.logger');
         $container->setAlias('logger', 'monolog.logger');
 
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
+
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
 
-        // we just check that the compiler pass does not break if a translator is not registered
-        $this->addToAssertionCount(1);
+        // the container is untouched (i.e. no new definitions or aliases)
+        $this->assertCount($definitionsBefore, $container->getDefinitions());
+        $this->assertCount($aliasesBefore, $container->getAliases());
     }
 }

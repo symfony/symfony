@@ -1,0 +1,4 @@
+baz_route:
+    path: /baz
+    defaults:
+        _controller: AppBundle:Baz:view

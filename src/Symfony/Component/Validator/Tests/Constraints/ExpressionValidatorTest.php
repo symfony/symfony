@@ -11,23 +11,17 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ToString;
-use Symfony\Component\Validator\Validation;
 
-class ExpressionValidatorTest extends AbstractConstraintValidatorTest
+class ExpressionValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
-        return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
+        return new ExpressionValidator();
     }
 
     public function testExpressionIsEvaluatedWithNullValue()
@@ -275,5 +269,19 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $validator->validate(null, $constraint);
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
+    }
+
+    public function testPassingCustomValues()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'value + custom == 2',
+            'values' => array(
+                'custom' => 1,
+            ),
+        ));
+
+        $this->validator->validate(1, $constraint);
+
+        $this->assertNoViolation();
     }
 }

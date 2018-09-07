@@ -157,9 +157,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return array(
             'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
-            'Aliases' => array_map(function (\ResourceBundle $bundle) {
-                return $bundle['replacement'];
-            }, iterator_to_array($metadataBundle['alias']['language'])),
+            'Aliases' => array_column(iterator_to_array($metadataBundle['alias']['language']), 'replacement'),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
         );
     }

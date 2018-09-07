@@ -24,16 +24,6 @@ class DateTimeTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('datetime');
-
-        $this->assertSame('datetime', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitDateTime()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -58,6 +48,34 @@ class DateTimeTypeTest extends BaseTypeTest
         ));
 
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
+
+        $this->assertEquals($dateTime, $form->getData());
+    }
+
+    public function testSubmitDateTimeImmutable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'years' => array(2010),
+            'time_widget' => 'choice',
+            'input' => 'datetime_immutable',
+        ));
+
+        $form->submit(array(
+            'date' => array(
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '3',
+                'minute' => '4',
+            ),
+        ));
+
+        $dateTime = new \DateTimeImmutable('2010-06-02 03:04:00 UTC');
 
         $this->assertEquals($dateTime, $form->getData());
     }
@@ -229,6 +247,26 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }
 
+    public function testSubmitDifferentTimezonesDateTimeImmutable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'America/New_York',
+            'view_timezone' => 'Pacific/Tahiti',
+            'widget' => 'single_text',
+            'input' => 'datetime_immutable',
+        ));
+
+        $outputTime = new \DateTimeImmutable('2010-06-02 03:04:00 Pacific/Tahiti');
+
+        $form->submit('2010-06-02T03:04:00-10:00');
+
+        $outputTime = $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
+        $this->assertEquals($outputTime, $form->getData());
+        $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
+    }
+
     public function testSubmitStringSingleText()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -342,31 +380,6 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty', $view['time']['hour']->vars['placeholder']);
         $this->assertSame('Empty', $view['time']['minute']->vars['placeholder']);
         $this->assertSame('Empty', $view['time']['second']->vars['placeholder']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPassEmptyValueBC()
-    {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
-            'empty_value' => 'Empty',
-            'with_seconds' => true,
-        ))
-            ->createView();
-
-        $this->assertSame('Empty', $view['date']['year']->vars['placeholder']);
-        $this->assertSame('Empty', $view['date']['month']->vars['placeholder']);
-        $this->assertSame('Empty', $view['date']['day']->vars['placeholder']);
-        $this->assertSame('Empty', $view['time']['hour']->vars['placeholder']);
-        $this->assertSame('Empty', $view['time']['minute']->vars['placeholder']);
-        $this->assertSame('Empty', $view['time']['second']->vars['placeholder']);
-        $this->assertSame('Empty', $view['date']['year']->vars['empty_value']);
-        $this->assertSame('Empty', $view['date']['month']->vars['empty_value']);
-        $this->assertSame('Empty', $view['date']['day']->vars['empty_value']);
-        $this->assertSame('Empty', $view['time']['hour']->vars['empty_value']);
-        $this->assertSame('Empty', $view['time']['minute']->vars['empty_value']);
-        $this->assertSame('Empty', $view['time']['second']->vars['empty_value']);
     }
 
     public function testPassPlaceholderAsArray()

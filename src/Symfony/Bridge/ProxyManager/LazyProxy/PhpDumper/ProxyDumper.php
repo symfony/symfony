@@ -13,8 +13,7 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
 use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use ProxyManager\Version;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
@@ -22,6 +21,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  * Generates dumped PHP code of proxies via reflection.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @final
  */
 class ProxyDumper implements DumperInterface
 {
@@ -29,10 +30,7 @@ class ProxyDumper implements DumperInterface
     private $proxyGenerator;
     private $classGenerator;
 
-    /**
-     * @param string $salt
-     */
-    public function __construct($salt = '')
+    public function __construct(string $salt = '')
     {
         $this->salt = $salt;
         $this->proxyGenerator = new LazyLoadingValueHolderGenerator();
@@ -44,46 +42,37 @@ class ProxyDumper implements DumperInterface
      */
     public function isProxyCandidate(Definition $definition)
     {
-        return $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class);
+        return ($definition->isLazy() || $definition->hasTag('proxy')) && $this->proxyGenerator->getProxifiedClass($definition);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id)
+    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null)
     {
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= " \$this->services['$id'] =";
-
-            if (\defined('Symfony\Component\DependencyInjection\ContainerInterface::SCOPE_CONTAINER') && ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
-                $instantiation .= " \$this->scopedServices['$scope']['$id'] =";
-            }
+            $instantiation .= sprintf(' $this->%s[\'%s\'] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', $id);
         }
 
-        $methodName = 'get'.Container::camelize($id).'Service';
+        if (null === $factoryCode) {
+            throw new \InvalidArgumentException(sprintf('Missing factory code to construct the service "%s".', $id));
+        }
+
         $proxyClass = $this->getProxyClassName($definition);
-
-        $generatedClass = $this->generateProxyClass($definition);
-
-        $constructorCall = $generatedClass->hasMethod('staticProxyConstructor')
-            ? $proxyClass.'::staticProxyConstructor'
-            : 'new '.$proxyClass;
 
         return <<<EOF
         if (\$lazyLoad) {
-            \$container = \$this;
-
-            $instantiation $constructorCall(
-                function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
-                    \$wrappedInstance = \$container->$methodName(false);
+            $instantiation \$this->createProxy('$proxyClass', function () {
+                return \\$proxyClass::staticProxyConstructor(function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
+                    \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
 
                     return true;
-                }
-            );
+                });
+            });
         }
 
 
@@ -95,32 +84,53 @@ EOF;
      */
     public function getProxyCode(Definition $definition)
     {
-        return preg_replace(
-            '/(\$this->initializer[0-9a-f]++) && \1->__invoke\(\$this->(valueHolder[0-9a-f]++), (.*?), \1\);/',
-            '$1 && ($1->__invoke(\$$2, $3, $1) || 1) && $this->$2 = \$$2;',
-            $this->classGenerator->generate($this->generateProxyClass($definition))
-        );
+        $code = $this->classGenerator->generate($this->generateProxyClass($definition));
+
+        if (version_compare(self::getProxyManagerVersion(), '2.2', '<')) {
+            $code = preg_replace(
+                '/((?:\$(?:this|initializer|instance)->)?(?:publicProperties|initializer|valueHolder))[0-9a-f]++/',
+                '${1}'.$this->getIdentifierSuffix($definition),
+                $code
+            );
+        }
+
+        return $code;
+    }
+
+    private static function getProxyManagerVersion(): string
+    {
+        if (!\class_exists(Version::class)) {
+            return '0.0.1';
+        }
+
+        return \defined(Version::class.'::VERSION') ? Version::VERSION : Version::getVersion();
     }
 
     /**
      * Produces the proxy class name for the given definition.
-     *
-     * @return string
      */
-    private function getProxyClassName(Definition $definition)
+    private function getProxyClassName(Definition $definition): string
     {
-        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition).$this->salt;
+        $class = $this->proxyGenerator->getProxifiedClass($definition);
+
+        return preg_replace('/^.*\\\\/', '', $class).'_'.$this->getIdentifierSuffix($definition);
     }
 
-    /**
-     * @return ClassGenerator
-     */
-    private function generateProxyClass(Definition $definition)
+    private function generateProxyClass(Definition $definition): ClassGenerator
     {
         $generatedClass = new ClassGenerator($this->getProxyClassName($definition));
+        $class = $this->proxyGenerator->getProxifiedClass($definition);
 
-        $this->proxyGenerator->generate(new \ReflectionClass($definition->getClass()), $generatedClass);
+        $this->proxyGenerator->setFluentSafe($definition->hasTag('proxy'));
+        $this->proxyGenerator->generate(new \ReflectionClass($class), $generatedClass);
 
         return $generatedClass;
+    }
+
+    private function getIdentifierSuffix(Definition $definition): string
+    {
+        $class = $this->proxyGenerator->getProxifiedClass($definition);
+
+        return substr(hash('sha256', $class.$this->salt), -7);
     }
 }

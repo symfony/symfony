@@ -27,20 +27,21 @@ class VarDumper
 
     public static function dump($var)
     {
-        if (null !== self::$handler) {
-            return \call_user_func(self::$handler, $var);
+        if (null === self::$handler) {
+            $cloner = new VarCloner();
+
+            if (isset($_SERVER['VAR_DUMPER_FORMAT'])) {
+                $dumper = 'html' === $_SERVER['VAR_DUMPER_FORMAT'] ? new HtmlDumper() : new CliDumper();
+            } else {
+                $dumper = \in_array(\PHP_SAPI, array('cli', 'phpdbg')) ? new CliDumper() : new HtmlDumper();
+            }
+
+            self::$handler = function ($var) use ($cloner, $dumper) {
+                $dumper->dump($cloner->cloneVar($var));
+            };
         }
 
-        $cloner = new VarCloner();
-        if (isset($_SERVER['VAR_DUMPER_FORMAT'])) {
-            $dumper = 'html' === $_SERVER['VAR_DUMPER_FORMAT'] ? new HtmlDumper() : new CliDumper();
-        } else {
-            $dumper = \in_array(\PHP_SAPI, array('cli', 'phpdbg')) ? new CliDumper() : new HtmlDumper();
-        }
-
-        self::$handler = function ($var) use ($cloner, $dumper) {
-            $dumper->dump($cloner->cloneVar($var));
-        };
+        return \call_user_func(self::$handler, $var);
     }
 
     public static function setHandler(callable $callable = null)

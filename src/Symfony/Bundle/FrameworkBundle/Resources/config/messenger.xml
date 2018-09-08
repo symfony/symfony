@@ -8,7 +8,7 @@
         <defaults public="false" />
 
         <!-- Asynchronous -->
-        <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Asynchronous\Routing\SenderLocator">
+        <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Asynchronous\Routing\ContainerSenderLocator">
             <argument type="service" id="messenger.sender_locator" />
             <argument type="collection" /> <!-- Message to sender ID mapping -->
         </service>

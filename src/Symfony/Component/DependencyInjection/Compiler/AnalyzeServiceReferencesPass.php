@@ -79,9 +79,10 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         }
     }
 
-    protected function processValue($value, $isRoot = false, bool $inExpression = false)
+    protected function processValue($value, $isRoot = false)
     {
         $lazy = $this->lazy;
+        $inExpression = $this->inExpression();
 
         if ($value instanceof ArgumentInterface) {
             $this->lazy = true;

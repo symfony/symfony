@@ -32,6 +32,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     private $processExpressions = false;
     private $expressionLanguage;
+    private $inExpression = false;
 
     /**
      * {@inheritdoc}
@@ -52,12 +53,21 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         $this->processExpressions = true;
     }
 
+    protected function inExpression(bool $reset = true): bool
+    {
+        $inExpression = $this->inExpression;
+        if ($reset) {
+            $this->inExpression = false;
+        }
+
+        return $inExpression;
+    }
+
     /**
      * Processes a value found in a definition tree.
      *
      * @param mixed $value
      * @param bool  $isRoot
-     * @param bool  $inExpression
      *
      * @return mixed The processed value
      */
@@ -194,7 +204,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
                 if ('""' === substr_replace($arg, '', 1, -1)) {
                     $id = stripcslashes(substr($arg, 1, -1));
-                    $arg = $this->processValue(new Reference($id), false, true);
+                    $this->inExpression = true;
+                    $arg = $this->processValue(new Reference($id));
+                    $this->inExpression = false;
                     if (!$arg instanceof Reference) {
                         throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, %s returned for service("%s").', \get_class($this), \is_object($arg) ? \get_class($arg) : \gettype($arg)));
                     }

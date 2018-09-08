@@ -145,10 +145,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
         @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (!isset($this->groups[$offset])) {
-            throw new OutOfBoundsException(sprintf(
-                'The offset "%s" does not exist.',
-                $offset
-            ));
+            throw new OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
         }
 
         return $this->groups[$offset];

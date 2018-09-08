@@ -237,11 +237,7 @@ abstract class DoctrineType extends AbstractType
             $em = $registry->getManagerForClass($options['class']);
 
             if (null === $em) {
-                throw new RuntimeException(sprintf(
-                    'Class "%s" seems not to be a managed Doctrine entity. '.
-                    'Did you forget to map it?',
-                    $options['class']
-                ));
+                throw new RuntimeException(sprintf('Class "%s" seems not to be a managed Doctrine entity. Did you forget to map it?', $options['class']));
             }
 
             return $em;

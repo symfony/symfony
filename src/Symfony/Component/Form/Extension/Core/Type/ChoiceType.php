@@ -132,10 +132,7 @@ class ChoiceType extends AbstractType
 
                 // Throw exception if unknown values were submitted
                 if (\count($unknownValues) > 0) {
-                    throw new TransformationFailedException(sprintf(
-                        'The choices "%s" do not exist in the choice list.',
-                        implode('", "', array_keys($unknownValues))
-                    ));
+                    throw new TransformationFailedException(sprintf('The choices "%s" do not exist in the choice list.', implode('", "', array_keys($unknownValues))));
                 }
 
                 $event->setData($data);

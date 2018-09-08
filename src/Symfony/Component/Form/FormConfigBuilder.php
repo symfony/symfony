@@ -821,11 +821,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $upperCaseMethod = strtoupper($method);
 
         if (!\in_array($upperCaseMethod, self::$allowedMethods)) {
-            throw new InvalidArgumentException(sprintf(
-                'The form method is "%s", but should be one of "%s".',
-                $method,
-                implode('", "', self::$allowedMethods)
-            ));
+            throw new InvalidArgumentException(sprintf('The form method is "%s", but should be one of "%s".', $method, implode('", "', self::$allowedMethods)));
         }
 
         $this->method = $upperCaseMethod;
@@ -892,10 +888,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         if (!self::isValidName($name)) {
-            throw new InvalidArgumentException(sprintf(
-                'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
-                $name
-            ));
+            throw new InvalidArgumentException(sprintf('The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").', $name));
         }
     }
 

@@ -222,17 +222,11 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     public function addConstraint(Constraint $constraint)
     {
         if (!\in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets())) {
-            throw new ConstraintDefinitionException(sprintf(
-                'The constraint "%s" cannot be put on classes.',
-                \get_class($constraint)
-            ));
+            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', \get_class($constraint)));
         }
 
         if ($constraint instanceof Valid) {
-            throw new ConstraintDefinitionException(sprintf(
-                'The constraint "%s" cannot be put on classes.',
-                \get_class($constraint)
-            ));
+            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on classes.', \get_class($constraint)));
         }
 
         if ($constraint instanceof Traverse) {

@@ -35,10 +35,7 @@ abstract class AbstractComparison extends Constraint
         }
 
         if (\is_array($options) && !isset($options['value'])) {
-            throw new ConstraintDefinitionException(sprintf(
-                'The %s constraint requires the "value" option to be set.',
-                \get_class($this)
-            ));
+            throw new ConstraintDefinitionException(sprintf('The %s constraint requires the "value" option to be set.', \get_class($this)));
         }
 
         parent::__construct($options);

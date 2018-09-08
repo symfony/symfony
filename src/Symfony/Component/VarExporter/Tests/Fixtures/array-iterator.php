@@ -2,7 +2,7 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\ArrayIterator::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\ArrayIterator::class, true)),
+        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\ArrayIterator::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\ArrayIterator::class)),
     ],
     null,
     [

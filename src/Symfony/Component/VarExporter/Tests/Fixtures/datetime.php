@@ -2,7 +2,7 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\DateTime::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\DateTime::class, true)),
+        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\DateTime::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\DateTime::class)),
     ],
     null,
     [

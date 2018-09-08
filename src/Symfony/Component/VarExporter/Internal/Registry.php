@@ -46,43 +46,50 @@ class Registry
         return $objects;
     }
 
-    public static function p($class, $instantiableWithoutConstructor)
+    public static function p($class)
     {
-        self::getClassReflector($class, $instantiableWithoutConstructor, true);
+        self::getClassReflector($class, true, true);
 
         return self::$prototypes[$class];
     }
 
-    public static function f($class, $instantiableWithoutConstructor)
+    public static function f($class)
     {
-        $reflector = self::$reflectors[$class] ?? self::getClassReflector($class, $instantiableWithoutConstructor, false);
+        $reflector = self::$reflectors[$class] ?? self::getClassReflector($class, true, false);
 
-        return self::$factories[$class] = \Closure::fromCallable(array($reflector, $instantiableWithoutConstructor ? 'newInstanceWithoutConstructor' : 'newInstance'));
+        return self::$factories[$class] = \Closure::fromCallable(array($reflector, 'newInstanceWithoutConstructor'));
     }
 
-    public static function getClassReflector($class, $instantiableWithoutConstructor = null, $cloneable = null)
+    public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
     {
         $reflector = new \ReflectionClass($class);
 
-        if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor ?? (!$reflector->isFinal() || !$reflector->isInternal())) {
+        if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor || !$reflector->isFinal()) {
             $proto = $reflector->newInstanceWithoutConstructor();
         } else {
-            try {
-                $proto = $reflector->newInstance();
-            } catch (\Throwable $e) {
-                throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class), 0, $e);
+            self::$instantiableWithoutConstructor[$class] = true;
+            $r = $reflector;
+            do {
+                if ($r->isInternal()) {
+                    self::$instantiableWithoutConstructor[$class] = false;
+                    if (false === $proto = @unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')) {
+                        throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
+                    }
+                    break;
+                }
+            } while ($r = $r->getParentClass());
+
+            if (!$r) {
+                $proto = $reflector->newInstanceWithoutConstructor();
             }
         }
 
-        if (null !== self::$cloneable[$class] = $cloneable) {
-            // no-op
-        } elseif ($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) {
-            if (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup')) {
+        if (null === self::$cloneable[$class] = $cloneable) {
+            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup'))) {
                 throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
             }
-            self::$cloneable[$class] = false;
-        } else {
-            self::$cloneable[$class] = !$reflector->hasMethod('__clone');
+
+            self::$cloneable[$class] = $reflector->isCloneable() && !$reflector->hasMethod('__clone');
         }
 
         self::$prototypes[$class] = $proto;

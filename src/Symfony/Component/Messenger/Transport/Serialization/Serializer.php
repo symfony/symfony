@@ -13,6 +13,10 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -29,6 +33,15 @@ class Serializer implements DecoderInterface, EncoderInterface
         $this->serializer = $serializer;
         $this->format = $format;
         $this->context = $context;
+    }
+
+    public static function create(): self
+    {
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new SymfonySerializer($normalizers, $encoders);
+
+        return new self($serializer);
     }
 
     /**

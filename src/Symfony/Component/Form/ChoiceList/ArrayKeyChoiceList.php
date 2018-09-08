@@ -70,10 +70,7 @@ class ArrayKeyChoiceList extends ArrayChoiceList
     public static function toArrayKey($choice)
     {
         if (!is_scalar($choice) && null !== $choice) {
-            throw new InvalidArgumentException(sprintf(
-                'The value of type "%s" cannot be converted to a valid array key.',
-                \gettype($choice)
-            ));
+            throw new InvalidArgumentException(sprintf('The value of type "%s" cannot be converted to a valid array key.', \gettype($choice)));
         }
 
         if (\is_bool($choice) || (string) (int) $choice === (string) $choice) {

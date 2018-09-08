@@ -70,11 +70,7 @@ abstract class Constraint
     public static function getErrorName($errorCode)
     {
         if (!isset(static::$errorNames[$errorCode])) {
-            throw new InvalidArgumentException(sprintf(
-                'The error code "%s" does not exist for constraint of type "%s".',
-                $errorCode,
-                \get_called_class()
-            ));
+            throw new InvalidArgumentException(sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, \get_called_class()));
         }
 
         return static::$errorNames[$errorCode];
@@ -137,9 +133,7 @@ abstract class Constraint
             $option = $this->getDefaultOption();
 
             if (null === $option) {
-                throw new ConstraintDefinitionException(
-                    sprintf('No default option is configured for constraint %s', \get_class($this))
-                );
+                throw new ConstraintDefinitionException(sprintf('No default option is configured for constraint %s', \get_class($this)));
             }
 
             if (array_key_exists($option, $knownOptions)) {
@@ -151,17 +145,11 @@ abstract class Constraint
         }
 
         if (\count($invalidOptions) > 0) {
-            throw new InvalidOptionsException(
-                sprintf('The options "%s" do not exist in constraint %s', implode('", "', $invalidOptions), \get_class($this)),
-                $invalidOptions
-            );
+            throw new InvalidOptionsException(sprintf('The options "%s" do not exist in constraint %s', implode('", "', $invalidOptions), \get_class($this)), $invalidOptions);
         }
 
         if (\count($missingOptions) > 0) {
-            throw new MissingOptionsException(
-                sprintf('The options "%s" must be set for constraint %s', implode('", "', array_keys($missingOptions)), \get_class($this)),
-                array_keys($missingOptions)
-            );
+            throw new MissingOptionsException(sprintf('The options "%s" must be set for constraint %s', implode('", "', array_keys($missingOptions)), \get_class($this)), array_keys($missingOptions));
         }
     }
 

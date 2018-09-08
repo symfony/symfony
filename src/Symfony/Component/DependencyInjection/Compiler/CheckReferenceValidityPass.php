@@ -94,12 +94,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
                 $targetDefinition = $this->getDefinition((string) $argument);
 
                 if (null !== $targetDefinition && $targetDefinition->isAbstract()) {
-                    throw new RuntimeException(sprintf(
-                        'The definition "%s" has a reference to an abstract definition "%s". '
-                       .'Abstract definitions cannot be the target of references.',
-                       $this->currentId,
-                       $argument
-                    ));
+                    throw new RuntimeException(sprintf('The definition "%s" has a reference to an abstract definition "%s". Abstract definitions cannot be the target of references.', $this->currentId, $argument));
                 }
 
                 $this->validateScope($argument, $targetDefinition);

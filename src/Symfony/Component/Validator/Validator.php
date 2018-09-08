@@ -34,13 +34,8 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     private $translationDomain;
     private $objectInitializers;
 
-    public function __construct(
-        MetadataFactoryInterface $metadataFactory,
-        ConstraintValidatorFactoryInterface $validatorFactory,
-        TranslatorInterface $translator,
-        $translationDomain = 'validators',
-        array $objectInitializers = array()
-    ) {
+    public function __construct(MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, TranslatorInterface $translator, $translationDomain = 'validators', array $objectInitializers = array())
+    {
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
         $this->translator = $translator;
@@ -175,12 +170,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
                 //
                 //  * Otherwise the validated group is propagated.
 
-                throw new ValidatorException(
-                    sprintf(
-                        'The constraint %s cannot be validated. Use the method validate() instead.',
-                        \get_class($constraint)
-                    )
-                );
+                throw new ValidatorException(sprintf('The constraint %s cannot be validated. Use the method validate() instead.', \get_class($constraint)));
             }
 
             $context->validateValue($value, $constraint, '', $groups);

@@ -94,10 +94,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         if ($defaultEntryPointId) {
             // explode if they've configured the entry_point, but there is already one
             if ($config['entry_point']) {
-                throw new \LogicException(sprintf(
-                    'The guard authentication provider cannot use the "%s" entry_point because another entry point is already configured by another provider! Either remove the other provider or move the entry_point configuration as a root key under your firewall (i.e. at the same level as "guard").',
-                    $config['entry_point']
-                ));
+                throw new \LogicException(sprintf('The guard authentication provider cannot use the "%s" entry_point because another entry point is already configured by another provider! Either remove the other provider or move the entry_point configuration as a root key under your firewall (i.e. at the same level as "guard").', $config['entry_point']));
             }
 
             return $defaultEntryPointId;
@@ -115,9 +112,6 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         }
 
         // we have multiple entry points - we must ask them to configure one
-        throw new \LogicException(sprintf(
-            'Because you have multiple guard configurators, you need to set the "guard.entry_point" key to one of your configurators (%s)',
-            implode(', ', $authenticatorIds)
-        ));
+        throw new \LogicException(sprintf('Because you have multiple guard configurators, you need to set the "guard.entry_point" key to one of your configurators (%s)', implode(', ', $authenticatorIds)));
     }
 }

@@ -66,10 +66,7 @@ class FixCheckboxInputListener implements EventSubscriberInterface
             }
 
             if (\count($submittedValues) > 0) {
-                throw new TransformationFailedException(sprintf(
-                    'The following choices were not found: "%s"',
-                    implode('", "', array_keys($submittedValues))
-                ));
+                throw new TransformationFailedException(sprintf('The following choices were not found: "%s"', implode('", "', array_keys($submittedValues))));
             }
         } elseif ('' === $data || null === $data) {
             // Empty values are always accepted.

@@ -33,10 +33,7 @@ class CallbackValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->callback && null !== $constraint->methods) {
-            throw new ConstraintDefinitionException(
-                'The Callback constraint supports either the option "callback" '.
-                'or "methods", but not both at the same time.'
-            );
+            throw new ConstraintDefinitionException('The Callback constraint supports either the option "callback" or "methods", but not both at the same time.');
         }
 
         // has to be an array so that we can differentiate between callables

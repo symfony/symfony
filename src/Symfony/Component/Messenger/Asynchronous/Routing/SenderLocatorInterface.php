@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Transport\SenderInterface;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @experimental in 4.1
  */
 interface SenderLocatorInterface
 {

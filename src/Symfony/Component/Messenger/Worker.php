@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.1
  */
 class Worker
 {

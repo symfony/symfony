@@ -22,8 +22,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * A console command to debug Messenger information.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @experimental in 4.1
  */
 class DebugCommand extends Command
 {

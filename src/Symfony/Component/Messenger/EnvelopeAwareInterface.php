@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger;
  * A Messenger protagonist aware of the message envelope and its content.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.1
  */
 interface EnvelopeAwareInterface
 {

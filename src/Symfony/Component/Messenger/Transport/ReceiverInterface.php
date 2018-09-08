@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Transport;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.1
  */
 interface ReceiverInterface
 {

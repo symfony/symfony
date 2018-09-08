@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger;
  * A message wrapped in an envelope with items (configurations, markers, ...).
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.1
  */
 final class Envelope
 {

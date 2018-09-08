@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -51,13 +51,13 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the public 'bar' shared service.
      *
-     * @return \c5
+     * @return \stdClass
      */
     protected function getBarService()
     {
-        $this->services['bar'] = $instance = new \c5();
+        $this->services['bar'] = $instance = new \stdClass();
 
-        $instance->p5 = new \c6(($this->services['foo'] ?? $this->getFooService()));
+        $instance->p5 = new \stdClass(($this->services['foo'] ?? $this->getFooService()));
 
         return $instance;
     }
@@ -65,7 +65,7 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the public 'foo' shared service.
      *
-     * @return \c1
+     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph
      */
     protected function getFooService()
     {
@@ -75,15 +75,11 @@ class ProjectServiceContainer extends Container
             return $this->services['foo'];
         }
 
-        $b = new \c2();
-
-        $this->services['foo'] = $instance = new \c1($a, $b);
-
-        $c = new \c3();
-
-        $c->p3 = new \c4();
+        $b = new \stdClass();
+        $c = new \stdClass();
+        $c->p3 = new \stdClass();
         $b->p2 = $c;
 
-        return $instance;
+        return $this->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph($a, $b);
     }
 }

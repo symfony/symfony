@@ -43,11 +43,7 @@ class EnumNode extends ScalarNode
         $value = parent::finalizeValue($value);
 
         if (!\in_array($value, $this->values, true)) {
-            $ex = new InvalidConfigurationException(sprintf(
-                'The value %s is not allowed for path "%s". Permissible values: %s',
-                json_encode($value),
-                $this->getPath(),
-                implode(', ', array_map('json_encode', $this->values))));
+            $ex = new InvalidConfigurationException(sprintf('The value %s is not allowed for path "%s". Permissible values: %s', json_encode($value), $this->getPath(), implode(', ', array_map('json_encode', $this->values))));
             $ex->setPath($this->getPath());
 
             throw $ex;

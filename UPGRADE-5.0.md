@@ -163,6 +163,7 @@ Validator
  * Removed the `checkDNS` and `dnsMessage` options from the `Url` constraint.
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final
+ * Removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
 
 Workflow
 --------

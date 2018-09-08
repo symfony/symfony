@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -36,11 +37,11 @@ class Serializer implements DecoderInterface, EncoderInterface
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
-            throw new \InvalidArgumentException('Encoded envelope should have at least a `body` and some `headers`.');
+            throw new InvalidArgumentException('Encoded envelope should have at least a "body" and some "headers".');
         }
 
         if (empty($encodedEnvelope['headers']['type'])) {
-            throw new \InvalidArgumentException('Encoded envelope does not have a `type` header.');
+            throw new InvalidArgumentException('Encoded envelope does not have a "type" header.');
         }
 
         $envelopeItems = $this->decodeEnvelopeItems($encodedEnvelope);

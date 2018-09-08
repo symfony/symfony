@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+
 /**
  * Represents a collection of message handlers.
  *
@@ -29,7 +31,7 @@ class ChainHandler
     public function __construct(array $handlers)
     {
         if (empty($handlers)) {
-            throw new \InvalidArgumentException('A collection of message handlers requires at least one handler.');
+            throw new InvalidArgumentException('A collection of message handlers requires at least one handler.');
         }
 
         $this->handlers = $handlers;

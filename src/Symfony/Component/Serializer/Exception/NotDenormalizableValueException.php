@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer\Exception;
 
-use Throwable;
-
 /**
  * @author Claudio Beatrice <claudi0.beatric3@gmail.com>
  */
@@ -23,7 +21,7 @@ class NotDenormalizableValueException extends NotNormalizableValueException
      */
     private $field;
 
-    public function __construct(string $message = '', string $field = null, Throwable $previous = null)
+    public function __construct(string $message = '', ?string $field = null, \Throwable $previous = null)
     {
         @trigger_error(sprintf('The %s class will stop extending %s in Symfony 5.0, where it will extend %s instead.', self::class, NotNormalizableValueException::class, UnexpectedValueException::class), E_USER_NOTICE);
 

@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExtraAttributeException;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotDenormalizableValueException;
@@ -244,6 +245,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $reflectionClass = new \ReflectionClass($class);
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes, $format);
 
+        $shouldCollectAllErrors = $context[self::COLLECT_ALL_ERRORS] ?? false;
+
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute, $class, $format, $context);
@@ -260,19 +263,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context, $accumulatingContext);
             } catch (NotDenormalizableValueException $exception) {
-                if (isset($context[self::COLLECT_ALL_ERRORS]) && $context[self::COLLECT_ALL_ERRORS]) {
-                    $accumulatingContext[$attribute][] = $exception->getMessage();
+                if ($shouldCollectAllErrors) {
+                    $accumulatingContext[$attribute][] = $exception;
 
                     continue;
                 }
 
                 throw $exception;
             } catch (UnexpectedValuesException $exception) {
-                $accumulatingContext[$attribute] = $exception->getUnexpectedValueErrors();
-                continue;
-            }
-
-            if (null === $value) {
+                $accumulatingContext[$attribute] = $exception;
                 continue;
             }
 
@@ -281,8 +280,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             } catch (InvalidArgumentException $e) {
                 $exception = new NotDenormalizableValueException($e->getMessage(), $attribute, $e);
 
-                if (isset($context[self::COLLECT_ALL_ERRORS]) && $context[self::COLLECT_ALL_ERRORS]) {
-                    $accumulatingContext[$attribute][] = $exception->getMessage();
+                if ($shouldCollectAllErrors) {
+                    $accumulatingContext[$attribute][] = $exception;
 
                     continue;
                 }
@@ -292,7 +291,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if (!empty($extraAttributes)) {
-            throw new ExtraAttributesException($extraAttributes);
+            if (!$shouldCollectAllErrors) {
+                throw new ExtraAttributesException($extraAttributes);
+            }
+
+            foreach ($extraAttributes as $extraAttribute) {
+                $accumulatingContext[$extraAttribute][] = new ExtraAttributeException($extraAttribute);
+            }
         }
 
         if (!empty($accumulatingContext)) {
@@ -328,6 +333,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         if (null === $types = $this->getTypes($currentClass, $attribute)) {
             return $data;
         }
+
+        $shouldCollectAllErrors = $context[self::COLLECT_ALL_ERRORS] ?? false;
 
         $expectedTypes = array();
         foreach ($types as $type) {
@@ -365,8 +372,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     try {
                         return $this->serializer->denormalize($data, $class, $format, $childContext, $accumulatingContext);
                     } catch (NotDenormalizableValueException | InvalidArgumentException $e) {
-                        if (isset($context[self::COLLECT_ALL_ERRORS]) && $context[self::COLLECT_ALL_ERRORS]) {
-                            $accumulatingContext[$attribute][] = $e->getMessage();
+                        if ($shouldCollectAllErrors) {
+                            $accumulatingContext[$attribute][] = $e;
 
                             continue;
                         }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Asynchronous\Middleware;
 
-use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocator;
+use Symfony\Component\Messenger\Asynchronous\Routing\AbstractSenderLocator;
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
@@ -60,6 +60,6 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
 
     private function mustSendAndHandle($message): bool
     {
-        return (bool) SenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $message);
+        return (bool) AbstractSenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $message);
     }
 }

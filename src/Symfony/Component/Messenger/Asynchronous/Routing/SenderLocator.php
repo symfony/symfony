@@ -11,21 +11,19 @@
 
 namespace Symfony\Component\Messenger\Asynchronous\Routing;
 
-use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
-class SenderLocator implements SenderLocatorInterface
+class SenderLocator extends AbstractSenderLocator
 {
-    private $senderServiceLocator;
-    private $messageToSenderIdMapping;
+    private $messageToSenderMapping;
 
-    public function __construct(ContainerInterface $senderServiceLocator, array $messageToSenderIdMapping)
+    public function __construct(array $messageToSenderMapping)
     {
-        $this->senderServiceLocator = $senderServiceLocator;
-        $this->messageToSenderIdMapping = $messageToSenderIdMapping;
+        $this->messageToSenderMapping = $messageToSenderMapping;
     }
 
     /**
@@ -33,34 +31,15 @@ class SenderLocator implements SenderLocatorInterface
      */
     public function getSenderForMessage($message): ?SenderInterface
     {
-        $senderId = $this->getSenderId($message);
-
-        return $senderId ? $this->senderServiceLocator->get($senderId) : null;
-    }
-
-    private function getSenderId($message): ?string
-    {
-        return self::getValueFromMessageRouting($this->messageToSenderIdMapping, $message);
-    }
-
-    /**
-     * @internal
-     */
-    public static function getValueFromMessageRouting(array $mapping, $message)
-    {
-        if (isset($mapping[\get_class($message)])) {
-            return $mapping[\get_class($message)];
-        }
-        if ($parentsMapping = array_intersect_key($mapping, class_parents($message))) {
-            return current($parentsMapping);
-        }
-        if ($interfaceMapping = array_intersect_key($mapping, class_implements($message))) {
-            return current($interfaceMapping);
-        }
-        if (isset($mapping['*'])) {
-            return $mapping['*'];
+        $sender = self::getValueFromMessageRouting($this->messageToSenderMapping, $message);
+        if (null === $sender) {
+            return null;
         }
 
-        return null;
+        if (!$sender instanceof SenderInterface) {
+            throw new RuntimeException(sprintf('The sender instance provided for message "%s" should be of type "%s" but got "%s".', \get_class($message), SenderInterface::class, \is_object($sender) ? \get_class($sender) : \gettype($sender)));
+        }
+
+        return $sender;
     }
 }

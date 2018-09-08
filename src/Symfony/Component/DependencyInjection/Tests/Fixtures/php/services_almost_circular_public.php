@@ -169,6 +169,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $c = new \stdClass($instance);
 
         $c->handler2 = new \stdClass(${($_ = isset($this->services['manager2']) ? $this->services['manager2'] : $this->getManager2Service()) && false ?: '_'});
+
         $b->logger2 = $c;
 
         return $instance;

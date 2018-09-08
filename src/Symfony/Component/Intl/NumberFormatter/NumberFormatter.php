@@ -360,10 +360,7 @@ class NumberFormatter
         }
 
         if (self::CURRENCY == $this->style) {
-            throw new NotImplementedException(sprintf(
-                '%s() method does not support the formatting of currencies (instance with CURRENCY style). %s',
-                __METHOD__, NotImplementedException::INTL_INSTALL_MESSAGE
-            ));
+            throw new NotImplementedException(sprintf('%s() method does not support the formatting of currencies (instance with CURRENCY style). %s', __METHOD__, NotImplementedException::INTL_INSTALL_MESSAGE));
         }
 
         // Only the default type is supported.

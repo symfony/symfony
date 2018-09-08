@@ -66,13 +66,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                     ));
                 }
 
-                throw new RuntimeException(sprintf(
-                    'The definition for "%s" has no class. If you intend to inject '
-                   .'this service dynamically at runtime, please mark it as synthetic=true. '
-                   .'If this is an abstract definition solely used by child definitions, '
-                   .'please add abstract=true, otherwise specify a class to get rid of this error.',
-                   $id
-                ));
+                throw new RuntimeException(sprintf('The definition for "%s" has no class. If you intend to inject this service dynamically at runtime, please mark it as synthetic=true. If this is an abstract definition solely used by child definitions, please add abstract=true, otherwise specify a class to get rid of this error.', $id));
             }
 
             // tag attribute values must be scalars

@@ -36,19 +36,11 @@ class PhpBundleReader implements BundleReaderInterface
         }
 
         if (!file_exists($fileName)) {
-            throw new ResourceBundleNotFoundException(sprintf(
-                'The resource bundle "%s/%s.php" does not exist.',
-                $path,
-                $locale
-            ));
+            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s/%s.php" does not exist.', $path, $locale));
         }
 
         if (!is_file($fileName)) {
-            throw new RuntimeException(sprintf(
-                'The resource bundle "%s/%s.php" is not a file.',
-                $path,
-                $locale
-            ));
+            throw new RuntimeException(sprintf('The resource bundle "%s/%s.php" is not a file.', $path, $locale));
         }
 
         return include $fileName;

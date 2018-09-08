@@ -47,9 +47,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
     public function __construct(\Memcache $memcache, array $options = array())
     {
         if ($diff = array_diff(array_keys($options), array('prefix', 'expiretime'))) {
-            throw new \InvalidArgumentException(sprintf(
-                'The following options are not supported "%s"', implode(', ', $diff)
-            ));
+            throw new \InvalidArgumentException(sprintf('The following options are not supported "%s"', implode(', ', $diff)));
         }
 
         $this->memcache = $memcache;

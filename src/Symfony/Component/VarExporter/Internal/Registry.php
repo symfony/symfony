@@ -67,11 +67,9 @@ class Registry
         if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor || !$reflector->isFinal()) {
             $proto = $reflector->newInstanceWithoutConstructor();
         } else {
-            self::$instantiableWithoutConstructor[$class] = true;
             $r = $reflector;
             do {
                 if ($r->isInternal()) {
-                    self::$instantiableWithoutConstructor[$class] = false;
                     if (false === $proto = @unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')) {
                         throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
                     }
@@ -79,7 +77,7 @@ class Registry
                 }
             } while ($r = $r->getParentClass());
 
-            if (!$r) {
+            if (self::$instantiableWithoutConstructor[$class] = !$r) {
                 $proto = $reflector->newInstanceWithoutConstructor();
             }
         }

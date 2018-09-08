@@ -94,7 +94,7 @@ class PhpFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid factory "factory:method": the `service:method` notation is not available when using PHP-based DI configuration. Use "[ref('factory'), 'method']" instead.
+     * @expectedExceptionMessage Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[ref('factory'), 'method']" instead.
      */
     public function testFactoryShortNotationNotAllowed()
     {

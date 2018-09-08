@@ -856,7 +856,7 @@ class Process implements \IteratorAggregate
     {
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
-            // given `SIGTERM` may not be defined and that `proc_terminate` uses the constant value and not the constant itself, we use the same here
+            // given SIGTERM may not be defined and that "proc_terminate" uses the constant value and not the constant itself, we use the same here
             $this->doSignal(15, false);
             do {
                 usleep(1000);
@@ -1479,7 +1479,7 @@ class Process implements \IteratorAggregate
             }
             if (!$ok) {
                 if ($throwException) {
-                    throw new RuntimeException(sprintf('Error while sending signal `%s`.', $signal));
+                    throw new RuntimeException(sprintf('Error while sending signal "%s".', $signal));
                 }
 
                 return false;
@@ -1553,7 +1553,7 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Ensures the process is terminated, throws a LogicException if the process has a status different than `terminated`.
+     * Ensures the process is terminated, throws a LogicException if the process has a status different than "terminated".
      *
      * @throws LogicException if the process is not yet terminated
      */

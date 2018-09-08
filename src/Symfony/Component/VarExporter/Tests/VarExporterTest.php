@@ -158,17 +158,23 @@ class VarExporterTest extends TestCase
 
         $value = new \Error();
 
-        $r = new \ReflectionProperty('Error', 'trace');
-        $r->setAccessible(true);
-        $r->setValue($value, array('file' => __FILE__, 'line' => 123));
+        $rt = new \ReflectionProperty('Error', 'trace');
+        $rt->setAccessible(true);
+        $rt->setValue($value, array('file' => __FILE__, 'line' => 123));
 
-        $r = new \ReflectionProperty('Error', 'line');
-        $r->setAccessible(true);
-        $r->setValue($value, 234);
+        $rl = new \ReflectionProperty('Error', 'line');
+        $rl->setAccessible(true);
+        $rl->setValue($value, 234);
 
         yield array('error', $value);
 
         yield array('var-on-sleep', new GoodNight());
+
+        $value = new FinalError(false);
+        $rt->setValue($value, array());
+        $rl->setValue($value, 123);
+
+        yield array('final-error', $value);
     }
 }
 
@@ -260,5 +266,15 @@ class GoodNight
         $this->good = 'night';
 
         return array('good');
+    }
+}
+
+final class FinalError extends \Error
+{
+    public function __construct(bool $throw = true)
+    {
+        if ($throw) {
+            throw new \BadMethodCallException('Should not be called.');
+        }
     }
 }

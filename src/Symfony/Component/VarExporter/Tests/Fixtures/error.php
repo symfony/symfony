@@ -2,7 +2,7 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        (\Symfony\Component\VarExporter\Internal\Registry::$factories[\Error::class] ?? \Symfony\Component\VarExporter\Internal\Registry::f(\Error::class, true))(),
+        (\Symfony\Component\VarExporter\Internal\Registry::$factories[\Error::class] ?? \Symfony\Component\VarExporter\Internal\Registry::f(\Error::class))(),
     ],
     null,
     [

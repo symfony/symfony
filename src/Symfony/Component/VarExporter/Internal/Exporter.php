@@ -283,6 +283,15 @@ class Exporter
                 $serializables[$k] = $class;
                 continue;
             }
+            if (!Registry::$instantiableWithoutConstructor[$class]) {
+                if (is_subclass_of($class, 'Throwable')) {
+                    $eol = is_subclass_of($class, 'Error') ? "\0Error\0" : "\0Exception\0";
+                    $serializables[$k] = 'O:'.\strlen($class).':"'.$class.'":1:{s:'.(5 + \strlen($eol)).':"'.$eol.'trace";a:0:{}}';
+                } else {
+                    $serializables[$k] = 'O:'.\strlen($class).':"'.$class.'":0:{}';
+                }
+                continue;
+            }
             $code .= $subIndent.(1 !== $k - $j ? $k.' => ' : '');
             $j = $k;
             $eol = ",\n";
@@ -299,21 +308,21 @@ class Exporter
             } else {
                 $seen[$class] = true;
                 if (Registry::$cloneable[$class]) {
-                    $code .= 'clone ('.($prototypesAccess++ ? '$p' : '($p =& '.$r.'::$prototypes)').$c.' ?? '.$r.'::p';
+                    $code .= 'clone ('.($prototypesAccess++ ? '$p' : '($p = &'.$r.'::$prototypes)').$c.' ?? '.$r.'::p';
                 } else {
-                    $code .= '('.($factoriesAccess++ ? '$f' : '($f =& '.$r.'::$factories)').$c.' ?? '.$r.'::f';
+                    $code .= '('.($factoriesAccess++ ? '$f' : '($f = &'.$r.'::$factories)').$c.' ?? '.$r.'::f';
                     $eol = '()'.$eol;
                 }
-                $code .= '('.substr($c, 1, -1).', '.self::export(Registry::$instantiableWithoutConstructor[$class]).'))';
+                $code .= '('.substr($c, 1, -1).'))';
             }
             $code .= $eol;
         }
 
         if (1 === $prototypesAccess) {
-            $code = str_replace('($p =& '.$r.'::$prototypes)', $r.'::$prototypes', $code);
+            $code = str_replace('($p = &'.$r.'::$prototypes)', $r.'::$prototypes', $code);
         }
         if (1 === $factoriesAccess) {
-            $code = str_replace('($f =& '.$r.'::$factories)', $r.'::$factories', $code);
+            $code = str_replace('($f = &'.$r.'::$factories)', $r.'::$factories', $code);
         }
         if ('' !== $code) {
             $code = "\n".$code.$indent;

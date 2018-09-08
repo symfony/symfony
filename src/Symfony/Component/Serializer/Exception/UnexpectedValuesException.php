@@ -70,9 +70,9 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
      */
     private function getType($unexpectedValueError): string
     {
-        return is_object($unexpectedValueError)
-            ? get_class($unexpectedValueError)
-            : gettype($unexpectedValueError);
+        return \is_object($unexpectedValueError)
+            ? \get_class($unexpectedValueError)
+            : \gettype($unexpectedValueError);
     }
 
     /**
@@ -90,7 +90,7 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
      */
     private function assertIsString($value, string $message): void
     {
-        if ($this->getType($value) !== 'string') {
+        if ('string' !== $this->getType($value)) {
             throw new InvalidArgumentException($message);
         }
     }

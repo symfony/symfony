@@ -34,36 +34,36 @@ final class AccumulatingContextTest extends TestCase
 
     public function dataToSerializeProvider(): array
     {
-        return [
-            [
-                [], [],
-            ],
-            [
-                ['foo' => [new UnexpectedValueException('test')]], ['foo' => [new UnexpectedValueException('test')]],
-            ],
-            [
-                ['foo.bar' => [new UnexpectedValueException('test')]], ['foo' => ['bar' => [new UnexpectedValueException('test')]]],
-            ],
-            [
-                [
-                    'foo.bar.baz' => [new UnexpectedValueException('test')],
-                    'foo.bar.quux' => [new UnexpectedValueException('test2')],
-                    'foo.corge.grault' => [new UnexpectedValueException('test3')],
-                    'garply' => [new UnexpectedValueException('test4')],
-                ],
-                [
-                    'foo' => [
-                        'bar' => [
-                            'baz' => [new UnexpectedValueException('test')],
-                            'quux' => [new UnexpectedValueException('test2')],
-                        ],
-                        'corge' => [
-                            'grault' => [new UnexpectedValueException('test3')],
-                        ]
-                    ],
-                    'garply' => [new UnexpectedValueException('test4')],
-                ],
-            ]
-        ];
+        return array(
+            array(
+                array(), array(),
+            ),
+            array(
+                array('foo' => array(new UnexpectedValueException('test'))), array('foo' => array(new UnexpectedValueException('test'))),
+            ),
+            array(
+                array('foo.bar' => array(new UnexpectedValueException('test'))), array('foo' => array('bar' => array(new UnexpectedValueException('test')))),
+            ),
+            array(
+                array(
+                    'foo.bar.baz' => array(new UnexpectedValueException('test')),
+                    'foo.bar.quux' => array(new UnexpectedValueException('test2')),
+                    'foo.corge.grault' => array(new UnexpectedValueException('test3')),
+                    'garply' => array(new UnexpectedValueException('test4')),
+                ),
+                array(
+                    'foo' => array(
+                        'bar' => array(
+                            'baz' => array(new UnexpectedValueException('test')),
+                            'quux' => array(new UnexpectedValueException('test2')),
+                        ),
+                        'corge' => array(
+                            'grault' => array(new UnexpectedValueException('test3')),
+                        ),
+                    ),
+                    'garply' => array(new UnexpectedValueException('test4')),
+                ),
+            ),
+        );
     }
 }

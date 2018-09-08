@@ -235,7 +235,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     public function denormalize($data, $class, $format = null, array $context = array(), AccumulatingContext $accumulatingContext = null)
     {
-        if ($accumulatingContext === null) {
+        if (null === $accumulatingContext) {
             $accumulatingContext = new AccumulatingContext();
         }
 

@@ -23,11 +23,13 @@ final class UnexpectedValuesExceptionTest extends TestCase
 
     public function testItCanBeInstantiated(): void
     {
-        new UnexpectedValuesException(array(
+        $unexpectedValuesException = new UnexpectedValuesException(array(
             'attribute1' => array(new UnexpectedValueException('foo')),
             'attribute2' => array(new UnexpectedValueException('bar')),
             'attribute3.subattibute1' => array(new UnexpectedValueException('bar')),
         ));
+
+        $this->assertCount(3, $unexpectedValuesException->getUnexpectedValueErrors());
     }
 
     public function wrongErrorsProvider()

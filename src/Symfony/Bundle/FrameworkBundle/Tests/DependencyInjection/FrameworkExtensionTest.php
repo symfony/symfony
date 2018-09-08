@@ -604,10 +604,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('messenger_transport');
 
-        $this->assertSame('messenger.transport.serializer', (string) $container->getAlias('messenger.transport.encoder'));
-        $this->assertSame('messenger.transport.serializer', (string) $container->getAlias('messenger.transport.decoder'));
+        $this->assertSame('messenger.transport.symfony_serializer', (string) $container->getAlias('messenger.transport.serializer'));
 
-        $serializerTransportDefinition = $container->getDefinition('messenger.transport.serializer');
+        $serializerTransportDefinition = $container->getDefinition('messenger.transport.symfony_serializer');
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
         $this->assertSame(array('enable_max_depth' => true), $serializerTransportDefinition->getArgument(2));
     }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\SenderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * Symfony Messenger sender to send messages to AMQP brokers using PHP's AMQP extension.
@@ -22,12 +22,12 @@ use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
  */
 class AmqpSender implements SenderInterface
 {
-    private $encoder;
+    private $serializer;
     private $connection;
 
-    public function __construct(EncoderInterface $encoder, Connection $connection)
+    public function __construct(SerializerInterface $serializer, Connection $connection)
     {
-        $this->encoder = $encoder;
+        $this->serializer = $serializer;
         $this->connection = $connection;
     }
 
@@ -36,7 +36,7 @@ class AmqpSender implements SenderInterface
      */
     public function send(Envelope $envelope)
     {
-        $encodedMessage = $this->encoder->encode($envelope);
+        $encodedMessage = $this->serializer->encode($envelope);
 
         $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
     }

@@ -85,6 +85,23 @@ FrameworkBundle
    and will allow dumping optimized routers and using Unicode classes in requirements.
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `Controller` class has been deprecated, use `AbstractController` instead.
+ * The Messenger encoder/decoder configuration has been changed for a unified Messenger serializer configuration.
+ 
+   Before:
+   ```yaml
+   framework:
+       messenger:
+           encoder: your_encoder_service_id
+           decoder: your_decoder_service_id
+   ```
+
+   After:
+   ```yaml
+   framework:
+       messenger:
+           serializer:
+               id: your_messenger_service_id
+   ```
 
 Messenger
 ---------
@@ -122,6 +139,9 @@ Messenger
        'priority' => 20,
    ];
    ```
+ * The `EncoderInterface` and `DecoderInterface` interfaces have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
+   Each interface method have been merged untouched into the `Serializer` interface, so you can simply merge your two implementations together and implement the new interface.
+ 
 
 Security
 --------

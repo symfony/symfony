@@ -378,7 +378,7 @@
             <xsd:element name="context" type="metadata" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="format" type="xsd:string" />
-        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="id" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_routing">

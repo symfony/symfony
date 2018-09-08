@@ -293,12 +293,10 @@ class ConfigurationTest extends TestCase
                 'routing' => array(),
                 'transports' => array(),
                 'serializer' => array(
-                    'enabled' => !class_exists(FullStack::class),
+                    'id' => 'messenger.transport.symfony_serializer',
                     'format' => 'json',
                     'context' => array(),
                 ),
-                'encoder' => 'messenger.transport.serializer',
-                'decoder' => 'messenger.transport.serializer',
                 'default_bus' => null,
                 'buses' => array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())),
             ),

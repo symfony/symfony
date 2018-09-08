@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:messenger>
-            <framework:serializer enabled="false" />
+            <framework:serializer id="null" />
             <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
         </framework:messenger>
     </framework:config>

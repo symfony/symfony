@@ -12,8 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
@@ -21,16 +20,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class AmqpTransport implements TransportInterface
 {
-    private $encoder;
-    private $decoder;
+    private $serializer;
     private $connection;
     private $receiver;
     private $sender;
 
-    public function __construct(EncoderInterface $encoder, DecoderInterface $decoder, Connection $connection)
+    public function __construct(SerializerInterface $serializer, Connection $connection)
     {
-        $this->encoder = $encoder;
-        $this->decoder = $decoder;
+        $this->serializer = $serializer;
         $this->connection = $connection;
     }
 
@@ -60,11 +57,11 @@ class AmqpTransport implements TransportInterface
 
     private function getReceiver()
     {
-        return $this->receiver = new AmqpReceiver($this->decoder, $this->connection);
+        return $this->receiver = new AmqpReceiver($this->serializer, $this->connection);
     }
 
     private function getSender()
     {
-        return $this->sender = new AmqpSender($this->encoder, $this->connection);
+        return $this->sender = new AmqpSender($this->serializer, $this->connection);
     }
 }

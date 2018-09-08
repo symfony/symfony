@@ -1030,9 +1030,23 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('serializer')
-                            ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                             ->addDefaultsIfNotSet()
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($config) {
+                                    if (false === $config) {
+                                        return array('id' => null);
+                                    }
+
+                                    if (\is_string($config)) {
+                                        return array('id' => $config);
+                                    }
+
+                                    return $config;
+                                })
+                            ->end()
                             ->children()
+                                ->scalarNode('id')->defaultValue('messenger.transport.symfony_serializer')->end()
                                 ->scalarNode('format')->defaultValue('json')->end()
                                 ->arrayNode('context')
                                     ->normalizeKeys(false)
@@ -1042,8 +1056,6 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
-                        ->scalarNode('encoder')->defaultValue('messenger.transport.serializer')->end()
-                        ->scalarNode('decoder')->defaultValue('messenger.transport.serializer')->end()
                         ->arrayNode('transports')
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()

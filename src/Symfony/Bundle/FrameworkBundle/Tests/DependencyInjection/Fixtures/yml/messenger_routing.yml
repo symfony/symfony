@@ -1,7 +1,6 @@
 framework:
     serializer: true
     messenger:
-        serializer: true
         routing:
             'Symfony\Component\Messenger\Tests\Fixtures\DummyMessage': [amqp, audit]
             'Symfony\Component\Messenger\Tests\Fixtures\SecondMessage':

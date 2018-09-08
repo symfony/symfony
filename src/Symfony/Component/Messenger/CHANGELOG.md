@@ -13,3 +13,4 @@ CHANGELOG
  * `EnvelopeItemInterface` doesn't extend `Serializable` anymore
  * [BC BREAK] The `ConsumeMessagesCommand` class now takes an instance of `Psr\Container\ContainerInterface` 
    as first constructor argument
+ * [BC BREAK] The `EncoderInterface` and `DecoderInterface` have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.

@@ -17,18 +17,18 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class Serializer implements DecoderInterface, EncoderInterface
+class Serializer implements SerializerInterface
 {
     private $serializer;
     private $format;
     private $context;
 
-    public function __construct(SerializerInterface $serializer, string $format = 'json', array $context = array())
+    public function __construct(SymfonySerializerInterface $serializer, string $format = 'json', array $context = array())
     {
         $this->serializer = $serializer;
         $this->format = $format;

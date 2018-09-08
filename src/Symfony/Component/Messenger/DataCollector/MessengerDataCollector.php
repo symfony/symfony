@@ -21,8 +21,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.1
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {

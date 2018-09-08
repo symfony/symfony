@@ -84,6 +84,7 @@ FrameworkBundle
    this will generate 404s for non-UTF-8 URLs, which are incompatible with you app anyway,
    and will allow dumping optimized routers and using Unicode classes in requirements.
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
+ * The `Controller` class has been deprecated, use `AbstractController` instead.
 
 Messenger
 ---------

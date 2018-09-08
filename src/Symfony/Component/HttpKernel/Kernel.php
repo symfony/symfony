@@ -250,11 +250,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
             if (null !== $resourceBundle) {
-                throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
-                    $file,
-                    $resourceBundle,
-                    $dir.'/'.$bundle->getName().$overridePath
-                ));
+                throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.', $file, $resourceBundle, $dir.'/'.$bundle->getName().$overridePath));
             }
 
             $files[] = $file;

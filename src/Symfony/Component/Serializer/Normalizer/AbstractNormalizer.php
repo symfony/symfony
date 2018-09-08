@@ -124,10 +124,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     {
         foreach ($callbacks as $attribute => $callback) {
             if (!\is_callable($callback)) {
-                throw new InvalidArgumentException(sprintf(
-                    'The given callback for attribute "%s" is not callable.',
-                    $attribute
-                ));
+                throw new InvalidArgumentException(sprintf('The given callback for attribute "%s" is not callable.', $attribute));
             }
         }
         $this->callbacks = $callbacks;
@@ -386,13 +383,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new MissingConstructorArgumentsException(
-                        sprintf(
-                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                            $class,
-                            $constructorParameter->name
-                        )
-                    );
+                    throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
                 }
             }
 

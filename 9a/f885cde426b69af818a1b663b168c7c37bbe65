@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-08T08:26:38Z
+
+I haven't used the Messenger component yet so I'm probably asking something stupid but --> could we make a radical simplification for this "SimpleSerializer" and just use `json_encode()` / `json_decode()` instead of the Symfony Serializer?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-08T08:37:40Z
+
+random thought, but what about putting a `SerializerInterface` in the contracts namespace, and forget about individual encoder/decoder contracts perhaps (or move those as well).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-08T08:38:24Z
+
+It's a bit more involving than that, but having the serializer as a dependency does not add any complexity, so I don't think we need to make it optional. SimpleSerializer is only needed when you are using the component standalone where you would basically have to do what I've done here. So, it only to get you started faster.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-08T08:40:11Z
+
+@ro0NL That's my thoughts as well :)

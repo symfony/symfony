@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Context\AccumulatingContext;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributeException;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -232,8 +233,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return \class_exists($type) || (\interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
-    public function denormalize($data, $class, $format = null, array $context = array(), array &$accumulatingContext = array())
+    public function denormalize($data, $class, $format = null, array $context = array(), AccumulatingContext $accumulatingContext = null)
     {
+        if ($accumulatingContext === null) {
+            $accumulatingContext = new AccumulatingContext();
+        }
+
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
@@ -271,7 +276,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
                 throw $exception;
             } catch (UnexpectedValuesException $exception) {
-                $accumulatingContext[$attribute] = $exception;
+                $accumulatingContext[$attribute] = $exception->getUnexpectedValueErrors();
+
                 continue;
             }
 
@@ -300,8 +306,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        if (!empty($accumulatingContext)) {
-            throw new UnexpectedValuesException($accumulatingContext);
+        if (!$accumulatingContext->isEmpty()) {
+            throw new UnexpectedValuesException($accumulatingContext->flatten());
         }
 
         return $object;
@@ -328,7 +334,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context, array &$accumulatingContext)
+    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context, AccumulatingContext $accumulatingContext)
     {
         if (null === $types = $this->getTypes($currentClass, $attribute)) {
             return $data;

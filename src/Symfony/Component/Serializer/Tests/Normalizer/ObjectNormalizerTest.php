@@ -749,13 +749,13 @@ class ObjectNormalizerTest extends TestCase
 
             $this->assertCount(3, $errors);
 
-            $this->assertSame('The type of the "baz" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectInner" must be one of "int" ("string" given).', $errors['inner']['baz'][0]);
+            $this->assertSame('The type of the "baz" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectInner" must be one of "int" ("string" given).', $errors['inner.baz'][0]->getMessage());
 
-            $this->assertSame('The type of the key "a" must be "int" ("string" given).', $errors['inners'][0]);
-            $this->assertSame('The type of the "inners" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "Symfony\Component\Serializer\Tests\Normalizer\ObjectInner[]" ("array" given).', $errors['inners'][1]);
+            $this->assertSame('The type of the key "a" must be "int" ("string" given).', $errors['inners'][0]->getMessage());
+            $this->assertSame('The type of the "inners" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "Symfony\Component\Serializer\Tests\Normalizer\ObjectInner[]" ("array" given).', $errors['inners'][1]->getMessage());
 
-            $this->assertSame('DateTimeImmutable::__construct(): Failed to parse time string (wrong date) at position 0 (w): The timezone could not be found in the database', $errors['date'][0]);
-            $this->assertSame('The type of the "date" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "DateTimeInterface" ("string" given).', $errors['date'][1]);
+            $this->assertSame('DateTimeImmutable::__construct(): Failed to parse time string (wrong date) at position 0 (w): The timezone could not be found in the database', $errors['date'][0]->getMessage());
+            $this->assertSame('The type of the "date" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "DateTimeInterface" ("string" given).', $errors['date'][1]->getMessage());
 
             return;
         }

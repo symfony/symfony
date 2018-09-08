@@ -22,7 +22,7 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
     private $unexpectedValueErrors;
 
     /**
-     * @param UnexpectedValueException[] $unexpectedValueErrors
+     * @param array<string, UnexpectedValueException[]> $unexpectedValueErrors
      */
     public function __construct(array $unexpectedValueErrors)
     {
@@ -34,7 +34,7 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
     }
 
     /**
-     * @return UnexpectedValueException[]
+     * @return array<string, UnexpectedValueException[]>
      */
     public function getUnexpectedValueErrors(): array
     {
@@ -42,21 +42,25 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
     }
 
     /**
-     * @param mixed[] $unexpectedValueErrors
+     * @param array<string, UnexpectedValueException[]> $unexpectedValueErrors
      *
      * @throws InvalidArgumentException
      */
     private function validateErrors(array $unexpectedValueErrors): void
     {
-        foreach ($unexpectedValueErrors as $unexpectedValueError) {
-            if (!$unexpectedValueError instanceof UnexpectedValueException) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'All errors must be instances of %s, %s given.',
-                        UnexpectedValuesException::class,
-                        $this->getType($unexpectedValueError)
-                    )
-                );
+        $this->assertNotEmpty($unexpectedValueErrors, 'No errors were given, at least one is expected.');
+
+        foreach ($unexpectedValueErrors as $field => $fieldUnexpectedValueErrors) {
+            $this->assertIsString($field, sprintf('All keys must be strings, %s given.', $this->getType($field)));
+            $this->assertNotEmpty($fieldUnexpectedValueErrors, sprintf('No errors were given for key "%s", at least one is expected.', $field));
+
+            foreach ((array) $fieldUnexpectedValueErrors as $fieldUnexpectedValueError) {
+                $this->assertIsError($fieldUnexpectedValueError, sprintf(
+                    'All errors must be instances of %s, %s given for key "%s".',
+                    UnexpectedValueException::class,
+                    $this->getType($fieldUnexpectedValueError),
+                    $field
+                ), $unexpectedValueErrors);
             }
         }
     }
@@ -69,5 +73,35 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
         return is_object($unexpectedValueError)
             ? get_class($unexpectedValueError)
             : gettype($unexpectedValueError);
+    }
+
+    /**
+     * @param array $values
+     */
+    private function assertNotEmpty(array $values, string $message): void
+    {
+        if (empty($values)) {
+            throw new InvalidArgumentException($message);
+        }
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function assertIsString($value, string $message): void
+    {
+        if ($this->getType($value) !== 'string') {
+            throw new InvalidArgumentException($message);
+        }
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function assertIsError($value, string $message, $unexpectedValueErrors): void
+    {
+        if (!$value instanceof UnexpectedValueException) {
+            throw new InvalidArgumentException($message);
+        }
     }
 }

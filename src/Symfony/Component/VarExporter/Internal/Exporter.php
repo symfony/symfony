@@ -77,19 +77,7 @@ class Exporter
             $properties = array();
             $sleep = null;
             $arrayValue = (array) $value;
-
-            if (!isset(Registry::$reflectors[$class])) {
-                Registry::getClassReflector($class);
-                try {
-                    serialize(Registry::$prototypes[$class]);
-                } catch (\Exception $e) {
-                    throw new NotInstantiableTypeException($class, $e);
-                }
-                if (\method_exists($class, '__sleep')) {
-                    Registry::getClassReflector($class, Registry::$instantiableWithoutConstructor[$class], Registry::$cloneable[$class]);
-                }
-            }
-            $reflector = Registry::$reflectors[$class];
+            $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
             $proto = Registry::$prototypes[$class];
 
             if (($value instanceof \ArrayIterator || $value instanceof \ArrayObject) && null !== $proto) {
@@ -133,7 +121,7 @@ class Exporter
             foreach ($arrayValue as $name => $v) {
                 $n = (string) $name;
                 if ('' === $n || "\0" !== $n[0]) {
-                    $c = '*';
+                    $c = 'stdClass';
                     $properties[$c][$n] = $v;
                     unset($sleep[$n]);
                 } elseif ('*' === $n[1]) {
@@ -305,7 +293,7 @@ class Exporter
             $code .= $subIndent.(1 !== $k - $j ? $k.' => ' : '');
             $j = $k;
             $eol = ",\n";
-            $c = '[\\'.$class.'::class]';
+            $c = '['.self::export($class).']';
 
             if ($seen[$class] ?? false) {
                 if (Registry::$cloneable[$class]) {
@@ -351,8 +339,7 @@ class Exporter
     {
         $code = '';
         foreach ($value->properties as $class => $properties) {
-            $c = '*' !== $class ? '\\'.$class.'::class' : "'*'";
-            $code .= $subIndent.'    '.$c.' => '.self::export($properties, $subIndent.'    ').",\n";
+            $code .= $subIndent.'    '.self::export($class).' => '.self::export($properties, $subIndent.'    ').",\n";
         }
 
         $code = array(

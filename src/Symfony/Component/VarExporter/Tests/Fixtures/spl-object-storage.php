@@ -2,12 +2,12 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)[\SplObjectStorage::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\SplObjectStorage::class)),
-        clone ($p[\stdClass::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\stdClass::class)),
+        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['SplObjectStorage'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('SplObjectStorage')),
+        clone ($p['stdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('stdClass')),
     ],
     null,
     [
-        \SplObjectStorage::class => [
+        'SplObjectStorage' => [
             "\0" => [
                 [
                     $o[1],

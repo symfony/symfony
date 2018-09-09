@@ -2,11 +2,11 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        (\Symfony\Component\VarExporter\Internal\Registry::$factories[\Error::class] ?? \Symfony\Component\VarExporter\Internal\Registry::f(\Error::class))(),
+        (\Symfony\Component\VarExporter\Internal\Registry::$factories['Error'] ?? \Symfony\Component\VarExporter\Internal\Registry::f('Error'))(),
     ],
     null,
     [
-        \TypeError::class => [
+        'TypeError' => [
             'file' => [
                 \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
             ],
@@ -14,7 +14,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
                 234,
             ],
         ],
-        \Error::class => [
+        'Error' => [
             'trace' => [
                 [
                     'file' => \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',

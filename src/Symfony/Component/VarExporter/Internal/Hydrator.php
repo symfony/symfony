@@ -49,7 +49,7 @@ class Hydrator
 
     public static function getHydrator($class)
     {
-        if ('*' === $class) {
+        if ('stdClass' === $class) {
             return self::$hydrators[$class] = static function ($properties, $objects) {
                 foreach ($properties as $name => $values) {
                     foreach ($values as $i => $v) {
@@ -62,13 +62,17 @@ class Hydrator
         $classReflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
 
         if (!$classReflector->isInternal()) {
-            return self::$hydrators[$class] = (self::$hydrators['*'] ?? self::getHydrator('*'))->bindTo(null, $class);
+            return self::$hydrators[$class] = (self::$hydrators['stdClass'] ?? self::getHydrator('stdClass'))->bindTo(null, $class);
+        }
+
+        if ($classReflector->name !== $class) {
+            return self::$hydrators[$classReflector->name] ?? self::getHydrator($classReflector->name);
         }
 
         switch ($class) {
             case 'ArrayIterator':
             case 'ArrayObject':
-                $constructor = $classReflector->getConstructor();
+                $constructor = \Closure::fromCallable(array($classReflector->getConstructor(), 'invokeArgs'));
 
                 return self::$hydrators[$class] = static function ($properties, $objects) use ($constructor) {
                     foreach ($properties as $name => $values) {
@@ -78,17 +82,17 @@ class Hydrator
                             }
                         }
                     }
-                    foreach ($properties["\0"] as $i => $v) {
-                        $constructor->invokeArgs($objects[$i], $v);
+                    foreach ($properties["\0"] ?? array() as $i => $v) {
+                        $constructor($objects[$i], $v);
                     }
                 };
 
             case 'ErrorException':
-                return self::$hydrators[$class] = (self::$hydrators['*'] ?? self::getHydrator('*'))->bindTo(null, new class() extends \ErrorException {
+                return self::$hydrators[$class] = (self::$hydrators['stdClass'] ?? self::getHydrator('stdClass'))->bindTo(null, new class() extends \ErrorException {
                 });
 
             case 'TypeError':
-                return self::$hydrators[$class] = (self::$hydrators['*'] ?? self::getHydrator('*'))->bindTo(null, new class() extends \Error {
+                return self::$hydrators[$class] = (self::$hydrators['stdClass'] ?? self::getHydrator('stdClass'))->bindTo(null, new class() extends \Error {
                 });
 
             case 'SplObjectStorage':
@@ -109,19 +113,28 @@ class Hydrator
                 };
         }
 
-        $propertyReflectors = array();
+        $propertySetters = array();
         foreach ($classReflector->getProperties() as $propertyReflector) {
             if (!$propertyReflector->isStatic()) {
                 $propertyReflector->setAccessible(true);
-                $propertyReflectors[$propertyReflector->name] = $propertyReflector;
+                $propertySetters[$propertyReflector->name] = \Closure::fromCallable(array($propertyReflector, 'setValue'));
             }
         }
 
-        return self::$hydrators[$class] = static function ($properties, $objects) use ($propertyReflectors) {
+        if (!$propertySetters) {
+            return self::$hydrators[$class] = self::$hydrators['stdClass'] ?? self::getHydrator('stdClass');
+        }
+
+        return self::$hydrators[$class] = static function ($properties, $objects) use ($propertySetters) {
             foreach ($properties as $name => $values) {
-                $p = $propertyReflectors[$name];
+                if ($setValue = $propertySetters[$name] ?? null) {
+                    foreach ($values as $i => $v) {
+                        $setValue($objects[$i], $v);
+                    }
+                    continue;
+                }
                 foreach ($values as $i => $v) {
-                    $p->setValue($objects[$i], $v);
+                    $objects[$i]->$name = $v;
                 }
             }
         };

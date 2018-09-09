@@ -2,11 +2,11 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\DateTime::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\DateTime::class)),
+        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['DateTime'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('DateTime')),
     ],
     null,
     [
-        '*' => [
+        'stdClass' => [
             'date' => [
                 '1970-01-01 00:00:00.000000',
             ],

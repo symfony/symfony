@@ -2,7 +2,7 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes[\stdClass::class] ?? \Symfony\Component\VarExporter\Internal\Registry::p(\stdClass::class)),
+        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['stdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('stdClass')),
     ],
     [
         $r = [],

@@ -48,6 +48,10 @@ final class ServiceValueResolver implements ArgumentValueResolverInterface
             $controller = ltrim($controller, '\\');
         }
 
+        if (!$this->container->has($controller) && false !== $i = strrpos($controller, ':')) {
+            $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
+        }
+
         return $this->container->has($controller) && $this->container->get($controller)->has($argument->getName());
     }
 
@@ -62,6 +66,11 @@ final class ServiceValueResolver implements ArgumentValueResolverInterface
 
         if ('\\' === $controller[0]) {
             $controller = ltrim($controller, '\\');
+        }
+
+        if (!$this->container->has($controller)) {
+            $i = strrpos($controller, ':');
+            $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
         }
 
         try {

@@ -220,24 +220,21 @@ class DebugClassLoaderTest extends TestCase
 
     public function testExtendedFinalMethod()
     {
-        set_error_handler(function () { return false; });
-        $e = error_reporting(0);
-        trigger_error('', E_USER_NOTICE);
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
 
         class_exists(__NAMESPACE__.'\\Fixtures\\ExtendedFinalMethod', true);
 
         error_reporting($e);
         restore_error_handler();
 
-        $lastError = error_get_last();
-        unset($lastError['file'], $lastError['line']);
-
         $xError = array(
-            'type' => E_USER_DEPRECATED,
-            'message' => 'The "Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod".',
+            'The "Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod".',
+            'The "Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod2()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod".',
         );
 
-        $this->assertSame($xError, $lastError);
+        $this->assertSame($xError, $deprecations);
     }
 
     public function testExtendedDeprecatedMethodDoesntTriggerAnyNotice()

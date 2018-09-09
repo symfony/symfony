@@ -102,6 +102,8 @@ FrameworkBundle
            serializer:
                id: your_messenger_service_id
    ```
+ * The `ContainerAwareCommand` class has been deprecated, use `Symfony\Component\Console\Command\Command`
+   with dependency injection instead.
 
 Messenger
 ---------

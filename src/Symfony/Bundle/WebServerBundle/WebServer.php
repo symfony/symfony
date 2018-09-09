@@ -150,7 +150,9 @@ class WebServer
             throw new \RuntimeException('Unable to find the PHP binary.');
         }
 
-        $process = new Process(array_merge(array($binary), $finder->findArguments(), array('-dvariables_order=EGPCS', '-S', $config->getAddress(), $config->getRouter())));
+        $xdebugArgs = ini_get('xdebug.profiler_enable_trigger') ? array('-dxdebug.profiler_enable_trigger=1') : array();
+
+        $process = new Process(array_merge(array($binary), $finder->findArguments(), $xdebugArgs, array('-dvariables_order=EGPCS', '-S', $config->getAddress(), $config->getRouter())));
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 

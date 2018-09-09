@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-30T16:45:34Z
+
+I would add a flag instead.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-30T16:49:20Z
+
+Could you be more precise please ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-30T16:55:33Z
+
+Being able to use an option (sorry, doing too much of that other language that is not PHP) on commands: `--enable-xdebug` or something similar.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-30T18:59:23Z
+
+> `--enable-xdebug`
+
+IMO, this feature should be enabled by default (if xdebug extension is loaded of course), so if we really want make this feature controllable, `--disable-xdebug` should make more sense. But I'd prefer to make it simple by not making it controllable : if xdebug extension is loaded, then use it, else do not.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T09:38:17Z
+
+I'm wondering: why would you need to do this? I mean: can't you change your php.ini instead and get the same result in a more flexible way (i.e. don't force the setting to everyone?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T09:39:53Z
+
+Or can't we make `php -dxdebug.profiler_enable_trigger=1 bin/console server:run` work instead?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-31T10:34:20Z
+
+> `php -dxdebug.profiler_enable_trigger=1 bin/console server:run`
+
+I thought that worked firstly, but it actually does not because we enable it only in the main process, not in the sub process running `php -S 127.0.0.1:8000`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T10:36:01Z
+
+Yep I know, but we *can* make it work. It would be better IMHO. We could even make it work for all xdebug ini settings if it makes sense, isn't it?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-08-31T10:41:56Z
+
+> We could even make it work for all xdebug ini settings
+
+After checking again the settings described in https://xdebug.org/docs/all_settings, just enabling the trigger of the profiler seems relevant IMO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-01T17:10:28Z
+
+I would really prefer this to be made to work with `php -dxdebug.profiler_enable_trigger=1 bin/console server:run` instead.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-09-01T17:49:03Z
+
+@nicolas-grekas Could you review the last version I committed ?

@@ -68,9 +68,9 @@ class VarExporterTest extends TestCase
     }
 
     /**
-     * @dataProvider provideMarshall
+     * @dataProvider provideExport
      */
-    public function testMarshall(string $testName, $value, bool $staticValueExpected = false)
+    public function testExport(string $testName, $value, bool $staticValueExpected = false)
     {
         $dumpedValue = $this->getDump($value);
         $isStaticValue = true;
@@ -98,7 +98,7 @@ class VarExporterTest extends TestCase
         }
     }
 
-    public function provideMarshall()
+    public function provideExport()
     {
         yield array('multiline-string', array("\0\0\r\nA" => "B\rC\n\n"), true);
 
@@ -175,6 +175,10 @@ class VarExporterTest extends TestCase
         $rl->setValue($value, 123);
 
         yield array('final-error', $value);
+
+        yield array('final-array-iterator', new FinalArrayIterator());
+
+        yield array('final-stdclass', new FinalStdClass());
     }
 }
 
@@ -276,5 +280,30 @@ final class FinalError extends \Error
         if ($throw) {
             throw new \BadMethodCallException('Should not be called.');
         }
+    }
+}
+
+final class FinalArrayIterator extends \ArrayIterator
+{
+    public function serialize()
+    {
+        return serialize(array(123, parent::serialize()));
+    }
+
+    public function unserialize($data)
+    {
+        if ('' === $data) {
+            throw new \InvalidArgumentException('Serialized data is empty.');
+        }
+        list(, $data) = unserialize($data);
+        parent::unserialize($data);
+    }
+}
+
+final class FinalStdClass extends \stdClass
+{
+    public function __clone()
+    {
+        throw new \BadMethodCallException('Should not be called.');
     }
 }

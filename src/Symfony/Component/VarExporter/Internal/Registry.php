@@ -37,7 +37,9 @@ class Registry
 
         try {
             foreach ($serializables as $k => $v) {
-                $objects[$k] = unserialize($v);
+                if (false === $objects[$k] = unserialize($v)) {
+                    throw new \Exception(error_get_last()['message'] ?? 'unserialize(): unknown error');
+                }
             }
         } finally {
             ini_set('unserialize_callback_func', $unserializeCallback);
@@ -67,18 +69,16 @@ class Registry
         if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor || !$reflector->isFinal()) {
             $proto = $reflector->newInstanceWithoutConstructor();
         } else {
-            $r = $reflector;
-            do {
-                if ($r->isInternal()) {
-                    if (false === $proto = @unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')) {
-                        throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
-                    }
-                    break;
-                }
-            } while ($r = $r->getParentClass());
-
-            if (self::$instantiableWithoutConstructor[$class] = !$r) {
+            try {
                 $proto = $reflector->newInstanceWithoutConstructor();
+                self::$instantiableWithoutConstructor[$class] = true;
+            } catch (\ReflectionException $e) {
+                $proto = $reflector->implementsInterface('Serializable') ? 'C:' : 'O:';
+                if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
+                    $proto = null;
+                } elseif (false === $proto = @unserialize($proto.\strlen($class).':"'.$class.'":0:{}')) {
+                    throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
+                }
             }
         }
 

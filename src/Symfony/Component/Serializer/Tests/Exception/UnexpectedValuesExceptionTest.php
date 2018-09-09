@@ -32,7 +32,7 @@ final class UnexpectedValuesExceptionTest extends TestCase
         $this->assertCount(3, $unexpectedValuesException->getUnexpectedValueErrors());
     }
 
-    public function wrongErrorsProvider()
+    public function wrongErrorsProvider(): array
     {
         return array(
             array(

@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Exception;
 /**
  * @author Claudio Beatrice <claudi0.beatric3@gmail.com>
  */
-class ExtraAttributeException extends RuntimeException
+class ExtraAttributeException extends \RuntimeException
 {
     /**
      * @var string

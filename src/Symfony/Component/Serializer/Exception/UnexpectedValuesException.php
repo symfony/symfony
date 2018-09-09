@@ -98,7 +98,7 @@ class UnexpectedValuesException extends \RuntimeException implements ExceptionIn
     /**
      * @param mixed $value
      */
-    private function assertIsError($value, string $message, $unexpectedValueErrors): void
+    private function assertIsError($value, string $message): void
     {
         if (!$value instanceof UnexpectedValueException) {
             throw new InvalidArgumentException($message);

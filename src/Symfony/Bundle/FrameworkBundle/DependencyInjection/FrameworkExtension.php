@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Monolog\Processor\ProcessorInterface;
@@ -46,8 +47,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -132,11 +131,7 @@ class FrameworkExtension extends Extension
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
 
-        if (!interface_exists(ContainerBagInterface::class)) {
-            $container->removeDefinition('parameter_bag');
-            $container->removeAlias(ContainerBagInterface::class);
-            $container->removeAlias(ParameterBagInterface::class);
-        }
+        $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
@@ -709,12 +704,6 @@ class FrameworkExtension extends Extension
 
         if ($config['utf8']) {
             $container->getDefinition('routing.loader')->replaceArgument(2, array('utf8' => true));
-        }
-        if (!interface_exists(ContainerBagInterface::class)) {
-            $container->getDefinition('router.default')
-                ->replaceArgument(0, new Reference('service_container'))
-                ->clearTag('container.service_subscriber')
-            ;
         }
 
         $container->setParameter('router.resource', $config['resource']);

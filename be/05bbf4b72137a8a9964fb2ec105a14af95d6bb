@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-09-08T20:54:04Z
+
+Does this handle older AppBundle:Blog:list notation (notice no `::` in there)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-08T22:34:11Z
+
+@ostrolucky the attached patch searches for only one `:` so it will work equally well with one or two `:`.
+Also, I don't think the old notation ever hits the `ServiceValueResolver`: it is resolved before.

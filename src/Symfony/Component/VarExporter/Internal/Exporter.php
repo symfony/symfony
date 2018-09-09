@@ -76,7 +76,7 @@ class Exporter
             $sleep = null;
             $arrayValue = (array) $value;
 
-            if (!isset(Registry::$prototypes[$class])) {
+            if (!isset(Registry::$reflectors[$class])) {
                 // Might throw Exception("Serialization of '...' is not allowed")
                 Registry::getClassReflector($class);
                 serialize(Registry::$prototypes[$class]);
@@ -87,14 +87,16 @@ class Exporter
             $reflector = Registry::$reflectors[$class];
             $proto = Registry::$prototypes[$class];
 
-            if ($value instanceof \ArrayIterator || $value instanceof \ArrayObject) {
+            if (($value instanceof \ArrayIterator || $value instanceof \ArrayObject) && null !== $proto) {
                 // ArrayIterator and ArrayObject need special care because their "flags"
                 // option changes the behavior of the (array) casting operator.
-                $proto = Registry::$cloneable[$class] ? clone Registry::$prototypes[$class] : $reflector->newInstanceWithoutConstructor();
                 $properties = self::getArrayObjectProperties($value, $arrayValue, $proto);
-            } elseif ($value instanceof \SplObjectStorage) {
-                // By implementing Serializable, SplObjectStorage breaks internal references,
-                // let's deal with it on our own.
+
+                // populates Registry::$prototypes[$class] with a new instance
+                Registry::getClassReflector($class, Registry::$instantiableWithoutConstructor[$class], Registry::$cloneable[$class]);
+            } elseif ($value instanceof \SplObjectStorage && Registry::$cloneable[$class] && null !== $proto) {
+                // By implementing Serializable, SplObjectStorage breaks
+                // internal references; let's deal with it on our own.
                 foreach (clone $value as $v) {
                     $properties[] = $v;
                     $properties[] = $value[$v];
@@ -284,11 +286,14 @@ class Exporter
                 continue;
             }
             if (!Registry::$instantiableWithoutConstructor[$class]) {
-                if (is_subclass_of($class, 'Throwable')) {
-                    $eol = is_subclass_of($class, 'Error') ? "\0Error\0" : "\0Exception\0";
-                    $serializables[$k] = 'O:'.\strlen($class).':"'.$class.'":1:{s:'.(5 + \strlen($eol)).':"'.$eol.'trace";a:0:{}}';
+                if (is_subclass_of($class, 'Serializable')) {
+                    $serializables[$k] = 'C:'.\strlen($class).':"'.$class.'":0:{}';
                 } else {
                     $serializables[$k] = 'O:'.\strlen($class).':"'.$class.'":0:{}';
+                }
+                if (is_subclass_of($class, 'Throwable')) {
+                    $eol = is_subclass_of($class, 'Error') ? "\0Error\0" : "\0Exception\0";
+                    $serializables[$k] = substr_replace($serializables[$k], '1:{s:'.(5 + \strlen($eol)).':"'.$eol.'trace";a:0:{}}', -4);
                 }
                 continue;
             }

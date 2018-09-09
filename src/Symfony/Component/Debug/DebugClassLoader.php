@@ -247,23 +247,21 @@ class DebugClassLoader
                     continue;
                 }
 
-                // Method from a trait
-                if ($method->getFilename() !== $refl->getFileName()) {
-                    continue;
-                }
-
                 if ($isClass && $parent && isset(self::$finalMethods[$parent][$method->name])) {
                     list($declaringClass, $message) = self::$finalMethods[$parent][$method->name];
                     @trigger_error(sprintf('The "%s::%s()" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
                 }
 
-                foreach ($parentAndTraits as $use) {
-                    if (isset(self::$internalMethods[$use][$method->name])) {
-                        list($declaringClass, $message) = self::$internalMethods[$use][$method->name];
-                        if (\strncmp($ns, $declaringClass, $len)) {
-                            @trigger_error(sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
-                        }
+                if (isset(self::$internalMethods[$name][$method->name])) {
+                    list($declaringClass, $message) = self::$internalMethods[$name][$method->name];
+                    if (\strncmp($ns, $declaringClass, $len)) {
+                        @trigger_error(sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
                     }
+                }
+
+                // Method from a trait
+                if ($method->getFilename() !== $refl->getFileName()) {
+                    continue;
                 }
 
                 // Detect method annotations

@@ -91,10 +91,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         $debugRepresentation = array(
             'bus' => $busName,
             'envelopeItems' => $tracedMessage['envelopeItems'] ?? null,
-            'message' => array(
-                'type' => new ClassStub(\get_class($message)),
-                'value' => $message,
-            ),
+            'message' => new ClassStub($message),
             'caller' => $tracedMessage['caller'],
         );
 

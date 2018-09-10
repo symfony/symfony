@@ -109,7 +109,7 @@
                 data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
                 data-toggle-initial="{{ loop.first ? 'display' }}"
             >
-                <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
+                <span class="dump-inline">{{ profiler_dump(dispatchCall.message) }}</span>
                 {% if showBus %}
                     <span class="label">{{ dispatchCall.bus }}</span>
                 {% endif %}
@@ -154,10 +154,6 @@
                 <td>{{ dispatchCall.bus }}</td>
             </tr>
             {% endif %}
-            <tr>
-                <td class="text-bold">Message</td>
-                <td>{{ profiler_dump(dispatchCall.message.value, maxDepth=2) }}</td>
-            </tr>
             <tr>
                 <td class="text-bold">Envelope items</td>
                 <td>

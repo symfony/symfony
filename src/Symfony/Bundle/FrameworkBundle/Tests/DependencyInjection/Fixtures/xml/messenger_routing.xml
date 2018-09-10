@@ -8,7 +8,6 @@
     <framework:config>
         <framework:serializer enabled="true" />
         <framework:messenger>
-            <framework:serializer enabled="true" />
             <framework:routing message-class="Symfony\Component\Messenger\Tests\Fixtures\DummyMessage">
                 <framework:sender service="amqp" />
                 <framework:sender service="audit" />

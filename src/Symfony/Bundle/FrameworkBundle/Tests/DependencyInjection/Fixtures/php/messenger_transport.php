@@ -7,5 +7,8 @@ $container->loadFromExtension('framework', array(
             'format' => 'csv',
             'context' => array('enable_max_depth' => true),
         ),
+        'transports' => array(
+            'default' => 'amqp://localhost/%2f/messages',
+        ),
     ),
 ));

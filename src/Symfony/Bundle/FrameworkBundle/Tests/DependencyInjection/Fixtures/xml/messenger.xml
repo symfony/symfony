@@ -7,7 +7,6 @@
 
     <framework:config>
         <framework:messenger>
-            <framework:serializer enabled="false" />
             <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage">
                 <framework:sender service="sender.bar" />
                 <framework:sender service="sender.biz" />

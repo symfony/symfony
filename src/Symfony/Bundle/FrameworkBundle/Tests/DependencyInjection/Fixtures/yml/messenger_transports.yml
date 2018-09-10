@@ -1,7 +1,6 @@
 framework:
     serializer: true
     messenger:
-        serializer: true
         transports:
             default: 'amqp://localhost/%2f/messages'
             customised:

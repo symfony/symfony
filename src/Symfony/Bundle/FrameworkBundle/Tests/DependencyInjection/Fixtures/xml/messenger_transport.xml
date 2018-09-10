@@ -13,6 +13,7 @@
                     <framework:enable_max_depth>true</framework:enable_max_depth>
                 </framework:context>
             </framework:serializer>
+            <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
         </framework:messenger>
     </framework:config>
 </container>

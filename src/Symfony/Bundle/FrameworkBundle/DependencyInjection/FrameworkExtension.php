@@ -1490,23 +1490,26 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.xml');
 
-        if ($this->isConfigEnabled($container, $config['serializer'])) {
-            if (!$this->isConfigEnabled($container, $serializerConfig)) {
-                throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
+        if (empty($config['transports'])) {
+            $container->removeDefinition('messenger.transport.symfony_serializer');
+            $container->removeDefinition('messenger.transport.amqp.factory');
+        } else {
+            if ('messenger.transport.symfony_serializer' === $config['serializer']['id']) {
+                if (!$this->isConfigEnabled($container, $serializerConfig)) {
+                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                }
+
+                $container->getDefinition('messenger.transport.symfony_serializer')
+                    ->replaceArgument(1, $config['serializer']['format'])
+                    ->replaceArgument(2, $config['serializer']['context']);
             }
 
-            $container->getDefinition('messenger.transport.serializer')
-                ->replaceArgument(1, $config['serializer']['format'])
-                ->replaceArgument(2, $config['serializer']['context']);
-        } else {
-            $container->removeDefinition('messenger.transport.serializer');
-            if ('messenger.transport.serializer' === $config['encoder'] || 'messenger.transport.serializer' === $config['decoder']) {
+            if ($config['serializer']['id']) {
+                $container->setAlias('messenger.transport.serializer', $config['serializer']['id']);
+            } else {
                 $container->removeDefinition('messenger.transport.amqp.factory');
             }
         }
-
-        $container->setAlias('messenger.transport.encoder', $config['encoder']);
-        $container->setAlias('messenger.transport.decoder', $config['decoder']);
 
         if (null === $config['default_bus']) {
             if (\count($config['buses']) > 1) {

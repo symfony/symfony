@@ -16,8 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
-use Symfony\Component\Messenger\Transport\Serialization\DecoderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
@@ -35,8 +34,7 @@ class AmqpTransportTest extends TestCase
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            null,
-            $decoder = $this->getMockBuilder(DecoderInterface::class)->getMock(),
+            $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock(),
             $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock()
         );
 
@@ -46,7 +44,7 @@ class AmqpTransportTest extends TestCase
         $amqpEnvelope->method('getBody')->willReturn('body');
         $amqpEnvelope->method('getHeaders')->willReturn(array('my' => 'header'));
 
-        $decoder->method('decode')->with(array('body' => 'body', 'headers' => array('my' => 'header')))->willReturn(Envelope::wrap($decodedMessage));
+        $serializer->method('decode')->with(array('body' => 'body', 'headers' => array('my' => 'header')))->willReturn(Envelope::wrap($decodedMessage));
         $connection->method('get')->willReturn($amqpEnvelope);
 
         $transport->receive(function (Envelope $envelope) use ($transport, $decodedMessage) {
@@ -56,12 +54,11 @@ class AmqpTransportTest extends TestCase
         });
     }
 
-    private function getTransport(EncoderInterface $encoder = null, DecoderInterface $decoder = null, Connection $connection = null)
+    private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)
     {
-        $encoder = $encoder ?: $this->getMockBuilder(EncoderInterface::class)->getMock();
-        $decoder = $decoder ?: $this->getMockBuilder(DecoderInterface::class)->getMock();
+        $serializer = $serializer ?: $this->getMockBuilder(SerializerInterface::class)->getMock();
         $connection = $connection ?: $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
 
-        return new AmqpTransport($encoder, $decoder, $connection);
+        return new AmqpTransport($serializer, $connection);
     }
 }

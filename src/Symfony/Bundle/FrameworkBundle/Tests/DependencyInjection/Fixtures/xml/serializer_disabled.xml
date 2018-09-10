@@ -7,8 +7,5 @@
 
     <framework:config>
         <framework:serializer enabled="false" />
-        <framework:messenger>
-            <framework:serializer enabled="false" />
-        </framework:messenger>
     </framework:config>
 </container>

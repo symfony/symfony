@@ -18,7 +18,7 @@
         </service>
 
         <!-- Message encoding/decoding -->
-        <service id="messenger.transport.serializer" class="Symfony\Component\Messenger\Transport\Serialization\Serializer">
+        <service id="messenger.transport.symfony_serializer" class="Symfony\Component\Messenger\Transport\Serialization\Serializer">
             <argument type="service" id="serializer" />
             <argument /> <!-- Format -->
             <argument type="collection" /> <!-- Context -->
@@ -61,8 +61,7 @@
         </service>
 
         <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
-            <argument type="service" id="messenger.transport.encoder" />
-            <argument type="service" id="messenger.transport.decoder" />
+            <argument type="service" id="messenger.transport.serializer" />
             <argument>%kernel.debug%</argument>
 
             <tag name="messenger.transport_factory" />

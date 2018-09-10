@@ -120,9 +120,18 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Gets the application root dir (path of the project's Kernel class).
      *
+     * @deprecated since Symfony 4.2, use getProjectDir() instead
+     *
      * @return string The Kernel root dir
      */
     public function getRootDir();
+
+    /**
+     * Gets the application root dir (path of the project's composer file).
+     *
+     * @return string The project root dir
+     */
+    public function getProjectDir();
 
     /**
      * Gets the current container.

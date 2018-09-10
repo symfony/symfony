@@ -435,14 +435,14 @@ class MessengerPassTest extends TestCase
         $dataCollector = $this->getMockBuilder(MessengerDataCollector::class)->getMock();
 
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
-        $container->register('messenger.data_collector', $dataCollector);
+        $container->register('data_collector.messenger', $dataCollector);
         $container->setParameter('kernel.debug', true);
 
         (new MessengerPass())->process($container);
 
         $this->assertTrue($container->hasDefinition($debuggedFooBusId = 'debug.traced.'.$fooBusId));
         $this->assertSame(array($fooBusId, null, 0), $container->getDefinition($debuggedFooBusId)->getDecoratedService());
-        $this->assertEquals(array(array('registerBus', array($fooBusId, new Reference($debuggedFooBusId)))), $container->getDefinition('messenger.data_collector')->getMethodCalls());
+        $this->assertEquals(array(array('registerBus', array($fooBusId, new Reference($debuggedFooBusId)))), $container->getDefinition('data_collector.messenger')->getMethodCalls());
     }
 
     public function testRegistersMiddlewareFromServices()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarExporter;
 
+use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use Symfony\Component\VarExporter\Internal\Exporter;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
@@ -36,7 +37,7 @@ final class VarExporter
      *
      * @return string The value exported as PHP code
      *
-     * @throws \Exception When the provided value cannot be serialized
+     * @throws ExceptionInterface When the provided value cannot be serialized
      */
     public static function export($value, bool &$isStaticValue = null): string
     {

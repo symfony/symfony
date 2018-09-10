@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
+use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -37,9 +40,7 @@ class Registry
 
         try {
             foreach ($serializables as $k => $v) {
-                if (false === $objects[$k] = unserialize($v)) {
-                    throw new \Exception(error_get_last()['message'] ?? 'unserialize(): unknown error');
-                }
+                $objects[$k] = unserialize($v);
             }
         } finally {
             ini_set('unserialize_callback_func', $unserializeCallback);
@@ -64,6 +65,9 @@ class Registry
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
     {
+        if (!\class_exists($class)) {
+            throw new ClassNotFoundException($class);
+        }
         $reflector = new \ReflectionClass($class);
 
         if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor || !$reflector->isFinal()) {
@@ -77,14 +81,14 @@ class Registry
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
                     $proto = null;
                 } elseif (false === $proto = @unserialize($proto.\strlen($class).':"'.$class.'":0:{}')) {
-                    throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
+                    throw new NotInstantiableTypeException($class);
                 }
             }
         }
 
         if (null === self::$cloneable[$class] = $cloneable) {
             if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup'))) {
-                throw new \Exception(sprintf("Serialization of '%s' is not allowed", $class));
+                throw new NotInstantiableTypeException($class);
             }
 
             self::$cloneable[$class] = $reflector->isCloneable() && !$reflector->hasMethod('__clone');

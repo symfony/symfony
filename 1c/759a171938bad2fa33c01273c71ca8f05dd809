@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-10T07:29:15Z
+
+I think I'm against being that broad. Conceptually, an argument can only be `string|string[]` and an option `string|string[]|bool`. In any case, adding support for more is not a bug fix, so not for 2.8.
+
+Note: it's not because something happens to work that we should make it official. That's one of these case IMHO
+
+---------------------------------------------------------------------------
+
+by liarco at 2018-09-10T07:47:51Z
+
+@fabpot thank you for your reply, I see your point (the original proposal was exactly that "strict"). There was a reason behind the inclusion of any object implementing `__toString()`, but I understand that it might be too broad and lead to misunderstandings and unpredictable behaviors. (I think that some explicit casts won't hurt)
+
+May I change the doc as you suggested or should I wait for further investigation?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-10T07:52:40Z
+
+I think you can go ahead and make the changes.

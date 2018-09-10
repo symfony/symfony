@@ -16,7 +16,7 @@ It also provides a few improvements over `var_export()`/`serialize()`:
 
  * the output is PSR-2 compatible;
  * the output can be re-indented without messing up with `\r` or `\n` in the data
- * missing classes throw a `ReflectionException` instead of being unserialized to
+ * missing classes throw a `ClassNotFoundException` instead of being unserialized to
    `PHP_Incomplete_Class` objects;
  * references involving `SplObjectStorage`, `ArrayObject` or `ArrayIterator`
    instances are preserved;

@@ -21,8 +21,8 @@ class VarExporterTest extends TestCase
     use VarDumperTestTrait;
 
     /**
-     * @expectedException \ReflectionException
-     * @expectedExceptionMessage Class SomeNotExistingClass does not exist
+     * @expectedException \Symfony\Component\VarExporter\Exception\ClassNotFoundException
+     * @expectedExceptionMessage Class "SomeNotExistingClass" not found.
      */
     public function testPhpIncompleteClassesAreForbidden()
     {
@@ -36,8 +36,8 @@ class VarExporterTest extends TestCase
 
     /**
      * @dataProvider provideFailingSerialization
-     * @expectedException \Exception
-     * @expectedExceptionMessageRegexp Serialization of '.*' is not allowed
+     * @expectedException \Symfony\Component\VarExporter\Exception\NotInstantiableTypeException
+     * @expectedExceptionMessageRegexp Type ".*" is not instantiable.
      */
     public function testFailingSerialization($value)
     {

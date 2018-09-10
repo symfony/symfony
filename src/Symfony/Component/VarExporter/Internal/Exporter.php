@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
+use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -31,14 +33,14 @@ class Exporter
      *
      * @return int
      *
-     * @throws \Exception When a value cannot be serialized
+     * @throws NotInstantiableTypeException When a value cannot be serialized
      */
     public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic)
     {
         $refs = $values;
         foreach ($values as $k => $value) {
             if (\is_resource($value)) {
-                throw new \Exception(sprintf("Serialization of '%s' resource is not allowed", \get_resource_type($value)));
+                throw new NotInstantiableTypeException(\get_resource_type($value).' resource');
             }
             $refs[$k] = $objectsPool;
 
@@ -77,9 +79,12 @@ class Exporter
             $arrayValue = (array) $value;
 
             if (!isset(Registry::$reflectors[$class])) {
-                // Might throw Exception("Serialization of '...' is not allowed")
                 Registry::getClassReflector($class);
-                serialize(Registry::$prototypes[$class]);
+                try {
+                    serialize(Registry::$prototypes[$class]);
+                } catch (\Exception $e) {
+                    throw new NotInstantiableTypeException($class, $e);
+                }
                 if (\method_exists($class, '__sleep')) {
                     Registry::getClassReflector($class, Registry::$instantiableWithoutConstructor[$class], Registry::$cloneable[$class]);
                 }

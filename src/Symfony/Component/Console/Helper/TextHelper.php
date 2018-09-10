@@ -30,7 +30,7 @@ final class TextHelper
     public static function strlen(string $string): int
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return strlen($string);
+            return \strlen($string);
         }
 
         return mb_strwidth($string, $encoding);
@@ -84,7 +84,7 @@ final class TextHelper
                 continue;
             }
 
-            if (2 == count($format)) {
+            if (2 == \count($format)) {
                 return $format[1];
             }
 

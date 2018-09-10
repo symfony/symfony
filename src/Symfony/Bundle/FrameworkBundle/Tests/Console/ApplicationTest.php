@@ -101,6 +101,10 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand" class is deprecated since Symfony 4.2, use "Symfony\Component\Console\Command\Command" with dependency injection instead.
+     */
     public function testBundleCommandsHaveRightContainer()
     {
         $command = $this->getMockForAbstractClass('Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand', array('foo'), '', true, true, true, array('setContainer'));

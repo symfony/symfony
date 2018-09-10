@@ -34,6 +34,8 @@ class RegionDataGenerator extends AbstractDataGenerator
     const BOUVET_ISLAND_ID = 'BV';
     const HEARD_MCDONALD_ISLANDS_ID = 'HM';
     const CLIPPERTON_ISLAND_ID = 'CP';
+    const EUROZONE_ID = 'EZ';
+    const UNITED_NATIONS_ID = 'UN';
 
     /**
      * Regions excluded from generation.
@@ -43,6 +45,8 @@ class RegionDataGenerator extends AbstractDataGenerator
         // Look like countries, but are sub-continents
         self::OUTLYING_OCEANIA_REGION_ID => true,
         self::EUROPEAN_UNION_ID => true,
+        self::EUROZONE_ID => true,
+        self::UNITED_NATIONS_ID => true,
         // No longer exists
         self::NETHERLANDS_ANTILLES_ID => true,
         // Uninhabited islands

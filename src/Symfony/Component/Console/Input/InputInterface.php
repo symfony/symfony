@@ -59,6 +59,8 @@ interface InputInterface
 
     /**
      * Binds the current Input instance with the given arguments and options.
+     *
+     * @throws RuntimeException
      */
     public function bind(InputDefinition $definition);
 

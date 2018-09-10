@@ -64,7 +64,7 @@ class MessengerPass implements CompilerPassInterface
                 $container->getParameterBag()->remove($busMiddlewareParameter);
             }
 
-            if ($container->hasDefinition('messenger.data_collector')) {
+            if ($container->hasDefinition('data_collector.messenger')) {
                 $this->registerBusToCollector($container, $busId);
             }
         }
@@ -276,7 +276,7 @@ class MessengerPass implements CompilerPassInterface
             (new Definition(TraceableMessageBus::class, array(new Reference($tracedBusId.'.inner'))))->setDecoratedService($busId)
         );
 
-        $container->getDefinition('messenger.data_collector')->addMethodCall('registerBus', array($busId, new Reference($tracedBusId)));
+        $container->getDefinition('data_collector.messenger')->addMethodCall('registerBus', array($busId, new Reference($tracedBusId)));
     }
 
     private function registerBusMiddleware(ContainerBuilder $container, string $busId, array $middlewareCollection)

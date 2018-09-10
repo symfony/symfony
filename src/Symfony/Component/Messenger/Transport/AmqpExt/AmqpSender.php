@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -25,10 +26,10 @@ class AmqpSender implements SenderInterface
     private $serializer;
     private $connection;
 
-    public function __construct(SerializerInterface $serializer, Connection $connection)
+    public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
-        $this->serializer = $serializer;
         $this->connection = $connection;
+        $this->serializer = $serializer ?? Serializer::create();
     }
 
     /**

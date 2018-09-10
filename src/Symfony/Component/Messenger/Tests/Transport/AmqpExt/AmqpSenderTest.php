@@ -34,7 +34,7 @@ class AmqpSenderTest extends TestCase
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers']);
 
-        $sender = new AmqpSender($serializer, $connection);
+        $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);
     }
 }

@@ -26,7 +26,7 @@ $serializer = new Serializer(
 );
 
 $connection = Connection::fromDsn(getenv('DSN'));
-$receiver = new AmqpReceiver($serializer, $connection);
+$receiver = new AmqpReceiver($connection, $serializer);
 
 $worker = new Worker($receiver, new class() implements MessageBusInterface {
     public function dispatch($envelope)

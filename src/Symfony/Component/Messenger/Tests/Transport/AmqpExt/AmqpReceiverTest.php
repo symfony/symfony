@@ -44,7 +44,7 @@ class AmqpReceiverTest extends TestCase
 
         $connection->expects($this->once())->method('ack')->with($envelope);
 
-        $receiver = new AmqpReceiver($serializer, $connection);
+        $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->receive(function (?Envelope $envelope) use ($receiver) {
             $this->assertEquals(new DummyMessage('Hi'), $envelope->getMessage());
             $receiver->stop();
@@ -71,7 +71,7 @@ class AmqpReceiverTest extends TestCase
 
         $connection->expects($this->once())->method('nack')->with($envelope);
 
-        $receiver = new AmqpReceiver($serializer, $connection);
+        $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->receive(function () {
             throw new InterruptException('Well...');
         });
@@ -96,7 +96,7 @@ class AmqpReceiverTest extends TestCase
         $connection->method('get')->willReturn($envelope);
         $connection->expects($this->once())->method('reject')->with($envelope);
 
-        $receiver = new AmqpReceiver($serializer, $connection);
+        $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->receive(function () {
             throw new WillNeverWorkException('Well...');
         });

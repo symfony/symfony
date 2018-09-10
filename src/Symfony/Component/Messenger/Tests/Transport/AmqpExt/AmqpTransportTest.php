@@ -59,6 +59,6 @@ class AmqpTransportTest extends TestCase
         $serializer = $serializer ?: $this->getMockBuilder(SerializerInterface::class)->getMock();
         $connection = $connection ?: $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
 
-        return new AmqpTransport($serializer, $connection);
+        return new AmqpTransport($connection, $serializer);
     }
 }

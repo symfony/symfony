@@ -31,7 +31,7 @@ class TraceableMessageBus implements MessageBusInterface
     {
         $caller = $this->getCaller();
         $callTime = microtime(true);
-        $messageToTrace = $message instanceof Envelope ? $message->getMessage() : $message;
+        $messageToTrace = \get_class($message instanceof Envelope ? $message->getMessage() : $message);
         $envelopeItems = $message instanceof Envelope ? array_values($message->all()) : null;
 
         try {

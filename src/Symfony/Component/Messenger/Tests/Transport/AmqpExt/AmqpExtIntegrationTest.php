@@ -48,8 +48,8 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->setup();
         $connection->queue()->purge();
 
-        $sender = new AmqpSender($serializer, $connection);
-        $receiver = new AmqpReceiver($serializer, $connection);
+        $sender = new AmqpSender($connection, $serializer);
+        $receiver = new AmqpReceiver($connection, $serializer);
 
         $sender->send($first = Envelope::wrap(new DummyMessage('First')));
         $sender->send($second = Envelope::wrap(new DummyMessage('Second')));
@@ -74,7 +74,7 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->setup();
         $connection->queue()->purge();
 
-        $sender = new AmqpSender($serializer, $connection);
+        $sender = new AmqpSender($connection, $serializer);
         $sender->send(Envelope::wrap(new DummyMessage('Hello')));
 
         $amqpReadTimeout = 30;
@@ -123,7 +123,7 @@ TXT
         $connection->setup();
         $connection->queue()->purge();
 
-        $receiver = new AmqpReceiver($serializer, $connection);
+        $receiver = new AmqpReceiver($connection, $serializer);
 
         $receivedMessages = 0;
         $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages) {

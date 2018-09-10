@@ -38,7 +38,7 @@ class AmqpTransportFactoryTest extends TestCase
             true
         );
 
-        $expectedTransport = new AmqpTransport($serializer, Connection::fromDsn('amqp://localhost', array('foo' => 'bar'), true));
+        $expectedTransport = new AmqpTransport(Connection::fromDsn('amqp://localhost', array('foo' => 'bar'), true), $serializer);
 
         $this->assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', array('foo' => 'bar')));
     }

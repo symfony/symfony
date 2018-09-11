@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests\Locale;
 
+use Symfony\Component\Intl\Locale\Locale;
+
 class LocaleTest extends AbstractLocaleTest
 {
     /**
@@ -172,6 +174,6 @@ class LocaleTest extends AbstractLocaleTest
     {
         $args = \array_slice(\func_get_args(), 1);
 
-        return \call_user_func_array(array('Symfony\Component\Intl\Locale\Locale', $methodName), $args);
+        return Locale::{$methodName}(...$args);
     }
 }

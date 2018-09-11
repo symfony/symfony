@@ -107,7 +107,7 @@ class LoggingTranslator implements LegacyTranslatorInterface, TranslatorBagInter
      */
     public function __call($method, $args)
     {
-        return \call_user_func_array(array($this->translator, $method), $args);
+        return $this->translator->{$method}(...$args);
     }
 
     /**

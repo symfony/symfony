@@ -33,6 +33,6 @@ class LocaleTest extends AbstractLocaleTest
     {
         $args = \array_slice(\func_get_args(), 1);
 
-        return \call_user_func_array(array('Locale', $methodName), $args);
+        return \Locale::{$methodName}(...$args);
     }
 }

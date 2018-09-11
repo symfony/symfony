@@ -336,13 +336,13 @@ trait RedisTrait
             // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
             $results = array();
             foreach ($generator() as $command => $args) {
-                $results[] = \call_user_func_array(array($this->redis, $command), $args);
+                $results[] = $this->redis->{$command}(...$args);
                 $ids[] = $args[0];
             }
         } elseif ($this->redis instanceof \Predis\Client) {
             $results = $this->redis->pipeline(function ($redis) use ($generator, &$ids) {
                 foreach ($generator() as $command => $args) {
-                    \call_user_func_array(array($redis, $command), $args);
+                    $redis->{$command}(...$args);
                     $ids[] = $args[0];
                 }
             });
@@ -353,7 +353,7 @@ trait RedisTrait
                     $connections[$h] = array($this->redis->_instance($h), -1);
                     $connections[$h][0]->multi(\Redis::PIPELINE);
                 }
-                \call_user_func_array(array($connections[$h][0], $command), $args);
+                $connections[$h][0]->{$command}(...$args);
                 $results[] = array($h, ++$connections[$h][1]);
                 $ids[] = $args[0];
             }
@@ -366,7 +366,7 @@ trait RedisTrait
         } else {
             $this->redis->multi(\Redis::PIPELINE);
             foreach ($generator() as $command => $args) {
-                \call_user_func_array(array($this->redis, $command), $args);
+                $this->redis->{$command}(...$args);
                 $ids[] = $args[0];
             }
             $results = $this->redis->exec();

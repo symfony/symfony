@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Logger.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
@@ -29,7 +27,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     public function getLogs(/* Request $request = null */)
     {
         if ($logger = $this->getDebugLogger()) {
-            return \call_user_func_array(array($logger, 'getLogs'), \func_get_args());
+            return $logger->getLogs(...\func_get_args());
         }
 
         return array();
@@ -41,7 +39,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     public function countErrors(/* Request $request = null */)
     {
         if ($logger = $this->getDebugLogger()) {
-            return \call_user_func_array(array($logger, 'countErrors'), \func_get_args());
+            return $logger->countErrors(...\func_get_args());
         }
 
         return 0;

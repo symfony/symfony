@@ -90,9 +90,7 @@ class ExpressionFunction
         };
 
         $evaluator = function () use ($phpFunctionName) {
-            $args = \func_get_args();
-
-            return \call_user_func_array($phpFunctionName, array_splice($args, 1));
+            return $phpFunctionName(...\array_slice(\func_get_args(), 1));
         };
 
         return new self($expressionFunctionName ?: end($parts), $compiler, $evaluator);

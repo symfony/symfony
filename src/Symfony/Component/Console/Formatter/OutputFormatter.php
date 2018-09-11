@@ -142,6 +142,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $offset = 0;
         $output = '';
         $tagRegex = '[a-z][a-z0-9,_=;-]*+';
+        $currentLineLength = 0;
         preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#ix", $message, $matches, PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
@@ -152,7 +153,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             }
 
             // add the text up to the next tag
-            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $output, $width);
+            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $output, $width, $currentLineLength);
             $offset = $pos + \strlen($text);
 
             // opening tag?
@@ -166,7 +167,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
                 // </>
                 $this->styleStack->pop();
             } elseif (false === $style = $this->createStyleFromString(strtolower($tag))) {
-                $output .= $this->applyCurrentStyle($text, $output, $width);
+                $output .= $this->applyCurrentStyle($text, $output, $width, $currentLineLength);
             } elseif ($open) {
                 $this->styleStack->push($style);
             } else {
@@ -174,7 +175,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width);
+        $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width, $currentLineLength);
 
         if (false !== strpos($output, "\0")) {
             return strtr($output, array("\0" => '\\', '\\<' => '<'));
@@ -231,24 +232,46 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * Applies current style from stack to text, if must be applied.
      */
-    private function applyCurrentStyle(string $text, string $current, int $width): string
+    private function applyCurrentStyle(string $text, string $current, int $width, int &$currentLineLength): string
     {
         if ('' === $text) {
             return '';
         }
 
-        if ($width) {
-            if ('' !== $current) {
-                $text = ltrim($text);
-            }
+        if (!$width) {
+            return $this->isDecorated() ? $this->styleStack->getCurrent()->apply($text) : $text;
+        }
 
-            $text = wordwrap($text, $width, "\n", true);
+        if (!$currentLineLength && '' !== $current) {
+            $text = ltrim($text);
+        }
 
-            if ('' !== $current && "\n" !== substr($current, -1)) {
-                $text = "\n".$text;
+        if ($currentLineLength) {
+            $prefix = substr($text, 0, $i = $width - $currentLineLength)."\n";
+            $text = substr($text, $i);
+        } else {
+            $prefix = '';
+        }
+
+        preg_match('~(\\n)$~', $text, $matches);
+        $text = $prefix.preg_replace('~([^\\n]{'.$width.'})\\ *~', "\$1\n", $text);
+        $text = rtrim($text, "\n").($matches[1] ?? '');
+
+        if (!$currentLineLength && '' !== $current && "\n" !== substr($current, -1)) {
+            $text = "\n".$text;
+        }
+
+        $lines = explode("\n", $text);
+        if ($width === $currentLineLength = \strlen(end($lines))) {
+            $currentLineLength = 0;
+        }
+
+        if ($this->isDecorated()) {
+            foreach ($lines as $i => $line) {
+                $lines[$i] = $this->styleStack->getCurrent()->apply($line);
             }
         }
 
-        return $this->isDecorated() && \strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
+        return implode("\n", $lines);
     }
 }

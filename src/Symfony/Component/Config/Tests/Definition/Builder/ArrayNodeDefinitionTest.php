@@ -43,7 +43,7 @@ class ArrayNodeDefinitionTest extends TestCase
     {
         $node = new ArrayNodeDefinition('root');
 
-        \call_user_func_array(array($node, $method), $args);
+        $node->{$method}(...$args);
 
         $node->getNode();
     }

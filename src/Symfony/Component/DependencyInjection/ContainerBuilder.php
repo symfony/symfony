@@ -1114,7 +1114,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (null !== $factory) {
-            $service = \call_user_func_array($factory, $arguments);
+            $service = $factory(...$arguments);
 
             if (!$definition->isDeprecated() && \is_array($factory) && \is_string($factory[0])) {
                 $r = new \ReflectionClass($factory[0]);
@@ -1563,7 +1563,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        \call_user_func_array(array($service, $call[0]), $this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlineServices));
+        $service->{$call[0]}(...$this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlineServices));
     }
 
     /**

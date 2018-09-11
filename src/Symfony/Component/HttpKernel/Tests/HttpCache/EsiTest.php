@@ -234,7 +234,7 @@ class EsiTest extends TestCase
         if (\is_array($response)) {
             $cache->expects($this->any())
                   ->method('handle')
-                  ->will(\call_user_func_array(array($this, 'onConsecutiveCalls'), $response))
+                  ->will($this->onConsecutiveCalls(...$response))
             ;
         } else {
             $cache->expects($this->any())

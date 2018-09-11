@@ -88,7 +88,7 @@ class FragmentHandlerTest extends TestCase
         ;
 
         if ($arguments) {
-            \call_user_func_array(array($e, 'with'), $arguments);
+            $e->with(...$arguments);
         }
 
         $handler = new FragmentHandler($this->requestStack);

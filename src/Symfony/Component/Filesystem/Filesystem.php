@@ -744,7 +744,7 @@ class Filesystem
         self::$lastError = null;
         \set_error_handler(__CLASS__.'::handleError');
         try {
-            $result = \call_user_func_array($func, \array_slice(\func_get_args(), 1));
+            $result = $func(...\array_slice(\func_get_args(), 1));
             \restore_error_handler();
 
             return $result;

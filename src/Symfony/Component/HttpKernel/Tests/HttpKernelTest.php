@@ -227,8 +227,8 @@ class HttpKernelTest extends TestCase
         $first = $e->getTrace()[0];
 
         // `file` index the array starting at 0, and __FILE__ starts at 1
-        $line = file($first['file'])[$first['line'] - 1];
-        $this->assertContains('call_user_func_array', $line);
+        $line = file($first['file'])[$first['line'] - 2];
+        $this->assertContains('// call controller', $line);
     }
 
     public function testHandleWhenTheControllerDoesNotReturnAResponseButAViewIsRegistered()
@@ -274,7 +274,7 @@ class HttpKernelTest extends TestCase
             $oldArguments = $event->getArguments();
 
             $newController = function ($id) use ($oldController, $oldArguments) {
-                $response = \call_user_func_array($oldController, $oldArguments);
+                $response = $oldController(...$oldArguments);
 
                 $response->headers->set('X-Id', $id);
 

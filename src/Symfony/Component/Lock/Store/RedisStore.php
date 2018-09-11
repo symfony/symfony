@@ -139,7 +139,7 @@ class RedisStore implements StoreInterface
         }
 
         if ($this->redis instanceof \Predis\Client) {
-            return \call_user_func_array(array($this->redis, 'eval'), array_merge(array($script, 1, $resource), $args));
+            return $this->redis->eval(...array_merge(array($script, 1, $resource), $args));
         }
 
         throw new InvalidArgumentException(sprintf('%s() expects being initialized with a Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));

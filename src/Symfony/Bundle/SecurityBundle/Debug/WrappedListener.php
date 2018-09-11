@@ -53,7 +53,7 @@ final class WrappedListener implements ListenerInterface
      */
     public function __call($method, $arguments)
     {
-        return \call_user_func_array(array($this->listener, $method), $arguments);
+        return $this->listener->{$method}(...$arguments);
     }
 
     public function getWrappedListener(): ListenerInterface

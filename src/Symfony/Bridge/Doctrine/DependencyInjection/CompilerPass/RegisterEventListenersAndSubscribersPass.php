@@ -146,7 +146,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
         if ($sortedTags) {
             krsort($sortedTags);
-            $sortedTags = \call_user_func_array('array_merge', $sortedTags);
+            $sortedTags = array_merge(...$sortedTags);
         }
 
         return $sortedTags;

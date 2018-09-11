@@ -65,17 +65,26 @@ class Registry
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
     {
-        if (!\class_exists($class)) {
+        if (!\class_exists($class) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
             throw new ClassNotFoundException($class);
         }
         $reflector = new \ReflectionClass($class);
 
-        if (self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor || !$reflector->isFinal()) {
+        if ($instantiableWithoutConstructor) {
             $proto = $reflector->newInstanceWithoutConstructor();
+        } elseif (!$reflector->isInstantiable()) {
+            throw new NotInstantiableTypeException($class);
+        } elseif ($reflector->name !== $class) {
+            $reflector = self::$reflectors[$name = $reflector->name] ?? self::getClassReflector($name, $instantiableWithoutConstructor, $cloneable);
+            self::$cloneable[$class] = self::$cloneable[$name];
+            self::$instantiableWithoutConstructor[$class] = self::$instantiableWithoutConstructor[$name];
+            self::$prototypes[$class] = self::$prototypes[$name];
+
+            return self::$reflectors[$class] = $reflector;
         } else {
             try {
                 $proto = $reflector->newInstanceWithoutConstructor();
-                self::$instantiableWithoutConstructor[$class] = true;
+                $instantiableWithoutConstructor = true;
             } catch (\ReflectionException $e) {
                 $proto = $reflector->implementsInterface('Serializable') ? 'C:' : 'O:';
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
@@ -84,31 +93,48 @@ class Registry
                     throw new NotInstantiableTypeException($class);
                 }
             }
+            if (null !== $proto && !$proto instanceof \Throwable) {
+                try {
+                    if (!$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
+                        serialize($proto);
+                    } elseif ($instantiableWithoutConstructor) {
+                        serialize($reflector->newInstanceWithoutConstructor());
+                    } else {
+                        serialize(unserialize(($proto instanceof \Serializable ? 'C:' : 'O:').\strlen($class).':"'.$class.'":0:{}'));
+                    }
+                } catch (\Exception $e) {
+                    throw new NotInstantiableTypeException($class, $e);
+                }
+            }
         }
 
-        if (null === self::$cloneable[$class] = $cloneable) {
+        if (null === $cloneable) {
             if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup'))) {
                 throw new NotInstantiableTypeException($class);
             }
 
-            self::$cloneable[$class] = $reflector->isCloneable() && !$reflector->hasMethod('__clone');
+            $cloneable = $reflector->isCloneable() && !$reflector->hasMethod('__clone');
         }
 
+        self::$cloneable[$class] = $cloneable;
+        self::$instantiableWithoutConstructor[$class] = $instantiableWithoutConstructor;
         self::$prototypes[$class] = $proto;
 
         if ($proto instanceof \Throwable) {
-            static $trace;
+            static $setTrace;
 
-            if (null === $trace) {
-                $trace = array(
+            if (null === $setTrace) {
+                $setTrace = array(
                     new \ReflectionProperty(\Error::class, 'trace'),
                     new \ReflectionProperty(\Exception::class, 'trace'),
                 );
-                $trace[0]->setAccessible(true);
-                $trace[1]->setAccessible(true);
+                $setTrace[0]->setAccessible(true);
+                $setTrace[1]->setAccessible(true);
+                $setTrace[0] = \Closure::fromCallable(array($setTrace[0], 'setValue'));
+                $setTrace[1] = \Closure::fromCallable(array($setTrace[1], 'setValue'));
             }
 
-            $trace[$proto instanceof \Exception]->setValue($proto, array());
+            $setTrace[$proto instanceof \Exception]($proto, array());
         }
 
         return self::$reflectors[$class] = $reflector;

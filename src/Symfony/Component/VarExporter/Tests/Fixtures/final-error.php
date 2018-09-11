@@ -6,7 +6,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     ]),
     null,
     [
-        \TypeError::class => [
+        'TypeError' => [
             'file' => [
                 \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
             ],

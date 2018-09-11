@@ -87,16 +87,9 @@ EOTXT
 
     public function testClosureCasterExcludingVerbosity()
     {
-        $var = function () {};
+        $var = function &($a = 5) {};
 
-        $expectedDump = <<<EOTXT
-Closure() {
-  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
-  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-}
-EOTXT;
-
-        $this->assertDumpEquals($expectedDump, $var, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals('Closure&($a = 5) { …6}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()

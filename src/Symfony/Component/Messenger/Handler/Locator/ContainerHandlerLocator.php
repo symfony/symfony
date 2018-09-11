@@ -33,7 +33,7 @@ class ContainerHandlerLocator implements HandlerLocatorInterface
         $handlerKey = 'handler.'.$messageClass;
 
         if (!$this->container->has($handlerKey)) {
-            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $messageClass));
+            throw new NoHandlerForMessageException($messageClass);
         }
 
         return $this->container->get($handlerKey);

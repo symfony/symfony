@@ -16,4 +16,8 @@ namespace Symfony\Component\Messenger\Exception;
  */
 class NoHandlerForMessageException extends \LogicException implements ExceptionInterface
 {
+    public function __construct(string $messageId)
+    {
+        parent::__construct(sprintf('No handler for message "%s".', $messageId));
+    }
 }

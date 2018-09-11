@@ -61,13 +61,13 @@ class ClientTest extends TestCase
         $m->setAccessible(true);
 
         $response = new Response();
-        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
-        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
-        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
         $this->assertSame(array((string) $cookie1, (string) $cookie2), $domResponse->getHeader('Set-Cookie', false));

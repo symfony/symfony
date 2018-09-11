@@ -83,7 +83,7 @@ interface InputInterface
      *
      * @param string $name The argument name
      *
-     * @return mixed The argument value
+     * @return string|string[] The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -120,7 +120,7 @@ interface InputInterface
      *
      * @param string $name The option name
      *
-     * @return mixed The option value
+     * @return string|string[]|bool The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */

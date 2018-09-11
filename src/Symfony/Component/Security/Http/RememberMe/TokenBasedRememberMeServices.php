@@ -80,7 +80,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
                 $expires,
                 $this->options['path'],
                 $this->options['domain'],
-                $this->options['secure'],
+                $this->options['secure'] ?? $request->isSecure(),
                 $this->options['httponly'],
                 false,
                 $this->options['samesite'] ?? null

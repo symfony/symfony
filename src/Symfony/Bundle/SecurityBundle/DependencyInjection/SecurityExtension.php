@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
@@ -37,7 +39,7 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class SecurityExtension extends Extension
+class SecurityExtension extends Extension implements PrependExtensionInterface
 {
     private $requestMatchers = array();
     private $expressions = array();
@@ -51,6 +53,32 @@ class SecurityExtension extends Extension
     {
         foreach ($this->listenerPositions as $position) {
             $this->factories[$position] = array();
+        }
+    }
+
+    public function prepend(ContainerBuilder $container)
+    {
+        $rememberMeSecureDefault = false;
+        $rememberMeSameSiteDefault = null;
+
+        if (!isset($container->getExtensions()['framework'])) {
+            return;
+        }
+        foreach ($container->getExtensionConfig('framework') as $config) {
+            if (isset($config['session'])) {
+                $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
+                $rememberMeSameSiteDefault = array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
+            }
+        }
+        foreach ($this->listenerPositions as $position) {
+            foreach ($this->factories[$position] as $factory) {
+                if ($factory instanceof RememberMeFactory) {
+                    \Closure::bind(function () use ($rememberMeSecureDefault, $rememberMeSameSiteDefault) {
+                        $this->options['secure'] = $rememberMeSecureDefault;
+                        $this->options['samesite'] = $rememberMeSameSiteDefault;
+                    }, $factory, $factory)();
+                }
+            }
         }
     }
 

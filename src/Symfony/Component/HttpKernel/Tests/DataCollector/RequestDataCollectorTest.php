@@ -225,6 +225,8 @@ class RequestDataCollectorTest extends TestCase
         $cookie = $this->getCookieByName($response, 'sf_redirect');
 
         $this->assertNotEmpty($cookie->getValue());
+        $this->assertSame('lax', $cookie->getSameSite());
+        $this->assertFalse($cookie->isSecure());
     }
 
     public function testItCollectsTheRedirectionAndClearTheCookie()

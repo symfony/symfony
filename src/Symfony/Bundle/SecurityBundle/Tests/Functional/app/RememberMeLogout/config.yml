@@ -1,6 +1,11 @@
 imports:
     - { resource: ./../config/framework.yml }
 
+framework:
+    session:
+        cookie_secure: auto
+        cookie_samesite: lax
+
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext

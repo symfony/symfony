@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-06T12:43:49Z
+
+(tests are red)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-06T12:48:22Z
+
+Ah forgot to mention; failures unrelated :)
+
+fabbot.io is a false-positive IMHO
+
+travis
+```
+1) Symfony\Component\Lock\Tests\Store\PdoStoreTest::testRefreshLock
+Failed asserting that false is true.
+```
+
+appveyor:
+```
+KO src\Symfony/Bundle/SecurityBundle
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-06T12:50:47Z
+
+I restarted the builds on Travis and appveyor. Let's fix fabbot.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-06T13:03:53Z
+
+Done. Consistent with `render()` anyway and doesnt break formatting: https://api.symfony.com/3.4/Symfony/Component/Console/Helper/Table.html#method_render
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-07T18:41:42Z
+
+Ready for me :) really happy with this feature.

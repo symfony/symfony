@@ -21,17 +21,8 @@ abstract class AbstractHandlerLocator implements HandlerLocatorInterface
 {
     public function resolve($message): callable
     {
-        $messageClass = \get_class($message);
+        $class = \get_class($message);
 
-        if (null === $handler = $this->resolveFromClass($messageClass)) {
-            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $messageClass));
-        }
-
-        return $handler;
-    }
-
-    private function resolveFromClass(string $class): ?callable
-    {
         if ($handler = $this->getHandler($class)) {
             return $handler;
         }
@@ -48,7 +39,7 @@ abstract class AbstractHandlerLocator implements HandlerLocatorInterface
             }
         }
 
-        return null;
+        throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $class));
     }
 
     abstract protected function getHandler(string $class);

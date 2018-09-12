@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
@@ -104,6 +105,22 @@ class CheckCircularReferencesPassTest extends TestCase
         $container->register('a')->addArgument(new Reference('b'));
         $container->register('b')->addArgument(new Reference('c'));
         $container->register('c')->addArgument(new Reference('b'));
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ArgumentCircularReferenceException
+     */
+    public function testProcessDetectCircularReferenceWhenChildDefinitionReferencesItselfAsParent()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a');
+
+        $definition = new ChildDefinition('a');
+        $definition->setClass('b');
+        $container->setDefinition('a', $definition);
 
         $this->process($container);
     }

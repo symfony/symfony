@@ -183,7 +183,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     private function onFailure(Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
-            $this->logger->info('Authentication request failed.', array('exception' => $failed));
+            $this->logger->error('Authentication request failed.', array('exception' => $failed));
         }
 
         $token = $this->tokenStorage->getToken();

@@ -36,6 +36,7 @@ trait GetForCacheItemPoolTrait
         if (INF === $beta || !$item->isHit()) {
             $value = $callback($item);
             $item->set($value);
+            $this->save($item);
         }
 
         return $item->get();

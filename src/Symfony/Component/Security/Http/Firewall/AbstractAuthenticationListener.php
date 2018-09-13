@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -183,7 +184,11 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     private function onFailure(Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
-            $this->logger->error('Authentication request failed.', array('exception' => $failed));
+            if ($failed instanceof AuthenticationServiceException) {
+                  $this->logger->error('Authentication request failed.', array('exception' => $failed));
+            } else {
+                  $this->logger->info('Authentication request failed.', array('exception' => $failed));
+            }
         }
 
         $token = $this->tokenStorage->getToken();

@@ -69,7 +69,7 @@ class Query extends AbstractQuery
                 QueryInterface::SCOPE_SUB => 'ldap_search',
             );
 
-            if (\in_array($this->options['scope'], $funcMap, true)) {
+            if (!\array_key_exists($this->options['scope'], $funcMap)) {
                 throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope']));
             }
 

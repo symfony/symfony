@@ -185,9 +185,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     {
         if (null !== $this->logger) {
             if ($failed instanceof AuthenticationServiceException) {
-                  $this->logger->error('Authentication request failed.', array('exception' => $failed));
+                $this->logger->error('Authentication request failed.', array('exception' => $failed));
             } else {
-                  $this->logger->info('Authentication request failed.', array('exception' => $failed));
+                $this->logger->info('Authentication request failed.', array('exception' => $failed));
             }
         }
 

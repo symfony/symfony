@@ -27,11 +27,12 @@
         "symfony/var-dumper": "~3.3|~4.0"
     },
     "conflict": {
+        "symfony/console": "<2.8",
         "symfony/http-foundation": "<3.3"
     },
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",
-        "symfony/console": "For the possibility to show log messages in console commands depending on verbosity settings. You need version ~2.3 of the console for it.",
+        "symfony/console": "For the possibility to show log messages in console commands depending on verbosity settings. You need version ^2.8 of the console for it.",
         "symfony/event-dispatcher": "Needed when using log messages in console commands.",
         "symfony/var-dumper": "For using the debugging handlers like the console handler or the log server handler."
      },

@@ -18,5 +18,11 @@
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="templating.locator" />
         </service>
+
+        <service id="templating.form_extension.twig" class="Symfony\Component\Form\Extension\Templating\Type\FormTypeThemeExtension">
+            <argument type="service" id="twig.form.engine" />
+            <argument>.html.twig</argument>
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+        </service>
     </services>
 </container>

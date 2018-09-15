@@ -783,7 +783,7 @@ TABLE;
         $table->render();
     }
 
-    public function testColumnWith()
+    public function testColumnWidth()
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -815,7 +815,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnWiths()
+    public function testColumnWidths()
     {
         $table = new Table($output = $this->getOutputStream());
         $table

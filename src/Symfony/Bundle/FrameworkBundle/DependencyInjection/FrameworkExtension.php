@@ -108,6 +108,7 @@ class FrameworkExtension extends Extension
     private $sessionConfigEnabled = false;
     private $annotationsConfigEnabled = false;
     private $validatorConfigEnabled = false;
+    private $messengerConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -269,7 +270,7 @@ class FrameworkExtension extends Extension
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['messenger'])) {
+        if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
             $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
@@ -443,6 +444,10 @@ class FrameworkExtension extends Extension
             $loader->load('translation_debug.xml');
 
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
+        }
+
+        if ($this->messengerConfigEnabled) {
+            $loader->load('messenger_debug.xml');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);

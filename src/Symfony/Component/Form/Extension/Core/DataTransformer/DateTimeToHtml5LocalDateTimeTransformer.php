@@ -16,17 +16,18 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * @author Franz Wilding <franz.wilding@me.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Fred Cox <mcfedr@gmail.com>
  */
-class DateTimeToHtml5DateTimeLocalTransformer extends BaseDateTimeTransformer
+class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 {
     const HTML5_FORMAT = 'Y-m-d\\TH:i:s';
 
     /**
-     * Transforms a normalized date into a localized date without trailing timezone.
+     * Transforms a \DateTime into a local date and time string.
      *
      * According to the HTML standard, the input string of a datetime-local
      * input is a RFC3339 date followed by 'T', followed by a RFC3339 time.
-     * http://w3c.github.io/html-reference/datatypes.html#form.data.datetime-local
+     * https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#valid-local-date-and-time-string
      *
      * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
@@ -57,7 +58,11 @@ class DateTimeToHtml5DateTimeLocalTransformer extends BaseDateTimeTransformer
     }
 
     /**
-     * Transforms a formatted datetime-local string into a normalized date.
+     * Transforms a local date and time string into a \DateTime.
+     *
+     * When transforming back to DateTime the regex is slightly laxer, taking into
+     * account rules for parsing a local date and time string
+     * https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-local-date-and-time-string
      *
      * @param string $dateTimeLocal Formatted string
      *

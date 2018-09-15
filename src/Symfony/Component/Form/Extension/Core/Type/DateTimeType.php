@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5DateTimeLocalTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
@@ -75,7 +75,7 @@ class DateTimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             if (self::HTML5_FORMAT === $pattern) {
-                $builder->addViewTransformer(new DateTimeToHtml5DateTimeLocalTransformer(
+                $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
                     $options['model_timezone'],
                     $options['view_timezone']
                 ));

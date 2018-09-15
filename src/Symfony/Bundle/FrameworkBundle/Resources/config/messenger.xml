@@ -34,15 +34,11 @@
             <argument type="service" id="validator" />
         </service>
 
-        <!-- Logging & Debug -->
+        <!-- Logging -->
         <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware" abstract="true">
             <argument type="service" id="logger" />
 
             <tag name="monolog.logger" channel="messenger" />
-        </service>
-
-        <service id="messenger.data_collector" class="Symfony\Component\Messenger\DataCollector\MessengerDataCollector">
-            <tag name="data_collector" template="@WebProfiler/Collector/messenger.html.twig" id="messenger" priority="100" />
         </service>
 
         <!-- Discovery -->

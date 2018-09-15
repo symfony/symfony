@@ -76,6 +76,10 @@ class DateTimeToHtml5DateTimeLocalTransformer extends BaseDateTimeTransformer
             return;
         }
 
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})[T ]\d{2}:\d{2}(?::\d{2})?$/', $dateTimeLocal, $matches)) {
+            throw new TransformationFailedException(sprintf('The date "%s" is not a valid date.', $dateTimeLocal));
+        }
+
         try {
             $dateTime = new \DateTime($dateTimeLocal, new \DateTimeZone($this->outputTimezone));
         } catch (\Exception $e) {
@@ -86,10 +90,8 @@ class DateTimeToHtml5DateTimeLocalTransformer extends BaseDateTimeTransformer
             $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 
-        if (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $dateTimeLocal, $m)) {
-            if (!checkdate($m[2], $m[3], $m[1])) {
-                throw new TransformationFailedException(sprintf('The date "%s-%s-%s" is not a valid date.', $m[1], $m[2], $m[3]));
-            }
+        if (!checkdate($matches[2], $matches[3], $matches[1])) {
+            throw new TransformationFailedException(sprintf('The date "%s-%s-%s" is not a valid date.', $matches[1], $matches[2], $matches[3]));
         }
 
         return $dateTime;

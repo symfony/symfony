@@ -86,7 +86,7 @@ class InputArgument
     /**
      * Sets the default value.
      *
-     * @param mixed $default The default value
+     * @param string|string[] $default The default value
      *
      * @throws LogicException When incorrect default value is given
      */
@@ -110,7 +110,7 @@ class InputArgument
     /**
      * Returns the default value.
      *
-     * @return mixed The default value
+     * @return string|string[] The default value
      */
     public function getDefault()
     {

@@ -318,6 +318,14 @@
                 <source>Error</source>
                 <target>エラー</target>
             </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>有効なUUIDではありません。</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>{{ compared_value }}の倍数でなければなりません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

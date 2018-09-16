@@ -123,6 +123,8 @@ class StreamedResponse extends Response
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a StreamedResponse instance.');
         }
+
+        $this->streamed = true;
     }
 
     /**
@@ -133,17 +135,5 @@ class StreamedResponse extends Response
     public function getContent()
     {
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return $this
-     */
-    public function setNotModified()
-    {
-        $this->setCallback(function () {});
-
-        return parent::setNotModified();
     }
 }

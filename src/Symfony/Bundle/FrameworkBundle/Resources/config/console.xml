@@ -113,6 +113,13 @@
             <tag name="console.command" command="translation:update" />
         </service>
 
+        <service id="console.command.translation_icu_convert" class="Symfony\Component\Translation\Command\IntlConvertCommand">
+            <argument type="service" id="translation.writer" />
+            <argument type="service" id="translation.reader" />
+            <tag name="console.command" command="translation:convert-to-icu-messages" />
+        </service>
+
+
         <service id="console.command.workflow_dump" class="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
             <tag name="console.command" command="workflow:dump" />
         </service>

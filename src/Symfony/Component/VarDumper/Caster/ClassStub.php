@@ -70,9 +70,6 @@ class ClassStub extends ConstStub
                 } else {
                     $this->value .= $s;
                 }
-                if (isset($this->attr['ellipsis'])) {
-                    $this->attr['ellipsis'] += \strlen($this->value) - \strlen($identifier);
-                }
             }
         } catch (\ReflectionException $e) {
             return;

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-09-15T11:00:49Z
+
+Wouldn’t it make more sense to move the service back to the `messenger.xml` file instead of creating a new one?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-09-15T11:15:15Z
+
+@sroze the collector should not be registered if the profiler is not enabled, so we would need to remove the definition. Adding the `_debug.xml` file is consistent with what we do for other optional components

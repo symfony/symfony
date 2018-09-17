@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-08-30T17:31:44Z
+
+Most of these deprecations won't be triggered if the child method does not call the parent method, so they might not be the best place to trigger them (sometimes, we might not have a better way though)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T08:25:48Z
+
+> Most of these deprecations won't be triggered if the child method does not call the parent method, so they might not be the best place to trigger them (sometimes, we might not have a better way though)
+
+True. We can't do better I think, unless we create a way to declare such added arguments and trigger a deprecation in e.g. `DebugClassLoader` or via a static analyzer. Could be a useful improvement (but not for this PR of course.)
+
+---------------------------------------------------------------------------
+
+by kevinjhappy at 2018-08-31T09:25:51Z
+
+Thanks @nicolas-grekas and @stof, I fixed Changelog and functions according to your feedbacks.
+About the providerKey in `GuardAuthenticatorHandler::authenticateWithToken()`, I started reverting my change to finally uncomment the argument according to Nicolas's last message.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2018-08-31T14:53:13Z
+
+I think we can avoid the limitation @stof described using `@param` annotations. I opened https://github.com/symfony/symfony/pull/28329 to suggest this alternative.

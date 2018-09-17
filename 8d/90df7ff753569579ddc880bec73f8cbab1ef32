@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T07:00:10Z
+
+This is a bit confusing:
+
+* Resources like MDN never include the `Z` in the datetime format: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
+* The official HTML5 spec seems to say that it's OK and valid to include it: https://www.w3.org/TR/2010/WD-html5-20101019/common-microsyntaxes.html#concept-datetime
+
+---------------------------------------------------------------------------
+
+by franzwilding at 2018-09-10T07:07:16Z
+
+@javiereguiluz The problem is, that Chrome do not support `Z` in datetime-local inputs, even if w3c says it is OK.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T07:12:31Z
+
+I see. In the past, we usually ignored issues like this considering them as browsers bugs (I remember a problem with a Safari-only behavior). But this is frustrating for users and Chrome is the most popular browser ... so it will be a tough decision.
+
+---------------------------------------------------------------------------
+
+by franzwilding at 2018-09-10T07:42:13Z
+
+@javiereguiluz I think in this case it is less a browser specific hack and more a more correct implementation of the datetime-local draft specs.
+
+I think the whole idea of datetime-local is to be a datetime field without a timezone, this is also the description of the datetime-local field: https://www.w3.org/TR/2012/WD-html-markup-20120315/input.datetime-local.html
+
+Also, when you see the reference of the date + time format (https://www.w3.org/TR/2012/WD-html-markup-20120315/datatypes.html#form.data.datetime-local) it clearly says that there should not be a timezone suffix.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T07:46:23Z
+
+@franzwilding thanks for the details. It's more clear to me now. Approved it!
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-09-10T08:38:40Z
+
+I refered to the whatwg spec, which does not include `Z` - I think some of the confusion here is the difference between `type=datetime` and `type=datetime-local`, the former is deprecated and not used by symfony. It allowed timezones, but the handling was inconsistent and that is why its been removed.
+
+[datetime-local](https://html.spec.whatwg.org/multipage/input.html#local-date-and-time-state-(type%3Ddatetime-local))
+[date time format](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#concept-datetime-local)

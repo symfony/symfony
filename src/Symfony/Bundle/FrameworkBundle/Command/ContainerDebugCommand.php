@@ -219,23 +219,27 @@ EOF
             throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
-        $default = 1 === \count($matchingServices) ? $matchingServices[0] : null;
+        if (1 === \count($matchingServices)) {
+            return $matchingServices[0];
+        }
 
-        return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
+        return $io->choice('Select one of the following services to display its information', $matchingServices);
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)
     {
         $serviceIds = $builder->getServiceIds();
-        $foundServiceIds = array();
+        $foundServiceIds = $foundServiceIdsIgnoringBackslashes = array();
         foreach ($serviceIds as $serviceId) {
-            if (false === stripos($serviceId, $name)) {
-                continue;
+            if (false !== stripos(str_replace('\\', '', $serviceId), $name)) {
+                $foundServiceIdsIgnoringBackslashes[] = $serviceId;
             }
-            $foundServiceIds[] = $serviceId;
+            if (false !== stripos($serviceId, $name)) {
+                $foundServiceIds[] = $serviceId;
+            }
         }
 
-        return $foundServiceIds;
+        return $foundServiceIds ?: $foundServiceIdsIgnoringBackslashes;
     }
 
     /**

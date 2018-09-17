@@ -37,8 +37,7 @@ class Query extends AbstractQuery
     {
         $con = $this->connection->getResource();
         $this->connection = null;
-
-        if (\in_array($this->search, array(null, false), true)) {
+        if (null === $this->search || false === $this->search) {
             return;
         }
 
@@ -69,7 +68,7 @@ class Query extends AbstractQuery
                 QueryInterface::SCOPE_SUB => 'ldap_search',
             );
 
-            if (!\array_key_exists($this->options['scope'], $funcMap)) {
+            if (!isset($funcMap[$this->options['scope']])) {
                 throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope']));
             }
 

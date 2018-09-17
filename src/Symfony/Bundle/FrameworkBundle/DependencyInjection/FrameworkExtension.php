@@ -92,6 +92,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\Formatter\FallbackFormatter;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -993,6 +994,11 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
+
+        if (!class_exists(\MessageFormatter::class)) {
+            $container->getDefinition(FallbackFormatter::class)
+                ->replaceArgument(1, new Reference('translator.formatter.intl_simple'));
+        }
 
         // Discover translation directories
         $dirs = array();

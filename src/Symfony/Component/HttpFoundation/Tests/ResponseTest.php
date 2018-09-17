@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -100,6 +101,13 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response->setTtl(10);
         $this->assertTrue($response->isCacheable());
+    }
+
+    public function testIsCachableWithCookies()
+    {
+        $response = new Response();
+        $response->headers->setCookie(new Cookie('test'));
+        $this->assertFalse($response->isCacheable());
     }
 
     public function testMustRevalidate()

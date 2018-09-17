@@ -530,6 +530,10 @@ class Response
             return false;
         }
 
+        if (\count($this->headers->getCookies()) > 0) {
+            return false;
+        }
+
         return $this->isValidateable() || $this->isFresh();
     }
 

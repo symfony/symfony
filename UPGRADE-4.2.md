@@ -57,6 +57,12 @@ Form
    {% endfor %}
    ```
 
+HttpFoundation
+--------------
+
+ * Responses that have any cookies are no longer eligible for caching. This mainly affects how `\Symfony\Component\HttpKernel\HttpCache\HttpCache` works as it will no longer cache any responses
+  that have a cookie, but it might affect third party code as well.
+
 Process
 -------
 

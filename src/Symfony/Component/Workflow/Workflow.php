@@ -118,8 +118,10 @@ class Workflow implements WorkflowInterface
 
             $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
-            if ($transitionBlockerList->isEmpty()) {
-                continue;
+            foreach ($transition->getFroms() as $place) {
+                if ($marking->has($place)) {
+                    break(2);
+                }
             }
         }
 

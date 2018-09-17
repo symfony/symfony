@@ -4,27 +4,31 @@ CHANGELOG
 4.2.0
 -----
 
-* `AbstractNormalizer::handleCircularReference` is now final, and receives two optional extra arguments: the format and the context
-* added support for XML comment encoding (encoding `['#comment' => ' foo ']` results `<!-- foo -->`)
-* added optional `int[] $encoderIgnoredNodeTypes` argument to `XmlEncoder::__construct` to configure node types to be
-  ignored during encoding.
-* added `AdvancedNameConverterInterface` to access the class, the format and the context in a name converter
+ * `AbstractNormalizer::handleCircularReference` is now final and receives
+   two optional extra arguments: the format and the context
+ * added support for XML comment encoding (encoding `['#comment' => ' foo ']` results `<!-- foo -->`)
+ * added optional `int[] $encoderIgnoredNodeTypes` argument to `XmlEncoder::__construct`
+   to configure node types to be ignored during encoding
+ * added `AdvancedNameConverterInterface` to access the class,
+   the format and the context in a name converter
+ * the `AbstractNormalizer::handleCircularReference()` method will have two new `$format`
+   and `$context` arguments in version 5.0, not defining them is deprecated
 
 4.1.0
 -----
 
-* added `CacheableSupportsMethodInterface` for normalizers and denormalizers that use
-  only the type and the format in their `supports*()` methods
-* added `MissingConstructorArgumentsException` new exception for deserialization failure
-  of objects that needs data insertion in constructor
-* added an optional `default_constructor_arguments` option of context to specify a default data in
-  case the object is not initializable by its constructor because of data missing
-* added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
-* added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
-  maximum depth is reached
-* added optional `int[] $ignoredNodeTypes` argument to `XmlEncoder::__construct`. XML decoding now
-  ignores comment node types by default.
-* added `ConstraintViolationListNormalizer`
+ * added `CacheableSupportsMethodInterface` for normalizers and denormalizers that use
+   only the type and the format in their `supports*()` methods
+ * added `MissingConstructorArgumentsException` new exception for deserialization failure
+   of objects that needs data insertion in constructor
+ * added an optional `default_constructor_arguments` option of context to specify a default data in
+   case the object is not initializable by its constructor because of data missing
+ * added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
+ * added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
+   maximum depth is reached
+ * added optional `int[] $ignoredNodeTypes` argument to `XmlEncoder::__construct`. XML decoding now
+   ignores comment node types by default.
+ * added `ConstraintViolationListNormalizer`
 
 4.0.0
 -----

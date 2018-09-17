@@ -311,6 +311,10 @@ abstract class Client
      */
     public function submit(Form $form, array $values = array()/*, array $serverParameters = array()*/)
     {
+        if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $form->setValues($values);
         $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
 

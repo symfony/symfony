@@ -6,6 +6,8 @@ CHANGELOG
 
 * The `$currentUri` constructor argument of the `AbstractUriElement`, `Link` and
   `Image` classes is now optional.
+* The `Crawler::children()` method will have a new `$selector` argument in version 5.0, 
+  not defining it is deprecated since version 4.2.
 
 3.1.0
 -----

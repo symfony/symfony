@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by skalpa at 2018-09-13T15:51:06Z
+
+@yceruto I understand that the performance cost I discussed is minor. However your changes don't add any functionality and some would argue that you are just changing code for the sake of changing code.
+Removing the dead code is useful, but I believe that there is no point in _fixing_ code that isn't broken to replace it with a version that is, even marginally, worse.
+
+What do you think was wrong with the if/else statements ?

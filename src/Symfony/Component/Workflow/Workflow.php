@@ -120,7 +120,7 @@ class Workflow implements WorkflowInterface
 
             foreach ($transition->getFroms() as $place) {
                 if ($marking->has($place)) {
-                    break(2);
+                    break 2;
                 }
             }
         }

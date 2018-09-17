@@ -20,7 +20,15 @@ class HttpException extends \RuntimeException implements HttpExceptionInterface
 {
     private $statusCode;
     private $headers;
-
+    
+    /**
+     * HttpException constructor.
+     * @param int             $statusCode An HTTP response status code
+     * @param string|null     $message    The internal exception message
+     * @param \Exception|null $previous   The previous exception
+     * @param array           $headers
+     * @param int             $code       The internal exception code
+     */
     public function __construct(int $statusCode, string $message = null, \Exception $previous = null, array $headers = array(), ?int $code = 0)
     {
         $this->statusCode = $statusCode;

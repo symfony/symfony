@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
+use Symfony\Component\DependencyInjection\Exception\ArgumentCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -1015,6 +1016,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         if ($this->isCompiled()) {
             throw new BadMethodCallException('Adding definition to a compiled container is not allowed');
+        }
+
+        if ($definition instanceof ChildDefinition && $id === $definition->getParent()) {
+            throw new ArgumentCircularReferenceException($definition->getParent(), $id);
         }
 
         $id = $this->normalizeId($id);

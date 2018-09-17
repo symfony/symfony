@@ -770,7 +770,9 @@ class OptionsResolver implements Options
 
                     // Don't include closures in the exception message
                     continue;
-                } elseif ($value === $allowedValue) {
+                }
+
+                if ($value === $allowedValue) {
                     $success = true;
                     break;
                 }
@@ -1059,21 +1061,5 @@ class OptionsResolver implements Options
     private static function isValueValidType($type, $value)
     {
         return (\function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
-    }
-
-    /**
-     * @return array
-     */
-    private function getInvalidValues(array $arrayValues, $type)
-    {
-        $invalidValues = array();
-
-        foreach ($arrayValues as $key => $value) {
-            if (!self::isValueValidType($type, $value)) {
-                $invalidValues[$key] = $value;
-            }
-        }
-
-        return $invalidValues;
     }
 }

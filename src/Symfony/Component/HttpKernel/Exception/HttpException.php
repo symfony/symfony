@@ -23,6 +23,7 @@ class HttpException extends \RuntimeException implements HttpExceptionInterface
     
     /**
      * HttpException constructor.
+     *
      * @param int               $statusCode An HTTP response status code
      * @param string|null       $message    The internal exception message
      * @param \Exception|null   $previous   The previous exception

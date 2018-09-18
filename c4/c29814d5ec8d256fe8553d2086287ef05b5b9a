@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Seb33300 at 2018-09-16T12:10:02Z
+
+Oups, didn't see that someone already worked on it: https://github.com/symfony/symfony/pull/28452
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2018-09-16T12:50:59Z
+
+Just pushed a test case since it looks to be the good way to fix this issue regarding comments on the other pull request.
+
+I pushed on master because it is a very similar issue as the previous one I fixed (https://github.com/symfony/symfony/pull/28315) which was merged on master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-17T19:33:17Z
+
+(for 3.4!)

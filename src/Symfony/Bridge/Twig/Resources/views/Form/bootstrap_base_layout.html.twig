@@ -64,11 +64,13 @@
         {%- if datetime is not defined or not datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif %}
+        {%- if label is not same as(false) -%}
             <div class="sr-only">
                 {{ form_label(form.year) }}
                 {{ form_label(form.month) }}
                 {{ form_label(form.day) }}
             </div>
+        {%- endif -%}
 
             {{- date_pattern|replace({
                 '{{ year }}': form_widget(form.year),
@@ -89,10 +91,10 @@
         {%- if datetime is not defined or false == datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif -%}
-        <div class="sr-only">{{ form_label(form.hour) }}</div>
+        {%- if label is not same as(false) -%}<div class="sr-only">{{ form_label(form.hour) }}</div>{%- endif -%}
         {{- form_widget(form.hour) -}}
-        {%- if with_minutes -%}:<div class="sr-only">{{ form_label(form.minute) }}</div>{{ form_widget(form.minute) }}{%- endif -%}
-        {%- if with_seconds -%}:<div class="sr-only">{{ form_label(form.second) }}</div>{{ form_widget(form.second) }}{%- endif -%}
+        {%- if with_minutes -%}:{%- if label is not same as(false) -%}<div class="sr-only">{{ form_label(form.minute) }}</div>{%- endif -%}{{ form_widget(form.minute) }}{%- endif -%}
+        {%- if with_seconds -%}:{%- if label is not same as(false) -%}<div class="sr-only">{{ form_label(form.second) }}</div>{%- endif -%}{{ form_widget(form.second) }}{%- endif -%}
         {%- if datetime is not defined or false == datetime -%}
             </div>
         {%- endif -%}

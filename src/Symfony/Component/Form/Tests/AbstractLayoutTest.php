@@ -1501,7 +1501,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/input
     [@type="datetime-local"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06Z"]
+    [@value="2011-02-03T04:05:06"]
 '
         );
     }
@@ -1521,7 +1521,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/input
     [@type="datetime-local"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06Z"]
+    [@value="2011-02-03T04:05:06"]
 '
         );
     }

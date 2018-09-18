@@ -22,6 +22,7 @@ CHANGELOG
    either `EncoderInterface` or `DecoderInterface`
  * added the optional `$objectClassResolver` argument in `AbstractObjectNormalizer`
    and `ObjectNormalizer` constructor
+ * added `MetadataAwareNameConverter` to configure the serialized name of properties through metadata
 
 4.1.0
 -----

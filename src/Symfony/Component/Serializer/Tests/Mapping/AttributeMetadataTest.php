@@ -49,6 +49,14 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(69, $attributeMetadata->getMaxDepth());
     }
 
+    public function testSerializedName()
+    {
+        $attributeMetadata = new AttributeMetadata('name');
+        $attributeMetadata->setSerializedName('serialized_name');
+
+        $this->assertEquals('serialized_name', $attributeMetadata->getSerializedName());
+    }
+
     public function testMerge()
     {
         $attributeMetadata1 = new AttributeMetadata('a1');
@@ -59,11 +67,13 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata2->addGroup('a');
         $attributeMetadata2->addGroup('c');
         $attributeMetadata2->setMaxDepth(2);
+        $attributeMetadata2->setSerializedName('a3');
 
         $attributeMetadata1->merge($attributeMetadata2);
 
         $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
+        $this->assertEquals('a3', $attributeMetadata1->getSerializedName());
     }
 
     public function testSerialize()
@@ -72,6 +82,7 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
         $attributeMetadata->setMaxDepth(3);
+        $attributeMetadata->setSerializedName('serialized_name');
 
         $serialized = serialize($attributeMetadata);
         $this->assertEquals($attributeMetadata, unserialize($serialized));

@@ -72,7 +72,7 @@ class DeprecationErrorHandler
             }
 
             $mode = $getMode();
-            $trace = debug_backtrace(true);
+            $trace = debug_backtrace();
             $group = 'other';
 
             $i = \count($trace);

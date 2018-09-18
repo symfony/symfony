@@ -136,7 +136,7 @@ class LdapClient implements LdapClientInterface
             ldap_set_option($this->connection, LDAP_OPT_REFERRALS, $this->optReferrals);
 
             if ($this->useStartTls) {
-                ldap_start_tls($this->connection);
+                @ldap_start_tls($this->connection);
             }
         }
     }

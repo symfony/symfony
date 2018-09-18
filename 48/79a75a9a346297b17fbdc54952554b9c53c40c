@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-09-18T18:02:15Z
+
+@nicolas-grekas This fixes that issue with the tests since merge of https://github.com/symfony/symfony/pull/28372

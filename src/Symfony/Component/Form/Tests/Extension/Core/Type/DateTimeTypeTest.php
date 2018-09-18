@@ -258,13 +258,13 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $outputTime = new \DateTimeImmutable('2010-06-02 03:04:00 Pacific/Tahiti');
 
-        $form->submit('2010-06-02T03:04:00-10:00');
+        $form->submit('2010-06-02T03:04:00');
 
         $outputTime = $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals($outputTime, $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
     }
 
     public function testSubmitStringSingleText()

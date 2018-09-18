@@ -69,10 +69,10 @@ final class Lock implements LockInterface, LoggerAwareInterface
     public function acquire($blocking = false)
     {
         try {
-            if (!$blocking) {
-                $this->store->save($this->key);
-            } else {
+            if ($blocking) {
                 $this->store->waitAndSave($this->key);
+            } else {
+                $this->store->save($this->key);
             }
 
             $this->dirty = true;

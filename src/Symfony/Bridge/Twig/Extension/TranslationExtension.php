@@ -17,6 +17,7 @@ use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
 use Twig\NodeVisitor\NodeVisitorInterface;
 use Twig\TokenParser\AbstractTokenParser;
@@ -29,6 +30,13 @@ use Twig\TwigFilter;
  */
 class TranslationExtension extends AbstractExtension
 {
+    use TranslatorTrait {
+        getLocale as private;
+        setLocale as private;
+        trans as private doTrans;
+        transChoice as private doTransChoice;
+    }
+
     private $translator;
     private $translationNodeVisitor;
 
@@ -91,7 +99,7 @@ class TranslationExtension extends AbstractExtension
     public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $this->translator) {
-            return strtr($message, $arguments);
+            return $this->doTrans($message, $arguments, $domain, $locale);
         }
 
         return $this->translator->trans($message, $arguments, $domain, $locale);
@@ -100,7 +108,7 @@ class TranslationExtension extends AbstractExtension
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $this->translator) {
-            return strtr($message, $arguments);
+            return $this->doTransChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
         }
 
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);

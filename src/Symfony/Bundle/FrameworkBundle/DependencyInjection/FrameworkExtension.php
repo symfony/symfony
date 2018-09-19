@@ -873,10 +873,6 @@ class FrameworkExtension extends Extension
             } else {
                 $container->removeDefinition('templating.helper.assets');
             }
-
-            if (!$this->translationConfigEnabled) {
-                $container->removeDefinition('templating.helper.translator');
-            }
         }
     }
 

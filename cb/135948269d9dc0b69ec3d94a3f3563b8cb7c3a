@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-17T11:40:28Z
+
+@nicolas-grekas do we need a doc PR for this?
+Maybe https://symfony.com/doc/current/service_container/debug.html ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-17T12:02:47Z
+
+I'm not sure actually.

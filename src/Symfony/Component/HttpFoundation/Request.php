@@ -707,16 +707,17 @@ class Request
     public function getSession()
     {
         $session = $this->session;
-        if (!$session instanceof SessionInterface && null !== $session) {
-            $this->setSession($session = $session());
+
+        if (\is_callable($session)) {
+            $this->setSession($session());
         }
 
-        if (null === $session) {
+        if (null === $this->session) {
             @trigger_error(sprintf('Calling "%s()" when no session has been set is deprecated since Symfony 4.1 and will throw an exception in 5.0. Use "hasSession()" instead.', __METHOD__), E_USER_DEPRECATED);
             // throw new \BadMethodCallException('Session has not been set');
         }
 
-        return $session;
+        return $this->session;
     }
 
     /**

@@ -191,6 +191,11 @@ class Request
     protected $defaultLocale = 'en';
 
     /**
+     * @var callable
+     */
+    protected $sessionFactory;
+
+    /**
      * @var array
      */
     protected static $formats;
@@ -706,10 +711,14 @@ class Request
      */
     public function getSession()
     {
-        $session = $this->session;
+        if (null === $this->session && \is_callable($this->sessionFactory)) {
+            $session = \call_user_func($this->sessionFactory);
 
-        if (\is_callable($session)) {
-            $this->setSession($session());
+            if (!$session instanceof SessionInterface) {
+                throw new \BadMethodCallException('The sessionFactory must return a SessionInterface');
+            }
+
+            $this->setSession($session);
         }
 
         if (null === $this->session) {
@@ -761,7 +770,7 @@ class Request
      */
     public function setSessionFactory(callable $factory)
     {
-        $this->session = $factory;
+        $this->sessionFactory = $factory;
     }
 
     /**

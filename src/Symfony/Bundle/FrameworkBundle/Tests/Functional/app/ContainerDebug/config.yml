@@ -8,3 +8,5 @@ services:
     private_alias:
         alias: public
         public: false
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass

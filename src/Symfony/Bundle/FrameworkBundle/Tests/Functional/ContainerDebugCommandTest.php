@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
@@ -62,5 +63,28 @@ class ContainerDebugCommandTest extends WebTestCase
         $tester->run(array('command' => 'debug:container'));
         $this->assertContains('public', $tester->getDisplay());
         $this->assertContains('private_alias', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider provideIgnoreBackslashWhenFindingService
+     */
+    public function testIgnoreBackslashWhenFindingService(string $validServiceId)
+    {
+        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'debug:container', 'name' => $validServiceId));
+        $this->assertNotContains('No services found', $tester->getDisplay());
+    }
+
+    public function provideIgnoreBackslashWhenFindingService()
+    {
+        return array(
+            array(BackslashClass::class),
+            array('FixturesBackslashClass'),
+        );
     }
 }

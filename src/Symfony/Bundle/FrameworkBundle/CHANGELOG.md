@@ -13,6 +13,7 @@ CHANGELOG
  * Added new "auto" mode for `framework.session.cookie_secure` to turn it on when HTTPS is used
  * Removed the `framework.messenger.encoder` and `framework.messenger.decoder` options. Use the `framework.messenger.serializer.id` option to replace the Messenger serializer. 
  * Deprecated the `ContainerAwareCommand` class in favor of `Symfony\Component\Console\Command\Command`
+ * Made `debug:container` and `debug:autowiring` ignore backslashes in service ids
 
 4.1.0
 -----

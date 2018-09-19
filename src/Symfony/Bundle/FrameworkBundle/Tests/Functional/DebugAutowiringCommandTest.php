@@ -47,6 +47,18 @@ class DebugAutowiringCommandTest extends WebTestCase
         $this->assertNotContains('Symfony\Component\Routing\RouterInterface', $tester->getDisplay());
     }
 
+    public function testSearchIgnoreBackslashWhenFindingService()
+    {
+        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'debug:autowiring', 'search' => 'HttpKernelHttpKernelInterface'));
+        $this->assertContains('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
+    }
+
     public function testSearchNoResults()
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));

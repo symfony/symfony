@@ -104,7 +104,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
     public function getProxifiedClass(Definition $definition): ?string
     {
         if (!$definition->hasTag('proxy')) {
-            return \class_exists($class = $definition->getClass()) || \interface_exists($class) ? $class : null;
+            return class_exists($class = $definition->getClass()) || interface_exists($class, false) ? $class : null;
         }
         if (!$definition->isLazy()) {
             throw new \InvalidArgumentException(sprintf('Invalid definition for service of class "%s": setting the "proxy" tag on a service requires it to be "lazy".', $definition->getClass()));
@@ -114,7 +114,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
             throw new \InvalidArgumentException(sprintf('Invalid definition for service of class "%s": the "interface" attribute is missing on the "proxy" tag.', $definition->getClass()));
         }
         if (1 === \count($tags)) {
-            return \class_exists($tags[0]['interface']) || \interface_exists($tags[0]['interface']) ? $tags[0]['interface'] : null;
+            return class_exists($tags[0]['interface']) || interface_exists($tags[0]['interface'], false) ? $tags[0]['interface'] : null;
         }
 
         $proxyInterface = 'LazyProxy';
@@ -123,7 +123,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
             if (!isset($tag['interface'])) {
                 throw new \InvalidArgumentException(sprintf('Invalid definition for service of class "%s": the "interface" attribute is missing on a "proxy" tag.', $definition->getClass()));
             }
-            if (!\interface_exists($tag['interface'])) {
+            if (!interface_exists($tag['interface'])) {
                 throw new \InvalidArgumentException(sprintf('Invalid definition for service of class "%s": several "proxy" tags found but "%s" is not an interface.', $definition->getClass(), $tag['interface']));
             }
 
@@ -131,7 +131,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
             $interfaces .= ', \\'.$tag['interface'];
         }
 
-        if (!\interface_exists($proxyInterface)) {
+        if (!interface_exists($proxyInterface)) {
             $i = strrpos($proxyInterface, '\\');
             $namespace = substr($proxyInterface, 0, $i);
             $interface = substr($proxyInterface, 1 + $i);

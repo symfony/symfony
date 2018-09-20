@@ -65,7 +65,7 @@ class UploadedFile extends File
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
 
-        if (4 < \func_num_args() ? !\is_bool($test) : null !== $error && @filesize($path) === $error) {
+        if (3 < \func_num_args() ? !\is_bool($test) : null !== $error && @filesize($path) === $error) {
             @trigger_error(sprintf('Passing a size as 4th argument to the constructor of "%s" is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
             $error = $test;
             $test = 5 < \func_num_args() ? func_get_arg(5) : false;

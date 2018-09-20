@@ -49,11 +49,17 @@ class AddValidatorInitializersPass implements CompilerPassInterface
 
         // @deprecated logic, to be removed in Symfony 5.0
         $builder = $container->getDefinition($this->builderService);
-        $calls = [];
+        $calls = array();
 
         foreach ($builder->getMethodCalls() as list($method, $arguments)) {
             if ('setTranslator' === $method) {
-                $translator = $arguments[0] instanceof Reference ? $container->findDefinition($arguments[0]) : $arguments[0];
+                if (!$arguments[0] instanceof Reference) {
+                    $translator = $arguments[0];
+                } elseif ($container->has($arguments[0])) {
+                    $translator = $container->findDefinition($arguments[0]);
+                } else {
+                    continue;
+                }
 
                 while (!($class = $translator->getClass()) && $translator instanceof ChildDefinition) {
                     $translator = $translator->getParent();

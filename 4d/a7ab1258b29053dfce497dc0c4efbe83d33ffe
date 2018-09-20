@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-19T13:55:06Z
+
+why do we care? we don't use strict_types (and we don't want to.)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-19T13:57:52Z
+
+this is not a bugfix as there is no bug. This file is not in strict mode, and cannot become in strict mode unless you edit the source code yourselves (in which case, *you* are introducing a bug)

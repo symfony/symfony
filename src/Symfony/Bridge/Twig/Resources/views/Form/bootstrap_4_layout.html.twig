@@ -127,8 +127,12 @@
 {% endblock %}
 
 {% block form_widget_simple -%}
+    {% if use_bootstrap_custom is not defined %}
+        {% set use_bootstrap_custom = true %}
+    {% endif %}
+
     {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' and use_bootstrap_custom ? ' custom-file-input' : ' form-control'))|trim}) -%}
     {% endif %}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}

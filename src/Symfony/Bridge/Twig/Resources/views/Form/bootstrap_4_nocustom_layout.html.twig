@@ -1,0 +1,20 @@
+{% extends "bootstrap_4_layout.html.twig" %}
+
+{% block file_widget -%}
+    <div class="form-group">
+        <{{ element|default('div') }}>
+        {%- set type = type|default('file') -%}
+        {{- block('form_widget_simple') -}}
+        <label for="{{ form.vars.id }}">
+            {%- if attr.placeholder is defined -%}
+                {{- translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans({}, translation_domain) -}}
+            {%- endif -%}
+        </label>
+        </{{ element|default('div') }}>
+    </div>
+{% endblock %}
+
+{% block form_widget_simple -%}
+    {% set use_bootstrap_custom = false %}
+    {{- parent() -}}
+{% endblock %}

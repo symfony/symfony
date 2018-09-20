@@ -18,6 +18,7 @@ CHANGELOG
 4.1.0
 -----
 
+ * Added optional $keepQueryParams argument to redirect() and redirectToRoute() methods
  * Allowed to pass an optional `LoggerInterface $logger` instance to the `Router`
  * Added a new `parameter_bag` service with related autowiring aliases to access parameters as-a-service
  * Allowed the `Router` to work with any PSR-11 container

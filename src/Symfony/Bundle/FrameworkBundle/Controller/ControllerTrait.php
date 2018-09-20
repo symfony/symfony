@@ -94,8 +94,19 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function redirect(string $url, int $status = 302): RedirectResponse
+    protected function redirect(string $url, int $status = 302, bool $keepQueryParams = false): RedirectResponse
     {
+        if ($keepQueryParams) {
+            $qs = $this->container->get('request_stack')->getCurrentRequest()->getQueryString();
+            if ($qs) {
+                if (false === strpos($url, '?')) {
+                    $url .= '?'.$qs;
+                } else {
+                    $url .= '&'.$qs;
+                }
+            }
+        }
+
         return new RedirectResponse($url, $status);
     }
 
@@ -104,9 +115,9 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function redirectToRoute(string $route, array $parameters = array(), int $status = 302): RedirectResponse
+    protected function redirectToRoute(string $route, array $parameters = array(), int $status = 302, bool $keepQueryParams = false): RedirectResponse
     {
-        return $this->redirect($this->generateUrl($route, $parameters), $status);
+        return $this->redirect($this->generateUrl($route, $parameters), $status, $keepQueryParams);
     }
 
     /**

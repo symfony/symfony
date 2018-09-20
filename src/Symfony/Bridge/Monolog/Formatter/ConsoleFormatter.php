@@ -69,6 +69,9 @@ class ConsoleFormatter implements FormatterInterface
             if (isset($args[2])) {
                 $options['multiline'] = $args[2];
             }
+            if (isset($args[3])) {
+                $options['ignore_empty_context_and_extra'] = $args[3];
+            }
         }
 
         $this->options = array_replace(array(
@@ -76,6 +79,7 @@ class ConsoleFormatter implements FormatterInterface
             'date_format' => self::SIMPLE_DATE,
             'colors' => true,
             'multiline' => false,
+            'ignore_empty_context_and_extra' => true,
         ), $options);
 
         if (class_exists(VarCloner::class)) {
@@ -116,20 +120,16 @@ class ConsoleFormatter implements FormatterInterface
 
         $levelColor = self::$levelColorMap[$record['level']];
 
-        if ($this->options['multiline']) {
-            $separator = "\n";
+        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
+            $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['context']);
         } else {
-            $separator = ' ';
+            $context = '';
         }
 
-        $context = $this->dumpData($record['context']);
-        if ($context) {
-            $context = $separator.$context;
-        }
-
-        $extra = $this->dumpData($record['extra']);
-        if ($extra) {
-            $extra = $separator.$extra;
+        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['extra'])) {
+            $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['extra']);
+        } else {
+            $extra = '';
         }
 
         $formatted = strtr($this->options['format'], array(

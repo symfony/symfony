@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-20T07:43:28Z
+
+@soerenbernstein I suppose you confirm this fixes the issue and allows disabling the bridge using the phpunit.xml file?
+
+---------------------------------------------------------------------------
+
+by soerenbernstein at 2018-09-20T07:44:52Z
+
+Yes. And it will actually set the mode to "disabled" for *future* use.

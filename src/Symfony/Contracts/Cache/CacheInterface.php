@@ -25,6 +25,7 @@ use Psr\Cache\InvalidArgumentException;
 interface CacheInterface
 {
     /**
+     * @param string                        $key      The key of the item to retrieve from the cache
      * @param callable(ItemInterface):mixed $callback Should return the computed value for the given key/item
      * @param float|null                    $beta     A float that, as it grows, controls the likeliness of triggering
      *                                                early expiration. 0 disables it, INF forces immediate expiration.

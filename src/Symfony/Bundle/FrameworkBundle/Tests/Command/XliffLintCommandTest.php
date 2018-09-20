@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class XliffLintCommandTest extends TestCase
 {
     private $files;
+    private $supportsArrayOfFiles = false;
 
     public function testGetHelp()
     {
@@ -64,7 +65,7 @@ EOF;
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(
-            array('filename' => '@AppBundle/Resources'),
+            array('filename' => $this->supportsArrayOfFiles ? array('@AppBundle/Resources') : '@AppBundle/Resources'),
             array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
         );
 
@@ -83,6 +84,7 @@ EOF;
         }
 
         $command = $application->find('lint:xliff');
+        $this->supportsArrayOfFiles = $command->getDefinition()->getArgument('filename')->isArray();
 
         if ($application) {
             $command->setApplication($application);

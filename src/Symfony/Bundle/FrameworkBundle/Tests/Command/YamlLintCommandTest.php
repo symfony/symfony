@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class YamlLintCommandTest extends TestCase
 {
     private $files;
+    private $supportsArrayOfFiles = false;
 
     public function testLintCorrectFile()
     {
@@ -36,7 +37,7 @@ class YamlLintCommandTest extends TestCase
         $filename = $this->createFile('foo: bar');
 
         $tester->execute(
-            array('filename' => $filename),
+            array('filename' => $this->supportsArrayOfFiles ? array($filename) : $filename),
             array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
         );
 
@@ -52,7 +53,7 @@ bar';
         $tester = $this->createCommandTester();
         $filename = $this->createFile($incorrectContent);
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(array('filename' => $this->supportsArrayOfFiles ? array($filename) : $filename), array('decorated' => false));
 
         $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
         $this->assertContains('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
@@ -67,7 +68,7 @@ bar';
         $filename = $this->createFile('');
         unlink($filename);
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(array('filename' => $this->supportsArrayOfFiles ? array($filename) : $filename), array('decorated' => false));
     }
 
     public function testGetHelp()
@@ -103,7 +104,7 @@ EOF;
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(
-            array('filename' => '@AppBundle/Resources'),
+            array('filename' => $this->supportsArrayOfFiles ? array('@AppBundle/Resources') : '@AppBundle/Resources'),
             array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
         );
 
@@ -135,6 +136,7 @@ EOF;
         }
 
         $command = $application->find('lint:yaml');
+        $this->supportsArrayOfFiles = $command->getDefinition()->getArgument('filename')->isArray();
 
         if ($application) {
             $command->setApplication($application);

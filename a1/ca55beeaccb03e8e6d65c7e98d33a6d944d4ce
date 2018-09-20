@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-09-20T08:40:19Z
+
+FYI, it's a very important bug, it prevents the following to work:
+```
+composer create-project symfony/website-skeleton:dev-master xxx
+```

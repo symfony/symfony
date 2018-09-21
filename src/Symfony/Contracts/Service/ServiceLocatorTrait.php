@@ -46,7 +46,9 @@ trait ServiceLocatorTrait
      */
     public function get($id)
     {
-        if (!isset($this->factories[$id])) {
+        $key = $id;
+
+        if (!isset($this->factories[$id]) && false === ($key = $this->getWithoutKey($id))) {
             throw $this->createNotFoundException($id);
         }
 
@@ -60,10 +62,20 @@ trait ServiceLocatorTrait
 
         $this->loading[$id] = $id;
         try {
-            return $this->factories[$id]($this);
+            return $this->factories[$key]($this);
         } finally {
             unset($this->loading[$id]);
         }
+    }
+
+    private function getWithoutKey($id) {
+        foreach ($this->factories as $key => $value) {
+            if ($id === get_class($value())) {
+                return $key;
+            }
+        }
+
+        return false;
     }
 
     private function createNotFoundException(string $id): NotFoundExceptionInterface

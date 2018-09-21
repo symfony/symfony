@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,7 +53,7 @@ class XliffLintCommand extends Command
     {
         $this
             ->setDescription('Lints a XLIFF file and outputs encountered errors')
-            ->addArgument('filename', null, 'A file or a directory or STDIN')
+            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a XLIFF file and outputs to STDOUT
@@ -79,11 +80,11 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $filename = $input->getArgument('filename');
+        $filenames = (array) $input->getArgument('filename');
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
 
-        if (!$filename) {
+        if (0 === \count($filenames)) {
             if (!$stdin = $this->getStdin()) {
                 throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
@@ -91,13 +92,15 @@ EOF
             return $this->display($io, array($this->validate($stdin)));
         }
 
-        if (!$this->isReadable($filename)) {
-            throw new RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));
-        }
-
         $filesInfo = array();
-        foreach ($this->getFiles($filename) as $file) {
-            $filesInfo[] = $this->validate(file_get_contents($file), $file);
+        foreach ($filenames as $filename) {
+            if (!$this->isReadable($filename)) {
+                throw new RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));
+            }
+
+            foreach ($this->getFiles($filename) as $file) {
+                $filesInfo[] = $this->validate(file_get_contents($file), $file);
+            }
         }
 
         return $this->display($io, $filesInfo);

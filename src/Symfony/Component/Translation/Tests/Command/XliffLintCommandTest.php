@@ -40,6 +40,21 @@ class XliffLintCommandTest extends TestCase
         $this->assertContains('OK', trim($tester->getDisplay()));
     }
 
+    public function testLintCorrectFiles()
+    {
+        $tester = $this->createCommandTester();
+        $filename1 = $this->createFile();
+        $filename2 = $this->createFile();
+
+        $tester->execute(
+            array('filename' => array($filename1, $filename2)),
+            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+        );
+
+        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $this->assertContains('OK', trim($tester->getDisplay()));
+    }
+
     /**
      * @dataProvider provideStrictFilenames
      */

@@ -37,7 +37,7 @@ class LocaleTypeTest extends BaseTypeTest
 
     public function testSupportedLocalesAreConfigurable()
     {
-        $choices = $this->factory->create(static::TESTED_TYPE, null, ['supported_locales' => ['en', 'zh_Hant_MO']])
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('supported_locales' => array('en', 'zh_Hant_MO')))
             ->createView()->vars['choices'];
 
         $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);

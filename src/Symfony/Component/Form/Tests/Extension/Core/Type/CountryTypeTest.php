@@ -57,6 +57,20 @@ class CountryTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('MY', 'MY', 'Малайзія'), $choices, '', false, false);
     }
 
+    public function testAcceptedCountriesIsConfigurable()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, array(
+                'supported_countries' => array('GB', 'DE'),
+            ))
+            ->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('DE', 'DE', 'Germany'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices, '', false, false);
+        $this->assertNotContains(new ChoiceView('US', 'US', 'United States'), $choices, '', false, false);
+        $this->assertNotContains(new ChoiceView('FR', 'FR', 'France'), $choices, '', false, false);
+    }
+
     public function testUnknownCountryIsNotIncluded()
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'country')

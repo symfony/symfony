@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-09-19T14:23:04Z
+
+@nicolas-grekas fixed
+
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-09-20T16:43:53Z
+
+done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-21T11:05:05Z
+
+can you update src/Symfony/Component/Validator/Constraints/BicValidator.php and src/Symfony/Component/Validator/Mapping/Factory/BlackHoleMetadataFactory.php to use the new exception also please?
+
+---------------------------------------------------------------------------
+
+by ronfroy at 2018-09-21T11:27:39Z
+
+@nicolas-grekas done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-21T11:27:41Z
+
+and src/Symfony/Component/Validator/ValidatorBuilder.php
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-21T11:28:45Z
+
+for consitency we should change Runtime to Logic in `EmailValidator, ExpressionValidator & ImageValidator` too :)

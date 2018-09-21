@@ -119,6 +119,11 @@ class DateTimeType extends AbstractType
                 'invalid_message_parameters',
             )));
 
+            if (false === $options['label']) {
+                $dateOptions['label'] = false;
+                $timeOptions['label'] = false;
+            }
+
             if (null !== $options['date_widget']) {
                 $dateOptions['widget'] = $options['date_widget'];
             }

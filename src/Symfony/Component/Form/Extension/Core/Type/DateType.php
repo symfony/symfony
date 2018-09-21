@@ -77,6 +77,18 @@ class DateType extends AbstractType
                 'error_bubbling' => true,
             );
 
+            if (isset($options['invalid_message'])) {
+                $dayOptions['invalid_message'] = $options['invalid_message'];
+                $monthOptions['invalid_message'] = $options['invalid_message'];
+                $yearOptions['invalid_message'] = $options['invalid_message'];
+            }
+
+            if (isset($options['invalid_message_parameters'])) {
+                $dayOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $monthOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $yearOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+            }
+
             $formatter = new \IntlDateFormatter(
                 \Locale::getDefault(),
                 $dateFormat,

@@ -112,7 +112,7 @@ class DeprecationErrorHandler
                 return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
 
-            $trace = debug_backtrace(true);
+            $trace = debug_backtrace();
             $group = 'other';
             $isVendor = DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $inVendors($file);
 

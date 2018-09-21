@@ -390,8 +390,8 @@ class PhpDumperTest extends TestCase
         $container->compile(true);
 
         $expected = array(
-          'env(foo)' => 'd29ybGQ=',
-          'hello' => 'world',
+            'env(foo)' => 'd29ybGQ=',
+            'hello' => 'world',
         );
         $this->assertSame($expected, $container->getParameterBag()->all());
     }

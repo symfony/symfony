@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-10T16:32:30Z
+
+(to be merged on master actually as that's not a bug fix but an improvement.)
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2018-09-11T10:10:52Z
+
+@nicolas-grekas should I rebase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-11T10:55:59Z
+
+@scaytrase if you can please yes, otherwise no worries we'll take care of it.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2018-09-11T12:09:22Z
+
+rebased

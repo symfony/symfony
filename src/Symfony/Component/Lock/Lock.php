@@ -147,12 +147,22 @@ final class Lock implements LockInterface, LoggerAwareInterface
      */
     public function release()
     {
-        $this->store->delete($this->key);
-        $this->dirty = false;
+        try {
+            try {
+                $this->store->delete($this->key);
+                $this->dirty = false;
+            } catch (LockReleasingException $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                throw new LockReleasingException(sprintf('Failed to release the "%s" lock.', $this->key), 0, $e);
+            }
 
-        if ($this->store->exists($this->key)) {
+            if ($this->store->exists($this->key)) {
+                throw new LockReleasingException(sprintf('Failed to release the "%s" lock, the resource is still locked.', $this->key));
+            }
+        } catch (LockReleasingException $e) {
             $this->logger->notice('Failed to release the "{resource}" lock.', array('resource' => $this->key));
-            throw new LockReleasingException(sprintf('Failed to release the "%s" lock.', $this->key));
+            throw $e;
         }
     }
 

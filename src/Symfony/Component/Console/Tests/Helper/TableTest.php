@@ -745,6 +745,42 @@ TABLE;
         Table::getStyleDefinition('absent');
     }
 
+    public function testBoxedStyleWithColspan()
+    {
+        $boxed = new TableStyle();
+        $boxed
+            ->setHorizontalBorderChar('─')
+            ->setVerticalBorderChar('│')
+            ->setCrossingChar('┼')
+        ;
+
+        $table = new Table($output = $this->getOutputStream());
+        $table->setStyle($boxed);
+        $table
+            ->setHeaders(array('ISBN', 'Title', 'Author'))
+            ->setRows(array(
+                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
+                new TableSeparator(),
+                array(new TableCell('This value spans 3 columns.', array('colspan' => 3))),
+            ))
+        ;
+        $table->render();
+
+        $expected =
+            <<<TABLE
+┼───────────────┼───────────────┼─────────────────┼
+│ ISBN          │ Title         │ Author          │
+┼───────────────┼───────────────┼─────────────────┼
+│ 99921-58-10-7 │ Divine Comedy │ Dante Alighieri │
+┼───────────────┼───────────────┼─────────────────┼
+│ This value spans 3 columns.                     │
+┼───────────────┼───────────────┼─────────────────┼
+
+TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
     protected function getOutputStream($decorated = false)
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, $decorated);

@@ -570,7 +570,7 @@ class Table
                 $lengths[] = $this->getCellWidth($row, $column);
             }
 
-            $this->columnWidths[$column] = max($lengths) + \strlen($this->style->getCellRowContentFormat()) - 2;
+            $this->columnWidths[$column] = max($lengths) + Helper::strlen($this->style->getCellRowContentFormat()) - 2;
         }
     }
 
@@ -581,7 +581,7 @@ class Table
      */
     private function getColumnSeparatorWidth()
     {
-        return \strlen(sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar()));
+        return Helper::strlen(sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar()));
     }
 
     /**

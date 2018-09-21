@@ -25,7 +25,6 @@ class AmqpReceiver implements ReceiverInterface
 {
     private $serializer;
     private $connection;
-    private $shouldStop;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -38,44 +37,35 @@ class AmqpReceiver implements ReceiverInterface
      */
     public function receive(callable $handler): void
     {
-        while (!$this->shouldStop) {
-            $AMQPEnvelope = $this->connection->get();
-            if (null === $AMQPEnvelope) {
-                $handler(null);
+        $AMQPEnvelope = $this->connection->get();
+        if (null === $AMQPEnvelope) {
+            $handler(null);
 
-                usleep($this->connection->getConnectionCredentials()['loop_sleep'] ?? 200000);
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
+            usleep($this->connection->getConnectionCredentials()['loop_sleep'] ?? 200000);
 
-                continue;
-            }
+            return;
+        }
 
-            try {
-                $handler($this->serializer->decode(array(
-                    'body' => $AMQPEnvelope->getBody(),
-                    'headers' => $AMQPEnvelope->getHeaders(),
-                )));
+        try {
+            $handler($this->serializer->decode(array(
+                'body' => $AMQPEnvelope->getBody(),
+                'headers' => $AMQPEnvelope->getHeaders(),
+            )));
 
-                $this->connection->ack($AMQPEnvelope);
-            } catch (RejectMessageExceptionInterface $e) {
-                $this->connection->reject($AMQPEnvelope);
+            $this->connection->ack($AMQPEnvelope);
+        } catch (RejectMessageExceptionInterface $e) {
+            $this->connection->reject($AMQPEnvelope);
 
-                throw $e;
-            } catch (\Throwable $e) {
-                $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
+            throw $e;
+        } catch (\Throwable $e) {
+            $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
 
-                throw $e;
-            } finally {
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
-            }
+            throw $e;
         }
     }
 
     public function stop(): void
     {
-        $this->shouldStop = true;
+
     }
 }

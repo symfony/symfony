@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Enhancers\InfiniteLoopReceiver;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -58,7 +59,7 @@ class AmqpTransport implements TransportInterface
 
     private function getReceiver()
     {
-        return $this->receiver = new AmqpReceiver($this->connection, $this->serializer);
+        return $this->receiver = new InfiniteLoopReceiver(new AmqpReceiver($this->connection, $this->serializer));
     }
 
     private function getSender()

@@ -701,20 +701,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('en', 'fr'), $calls[1][1][0]);
     }
 
-    public function testTranslatorHelperIsRegisteredWhenTranslatorIsEnabled()
-    {
-        $container = $this->createContainerFromFile('templating_php_translator_enabled');
-
-        $this->assertTrue($container->has('templating.helper.translator'));
-    }
-
-    public function testTranslatorHelperIsNotRegisteredWhenTranslatorIsDisabled()
-    {
-        $container = $this->createContainerFromFile('templating_php_translator_disabled');
-
-        $this->assertFalse($container->has('templating.helper.translator'));
-    }
-
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */

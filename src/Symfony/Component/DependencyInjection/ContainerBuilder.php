@@ -1587,7 +1587,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+                throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
         }

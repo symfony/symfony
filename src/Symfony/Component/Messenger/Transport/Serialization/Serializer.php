@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
-use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -39,7 +39,7 @@ class Serializer implements SerializerInterface
     public static function create(): self
     {
         if (!class_exists(SymfonySerializer::class)) {
-            throw new RuntimeException(sprintf('The default Messenger Serializer requires Symfony\'s Serializer component. Try running "composer require symfony/serializer".'));
+            throw new LogicException(sprintf('The default Messenger Serializer requires Symfony\'s Serializer component. Try running "composer require symfony/serializer".'));
         }
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());

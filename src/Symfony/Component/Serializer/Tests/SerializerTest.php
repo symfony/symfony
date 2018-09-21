@@ -56,6 +56,24 @@ class SerializerTest extends TestCase
     }
 
     /**
+     * @expectedDeprecation Passing normalizers ("stdClass") which do not implement either "Symfony\Component\Serializer\Normalizer\NormalizerInterface" or "Symfony\Component\Serializer\Normalizer\DenormalizerInterface" has been deprecated since Symfony 4.2.
+     * @group legacy
+     */
+    public function testDeprecationErrorOnInvalidNormalizer()
+    {
+        new Serializer(array(new \stdClass()));
+    }
+
+    /**
+     * @expectedDeprecation Passing encoders ("stdClass") which do not implement either "Symfony\Component\Serializer\Encoder\EncoderInterface" or "Symfony\Component\Serializer\Encoder\DecoderInterface" has been deprecated since Symfony 4.2.
+     * @group legacy
+     */
+    public function testDeprecationErrorOnInvalidEncoder()
+    {
+        new Serializer(array(), array(new \stdClass()));
+    }
+
+    /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
     public function testNormalizeNoMatch()
@@ -334,7 +352,7 @@ class SerializerTest extends TestCase
 
     public function testNormalizerAware()
     {
-        $normalizerAware = $this->getMockBuilder(NormalizerAwareInterface::class)->getMock();
+        $normalizerAware = $this->getMockBuilder(array(NormalizerAwareInterface::class, NormalizerInterface::class))->getMock();
         $normalizerAware->expects($this->once())
             ->method('setNormalizer')
             ->with($this->isInstanceOf(NormalizerInterface::class));
@@ -344,7 +362,7 @@ class SerializerTest extends TestCase
 
     public function testDenormalizerAware()
     {
-        $denormalizerAware = $this->getMockBuilder(DenormalizerAwareInterface::class)->getMock();
+        $denormalizerAware = $this->getMockBuilder(array(DenormalizerAwareInterface::class, DenormalizerInterface::class))->getMock();
         $denormalizerAware->expects($this->once())
             ->method('setDenormalizer')
             ->with($this->isInstanceOf(DenormalizerInterface::class));

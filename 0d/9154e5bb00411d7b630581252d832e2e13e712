@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-25T08:52:29Z
+
+Personally, when this is contributed like here, I'm OK with adding this to the component directly, provided the implementation is top quality (double care for reviewers + author).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-25T09:36:58Z
+
+I prefer to have it in the core too
+
+---------------------------------------------------------------------------
+
+by GaneshChandrasekaran at 2018-08-01T22:32:04Z
+
+@jderusse @nicolas-grekas @iltar - The changes are made and ready for review with fully functional tests running in Travis using zookeeper service.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-03T13:53:55Z
+
+Could you please rebase? I refactored the .travis.yml file so you need to adapt your patch now. Thanks.
+
+---------------------------------------------------------------------------
+
+by GaneshChandrasekaran at 2018-09-10T12:40:32Z
+
+@jderusse - please let me know if there are additional concerns. I am also not sure why the test is failing in just 1 environment but succeeds in other environment without any issues.
+
+---------------------------------------------------------------------------
+
+by GaneshChandrasekaran at 2018-09-15T20:18:53Z
+
+@nicolas-grekas @lyrixx @fabpot - please let me know if this looks good. Would love to get my first contribution out in the upcoming release :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-18T19:29:22Z
+
+@jderusse any more comment?
+
+---------------------------------------------------------------------------
+
+by GaneshChandrasekaran at 2018-09-19T15:43:02Z
+
+Thanks @nicolas-grekas for the comments, they were really helpful.
+
+On your question
+```
+Tests are green but display "ZOO_ERROR@getaddrs@599: getaddrinfo: No such file or directory" messages, is it legit or does it hint an issue
+```
+
+I had tried debugging that but couldn't find root cause and gave up previously. Today however, I was able to find the root cause for that. I was setting the `ZOOKEEPER_HOST` `env` variable only in 1 `phpunit.xml` file. I put it in both places and those errors are gone now. Looks like the config is read from either of those files depending on the `deps`. I am also not skipping my tests anymore as they should always run correctly.
+
+---------------------------------------------------------------------------
+
+by GaneshChandrasekaran at 2018-09-19T18:57:51Z
+
+Thank you very much @jderusse and @nicolas-grekas for your valuable reviews!!!! This is very exciting 🎉

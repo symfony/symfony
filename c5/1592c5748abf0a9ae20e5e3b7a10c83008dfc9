@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T15:05:03Z
+
+We should try to enable DebugClassLoader using the phpunit bridge and see how it goes!
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2018-08-31T15:42:50Z
+
+@nicolas-grekas imo we can enable it either by updating the bridge and adding an ``SYMFONY_CLASS_DEBUG_LOADER`` env checked in its `bootstrap.php` or by having an autoloader dedicated to tests at the root of the symfony repository.
+
+In both cases, it will require a consequent work to fix all deprecations (using php 7.1, I already have `2x: The "Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV6" class extends "PHPUnit\Framework\BaseTestListener" that is deprecated Use TestListenerDefaultImplementation trait instead.`, I'm not sure we can fix it without a new class). So 👍 for enabling it but I'd say in another PR 😄
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T15:58:30Z
+
+Ok works for me :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-08T22:26:55Z
+
+@GuilhemN FYI I push-forced on your fork after squashing the CS commit. See also the 2nd commit I added: it enables `DebugClassLoader` from the `PhpUnitBridge` and it fixes a few issues found while doing so.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2018-09-08T23:37:12Z
+
+:+1: thanks for doing these changes, I hope your second commit will help symfony keep a clean codebase :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-09T09:47:52Z
+
+phpunit-bridge part split in #28412
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-19T17:39:02Z
+
+Could you please rebase (+squash) while fixing the small comment above to trigger tests?
+There are some failures we need to take care of.

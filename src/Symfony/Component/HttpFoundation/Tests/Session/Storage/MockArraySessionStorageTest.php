@@ -48,7 +48,7 @@ class MockArraySessionStorageTest extends TestCase
         $this->data = array(
             $this->attributes->getStorageKey() => array('foo' => 'bar'),
             $this->flashes->getStorageKey() => array('notice' => 'hello'),
-            );
+        );
 
         $this->storage = new MockArraySessionStorage();
         $this->storage->registerBag($this->flashes);

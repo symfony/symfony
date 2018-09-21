@@ -948,12 +948,12 @@ class FormTest extends TestCase
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
-              <html>
-                  <form>
-                      <textarea name="example"></textarea>
-                  </form>
-              </html>
-          ');
+            <html>
+                <form>
+                    <textarea name="example"></textarea>
+                </form>
+            </html>'
+        );
 
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');

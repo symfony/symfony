@@ -189,8 +189,8 @@ XML;
     public function testEncodeScalarRootAttributes()
     {
         $array = array(
-          '#' => 'Paul',
-          '@gender' => 'm',
+            '#' => 'Paul',
+            '@gender' => 'm',
         );
 
         $expected = '<?xml version="1.0"?>'."\n".
@@ -202,8 +202,8 @@ XML;
     public function testEncodeRootAttributes()
     {
         $array = array(
-          'firstname' => 'Paul',
-          '@gender' => 'm',
+            'firstname' => 'Paul',
+            '@gender' => 'm',
         );
 
         $expected = '<?xml version="1.0"?>'."\n".
@@ -215,7 +215,7 @@ XML;
     public function testEncodeCdataWrapping()
     {
         $array = array(
-          'firstname' => 'Paul <or Me>',
+            'firstname' => 'Paul <or Me>',
         );
 
         $expected = '<?xml version="1.0"?>'."\n".

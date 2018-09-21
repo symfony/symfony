@@ -73,6 +73,18 @@ class TimeType extends AbstractType
                 'error_bubbling' => true,
             );
 
+            if (isset($options['invalid_message'])) {
+                $hourOptions['invalid_message'] = $options['invalid_message'];
+                $minuteOptions['invalid_message'] = $options['invalid_message'];
+                $secondOptions['invalid_message'] = $options['invalid_message'];
+            }
+
+            if (isset($options['invalid_message_parameters'])) {
+                $hourOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $minuteOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $secondOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+            }
+
             if ('choice' === $options['widget']) {
                 $hours = $minutes = array();
 

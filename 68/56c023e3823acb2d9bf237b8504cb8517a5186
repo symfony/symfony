@@ -1,0 +1,300 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-08-30T14:07:38Z
+
+i like the required var as a function semantic =/ Not sure `dd()` and `die()` being equivalent makes sense
+
+---------------------------------------------------------------------------
+
+by Mvannes at 2018-08-30T14:29:22Z
+
+But isn't this just calling `die();`? The name even implies that you want to dump something. If you don't want to dump something, why would you want to call something named dump die?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-30T15:27:27Z
+
+Thanks for submitting, that's indeed a difference with the previous Laravel's dd() function.
+But I agree with previous comments, you should use `die()` instead in this case.
+~:-1: on my side.~
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-08-30T16:56:37Z
+
+With Laravel's helper you could move around an empty `dd()` to figure out if your code reached a certain point. There was no reason to use `die` or `exit` because `dd()` did the same thing, with the added benefit of easily being able to put variables in there for it to dump. I don't see a good reason for Symfony's helper to have changed this behavior.
+
+Also, allowing it to be called with no arguments has the (very) minor advantage that programs alway die when they call `dd()`, even when you forget to give it an argument. Currently, if you have a try/catch around your code that catches either Errors or Throwables, and you by mistake call `dd()` without arguments, the program won't die.
+
+Apart from making the function less semantic (which i'd argue doesn't make a difference in this case), is there a good reason to not allow `dd()` to be called without arguments?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-08-30T19:21:45Z
+
+> Currently, if you have a try/catch around your code that catches either Errors or Throwables, and you by mistake call dd() without arguments, the program won't die.
+
+Hm that's a strong argument actually :)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-08-30T20:07:46Z
+
+Apart from that the generic code now after the second commit is also cleaner.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T09:31:42Z
+
+What about making this a bit more useful and make it dump the stack trace instead of nothing?
+
+Here is a patch doing so:
+![image](https://user-images.githubusercontent.com/243674/44905108-64ae6480-ad11-11e8-8925-e1f6723cbc79.png)
+
+```diff
+diff --git a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
+index f3af638d94..35f2f2b63a 100644
+--- a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
+@@ -111,7 +111,7 @@ class ExceptionCaster
+
+     public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, $isNested)
+     {
+-        if (!$isNested) {
++        if (!$isNested && !$trace->castWhenRoot) {
+             return $a;
+         }
+         $stub->class = '';
+diff --git a/src/Symfony/Component/VarDumper/Caster/TraceStub.php b/src/Symfony/Component/VarDumper/Caster/TraceStub.php
+index 5eea1c8766..c3c51bb1ef 100644
+--- a/src/Symfony/Component/VarDumper/Caster/TraceStub.php
++++ b/src/Symfony/Component/VarDumper/Caster/TraceStub.php
+@@ -24,13 +24,15 @@ class TraceStub extends Stub
+     public $sliceOffset;
+     public $sliceLength;
+     public $numberingOffset;
++    public $castWhenRoot;
+
+-    public function __construct(array $trace, bool $keepArgs = true, int $sliceOffset = 0, int $sliceLength = null, int $numberingOffset = 0)
++    public function __construct(array $trace, bool $keepArgs = true, int $sliceOffset = 0, int $sliceLength = null, int $numberingOffset = 0, bool $castWhenRoot = false)
+     {
+         $this->value = $trace;
+         $this->keepArgs = $keepArgs;
+         $this->sliceOffset = $sliceOffset;
+         $this->sliceLength = $sliceLength;
+         $this->numberingOffset = $numberingOffset;
++        $this->castWhenRoot = $castWhenRoot;
+     }
+ }
+diff --git a/src/Symfony/Component/VarDumper/Resources/functions/dump.php b/src/Symfony/Component/VarDumper/Resources/functions/dump.php
+index 1ea3dc8434..46dbb3a434 100644
+--- a/src/Symfony/Component/VarDumper/Resources/functions/dump.php
++++ b/src/Symfony/Component/VarDumper/Resources/functions/dump.php
+@@ -10,6 +10,7 @@
+  */
+
+ use Symfony\Component\VarDumper\VarDumper;
++use Symfony\Component\VarDumper\Caster\TraceStub;
+
+ if (!function_exists('dump')) {
+     /**
+@@ -32,11 +33,13 @@ if (!function_exists('dump')) {
+ }
+
+ if (!function_exists('dd')) {
+-    function dd($var, ...$moreVars)
++    function dd(...$vars)
+     {
+-        VarDumper::dump($var);
++        if (!$vars) {
++            VarDumper::dump(new TraceStub(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), false, 0, null, 0, true));
++        }
+
+-        foreach ($moreVars as $var) {
++        foreach ($vars as $var) {
+             VarDumper::dump($var);
+         }
+
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T09:35:25Z
+
+Could also be done for `dump()` btw if you like the idea.
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-08-31T10:23:59Z
+
+I always liked the way the Laravel helper worked. If i put an empty `dd()` in my code and then run my unit tests, it would simply stop execution, leaving my console clean. Stacktraces can get pretty long, especially in feature tests that hit controllers. For example, dumping a stacktrace in one of my controllers when running feature tests prints a list of 74 calls (most of which are middleware or `Routing/Pipeline.php`)
+
+I can imagine situations where it is useful to dump a stacktrace, but i'd prefer that to be a separate helper, or maybe a static method on the `VarDumper` class.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-08-31T11:00:29Z
+
+What about something minimal, just a file/line ref of where `dd` occurred.
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-08-31T11:10:15Z
+
+I like that idea. Dumping the last call (or maybe last 3 calls) of the stacktrace would be useful, and it would be clean enough to not flood the console.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-31T11:12:44Z
+
+PR update welcome then (the number of frames can be limited thanks to debug_backtrace()'s 2nd argument)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-08-31T11:20:20Z
+
+> What about something minimal, just a file/line ref of where dd occurred.
+
+I think that's generically useful, independent of whether parameters were supplied to always show it when invoked.
+```
+Execution halted by call to dd(...) at /my/project/folder/file.php line 43.
+```
+Then followed by the sequential dumps of the parameters, if supplied.
+
+I wouldn't include more than 1 line of callstack as indeed it's not up to us whether to judge by default how many lines are relevant. 2 or 3 would also be arbitrarily either too much or too few for any specific situation.
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-08-31T11:51:10Z
+
+I've changed the PR to dump a reference of where the `dd()` occurred.
+
+It looks like this in the console:
+
+![image](https://user-images.githubusercontent.com/7202674/44910666-5b7ac300-ad24-11e8-8067-66211b00c25a.png)
+
+and like this in the browser:
+
+![image](https://user-images.githubusercontent.com/7202674/44910746-af85a780-ad24-11e8-8228-9f6280a79b1d.png)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-08-31T12:35:53Z
+
+Looks good to me presentation-wise.
+
+Anyone care to chime in on my opinion that we should standardize this to always dump the call location and not "magically" change behavior based on parameters or not?
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-08-31T12:58:33Z
+
+I think that for debug-only helpers like this being useful is most important, we shouldn't worry about semantics or "magic".
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-08-31T13:01:54Z
+
+Why is showing the location of the break suddenly not useful anymore when also dumping parameters?
+
+"Magic" is not bad per se, we do a lot of awesome magic in Symfony like autowiring services. "Magic" is cool when it boils down to "it just works". "Magic" becomes bad when it's not consistent.
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-08-31T13:21:48Z
+
+Oh, my bad. I thought you meant removing the ability to dump vars, i thought it was strange 😄
+
+I'd prefer not changing the helper's behavior when it's given arguments, it has worked like this for a long time in Laravel, as far as i know everyone's happy with it.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2018-08-31T20:07:24Z
+
++1 to curry684 suggestion to add this behavior to every dump() call.
+Sometimes it's hard to find the dump() you've put in vendor files etc..
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-09-03T13:34:22Z
+
+I'd prefer to keep this PR like it is now. It only restores something i used to be able to do in Laravel, and doesn't change the behavior of other helpers.
+
+We can always open another PR to change the behavior of `dump()`
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-09-03T14:01:38Z
+
+I didn't suggest changing `dump` actually, that's indeed a different discussion. I'm just saying I severely dislike that right now the behavior between non-parametrized and parametrized invocation is inconsistent.
+
+Imho it should just be:
+```
+if (!function_exists('dd')) {
+    function dd(...$vars)
+    {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        VarDumper::dump(new TraceStub($backtrace, false, 0, null, 0, true));
+        foreach ($vars as $var) {
+            VarDumper::dump($var);
+        }
+        die(1);
+    }
+}
+```
+Either do it never, or always. In `dd`.
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-09-03T14:43:14Z
+
+To keep the helper consistent, i've changed the PR to never make it print the backtrace. It now works exactly like the Laravel helper used to.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-09-03T14:51:35Z
+
+That's fine with me, we can then have the discussion about changing the behavior elsewhere as it seems to have more implications than initially anticipated.
+
+(kicking off the other discussion: I'd also suggest actually making `VarDumper` a tad more configurable, ie. have some methods `VarDumper::setTraceDepth(3);` that one can override from sane universal defaults in their own front controller or in `config/packages/dev/debug.yaml`, as yes it does make sense to also dump the call stack sometimes in `dump(...)`, but that could even have consequences in the web profiler toolbar as it needs to be rendered there etc.)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-06T10:52:09Z
+
+I don't understand why are we trying to complicate things so much here 😕
+
+`dd()` means: `dump()` what I pass you ... and then `die()` immediately.
+
+Well, if I use `dd()` without arguments, what I expect is:
+
+* `dump()` what I pass you: I haven't passed anything, so don't dump anything
+* `die()` immediately
+
+So doing the change proposed originally in this PR is the most consistent behavior in my opinion. There's no need to add stack traces or any other information.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-09-06T11:02:57Z
+
+> the change proposed originally in this PR
+
+See the commits, it's been brought back to that state  😉
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-06T11:05:27Z
+
+Great!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-21T07:15:54Z
+
+@SjorsO could you please fix the merge conflict to make this PR mergeable again? Thanks!
+
+---------------------------------------------------------------------------
+
+by SjorsO at 2018-09-21T07:22:39Z
+
+@javiereguiluz done

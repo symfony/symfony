@@ -23,6 +23,8 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @param Request|null $request
      */
     public function getLogs(/* Request $request = null */)
     {
@@ -39,6 +41,8 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param Request|null $request
      */
     public function countErrors(/* Request $request = null */)
     {

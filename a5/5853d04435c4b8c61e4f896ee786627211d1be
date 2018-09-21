@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-20T07:02:42Z
+
+On master, deps=high failures mean the PR breaks 4.1 when used with deps at 4.2 - this should be fixed somehow (yes, that's the big downside of moving things to components: we now have to deal with cross deps compat...)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-20T08:14:19Z
+
+Well, here, the issue is only related to the way our CommandTester works. Turning an argument into an array argument is a BC break for tests, because the argument now has to be provided as an array, while there is no BC break when running the command in the CLI.
+
+And as FrameworkBundle extends the command and has tests for its child class, it is affected by this change in the argument definition of the component.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-20T11:12:21Z
+
+Could be an alternative to do this in the command `$filenames = (array) $input->getArgument('filename');` and revert all changes in tests?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-09-20T11:20:31Z
+
+@yceruto you mean reverting the argument type to `OPTIONAL` and parsing `$filenames` in the command itself? I don't think it's a good alternative

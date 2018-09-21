@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
+use Symfony\Component\Form\Extension\Core\ArrayInclusionFilter;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -42,16 +43,25 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
         $resolver->setDefaults(array(
             'choice_loader' => function (Options $options) {
                 $choiceTranslationLocale = $options['choice_translation_locale'];
+                $supportedLocales = $options['supported_locales'];
 
-                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
-                    return array_flip(Intl::getLocaleBundle()->getLocaleNames($choiceTranslationLocale));
+                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $supportedLocales) {
+                    $locales = Intl::getLocaleBundle()->getLocaleNames($choiceTranslationLocale);
+
+                    if (null !== $supportedLocales) {
+                        $locales = array_filter($locales, new ArrayInclusionFilter($supportedLocales), ARRAY_FILTER_USE_KEY);
+                    }
+
+                    return array_flip($locales);
                 });
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
+            'supported_locales' => null,
         ));
 
         $resolver->setAllowedTypes('choice_translation_locale', array('null', 'string'));
+        $resolver->setAllowedTypes('supported_locales', array('null', 'string[]'));
     }
 
     /**

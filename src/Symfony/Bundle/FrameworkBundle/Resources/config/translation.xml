@@ -33,6 +33,7 @@
             <argument type="service" id="identity_translator" />
         </service>
         <service id="translator.formatter.intl" class="Symfony\Component\Translation\Formatter\IntlMessageFormatter" public="false" />
+        <service id="translator.formatter.intl_simple" class="Symfony\Component\Translation\Formatter\IntlSimpleMessageFormatter" public="false" />
         <service id="translator.formatter.fallback" class="Symfony\Component\Translation\Formatter\FallbackFormatter" public="false">
             <argument type="service" id="translator.formatter.intl" />
             <argument type="service" id="translator.formatter.symfony" />

@@ -167,7 +167,7 @@ class PhpDumper extends Dumper
             }
         }
 
-        (new AnalyzeServiceReferencesPass(false, !$this->getProxyDumper() instanceof NullDumper))->process($this->container);
+        (new AnalyzeServiceReferencesPass(false))->process($this->container);
         $this->circularReferences = array();
         $this->singleUsePrivateIds = array();
         $checkedNodes = array();

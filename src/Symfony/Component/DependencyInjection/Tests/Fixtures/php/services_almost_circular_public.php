@@ -127,17 +127,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getConnectionService()
     {
-        $a = ($this->services['dispatcher'] ?? $this->getDispatcherService());
+        $a = new \stdClass();
 
-        if (isset($this->services['connection'])) {
-            return $this->services['connection'];
-        }
+        $this->services['connection'] = $instance = new \stdClass(($this->services['dispatcher'] ?? $this->getDispatcherService()), $a);
 
-        $b = new \stdClass();
-
-        $this->services['connection'] = $instance = new \stdClass($a, $b);
-
-        $b->logger = ($this->services['logger'] ?? $this->getLoggerService());
+        $a->logger = ($this->services['logger'] ?? $this->getLoggerService());
 
         return $instance;
     }
@@ -149,21 +143,15 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getConnection2Service()
     {
-        $a = ($this->services['dispatcher2'] ?? $this->getDispatcher2Service());
+        $a = new \stdClass();
 
-        if (isset($this->services['connection2'])) {
-            return $this->services['connection2'];
-        }
+        $this->services['connection2'] = $instance = new \stdClass(($this->services['dispatcher2'] ?? $this->getDispatcher2Service()), $a);
 
-        $b = new \stdClass();
+        $b = new \stdClass($instance);
 
-        $this->services['connection2'] = $instance = new \stdClass($a, $b);
+        $b->handler2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
 
-        $c = new \stdClass($instance);
-
-        $c->handler2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
-
-        $b->logger2 = $c;
+        $a->logger2 = $b;
 
         return $instance;
     }
@@ -373,12 +361,6 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getSubscriberService()
     {
-        $a = ($this->services['manager'] ?? $this->getManagerService());
-
-        if (isset($this->services['subscriber'])) {
-            return $this->services['subscriber'];
-        }
-
-        return $this->services['subscriber'] = new \stdClass($a);
+        return $this->services['subscriber'] = new \stdClass(($this->services['manager'] ?? $this->getManagerService()));
     }
 }

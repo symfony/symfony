@@ -1514,6 +1514,22 @@ class ContainerBuilderTest extends TestCase
         $container->set('foo5', $foo5 = new \stdClass());
         $this->assertSame($foo5, $locator->get('foo5'));
     }
+
+    public function testDecoratedSelfReferenceInvolvingPrivateServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setPublic(false)
+            ->setProperty('bar', new Reference('foo'));
+        $container->register('baz', 'stdClass')
+            ->setPublic(false)
+            ->setProperty('inner', new Reference('baz.inner'))
+            ->setDecoratedService('foo');
+
+        $container->compile();
+
+        $this->assertSame(array('service_container'), array_keys($container->getDefinitions()));
+    }
 }
 
 class FooClass

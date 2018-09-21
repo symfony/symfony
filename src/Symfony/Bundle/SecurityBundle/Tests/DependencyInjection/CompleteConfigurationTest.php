@@ -159,8 +159,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 null,
                 null,
                 array(
-                  'simple_form',
-                  'anonymous',
+                    'simple_form',
+                    'anonymous',
                 ),
                 null,
             ),

@@ -127,6 +127,8 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                 return $value;
             }
             $this->currentDefinition = $value;
+        } elseif ($this->currentDefinition === $value) {
+            return $value;
         }
         $this->lazy = false;
 

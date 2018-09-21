@@ -64,9 +64,9 @@ class ConsoleHandlerTest extends TestCase
         $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\Output')->setMethods(array('doWrite'))->getMock();
         $realOutput->setVerbosity($verbosity);
         if ($realOutput->isDebug()) {
-            $log = "16:21:54 $levelName [app] My info message\n[]\n[]\n";
+            $log = "16:21:54 $levelName [app] My info message\n";
         } else {
-            $log = "16:21:54 $levelName [app] My info message [] []\n";
+            $log = "16:21:54 $levelName [app] My info message\n";
         }
         $realOutput
             ->expects($isHandling ? $this->once() : $this->never())
@@ -149,7 +149,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->once())
             ->method('write')
-            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n[]\n[]\n")
+            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n")
         ;
 
         $handler = new ConsoleHandler(null, false);

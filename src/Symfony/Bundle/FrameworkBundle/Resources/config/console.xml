@@ -113,7 +113,7 @@
             <tag name="console.command" command="translation:update" />
         </service>
 
-        <service id="console.command.translation_icu_convert" class="Symfony\Component\Translation\Command\IntlConvertCommand">
+        <service id="console.command.translation_icu_convert" class="IcuConvertCommand">
             <argument type="service" id="translation.writer" />
             <argument type="service" id="translation.reader" />
             <tag name="console.command" command="translation:convert-to-icu-messages" />

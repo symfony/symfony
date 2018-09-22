@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Symfony\Component\Translation\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Util\IntlMessageConverter;
+use Symfony\Component\Translation\Util\IcuMessageConverter;
 
-class IntlMessageConverterTest extends TestCase
+class IcuMessageConverterTest extends TestCase
 {
     /**
      * @dataProvider getTestData
      */
     public function testConvert($input, $output)
     {
-        $result = IntlMessageConverter::convert($input);
+        $result = IcuMessageConverter::convert($input);
         $this->assertEquals($output, $result);
     }
 
@@ -24,7 +24,7 @@ class IntlMessageConverterTest extends TestCase
     public function testImpossibleConvert()
     {
         $this->expectException(\LogicException::class);
-        IntlMessageConverter::convert(']-Inf, -2[ Negative|]1,Inf[ Positive');
+        IcuMessageConverter::convert(']-Inf, -2[ Negative|]1,Inf[ Positive');
     }
 
     public function getTestData()

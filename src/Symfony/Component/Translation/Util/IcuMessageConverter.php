@@ -17,7 +17,7 @@ namespace Symfony\Component\Translation\Util;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class IntlMessageConverter
+class IcuMessageConverter
 {
     public static function convert(string $message): string
     {

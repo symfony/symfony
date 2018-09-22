@@ -187,6 +187,29 @@ class LockTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Lock\Exception\LockReleasingException
      */
+    public function testReleaseThrowsExceptionWhenDeletionFail()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $lock = new Lock($key, $store, 10);
+
+        $store
+            ->expects($this->once())
+            ->method('delete')
+            ->with($key)
+            ->willThrowException(new \RuntimeException('Boom'));
+
+        $store
+            ->expects($this->never())
+            ->method('exists')
+            ->with($key);
+
+        $lock->release();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\LockReleasingException
+     */
     public function testReleaseThrowsExceptionIfNotWellDeleted()
     {
         $key = new Key(uniqid(__METHOD__, true));

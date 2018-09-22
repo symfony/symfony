@@ -22,6 +22,9 @@ class IntlMessageConverter
     public static function convert(string $message): string
     {
         $array = self::getMessageArray($message);
+        if (empty($array)) {
+            return $message;
+        }
 
         if (1 === \count($array) && isset($array[0])) {
             return preg_replace('|%(.*?)%|s', '{$1}', $message);
@@ -37,13 +40,13 @@ class IntlMessageConverter
      */
     private static function getMessageArray(string $message): array
     {
-        $parts = array();
         if (preg_match('/^\|++$/', $message)) {
-            $parts = explode('|', $message);
+            // If the message only contains pipes ("|||")
+            return [];
         } elseif (preg_match_all('/(?:\|\||[^\|])++/', $message, $matches)) {
             $parts = $matches[0];
         } else {
-            $parts = array($message);
+            throw new \LogicException(sprintf('Input string "%s" is not supported.', $message));
         }
 
         $intervalRegexp = <<<'EOF'

@@ -29,6 +29,7 @@ class IntlMessageConverterTest extends TestCase
 
     public function getTestData()
     {
+        yield array('|', '|');
         yield array(
             '{0} There are no apples|{1} There is one apple|]1,Inf[ There %name% are %count% apples',
             <<<ICU

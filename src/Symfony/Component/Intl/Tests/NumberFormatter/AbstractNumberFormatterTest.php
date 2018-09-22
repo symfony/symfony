@@ -654,6 +654,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
             array('-123,4567', false, '->parse() does not parse when invalid grouping used.', 9),
             array('-123,,456', false, '->parse() does not parse when invalid grouping used.', 4),
             array('-123,,456', -123.0, '->parse() parses when grouping is disabled.', 4, false),
+            array('239.', 239.0, '->parse() parses when string ends with decimal separator.', 4, false),
         );
     }
 

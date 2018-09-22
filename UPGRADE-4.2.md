@@ -101,7 +101,7 @@ FrameworkBundle
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `Controller` class has been deprecated, use `AbstractController` instead.
  * The Messenger encoder/decoder configuration has been changed for a unified Messenger serializer configuration.
- 
+
    Before:
    ```yaml
    framework:
@@ -126,8 +126,8 @@ Messenger
  * `EnvelopeItemInterface` doesn't extend `Serializable` anymore
  * The `handle` method of the `Symfony\Component\Messenger\Middleware\ValidationMiddleware` and `Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware` middlewares now requires an `Envelope` object to be given (because they implement the `EnvelopeAwareInterface`). When using these middleware with the provided `MessageBus`, you will not have to do anything. If you use the middlewares any other way, you can use `Envelope::wrap($message)` to create an envelope for your message.
  * `MessageSubscriberInterface::getHandledMessages()` return value has changed. The value of an array item
-   needs to be an associative array or the method name. 
-   
+   needs to be an associative array or the method name.
+
    Before:
    ```php
    return [
@@ -135,20 +135,20 @@ Messenger
       [SecondMessage::class, -10],
    ];
    ```
-   
+
    After:
    ```php
    yield FirstMessage::class => ['priority' => 0];
    yield SecondMessage::class => ['priority => -10];
    ```
-   
+
    Before:
    ```php
    return [
        SecondMessage::class => ['secondMessageMethod', 20],
    ];
    ```
-   
+
    After:
    ```php
    yield SecondMessage::class => [
@@ -158,7 +158,6 @@ Messenger
    ```
  * The `EncoderInterface` and `DecoderInterface` interfaces have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
    Each interface method have been merged untouched into the `Serializer` interface, so you can simply merge your two implementations together and implement the new interface.
- 
 
 Monolog
 -------

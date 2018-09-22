@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * added the PDO Store
- * Add a new Zookeeper Data Store for Lock Component.
+ * added a new Zookeeper Data Store for Lock Component
 
 3.4.0
 -----

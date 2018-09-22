@@ -310,8 +310,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $class = $collectionValueType->getClassName().'[]';
 
                 // Fix a collection that contains the only one element
-                // This is special to xml format only
-                if ('xml' === $format && !\is_int(key($data))) {
+                // For xml and json format
+                if (('xml' === $format || 'json' === $format) && !\is_int(key($data))) {
                     $data = array($data);
                 }
 

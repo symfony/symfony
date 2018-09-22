@@ -120,6 +120,48 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[1]);
     }
 
+    public function testDenormalizeCollectionDecodedFromJsonWithOneChild()
+    {
+        $denormalizer = $this->getDenormalizerForDummyCollection();
+
+        $dummyCollection = $denormalizer->denormalize(
+            array(
+                'children' => array(
+                    'bar' => 'first',
+                ),
+            ),
+            DummyCollection::class,
+            'json'
+        );
+
+        $this->assertInstanceOf(DummyCollection::class, $dummyCollection);
+        $this->assertInternalType('array', $dummyCollection->children);
+        $this->assertCount(1, $dummyCollection->children);
+        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[0]);
+    }
+
+    public function testDenormalizeCollectionDecodedFromJsonWithTwoChildren()
+    {
+        $denormalizer = $this->getDenormalizerForDummyCollection();
+
+        $dummyCollection = $denormalizer->denormalize(
+            array(
+                'children' => array(
+                    array('bar' => 'first'),
+                    array('bar' => 'second'),
+                ),
+            ),
+            DummyCollection::class,
+            'json'
+        );
+
+        $this->assertInstanceOf(DummyCollection::class, $dummyCollection);
+        $this->assertInternalType('array', $dummyCollection->children);
+        $this->assertCount(2, $dummyCollection->children);
+        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[0]);
+        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[1]);
+    }
+
     private function getDenormalizerForDummyCollection()
     {
         $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();

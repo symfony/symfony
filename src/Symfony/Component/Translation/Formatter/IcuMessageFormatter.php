@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class IntlMessageFormatter implements MessageFormatterInterface
+class IcuMessageFormatter implements MessageFormatterInterface
 {
     /**
      * {@inheritdoc}

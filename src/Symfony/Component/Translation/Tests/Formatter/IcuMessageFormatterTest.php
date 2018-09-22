@@ -12,9 +12,9 @@
 namespace Symfony\Component\Translation\Tests\Formatter;
 
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\Formatter\IntlMessageFormatter;
+use Symfony\Component\Translation\Formatter\IcuMessageFormatter;
 
-class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
+class IcuMessageFormatterTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {
@@ -28,13 +28,13 @@ class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormat($expected, $message, $arguments)
     {
-        $this->assertEquals($expected, trim((new IntlMessageFormatter())->format($message, 'en', $arguments)));
+        $this->assertEquals($expected, trim((new IcuMessageFormatter())->format($message, 'en', $arguments)));
     }
 
     public function testInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
-        (new IntlMessageFormatter())->format('{foo', 'en', array(2));
+        (new IcuMessageFormatter())->format('{foo', 'en', array(2));
     }
 
     public function testFormatWithNamedArguments()
@@ -62,7 +62,7 @@ class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
      other {{host} invites {guest} as one of the # people invited to their party.}}}}
 _MSG_;
 
-        $message = (new IntlMessageFormatter())->format($chooseMessage, 'en', array(
+        $message = (new IcuMessageFormatter())->format($chooseMessage, 'en', array(
             'gender_of_host' => 'male',
             'num_guests' => 10,
             'host' => 'Fabien',

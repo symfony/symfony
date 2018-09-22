@@ -18,6 +18,24 @@ class IcuMessageConverterTest extends TestCase
         $this->assertEquals($output, $result);
     }
 
+
+
+    public function testConvertWithCustomDelimiter()
+    {
+        $result = IcuMessageConverter::convert('Foo #var# bar', '#');
+        $this->assertEquals('Foo {var} bar', $result);
+
+        $result = IcuMessageConverter::convert('{0} Foo #var# bar | {1} Bar #var# foo', '#');
+        $this->assertEquals(
+            <<<ICU
+{ COUNT, plural,
+  =0 {Foo {var} bar}
+  =1 {Bar {var} foo}
+}
+ICU
+, $result);
+    }
+
     /**
      * We cannot use negative Inf together with positive Inf.
      */

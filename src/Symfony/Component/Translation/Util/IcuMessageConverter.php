@@ -19,7 +19,7 @@ namespace Symfony\Component\Translation\Util;
  */
 class IcuMessageConverter
 {
-    public static function convert(string $message): string
+    public static function convert(string $message, string $variableDelimiter = '%'): string
     {
         $array = self::getMessageArray($message);
         if (empty($array)) {
@@ -27,10 +27,10 @@ class IcuMessageConverter
         }
 
         if (1 === \count($array) && isset($array[0])) {
-            return preg_replace('|%(.*?)%|s', '{$1}', $message);
+            return self::replaceVariables($message, $variableDelimiter);
         }
 
-        $icu = self::buildIcuString($array);
+        $icu = self::buildIcuString($array, $variableDelimiter);
 
         return $icu;
     }
@@ -106,16 +106,24 @@ EOF;
         return $standardRules;
     }
 
-    private static function buildIcuString(array $data): string
+    private static function buildIcuString(array $data, string $variableDelimiter): string
     {
         $icu = "{ COUNT, plural,\n";
         foreach ($data as $key => $message) {
             $message = strtr($message, array('%count%' => '#'));
-            $message = preg_replace('|%(.*?)%|s', '{$1}', $message);
+            $message = self::replaceVariables($message, $variableDelimiter);
             $icu .= sprintf("  %s {%s}\n", $key, $message);
         }
         $icu .= '}';
 
         return $icu;
+    }
+
+
+    private static function replaceVariables(string $message, string $variableDelimiter): string
+    {
+        $regex = sprintf('|%s(.*?)%s|s', $variableDelimiter, $variableDelimiter);
+
+        return preg_replace($regex, '{$1}', $message);
     }
 }

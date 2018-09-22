@@ -134,12 +134,25 @@ class DateTimeToRfc3339TransformerTest extends TestCase
     }
 
     /**
+     * @dataProvider invalidDateStringProvider
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsValidDateString()
+    public function testReverseTransformExpectsValidDateString($date)
     {
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');
 
-        $transformer->reverseTransform('2010-2010-2010');
+        $transformer->reverseTransform($date);
+    }
+
+    public function invalidDateStringProvider()
+    {
+        return array(
+            'invalid month' => array('2010-2010-01'),
+            'invalid day' => array('2010-10-2010'),
+            'no date' => array('x'),
+            'cookie format' => array('Saturday, 01-May-2010 04:05:00 Z'),
+            'RFC 822 format' => array('Sat, 01 May 10 04:05:00 +0000'),
+            'RSS format' => array('Sat, 01 May 2010 04:05:00 +0000'),
+        );
     }
 }

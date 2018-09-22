@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace Symfony\Component\Translation\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Util\IcuMessageConverter;
+use Symfony\Component\Translation\Util\IntlMessageConverter;
 
-class IcuMessageConverterTest extends TestCase
+class IntlMessageConverterTest extends TestCase
 {
     /**
      * @dataProvider getTestData
      */
     public function testConvert($input, $output)
     {
-        $result = IcuMessageConverter::convert($input);
+        $result = IntlMessageConverter::convert($input);
         $this->assertEquals($output, $result);
     }
 
     public function testConvertWithCustomDelimiter()
     {
-        $result = IcuMessageConverter::convert('Foo #var# bar', '#');
+        $result = IntlMessageConverter::convert('Foo #var# bar', '#');
         $this->assertEquals('Foo {var} bar', $result);
 
-        $result = IcuMessageConverter::convert('{0} Foo #var# bar | {1} Bar #var# foo', '#');
+        $result = IntlMessageConverter::convert('{0} Foo #var# bar | {1} Bar #var# foo', '#');
         $this->assertEquals(
             <<<ICU
 { COUNT, plural,
@@ -40,7 +40,7 @@ ICU
     public function testImpossibleConvert()
     {
         $this->expectException(\LogicException::class);
-        IcuMessageConverter::convert(']-Inf, -2[ Negative|]1,Inf[ Positive');
+        IntlMessageConverter::convert(']-Inf, -2[ Negative|]1,Inf[ Positive');
     }
 
     public function getTestData()

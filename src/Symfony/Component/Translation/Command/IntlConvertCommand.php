@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
-use Symfony\Component\Translation\Util\IcuMessageConverter;
+use Symfony\Component\Translation\Util\IntlMessageConverter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
@@ -28,9 +28,9 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class IcuConvertCommand extends Command
+class IntlConvertCommand extends Command
 {
-    protected static $defaultName = 'translation:convert-to-icu-messages';
+    protected static $defaultName = 'translation:convert-to-intl-messages';
 
     private $writer;
     private $reader;
@@ -87,7 +87,7 @@ class IcuConvertCommand extends Command
         $updated = array();
         foreach ($allMessages as $messageDomain => $messages) {
             foreach ($messages as $key => $message) {
-                $updated[$messageDomain][$key] = IcuMessageConverter::convert($message);
+                $updated[$messageDomain][$key] = IntlMessageConverter::convert($message);
             }
         }
 

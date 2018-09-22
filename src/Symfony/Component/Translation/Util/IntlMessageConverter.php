@@ -17,7 +17,7 @@ namespace Symfony\Component\Translation\Util;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class IcuMessageConverter
+class IntlMessageConverter
 {
     public static function convert(string $message, string $variableDelimiter = '%'): string
     {

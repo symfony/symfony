@@ -42,6 +42,8 @@ class IntlMessageConverter
             $parts = explode('|', $message);
         } elseif (preg_match_all('/(?:\|\||[^\|])++/', $message, $matches)) {
             $parts = $matches[0];
+        } else {
+            $parts = array($message);
         }
 
         $intervalRegexp = <<<'EOF'

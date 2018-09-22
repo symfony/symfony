@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2018-09-22T18:10:31Z
+
+I've done the fix in https://github.com/symfony/symfony/compare/master...GuilhemN:debug-int, I did not realize it was there since 3.4...
+BTW one of test cases should have detected this issue... If it wasn't broken itself 😅
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-22T18:30:09Z
+
+'@GuilhemN thanks a lot for having a look! Actually I don't agree with your patch, the test was fine and it's exactly why it was added in #28411. The issue is nastier: we don't deal with traits correctly. This very check you moved up shouldn't exist at all - and we should never inspect method annotations on traits.
+This PR is now ready with the correct fix, see https://github.com/symfony/symfony/pull/28553/files?w=1
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2018-09-22T18:40:41Z
+
+Oops sorry, I thought I was the one who introduced it and by mistake 😶 I understand now why you've done this change, I will review your last commit asap :)

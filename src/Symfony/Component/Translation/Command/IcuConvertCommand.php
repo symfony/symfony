@@ -67,7 +67,7 @@ class IcuConvertCommand extends Command
         $kernel = $this->getApplication()->getKernel();
 
         // Define Root Paths
-        $transPaths = $kernel->getProjectDir().DIRECTORY_SEPARATOR.'translations';
+        $transPaths = $kernel->getProjectDir().\DIRECTORY_SEPARATOR.'translations';
         if (null !== $path) {
             $transPaths = $path;
         }

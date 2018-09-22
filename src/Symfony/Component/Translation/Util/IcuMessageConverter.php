@@ -42,7 +42,7 @@ class IcuMessageConverter
     {
         if (preg_match('/^\|++$/', $message)) {
             // If the message only contains pipes ("|||")
-            return [];
+            return array();
         } elseif (preg_match_all('/(?:\|\||[^\|])++/', $message, $matches)) {
             $parts = $matches[0];
         } else {
@@ -118,7 +118,6 @@ EOF;
 
         return $icu;
     }
-
 
     private static function replaceVariables(string $message, string $variableDelimiter): string
     {

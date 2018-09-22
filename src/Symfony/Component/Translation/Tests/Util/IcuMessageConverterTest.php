@@ -18,8 +18,6 @@ class IcuMessageConverterTest extends TestCase
         $this->assertEquals($output, $result);
     }
 
-
-
     public function testConvertWithCustomDelimiter()
     {
         $result = IcuMessageConverter::convert('Foo #var# bar', '#');

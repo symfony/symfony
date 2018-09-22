@@ -123,6 +123,40 @@ class IntlCaster
         return self::castError($c, $a);
     }
 
+    public static function castIntlCalendar(\IntlCalendar $c, array $a, Stub $stub, $isNested, $filter = 0)
+    {
+        $a += array(
+            Caster::PREFIX_VIRTUAL.'type' => $c->getType(),
+            Caster::PREFIX_VIRTUAL.'first_day_of_week' => $c->getFirstDayOfWeek(),
+            Caster::PREFIX_VIRTUAL.'minimal_days_in_first_week' => $c->getMinimalDaysInFirstWeek(),
+            Caster::PREFIX_VIRTUAL.'repeated_wall_time_option' => $c->getRepeatedWallTimeOption(),
+            Caster::PREFIX_VIRTUAL.'skipped_wall_time_option' => $c->getSkippedWallTimeOption(),
+            Caster::PREFIX_VIRTUAL.'time' => $c->getTime(),
+            Caster::PREFIX_VIRTUAL.'type' => $c->getType(),
+            Caster::PREFIX_VIRTUAL.'in_daylight_time' => $c->inDaylightTime(),
+            Caster::PREFIX_VIRTUAL.'is_lenient' => $c->isLenient(),
+            Caster::PREFIX_VIRTUAL.'time_zone' => ($filter & Caster::EXCLUDE_VERBOSE) ? new CutStub($c->getTimeZone()) : $c->getTimeZone(),
+        );
+
+        return self::castError($c, $a);
+    }
+
+    public static function castIntlDateFormatter(\IntlDateFormatter $c, array $a, Stub $stub, $isNested, $filter = 0)
+    {
+        $a += array(
+            Caster::PREFIX_VIRTUAL.'locale' => $c->getLocale(),
+            Caster::PREFIX_VIRTUAL.'pattern' => $c->getPattern(),
+            Caster::PREFIX_VIRTUAL.'calendar' => $c->getCalendar(),
+            Caster::PREFIX_VIRTUAL.'time_zone_id' => $c->getTimeZoneId(),
+            Caster::PREFIX_VIRTUAL.'time_type' => $c->getTimeType(),
+            Caster::PREFIX_VIRTUAL.'date_type' => $c->getDateType(),
+            Caster::PREFIX_VIRTUAL.'calendar_object' => ($filter & Caster::EXCLUDE_VERBOSE) ? new CutStub($c->getCalendarObject()) : $c->getCalendarObject(),
+            Caster::PREFIX_VIRTUAL.'time_zone' => ($filter & Caster::EXCLUDE_VERBOSE) ? new CutStub($c->getTimeZone()) : $c->getTimeZone(),
+        );
+
+        return self::castError($c, $a);
+    }
+
     private static function castError($c, array $a): array
     {
         if ($errorCode = $c->getErrorCode()) {

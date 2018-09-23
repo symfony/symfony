@@ -55,6 +55,8 @@ Finder
 Form
 ----
 
+ * The `scale` option of the `IntegerType` is deprecated.
+
  * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered.
    Instead of expecting such calls to return empty strings, check if the field has already been rendered.
 

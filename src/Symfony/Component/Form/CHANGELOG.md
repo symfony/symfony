@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `Symfony\Component\Form\ClearableErrorsInterface`
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+ * deprecated the `scale` option of the `IntegerType`
 
 4.1.0
 -----

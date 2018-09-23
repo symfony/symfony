@@ -55,6 +55,9 @@ Finder
 Form
 ----
 
+ * The `scale` option of the `IntegerType` is deprecated.
+ * The `$scale` argument of the `IntegerToLocalizedStringTransformer` is deprecated.
+
  * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered.
    Instead of expecting such calls to return empty strings, check if the field has already been rendered.
 
@@ -72,24 +75,12 @@ Form
    {% endfor %}
    ```
 
-Process
--------
+HttpFoundation
+--------------
 
- * Deprecated the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
- * Deprecated passing commands as strings when creating a `Process` instance.
-
-   Before:
-   ```php
-   $process = new Process('ls -l');
-   ```
-
-   After:
-   ```php
-   $process = new Process(array('ls', '-l'));
-
-   // alternatively, when a shell wrapper is required
-   $process = Process::fromShellCommandline('ls -l');
-   ```
+ * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
+   will respectively change from "false" to "null" and from "null" to "lax" in Symfony
+   5.0, you should define their values explicitly or use "Cookie::create()" instead.
 
 FrameworkBundle
 ---------------
@@ -164,6 +155,25 @@ Monolog
 
  * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()` and `Logger::countErrors()` will have a new `$request` argument in version 5.0, not defining it is deprecated.
 
+Process
+-------
+
+ * Deprecated the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
+ * Deprecated passing commands as strings when creating a `Process` instance.
+
+   Before:
+   ```php
+   $process = new Process('ls -l');
+   ```
+
+   After:
+   ```php
+   $process = new Process(array('ls', '-l'));
+
+   // alternatively, when a shell wrapper is required
+   $process = Process::fromShellCommandline('ls -l');
+   ```
+
 Security
 --------
 
@@ -206,3 +216,4 @@ Validator
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final
  * Deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
+ * Using the `Bic` constraint without `symfony/intl` is deprecated

@@ -100,7 +100,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             if ($adapter instanceof CacheInterface) {
                 $value = $adapter->get($key, $callback, $beta);
             } else {
-                $value = $this->doGet($adapter, $key, $callback, $beta ?? 1.0);
+                $value = $this->doGet($adapter, $key, $callback, $beta);
             }
             if (null !== $item) {
                 ($this->syncItem)($lastItem = $lastItem ?? $item, $item);

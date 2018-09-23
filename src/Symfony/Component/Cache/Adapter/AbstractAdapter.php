@@ -151,7 +151,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         if (0 === strpos($dsn, 'redis://')) {
             return RedisAdapter::createConnection($dsn, $options);
         }
-        if (0 === strpos($dsn, 'memcached://')) {
+        if (0 === strpos($dsn, 'memcached:')) {
             return MemcachedAdapter::createConnection($dsn, $options);
         }
 

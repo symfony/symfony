@@ -5,7 +5,8 @@ CHANGELOG
 -----
 
  * The method `Client::submit()` will have a new `$serverParameters` argument 
-   in version 5.0, not defining it is deprecated since version 4.2
+   in version 5.0, not defining it is deprecated
+ * Added ability to read the "samesite" attribute of cookies using `Cookie::getSameSite()`
 
 3.4.0
 -----

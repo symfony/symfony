@@ -11,6 +11,6 @@ Array
 (
     [0] => Content-Type: text/plain; charset=utf-8
     [1] => Cache-Control: max-age=0, private, must-revalidate
-    [2] => Set-Cookie: sid=random_session_id; path=/; secure; HttpOnly; SameSite=lax
+    [2] => Set-Cookie: sid=random_session_id; path=/; secure; HttpOnly; samesite=lax
 )
 shutdown

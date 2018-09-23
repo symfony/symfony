@@ -5,6 +5,9 @@ The VarExporter component allows exporting any serializable PHP data structure t
 plain PHP code. While doing so, it preserves all the semantics associated with
 the serialization mechanism of PHP (`__wakeup`, `__sleep`, `Serializable`).
 
+It also provides an instantiator that allows creating and populating objects
+without calling their constructor nor any other methods.
+
 The reason to use this component *vs* `serialize()` or
 [igbinary](https://github.com/igbinary/igbinary) is performance: thanks to
 OPcache, the resulting code is significantly faster and more memory efficient

@@ -133,7 +133,7 @@ class CachePoolPass implements CompilerPassInterface
     {
         $container->resolveEnvPlaceholders($name, null, $usedEnvs);
 
-        if ($usedEnvs || preg_match('#^[a-z]++://#', $name)) {
+        if ($usedEnvs || preg_match('#^[a-z]++:#', $name)) {
             $dsn = $name;
 
             if (!$container->hasDefinition($name = '.cache_connection.'.ContainerBuilder::hash($dsn))) {

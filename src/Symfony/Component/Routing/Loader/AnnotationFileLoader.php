@@ -32,7 +32,7 @@ class AnnotationFileLoader extends FileLoader
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
     {
         if (!\function_exists('token_get_all')) {
-            throw new \RuntimeException('The Tokenizer extension is required for the routing annotation loaders.');
+            throw new \LogicException('The Tokenizer extension is required for the routing annotation loaders.');
         }
 
         parent::__construct($locator);

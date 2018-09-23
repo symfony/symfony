@@ -22,12 +22,18 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     /**
      * Constructs a transformer.
      *
-     * @param int  $scale        Unused
      * @param bool $grouping     Whether thousands should be grouped
      * @param int  $roundingMode One of the ROUND_ constants in this class
      */
-    public function __construct(?int $scale = 0, ?bool $grouping = false, int $roundingMode = self::ROUND_DOWN)
+    public function __construct($grouping = false, $roundingMode = self::ROUND_DOWN)
     {
+        if (\is_int($grouping) || \is_bool($roundingMode) || 2 < \func_num_args()) {
+            @trigger_error(sprintf('Passing a precision as the first value to %s::__construct() is deprecated since Symfony 4.2 and support for it will be dropped in 5.0.', __CLASS__), E_USER_DEPRECATED);
+
+            $grouping = $roundingMode;
+            $roundingMode = 2 < \func_num_args() ? func_get_arg(2) : self::ROUND_DOWN;
+        }
+
         parent::__construct(0, $grouping, $roundingMode);
     }
 

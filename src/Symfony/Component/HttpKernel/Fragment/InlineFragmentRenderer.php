@@ -125,6 +125,13 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
         $setSession($subRequest, $request);
 
+        if ($request->get('_format')) {
+            $subRequest->attributes->set('_format', $request->get('_format'));
+        }
+        if ($request->getDefaultLocale() !== $request->getLocale()) {
+            $subRequest->setLocale($request->getLocale());
+        }
+
         return $subRequest;
     }
 

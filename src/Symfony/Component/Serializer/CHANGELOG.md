@@ -13,6 +13,12 @@ CHANGELOG
    the format and the context in a name converter
  * the `AbstractNormalizer::handleCircularReference()` method will have two new `$format`
    and `$context` arguments in version 5.0, not defining them is deprecated
+ * deprecated creating a `Serializer` with normalizers which do not implement
+   either `NormalizerInterface` or `DenormalizerInterface`
+ * deprecated creating a `Serializer` with normalizers which do not implement
+   either `NormalizerInterface` or `DenormalizerInterface`
+ * deprecated creating a `Serializer` with encoders which do not implement
+   either `EncoderInterface` or `DecoderInterface`
 
 4.1.0
 -----

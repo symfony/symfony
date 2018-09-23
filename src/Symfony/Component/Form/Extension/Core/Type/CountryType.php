@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,6 +42,10 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
     {
         $resolver->setDefaults(array(
             'choice_loader' => function (Options $options) {
+                if (!class_exists(Intl::class)) {
+                    throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s".', static::class));
+                }
+
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
                 return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {

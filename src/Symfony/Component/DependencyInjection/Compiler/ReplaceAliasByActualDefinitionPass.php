@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -53,8 +54,12 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
             $seenAliasTargets[$targetId] = true;
             try {
                 $definition = $container->getDefinition($targetId);
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with actual definition "%s".', $definitionId, $targetId), null, $e);
+            } catch (ServiceNotFoundException $e) {
+                if ('' !== $e->getId() && '@' === $e->getId()[0]) {
+                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, array(substr($e->getId(), 1)));
+                }
+
+                throw $e;
             }
             if ($definition->isPublic()) {
                 continue;

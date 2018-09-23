@@ -119,6 +119,9 @@ abstract class AbstractCloner implements ClonerInterface
 
         'MessageFormatter' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castMessageFormatter'),
         'NumberFormatter' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castNumberFormatter'),
+        'IntlTimeZone' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castIntlTimeZone'),
+        'IntlCalendar' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castIntlCalendar'),
+        'IntlDateFormatter' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castIntlDateFormatter'),
 
         ':curl' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'),
         ':dba' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'),

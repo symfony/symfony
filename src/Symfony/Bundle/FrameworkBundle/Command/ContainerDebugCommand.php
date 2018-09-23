@@ -22,6 +22,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -144,7 +145,16 @@ EOF
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $helper->describe($io, $object, $options);
+
+        try {
+            $helper->describe($io, $object, $options);
+        } catch (ServiceNotFoundException $e) {
+            if ('' !== $e->getId() && '@' === $e->getId()[0]) {
+                throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, array(substr($e->getId(), 1)));
+            }
+
+            throw $e;
+        }
 
         if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && $input->isInteractive()) {
             if ($input->getOption('tags')) {

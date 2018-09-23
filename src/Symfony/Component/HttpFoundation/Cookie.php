@@ -27,6 +27,7 @@ class Cookie
     protected $httpOnly;
     private $raw;
     private $sameSite;
+    private $secureDefault = false;
 
     const SAMESITE_LAX = 'lax';
     const SAMESITE_STRICT = 'strict';
@@ -66,21 +67,30 @@ class Cookie
         return new static($name, $value, $data['expires'], $data['path'], $data['domain'], $data['secure'], $data['httponly'], $data['raw'], $data['samesite']);
     }
 
+    public static function create(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX): self
+    {
+        return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+    }
+
     /**
      * @param string                        $name     The name of the cookie
      * @param string|null                   $value    The value of the cookie
      * @param int|string|\DateTimeInterface $expire   The time the cookie expires
      * @param string                        $path     The path on the server in which the cookie will be available on
      * @param string|null                   $domain   The domain that the cookie is available to
-     * @param bool                          $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param bool|null                     $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
      * @param string|null                   $sameSite Whether the cookie will be available for cross-site requests
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, bool $raw = false, string $sameSite = null)
+    public function __construct(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, ?bool $secure = false, bool $httpOnly = true, bool $raw = false, string $sameSite = null)
     {
+        if (9 > \func_num_args()) {
+            @trigger_error(sprintf('The default value of the "$secure" and "$samesite" arguments of "%s"\'s constructor will respectively change from "false" to "null" and from "null" to "lax" in Symfony 5.0, you should define their values explicitly or use "Cookie::create()" instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
             throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
@@ -110,7 +120,9 @@ class Cookie
         $this->httpOnly = $httpOnly;
         $this->raw = $raw;
 
-        if (null !== $sameSite) {
+        if ('' === $sameSite) {
+            $sameSite = null;
+        } elseif (null !== $sameSite) {
             $sameSite = strtolower($sameSite);
         }
 
@@ -232,7 +244,7 @@ class Cookie
      */
     public function isSecure()
     {
-        return $this->secure;
+        return $this->secure ?? $this->secureDefault;
     }
 
     /**
@@ -273,5 +285,13 @@ class Cookie
     public function getSameSite()
     {
         return $this->sameSite;
+    }
+
+    /**
+     * @param bool $default The default value of the "secure" flag when it is set to null
+     */
+    public function setSecureDefault(bool $default): void
+    {
+        $this->secureDefault = $default;
     }
 }

@@ -145,6 +145,26 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('Foo', ob_get_clean());
     }
 
+    public function testLocaleAndFormatAreIsKeptInSubrequest()
+    {
+        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest->attributes->set('_format', 'foo');
+        $expectedSubRequest->setLocale('fr');
+        if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
+            $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
+            $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+        }
+        $expectedSubRequest->headers->set('forwarded', array('for="127.0.0.1";host="localhost";proto=http'));
+        $expectedSubRequest->server->set('HTTP_FORWARDED', 'for="127.0.0.1";host="localhost";proto=http');
+
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
+
+        $request = Request::create('/');
+        $request->attributes->set('_format', 'foo');
+        $request->setLocale('fr');
+        $strategy->render('/', $request);
+    }
+
     public function testESIHeaderIsKeptInSubrequest()
     {
         $expectedSubRequest = Request::create('/');

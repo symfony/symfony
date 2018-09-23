@@ -365,9 +365,10 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testsTranslateCustomErrorMessage()
     {
+        $csrfToken = new CsrfToken('TOKEN_ID', 'token');
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
-            ->with(new CsrfToken('TOKEN_ID', 'token'))
+            ->with($csrfToken)
             ->will($this->returnValue(false));
 
         $this->translator->expects($this->once())
@@ -390,7 +391,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
 
         $errors = $form->getErrors();
-        $expected = new FormError('[trans]Foobar[/trans]');
+        $expected = new FormError('[trans]Foobar[/trans]', null, array(), null, $csrfToken);
         $expected->setOrigin($form);
 
         $this->assertGreaterThan(0, \count($errors));

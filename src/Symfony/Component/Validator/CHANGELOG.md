@@ -10,6 +10,7 @@ CHANGELOG
  * made `ValidatorBuilder` final
  * marked `format` the default option in `DateTime` constraint
  * deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`.
+ * deprecated using the `Bic` constraint without `symfony/intl`
 
 4.1.0
 -----

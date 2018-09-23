@@ -23,7 +23,7 @@ abstract class WebTestCase extends KernelTestCase
     /**
      * Creates a Client.
      *
-     * @param array $options An array of options to pass to the createKernel class
+     * @param array $options An array of options to pass to the createKernel method
      * @param array $server  An array of server parameters
      *
      * @return Client A Client instance

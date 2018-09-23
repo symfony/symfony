@@ -26,6 +26,7 @@ class LogoutTest extends WebTestCase
         $cookieJar->expire(session_name());
 
         $this->assertNotNull($cookieJar->get('REMEMBERME'));
+        $this->assertSame('lax', $cookieJar->get('REMEMBERME')->getSameSite());
 
         $client->request('GET', '/logout');
 

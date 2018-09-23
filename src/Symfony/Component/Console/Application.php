@@ -129,15 +129,7 @@ class Application
                 $this->renderException($e, $output);
             }
 
-            $exitCode = $e->getCode();
-            if (is_numeric($exitCode)) {
-                $exitCode = (int) $exitCode;
-                if (0 === $exitCode) {
-                    $exitCode = 1;
-                }
-            } else {
-                $exitCode = 1;
-            }
+            $exitCode = $this->getExitCodeForThrowable($e);
         }
 
         if ($this->autoExit) {
@@ -873,7 +865,8 @@ class Application
             if ($x !== $event->getException()) {
                 $e = $event->getException();
             }
-            $exitCode = $e->getCode();
+
+            $exitCode = $this->getExitCodeForThrowable($e);
         }
 
         $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
@@ -1147,5 +1140,27 @@ class Application
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
         }
+    }
+
+    /**
+     * Type hint omitted to be PHP5 compatible.
+     *
+     * @param \Exception|\Throwable $throwable
+     *
+     * @return int
+     */
+    private function getExitCodeForThrowable($throwable)
+    {
+        $exitCode = $throwable->getCode();
+        if (is_numeric($exitCode)) {
+            $exitCode = (int) $exitCode;
+            if (0 === $exitCode) {
+                $exitCode = 1;
+            }
+        } else {
+            $exitCode = 1;
+        }
+
+        return $exitCode;
     }
 }

@@ -106,6 +106,23 @@ class IntlCaster
         return self::castError($c, $a);
     }
 
+    public static function castIntlTimeZone(\IntlTimeZone $c, array $a, Stub $stub, $isNested)
+    {
+        $a += array(
+            Caster::PREFIX_VIRTUAL.'display_name' => $c->getDisplayName(),
+            Caster::PREFIX_VIRTUAL.'id' => $c->getID(),
+            Caster::PREFIX_VIRTUAL.'raw_offset' => $c->getRawOffset(),
+        );
+
+        if ($c->useDaylightTime()) {
+            $a += array(
+                Caster::PREFIX_VIRTUAL.'dst_savings' => $c->getDSTSavings(),
+            );
+        }
+
+        return self::castError($c, $a);
+    }
+
     private static function castError($c, array $a): array
     {
         if ($errorCode = $c->getErrorCode()) {

@@ -150,4 +150,42 @@ NumberFormatter {
 EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
+
+    public function testCastIntlTimeZoneWithDST()
+    {
+        $var = \IntlTimeZone::createTimeZone('America/Los_Angeles');
+
+        $expectedDisplayName = $var->getDisplayName();
+        $expectedDSTSavings = $var->getDSTSavings();
+        $expectedID = $var->getID();
+        $expectedRawOffset = $var->getRawOffset();
+
+        $expected = <<<EOTXT
+IntlTimeZone {
+  display_name: "$expectedDisplayName"
+  id: "$expectedID"
+  raw_offset: $expectedRawOffset
+  dst_savings: $expectedDSTSavings
+}
+EOTXT;
+        $this->assertDumpEquals($expected, $var);
+    }
+
+    public function testCastIntlTimeZoneWithoutDST()
+    {
+        $var = \IntlTimeZone::createTimeZone('Asia/Bangkok');
+
+        $expectedDisplayName = $var->getDisplayName();
+        $expectedID = $var->getID();
+        $expectedRawOffset = $var->getRawOffset();
+
+        $expected = <<<EOTXT
+IntlTimeZone {
+  display_name: "$expectedDisplayName"
+  id: "$expectedID"
+  raw_offset: $expectedRawOffset
+}
+EOTXT;
+        $this->assertDumpEquals($expected, $var);
+    }
 }

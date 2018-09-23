@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2018-09-21T17:30:03Z
+
+3.4 does not have this bug, most likely due to #22441
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-22T18:41:06Z
+
+at least tests fail :)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-09-22T18:51:10Z
+
+@nicolas-grekas Will work on tests if you agree we should fix it on 2.8.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-22T18:53:59Z
+
+We might also just wait for 2.8 to fade out if you don't have time to work on this :)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-09-22T19:00:28Z
+
+I was expecting this :-)
+
+Personally, I‘ll probably have to deal with 2.8 for another year so I‘d be glad to have this fixed.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-09-22T21:29:07Z
+
+@nicolas-grekas Tests added – does it make sense to omit the `Exception` type hint to be PHP 5 and 7 compatible (no `\Throwable` on PHP 5 but possibly have to handle `\Error` on PHP7)?

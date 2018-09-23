@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-23T05:55:48Z
+
+should we add dump getDSTSavings only when useDaylightTime is true?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-23T10:42:09Z
+
+can be rebased now that #28555 is merged (and thus can leverage castError)
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2018-09-23T10:45:34Z
+
+on it

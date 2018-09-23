@@ -118,6 +118,7 @@ abstract class AbstractCloner implements ClonerInterface
         'GMP' => array('Symfony\Component\VarDumper\Caster\GmpCaster', 'castGmp'),
 
         'MessageFormatter' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castMessageFormatter'),
+        'NumberFormatter' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castNumberFormatter'),
 
         ':curl' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'),
         ':dba' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'),

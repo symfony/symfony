@@ -35,7 +35,7 @@ class LocaleTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'), $choices, '', false, false);
     }
 
-    public function testSupportedLocalesAreConfigurable()
+    public function testSupportedLocalesAreConfigurableByArray()
     {
         $choices = $this->factory->create(static::TESTED_TYPE, null, array('supported_locales' => array('en', 'zh_Hant_MO')))
             ->createView()->vars['choices'];
@@ -43,6 +43,19 @@ class LocaleTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'), $choices, '', false, false);
         $this->assertNotContains(new ChoiceView('en_GB', 'en_GB', 'English (United Kingdom)'), $choices, '', false, false);
+        $this->assertNotContains(new ChoiceView('af_ZA', 'af_ZA', 'Afrikaans (South Africa)'), $choices, '', false, false);
+    }
+
+    public function testSupportedLocalesAreConfigurableByClosure()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('supported_locales' => function ($v, $k) {
+            return $k === 'zh_Hant_MO' || strpos($k, 'en') === 0;
+        }))->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'English (United Kingdom)'), $choices, '', false, false);
+        $this->assertNotContains(new ChoiceView('af_ZA', 'af_ZA', 'Afrikaans (South Africa)'), $choices, '', false, false);
     }
 
     /**

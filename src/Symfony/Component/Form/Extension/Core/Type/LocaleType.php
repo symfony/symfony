@@ -49,7 +49,7 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
                     $locales = Intl::getLocaleBundle()->getLocaleNames($choiceTranslationLocale);
 
                     if (null !== $supportedLocales) {
-                        $locales = array_filter($locales, new ArrayInclusionFilter($supportedLocales), ARRAY_FILTER_USE_KEY);
+                        $locales = (new ArrayInclusionFilter($supportedLocales))->filter($locales);
                     }
 
                     return array_flip($locales);
@@ -61,7 +61,7 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
         ));
 
         $resolver->setAllowedTypes('choice_translation_locale', array('null', 'string'));
-        $resolver->setAllowedTypes('supported_locales', array('null', 'string[]'));
+        $resolver->setAllowedTypes('supported_locales', array('null', 'string[]', 'Closure'));
     }
 
     /**

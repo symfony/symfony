@@ -18,14 +18,26 @@ namespace Symfony\Component\Form\Extension\Core;
  */
 final class ArrayInclusionFilter
 {
+    private $filterCallable;
     private $acceptedKeys;
 
-    public function __construct(array $acceptedKeys)
+    public function __construct($filter)
     {
-        $this->acceptedKeys = array_fill_keys($acceptedKeys, true);
+        if (\is_array($filter)) {
+            $this->acceptedKeys = array_fill_keys($filter, true);
+            $this->filterCallable = $this;
+        } else {
+            $this->acceptedKeys = [];
+            $this->filterCallable = $filter;
+        }
     }
 
-    public function __invoke(string $k)
+    public function filter(array $choices)
+    {
+        return array_filter($choices, $this->filterCallable, ARRAY_FILTER_USE_BOTH);
+    }
+
+    public function __invoke($v, $k)
     {
         return isset($this->acceptedKeys[$k]);
     }

@@ -49,8 +49,11 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
                     $countries = Intl::getRegionBundle()->getCountryNames($choiceTranslationLocale);
 
                     if (null !== $supportedCountries) {
-                        $supportedCountries = array_map('strtoupper', $supportedCountries);
-                        $countries = array_filter($countries, new ArrayInclusionFilter($supportedCountries), ARRAY_FILTER_USE_KEY);
+                        if (is_array($supportedCountries)) {
+                            $supportedCountries = array_map('strtoupper', $supportedCountries);
+                        }
+
+                        $countries = (new ArrayInclusionFilter($supportedCountries))->filter($countries);
                     }
 
                     return array_flip($countries);

@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-22T17:08:15Z
+
+Thanks for working on this.
+Would you mind rebasing to get rid of the merge commit please?
+It could be interesting to also dump the attributes, text-attributes and symbol. WDYT?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2018-09-22T18:55:16Z
+
+@nicolas-grekas
+
+> Would you mind rebasing to get rid of the merge commit please?
+
+done
+
+> It could be interesting to also dump the attributes, text-attributes and symbol. WDYT?
+
+I like the idea. The first possible solution which came to my mind was to show all possible values of the attributes, text-attributes and symbol as an array:
+
+```
+NumberFormatter {
+  locale: "en"
+  pattern: "#,##0.###"
+  attributes: array:20 [
+    "PARSE_INT_ONLY" => "."
+    "GROUPING_USED" => ","
+    "DECIMAL_ALWAYS_SHOWN" => ";"
+    "MAX_INTEGER_DIGITS" => "%"
+    "MIN_INTEGER_DIGITS" => "0"
+    "INTEGER_DIGITS" => "#"
+    "MAX_FRACTION_DIGITS" => "-"
+    "MIN_FRACTION_DIGITS" => "+"
+    "FRACTION_DIGITS" => "¤"
+    "MULTIPLIER" => "¤¤"
+    "GROUPING_SIZE" => "."
+    "ROUNDING_MODE" => "E"
+    "ROUNDING_INCREMENT" => "‰"
+    "FORMAT_WIDTH" => "*"
+    "PADDING_POSITION" => "∞"
+    "SECONDARY_GROUPING_SIZE" => "NaN"
+    "SIGNIFICANT_DIGITS_USED" => "@"
+    "MIN_SIGNIFICANT_DIGITS" => ","
+    "MAX_SIGNIFICANT_DIGITS" => "1"
+    "LENIENT_PARSE" => "2"
+  ]
+  text_attributes: array:8 [
+    "POSITIVE_PREFIX" => ""
+    "POSITIVE_SUFFIX" => ""
+    "NEGATIVE_PREFIX" => "-"
+    "NEGATIVE_SUFFIX" => ""
+    "PADDING_CHARACTER" => " "
+    "CURRENCY_CODE" => ""
+    "DEFAULT_RULESET" => false
+    "PUBLIC_RULESETS" => false
+  ]
+  symbols: array:18 [
+    "DECIMAL_SEPARATOR_SYMBOL" => "."
+    "GROUPING_SEPARATOR_SYMBOL" => ","
+    "PATTERN_SEPARATOR_SYMBOL" => ";"
+    "PERCENT_SYMBOL" => "%"
+    "ZERO_DIGIT_SYMBOL" => "0"
+    "DIGIT_SYMBOL" => "#"
+    "MINUS_SIGN_SYMBOL" => "-"
+    "PLUS_SIGN_SYMBOL" => "+"
+    "CURRENCY_SYMBOL" => "¤"
+    "INTL_CURRENCY_SYMBOL" => "¤¤"
+    "MONETARY_SEPARATOR_SYMBOL" => "."
+    "EXPONENTIAL_SYMBOL" => "E"
+    "PERMILL_SYMBOL" => "‰"
+    "PAD_ESCAPE_SYMBOL" => "*"
+    "INFINITY_SYMBOL" => "∞"
+    "NAN_SYMBOL" => "NaN"
+    "SIGNIFICANT_DIGIT_SYMBOL" => "@"
+    "MONETARY_GROUPING_SEPARATOR_SYMBOL" => ","
+  ]
+```
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-22T21:15:21Z
+
+Wow, I didn't expect so many! LGTM yes.
+I'd suggest wrapping the maps in an EnumStub to make them nicer.

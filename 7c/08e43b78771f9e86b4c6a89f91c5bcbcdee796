@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-11T17:09:39Z
+
+Should be for master, isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-12T12:48:09Z
+
+Indeed. We avoid doing such changes in patch releases generally.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-13T13:33:45Z
+
+rebased on `master`, I also updated the descriptors to provide more information there too (which is what was actually reported in #28413)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-17T18:01:27Z
+
+Are the descriptor changes required? I mean: the pass will always catch this before descriptor ever hit this situation, isn't it? Would be great to reduce the complexity if possible.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-17T18:27:37Z
+
+Unfortunately, the pass is not executed when the command is run. All removal passes are disabled first.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-17T19:20:22Z
+
+But the commands run after the container is compiled, isn't it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-17T20:54:02Z
+
+It uses a container that is compiled without the removal passes: https://github.com/symfony/symfony/blob/744bf0e7ac3ecf240d0bf055cc58f881bb0b3ec0/src/Symfony/Bundle/FrameworkBundle/Command/ContainerDebugCommand.php#L199-L203
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-09-18T18:49:37Z
+
+indeed, required for being able to list all available services including autowiring types

@@ -23,12 +23,7 @@ class IntegerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addViewTransformer(
-            new IntegerToLocalizedStringTransformer(
-                $options['scale'],
-                $options['grouping'],
-                $options['rounding_mode']
-        ));
+        $builder->addViewTransformer(new IntegerToLocalizedStringTransformer($options['grouping'], $options['rounding_mode']));
     }
 
     /**

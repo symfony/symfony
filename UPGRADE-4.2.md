@@ -55,6 +55,8 @@ Finder
 Form
 ----
 
+ * The `$scale` argument of the `IntegerToLocalizedStringTransformer` is deprecated.
+
  * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered.
    Instead of expecting such calls to return empty strings, check if the field has already been rendered.
 

@@ -101,6 +101,25 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
         return false;
     }
 
+    protected function hasRegexModifiers(string $str, array $modifiers)
+    {
+        $regexParts = explode('/', $str);
+
+        if (0 == \count($regexParts)) {
+            return false;
+        }
+
+        $foundModifiers = $regexParts[\count($regexParts) - 1];
+
+        foreach ($modifiers as $modifier) {
+            if (true === strpos($foundModifiers, $modifier)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Converts string into regexp.
      *

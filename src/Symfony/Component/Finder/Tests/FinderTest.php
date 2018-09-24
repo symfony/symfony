@@ -278,6 +278,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('A.xml', 'B.XML')), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testNameAndInameWillBeCombindedWithAND()
+    {
+        $finder = $this->buildFinder();
+        $finder->name('*.XML');
+        $finder->iname('*.xml');
+        $this->assertIterator($this->toAbsolute(array('B.XML')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->name('*.xml');
+        $finder->iname('*.XML');
+        $this->assertIterator($this->toAbsolute(array('A.xml')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testNameWithArrayParam()
     {
         $finder = $this->buildFinder();

@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Profiler;
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-class FileProfilerStorage implements ProfilerStorageInterface
+class FileProfilerStorage extends AbstractProfileStorage
 {
     /**
      * Folder where profiler data are stored.
@@ -61,30 +61,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $result = array();
         while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
             $values = str_getcsv($line);
-            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode) = $values;
-            $csvTime = (int) $csvTime;
 
-            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method) || $statusCode && false === strpos($csvStatusCode, $statusCode)) {
+            $checked = $this->checkIndexItem($values, $ip, $url, $method, $start, $end, $statusCode);
+            if (!$checked) {
                 continue;
             }
 
-            if (!empty($start) && $csvTime < $start) {
-                continue;
-            }
-
-            if (!empty($end) && $csvTime > $end) {
-                continue;
-            }
-
-            $result[$csvToken] = array(
-                'token' => $csvToken,
-                'ip' => $csvIp,
-                'method' => $csvMethod,
-                'url' => $csvUrl,
-                'time' => $csvTime,
-                'parent' => $csvParent,
-                'status_code' => $csvStatusCode,
-            );
+            $result[$checked['token']] = $checked;
         }
 
         fclose($file);
@@ -113,13 +96,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function read($token)
+    public function readProfileData($token)
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
-            return;
+            return false;
         }
 
-        return $this->createProfileFromData($token, unserialize(file_get_contents($file)));
+        return unserialize(file_get_contents($file));
     }
 
     /**
@@ -140,26 +123,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             }
         }
 
-        $profileToken = $profile->getToken();
-        // when there are errors in sub-requests, the parent and/or children tokens
-        // may equal the profile token, resulting in infinite loops
-        $parentToken = $profile->getParentToken() !== $profileToken ? $profile->getParentToken() : null;
-        $childrenToken = array_filter(array_map(function (Profile $p) use ($profileToken) {
-            return $profileToken !== $p->getToken() ? $p->getToken() : null;
-        }, $profile->getChildren()));
-
-        // Store profile
-        $data = array(
-            'token' => $profileToken,
-            'parent' => $parentToken,
-            'children' => $childrenToken,
-            'data' => $profile->getCollectors(),
-            'ip' => $profile->getIp(),
-            'method' => $profile->getMethod(),
-            'url' => $profile->getUrl(),
-            'time' => $profile->getTime(),
-            'status_code' => $profile->getStatusCode(),
-        );
+        $data = $this->getProfileData($profile);
 
         if (false === file_put_contents($file, serialize($data))) {
             return false;
@@ -171,15 +135,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 return false;
             }
 
-            fputcsv($file, array(
-                $profile->getToken(),
-                $profile->getIp(),
-                $profile->getMethod(),
-                $profile->getUrl(),
-                $profile->getTime(),
-                $profile->getParentToken(),
-                $profile->getStatusCode(),
-            ));
+            fputcsv($file, $this->getProfileIndexItem($profile));
             fclose($file);
         }
 
@@ -257,34 +213,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         return '' === $line ? null : $line;
-    }
-
-    protected function createProfileFromData($token, $data, $parent = null)
-    {
-        $profile = new Profile($token);
-        $profile->setIp($data['ip']);
-        $profile->setMethod($data['method']);
-        $profile->setUrl($data['url']);
-        $profile->setTime($data['time']);
-        $profile->setStatusCode($data['status_code']);
-        $profile->setCollectors($data['data']);
-
-        if (!$parent && $data['parent']) {
-            $parent = $this->read($data['parent']);
-        }
-
-        if ($parent) {
-            $profile->setParent($parent);
-        }
-
-        foreach ($data['children'] as $token) {
-            if (!$token || !file_exists($file = $this->getFilename($token))) {
-                continue;
-            }
-
-            $profile->addChild($this->createProfileFromData($token, unserialize(file_get_contents($file)), $profile));
-        }
-
-        return $profile;
     }
 }

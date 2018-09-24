@@ -140,7 +140,7 @@ class Process implements \IteratorAggregate
     public function __construct($command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
         if (!\function_exists('proc_open')) {
-            throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
+            throw new LogicException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
         if (!\is_array($command)) {

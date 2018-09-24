@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -180,7 +181,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     private static function phpize($value)
     {
         if (!class_exists(XmlUtils::class)) {
-            throw new RuntimeException('The Symfony Config component is required to cast env vars to "bool", "int" or "float".');
+            throw new LogicException('The Symfony Config component is required to cast env vars to "bool", "int" or "float".');
         }
 
         return XmlUtils::phpize($value);

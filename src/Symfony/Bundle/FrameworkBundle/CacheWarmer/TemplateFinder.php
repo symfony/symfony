@@ -58,7 +58,7 @@ class TemplateFinder implements TemplateFinderInterface
             $templates = array_merge($templates, $this->findTemplatesInBundle($bundle));
         }
 
-        $templates = array_merge($templates, $this->findTemplatesInFolder($this->rootDir.'/views'));
+        $templates = array_merge($templates, $this->findTemplatesInFolder($this->rootDir, 'bundles'));
 
         return $this->templates = $templates;
     }
@@ -66,17 +66,18 @@ class TemplateFinder implements TemplateFinderInterface
     /**
      * Find templates in the given directory.
      *
-     * @param string $dir The folder where to look for templates
+     * @param string $dir        The folder where to look for templates
+     * @param string $excludeDir A subfolder of $folder to exclude
      *
      * @return TemplateReferenceInterface[]
      */
-    private function findTemplatesInFolder($dir)
+    private function findTemplatesInFolder($dir, $excludeDir = null)
     {
         $templates = array();
 
         if (is_dir($dir)) {
             $finder = new Finder();
-            foreach ($finder->files()->followLinks()->in($dir) as $file) {
+            foreach ($finder->files()->followLinks()->in($dir)->exclude($excludeDir) as $file) {
                 $template = $this->parser->parse($file->getRelativePathname());
                 if (false !== $template) {
                     $templates[] = $template;
@@ -99,7 +100,7 @@ class TemplateFinder implements TemplateFinderInterface
         $name = $bundle->getName();
         $templates = array_unique(array_merge(
             $this->findTemplatesInFolder($bundle->getPath().'/Resources/views'),
-            $this->findTemplatesInFolder($this->rootDir.'/'.$name.'/views')
+            $this->findTemplatesInFolder($this->rootDir.'/bundles/'.$name)
         ));
 
         foreach ($templates as $i => $template) {

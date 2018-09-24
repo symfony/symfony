@@ -54,6 +54,11 @@ class AppKernel extends Kernel
         return include $filename;
     }
 
+    public function getProjectDir()
+    {
+        return \dirname(__DIR__);
+    }
+
     public function getRootDir()
     {
         return __DIR__;

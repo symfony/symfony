@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -26,10 +27,12 @@ use Twig\TwigFunction;
 class RoutingExtension extends AbstractExtension
 {
     private $generator;
+    private $router;
 
-    public function __construct(UrlGeneratorInterface $generator)
+    public function __construct(UrlGeneratorInterface $generator, RouterInterface $router)
     {
         $this->generator = $generator;
+        $this->router = $router;
     }
 
     /**
@@ -42,6 +45,7 @@ class RoutingExtension extends AbstractExtension
         return array(
             new TwigFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
             new TwigFunction('path', array($this, 'getPath'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
+            new TwigFunction('has_route', array($this, 'hasRoute')),
         );
     }
 
@@ -67,6 +71,16 @@ class RoutingExtension extends AbstractExtension
     public function getUrl($name, $parameters = array(), $schemeRelative = false)
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    /**
+     * Check if a route exists
+     *
+     * @see RouteCollection
+     */
+    public function hasRoute(string $name)
+    {
+        return $this->router->getRouteCollection()->has($name);
     }
 
     /**

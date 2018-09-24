@@ -73,9 +73,8 @@
             <argument /> <!-- Message bus locator -->
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
-            <argument type="collection" /> <!-- Receiver names -->
-            <argument type="collection" /> <!-- Message bus names -->
-
+            <argument>%messenger.receiver_names%</argument>
+            <argument>%messenger.bus_names%</argument>
             <tag name="console.command" command="messenger:consume-messages" />
         </service>
 

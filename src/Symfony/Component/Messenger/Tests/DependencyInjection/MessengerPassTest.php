@@ -238,15 +238,36 @@ class MessengerPassTest extends TestCase
         $this->assertEquals(array(AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
     }
 
-    public function testItRegistersMultipleReceiversAndSetsTheReceiverNamesOnTheCommand()
+    public function testItRegistersReceiverNames()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
+
+        (new MessengerPass())->process($container);
+
+        $this->assertEquals(array('amqp'), $container->getParameter('messenger.receiver_names'));
+    }
+
+    public function testItRegistersBusNames()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
+
+        (new MessengerPass())->process($container);
+
+        $this->assertEquals(array('message_bus'), $container->getParameter('messenger.bus_names'));
+    }
+
+    public function testItRegistersMultipleReceiversAndSetsTheBusLocator()
     {
         $container = $this->getContainerBuilder();
         $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
             null,
             new Reference('messenger.receiver_locator'),
             null,
-            null,
-            null,
+            '%messenger.receiver_names%',
+            '%messenger.bus_names%',
         ));
 
         $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
@@ -254,8 +275,7 @@ class MessengerPassTest extends TestCase
 
         (new MessengerPass())->process($container);
 
-        $this->assertSame(array('amqp', 'dummy'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
-        $this->assertSame(array('message_bus'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4));
+        $this->assertNotNull($container->getDefinition('console.command.messenger_consume_messages')->getArgument(0));
     }
 
     public function testItRegistersSenders()

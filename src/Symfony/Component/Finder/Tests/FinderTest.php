@@ -1180,6 +1180,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 }
 
                 $this->assertInstanceOf($expectedExceptionClass, $e);
+            } finally {
+                // restore original permissions
+                chmod($testDir, 0777);
+                clearstatcache($testDir);
             }
         }
 
@@ -1206,20 +1210,26 @@ class FinderTest extends Iterator\RealIteratorTestCase
         chmod($testDir, 0333);
 
         if (false === ($couldRead = is_readable($testDir))) {
-            $this->assertIterator($this->toAbsolute(array(
-                'foo bar',
-                'test.php',
-                'test.py',
-                'qux/baz_100_1.py',
-                'qux/baz_1_2.py',
-                'qux_0_1.php',
-                'qux_1000_1.php',
-                'qux_1002_0.php',
-                'qux_10_2.php',
-                'qux_12_0.php',
-                'qux_2_0.php',
-                )
-            ), $finder->getIterator());
+            try {
+                $this->assertIterator($this->toAbsolute(array(
+                        'foo bar',
+                        'test.php',
+                        'test.py',
+                        'qux/baz_100_1.py',
+                        'qux/baz_1_2.py',
+                        'qux_0_1.php',
+                        'qux_1000_1.php',
+                        'qux_1002_0.php',
+                        'qux_10_2.php',
+                        'qux_12_0.php',
+                        'qux_2_0.php',
+                    )
+                ), $finder->getIterator());
+            } finally {
+                // restore original permissions
+                chmod($testDir, 0777);
+                clearstatcache($testDir);
+            }
         }
 
         // restore original permissions

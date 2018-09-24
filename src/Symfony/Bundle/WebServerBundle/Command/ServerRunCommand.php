@@ -52,6 +52,7 @@ class ServerRunCommand extends Command
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('dev', null, InputOption::VALUE_NONE, 'Ignore environment variables in "bin/console.php" and force running a web server in "dev" mode'),
             ))
             ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'

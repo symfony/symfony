@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-24T06:56:49Z
+
+2.8?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-24T06:59:29Z
+
+2.8 is not possible as we had several storage implementations back then.
+Could be in 3.4 but adding a warning in a patch version does not look good to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-24T07:01:52Z
+
+The message is still correct on 2.8 to me. Since this involves security, we can do it :)

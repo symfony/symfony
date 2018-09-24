@@ -90,9 +90,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Check if a route exists
+     * Check if a route exists.
      *
      * @param $name
+     *
      * @return bool return true if the route exists, false if not
      */
     public function has($name)

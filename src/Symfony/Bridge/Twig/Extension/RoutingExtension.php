@@ -74,7 +74,7 @@ class RoutingExtension extends AbstractExtension
     }
 
     /**
-     * Check if a route exists
+     * Check if a route exists.
      *
      * @see RouteCollection
      */

@@ -47,6 +47,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
             'compression' => true,
             'tcp_keepalive' => 0,
             'lazy' => false,
+            'cluster' => null,
             'database' => '1',
             'password' => null,
         );

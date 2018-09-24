@@ -50,6 +50,10 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('This test cannot run on Windows.');
         }
 
+        if (!getenv('USER') || 'root' === getenv('USER')) {
+            $this->markTestSkipped('This test will fail if run under superuser');
+        }
+
         $sourceFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_source_file';
         $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
 
@@ -122,6 +126,10 @@ class FilesystemTest extends FilesystemTestCase
         // skip test on Windows; PHP can't easily set file as unwritable on Windows
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot run on Windows.');
+        }
+
+        if (!getenv('USER') || 'root' === getenv('USER')) {
+            $this->markTestSkipped('This test will fail if run under superuser');
         }
 
         $sourceFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_source_file';

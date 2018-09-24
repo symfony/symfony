@@ -93,7 +93,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
                 return $this->pool->get($key, $callback, $beta);
             }
 
-            return $this->doGet($this->pool, $key, $callback, $beta ?? 1.0);
+            return $this->doGet($this->pool, $key, $callback, $beta);
         }
         $value = $this->values[$this->keys[$key]];
 

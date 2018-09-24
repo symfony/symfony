@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-23T17:59:50Z
+
+I am not convinced that creating a new `FloatToLocalizedStringTransformer` is really needed, but deprecating the `$scale` argument of the `IntegerToLocalizedStringTransformer` IMO indeed makes sense.

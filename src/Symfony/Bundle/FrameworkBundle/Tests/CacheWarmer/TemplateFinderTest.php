@@ -39,7 +39,7 @@ class TemplateFinderTest extends TestCase
 
         $parser = new TemplateFilenameParser();
 
-        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources');
+        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources/templates');
 
         $templates = array_map(
             function ($template) { return $template->getLogicalName(); },

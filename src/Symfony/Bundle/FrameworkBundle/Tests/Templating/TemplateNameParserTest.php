@@ -62,15 +62,15 @@ class TemplateNameParserTest extends TestCase
             array('FooBundle:Post:index.xml.php', 'FooBundle:Post:index.xml.php', '@FooBundle/Resources/views/Post/index.xml.php', new TemplateReference('FooBundle', 'Post', 'index', 'xml', 'php')),
             array('SensioFooBundle:Post:index.html.php', 'SensioFooBundle:Post:index.html.php', '@SensioFooBundle/Resources/views/Post/index.html.php', new TemplateReference('SensioFooBundle', 'Post', 'index', 'html', 'php')),
             array('SensioCmsFooBundle:Post:index.html.php', 'SensioCmsFooBundle:Post:index.html.php', '@SensioCmsFooBundle/Resources/views/Post/index.html.php', new TemplateReference('SensioCmsFooBundle', 'Post', 'index', 'html', 'php')),
-            array(':Post:index.html.php', ':Post:index.html.php', 'views/Post/index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
-            array('::index.html.php', '::index.html.php', 'views/index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
-            array('index.html.php', '::index.html.php', 'views/index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
+            array(':Post:index.html.php', ':Post:index.html.php', 'templates/Post/index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
+            array('::index.html.php', '::index.html.php', 'templates/index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
+            array('index.html.php', '::index.html.php', 'templates/index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
             array('FooBundle:Post:foo.bar.index.html.php', 'FooBundle:Post:foo.bar.index.html.php', '@FooBundle/Resources/views/Post/foo.bar.index.html.php', new TemplateReference('FooBundle', 'Post', 'foo.bar.index', 'html', 'php')),
             array('@FooBundle/Resources/views/layout.html.twig', '@FooBundle/Resources/views/layout.html.twig', '@FooBundle/Resources/views/layout.html.twig', new BaseTemplateReference('@FooBundle/Resources/views/layout.html.twig', 'twig')),
             array('@FooBundle/Foo/layout.html.twig', '@FooBundle/Foo/layout.html.twig', '@FooBundle/Foo/layout.html.twig', new BaseTemplateReference('@FooBundle/Foo/layout.html.twig', 'twig')),
             array('name.twig', 'name.twig', 'name.twig', new BaseTemplateReference('name.twig', 'twig')),
             array('name', 'name', 'name', new BaseTemplateReference('name')),
-            array('default/index.html.php', '::default/index.html.php', 'views/default/index.html.php', new TemplateReference(null, null, 'default/index', 'html', 'php')),
+            array('default/index.html.php', '::default/index.html.php', 'templates/default/index.html.php', new TemplateReference(null, null, 'default/index', 'html', 'php')),
         );
     }
 

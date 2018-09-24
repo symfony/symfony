@@ -46,7 +46,7 @@ class TemplateLocatorTest extends TestCase
 
         $locator = new TemplateLocator($fileLocator, __DIR__.'/../../Fixtures');
 
-        $this->assertEquals(realpath(__DIR__.'/../../Fixtures/Resources/views/this.is.a.template.format.engine'), $locator->locate($template));
+        $this->assertEquals(realpath(__DIR__.'/../../Fixtures/Resources/templates/this.is.a.template.format.engine'), $locator->locate($template));
     }
 
     public function testThrowsExceptionWhenTemplateNotFound()

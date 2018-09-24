@@ -26,7 +26,7 @@
         <service id="templating.finder" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder">
             <argument type="service" id="kernel" />
             <argument type="service" id="templating.filename_parser" />
-            <argument>%kernel.root_dir%/Resources</argument>
+            <argument>%kernel.project_dir%/templates</argument>
         </service>
 
         <service id="templating.cache_warmer.template_paths" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplatePathsCacheWarmer">

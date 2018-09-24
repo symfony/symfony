@@ -64,6 +64,11 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been removed.
 
+Form
+----
+
+ * The `$scale` argument of the `IntegerToLocalizedStringTransformer` was removed.
+
 Finder
 ------
 

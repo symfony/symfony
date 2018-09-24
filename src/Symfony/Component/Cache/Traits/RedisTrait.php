@@ -182,10 +182,25 @@ trait RedisTrait
 
             $redis = $params['lazy'] ? new RedisClusterProxy($initializer) : $initializer();
         } elseif (is_a($class, \Predis\Client::class, true)) {
-            $params['scheme'] = $scheme;
-            $params['database'] = $params['dbindex'] ?: null;
-            $params['password'] = $auth;
-            $redis = new $class((new Factory())->create($params));
+            if ('server' === $params['cluster']) {
+                $host = $params['host'];
+                if (isset($params['port'])) {
+                    $host .= ':'.$params['port'];
+                }
+
+                $host = array_map(function (string $host) use ($scheme): string {
+                    return $scheme.'://'.$host;
+                }, explode(',', $host));
+
+                // Predis cluster only supports an array of hosts as first argument, otherwise
+                // options array is ignored.
+                $redis = new $class($host, array('cluster' => 'redis'));
+            } else {
+                $params['scheme'] = $scheme;
+                $params['database'] = $params['dbindex'] ?: null;
+                $params['password'] = $auth;
+                $redis = new $class((new Factory())->create($params));
+            }
         } elseif (class_exists($class, false)) {
             throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis" or "Predis\Client"', $class));
         } else {

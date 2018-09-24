@@ -200,6 +200,15 @@ class RouteCollectionTest extends TestCase
         $this->assertCount(1, $collection1->getIterator(), '->addCollection() removes previous routes when adding new routes with the same name');
     }
 
+    public function testHas()
+    {
+        $collection = new RouteCollection();
+        $collection->add('exist', new Route('/exist'));
+
+        $this->assertTrue($collection->has('exist'));
+        $this->assertFalse($collection->has('does_not_exist'));
+    }
+
     public function testGet()
     {
         $collection1 = new RouteCollection();

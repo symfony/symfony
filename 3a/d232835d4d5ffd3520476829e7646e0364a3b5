@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-21T10:31:18Z
+
+Don't we have other tests that could be updated in a similar manner?
+
+---------------------------------------------------------------------------
+
+by lbassin at 2018-09-21T12:42:48Z
+
+I was searching for similar cases and i found the test `testGuessWithNonReadablePath` in `Symfony/Component/HttpFoundation/Tests/File/MimeType/MimeTypeTest.php` line 60
+
+```php
+if (!getenv('USER') || 'root' === getenv('USER')) {
+       $this->markTestSkipped('This test will fail if run under superuser');
+}
+```
+Root user case is handled but inside the php container (even with the --user flag) the environment variable USER is not set. It means this test will be always skipped inside a docker container
+
+Command line to test the behavior :
+```bash
+docker run -it --rm -v "$PWD":/app -w /app --user 1000 php:7.2-cli ./phpunit src/Symfony/Component/HttpFoundation/Tests/File/MimeType/MimeTypeTest.php --filter testGuessWithNonReadablePath
+```
+
+I don't know if we're supposed to edit this test to match docker constraints ?
+
+I keep searching for other tests affected by the behaviour and i'll keep you informed

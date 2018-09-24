@@ -8,6 +8,8 @@ CHANGELOG
  * added `Symfony\Component\Form\ClearableErrorsInterface`
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
  * deprecated the `scale` option of the `IntegerType`
+ * added `Symfony\Component\Form\ChoiceList\Loader\ChoiceFilterInterface`
+ * added `choice_filter` option to `ChoiceType`
 
 4.1.0
 -----

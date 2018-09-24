@@ -6,18 +6,18 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   Options                     Overridden options   Parent options            Extension options      
  --------------------------- -------------------- ------------------------- ----------------------- 
   choice_attr                 FormType             FormType                  FormTypeCsrfExtension  
-  choice_label               -------------------- ------------------------- ----------------------- 
-  choice_loader               compound             action                    csrf_field_name        
-  choice_name                 data_class           attr                      csrf_message           
-  choice_translation_domain   empty_data           auto_initialize           csrf_protection        
-  choice_value                error_bubbling       block_name                csrf_token_id          
-  choices                     trim                 by_reference              csrf_token_manager     
-  expanded                                         data                                             
-  group_by                                         disabled                                         
-  multiple                                         help                                             
-  placeholder                                      inherit_data                                     
-  preferred_choices                                label                                            
-                                                   label_attr                                       
+  choice_filter              -------------------- ------------------------- ----------------------- 
+  choice_label                compound             action                    csrf_field_name        
+  choice_loader               data_class           attr                      csrf_message           
+  choice_name                 empty_data           auto_initialize           csrf_protection        
+  choice_translation_domain   error_bubbling       block_name                csrf_token_id          
+  choice_value                trim                 by_reference              csrf_token_manager     
+  choices                                          data                                             
+  expanded                                         disabled                                         
+  group_by                                         help                                             
+  multiple                                         inherit_data                                     
+  placeholder                                      label                                            
+  preferred_choices                                label_attr                                       
                                                    label_format                                     
                                                    mapped                                           
                                                    method                                           

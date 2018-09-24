@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
@@ -2051,5 +2053,95 @@ class ChoiceTypeTest extends BaseTypeTest
             'Simple expanded' => array(false, true),
             'Multiple expanded' => array(true, true),
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testChoiceFilterOptionExpectsCallable()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'choice_filter' => new \stdClass(),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testChoiceFilterOptionExpectsChoiceFilterInterface()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'choice_loader' => new class() implements ChoiceLoaderInterface {
+                public function loadChoiceList($value = null)
+                {
+                }
+
+                public function loadChoicesForValues(array $values, $value = null)
+                {
+                }
+
+                public function loadValuesForChoices(array $choices, $value = null)
+                {
+                }
+            },
+            'choice_filter' => function ($choice) {},
+        ));
+    }
+
+    public function testClosureChoiceFilterOptionWithChoiceLoaderOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            // defined by superclass
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            // defined by subclass or userland
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, array('b', 'c'), true);
+            },
+        ));
+
+        $options = array();
+        foreach ($form->createView()->vars['choices'] as $choiceView) {
+            $options[$choiceView->label] = $choiceView->value;
+        }
+
+        $this->assertSame(array('Fabien' => 'b', 'Kris' => 'c'), $options);
+    }
+
+    public function testStaticChoiceFilterOptionWithChoiceLoaderOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            // defined by superclass
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            // defined by subclass or userland
+            'choice_filter' => array('b', 'c'),
+        ));
+
+        $options = array();
+        foreach ($form->createView()->vars['choices'] as $choiceView) {
+            $options[$choiceView->label] = $choiceView->value;
+        }
+
+        $this->assertSame(array('Fabien' => 'b', 'Kris' => 'c'), $options);
+    }
+
+    public function testChoiceFilterOptionWithChoicesOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            // defined by superclass
+            'choices' => $this->choices,
+            // defined by subclass or userland
+            'choice_filter' => array('b', 'c'),
+        ));
+
+        $options = array();
+        foreach ($form->createView()->vars['choices'] as $choiceView) {
+            $options[$choiceView->label] = $choiceView->value;
+        }
+
+        $this->assertSame(array('Fabien' => 'b', 'Kris' => 'c'), $options);
     }
 }

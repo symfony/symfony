@@ -42,9 +42,11 @@ class Author
         return 'foobar';
     }
 
-    public function setAustralian($australian)
+    public function setAustralian($australian): self
     {
         $this->australian = $australian;
+
+        return $this;
     }
 
     public function isAustralian()

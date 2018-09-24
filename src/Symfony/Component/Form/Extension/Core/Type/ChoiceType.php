@@ -17,9 +17,11 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceFilterInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\RadioListMapper;
@@ -265,6 +267,16 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
+        $choiceFilterNormalizer = function (Options $options, $choiceFilter) {
+            if (null !== $choiceFilter && !\is_callable($choiceFilter)) {
+                return function ($choice) use ($choiceFilter) {
+                    return \in_array($choice, $choiceFilter, true);
+                };
+            }
+
+            return $choiceFilter;
+        };
+
         $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
                 // never use an empty value for this case
@@ -301,6 +313,7 @@ class ChoiceType extends AbstractType
             'expanded' => false,
             'choices' => array(),
             'choice_loader' => null,
+            'choice_filter' => null,
             'choice_label' => null,
             'choice_name' => null,
             'choice_value' => null,
@@ -319,12 +332,14 @@ class ChoiceType extends AbstractType
             'trim' => false,
         ));
 
+        $resolver->setNormalizer('choice_filter', $choiceFilterNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
         $resolver->setAllowedTypes('choice_loader', array('null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface'));
+        $resolver->setAllowedTypes('choice_filter', array('null', 'array', 'callable'));
         $resolver->setAllowedTypes('choice_label', array('null', 'bool', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_name', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_value', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
@@ -390,6 +405,14 @@ class ChoiceType extends AbstractType
     private function createChoiceList(array $options)
     {
         if (null !== $options['choice_loader']) {
+            if (null !== $options['choice_filter']) {
+                if (!$options['choice_loader'] instanceof ChoiceFilterInterface) {
+                    throw new RuntimeException(sprintf('The choice loader "%s" must implement "%s" to use the "choice_filter" option.', \get_class($options['choice_loader']), ChoiceFilterInterface::class));
+                }
+
+                $options['choice_loader']->setChoiceFilter($options['choice_filter']);
+            }
+
             return $this->choiceListFactory->createListFromLoader(
                 $options['choice_loader'],
                 $options['choice_value']
@@ -398,6 +421,10 @@ class ChoiceType extends AbstractType
 
         // Harden against NULL values (like in EntityType and ModelType)
         $choices = null !== $options['choices'] ? $options['choices'] : array();
+
+        if (null !== $options['choice_filter'] && 0 !== \count($choices)) {
+            $choices = array_filter($choices, $options['choice_filter'], ARRAY_FILTER_USE_BOTH);
+        }
 
         return $this->choiceListFactory->createListFromChoices($choices, $options['choice_value']);
     }

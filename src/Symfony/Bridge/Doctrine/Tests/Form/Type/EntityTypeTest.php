@@ -1482,4 +1482,22 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(), $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
+
+    public function testChoiceFilterOption()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'choice_filter' => function (SingleIntIdEntity $entity) {
+                return 'Bar' === $entity->name;
+            },
+        ));
+
+        $this->assertEquals(array(2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
+    }
 }

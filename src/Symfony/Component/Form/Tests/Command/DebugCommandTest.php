@@ -15,11 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
-use Symfony\Component\Form\Tests\Console\Descriptor\FooType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DebugCommandTest extends TestCase
 {
@@ -40,10 +42,15 @@ class DebugCommandTest extends TestCase
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertSame(<<<TXT
 
+Built-in form types (Symfony\Component\Form\Extension\Core\Type)
+----------------------------------------------------------------
+
+ IntegerType
+
 Service form types
 ------------------
 
- * Symfony\Component\Form\Tests\Console\Descriptor\FooType
+ * Symfony\Component\Form\Tests\Command\FooType
 
 
 TXT
@@ -145,5 +152,27 @@ TXT
         $application->add($command);
 
         return new CommandTester($application->find('debug:form'));
+    }
+}
+
+class FooType extends AbstractType
+{
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired('foo');
+        $resolver->setDefined('bar');
+        $resolver->setDeprecated('bar');
+        $resolver->setDefault('empty_data', function (Options $options) {
+            $foo = $options['foo'];
+
+            return function (FormInterface $form) use ($foo) {
+                return $form->getConfig()->getCompound() ? array($foo) : $foo;
+            };
+        });
+        $resolver->setAllowedTypes('foo', 'string');
+        $resolver->setAllowedValues('foo', array('bar', 'baz'));
+        $resolver->setNormalizer('foo', function (Options $options, $value) {
+            return (string) $value;
+        });
     }
 }

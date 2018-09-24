@@ -18,7 +18,6 @@ class InfiniteLoopReceiver implements ReceiverInterface
         $this->shouldStop = false;
     }
 
-
     public function receive(callable $handler): void
     {
         while (!$this->shouldStop) {
@@ -36,10 +35,9 @@ class InfiniteLoopReceiver implements ReceiverInterface
         }
     }
 
-    /**
-     * Stop receiving some messages.
-     */
-    public function stop(): void {
+    public function stop(): void
+    {
         $this->shouldStop = true;
+        $this->receiver->stop();
     }
 }

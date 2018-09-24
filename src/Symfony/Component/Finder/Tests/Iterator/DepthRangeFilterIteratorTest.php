@@ -48,6 +48,9 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'A.xml',
+            'B.XML',
+            'FOO.py',
         );
 
         $lessThanOrEqualTo1 = array(
@@ -72,6 +75,9 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'A.xml',
+            'B.XML',
+            'FOO.py',
         );
 
         $graterThanOrEqualTo1 = array(

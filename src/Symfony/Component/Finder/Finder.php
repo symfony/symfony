@@ -42,7 +42,9 @@ class Finder implements \IteratorAggregate, \Countable
 
     private $mode = 0;
     private $names = array();
+    private $inames = array();
     private $notNames = array();
+    private $notInames = array();
     private $exclude = array();
     private $filters = array();
     private $depths = array();
@@ -155,6 +157,32 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Adds rules that files must match like $finder->name() but with case-insensitivity set.
+     *
+     * You can use patterns (delimited with / sign), globs or simple strings.
+     *
+     *     $finder->iname('*.php')
+     *     $finder->iname('/\.php$/') // same as above
+     *     $finder->iname('*.PHP')
+     *     $finder->iname('/\.php$/i') // same as above
+     *     $finder->iname('test.php')
+     *     $finder->iname('Test.php')
+     *     $finder->iname(['test.py', 'test.php'])
+     *
+     * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
+     *
+     * @return $this
+     *
+     * @see FilenameFilterIterator
+     */
+    public function iname($patterns)
+    {
+        $this->inames = \array_merge($this->inames, (array) $patterns);
+
+        return $this;
+    }
+
+    /**
      * Adds rules that files must match.
      *
      * You can use patterns (delimited with / sign), globs or simple strings.
@@ -189,6 +217,22 @@ class Finder implements \IteratorAggregate, \Countable
     public function notName($patterns)
     {
         $this->notNames = \array_merge($this->notNames, (array) $patterns);
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that files must not match like $finder->notName() but with case-insensitivity set.
+     *
+     * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
+     *
+     * @return $this
+     *
+     * @see FilenameFilterIterator
+     */
+    public function notIname($patterns)
+    {
+        $this->notInames = \array_merge($this->notInames, (array) $patterns);
 
         return $this;
     }
@@ -727,7 +771,11 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if ($this->names || $this->notNames) {
-            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
+            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames, true);
+        }
+
+        if ($this->inames || $this->notInames) {
+            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->inames, $this->notInames, false);
         }
 
         if ($this->contains || $this->notContains) {

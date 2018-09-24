@@ -45,7 +45,7 @@ class Glob
      *
      * @return string regex The regexp
      */
-    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#')
+    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#', $isCaseSensitive = true)
     {
         $firstByte = true;
         $escaping = false;
@@ -111,6 +111,6 @@ class Glob
             $escaping = false;
         }
 
-        return $delimiter.'^'.$regex.'$'.$delimiter;
+        return $delimiter.'^'.$regex.'$'.$delimiter.((!$isCaseSensitive) ? 'i' : '');
     }
 }

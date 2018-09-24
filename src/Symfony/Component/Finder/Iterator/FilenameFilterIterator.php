@@ -20,6 +20,15 @@ use Symfony\Component\Finder\Glob;
  */
 class FilenameFilterIterator extends MultiplePcreFilterIterator
 {
+    private $isCaseSensitive;
+
+    public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns, bool $isCaseSensitive = true)
+    {
+        $this->isCaseSensitive = $isCaseSensitive;
+
+        parent::__construct($iterator, $matchPatterns, $noMatchPatterns);
+    }
+
     /**
      * Filters the iterator values.
      *
@@ -42,6 +51,6 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex($str)
     {
-        return $this->isRegex($str) ? $str : Glob::toRegex($str);
+        return $this->isRegex($str) ? $str : Glob::toRegex($str, true, true, '#', $this->isCaseSensitive);
     }
 }

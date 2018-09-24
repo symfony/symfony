@@ -37,7 +37,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->files());
-        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp',
+        $this->assertIterator($this->toAbsolute(array(
+            'foo/bar.tmp',
             'test.php',
             'test.py',
             'foo bar',
@@ -49,13 +50,17 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
         $finder->files();
         $finder->directories();
         $finder->files();
-        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp',
+        $this->assertIterator($this->toAbsolute(array(
+            'foo/bar.tmp',
             'test.php',
             'test.py',
             'foo bar',
@@ -67,6 +72,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -87,6 +95,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         ));
         $in = self::$tmpDir.'//';
 
@@ -126,7 +137,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->depth('< 1'));
-        $this->assertIterator($this->toAbsolute(array('foo',
+        $this->assertIterator($this->toAbsolute(array(
+            'foo',
             'test.php',
             'test.py',
             'toto',
@@ -138,11 +150,15 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->depth('<= 0'));
-        $this->assertIterator($this->toAbsolute(array('foo',
+        $this->assertIterator($this->toAbsolute(array(
+            'foo',
             'test.php',
             'test.py',
             'toto',
@@ -154,6 +170,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -220,6 +239,45 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('test.php', 'test.py')), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testIname()
+    {
+        $finder = $this->buildFinder();
+        $finder->iname('foo.py');
+        $this->assertIterator($this->toAbsolute(array('FOO.py')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->iname('FOO.py');
+        $this->assertIterator($this->toAbsolute(array('FOO.py')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->iname('*.xml');
+        $this->assertIterator($this->toAbsolute(array('A.xml', 'B.XML')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->iname('~\\.php$~i');
+        $this->assertIterator($this->toAbsolute(array(
+            'test.php',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
+        )), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->iname('~\\.xml$~i');
+        $this->assertIterator($this->toAbsolute(array('A.xml', 'B.XML')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->iname('~\\.xml$~');
+        $this->assertIterator($this->toAbsolute(array('A.xml')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->iname('~\\.XML~');
+        $this->assertIterator($this->toAbsolute(array('B.XML')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testNameWithArrayParam()
     {
         $finder = $this->buildFinder();
@@ -240,6 +298,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux',
             'qux/baz_100_1.py',
             'qux/baz_1_2.py',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -251,6 +312,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'toto',
             'foo bar',
             'qux',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -267,6 +330,39 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator(array(), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testNotIname()
+    {
+        $finder = $this->buildFinder();
+        $finder->notIname('*.php');
+        $finder->notIname('*.xml');
+        $this->assertIterator($this->toAbsolute(array(
+            'foo',
+            'foo/bar.tmp',
+            'test.py',
+            'toto',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'FOO.py',
+        )), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->notIname('*.php');
+        $finder->notIname('*.XML');
+        $this->assertIterator($this->toAbsolute(array(
+            'foo',
+            'foo/bar.tmp',
+            'test.py',
+            'toto',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'FOO.py',
+        )), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testNotNameWithArrayParam()
     {
         $finder = $this->buildFinder();
@@ -277,6 +373,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'toto',
             'foo bar',
             'qux',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -339,6 +437,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -368,6 +469,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -394,6 +498,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -418,6 +525,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -447,6 +557,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -473,6 +586,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -493,6 +609,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -516,6 +635,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -539,6 +661,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -562,6 +687,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -585,6 +713,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -608,6 +739,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -655,6 +789,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -675,6 +812,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -698,6 +838,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -732,6 +875,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         )), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -833,7 +979,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $paths[] = $file->getRelativePath();
         }
 
-        $ref = array('', '', '', '', '', '', '', '', '', '', '', 'foo', 'qux', 'qux', '');
+        $ref = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', 'foo', 'qux', 'qux', '');
 
         sort($ref);
         sort($paths);
@@ -867,6 +1013,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         );
 
         sort($paths);

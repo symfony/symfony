@@ -42,6 +42,9 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             'qux/',
             'qux/baz_1_2.py',
             'qux/baz_100_1.py',
+            'FOO.py',
+            'A.xml',
+            'B.XML',
         );
 
         self::$files = self::toAbsolute(self::$files);

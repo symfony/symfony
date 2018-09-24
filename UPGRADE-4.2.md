@@ -75,25 +75,6 @@ Form
    {% endfor %}
    ```
 
-Process
--------
-
- * Deprecated the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
- * Deprecated passing commands as strings when creating a `Process` instance.
-
-   Before:
-   ```php
-   $process = new Process('ls -l');
-   ```
-
-   After:
-   ```php
-   $process = new Process(array('ls', '-l'));
-
-   // alternatively, when a shell wrapper is required
-   $process = Process::fromShellCommandline('ls -l');
-   ```
-
 FrameworkBundle
 ---------------
 
@@ -166,6 +147,25 @@ Monolog
 -------
 
  * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()` and `Logger::countErrors()` will have a new `$request` argument in version 5.0, not defining it is deprecated.
+
+Process
+-------
+
+ * Deprecated the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
+ * Deprecated passing commands as strings when creating a `Process` instance.
+
+   Before:
+   ```php
+   $process = new Process('ls -l');
+   ```
+
+   After:
+   ```php
+   $process = new Process(array('ls', '-l'));
+
+   // alternatively, when a shell wrapper is required
+   $process = Process::fromShellCommandline('ls -l');
+   ```
 
 Security
 --------

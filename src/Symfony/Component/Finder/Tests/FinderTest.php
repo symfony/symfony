@@ -1211,7 +1211,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         if (false === ($couldRead = is_readable($testDir))) {
             try {
-                $this->assertIterator($this->toAbsolute([
+                $this->assertIterator($this->toAbsolute(array(
                         'foo bar',
                         'test.php',
                         'test.py',
@@ -1223,7 +1223,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
                         'qux_10_2.php',
                         'qux_12_0.php',
                         'qux_2_0.php',
-                    ]
+                    )
                 ), $finder->getIterator());
             } finally {
                 // restore original permissions

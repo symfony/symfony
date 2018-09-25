@@ -51,10 +51,6 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex($str)
     {
-        if ($this->isRegex($str) && !$this->hasRegexModifiers($str, array('i')) && !$this->caseSensitive) {
-            $str = $str.'i';
-        }
-
-        return $this->isRegex($str) ? $str : Glob::toRegex($str, true, true, '#', $this->caseSensitive);
+        return $this->isRegex($str) ? $str.(!$this->caseSensitive ? 'i' : '') : Glob::toRegex($str, true, true, '#', $this->caseSensitive);
     }
 }

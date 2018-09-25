@@ -262,6 +262,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
         )), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
+        $finder->iname('~\\.xml~');
+        $this->assertIterator($this->toAbsolute(array(
+            'A.xml',
+            'B.XML',
+        )), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
         $finder->iname('~\\.xml$~i');
         $this->assertIterator($this->toAbsolute(array('A.xml', 'B.XML')), $finder->in(self::$tmpDir)->getIterator());
 
@@ -272,19 +279,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->iname('~\\.XML~');
         $this->assertIterator($this->toAbsolute(array('A.xml', 'B.XML')), $finder->in(self::$tmpDir)->getIterator());
-    }
-
-    public function testNameAndInameWillBeCombindedWithAND()
-    {
-        $finder = $this->buildFinder();
-        $finder->name('*.XML');
-        $finder->iname('*.xml');
-        $this->assertIterator($this->toAbsolute(array('B.XML')), $finder->in(self::$tmpDir)->getIterator());
-
-        $finder = $this->buildFinder();
-        $finder->name('*.xml');
-        $finder->iname('*.XML');
-        $this->assertIterator($this->toAbsolute(array('A.xml')), $finder->in(self::$tmpDir)->getIterator());
     }
 
     public function testNameWithArrayParam()
@@ -1400,6 +1394,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 'qux_10_2.php',
                 'qux_12_0.php',
                 'qux_2_0.php',
+                'FOO.py',
+                'A.xml',
+                'B.XML',
                 )
             ), $finder->getIterator());
         }

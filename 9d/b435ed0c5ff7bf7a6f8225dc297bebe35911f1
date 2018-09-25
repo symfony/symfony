@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-03T15:42:05Z
+
+Has this been introduced for 4.2? If not, this should throw a deprecation instead I suppose?
+Note that the exception should be one line per our CS.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2018-07-03T16:32:03Z
+
+@nicolas-grekas Ok I'll switch the exception to a deprecation warning - can you advise which since/to versions this warning should read?
+
+eg. `Passing normalizers which don't implement either NormalizerInterface or DenormalizerInterface has been deprecated since X and will throw an exception in Y`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-03T20:58:46Z
+
+LGTM, let's propose this yes.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2018-07-04T09:35:06Z
+
+@nicolas-grekas Switched to deprecation with docs.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2018-07-04T09:55:13Z
+
+@nicolas-grekas Done, thanks.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-07-04T22:20:03Z
+
+Injecting something else than a `NormalizerInterface` or `DenormalizerInterface` wouldn't make sense and would be a misuse in the first place. So I don't understand why we should trigger a deprecation here rather than throw the exception directly. It works and is only ignored by luck, as we share the same property for normalizers and denormalizers and use `instanceof` checks in `getNormalizer/getDenormalizer`.
+If any app is misusing it, this exception would be raised by any test covering part of the app using the serializer and should be fixed right away.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-04T22:40:17Z
+
+Altenative proposal:
+
+```php
+    /**
+     * @param NormalizerInterface[]|DenormalizerInterface[] $normalizers
+     * @param EncoderInterface[]|DecoderInterface[] $encoders
+     */
+    public function __construct(array $normalizers = array(), array $encoders = array())
+```
+
+No deprecation, no overhead.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-04T22:41:44Z
+
+Should be done for encoders too btw.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T06:21:39Z
+
+Good idea to add the docblock @dunglas, let's do that. The instanceof checks are mostly free not sure that's overhead. Don't you want to have an exception in 5.0?
+@ogizanagi let's not argue about when we're ok to break BC, we already made the mistake. A deprecation is not the end of the world.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2018-07-05T06:44:49Z
+
+Regards docblock... My reason for adding this check was having lost time debugging a mistake with a normalizer service I was injecting, a runtime exception would have be the quickest notification (docs or static analysis probably wouldn't have highlighted it for me in that instance, but of course worth having).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-05T07:09:55Z
+
+Still let's add them also :)
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2018-07-05T07:20:16Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-05T05:44:16Z
+
+Can you rebase please?

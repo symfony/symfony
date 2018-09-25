@@ -38,14 +38,15 @@ class Glob
     /**
      * Returns a regexp which is the equivalent of the glob pattern.
      *
-     * @param string $glob                The glob pattern
-     * @param bool   $strictLeadingDot
-     * @param bool   $strictWildcardSlash
-     * @param string $delimiter           Optional delimiter
+     * @param string $glob The glob pattern
+     * @param bool $strictLeadingDot
+     * @param bool $strictWildcardSlash
+     * @param string $delimiter Optional delimiter
+     * @param bool $caseSensitive Add case-sensitive modifier to regex
      *
      * @return string regex The regexp
      */
-    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#', bool $isCaseSensitive = true)
+    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#', bool $caseSensitive = true)
     {
         $firstByte = true;
         $escaping = false;
@@ -111,6 +112,6 @@ class Glob
             $escaping = false;
         }
 
-        return $delimiter.'^'.$regex.'$'.$delimiter.((!$isCaseSensitive) ? 'i' : '');
+        return $delimiter.'^'.$regex.'$'.$delimiter.(!$caseSensitive ? 'i' : '');
     }
 }

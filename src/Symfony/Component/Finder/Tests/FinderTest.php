@@ -37,8 +37,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->files());
-        $this->assertIterator($this->toAbsolute(array(
-            'foo/bar.tmp',
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp',
             'test.php',
             'test.py',
             'foo bar',
@@ -59,8 +58,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->files();
         $finder->directories();
         $finder->files();
-        $this->assertIterator($this->toAbsolute(array(
-            'foo/bar.tmp',
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp',
             'test.php',
             'test.py',
             'foo bar',
@@ -137,8 +135,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->depth('< 1'));
-        $this->assertIterator($this->toAbsolute(array(
-            'foo',
+        $this->assertIterator($this->toAbsolute(array('foo',
             'test.php',
             'test.py',
             'toto',
@@ -157,8 +154,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->depth('<= 0'));
-        $this->assertIterator($this->toAbsolute(array(
-            'foo',
+        $this->assertIterator($this->toAbsolute(array('foo',
             'test.php',
             'test.py',
             'toto',

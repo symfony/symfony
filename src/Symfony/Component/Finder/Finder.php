@@ -770,7 +770,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if ($this->names || $this->notNames) {
-            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames, true);
+            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
         if ($this->inames || $this->notInames) {

@@ -485,7 +485,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     /**
      * Sets the default group sequence for this class.
      *
-     * @param array $groupSequence An array of group names
+     * @param string[]|GroupSequence $groupSequence An array of group names
      *
      * @return $this
      *

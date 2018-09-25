@@ -55,7 +55,7 @@ class WebServerConfig
         } elseif (false !== $pos = strrpos($address, ':')) {
             $this->hostname = substr($address, 0, $pos);
             if ('*' === $this->hostname) {
-                $this->hostname = '0.0.0.0';
+                $this->hostname = gethostbyname(gethostname());
             }
             $this->port = substr($address, $pos + 1);
         } elseif (ctype_digit($address)) {

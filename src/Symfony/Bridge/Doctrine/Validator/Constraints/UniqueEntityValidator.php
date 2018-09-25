@@ -82,7 +82,7 @@ class UniqueEntityValidator extends ConstraintValidator
         /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
 
         $criteria = [];
-        $hasNullValue = false;
+        $needBreakValidation = false;
 
         foreach ($fields as $fieldName) {
             if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
@@ -91,11 +91,8 @@ class UniqueEntityValidator extends ConstraintValidator
 
             $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
 
-            if (null === $fieldValue) {
-                $hasNullValue = true;
-            }
-
-            if ($constraint->ignoreNull && null === $fieldValue) {
+            if ($this->needBreakValidation($constraint, $fieldValue, $class->getTypeOfField($fieldName))) {
+                $needBreakValidation = true;
                 continue;
             }
 
@@ -110,8 +107,8 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        // validation doesn't fail if one of the fields is null and if null values should be ignored
-        if ($hasNullValue && $constraint->ignoreNull) {
+        // validation doesn't fail if one of the fields is null (or false) and if null (or false) values should be ignored
+        if ($needBreakValidation) {
             return;
         }
 
@@ -218,5 +215,22 @@ class UniqueEntityValidator extends ConstraintValidator
         });
 
         return sprintf('object("%s") identified by (%s)', $idClass, implode(', ', $identifiers));
+    }
+
+    /**
+     * Validation doesn't fail and must be stopped if one of the fields is
+     * `null`|`false` and `null`|`false` values should be ignored.
+     */
+    private function needBreakValidation(UniqueEntity $constraint, $fieldValue, ?string $fieldType): bool
+    {
+        if ($constraint->ignoreNull && null === $fieldValue) {
+            return true;
+        }
+
+        if ($constraint->ignoreFalse && false === $fieldValue && 'boolean' === $fieldType) {
+            return true;
+        }
+
+        return false;
     }
 }

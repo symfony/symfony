@@ -29,6 +29,7 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdWithBooleanEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
@@ -146,6 +147,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema([
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdWithBooleanEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity'),
@@ -804,6 +806,54 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ value }}', '"Foo"')
             ->setInvalidValue($entity2)
             ->setCause([$entity1])
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidateUniquenessWithBooleanFalseValueWithIgnoreFalseEnabled()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['enabled'],
+            'em' => self::EM_NAME,
+            'ignoreFalse' => true,
+        ]);
+
+        $entity1 = new SingleIntIdWithBooleanEntity(1, false);
+        $entity2 = new SingleIntIdWithBooleanEntity(2, false);
+
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateUniquenessWithBooleanFalseValueWithIgnoreFalseDisabled()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['enabled'],
+            'em' => self::EM_NAME,
+            'ignoreFalse' => false,
+        ]);
+
+        $entity1 = new SingleIntIdWithBooleanEntity(1, false);
+        $entity2 = new SingleIntIdWithBooleanEntity(2, false);
+
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.enabled')
+            ->setParameter('{{ value }}', 'false')
+            ->setInvalidValue(false)
+            ->setCause([$entity1, $entity2])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }

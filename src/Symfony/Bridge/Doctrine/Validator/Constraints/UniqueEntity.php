@@ -33,6 +33,7 @@ class UniqueEntity extends Constraint
     public $fields = [];
     public $errorPath = null;
     public $ignoreNull = true;
+    public $ignoreFalse = false;
 
     protected static $errorNames = [
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',

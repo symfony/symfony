@@ -202,4 +202,13 @@ class CookieTest extends TestCase
     {
         $cookie = new Cookie('foo', 'bar', 'string');
     }
+
+    public function testSameSite()
+    {
+        $cookie = new Cookie('foo', 'bar');
+        $this->assertNull($cookie->getSameSite());
+
+        $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true, false, 'lax');
+        $this->assertSame('lax', $cookie->getSameSite());
+    }
 }

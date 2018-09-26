@@ -83,7 +83,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
-                $this->options['secure'],
+                $this->options['secure'] ?? $request->isSecure(),
                 $this->options['httponly'],
                 false,
                 $this->options['samesite'] ?? null
@@ -118,7 +118,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
-                $this->options['secure'],
+                $this->options['secure'] ?? $request->isSecure(),
                 $this->options['httponly'],
                 false,
                 $this->options['samesite'] ?? null

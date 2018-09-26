@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-11T20:26:16Z
+
+This PR now goes one step further and creates a path to change the default "secure" setting on `new Cookie` instances. The goal is to make it go from the current `false` to the new `null`, so that cookies are secure by default in 5.0, when they're created on an HTTPS connection.
+Makes sense?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-19T17:25:48Z
+
+Tests added.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-19T17:26:29Z
+
+Oh, and there is one more step now: samesite will turn to "lax" by default in Symfony 5!

@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T06:33:28Z
+
+Thanks for the detailed description! Looking at the end-user API, I have two comments/questions:
+
+1) Do we really need to support an array as the argument of `instantiate()`? Is that common to instantiate more than one object at a time?
+
+```php
+// Before
+Instantiator::instantiate([
+    Foo::class => [],
+    Bar::class => ['propertyName' => $propertyValue],
+]);
+
+// After
+Instantiator::instantiate(Foo::class, []);
+Instantiator::instantiate(Bar::class, ['propertyName' => $propertyValue]);
+```
+
+2) The use of `\0` for some special objects looks like an internal detail which complicates the learning curve when exposing it publicly. Why not "hardcode" this detail internally and let the end-user not know about this?
+
+```php
+// Before
+Instantiator::instantiate([SplObjectStorage::class => ["\0" => [$obj1, $info1, $obj2, $info2]]]);
+Instantiator::instantiate([ArrayObject::class => ["\0" => $inputArray]]);
+
+// After
+Instantiator::instantiate(SplObjectStorage::class, [$obj1 => $info1, $obj2 => $info2]);
+Instantiator::instantiate(ArrayObject::class, $inputArray);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-10T11:01:07Z
+
+@Ocramius @javiereguiluz thanks for the review+comments, I addressed some inline, let's address the remaining ones:
+
+I added a 2nd commit to change the signature to `instantiate(string $class, array $properties, array $privateProperties);`. See updated examples in the PR. If you think it's better for DX, fine to me.
+
+> The use of \0 for some special objects looks like an internal detail
+
+It's not actually: e.g. you can also add dynamic properties to ArrayObject instances, that are *not* stored in the internal array structure. The `instantiate()` method has to provide a way to set both these properties and the internal array. `\0` is specifically chosen because no dynamic properties can start with the nul character, so it is safe to use.
+
+This doesn't mean we cannot do what you propose @javiereguiluz, but we still need a way to set dynamic properties when needed.
+
+Actually, there is a trivial way that works already: using an `stdClass` key in the `$privateProperties`: this populates public (thus dynamic) properties already.
+
+So, let's say we want to create something like that using instantiate:
+```php
+$a = new ArrayObject($input);
+$a->foo = 123;
+```
+
+The current code allows doing so using:
+```php
+Instantiator::instantiate(ArrayObject::class, ['foo' => 123, "\0" => [$input]]);
+```
+
+And we *could* make it do the same using:
+```php
+Instantiator::instantiate(ArrayObject::class, [$input], ['stdClass' => ['foo' => 123]]);
+```
+
+Please advise.
+(note that I have a preference for the 1st variant because it makes it less an edge case, so would be easier to work with in generic code - at least that's how I feel about it.)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T11:12:39Z
+
+Thanks for the detailed explanation. I hadn't thought about this use case:
+
+```php
+$a = new ArrayObject($input);
+$a->foo = 123;
+```
+
+I thought this utility was only for instantiating ... but that code instantiates and then initializes, so it's doing two different things :)
+
+What if we use this signature?
+
+```
+public static function instantiate(
+    string $classFqcn,
+    array $constructorArguments = [],
+    array $propertyValues = []
+)
+```
+
+Then, this example would look as:
+
+```php
+Instantiator::instantiate(ArrayObject::class, [$input], ['foo' => 123])
+```
+
+But most of the times you'd simply use something like this:
+
+```php
+Instantiator::instantiate(ArrayObject::class, [$input])
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-10T11:14:02Z
+
+@javiereguiluz wouldn't make sense: the specific property of instantiators is to *not* call the constructor nor any other methods...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T11:16:38Z
+
+I just followed your last example: why pass `$input` if it's never used?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-10T11:31:50Z
+
+After talking with Nico on Slack about this ... it's clear to me that I don't fully understand this 😅 So let's forget about my previous examples and proposals. Sorry!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-10T14:08:44Z
+
+Good news: shaking the code always helps to spot new edge cases.
+PR is ready, with test cases and fixes found meanwhile.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-11T08:53:46Z
+
+Fixes split in PR #28437. This PR is now rebased on top of it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-26T05:31:46Z
+
+@nicolas-grekas We needs good docs on that one (and the whole component). Can you create a PR for that in the docs repo? I think it won't take too much of your time as you're the best to write something smart about this :)

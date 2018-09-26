@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-25T07:07:39Z
+
+(note that `Request::duplicate()` already preserves the format and the locale - but it's not the way the subrequest is created in these two spots.)

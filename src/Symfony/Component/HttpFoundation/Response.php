@@ -313,6 +313,12 @@ class Response
 
         $this->ensureIEOverSSLCompatibility($request);
 
+        if ($request->isSecure()) {
+            foreach ($headers->getCookies() as $cookie) {
+                $cookie->setSecureDefault(true);
+            }
+        }
+
         return $this;
     }
 

@@ -24,7 +24,7 @@ class ResponseListenerTest extends TestCase
 {
     public function testRememberMeCookieIsSentWithResponse()
     {
-        $cookie = new Cookie('rememberme');
+        $cookie = new Cookie('rememberme', null, 0, '/', null, false, true, false, null);
 
         $request = $this->getRequest(array(
             RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
@@ -39,7 +39,7 @@ class ResponseListenerTest extends TestCase
 
     public function testRememberMeCookieIsNotSendWithResponseForSubRequests()
     {
-        $cookie = new Cookie('rememberme');
+        $cookie = new Cookie('rememberme', null, 0, '/', null, false, true, false, null);
 
         $request = $this->getRequest(array(
             RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,

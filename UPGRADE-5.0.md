@@ -123,6 +123,8 @@ HttpFoundation
  * The `$size` argument of the `UploadedFile` constructor has been removed.
  * The `getClientSize()` method of the `UploadedFile` class has been removed.
  * The `getSession()` method of the `Request` class throws an exception when session is null.
+ * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
+   changed respectively from "false" to "null" and from "null" to "lax".
 
 Monolog
 -------

@@ -199,6 +199,9 @@ class FrameworkExtension extends Extension
         if ($this->isConfigEnabled($container, $config['session'])) {
             $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
+            if (!empty($config['test'])) {
+                $container->getDefinition('test.session.listener')->setArgument(1, '%session.storage.options%');
+            }
         }
 
         if ($this->isConfigEnabled($container, $config['request'])) {

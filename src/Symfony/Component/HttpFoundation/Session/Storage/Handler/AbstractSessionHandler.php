@@ -128,7 +128,9 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
                 if (\PHP_VERSION_ID < 70300) {
                     setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));
                 } else {
-                    setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'), ini_get('session.cookie_samesite'));
+                    $params = session_get_cookie_params();
+                    unset($params['lifetime']);
+                    setcookie($this->sessionName, '', $params);
                 }
             }
         }

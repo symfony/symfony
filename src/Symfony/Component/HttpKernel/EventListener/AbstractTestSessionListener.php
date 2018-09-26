@@ -30,6 +30,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 abstract class AbstractTestSessionListener implements EventSubscriberInterface
 {
     private $sessionId;
+    private $sessionOptions;
+
+    public function __construct(array $sessionOptions = array())
+    {
+        $this->sessionOptions = $sessionOptions;
+    }
 
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -72,7 +78,12 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
         }
 
         if ($session instanceof Session ? !$session->isEmpty() || (null !== $this->sessionId && $session->getId() !== $this->sessionId) : $wasStarted) {
-            $params = session_get_cookie_params();
+            $params = session_get_cookie_params() + array('samesite' => null);
+            foreach ($this->sessionOptions as $k => $v) {
+                if (0 === strpos($k, 'cookie_')) {
+                    $params[substr($k, 7)] = $v;
+                }
+            }
 
             foreach ($event->getResponse()->headers->getCookies() as $cookie) {
                 if ($session->getName() === $cookie->getName() && $params['path'] === $cookie->getPath() && $params['domain'] == $cookie->getDomain()) {
@@ -80,7 +91,7 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
                 }
             }
 
-            $event->getResponse()->headers->setCookie(new Cookie($session->getName(), $session->getId(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+            $event->getResponse()->headers->setCookie(new Cookie($session->getName(), $session->getId(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly'], false, $params['samesite'] ?: null));
             $this->sessionId = $session->getId();
         }
     }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-09-12T13:00:01Z
+
+As you add support in BrowserKit, shouldn't you also not send the cookie in the request if it is a samesite=strict one and we don't have a request to the same site as the last one in the history ? Otherwise, we don't actually support them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-12T13:22:10Z
+
+At least we can read the response cookie. I agree it would even be better to implement the samesite logic in browserkit. Let's open a separate issue for that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-18T19:32:10Z
+
+Comments addressed.
+
+Status: needs review

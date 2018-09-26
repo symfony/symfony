@@ -19,6 +19,7 @@ use Psr\Http\Message\StreamInterface;
 class Stream implements StreamInterface
 {
     private $stringContent;
+    private $eof = true;
 
     public function __construct($stringContent = '')
     {
@@ -49,12 +50,12 @@ class Stream implements StreamInterface
 
     public function eof()
     {
-        return true;
+        return $this->eof;
     }
 
     public function isSeekable()
     {
-        return false;
+        return true;
     }
 
     public function seek($offset, $whence = SEEK_SET)
@@ -63,6 +64,7 @@ class Stream implements StreamInterface
 
     public function rewind()
     {
+        $this->eof = false;
     }
 
     public function isWritable()
@@ -81,6 +83,8 @@ class Stream implements StreamInterface
 
     public function read($length)
     {
+        $this->eof = true;
+
         return $this->stringContent;
     }
 

@@ -8,6 +8,8 @@ CHANGELOG
    option is set to `single_text`
  * added `block_prefix` option to `BaseType`.
  * added `help_html` option to display the `help` text as HTML.
+ * added `FilterChoiceLoader`
+ * added `choice_filter` option to `ChoiceType`
 
 4.2.0
 -----

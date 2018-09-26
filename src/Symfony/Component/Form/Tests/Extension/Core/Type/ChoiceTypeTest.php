@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
@@ -2052,5 +2053,55 @@ class ChoiceTypeTest extends BaseTypeTest
             'Simple expanded' => [false, true],
             'Multiple expanded' => [true, true],
         ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testChoiceFilterOptionExpectsCallable()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_filter' => new \stdClass(),
+        ]);
+    }
+
+    public function testClosureChoiceFilterOptionWithChoiceLoaderOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            // defined by superclass
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            // defined by subclass or userland
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, ['b', 'c'], true);
+            },
+        ]);
+
+        $options = [];
+        foreach ($form->createView()->vars['choices'] as $choiceView) {
+            $options[$choiceView->label] = $choiceView->value;
+        }
+
+        $this->assertSame(['Fabien' => 'b', 'Kris' => 'c'], $options);
+    }
+
+    public function testChoiceFilterOptionWithChoicesOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            // defined by superclass
+            'choices' => $this->choices,
+            // defined by subclass or userland
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, ['b', 'c'], true);
+            },
+        ]);
+
+        $options = [];
+        foreach ($form->createView()->vars['choices'] as $choiceView) {
+            $options[$choiceView->label] = $choiceView->value;
+        }
+
+        $this->assertSame(['Fabien' => 'b', 'Kris' => 'c'], $options);
     }
 }

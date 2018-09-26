@@ -17,6 +17,8 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -305,6 +307,7 @@ class ChoiceType extends AbstractType
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
+            'choice_filter' => null,
             'preferred_choices' => [],
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -329,6 +332,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
         $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
         $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('choice_filter', ['null', 'callable']);
         $resolver->setAllowedTypes('preferred_choices', ['array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
     }
@@ -391,13 +395,21 @@ class ChoiceType extends AbstractType
     {
         if (null !== $options['choice_loader']) {
             return $this->choiceListFactory->createListFromLoader(
-                $options['choice_loader'],
+                null === $options['choice_filter'] ? $options['choice_loader'] : new FilterChoiceLoader($options['choice_loader'], $options['choice_filter']),
                 $options['choice_value']
             );
         }
 
         // Harden against NULL values (like in EntityType and ModelType)
         $choices = null !== $options['choices'] ? $options['choices'] : [];
+
+        if (null !== $options['choice_filter']) {
+            $loader = new FilterChoiceLoader(new CallbackChoiceLoader(function () use ($choices) {
+                return $choices;
+            }), $options['choice_filter']);
+
+            return $this->choiceListFactory->createListFromLoader($loader, $options['choice_value']);
+        }
 
         return $this->choiceListFactory->createListFromChoices($choices, $options['choice_value']);
     }

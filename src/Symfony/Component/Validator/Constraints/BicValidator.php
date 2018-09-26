@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -69,13 +68,14 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        if (!class_exists(Intl::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Bic constraint.');
+        // @deprecated since Symfony 4.2
+        if (class_exists(Intl::class)) {
+            $validCountryCode = isset(Intl::getRegionBundle()->getCountryNames()[substr($canonicalize, 4, 2)]);
+        } else {
+            $validCountryCode = ctype_alpha(substr($canonicalize, 4, 2));
         }
 
-        // next 2 letters must be alphabetic (country code)
-        $countries = Intl::getRegionBundle()->getCountryNames();
-        if (!isset($countries[substr($canonicalize, 4, 2)])) {
+        if (!$validCountryCode) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_COUNTRY_CODE_ERROR)

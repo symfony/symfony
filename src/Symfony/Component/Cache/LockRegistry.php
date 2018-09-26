@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Cache;
 
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * LockRegistry is used internally by existing adapters to protect against cache stampede.
@@ -75,40 +75,20 @@ class LockRegistry
         return $previousFiles;
     }
 
-    /**
-     * @internal
-     */
-    public static function save(string $key, CacheItemPoolInterface $pool, CacheItemInterface $item, callable $callback, float $startTime, &$value): bool
+    public static function compute(ItemInterface $item, callable $callback, CacheInterface $pool)
     {
-        self::$save = self::$save ?? \Closure::bind(
-            function (CacheItemPoolInterface $pool, CacheItemInterface $item, $value, float $startTime) {
-                if ($item instanceof CacheItem && $startTime && $item->expiry > $endTime = microtime(true)) {
-                    $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
-                    $item->newMetadata[CacheItem::METADATA_CTIME] = 1000 * (int) ($endTime - $startTime);
-                }
-                $pool->save($item->set($value));
-
-                return $value;
-            },
-            null,
-            CacheItem::class
-        );
-
-        $key = self::$files ? crc32($key) % \count(self::$files) : -1;
+        $key = self::$files ? crc32($item->getKey()) % \count(self::$files) : -1;
 
         if ($key < 0 || (self::$lockedFiles[$key] ?? false) || !$lock = self::open($key)) {
-            $value = (self::$save)($pool, $item, $callback($item), $startTime);
-
-            return true;
+            return $callback($item);
         }
 
         try {
             // race to get the lock in non-blocking mode
             if (flock($lock, LOCK_EX | LOCK_NB)) {
                 self::$lockedFiles[$key] = true;
-                $value = (self::$save)($pool, $item, $callback($item), $startTime);
 
-                return true;
+                return $callback($item);
             }
             // if we failed the race, retry locking in blocking mode to wait for the winner
             flock($lock, LOCK_SH);
@@ -117,7 +97,7 @@ class LockRegistry
             unset(self::$lockedFiles[$key]);
         }
 
-        return false;
+        return $pool->get($item->getKey(), $callback, 0);
     }
 
     private static function open(int $key)

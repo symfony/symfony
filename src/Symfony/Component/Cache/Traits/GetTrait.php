@@ -11,48 +11,62 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\LockRegistry;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * An implementation for CacheInterface that provides stampede protection via probabilistic early expiration.
- *
- * @see https://en.wikipedia.org/wiki/Cache_stampede
- *
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
 trait GetTrait
 {
+    private $callbackWrapper = array(LockRegistry::class, 'compute');
+
+    /**
+     * Wraps the callback passed to ->get() in a callable.
+     *
+     * @param callable(ItemInterface, callable, CacheInterface):mixed $callbackWrapper
+     *
+     * @return callable the previous callback wrapper
+     */
+    public function setCallbackWrapper(callable $callbackWrapper): callable
+    {
+        $previousWrapper = $this->callbackWrapper;
+        $this->callbackWrapper = $callbackWrapper;
+
+        return $previousWrapper;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function get(string $key, callable $callback, float $beta = null)
     {
-        if (0 > $beta) {
+        return $this->doGet($this, $key, $callback, $beta);
+    }
+
+    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta)
+    {
+        if (0 > $beta = $beta ?? 1.0) {
             throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', \get_class($this), $beta));
         }
 
-        return $this->doGet($this, $key, $callback, $beta ?? 1.0);
-    }
-
-    private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, float $beta)
-    {
-        retry:
         $t = 0;
         $item = $pool->getItem($key);
         $recompute = !$item->isHit() || INF === $beta;
 
-        if ($item instanceof CacheItem && 0 < $beta) {
+        if (0 < $beta) {
             if ($recompute) {
                 $t = microtime(true);
             } else {
                 $metadata = $item->getMetadata();
-                $expiry = $metadata[CacheItem::METADATA_EXPIRY] ?? false;
-                $ctime = $metadata[CacheItem::METADATA_CTIME] ?? false;
+                $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;
+                $ctime = $metadata[ItemInterface::METADATA_CTIME] ?? false;
 
                 if ($ctime && $expiry) {
                     $t = microtime(true);
@@ -69,11 +83,32 @@ trait GetTrait
             return $item->get();
         }
 
-        if (!LockRegistry::save($key, $pool, $item, $callback, $t, $value)) {
-            $beta = 0;
-            goto retry;
-        }
+        static $save;
 
-        return $value;
+        $save = $save ?? \Closure::bind(
+            function (AdapterInterface $pool, ItemInterface $item, $value, float $startTime) {
+                if ($startTime && $item->expiry > $endTime = microtime(true)) {
+                    $item->newMetadata[ItemInterface::METADATA_EXPIRY] = $item->expiry;
+                    $item->newMetadata[ItemInterface::METADATA_CTIME] = 1000 * (int) ($endTime - $startTime);
+                }
+                $pool->save($item->set($value));
+
+                return $value;
+            },
+            null,
+            CacheItem::class
+        );
+
+        // don't wrap nor save recursive calls
+        if (null === $callbackWrapper = $this->callbackWrapper) {
+            return $callback($item);
+        }
+        $this->callbackWrapper = null;
+
+        try {
+            return $save($pool, $item, $callbackWrapper($item, $callback, $pool), $t);
+        } finally {
+            $this->callbackWrapper = $callbackWrapper;
+        }
     }
 }

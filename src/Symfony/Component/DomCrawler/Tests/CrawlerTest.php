@@ -350,13 +350,7 @@ EOF
     public function testAttr()
     {
         $this->assertEquals('first', $this->createTestCrawler()->filterXPath('//li')->attr('class'), '->attr() returns the attribute of the first element of the node list');
-
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->attr('class');
-            $this->fail('->attr() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->attr() throws an \InvalidArgumentException if the node list is empty');
-        }
+        $this->assertNull($this->createTestCrawler()->filterXPath('//ol')->attr('class'), '->attr() returns null if the node list is empty');
     }
 
     public function testMissingAttrValueIsNull()
@@ -385,26 +379,14 @@ EOF
     public function testText()
     {
         $this->assertEquals('One', $this->createTestCrawler()->filterXPath('//li')->text(), '->text() returns the node value of the first element of the node list');
-
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->text();
-            $this->fail('->text() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->text() throws an \InvalidArgumentException if the node list is empty');
-        }
+        $this->assertNull($this->createTestCrawler()->filterXPath('//ol')->text(), '->text() returns null if the node list is empty');
     }
 
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
         $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>', trim(preg_replace('~>\s+<~', '><', $this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html())));
-
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->html();
-            $this->fail('->html() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->html() throws an \InvalidArgumentException if the node list is empty');
-        }
+        $this->assertNull($this->createTestCrawler()->filterXPath('//ol')->html(), '->html() returns null if the node list is empty');
     }
 
     public function testExtract()

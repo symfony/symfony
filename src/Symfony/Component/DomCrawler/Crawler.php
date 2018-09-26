@@ -537,13 +537,11 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param string $attribute The attribute name
      *
      * @return string|null The attribute value or null if the attribute does not exist
-     *
-     * @throws \InvalidArgumentException When current node is empty
      */
     public function attr($attribute)
     {
         if (!$this->nodes) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            return null;
         }
 
         $node = $this->getNode(0);
@@ -570,14 +568,12 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the node value of the first node of the list.
      *
-     * @return string The node value
-     *
-     * @throws \InvalidArgumentException When current node is empty
+     * @return string|null The node value
      */
     public function text()
     {
         if (!$this->nodes) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            return null;
         }
 
         return $this->getNode(0)->nodeValue;
@@ -586,14 +582,12 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the first node of the list as HTML.
      *
-     * @return string The node html
-     *
-     * @throws \InvalidArgumentException When current node is empty
+     * @return string|null The node html
      */
     public function html()
     {
         if (!$this->nodes) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            return null;
         }
 
         $html = '';

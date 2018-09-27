@@ -172,6 +172,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $container,
                 $access['path'],
                 $access['host'],
+                $access['port'],
                 $access['methods'],
                 $access['ips']
             );
@@ -275,7 +276,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
             $host = isset($firewall['host']) ? $firewall['host'] : null;
             $methods = isset($firewall['methods']) ? $firewall['methods'] : array();
-            $matcher = $this->createRequestMatcher($container, $pattern, $host, $methods);
+            $matcher = $this->createRequestMatcher($container, $pattern, $host, null, $methods);
         }
 
         $config->replaceArgument(2, $matcher ? (string) $matcher : null);
@@ -696,20 +697,20 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
+    private function createRequestMatcher($container, $path = null, $host = null, int $port = null, $methods = array(), $ip = null, array $attributes = array())
     {
         if ($methods) {
             $methods = array_map('strtoupper', (array) $methods);
         }
 
-        $id = '.security.request_matcher.'.ContainerBuilder::hash(array($path, $host, $methods, $ip, $attributes));
+        $id = '.security.request_matcher.'.ContainerBuilder::hash(array($path, $host, $port, $methods, $ip, $attributes));
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
         }
 
         // only add arguments that are necessary
-        $arguments = array($path, $host, $methods, $ip, $attributes);
+        $arguments = array($path, $host, $methods, $ip, $attributes, null, $port);
         while (\count($arguments) > 0 && !end($arguments)) {
             array_pop($arguments);
         }

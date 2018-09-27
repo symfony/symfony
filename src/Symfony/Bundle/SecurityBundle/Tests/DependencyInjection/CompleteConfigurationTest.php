@@ -84,7 +84,7 @@ abstract class CompleteConfigurationTest extends TestCase
             array(
                 'simple',
                 'security.user_checker',
-                '.security.request_matcher.6tndozi',
+                '.security.request_matcher.xmi9dcw',
                 false,
             ),
             array(
@@ -116,7 +116,7 @@ abstract class CompleteConfigurationTest extends TestCase
             array(
                 'host',
                 'security.user_checker',
-                '.security.request_matcher.and0kk1',
+                '.security.request_matcher.iw4hyjb',
                 true,
                 false,
                 'security.user.provider.concrete.default',
@@ -238,7 +238,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 $this->assertEquals(array('ROLE_USER'), $attributes);
                 $this->assertEquals('https', $channel);
                 $this->assertEquals(
-                    array('/blog/524', null, array('GET', 'POST')),
+                    array('/blog/524', null, array('GET', 'POST'), array(), array(), null, 8000),
                     $requestMatcher->getArguments()
                 );
             } elseif (2 === $i) {

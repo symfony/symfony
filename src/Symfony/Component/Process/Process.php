@@ -960,7 +960,7 @@ class Process implements \IteratorAggregate
     /**
      * Sets the process timeout (max. runtime).
      *
-     * To disable the timeout, set this value to null.
+     * To disable the timeout, set this value to 0.
      *
      * @param int|float|null $timeout The timeout in seconds
      *
@@ -978,7 +978,7 @@ class Process implements \IteratorAggregate
     /**
      * Sets the process idle timeout (max. time since last output).
      *
-     * To disable the timeout, set this value to null.
+     * To disable the timeout, set this value to 0.
      *
      * @param int|float|null $timeout The timeout in seconds
      *

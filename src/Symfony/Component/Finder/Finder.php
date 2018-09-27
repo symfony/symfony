@@ -119,7 +119,7 @@ class Finder implements \IteratorAggregate, \Countable
     public function depth($levels)
     {
         foreach ((array) $levels as $level) {
-            $this->depths[] = new Comparator\NumberComparator($level);
+            $this->depths[] = new Comparator\NumberComparator((string) $level);
         }
 
         return $this;
@@ -302,7 +302,7 @@ class Finder implements \IteratorAggregate, \Countable
     public function size($sizes)
     {
         foreach ((array) $sizes as $size) {
-            $this->sizes[] = new Comparator\NumberComparator($size);
+            $this->sizes[] = new Comparator\NumberComparator((string) $size);
         }
 
         return $this;

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Symfony\Component\Finder\Comparator;
 
 /**
@@ -36,7 +38,7 @@ class DateComparator extends Comparator
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid date.', $matches[2]));
         }
 
-        $operator = isset($matches[1]) ? $matches[1] : '==';
+        $operator = '' !== $matches[1] ? strtolower($matches[1]) : '==';
         if ('since' === $operator || 'after' === $operator) {
             $operator = '>';
         }

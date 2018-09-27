@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-06T01:07:56Z
+
+This iterator suffers from tachycardia having to duplicate the paths registration and convention :)
+
+Note that we're still missing custom paths registered in a third party bundles through `twig.loader.native_filesystem` service, e.g.:
+```php
+$container->getDefinition('twig.loader.native_filesystem')
+    ->addMethodCall('addPath', array('/foo/templates/path', 'Foo'));
+```
+The templates inside it, will not be cached on cache warmup.
+
+I wondering if can we iterate over the Twig loader filesystem instead?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-06T09:00:10Z
+
+We should recommend third-party bundles to add their paths through adding them in the bundle config (with PrependExtensionInterface on their DI extension).
+
+Adding paths directly on the filesystem loader is quite fragile, because Symfony is injecting the paths in multiple places, and `twig.loader.native_filesystem` might even not be used at all (when `symfony/templating` is installed, we use a different loader).
+Thus, compiler passes might run after the TwigBundle one, so reading method calls added on this services (with some complex logic to detect the one not added by TwigBundle itself) will not even ensure that this works (it would depend on the order of passes)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-06T14:12:35Z
+
+> We should recommend third-party bundles to add their paths through adding them in the bundle config (with PrependExtensionInterface on their DI extension).
+
+I've a use case where that recommendation wouldn't work. For example: a shared third-party bundle aiming to override templates (company design & themes standardization) from others third-party bundles (`@Twig/Exception/*`, `@SonataAdmin/*`, `@EasyAdmin/*`, etc), without losing the possibility of override templates at project level (for minor tweaks).
+
+This shared bundle will work for our 4.0+ projects only (without `symfony/templating`). Using Twig `paths` config (with `PrependExtensionInterface` on their DI extension) will add the new paths on the top, making impossible the overriding at project level.
+
+Therefore, reading method calls added on this services (`twig.loader.native_filesystem`), with some logic to insert the new path just before the last one per bundle namespace, was the solution so far.
+
+This shared bundle would also define a new `templates/` directory instead of the traditional `Resources/views/` (yes, I had to register it manually), but I had to undo these changes because these templates aren't cached on cache warmup, as this `TemplateIterator`, is not aware of dynamic paths added on `twig.loader.native_filesystem` service (I could have updated the iterator definition, but I thought it was too much).
+
+> Adding paths directly on the filesystem loader is quite fragile, because Symfony is injecting the paths in multiple places, and twig.loader.native_filesystem might even not be used at all (when symfony/templating is installed, we use a different loader).
+
+I think it is possible to detect that situation and inject the right loader, as well as the method calls are copied during this transition:
+https://github.com/symfony/symfony/blob/ef1f7ff0bb1f3ac80c34505148532c3a34ab0bd3/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php#L110
+
+Still I think that the current logic behind this iterator is quite fragile too and prone to errors, by using the Twig loader we can remove all this logic and rely only on the registered paths. Thus, removing the need to keep updated the iterator `paths` everywhere where a new path is added to the loader.
+
+This is just an idea, meanwhile we can merge this as it is.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-06T16:40:45Z
+
+> I think it is possible to detect that situation and inject the right loader, as well as the method calls are copied during this transition:
+
+but your own compiler pass might be running *after that transition. That's precisely why I'm saying it is fragile to do it
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-06T17:29:53Z
+
+> but your own compiler pass might be running *after that transition. That's precisely why I'm saying it is fragile to do it
+
+Can't I use (in my own compiler pass) the `twig.loader.filesystem` service if `templating` service is activated, otherwise `twig.loader.native_filesystem`? I've setting a priority to ensure it's executed after `ExtensionPass`.
+
+About the `TemplateIterator`, we can to inject `twig.loader.filesystem` always, as it'll an alias of `twig.loader.native_filesystem` when `templating` doesn't exist.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-24T12:46:42Z
+
+This is ready on my side. I'll move the discussion about the `TemplateIterator` issues in a separate issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-27T14:37:43Z
+
+Could be seen as a BC break. I would only do the change in master with a note in the UPGRADE file. WDYT?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-27T16:08:35Z
+
+> Could be seen as a BC break. I would only do the change in master with a note in the UPGRADE file. WDYT?
+
+Are you referring to the proposal "iterate over the Twig loader filesystem instead"? I agree, I'll do it soon.
+
+However, we still have to fix this bug on `2.8` (as is).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-27T16:28:33Z
+
+I was referring to the current patch. People might have stored their templates in the current supported directory
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-27T16:44:40Z
+
+AFAIK this path `$this->rootDir.'/'.$bundle->getName().'/views'` was never supported nor expected to work: `src/FooBundle/views`, also it's not added to the loader to render a template. How would it be a BC break?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-27T17:04:33Z
+
+Even if ppl registering it (manually in Twig `paths`) they still can render templates there and Twig `paths` are taken into account on this `TemplateIterator`, so all these templates will be cached on warmup.
+
+This fix the cache warmup of the overriding convention templates in `src/Resources/<BundleName>/views` as defined here:
+https://github.com/symfony/symfony/blob/992a174470fd557e1cddccd3a35447209602aea3/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php#L165

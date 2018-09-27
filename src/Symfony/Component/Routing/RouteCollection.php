@@ -201,6 +201,20 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sets explicit defaults on all routes.
+     *
+     * Existing explicit defaults will be overridden.
+     *
+     * @param bool $explicitDefaults
+     */
+    public function setExplicitDefaults($explicitDefaults)
+    {
+        foreach ($this->routes as $route) {
+            $route->setExplicitDefaults($explicitDefaults);
+        }
+    }
+
+    /**
      * Adds defaults to all routes.
      *
      * An existing default value under the same name in a route will be overridden.

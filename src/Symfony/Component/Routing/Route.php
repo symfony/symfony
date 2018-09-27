@@ -27,6 +27,7 @@ class Route implements \Serializable
     private $requirements = array();
     private $options = array();
     private $condition = '';
+    private $explicitDefaults = false;
 
     /**
      * @var null|CompiledRoute
@@ -49,8 +50,9 @@ class Route implements \Serializable
      * @param string|string[] $schemes      A required URI scheme or an array of restricted schemes
      * @param string|string[] $methods      A required HTTP method or an array of restricted methods
      * @param string          $condition    A condition that should evaluate to true for the route to match
+     * @param bool            $explicitDefaults
      */
-    public function __construct(string $path, array $defaults = array(), array $requirements = array(), array $options = array(), ?string $host = '', $schemes = array(), $methods = array(), ?string $condition = '')
+    public function __construct(string $path, array $defaults = array(), array $requirements = array(), array $options = array(), ?string $host = '', $schemes = array(), $methods = array(), ?string $condition = '', bool $explicitDefaults = false)
     {
         $this->setPath($path);
         $this->addDefaults($defaults);
@@ -60,6 +62,7 @@ class Route implements \Serializable
         $this->setSchemes($schemes);
         $this->setMethods($methods);
         $this->setCondition($condition);
+        $this->setExplicitDefaults($explicitDefaults);
     }
 
     /**
@@ -522,6 +525,33 @@ class Route implements \Serializable
     public function setCondition($condition)
     {
         $this->condition = (string) $condition;
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the explicitDefaults.
+     *
+     * @return string The explicitDefaults
+     */
+    public function getExplicitDefaults()
+    {
+        return $this->explicitDefaults;
+    }
+
+    /**
+     * Sets the explicitDefaults.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $explicitDefaults The explicitDefaults
+     *
+     * @return $this
+     */
+    public function setExplicitDefaults($explicitDefaults)
+    {
+        $this->explicitDefaults = (bool) $explicitDefaults;
         $this->compiled = null;
 
         return $this;

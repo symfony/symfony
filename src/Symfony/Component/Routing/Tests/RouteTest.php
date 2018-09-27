@@ -73,6 +73,12 @@ class RouteTest extends TestCase
         $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is set');
     }
 
+    public function testExplicitDefaults()
+    {
+        $route = new Route('/{foo}');
+        $this->assertFalse($route->getExplicitDefaults(), '->getExplicitDefaults() return false by default');
+    }
+
     public function testDefaults()
     {
         $route = new Route('/{foo}');

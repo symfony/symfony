@@ -291,6 +291,13 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/app.php/category/foo', $this->getGenerator($routes)->generate('test', array('slug1' => 'foo')));
     }
 
+    public function testExplicitDefaults()
+    {
+        $routes = $this->getRoutes('test', (new Route('/category/{slug1}'))->setExplicitDefaults(true));
+
+        $this->assertEquals('/app.php/category/foo', $this->getGenerator($routes)->generate('test', array('slug1' => 'foo')));
+    }
+
     public function testWithAnIntegerAsADefaultValue()
     {
         $routes = $this->getRoutes('test', new Route('/{default}', array('default' => 0)));

@@ -230,6 +230,19 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('/testing', $url);
     }
 
+    public function testDumpForRouteWithExplicitDefaults()
+    {
+        $this->routeCollection->add('Test', (new Route('/testing/{foo}.{_format}', array('foo' => 'bar', '_format' => 'baz')))->setExplicitDefaults(true));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'ExplicitDefaultsRoutesUrlGenerator')));
+        include $this->testTmpFilepath;
+
+        $projectUrlGenerator = new \ExplicitDefaultsRoutesUrlGenerator(new RequestContext());
+        $url = $projectUrlGenerator->generate('Test', array());
+
+        $this->assertEquals('/testing/bar.baz', $url);
+    }
+
     public function testDumpWithSchemeRequirement()
     {
         $this->routeCollection->add('Test1', new Route('/testing', array(), array(), array(), '', array('ftp', 'https')));

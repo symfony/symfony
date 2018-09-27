@@ -159,6 +159,7 @@ class XmlFileLoader extends FileLoader
         $schemes = $node->hasAttribute('schemes') ? preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $trailingSlashOnRoot = $node->hasAttribute('trailing-slash-on-root') ? XmlUtils::phpize($node->getAttribute('trailing-slash-on-root')) : true;
+        $explicitDefaults = $node->hasAttribute('explicit-defaults') ? XmlUtils::phpize($node->getAttribute('explicit-defaults')) : false;
 
         list($defaults, $requirements, $options, $condition, /* $paths */, $prefixes) = $this->parseConfigs($node, $path);
 
@@ -222,6 +223,7 @@ class XmlFileLoader extends FileLoader
                 $subCollection->setMethods($methods);
             }
             $subCollection->addDefaults($defaults);
+            $subCollection->setExplicitDefaults($explicitDefaults);
             $subCollection->addRequirements($requirements);
             $subCollection->addOptions($options);
 
@@ -262,6 +264,7 @@ class XmlFileLoader extends FileLoader
     private function parseConfigs(\DOMElement $node, $path)
     {
         $defaults = array();
+        $explicitDefaults = false;
         $requirements = array();
         $options = array();
         $condition = null;

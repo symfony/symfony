@@ -6,6 +6,7 @@ $collection = $loader->import('validpattern.php');
 $collection->addDefaults(array(
     'foo' => 123,
 ));
+$collection->setExplicitDefaults(true);
 $collection->addRequirements(array(
     'foo' => '\d+',
 ));

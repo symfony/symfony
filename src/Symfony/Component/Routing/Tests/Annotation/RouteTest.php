@@ -54,6 +54,7 @@ class RouteTest extends TestCase
             array('host', '{locale}.example.com', 'getHost'),
             array('condition', 'context.getMethod() == "GET"', 'getCondition'),
             array('value', array('nl' => '/hier', 'en' => '/here'), 'getLocalizedPaths'),
+            array('explicit_defaults', true, 'getExplicitDefaults'),
         );
     }
 }

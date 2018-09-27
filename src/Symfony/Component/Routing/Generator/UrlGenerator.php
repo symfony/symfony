@@ -141,7 +141,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
-    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, array $requiredSchemes = array())
+    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, array $requiredSchemes = array(), $explicitDefaults = false)
     {
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
@@ -156,7 +156,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $message = 'Parameter "{parameter}" for route "{route}" must match "{expected}" ("{given}" given) to generate a corresponding URL.';
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
+                if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && ((string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) || true === $explicitDefaults)  {
                     // check requirement
                     if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
                         if ($this->strictRequirements) {

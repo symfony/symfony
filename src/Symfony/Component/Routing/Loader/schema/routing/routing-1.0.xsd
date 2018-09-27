@@ -35,6 +35,7 @@
   <xsd:group name="configs">
     <xsd:choice>
       <xsd:element name="default" nillable="true" type="default" />
+      <xsd:element name="explicit-defaults" nillable="true" type="xsd:boolean" />
       <xsd:element name="requirement" type="element" />
       <xsd:element name="option" type="element" />
       <xsd:element name="condition" type="xsd:string" />

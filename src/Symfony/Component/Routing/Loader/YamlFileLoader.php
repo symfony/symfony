@@ -28,7 +28,7 @@ use Symfony\Component\Yaml\Yaml;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'explicit_defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root',
     );
     private $yamlParser;
 
@@ -109,6 +109,7 @@ class YamlFileLoader extends FileLoader
     protected function parseRoute(RouteCollection $collection, $name, array $config, $path)
     {
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
+        $explicitDefaults = isset($config['explicit_defaults']) ? $config['explicit_defaults'] : false;
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
         $host = isset($config['host']) ? $config['host'] : '';
@@ -127,7 +128,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (\is_array($config['path'])) {
-            $route = new Route('', $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+            $route = new Route('', $defaults, $requirements, $options, $host, $schemes, $methods, $condition, $explicitDefaults);
 
             foreach ($config['path'] as $locale => $path) {
                 $localizedRoute = clone $route;
@@ -137,7 +138,7 @@ class YamlFileLoader extends FileLoader
                 $collection->add($name.'.'.$locale, $localizedRoute);
             }
         } else {
-            $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+            $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition, $explicitDefaults);
             $collection->add($name, $route);
         }
     }

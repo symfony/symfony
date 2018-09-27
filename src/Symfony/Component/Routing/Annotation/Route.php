@@ -31,6 +31,7 @@ class Route
     private $methods = array();
     private $schemes = array();
     private $condition;
+    private $explicitDefaults = false;
 
     /**
      * @param array $data An array of key/value parameters
@@ -160,5 +161,15 @@ class Route
     public function getCondition()
     {
         return $this->condition;
+    }
+
+    public function setExplicitDefaults($explicitDefaults)
+    {
+        $this->explicitDefaults = $explicitDefaults;
+    }
+
+    public function getExplicitDefaults()
+    {
+        return $this->explicitDefaults;
     }
 }

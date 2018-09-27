@@ -10,6 +10,10 @@ CHANGELOG
  * added `Json` constraint
  * added `Unique` constraint
  * added a new `normalizer` option to the string constraints and to the `NotBlank` constraint
+ * added `Positive` constraint
+ * added `PositiveOrZero` constraint
+ * added `Negative` constraint
+ * added `NegativeOrZero` constraint
 
 4.2.0
 -----

@@ -334,6 +334,22 @@
                 <source>This value should be valid JSON.</source>
                 <target>This value should be valid JSON.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This value should be positive.</source>
+                <target>This value should be positive.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be either positive or zero.</source>
+                <target>This value should be either positive or zero.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be negative.</source>
+                <target>This value should be negative.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be either negative or zero.</source>
+                <target>This value should be either negative or zero.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

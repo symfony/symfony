@@ -330,6 +330,22 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Diese internationale Bankleitzahl (BIC) ist nicht mit der IBAN {{ iban }} assoziiert.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This value should be positive.</source>
+                <target>Dieser Wert sollte positiv sein.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be either positive or zero.</source>
+                <target>Dieser Wert sollte entweder positiv oder 0 sein.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be negative.</source>
+                <target>Dieser Wert sollte negativ sein.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be either negative or zero.</source>
+                <target>Dieser Wert sollte entweder negativ oder 0 sein.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

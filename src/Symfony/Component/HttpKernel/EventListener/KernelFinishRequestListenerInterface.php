@@ -1,0 +1,27 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpKernel\EventListener;
+
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+
+/**
+ * Implement this interface to allow automatically add the "kernel.event_listener" tag with event "kernel.finish_request".
+ *
+ * @author Gary PEGEOT <garypegeot@gmail.com>
+ */
+interface KernelFinishRequestListenerInterface
+{
+    /**
+     * @param FinishRequestEvent $event
+     */
+    public function __invoke(FinishRequestEvent $event): void;
+}

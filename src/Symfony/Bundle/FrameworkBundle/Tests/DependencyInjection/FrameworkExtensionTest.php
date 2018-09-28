@@ -36,6 +36,14 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\EventListener\KernelControllerListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelExceptionListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelFinishRequestListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelRequestListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelResponseListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelTerminateListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelViewListenerInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1237,6 +1245,42 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $expected = array('session', 'initialized_session', 'session_storage', 'request_stack');
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+    }
+
+    public function testKernelListenersRegistration()
+    {
+        $mapping = array(
+            KernelControllerListenerInterface::class => KernelEvents::CONTROLLER,
+            KernelExceptionListenerInterface::class => KernelEvents::EXCEPTION,
+            KernelFinishRequestListenerInterface::class => KernelEvents::FINISH_REQUEST,
+            KernelRequestListenerInterface::class => KernelEvents::REQUEST,
+            KernelResponseListenerInterface::class => KernelEvents::RESPONSE,
+            KernelTerminateListenerInterface::class => KernelEvents::TERMINATE,
+            KernelViewListenerInterface::class => KernelEvents::VIEW,
+        );
+
+        $container = $this->createContainerFromFile('full', array(), true, false);
+        $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
+
+        foreach ($mapping as $class => $event) {
+            $container->register("listener_of.$event", $class)
+                ->setAutoconfigured(true);
+        }
+        $container->compile();
+
+        foreach ($mapping as $class => $event) {
+            $definition = $container->findDefinition("listener_of.$event");
+
+            $this->assertTrue(
+                $definition->hasTag('kernel.event_listener'),
+                'Definition should have tag "kernel.event_listener".'
+            );
+
+            $this->assertSame(
+                array(array('event' => $event, 'method' => '__invoke')),
+                $definition->getTag('kernel.event_listener')
+            );
+        }
     }
 
     protected function createContainer(array $data = array())

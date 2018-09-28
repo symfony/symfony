@@ -59,6 +59,14 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\EventListener\KernelControllerListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelExceptionListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelFinishRequestListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelRequestListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelResponseListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelTerminateListenerInterface;
+use Symfony\Component\HttpKernel\EventListener\KernelViewListenerInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockInterface;
@@ -367,6 +375,21 @@ class FrameworkExtension extends Extension
             ->addTag('messenger.transport_factory');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', array(new Reference('logger')));
+
+        $kernelEventsMapping = array(
+            KernelControllerListenerInterface::class => KernelEvents::CONTROLLER,
+            KernelExceptionListenerInterface::class => KernelEvents::EXCEPTION,
+            KernelFinishRequestListenerInterface::class => KernelEvents::FINISH_REQUEST,
+            KernelRequestListenerInterface::class => KernelEvents::REQUEST,
+            KernelResponseListenerInterface::class => KernelEvents::RESPONSE,
+            KernelTerminateListenerInterface::class => KernelEvents::TERMINATE,
+            KernelViewListenerInterface::class => KernelEvents::VIEW,
+        );
+
+        foreach ($kernelEventsMapping as $class => $event) {
+            $container->registerForAutoconfiguration($class)
+                ->addTag('kernel.event_listener', array('event' => $event, 'method' => '__invoke'));
+        }
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers

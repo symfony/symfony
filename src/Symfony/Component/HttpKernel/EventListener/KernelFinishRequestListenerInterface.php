@@ -23,5 +23,5 @@ interface KernelFinishRequestListenerInterface
     /**
      * @param FinishRequestEvent $event
      */
-    public function __invoke(FinishRequestEvent $event): void;
+    public function onKernelFinishRequest(FinishRequestEvent $event): void;
 }

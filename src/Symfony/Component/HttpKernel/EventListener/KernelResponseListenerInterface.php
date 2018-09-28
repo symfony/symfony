@@ -23,5 +23,5 @@ interface KernelResponseListenerInterface
     /**
      * @param FilterResponseEvent $event
      */
-    public function __invoke(FilterResponseEvent $event): void;
+    public function onKernelResponse(FilterResponseEvent $event): void;
 }

@@ -23,5 +23,5 @@ interface KernelTerminateListenerInterface
     /**
      * @param PostResponseEvent $event
      */
-    public function __invoke(PostResponseEvent $event): void;
+    public function onKernelTerminate(PostResponseEvent $event): void;
 }

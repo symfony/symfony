@@ -36,6 +36,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\KernelControllerListenerInterface;
 use Symfony\Component\HttpKernel\EventListener\KernelExceptionListenerInterface;
 use Symfony\Component\HttpKernel\EventListener\KernelFinishRequestListenerInterface;
@@ -1262,6 +1264,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full', array(), true, false);
         $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
 
+        $container->register('multiple_events_listener', MyMultipleEventListener::class)
+            ->setAutoconfigured(true);
+
         foreach ($mapping as $class => $event) {
             $container->register("listener_of.$event", $class)
                 ->setAutoconfigured(true);
@@ -1277,10 +1282,23 @@ abstract class FrameworkExtensionTest extends TestCase
             );
 
             $this->assertSame(
-                array(array('event' => $event, 'method' => '__invoke')),
+                array(array('event' => $event)),
                 $definition->getTag('kernel.event_listener')
             );
         }
+
+        $definition = $container->findDefinition('multiple_events_listener');
+
+        $this->assertTrue(
+            $definition->hasTag('kernel.event_listener'),
+            'Definition should have tag "kernel.event_listener".'
+        );
+
+        $this->assertSame(
+            array(array('event' => 'kernel.response'), array('event' => 'kernel.request')),
+            $definition->getTag('kernel.event_listener'),
+            'Should contain 2 events in the tag definition'
+        );
     }
 
     protected function createContainer(array $data = array())
@@ -1412,6 +1430,28 @@ abstract class FrameworkExtensionTest extends TestCase
             default:
                 $this->fail('Unresolved adapter: '.$adapter);
         }
+    }
+}
+
+/**
+ * @internal
+ */
+class MyMultipleEventListener implements KernelRequestListenerInterface, KernelResponseListenerInterface
+{
+    /**
+     * @param GetResponseEvent $event
+     */
+    public function onKernelRequest(GetResponseEvent $event): void
+    {
+        // Do something
+    }
+
+    /**
+     * @param FilterResponseEvent $event
+     */
+    public function onKernelResponse(FilterResponseEvent $event): void
+    {
+        // Do something else
     }
 }
 

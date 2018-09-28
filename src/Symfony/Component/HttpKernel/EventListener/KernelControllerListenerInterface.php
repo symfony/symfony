@@ -22,5 +22,5 @@ interface KernelControllerListenerInterface
     /**
      * @param FilterControllerEvent $event
      */
-    public function __invoke(FilterControllerEvent $event): void;
+    public function onKernelController(FilterControllerEvent $event): void;
 }

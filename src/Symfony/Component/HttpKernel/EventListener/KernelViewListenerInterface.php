@@ -23,5 +23,5 @@ interface KernelViewListenerInterface
     /**
      * @param GetResponseForControllerResultEvent $event
      */
-    public function __invoke(GetResponseForControllerResultEvent $event): void;
+    public function onKernelView(GetResponseForControllerResultEvent $event): void;
 }

@@ -388,7 +388,7 @@ class FrameworkExtension extends Extension
 
         foreach ($kernelEventsMapping as $class => $event) {
             $container->registerForAutoconfiguration($class)
-                ->addTag('kernel.event_listener', array('event' => $event, 'method' => '__invoke'));
+                ->addTag('kernel.event_listener', array('event' => $event));
         }
 
         if (!$container->getParameter('kernel.debug')) {

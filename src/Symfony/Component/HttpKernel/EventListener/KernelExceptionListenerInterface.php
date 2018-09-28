@@ -23,5 +23,5 @@ interface KernelExceptionListenerInterface
     /**
      * @param GetResponseForExceptionEvent $event
      */
-    public function __invoke(GetResponseForExceptionEvent $event): void;
+    public function onKernelException(GetResponseForExceptionEvent $event): void;
 }

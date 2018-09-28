@@ -23,5 +23,5 @@ interface KernelRequestListenerInterface
     /**
      * @param GetResponseEvent $event
      */
-    public function __invoke(GetResponseEvent $event): void;
+    public function onKernelRequest(GetResponseEvent $event): void;
 }

@@ -33,7 +33,7 @@ class CallbackValidator extends ConstraintValidator
         }
 
         $method = $constraint->callback;
-        if ($method instanceof \Closure) {
+        if (\is_callable($method)) {
             $method($object, $this->context, $constraint->payload);
         } elseif (\is_array($method)) {
             if (!\is_callable($method)) {
@@ -45,11 +45,8 @@ class CallbackValidator extends ConstraintValidator
 
             \call_user_func($method, $object, $this->context, $constraint->payload);
         } elseif (\method_exists($method, '__invoke')) {
-            if (!\is_object($method)) {
-                $method = new $method();
-            }
-
-            $method($object, $this->context, $constraint->payload);
+            $validator = new $method();
+            $validator($object, $this->context, $constraint->payload);
         } elseif (null !== $object) {
             if (!\method_exists($object, $method)) {
                 throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist in class %s', $method, \get_class($object)));

@@ -18,7 +18,14 @@ namespace Symfony\Component\Finder\Comparator;
  */
 class Comparator
 {
+    /**
+     * @var string
+     */
     private $target;
+
+    /**
+     * @var string
+     */
     private $operator = '==';
 
     /**
@@ -26,7 +33,7 @@ class Comparator
      *
      * @return string The target value
      */
-    public function getTarget()
+    public function getTarget(): string
     {
         return $this->target;
     }
@@ -36,7 +43,7 @@ class Comparator
      *
      * @param string $target The target value
      */
-    public function setTarget($target)
+    public function setTarget(string $target): void
     {
         $this->target = $target;
     }
@@ -46,7 +53,7 @@ class Comparator
      *
      * @return string The operator
      */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }
@@ -54,17 +61,17 @@ class Comparator
     /**
      * Sets the comparison operator.
      *
-     * @param string $operator A valid operator
+     * @param null|string $operator A valid operator
      *
      * @throws \InvalidArgumentException
      */
-    public function setOperator($operator)
+    public function setOperator(?string $operator): void
     {
-        if (!$operator) {
+        if (null === $operator) {
             $operator = '==';
         }
 
-        if (!\in_array($operator, array('>', '<', '>=', '<=', '==', '!='))) {
+        if (!\in_array($operator, array('>', '<', '>=', '<=', '==', '!='), true)) {
             throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
         }
 
@@ -78,7 +85,7 @@ class Comparator
      *
      * @return bool
      */
-    public function test($test)
+    public function test($test): bool
     {
         switch ($this->operator) {
             case '>':

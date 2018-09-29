@@ -17,28 +17,36 @@ use Symfony\Component\Finder\Comparator\NumberComparator;
 class NumberComparatorTest extends TestCase
 {
     /**
-     * @dataProvider getConstructorTestData
+     * @param string $goodTest
+     *
+     * @dataProvider getConstructorTestDataSuccesses
      */
-    public function testConstructor($successes, $failures)
+    public function testConstructorSuccess(string $goodTest): void
     {
-        foreach ($successes as $s) {
-            new NumberComparator($s);
-        }
+        $numberComparator = new NumberComparator($goodTest);
 
-        foreach ($failures as $f) {
-            try {
-                new NumberComparator($f);
-                $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
-            } catch (\Exception $e) {
-                $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
-            }
+        $this->assertInstanceOf(NumberComparator::class, $numberComparator);
+    }
+
+    /**
+     * @param mixed $badTest
+     *
+     * @dataProvider getConstructorTestDataFailures
+     */
+    public function testConstructorFailure($badTest): void
+    {
+        try {
+            new NumberComparator($badTest);
+            $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
         }
     }
 
     /**
      * @dataProvider getTestData
      */
-    public function testTest($test, $match, $noMatch)
+    public function testTest($test, $match, $noMatch): void
     {
         $c = new NumberComparator($test);
 
@@ -51,7 +59,7 @@ class NumberComparatorTest extends TestCase
         }
     }
 
-    public function getTestData()
+    public function getTestData(): array
     {
         return array(
             array('< 1000', array('500', '999'), array('1000', '1500')),
@@ -81,27 +89,31 @@ class NumberComparatorTest extends TestCase
         );
     }
 
-    public function getConstructorTestData()
+    public function getConstructorTestDataSuccesses(): array
     {
         return array(
             array(
-                array(
-                    '1', '0',
-                    '3.5', '33.55', '123.456', '123456.78',
-                    '.1', '.123',
-                    '.0', '0.0',
-                    '1.', '0.', '123.',
-                    '==1', '!=1', '<1', '>1', '<=1', '>=1',
-                    '==1k', '==1ki', '==1m', '==1mi', '==1g', '==1gi',
-                    '1k', '1ki', '1m', '1mi', '1g', '1gi',
-                ),
-                array(
-                    false, null, '',
-                    ' ', 'foobar',
-                    '=1', '===1',
-                    '0 . 1', '123 .45', '234. 567',
-                    '..', '.0.', '0.1.2',
-                ),
+                '1', '0',
+                '3.5', '33.55', '123.456', '123456.78',
+                '.1', '.123',
+                '.0', '0.0',
+                '1.', '0.', '123.',
+                '==1', '!=1', '<1', '>1', '<=1', '>=1',
+                '==1k', '==1ki', '==1m', '==1mi', '==1g', '==1gi',
+                '1k', '1ki', '1m', '1mi', '1g', '1gi',
+            ),
+        );
+    }
+
+    public function getConstructorTestDataFailures(): array
+    {
+        return array(
+            array(
+                false, null, '',
+                ' ', 'foobar',
+                '=1', '===1',
+                '0 . 1', '123 .45', '234. 567',
+                '..', '.0.', '0.1.2',
             ),
         );
     }

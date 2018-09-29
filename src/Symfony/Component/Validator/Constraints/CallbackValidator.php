@@ -45,7 +45,7 @@ class CallbackValidator extends ConstraintValidator
 
             \call_user_func($method, $object, $this->context, $constraint->payload);
         } elseif (\method_exists($method, '__invoke')) {
-            if (!is_object($method)) {
+            if (!\is_object($method)) {
                 $method = new $method();
             }
 

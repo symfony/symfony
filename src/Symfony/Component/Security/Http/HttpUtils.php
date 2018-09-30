@@ -35,19 +35,26 @@ class HttpUtils
     /**
      * @param UrlGeneratorInterface                       $urlGenerator       A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher         The URL or Request matcher
-     * @param string|null                                 $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
-     * @param string|null                                 $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
+     * @param @todo                                       $sessionOptions     Session options configuration array
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, string $domainRegexp = null, string $secureDomainRegexp = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, string $cookieSecure, string $domainRegexp)
     {
+        if ('auto' === ($cookieSecure ?? null)) {
+            $secureDomainRegexp = sprintf('{^https://%s$}i', $domainRegexp);
+            $domainRegexp = 'https?://'.$domainRegexp;
+        } else {
+            $secureDomainRegexp = null;
+            $domainRegexp = (empty($cookieSecure) ? 'https?://' : 'https://').$domainRegexp;
+        }
+
         $this->urlGenerator = $urlGenerator;
         if (null !== $urlMatcher && !$urlMatcher instanceof UrlMatcherInterface && !$urlMatcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
         }
         $this->urlMatcher = $urlMatcher;
-        $this->domainRegexp = $domainRegexp;
+        $this->domainRegexp = sprintf('{^%s$}i', $domainRegexp);
         $this->secureDomainRegexp = $secureDomainRegexp;
     }
 

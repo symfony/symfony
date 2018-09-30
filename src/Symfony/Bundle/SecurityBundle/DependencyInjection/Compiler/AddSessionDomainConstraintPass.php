@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * Uses the session domain to restrict allowed redirection targets.
@@ -33,16 +34,8 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
         $sessionOptions = $container->getParameter('session.storage.options');
         $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%s' : sprintf('(?:%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
 
-        if ('auto' === ($sessionOptions['cookie_secure'] ?? null)) {
-            $secureDomainRegexp = sprintf('{^https://%s$}i', $domainRegexp);
-            $domainRegexp = 'https?://'.$domainRegexp;
-        } else {
-            $secureDomainRegexp = null;
-            $domainRegexp = (empty($sessionOptions['cookie_secure']) ? 'https?://' : 'https://').$domainRegexp;
-        }
-
         $container->findDefinition('security.http_utils')
-            ->addArgument(sprintf('{^%s$}i', $domainRegexp))
-            ->addArgument($secureDomainRegexp);
+            ->addArgument($sessionOptions['cookie_secure'])
+            ->addArgument($domainRegexp);
     }
 }

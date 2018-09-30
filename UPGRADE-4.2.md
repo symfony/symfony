@@ -110,6 +110,10 @@ FrameworkBundle
    ```
  * The `ContainerAwareCommand` class has been deprecated, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
+ * The `--env` console option and its "-e" shortcut have been deprecated,
+   set the "APP_ENV" environment variable instead.
+ * The `--no-debug` console option has been deprecated,
+   set the "APP_DEBUG" environment variable to "0" instead.
 
 Messenger
 ---------

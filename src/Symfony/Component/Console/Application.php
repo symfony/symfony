@@ -1143,8 +1143,6 @@ class Application
     }
 
     /**
-     * Type hint omitted to be PHP5 compatible.
-     *
      * @param \Exception|\Throwable $throwable
      *
      * @return int

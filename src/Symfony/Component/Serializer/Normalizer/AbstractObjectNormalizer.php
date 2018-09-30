@@ -44,13 +44,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @var callable|null
      */
     private $maxDepthHandler;
+    private $objectClassResolver;
 
     /**
      * @var ClassDiscriminatorResolverInterface|null
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
@@ -60,6 +61,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $classDiscriminatorResolver = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         }
         $this->classDiscriminatorResolver = $classDiscriminatorResolver;
+        $this->objectClassResolver = $objectClassResolver;
     }
 
     /**
@@ -86,7 +88,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $data = array();
         $stack = array();
         $attributes = $this->getAttributes($object, $format, $context);
-        $class = \get_class($object);
+        $class = $this->objectClassResolver ? \call_user_func($this->objectClassResolver, $object) : \get_class($object);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
 
         foreach ($attributes as $attribute) {
@@ -155,7 +157,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes($object, $format = null, array $context)
     {
-        $class = \get_class($object);
+        $class = $this->objectClassResolver ? \call_user_func($this->objectClassResolver, $object) : \get_class($object);
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {

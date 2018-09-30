@@ -10,7 +10,9 @@ CHANGELOG
  * made `ValidatorBuilder` final
  * marked `format` the default option in `DateTime` constraint
  * deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`.
- * deprecated using the `Bic` constraint without `symfony/intl`
+ * deprecated using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl`
+ * deprecated using the `Email` constraint without `egulias/email-validator`
+ * deprecated using the `Expression` constraint without `symfony/expression-language`
 
 4.1.0
 -----

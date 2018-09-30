@@ -35,7 +35,8 @@ class HttpUtils
     /**
      * @param UrlGeneratorInterface                       $urlGenerator       A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher         The URL or Request matcher
-     * @param @todo                                       $sessionOptions     Session options configuration array
+     * @param string                                      $cookieSecure       Cookie secure configration option
+     * @param string                                      $domainRegexp
      *
      * @throws \InvalidArgumentException
      */

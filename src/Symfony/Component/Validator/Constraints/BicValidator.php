@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Validator\Constraints\Bic;
+
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
@@ -28,12 +29,11 @@ class BicValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value) {
-            return;
-        }
+        /* @var Bic $constraint */
+        self::testConstraint($constraint, Bic::class);
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+        if (null === $value = self::toString($value)) {
+            return;
         }
 
         $canonicalize = str_replace(' ', '', $value);

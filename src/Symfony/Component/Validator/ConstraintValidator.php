@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Base class for constraint validators.
@@ -42,6 +43,40 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * Test a constraint class for the current validator.
+     *
+     * @throws UnexpectedTypeException
+     */
+    final protected static function testConstraint(Constraint $constraint, string $expectedClass)
+    {
+        if (!$constraint instanceof $expectedClass) {
+            throw new UnexpectedTypeException($constraint, $expectedClass);
+        }
+    }
+
+    /**
+     * Get a string value.
+     *
+     * @throws UnexpectedTypeException
+     */
+    final protected static function toString($value): ?string
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+            throw new UnexpectedTypeException($value, 'string or null');
+        }
+
+        if ('' === $value = (string) $value) {
+            return null;
+        }
+
+        return $value;
     }
 
     /**

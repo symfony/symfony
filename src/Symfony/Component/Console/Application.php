@@ -153,7 +153,17 @@ class Application
 
             $renderException($e);
 
-            $exitCode = $this->getExitCodeForThrowable($e);
+            $exitCode = $e->getCode();
+            if (is_numeric($exitCode)) {
+                $exitCode = (int) $exitCode;
+                if (0 === $exitCode) {
+                    $exitCode = 1;
+                }
+            } else {
+                $exitCode = 1;
+            }
+
+            return $exitCode;
         } finally {
             // if the exception handler changed, keep it
             // otherwise, unregister $renderException
@@ -1211,25 +1221,5 @@ class Application
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
         }
-    }
-
-    /**
-     * @param \Exception|\Throwable $throwable
-     *
-     * @return int
-     */
-    private function getExitCodeForThrowable($throwable)
-    {
-        $exitCode = $throwable->getCode();
-        if (is_numeric($exitCode)) {
-            $exitCode = (int) $exitCode;
-            if (0 === $exitCode) {
-                $exitCode = 1;
-            }
-        } else {
-            $exitCode = 1;
-        }
-
-        return $exitCode;
     }
 }

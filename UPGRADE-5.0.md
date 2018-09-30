@@ -199,6 +199,7 @@ Validator
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final
  * Removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
+ * The `symfony/intl` component is now required for using the `Bic` constraint
 
 Workflow
 --------

@@ -33,10 +33,10 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
         $sessionOptions = $container->getParameter('session.storage.options');
         $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%s' : sprintf('(?:%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
 
-        $container->setParameter('session.cookie.secure', $sessionOptions['cookie_secure']);
+        $container->setParameter('session.cookie_secure', $sessionOptions['cookie_secure'] ?? null);
 
         $container->findDefinition('security.http_utils')
-            ->addArgument('%session.cookie.secure%')
+            ->addArgument('%session.cookie_secure%')
             ->addArgument($domainRegexp);
     }
 }

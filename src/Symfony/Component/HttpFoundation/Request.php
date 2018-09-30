@@ -1325,7 +1325,7 @@ class Request
      *  * _format request attribute
      *  * $default
      *
-     * @param string $default The default format
+     * @param string|null $default The default format
      *
      * @return string The request format
      */

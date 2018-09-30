@@ -95,6 +95,13 @@ class HttpUtils
             $newRequest->attributes->set(Security::LAST_USERNAME, $request->attributes->get(Security::LAST_USERNAME));
         }
 
+        if ($request->get('_format')) {
+            $newRequest->attributes->set('_format', $request->get('_format'));
+        }
+        if ($request->getDefaultLocale() !== $request->getLocale()) {
+            $newRequest->setLocale($request->getLocale());
+        }
+
         return $newRequest;
     }
 

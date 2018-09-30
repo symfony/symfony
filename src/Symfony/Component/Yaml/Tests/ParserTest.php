@@ -1945,6 +1945,10 @@ YAML;
             $this->markTestSkipped('chmod is not supported on Windows');
         }
 
+        if (!getenv('USER') || 'root' === getenv('USER')) {
+            $this->markTestSkipped('This test will fail if run under superuser');
+        }
+
         $file = __DIR__.'/Fixtures/not_readable.yml';
         chmod($file, 0200);
 

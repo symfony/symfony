@@ -912,6 +912,31 @@ class ApplicationTest extends TestCase
         $this->assertSame(4, $exitCode, '->run() returns integer exit code extracted from raised exception');
     }
 
+    public function testRunDispatchesIntegerExitCode()
+    {
+        $passedRightValue = false;
+
+        // We can assume here that some other test asserts that the event is dispatched at all
+        $dispatcher = new EventDispatcher();
+        $self = $this;
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($self, &$passedRightValue) {
+            $passedRightValue = (4 === $event->getExitCode());
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('test')->setCode(function (InputInterface $input, OutputInterface $output) {
+            throw new \Exception('', 4);
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'test'));
+
+        $this->assertTrue($passedRightValue, '-> exit code 4 was passed in the console.terminate event');
+    }
+
     public function testRunReturnsExitCodeOneForExceptionCodeZero()
     {
         $exception = new \Exception('', 0);
@@ -925,6 +950,31 @@ class ApplicationTest extends TestCase
         $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
 
         $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is 0');
+    }
+
+    public function testRunDispatchesExitCodeOneForExceptionCodeZero()
+    {
+        $passedRightValue = false;
+
+        // We can assume here that some other test asserts that the event is dispatched at all
+        $dispatcher = new EventDispatcher();
+        $self = $this;
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($self, &$passedRightValue) {
+            $passedRightValue = (1 === $event->getExitCode());
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('test')->setCode(function (InputInterface $input, OutputInterface $output) {
+            throw new \Exception();
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'test'));
+
+        $this->assertTrue($passedRightValue, '-> exit code 1 was passed in the console.terminate event');
     }
 
     /**

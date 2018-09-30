@@ -272,9 +272,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Normalizes the given group or list of groups to an array.
      *
-     * @param mixed $groups The groups to normalize
+     * @param string|GroupSequence|(string|GroupSequence)[] $groups The groups to normalize
      *
-     * @return array A group array
+     * @return (string|GroupSequence)[] A group array
      */
     protected function normalizeGroups($groups)
     {
@@ -295,7 +295,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @param object                    $object            The object to cascade
      * @param string                    $propertyPath      The current property path
-     * @param string[]                  $groups            The validated groups
+     * @param (string|GroupSequence)[]  $groups            The validated groups
      * @param int                       $traversalStrategy The strategy for traversing the
      *                                                     cascaded object
      * @param ExecutionContextInterface $context           The current execution context
@@ -355,10 +355,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * objects are iterated as well. Nested arrays are always iterated,
      * regardless of the value of $recursive.
      *
-     * @param iterable                  $collection   The collection
-     * @param string                    $propertyPath The current property path
-     * @param string[]                  $groups       The validated groups
-     * @param ExecutionContextInterface $context      The current execution context
+     * @param iterable                  $collection    The collection
+     * @param string                    $propertyPath  The current property path
+     * @param (string|GroupSequence)[]  $groups        The validated groups
+     * @param ExecutionContextInterface $context       The current execution context
      *
      * @see ClassNode
      * @see CollectionNode
@@ -424,7 +424,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                                     the object
      * @param string                    $propertyPath      The property path leading
      *                                                     to the object
-     * @param string[]                  $groups            The groups in which the
+     * @param (string|GroupSequence)[]  $groups            The groups in which the
      *                                                     object should be validated
      * @param string[]|null             $cascadedGroups    The groups in which
      *                                                     cascaded objects should
@@ -608,7 +608,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                                     value
      * @param string                    $propertyPath      The property path leading
      *                                                     to the value
-     * @param string[]                  $groups            The groups in which the
+     * @param (string|GroupSequence)[]  $groups            The groups in which the
      *                                                     value should be validated
      * @param string[]|null             $cascadedGroups    The groups in which
      *                                                     cascaded objects should

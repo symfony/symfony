@@ -52,6 +52,10 @@ class LockHandlerTest extends TestCase
             $this->markTestSkipped('This test cannot run on Windows.');
         }
 
+        if (!getenv('USER') || 'root' === getenv('USER')) {
+            $this->markTestSkipped('This test will fail if run under superuser');
+        }
+
         $lockPath = sys_get_temp_dir().'/'.uniqid('', true);
         $e = null;
         $wrongMessage = null;

@@ -150,7 +150,7 @@ class InlineFragmentRendererTest extends TestCase
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->attributes->set('_format', 'foo');
         $expectedSubRequest->setLocale('fr');
-        if (Request::HEADER_CLIENT_IP & Request::getTrustedHeaderSet()) {
+        if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
             $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
             $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
         }

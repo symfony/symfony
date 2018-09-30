@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-29T06:33:03Z
+
+from #28513 shouldnt we move the check for all intl constraints?
+
+if so, we can update the messages right away as done in #28610
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-09-29T10:56:14Z
+
+@ro0nl That would be best but also involve BC layers as well to me, as moving them to the constraints would mean breaking earlier than currently. Is it worth it? \cc @xabbuh.
+
+Deprecation message updated to use the FQCN here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-29T11:13:24Z
+
+we could revert #28513 in favor of deprecations in the constraint
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-29T11:13:45Z
+
+That's basically the same as #25865 which IMO still makes sense, but should be done in a different PR.

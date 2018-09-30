@@ -7,6 +7,27 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.46 (2018-09-30)
+
+ * bug #28376 [TwigBundle] Fixed caching of templates in src/Resources/<BundleName>/views on cache warmup (yceruto)
+ * bug #28565 [HttpFoundation][Security] forward locale and format to subrequests (nicolas-grekas)
+ * bug #28545 [Console] Send the right exit code to console.terminate listeners (mpdude)
+ * bug #28466 [Form] fail reverse transforming invalid RFC 3339 dates (xabbuh)
+ * bug #28540 [Intl] parse numbers terminated with decimal separator (xabbuh)
+ * bug #28548 [Console] Fixed boxed table style with colspan (ro0NL)
+ * bug #28433 [HttpFoundation] Allow reuse of Session between requests if ID did not change (tgalopin)
+ * bug #28508 [Form] forward false label option to nested types (xabbuh)
+ * bug #28464 [Form] forward the invalid_message option in date types (xabbuh)
+ * bug #28499 [Ldap] Use shut up operator on connection errors at ldap_start_tls (Andras Debreczeni)
+ * bug #28372 [Form] Fix DateTimeType html5 input format (franzwilding, mcfedr)
+ * bug #28396 [Intl] Blacklist Eurozone and United Nations in Region Data Generator (gregurco)
+ * bug #28393 [Console] fixed corrupt error output for unknown multibyte short option (downace)
+ * bug #28401 [Console] Fix SymfonyQuestionHelper::askQuestion() with choice value as default (chalasr)
+ * bug #28377 fix fopen flags (SpacePossum)
+ * bug #27970 [FileValidator] Format file size in validation message according to binaryFormat option (jfredon)
+ * bug #28029 [TwigBundle] remove cache warmers when Twig cache is disabled (xabbuh)
+ * bug #28344 [HttpKernel][FrameworkBundle] Fix escaping of serialized payloads passed to test clients (nicolas-grekas)
+
 * 2.8.45 (2018-08-27)
 
  * bug #28278 [HttpFoundation] Fix unprepared BinaryFileResponse sends empty file (wackymole)

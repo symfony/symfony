@@ -42,11 +42,10 @@ class Glob
      * @param bool   $strictLeadingDot
      * @param bool   $strictWildcardSlash
      * @param string $delimiter           Optional delimiter
-     * @param bool   $caseSensitive       Add case-sensitive modifier to regex
      *
      * @return string regex The regexp
      */
-    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#', bool $caseSensitive = true)
+    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#')
     {
         $firstByte = true;
         $escaping = false;
@@ -112,6 +111,6 @@ class Glob
             $escaping = false;
         }
 
-        return $delimiter.'^'.$regex.'$'.$delimiter.(!$caseSensitive ? 'i' : '');
+        return $delimiter.'^'.$regex.'$'.$delimiter;
     }
 }

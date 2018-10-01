@@ -174,7 +174,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function iname($patterns)
+    public function iname($patterns): self
     {
         $this->inames = \array_merge($this->inames, (array) $patterns);
 
@@ -229,7 +229,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notIname($patterns)
+    public function notIname($patterns): self
     {
         $this->notInames = \array_merge($this->notInames, (array) $patterns);
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-10-01T15:09:16Z
+
+Testing this case would indeed be harder. A way could be to run a subprocess running the Application class and checking the exit code of the command (if the call to `exit` is not performed, it would exit with `0` rather than the expected one)

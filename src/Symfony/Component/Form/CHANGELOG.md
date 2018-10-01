@@ -7,6 +7,7 @@ CHANGELOG
  * deprecated the `$scale` argument of the `IntegerToLocalizedStringTransformer`
  * added `Symfony\Component\Form\ClearableErrorsInterface`
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+ * added a cause when a CSRF error has occurred
  * deprecated the `scale` option of the `IntegerType`
 
 4.1.0

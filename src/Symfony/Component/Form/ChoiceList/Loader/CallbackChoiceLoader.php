@@ -18,9 +18,14 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
  *
  * @author Jules Pietri <jules@heahprod.com>
  */
-class CallbackChoiceLoader implements ChoiceLoaderInterface
+class CallbackChoiceLoader implements ChoiceLoaderInterface, ChoiceFilterInterface
 {
     private $callback;
+
+    /**
+     * @var callable
+     */
+    private $choiceFilter;
 
     /**
      * The loaded choice list.
@@ -46,7 +51,13 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList(\call_user_func($this->callback), $value);
+        $choices = \call_user_func($this->callback);
+
+        if (null !== $this->choiceFilter) {
+            $choices = array_filter($choices, $this->choiceFilter, ARRAY_FILTER_USE_BOTH);
+        }
+
+        return $this->choiceList = new ArrayChoiceList($choices, $value);
     }
 
     /**
@@ -73,5 +84,13 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
         }
 
         return $this->loadChoiceList($value)->getValuesForChoices($choices);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChoiceFilter(callable $choiceFilter)
+    {
+        $this->choiceFilter = $choiceFilter;
     }
 }

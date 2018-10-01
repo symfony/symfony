@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceFilterInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 
 /**
@@ -21,12 +22,17 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class DoctrineChoiceLoader implements ChoiceLoaderInterface
+class DoctrineChoiceLoader implements ChoiceLoaderInterface, ChoiceFilterInterface
 {
     private $manager;
     private $class;
     private $idReader;
     private $objectLoader;
+
+    /**
+     * @var callable
+     */
+    private $choiceFilter;
 
     /**
      * @var ChoiceListInterface
@@ -67,6 +73,10 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         $objects = $this->objectLoader
             ? $this->objectLoader->getEntities()
             : $this->manager->getRepository($this->class)->findAll();
+
+        if (null !== $this->choiceFilter) {
+            $objects = array_filter($objects, $this->choiceFilter, ARRAY_FILTER_USE_BOTH);
+        }
 
         return $this->choiceList = new ArrayChoiceList($objects, $value);
     }
@@ -145,5 +155,13 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChoiceFilter(callable $choiceFilter)
+    {
+        $this->choiceFilter = $choiceFilter;
     }
 }

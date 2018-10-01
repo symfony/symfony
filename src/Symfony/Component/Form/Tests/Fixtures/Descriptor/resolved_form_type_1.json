@@ -4,6 +4,7 @@
     "options": {
         "own": [
             "choice_attr",
+            "choice_filter",
             "choice_label",
             "choice_loader",
             "choice_name",

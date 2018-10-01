@@ -9,6 +9,8 @@ CHANGELOG
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
  * added a cause when a CSRF error has occurred
  * deprecated the `scale` option of the `IntegerType`
+ * added `Symfony\Component\Form\ChoiceList\Loader\ChoiceFilterInterface`
+ * added `choice_filter` option to `ChoiceType`
 
 4.1.0
 -----

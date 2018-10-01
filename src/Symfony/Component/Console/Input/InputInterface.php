@@ -83,7 +83,7 @@ interface InputInterface
      *
      * @param string $name The argument name
      *
-     * @return string|string[] The argument value
+     * @return string|string[]|null The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -92,8 +92,8 @@ interface InputInterface
     /**
      * Sets an argument value by name.
      *
-     * @param string          $name  The argument name
-     * @param string|string[] $value The argument value
+     * @param string               $name  The argument name
+     * @param string|string[]|null $value The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -120,7 +120,7 @@ interface InputInterface
      *
      * @param string $name The option name
      *
-     * @return string|string[]|bool The option value
+     * @return string|string[]|bool|null The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
@@ -129,8 +129,8 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
-     * @param string               $name  The option name
-     * @param string|string[]|bool $value The option value
+     * @param string                    $name  The option name
+     * @param string|string[]|bool|null $value The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */

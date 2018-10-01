@@ -1385,6 +1385,9 @@ class ContainerBuilderTest extends TestCase
 
         $manager = $container->get('manager2');
         $this->assertEquals(new \stdClass(), $manager);
+
+        $foo6 = $container->get('foo6');
+        $this->assertEquals((object) array('bar6' => (object) array()), $foo6);
     }
 
     public function provideAlmostCircular()

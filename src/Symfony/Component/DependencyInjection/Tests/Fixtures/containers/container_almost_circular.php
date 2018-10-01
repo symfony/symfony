@@ -101,4 +101,18 @@ $container->register('dispatcher2', 'stdClass')->setPublic($public)
 $container->register('subscriber2', 'stdClass')->setPublic(false)
     ->addArgument(new Reference('manager2'));
 
+// private service involved in a loop
+
+$container->register('foo6', 'stdClass')
+    ->setPublic(true)
+    ->setProperty('bar6', new Reference('bar6'));
+
+$container->register('bar6', 'stdClass')
+    ->setPublic(false)
+    ->addArgument(new Reference('foo6'));
+
+$container->register('baz6', 'stdClass')
+    ->setPublic(true)
+    ->setProperty('bar6', new Reference('bar6'));
+
 return $container;

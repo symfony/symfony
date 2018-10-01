@@ -751,7 +751,7 @@ EOF;
 
 EOTXT
             ,
-            $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates',
+            'services',
             $id
         );
 

@@ -59,14 +59,15 @@ class CsrfValidationListener implements EventSubscriberInterface
         if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
             $data = $event->getData();
 
-            if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {
+            $csrfToken = new CsrfToken($this->tokenId, $data[$this->fieldName] ?? null);
+            if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid($csrfToken)) {
                 $errorMessage = $this->errorMessage;
 
                 if (null !== $this->translator) {
                     $errorMessage = $this->translator->trans($errorMessage, array(), $this->translationDomain);
                 }
 
-                $form->addError(new FormError($errorMessage));
+                $form->addError(new FormError($errorMessage, $errorMessage, array(), null, $csrfToken));
             }
 
             if (\is_array($data)) {

@@ -2557,4 +2557,80 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '
         );
     }
+
+    public function testLabelWithTranslationParameters()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $html = $this->renderLabel($form->createView(), 'Address is %address%', array(
+            'translation_parameters' => array(
+                '%address%' => 'Paris, rue de la Paix',
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+            '/label
+    [@for="name"]
+    [.="[trans]Address is Paris, rue de la Paix[/trans]"]
+'
+        );
+    }
+
+    public function testHelpWithTranslationParameters()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'for company %company%',
+            'translation_parameters' => array(
+                '%company%' => 'ACME Ltd.',
+            ),
+        ));
+        $html = $this->renderHelp($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/*
+    [@id="name_help"]
+    [.="[trans]for company ACME Ltd.[/trans]"]
+'
+        );
+    }
+
+    public function testAttributesWithTranslationParameters()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'attr' => array(
+                'title' => 'Message to %company%',
+                'placeholder' => 'Enter a message to %company%',
+            ),
+            'translation_parameters' => array(
+                '%company%' => 'ACME Ltd.',
+            ),
+        ));
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/input
+    [@title="[trans]Message to ACME Ltd.[/trans]"]
+    [@placeholder="[trans]Enter a message to ACME Ltd.[/trans]"]
+'
+        );
+    }
+
+    public function testButtonWithTranslationParameters()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', array(
+                'label' => 'Submit to %company%',
+                'translation_parameters' => array(
+                    '%company%' => 'ACME Ltd.',
+                ),
+            ))
+            ->getForm();
+        $view = $form->get('mybutton')->createView();
+        $html = $this->renderWidget($view, array('label_format' => 'form.%name%'));
+
+        $this->assertMatchesXpath($html,
+            '/button
+    [.="[trans]Submit to ACME Ltd.[/trans]"]
+'
+        );
+    }
 }

@@ -45,6 +45,7 @@
                 "property_path",
                 "required",
                 "translation_domain",
+                "translation_parameters",
                 "upload_max_size_message"
             ]
         },

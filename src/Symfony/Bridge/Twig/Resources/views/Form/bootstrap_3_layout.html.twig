@@ -181,7 +181,7 @@
             {%- if translation_domain is same as(false) -%}
                 {{- help -}}
             {%- else -%}
-                {{- help|trans({}, translation_domain) -}}
+                {{- help|trans(translation_parameters, translation_domain) -}}
             {%- endif -%}
         </span>
     {%- endif -%}

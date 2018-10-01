@@ -25,6 +25,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    property_path                                    
                                                    required                                         
                                                    translation_domain                               
+                                                   translation_parameters                           
                                                    upload_max_size_message                          
  --------------------------- -------------------- ------------------------- ----------------------- 
 

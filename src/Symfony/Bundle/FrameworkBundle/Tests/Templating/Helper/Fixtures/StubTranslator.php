@@ -17,7 +17,7 @@ class StubTranslator implements TranslatorInterface
 {
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        return '[trans]'.$id.'[/trans]';
+        return '[trans]'.strtr($id, $parameters).'[/trans]';
     }
 
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)

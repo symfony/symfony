@@ -9,6 +9,7 @@ CHANGELOG
  * added `Languages` and `Scripts` in favor of `Intl::getLanguageBundle()`
  * added `Locales` in favor of `Intl::getLocaleBundle()`
  * added `Regions` in favor of `Intl::getRegionBundle()`
+ * added `Timezones`
 
 4.2.0
 -----

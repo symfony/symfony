@@ -25,6 +25,7 @@ class DataCollectorTranslatorTest extends TestCase
 
         $collector->trans('foo');
         $collector->trans('bar');
+        $collector->trans('choice', array('%count%' => 0));
         $collector->trans('bar_ru');
         $collector->trans('bar_ru', array('foo' => 'bar'));
 
@@ -46,6 +47,15 @@ class DataCollectorTranslatorTest extends TestCase
             'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
             'parameters' => array(),
             'transChoiceNumber' => null,
+        );
+        $expectedMessages[] = array(
+            'id' => 'choice',
+            'translation' => 'choice',
+            'locale' => 'en',
+            'domain' => 'messages',
+            'state' => DataCollectorTranslator::MESSAGE_MISSING,
+            'parameters' => array('%count%' => 0),
+            'transChoiceNumber' => 0,
         );
         $expectedMessages[] = array(
             'id' => 'bar_ru',
@@ -86,7 +96,7 @@ class DataCollectorTranslatorTest extends TestCase
               'locale' => 'en',
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_MISSING,
-              'parameters' => array(),
+              'parameters' => array('%count%' => 0),
               'transChoiceNumber' => 0,
         );
 

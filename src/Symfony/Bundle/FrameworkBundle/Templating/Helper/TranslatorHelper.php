@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\LegacyTranslatorTrait;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
@@ -28,14 +27,16 @@ class TranslatorHelper extends Helper
         trans as private doTrans;
     }
 
-    use LegacyTranslatorTrait {
-        transChoice as private doTransChoice;
-    }
-
     protected $translator;
 
-    public function __construct(TranslatorInterface $translator = null)
+    /**
+     * @param TranslatorInterface|null $translator
+     */
+    public function __construct($translator = null)
     {
+        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+        }
         $this->translator = $translator;
     }
 
@@ -53,11 +54,17 @@ class TranslatorHelper extends Helper
 
     /**
      * @see TranslatorInterface::transChoice()
+     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        if (null === $this->translator || !$this->translator instanceof LegacyTranslatorInterface) {
-            return $this->doTransChoice($id, $number, $parameters, $domain, $locale);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%count%" parameter.', __METHOD__), E_USER_DEPRECATED);
+
+        if (null === $this->translator) {
+            return $this->doTrans($id, array('%count%' => $number) + $parameters, $domain, $locale);
+        }
+        if ($this->translator instanceof TranslatorInterface) {
+            return $this->translator->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
         }
 
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);

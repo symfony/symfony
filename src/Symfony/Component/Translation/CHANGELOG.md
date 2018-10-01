@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * Started using ICU parent locales as fallback locales.
- * deprecated `Translator::transChoice()` in favor of using `Translator::trans()` with intl message format 
+ * deprecated `Translator::transChoice()` in favor of using `Translator::trans()` with a `%count%` parameter
  * deprecated `TranslatorInterface` in favor of `Symfony\Contracts\Translation\TranslatorInterface`
  * deprecated `MessageSelector`, `Interval` and `PluralizationRules`; use `IdentityTranslator` instead
  * Added `IntlMessageFormatter` and `FallbackMessageFormatter`

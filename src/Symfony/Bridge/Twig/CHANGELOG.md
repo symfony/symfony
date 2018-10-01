@@ -4,8 +4,9 @@ CHANGELOG
 4.2.0
 -----
 
-* add bundle name suggestion on wrongly overridden templates paths
-* added `name` argument in `debug:twig` command and changed `filter` argument as `--filter` option
+ * add bundle name suggestion on wrongly overridden templates paths
+ * added `name` argument in `debug:twig` command and changed `filter` argument as `--filter` option
+ * deprecated the `transchoice` tag and filter, use the `trans` ones instead with a `%count%` parameter
 
 4.1.0
 -----

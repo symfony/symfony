@@ -23,6 +23,8 @@ use Twig\Token;
  * Token Parser for the 'transchoice' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.2, use the "trans" tag with a "%count%" parameter instead
  */
 class TransChoiceTokenParser extends TransTokenParser
 {
@@ -37,6 +39,8 @@ class TransChoiceTokenParser extends TransTokenParser
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
+
+        @trigger_error(sprintf('The "transchoice" tag is deprecated since Symfony 4.2, use the "trans" one instead with a "%count%" parameter in %s line %d.', $stream->getSourceContext()->getName(), $lineno), E_USER_DEPRECATED);
 
         $vars = new ArrayExpression(array(), $lineno);
 

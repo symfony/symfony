@@ -52,8 +52,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array('%count%' => 0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array('%count%' => 1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
@@ -81,8 +83,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array('%count%' => 0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array('%count%' => 1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 

@@ -18,12 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBagInterface
+class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorInterface, TranslatorBagInterface
 {
-    use LegacyTranslatorTrait {
-        transChoice as private doTransChoice;
-    }
-
     const MESSAGE_DEFINED = 0;
     const MESSAGE_MISSING = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
@@ -38,8 +34,11 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBa
     /**
      * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct($translator)
     {
+        if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+        }
         if (!$translator instanceof TranslatorBagInterface) {
             throw new InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', \get_class($translator)));
         }
@@ -60,16 +59,18 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBa
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        if ($this->translator instanceof LegacyTranslatorInterface) {
-            $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
-        } else {
-            $trans = $this->doTransChoice($id, $number, $parameters, $domain, $locale);
+        if ($this->translator instanceof TranslatorInterface) {
+            $trans = $this->translator->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
         }
 
-        $this->collectMessage($locale, $domain, $id, $trans, $parameters, $number);
+        $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+
+        $this->collectMessage($locale, $domain, $id, $trans, array('%count%' => $number) + $parameters);
 
         return $trans;
     }
@@ -134,9 +135,8 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBa
      * @param string      $id
      * @param string      $translation
      * @param array|null  $parameters
-     * @param int|null    $number
      */
-    private function collectMessage($locale, $domain, $id, $translation, $parameters = array(), $number = null)
+    private function collectMessage($locale, $domain, $id, $translation, $parameters = array())
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -169,8 +169,8 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorBa
             'id' => $id,
             'translation' => $translation,
             'parameters' => $parameters,
-            'transChoiceNumber' => $number,
             'state' => $state,
+            'transChoiceNumber' => isset($parameters['%count%']) && is_numeric($parameters['%count%']) ? $parameters['%count%'] : null,
         );
     }
 }

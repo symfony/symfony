@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
@@ -18,12 +20,9 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class IdentityTranslator implements TranslatorInterface
+class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterface
 {
     use TranslatorTrait;
-    use LegacyTranslatorTrait {
-        transChoice as private doTransChoice;
-    }
 
     private $selector;
 
@@ -41,14 +40,22 @@ class IdentityTranslator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "trans()" method with intl formatted messages instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%count%" parameter.', __METHOD__), E_USER_DEPRECATED);
+
         if ($this->selector) {
             return strtr($this->selector->choose((string) $id, $number, $locale ?: $this->getLocale()), $parameters);
         }
 
-        return $this->doTransChoice($id, $number, $parameters, $domain, $locale);
+        return $this->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
+    }
+
+    private function getPluralizationRule(int $number, string $locale): int
+    {
+        return PluralizationRules::get($number, $locale, false);
     }
 }

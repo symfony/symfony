@@ -134,7 +134,7 @@ interface ExecutionContextInterface
      *
      * @param mixed                $value    The value to validate
      * @param string               $subPath  The path to append to the context's property path
-     * @param null|string|string[] $groups   The groups to validate in. If you don't pass any
+     * @param string|string[]|null $groups   The groups to validate in. If you don't pass any
      *                                       groups here, the current group of the context
      *                                       will be used.
      * @param bool                 $traverse Whether to traverse the value if it is an array
@@ -166,7 +166,7 @@ interface ExecutionContextInterface
      * @param mixed                   $value       The value to validate
      * @param Constraint|Constraint[] $constraints The constraint(s) to validate against
      * @param string                  $subPath     The path to append to the context's property path
-     * @param null|string|string[]    $groups      The groups to validate in. If you don't pass any
+     * @param string|string[]|null    $groups      The groups to validate in. If you don't pass any
      *                                             groups here, the current group of the context
      *                                             will be used.
      *

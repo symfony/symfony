@@ -24,7 +24,7 @@ class PropertyPathBuilder
     /**
      * Creates a new property path builder.
      *
-     * @param null|PropertyPathInterface|string $path The path to initially store
+     * @param PropertyPathInterface|string|null $path The path to initially store
      *                                                in the builder. Optional.
      */
     public function __construct($path = null)

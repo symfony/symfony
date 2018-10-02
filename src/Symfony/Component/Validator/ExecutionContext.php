@@ -41,7 +41,7 @@ class ExecutionContext implements ExecutionContextInterface
      *
      * @param GlobalExecutionContextInterface $globalContext     The global context storing node-independent state
      * @param TranslatorInterface             $translator        The translator for translating violation messages
-     * @param null|string                     $translationDomain The domain of the validation messages
+     * @param string|null                     $translationDomain The domain of the validation messages
      * @param MetadataInterface               $metadata          The metadata of the validated node
      * @param mixed                           $value             The value of the validated node
      * @param string                          $group             The current validation group
@@ -255,7 +255,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * Returns an array of group names.
      *
-     * @param null|string|string[] $groups The groups to resolve. If a single string is
+     * @param string|string[]|null $groups The groups to resolve. If a single string is
      *                                     passed, it is converted to an array. If null
      *                                     is passed, an array containing the current
      *                                     group of the context is returned.

@@ -51,7 +51,7 @@ class MappingRule
      *
      * @param string $propertyPath The property path to match against the rule
      *
-     * @return null|FormInterface The mapped form or null
+     * @return FormInterface|null The mapped form or null
      */
     public function match($propertyPath)
     {

@@ -197,7 +197,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * @param null|string|string[] $groups
+     * @param string|string[]|null $groups
      *
      * @return string[]
      */

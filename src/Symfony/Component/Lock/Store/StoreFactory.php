@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 
@@ -28,7 +29,14 @@ class StoreFactory
      */
     public static function createStore($connection)
     {
-        if ($connection instanceof \Redis || $connection instanceof \RedisArray || $connection instanceof \RedisCluster || $connection instanceof \Predis\Client || $connection instanceof RedisProxy) {
+        if (
+            $connection instanceof \Redis ||
+            $connection instanceof \RedisArray ||
+            $connection instanceof \RedisCluster ||
+            $connection instanceof \Predis\Client ||
+            $connection instanceof RedisProxy ||
+            $connection instanceof RedisClusterProxy
+        ) {
             return new RedisStore($connection);
         }
         if ($connection instanceof \Memcached) {

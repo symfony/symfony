@@ -32,9 +32,7 @@ class LegacyOptionsTest extends TestCase
 
     public function testSetLazyOption()
     {
-        $test = $this;
-
-        $this->options->set('foo', function (Options $options) use ($test) {
+        $this->options->set('foo', function (Options $options) {
             return 'dynamic';
         });
 
@@ -89,7 +87,7 @@ class LegacyOptionsTest extends TestCase
         });
 
         // defined by subclass, no $previousValue argument defined!
-        $this->options->overload('foo', function (Options $options) use ($test) {
+        $this->options->overload('foo', function (Options $options) {
             return 'dynamic';
         });
 

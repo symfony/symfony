@@ -153,7 +153,7 @@ class NativeSessionStorage implements SessionStorageInterface
         if (null !== $this->emulateSameSite) {
             $originalCookie = SessionUtils::popSessionCookie(session_name(), session_id());
             if (null !== $originalCookie) {
-                header(sprintf('%s; samesite=%s', $originalCookie, $this->emulateSameSite));
+                header(sprintf('%s; SameSite=%s', $originalCookie, $this->emulateSameSite));
             }
         }
 

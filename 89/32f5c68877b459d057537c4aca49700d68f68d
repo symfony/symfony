@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-02T09:55:04Z
+
+(can you fix fabbot reports meanwhile please?)
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2018-10-02T11:26:20Z
+
+@nicolas-grekas Done, excepted this one that isn't related to this patch:
+
+```diff
+diff -ru src/Symfony/Component/Console/Tests/ApplicationTest.php src/Symfony/Component/Console/Tests/ApplicationTest.php
+--- src/Symfony/Component/Console/Tests/ApplicationTest.php	2018-10-02 03:09:15.341074072 +0000
++++ src/Symfony/Component/Console/Tests/ApplicationTest.php	2018-10-02 03:09:17.583000869 +0000
+@@ -746,7 +746,7 @@
+         $application->setCatchExceptions(false);
+         $application->add(new \FooCommand());
+
+-        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
++        $output = new StreamOutput(fopen('php://memory', 'wb', false));
+
+         $input = new ArgvInput(array('cli.php', '-v', 'foo:bar'));
+         $application->run($input, $output);
+```

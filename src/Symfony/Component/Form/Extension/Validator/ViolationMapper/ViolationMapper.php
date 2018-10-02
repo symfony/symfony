@@ -144,7 +144,7 @@ class ViolationMapper implements ViolationMapperInterface
      * @param FormInterface                 $form The form to search
      * @param PropertyPathIteratorInterface $it   The iterator at its current position
      *
-     * @return null|FormInterface The found match or null
+     * @return FormInterface|null The found match or null
      */
     private function matchChild(FormInterface $form, PropertyPathIteratorInterface $it)
     {

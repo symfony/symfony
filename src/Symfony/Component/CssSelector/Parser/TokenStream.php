@@ -142,7 +142,7 @@ class TokenStream
     /**
      * Returns nex identifier or star delimiter token.
      *
-     * @return null|string The identifier token value or null if star found
+     * @return string|null The identifier token value or null if star found
      *
      * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      */

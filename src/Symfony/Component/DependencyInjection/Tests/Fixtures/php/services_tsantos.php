@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
+class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -28,11 +28,11 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
     {
         $this->services = $this->privates = array();
         $this->methodMap = array(
-            'bar' => 'getBarService',
-            'foo' => 'getFooService',
+            'tsantos_serializer' => 'getTsantosSerializerService',
         );
-
-        $this->aliases = array();
+        $this->aliases = array(
+            'TSantos\\Serializer\\SerializerInterface' => 'tsantos_serializer',
+        );
     }
 
     public function reset()
@@ -60,38 +60,31 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
     }
 
     /**
-     * Gets the public 'bar' shared service.
+     * Gets the public 'tsantos_serializer' shared service.
      *
-     * @return \stdClass
+     * @return \TSantos\Serializer\EventEmitterSerializer
      */
-    protected function getBarService()
+    protected function getTsantosSerializerService()
     {
-        $this->services['bar'] = $instance = new \stdClass();
+        $a = new \TSantos\Serializer\NormalizerRegistry();
 
-        $instance->p5 = new \stdClass(($this->services['foo'] ?? $this->getFooService()));
+        $d = new \TSantos\Serializer\EventDispatcher\EventDispatcher();
+        $d->addSubscriber(new \TSantos\SerializerBundle\EventListener\StopwatchListener(new \Symfony\Component\Stopwatch\Stopwatch(true)));
+
+        $this->services['tsantos_serializer'] = $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $d);
+
+        $b = new \TSantos\Serializer\Normalizer\CollectionNormalizer();
+
+        $b->setSerializer($instance);
+
+        $c = new \TSantos\Serializer\Normalizer\JsonNormalizer();
+
+        $c->setSerializer($instance);
+
+        $a->add(new \TSantos\Serializer\Normalizer\ObjectNormalizer(new \TSantos\SerializerBundle\Serializer\CircularReferenceHandler()));
+        $a->add($b);
+        $a->add($c);
 
         return $instance;
-    }
-
-    /**
-     * Gets the public 'foo' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph
-     */
-    protected function getFooService()
-    {
-        $a = ($this->services['bar'] ?? $this->getBarService());
-
-        if (isset($this->services['foo'])) {
-            return $this->services['foo'];
-        }
-
-        $b = new \stdClass();
-        $c = new \stdClass();
-        $c->p3 = new \stdClass();
-
-        $b->p2 = $c;
-
-        return $this->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph($a, $b);
     }
 }

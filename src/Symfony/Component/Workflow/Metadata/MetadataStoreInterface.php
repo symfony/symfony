@@ -31,7 +31,7 @@ interface MetadataStoreInterface
      *
      * This is a proxy method.
      *
-     * @param null|string|Transition $subject Use null to get workflow metadata
+     * @param string|Transition|null $subject Use null to get workflow metadata
      *                                        Use a string (the place name) to get place metadata
      *                                        Use a Transition instance to get transition metadata
      */

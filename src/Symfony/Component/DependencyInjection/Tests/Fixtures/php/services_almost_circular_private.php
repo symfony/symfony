@@ -30,11 +30,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         $this->methodMap = array(
             'bar2' => 'getBar2Service',
             'bar3' => 'getBar3Service',
+            'baz6' => 'getBaz6Service',
             'connection' => 'getConnectionService',
             'connection2' => 'getConnection2Service',
             'foo' => 'getFooService',
             'foo2' => 'getFoo2Service',
             'foo5' => 'getFoo5Service',
+            'foo6' => 'getFoo6Service',
             'foobar4' => 'getFoobar4Service',
             'logger' => 'getLoggerService',
             'manager' => 'getManagerService',
@@ -68,6 +70,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar' => true,
             'bar5' => true,
+            'bar6' => true,
             'config' => true,
             'config2' => true,
             'dispatcher' => true,
@@ -107,6 +110,20 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         $a = new \FoobarCircular();
 
         $instance->addFoobar($a, $a);
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'baz6' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getBaz6Service()
+    {
+        $this->services['baz6'] = $instance = new \stdClass();
+
+        $instance->bar6 = ($this->privates['bar6'] ?? $this->getBar6Service());
 
         return $instance;
     }
@@ -208,6 +225,20 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     }
 
     /**
+     * Gets the public 'foo6' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getFoo6Service()
+    {
+        $this->services['foo6'] = $instance = new \stdClass();
+
+        $instance->bar6 = ($this->privates['bar6'] ?? $this->getBar6Service());
+
+        return $instance;
+    }
+
+    /**
      * Gets the public 'foobar4' shared service.
      *
      * @return \stdClass
@@ -289,5 +320,21 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         }
 
         return $this->services['subscriber'] = new \stdClass($a);
+    }
+
+    /**
+     * Gets the private 'bar6' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getBar6Service()
+    {
+        $a = ($this->services['foo6'] ?? $this->getFoo6Service());
+
+        if (isset($this->privates['bar6'])) {
+            return $this->privates['bar6'];
+        }
+
+        return $this->privates['bar6'] = new \stdClass($a);
     }
 }

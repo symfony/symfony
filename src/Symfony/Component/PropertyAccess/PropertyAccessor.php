@@ -121,7 +121,6 @@ class PropertyAccessor implements PropertyAccessorInterface
                 // '[a][b][c]' => 'old-value'
                 // If you want to change its value to 'new-value',
                 // you only need set value for '[a][b][c]' and it's safe to ignore '[a][b]' and '[a]'
-                //
                 if ($overwrite) {
                     $property = $propertyPath->getElement($i);
 

@@ -31,7 +31,7 @@ abstract class AbstractOperation implements OperationInterface
     protected $result;
 
     /**
-     * @var null|array The domains affected by this operation
+     * @var array|null The domains affected by this operation
      */
     private $domains;
 

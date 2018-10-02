@@ -35,6 +35,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
     const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
+    const SKIP_NULL_VALUES = 'skip_null_values';
 
     private $propertyTypeExtractor;
     private $typesCache = array();
@@ -402,6 +403,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function updateData(array $data, string $attribute, $attributeValue, string $class, ?string $format, array $context): array
     {
+        if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? false)) {
+            return $data;
+        }
+
         if ($this->nameConverter) {
             $attribute = $this->nameConverter->normalize($attribute, $class, $format, $context);
         }

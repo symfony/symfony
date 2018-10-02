@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * added a `skip_null_values` context option to not serialize properties with a `null` values
  * `AbstractNormalizer::handleCircularReference` is now final and receives
    two optional extra arguments: the format and the context
  * added support for XML comment encoding (encoding `['#comment' => ' foo ']` results `<!-- foo -->`)

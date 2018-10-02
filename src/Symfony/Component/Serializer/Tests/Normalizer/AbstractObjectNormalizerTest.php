@@ -161,6 +161,16 @@ class AbstractObjectNormalizerTest extends TestCase
             'allow_extra_attributes' => false,
         ));
     }
+
+    public function testSkipNullValues()
+    {
+        $dummy = new Dummy();
+        $dummy->bar = 'present';
+
+        $normalizer = new ObjectNormalizer();
+        $result = $normalizer->normalize($dummy, null, array(AbstractObjectNormalizer::SKIP_NULL_VALUES => true));
+        $this->assertSame(array('bar' => 'present'), $result);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

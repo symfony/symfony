@@ -186,6 +186,9 @@ Security
    use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
    or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
  * Accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated.
+ * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
+   `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
+   `SimplePreAuthenticationListener` have been deprecated. Use Guard instead.
 
 SecurityBundle
 --------------
@@ -196,6 +199,10 @@ SecurityBundle
    `security.authentication.trust_resolver.rememberme_class` parameters to define
    the token classes is deprecated. To use
    custom tokens extend the existing AnonymousToken and RememberMeToken.
+ * The `simple_form` and `simple_preauth` authentication listeners have been deprecated,
+   use Guard instead.
+ * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been deprecated,
+   use Guard instead.
 
 Serializer
 ----------

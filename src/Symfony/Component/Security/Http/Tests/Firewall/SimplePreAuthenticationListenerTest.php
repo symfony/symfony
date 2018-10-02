@@ -18,6 +18,9 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener;
 use Symfony\Component\Security\Http\SecurityEvents;
 
+/**
+ * @group legacy
+ */
 class SimplePreAuthenticationListenerTest extends TestCase
 {
     private $authenticationManager;

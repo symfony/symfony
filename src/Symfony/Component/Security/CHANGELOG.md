@@ -13,6 +13,9 @@ CHANGELOG
   or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
 * allow passing null as $filter in LdapUserProvider to get the default filter
 * accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated
+* Deprecated `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`,
+  `SimplePreAuthenticatorInterface`, `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`,
+  `SimpleFormAuthenticationListener` and `SimplePreAuthenticationListener`. Use Guard instead.
 
 4.1.0
 -----

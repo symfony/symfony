@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:sec="http://symfony.com/schema/dic/security"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <sec:config>
+        <sec:provider name="default">
+            <sec:memory>
+                <sec:user name="foo" password="foo" roles="ROLE_USER" />
+            </sec:memory>
+        </sec:provider>
+
+        <sec:firewall name="simple_auth">
+            <sec:simple_form authenticator="simple_authenticator"/>
+            <sec:anonymous/>
+        </sec:firewall>
+    </sec:config>
+
+</container>

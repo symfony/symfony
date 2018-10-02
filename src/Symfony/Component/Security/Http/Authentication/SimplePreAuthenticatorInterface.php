@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since Symfony 4.2, use Guard instead.
  */
 interface SimplePreAuthenticatorInterface extends SimpleAuthenticatorInterface
 {

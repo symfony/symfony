@@ -78,6 +78,7 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
         $b = new \stdClass();
         $c = new \stdClass();
         $c->p3 = new \stdClass();
+
         $b->p2 = $c;
 
         return $this->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph($a, $b);

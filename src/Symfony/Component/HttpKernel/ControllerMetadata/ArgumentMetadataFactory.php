@@ -45,7 +45,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      *
      * @param \ReflectionParameter $parameter
      *
-     * @return null|string
+     * @return string|null
      */
     private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function)
     {

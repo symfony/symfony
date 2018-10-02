@@ -67,7 +67,7 @@ class ClockMock
             return self::$now;
         }
 
-        return sprintf('%0.6f %d', self::$now - (int) self::$now, (int) self::$now);
+        return sprintf('%0.6f00 %d', self::$now - (int) self::$now, (int) self::$now);
     }
 
     public static function date($format, $timestamp = null)

@@ -71,7 +71,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     private $pdo;
 
     /**
-     * @var string|null|false DSN string or null for session.save_path or false when lazy connection disabled
+     * @var string|false|null DSN string or null for session.save_path or false when lazy connection disabled
      */
     private $dsn = false;
 

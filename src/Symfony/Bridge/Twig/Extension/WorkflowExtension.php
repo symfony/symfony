@@ -106,7 +106,7 @@ class WorkflowExtension extends AbstractExtension
      * Returns the metadata for a specific subject.
      *
      * @param object                 $subject         A subject
-     * @param null|string|Transition $metadataSubject Use null to get workflow metadata
+     * @param string|Transition|null $metadataSubject Use null to get workflow metadata
      *                                                Use a string (the place name) to get place metadata
      *                                                Use a Transition instance to get transition metadata
      */

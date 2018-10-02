@@ -117,7 +117,7 @@ class Question
     /**
      * Gets values for the autocompleter.
      *
-     * @return null|iterable
+     * @return iterable|null
      */
     public function getAutocompleterValues()
     {
@@ -127,7 +127,7 @@ class Question
     /**
      * Sets values for the autocompleter.
      *
-     * @param null|iterable $values
+     * @param iterable|null $values
      *
      * @return $this
      *
@@ -156,7 +156,7 @@ class Question
     /**
      * Sets a validator for the question.
      *
-     * @param null|callable $validator
+     * @param callable|null $validator
      *
      * @return $this
      */
@@ -170,7 +170,7 @@ class Question
     /**
      * Gets the validator for the question.
      *
-     * @return null|callable
+     * @return callable|null
      */
     public function getValidator()
     {
@@ -182,7 +182,7 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @param null|int $attempts
+     * @param int|null $attempts
      *
      * @return $this
      *
@@ -204,7 +204,7 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @return null|int
+     * @return int|null
      */
     public function getMaxAttempts()
     {

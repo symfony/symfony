@@ -44,7 +44,7 @@ class ClockMockTest extends TestCase
 
     public function testMicrotime()
     {
-        $this->assertSame('0.125000 1234567890', microtime());
+        $this->assertSame('0.12500000 1234567890', microtime());
     }
 
     public function testMicrotimeAsFloat()

@@ -31,7 +31,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     private $namespace;
 
     /**
-     * @param null|string|RequestStack|callable $namespace
+     * @param string|RequestStack|callable|null $namespace
      *                                                     * null: generates a namespace using $_SERVER['HTTPS']
      *                                                     * string: uses the given string
      *                                                     * RequestStack: generates a namespace using the current master request

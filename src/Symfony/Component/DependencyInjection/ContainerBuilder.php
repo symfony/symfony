@@ -919,7 +919,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * an autowired definition.
      *
      * @param string      $id    The service identifier
-     * @param null|string $class The service class
+     * @param string|null $class The service class
      *
      * @return Definition The created definition
      */

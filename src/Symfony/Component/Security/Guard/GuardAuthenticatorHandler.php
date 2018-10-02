@@ -75,7 +75,7 @@ class GuardAuthenticatorHandler
      * @param AuthenticatorInterface $guardAuthenticator
      * @param string                 $providerKey        The provider (i.e. firewall) key
      *
-     * @return null|Response
+     * @return Response|null
      */
     public function handleAuthenticationSuccess(TokenInterface $token, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
     {
@@ -120,7 +120,7 @@ class GuardAuthenticatorHandler
      * @param AuthenticatorInterface  $guardAuthenticator
      * @param string                  $providerKey             The key of the firewall
      *
-     * @return null|Response
+     * @return Response|null
      */
     public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
     {

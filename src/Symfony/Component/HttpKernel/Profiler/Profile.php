@@ -92,7 +92,7 @@ class Profile
     /**
      * Returns the parent token.
      *
-     * @return null|string The parent token
+     * @return string|null The parent token
      */
     public function getParentToken()
     {

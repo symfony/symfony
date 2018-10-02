@@ -788,7 +788,7 @@ class Inline
      * @param int    &$i
      * @param int    $flags
      *
-     * @return null|string
+     * @return string|null
      */
     private static function parseTag($value, &$i, $flags)
     {

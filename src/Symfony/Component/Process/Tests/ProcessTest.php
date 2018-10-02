@@ -1550,9 +1550,9 @@ EOTXT;
 
     /**
      * @param string      $commandline
-     * @param null|string $cwd
-     * @param null|array  $env
-     * @param null|string $input
+     * @param string|null $cwd
+     * @param array|null  $env
+     * @param string|null $input
      * @param int         $timeout
      * @param array       $options
      *

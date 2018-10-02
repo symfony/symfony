@@ -106,7 +106,7 @@ class StaticPrefixCollection
      * @param string                       $prefix
      * @param mixed                        $route
      *
-     * @return null|StaticPrefixCollection
+     * @return StaticPrefixCollection|null
      */
     private function groupWithItem($item, $prefix, $route)
     {

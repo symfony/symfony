@@ -458,7 +458,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Search for a manager that is declared as 'auto_mapping' = true.
      *
-     * @return null|string The name of the manager. If no one manager is found, returns null
+     * @return string|null The name of the manager. If no one manager is found, returns null
      *
      * @throws \LogicException
      */

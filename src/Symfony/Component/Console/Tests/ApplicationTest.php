@@ -918,8 +918,7 @@ class ApplicationTest extends TestCase
 
         // We can assume here that some other test asserts that the event is dispatched at all
         $dispatcher = new EventDispatcher();
-        $self = $this;
-        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($self, &$passedRightValue) {
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use (&$passedRightValue) {
             $passedRightValue = (4 === $event->getExitCode());
         });
 
@@ -958,8 +957,7 @@ class ApplicationTest extends TestCase
 
         // We can assume here that some other test asserts that the event is dispatched at all
         $dispatcher = new EventDispatcher();
-        $self = $this;
-        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($self, &$passedRightValue) {
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use (&$passedRightValue) {
             $passedRightValue = (1 === $event->getExitCode());
         });
 

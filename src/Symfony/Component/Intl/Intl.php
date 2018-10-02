@@ -187,7 +187,7 @@ final class Intl
     /**
      * Returns the version of the installed ICU library.
      *
-     * @return null|string The ICU version or NULL if it could not be determined
+     * @return string|null The ICU version or NULL if it could not be determined
      */
     public static function getIcuVersion()
     {

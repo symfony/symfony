@@ -1484,7 +1484,7 @@ EOF;
      *
      * @param string $value
      *
-     * @return null|string
+     * @return string|null
      */
     private function getServiceConditionals($value)
     {

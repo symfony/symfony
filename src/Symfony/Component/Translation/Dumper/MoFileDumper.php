@@ -67,7 +67,7 @@ class MoFileDumper extends FileDumper
                           .$this->writeLong($offset[2] + $sourcesStart + $sourcesSize);
         }
 
-        $output = implode(array_map(array($this, 'writeLong'), $header))
+        $output = implode('', array_map(array($this, 'writeLong'), $header))
                .$sourceOffsets
                .$targetOffsets
                .$sources

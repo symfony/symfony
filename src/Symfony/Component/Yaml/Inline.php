@@ -234,7 +234,7 @@ class Inline
             if (null !== $delimiters) {
                 $tmp = ltrim(substr($scalar, $i), ' ');
                 if ('' === $tmp) {
-                    throw new ParseException(sprintf('Unexpected end of line, expected one of "%s".', implode($delimiters)));
+                    throw new ParseException(sprintf('Unexpected end of line, expected one of "%s".', implode('', $delimiters)));
                 }
                 if (!\in_array($tmp[0], $delimiters)) {
                     throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)));

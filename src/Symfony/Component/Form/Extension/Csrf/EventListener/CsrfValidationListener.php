@@ -51,7 +51,7 @@ class CsrfValidationListener implements EventSubscriberInterface
      *                                                     same session and with the same tokenId
      * @param string                    $errorMessage      The message displayed in case of an error
      * @param TranslatorInterface       $translator
-     * @param null|string               $translationDomain
+     * @param string|null               $translationDomain
      * @param ServerParams              $serverParams
      */
     public function __construct($fieldName, $tokenManager, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null, ServerParams $serverParams = null)

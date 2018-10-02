@@ -24,7 +24,7 @@ class Section
     private $events = array();
 
     /**
-     * @var null|float
+     * @var float|null
      */
     private $origin;
 

@@ -235,7 +235,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * @param string $dsn
      *
-     * @return null|array Array($server, $database, $collection)
+     * @return array|null Array($server, $database, $collection)
      */
     private function parseDsn($dsn)
     {

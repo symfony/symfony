@@ -109,7 +109,7 @@ class QuestionHelper extends Helper
      *
      * This method is public for PHP 5.3 compatibility, it should be private.
      *
-     * @return bool|mixed|null|string
+     * @return bool|mixed|string|null
      *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */

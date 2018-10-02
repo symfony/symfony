@@ -90,7 +90,7 @@ interface FormTypeInterface
      * Symfony 2.8 and will be unsupported as of Symfony 3.0. Return the
      * fully-qualified class name of the parent type instead.
      *
-     * @return string|null|FormTypeInterface The name of the parent type if any, null otherwise
+     * @return string|FormTypeInterface|null The name of the parent type if any, null otherwise
      */
     public function getParent();
 

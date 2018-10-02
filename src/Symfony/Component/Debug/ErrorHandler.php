@@ -115,7 +115,7 @@ class ErrorHandler
     /**
      * Registers the error handler.
      *
-     * @param self|null|int $handler The handler to register, or @deprecated (since version 2.6, to be removed in 3.0) bit field of thrown levels
+     * @param self|int|null $handler The handler to register, or @deprecated (since version 2.6, to be removed in 3.0) bit field of thrown levels
      * @param bool          $replace Whether to replace or not any existing handler
      *
      * @return self The registered error handler

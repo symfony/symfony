@@ -34,21 +34,13 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
 
         $params = array(
             'scheme' => 'tcp',
-            'host' => $redisHost,
-            'path' => '',
-            'dbindex' => '1',
+            'host' => 'localhost',
             'port' => 6379,
-            'class' => 'Predis\Client',
-            'timeout' => 3,
             'persistent' => 0,
-            'persistent_id' => null,
-            'read_timeout' => 0,
-            'retry_interval' => 0,
-            'compression' => true,
-            'tcp_keepalive' => 0,
-            'lazy' => false,
+            'timeout' => 3,
+            'read_write_timeout' => 0,
+            'tcp_nodelay' => true,
             'database' => '1',
-            'password' => null,
         );
         $this->assertSame($params, $connection->getParameters()->toArray());
     }

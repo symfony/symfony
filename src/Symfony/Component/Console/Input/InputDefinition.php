@@ -390,7 +390,7 @@ class InputDefinition
             if (!$argument->isRequired()) {
                 $element = '['.$element.']';
             } elseif ($argument->isArray()) {
-                $element = $element.' ('.$element.')';
+                $element .= ' ('.$element.')';
             }
 
             if ($argument->isArray()) {

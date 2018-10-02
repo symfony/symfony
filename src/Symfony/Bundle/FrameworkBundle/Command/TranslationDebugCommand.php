@@ -263,7 +263,7 @@ EOF
     {
         $extractedCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            $path = $path.'views';
+            $path .= 'views';
             if (is_dir($path)) {
                 $this->getContainer()->get('translation.extractor')->extract($path, $extractedCatalogue);
             }
@@ -283,7 +283,7 @@ EOF
     {
         $currentCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            $path = $path.'translations';
+            $path .= 'translations';
             if (is_dir($path)) {
                 $loader->loadMessages($path, $currentCatalogue);
             }
@@ -311,7 +311,7 @@ EOF
 
                 $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
                 foreach ($transPaths as $path) {
-                    $path = $path.'translations';
+                    $path .= 'translations';
                     if (is_dir($path)) {
                         $loader->loadMessages($path, $fallbackCatalogue);
                     }

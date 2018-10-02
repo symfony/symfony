@@ -49,7 +49,7 @@ class ServerStatusCommand extends ServerCommand
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
+            $address .= ':'.$input->getOption('port');
         }
 
         // remove an orphaned lock file

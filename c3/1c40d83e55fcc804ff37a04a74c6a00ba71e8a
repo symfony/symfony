@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-01T20:34:21Z
+
+@ostrolucky you're right. I'll also add a constructor option.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-02T13:44:08Z
+
+@ostrolucky done
+
+I also widened the visibility of `$maxDepthHandler` to protected, for consistency.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-02T15:06:26Z
+
+Last commit has been reverted, after discussing with @nicolas-grekas we had a better idea: we'll introduce soon an option to be able to easily set a default context.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-02T15:06:40Z
+
+We just talked with @dunglas on Slack: he's going to make another PR that will provide a `$contextDefaults` argument to the constructor, instead of any added setter or extra argument.

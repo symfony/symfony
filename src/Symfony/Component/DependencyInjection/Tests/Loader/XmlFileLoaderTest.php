@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -806,5 +807,17 @@ class XmlFileLoaderTest extends TestCase
             '$quz' => 'quz',
             '$factory' => 'factory',
         ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+    }
+
+    public function testTsantosContainer()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_tsantos.xml');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump();
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_tsantos.php', $dumper->dump());
     }
 }

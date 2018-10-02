@@ -355,10 +355,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * objects are iterated as well. Nested arrays are always iterated,
      * regardless of the value of $recursive.
      *
-     * @param iterable                  $collection    The collection
-     * @param string                    $propertyPath  The current property path
-     * @param (string|GroupSequence)[]  $groups        The validated groups
-     * @param ExecutionContextInterface $context       The current execution context
+     * @param iterable                  $collection   The collection
+     * @param string                    $propertyPath The current property path
+     * @param (string|GroupSequence)[]  $groups       The validated groups
+     * @param ExecutionContextInterface $context      The current execution context
      *
      * @see ClassNode
      * @see CollectionNode

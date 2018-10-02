@@ -398,7 +398,6 @@ class Table
      * Example:
      *
      *     | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
-     *
      */
     private function renderRow(array $row, string $cellFormat)
     {

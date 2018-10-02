@@ -341,7 +341,7 @@ class DebugClassLoader
                     self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its parent class "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, $method->class);
                 }
             }
-       }
+        }
 
         return $deprecations;
     }

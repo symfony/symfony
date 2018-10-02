@@ -84,7 +84,7 @@ class Translator implements TranslatorInterface
             }
         }
 
-        return sprintf('concat(%s)', implode($parts, ', '));
+        return sprintf('concat(%s)', implode(', ', $parts));
     }
 
     /**

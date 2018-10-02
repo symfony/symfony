@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-02T09:54:29Z
+
+@carusogabriel you are involved in the core PHP development, so I'd like to ask you something about this.
+
+In my opinion, in most of the proposed changes the original code is more readable and easier to understand. For example:
+
+```php
+$file = $file.'.'.$this->getFileExtension();
+$file .= '.'.$this->getFileExtension();
+```
+
+The first line is easier to understand for me because I just need to read it to know what it does. The second line has some "complication" and you need to "compile it" in your head to understand it.
+
+So, here's my question related to what you said (*"less opcodes for us"*). Doesn't PHP (or OPCache) do this optimization when compiling the code? If it doesn't ... shouldn't do it? It's a trivial optimization for a machine ... and that would allow us to keep using the "more readable for humans" code.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2018-10-02T11:34:01Z
+
+> The first line is easier to understand for me because I just need to read it to know what it does. The second line has some "complication" and you need to "compile it" in your head to understand it.
+
+@javiereguiluz Yeah, I agree with you. Even for trivial cases, e.g. https://3v4l.org/TCEJg, we need some time to understand sometime what is going on if we are not familiar with the operator.
+
+> So, here's my question related to what you said ("less opcodes for us"). Doesn't PHP (or OPCache) do this optimization when compiling the code? If it doesn't ... shouldn't do it? It's a trivial optimization for a machine ... and that would allow us to keep using the "more readable for humans" code.
+
+My answer, unfortunately, is **I don't know**. OPCache is one of the parts of the PHP Internals that I haven't have the change to look up yet, but, I'm gonna take this question to those how knows, as, yes, the following refactor https://3v4l.org/gABQl/vld#output vs. https://3v4l.org/fdLjt/vld#output generates less opcodes, but isn't more readable.

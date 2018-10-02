@@ -264,7 +264,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     protected function getContainer($file)
     {
-        $file = $file.'.'.$this->getFileExtension();
+        $file .= '.'.$this->getFileExtension();
 
         if (isset(self::$containerCache[$file])) {
             return self::$containerCache[$file];

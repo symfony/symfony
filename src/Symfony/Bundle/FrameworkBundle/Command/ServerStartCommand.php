@@ -112,7 +112,7 @@ EOF
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
+            $address .= ':'.$input->getOption('port');
         }
 
         if (!$input->getOption('force') && $this->isOtherServerProcessRunning($address)) {

@@ -132,7 +132,7 @@ EOF
         } elseif ($tag = $input->getOption('tag')) {
             $options = array('tag' => $tag);
         } elseif ($name = $input->getArgument('name')) {
-            $name = $this->findProperServiceName($input, $errorIo, $object, $name);
+            $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = array('id' => $name);
         } else {
             $options = array();
@@ -208,13 +208,13 @@ EOF
         return $this->containerBuilder = $container;
     }
 
-    private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, $name)
+    private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden)
     {
         if ($builder->has($name) || !$input->isInteractive()) {
             return $name;
         }
 
-        $matchingServices = $this->findServiceIdsContaining($builder, $name);
+        $matchingServices = $this->findServiceIdsContaining($builder, $name, $showHidden);
         if (empty($matchingServices)) {
             throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
@@ -224,11 +224,14 @@ EOF
         return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
     }
 
-    private function findServiceIdsContaining(ContainerBuilder $builder, $name)
+    private function findServiceIdsContaining(ContainerBuilder $builder, string $name, bool $showHidden)
     {
         $serviceIds = $builder->getServiceIds();
         $foundServiceIds = array();
         foreach ($serviceIds as $serviceId) {
+            if (!$showHidden && 0 === strpos($serviceId, '.')) {
+                continue;
+            }
             if (false === stripos($serviceId, $name)) {
                 continue;
             }

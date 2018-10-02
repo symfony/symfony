@@ -184,6 +184,7 @@ class FrameworkExtension extends Extension
                     'sublime' => 'subl://open?url=file://%%f&line=%%l',
                     'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
                     'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
+                    'vscode' => 'vscode://file/%%f:%%l',
                 );
                 $ide = $config['ide'];
 

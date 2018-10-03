@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by alanpoulain at 2018-10-02T09:02:00Z
+
+I have used a callable instead of an interface.
+For the sake of performance, I have kept the ternary.

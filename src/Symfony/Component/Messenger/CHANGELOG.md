@@ -4,7 +4,8 @@ CHANGELOG
 4.2.0
 -----
 
- * [BC BREAK] The signature of Amqp* classes changed to take a `Connection` as a first argument and an optional
+ * The component is not experimental anymore
+ * [BC BREAK] The signature of `Amqp*` classes changed to take a `Connection` as a first argument and an optional
    `Serializer` as a second argument.
  * [BC BREAK] `SenderLocator` has been renamed to `ContainerSenderLocator`
    Be careful as there is still a `SenderLocator` class, but it does not rely on a `ContainerInterface` to find senders.
@@ -16,3 +17,10 @@ CHANGELOG
  * [BC BREAK] The `ConsumeMessagesCommand` class now takes an instance of `Psr\Container\ContainerInterface` 
    as first constructor argument
  * [BC BREAK] The `EncoderInterface` and `DecoderInterface` have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
+ * [BC BREAK] The locator passed to `ContainerHandlerLocator` should not prefix its keys by "handler." anymore
+ * [BC BREAK] The `AbstractHandlerLocator::getHandler()` method uses `?callable` as return type
+
+4.1.0
+-----
+
+ * Introduced the component as experimental

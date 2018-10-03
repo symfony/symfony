@@ -167,7 +167,7 @@ class MessengerPass implements CompilerPassInterface
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
             foreach ($handlersByMessage as $message => $handlersIds) {
                 if (1 === \count($handlersIds)) {
-                    $handlersLocatorMappingByBus[$bus]['handler.'.$message] = new Reference(current($handlersIds));
+                    $handlersLocatorMappingByBus[$bus][$message] = new Reference(current($handlersIds));
                 } else {
                     $chainHandler = new Definition(ChainHandler::class, array(array_map(function (string $handlerId): Reference {
                         return new Reference($handlerId);
@@ -175,7 +175,7 @@ class MessengerPass implements CompilerPassInterface
                     $chainHandler->setPrivate(true);
                     $serviceId = '.messenger.chain_handler.'.ContainerBuilder::hash($bus.$message);
                     $definitions[$serviceId] = $chainHandler;
-                    $handlersLocatorMappingByBus[$bus]['handler.'.$message] = new Reference($serviceId);
+                    $handlersLocatorMappingByBus[$bus][$message] = new Reference($serviceId);
                 }
             }
         }

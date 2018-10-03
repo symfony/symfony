@@ -26,10 +26,11 @@ class ContainerHandlerLocator extends AbstractHandlerLocator
         $this->container = $container;
     }
 
-    protected function getHandler(string $class)
+    /**
+     * {@inheritdoc}
+     */
+    protected function getHandler(string $class): ?callable
     {
-        $handlerKey = 'handler.'.$class;
-
-        return $this->container->has($handlerKey) ? $this->container->get($handlerKey) : null;
+        return $this->container->has($class) ? $this->container->get($class) : null;
     }
 }

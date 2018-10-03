@@ -16,7 +16,7 @@ class ContainerHandlerLocatorTest extends TestCase
         $handler = function () {};
 
         $container = new Container();
-        $container->set('handler.'.DummyMessage::class, $handler);
+        $container->set(DummyMessage::class, $handler);
 
         $locator = new ContainerHandlerLocator($container);
         $resolvedHandler = $locator->resolve(new DummyMessage('Hey'));
@@ -39,7 +39,7 @@ class ContainerHandlerLocatorTest extends TestCase
         $handler = function () {};
 
         $container = new Container();
-        $container->set('handler.'.DummyMessageInterface::class, $handler);
+        $container->set(DummyMessageInterface::class, $handler);
 
         $locator = new ContainerHandlerLocator($container);
         $resolvedHandler = $locator->resolve(new DummyMessage('Hey'));
@@ -52,7 +52,7 @@ class ContainerHandlerLocatorTest extends TestCase
         $handler = function () {};
 
         $container = new Container();
-        $container->set('handler.'.DummyMessage::class, $handler);
+        $container->set(DummyMessage::class, $handler);
 
         $locator = new ContainerHandlerLocator($container);
         $resolvedHandler = $locator->resolve(new ChildDummyMessage('Hey'));

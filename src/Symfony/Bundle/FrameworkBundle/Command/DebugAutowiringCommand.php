@@ -66,7 +66,7 @@ EOF
 
         if ($search = $input->getArgument('search')) {
             $serviceIds = array_filter($serviceIds, function ($serviceId) use ($search) {
-                return false !== stripos($serviceId, $search);
+                return false !== stripos($serviceId, $search) && 0 !== strpos($serviceId, '.');
             });
 
             if (empty($serviceIds)) {

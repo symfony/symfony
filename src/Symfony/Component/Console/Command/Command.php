@@ -363,10 +363,12 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param string $name        The argument name
-     * @param int    $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string $description A description text
-     * @param mixed  $default     The default value (for InputArgument::OPTIONAL mode only)
+     * @param string               $name        The argument name
+     * @param int|null             $mode        The argument mode: self::REQUIRED or self::OPTIONAL
+     * @param string               $description A description text
+     * @param string|string[]|null $default     The default value (for self::OPTIONAL mode only)
+     *
+     * @throws InvalidArgumentException When argument mode is not valid
      *
      * @return $this
      */
@@ -380,11 +382,13 @@ class Command
     /**
      * Adds an option.
      *
-     * @param string $name        The option name
-     * @param string $shortcut    The shortcut (can be null)
-     * @param int    $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string $description A description text
-     * @param mixed  $default     The default value (must be null for InputOption::VALUE_NONE)
+     * @param string                    $name        The option name
+     * @param string|array              $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int|null                  $mode        The option mode: One of the VALUE_* constants
+     * @param string                    $description A description text
+     * @param string|string[]|bool|null $default     The default value (must be null for self::VALUE_NONE)
+     *
+     * @throws InvalidArgumentException If option mode is invalid or incompatible
      *
      * @return $this
      */

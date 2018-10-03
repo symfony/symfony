@@ -97,6 +97,7 @@ class ConfigurationTest extends TestCase
             'base_urls' => array(),
             'packages' => array(),
             'json_manifest_path' => null,
+            'package_json_path' => null,
         );
 
         $this->assertEquals($defaultConfig, $config['assets']);
@@ -147,15 +148,29 @@ class ConfigurationTest extends TestCase
             'json_manifest_path' => '/foo.json',
             'version_strategy' => 'foo',
         );
-        yield array($config, 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".');
-        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.');
+        yield array($config, 'You cannot use both "version_strategy" and "json_manifest_path" or "package_json_path" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" or "package_json_path" at the same time under "assets" packages.');
 
         $config = array(
             'json_manifest_path' => '/foo.json',
             'version' => '1',
         );
-        yield array($config, 'You cannot use both "version" and "json_manifest_path" at the same time under "assets".');
-        yield array($createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.');
+        yield array($config, 'You cannot use both "version" and "json_manifest_path" or "package_json_path" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" or "package_json_path" at the same time under "assets" packages.');
+
+        $config = array(
+            'package_json_path' => '/package.json',
+            'version_strategy' => 'foo',
+        );
+        yield array($config, 'You cannot use both "version_strategy" and "json_manifest_path" or "package_json_path" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" or "package_json_path" at the same time under "assets" packages.');
+
+        $config = array(
+            'package_json_path' => '/package.json',
+            'version' => '1',
+        );
+        yield array($config, 'You cannot use both "version" and "json_manifest_path" or "package_json_path" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" or "package_json_path" at the same time under "assets" packages.');
     }
 
     protected static function getBundleDefaultConfig()
@@ -261,6 +276,7 @@ class ConfigurationTest extends TestCase
                 'base_urls' => array(),
                 'packages' => array(),
                 'json_manifest_path' => null,
+                'package_json_path' => null,
             ),
             'cache' => array(
                 'pools' => array(),

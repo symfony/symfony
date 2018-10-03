@@ -912,7 +912,7 @@ class FrameworkExtension extends Extension
         if ($config['version_strategy']) {
             $defaultVersion = new Reference($config['version_strategy']);
         } else {
-            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default');
+            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], $config['package_json_path'], '_default');
         }
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
@@ -922,14 +922,14 @@ class FrameworkExtension extends Extension
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
-            } elseif (!array_key_exists('version', $package) && null === $package['json_manifest_path']) {
-                // if neither version nor json_manifest_path are specified, use the default
+            } elseif (!array_key_exists('version', $package) && null === $package['json_manifest_path'] && null === $package['package_json_path']) {
+                // if neither version nor json_manifest_path nor package_json_path are specified, use the default
                 $version = $defaultVersion;
             } else {
                 // let format fallback to main version_format
                 $format = $package['version_format'] ?: $config['version_format'];
                 $version = isset($package['version']) ? $package['version'] : null;
-                $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
+                $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $package['package_json_path'], $name);
             }
 
             $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
@@ -961,7 +961,7 @@ class FrameworkExtension extends Extension
         return $package;
     }
 
-    private function createVersion(ContainerBuilder $container, $version, $format, $jsonManifestPath, $name)
+    private function createVersion(ContainerBuilder $container, $version, $format, $jsonManifestPath, $packageJsonPath, $name)
     {
         // Configuration prevents $version and $jsonManifestPath from being set
         if (null !== $version) {
@@ -978,6 +978,17 @@ class FrameworkExtension extends Extension
         if (null !== $jsonManifestPath) {
             $def = new ChildDefinition('assets.json_manifest_version_strategy');
             $def->replaceArgument(0, $jsonManifestPath);
+            $container->setDefinition('assets._version_'.$name, $def);
+
+            return new Reference('assets._version_'.$name);
+        }
+
+        if (null !== $packageJsonPath) {
+            $def = new ChildDefinition('assets.package_json_version_strategy');
+            $def
+                ->replaceArgument(0, $packageJsonPath)
+                ->replaceArgument(1, $format)
+            ;
             $container->setDefinition('assets._version_'.$name, $def);
 
             return new Reference('assets._version_'.$name);

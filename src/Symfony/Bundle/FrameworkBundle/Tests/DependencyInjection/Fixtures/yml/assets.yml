@@ -19,3 +19,6 @@ framework:
                 version_strategy: assets.custom_version_strategy
             json_manifest_strategy:
                 json_manifest_path: '/path/to/manifest.json'
+            package_json_strategy:
+                package_json_path: '/path/to/package.json'
+                version_format: '%%s?v=%%s'

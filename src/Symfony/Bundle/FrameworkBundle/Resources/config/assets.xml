@@ -50,5 +50,10 @@
         <service id="assets.json_manifest_version_strategy" class="Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy" abstract="true">
             <argument /> <!-- manifest path -->
         </service>
+
+        <service id="assets.package_json_version_strategy" class="Symfony\Component\Asset\VersionStrategy\PackageJsonVersionStrategy" abstract="true">
+            <argument /> <!-- package.json path -->
+            <argument /> <!-- format -->
+        </service>
     </services>
 </container>

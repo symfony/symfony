@@ -617,6 +617,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('version')->defaultNull()->end()
                         ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
                         ->scalarNode('json_manifest_path')->defaultNull()->end()
+                        ->scalarNode('package_json_path')->defaultNull()->end()
                         ->scalarNode('base_path')->defaultValue('')->end()
                         ->arrayNode('base_urls')
                             ->requiresAtLeastOneElement()
@@ -635,15 +636,21 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                            return isset($v['json_manifest_path']) && isset($v['package_json_path']);
                         })
-                        ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".')
+                        ->thenInvalid('You cannot use both "json_manifest_path" and "package_json_path" at the same time under "assets".')
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version']) && isset($v['json_manifest_path']);
+                            return isset($v['version_strategy']) && (isset($v['json_manifest_path']) || isset($v['package_json_path']));
                         })
-                        ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets".')
+                        ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" or "package_json_path" at the same time under "assets".')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return isset($v['version']) && (isset($v['json_manifest_path']) || isset($v['package_json_path']));
+                        })
+                        ->thenInvalid('You cannot use both "version" and "json_manifest_path" or "package_json_path" at the same time under "assets".')
                     ->end()
                     ->fixXmlConfig('package')
                     ->children()
@@ -661,6 +668,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->scalarNode('json_manifest_path')->defaultNull()->end()
+                                    ->scalarNode('package_json_path')->defaultNull()->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()
                                     ->arrayNode('base_urls')
                                         ->requiresAtLeastOneElement()
@@ -679,15 +687,15 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                                        return isset($v['version_strategy']) && (isset($v['json_manifest_path']) || isset($v['package_json_path']));
                                     })
-                                    ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.')
+                                    ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" or "package_json_path" at the same time under "assets" packages.')
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version']) && isset($v['json_manifest_path']);
+                                        return isset($v['version']) && (isset($v['json_manifest_path']) || isset($v['package_json_path']));
                                     })
-                                    ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.')
+                                    ->thenInvalid('You cannot use both "version" and "json_manifest_path" or "package_json_path" at the same time under "assets" packages.')
                                 ->end()
                             ->end()
                         ->end()

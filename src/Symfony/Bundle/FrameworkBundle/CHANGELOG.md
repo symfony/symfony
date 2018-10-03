@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added asset `PackageJsonVersionStrategy`
  * Added `ControllerTrait::isFormValid()`
 
 4.2.0

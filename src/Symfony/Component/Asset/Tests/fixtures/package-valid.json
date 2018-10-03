@@ -1,0 +1,8 @@
+{
+    "version": "1.2.3",
+    "scripts": {
+        "build": "npm run build:assets && npm run version:patch",
+        "build:assets": "...",
+        "version:patch": "npm version patch --git-tag-version false"
+    }
+}

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\StoppableTaskInterface;
+use Psr\EventDispatcher\TaskInterface;
+
 /**
  * Event is the base class for classes containing event data.
  *
@@ -25,7 +28,7 @@ namespace Symfony\Component\EventDispatcher;
  * @author Roman Borschel <roman@code-factory.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Event
+class Event implements TaskInterface, StoppableTaskInterface
 {
     /**
      * @var bool Whether no further event listeners should be triggered
@@ -39,7 +42,7 @@ class Event
      *
      * @return bool Whether propagation was already stopped for this event
      */
-    public function isPropagationStopped()
+    public function isPropagationStopped(): bool
     {
         return $this->propagationStopped;
     }

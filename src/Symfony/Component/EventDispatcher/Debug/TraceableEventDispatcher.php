@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
+use Psr\EventDispatcher\StoppableTaskInterface;
+use Psr\EventDispatcher\TaskInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -120,16 +122,26 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         return $this->dispatcher->hasListeners($eventName);
     }
 
+    public function process(TaskInterface $event): TaskInterface
+    {
+        return $this->executeDispatch(get_class($event), $event);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function dispatch($eventName, Event $event = null)
     {
+        return $this->executeDispatch($eventName, $event);
+    }
+
+    private function executeDispatch($eventName, $event = null)
+    {
         if (null === $event) {
             $event = new Event();
         }
 
-        if (null !== $this->logger && $event->isPropagationStopped()) {
+        if (null !== $this->logger && $event instanceof StoppableTaskInterface && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 

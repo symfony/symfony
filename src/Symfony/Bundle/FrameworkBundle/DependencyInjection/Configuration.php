@@ -879,7 +879,7 @@ class Configuration implements ConfigurationInterface
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->integerNode('default_lifetime')->end()
                                     ->scalarNode('provider')
-                                        ->info('The service name to use as provider when the specified adapter needs one.')
+                                        ->info('Overwrite the setting from the default provider for this adapter.')
                                     ->end()
                                     ->scalarNode('clearer')->end()
                                 ->end()

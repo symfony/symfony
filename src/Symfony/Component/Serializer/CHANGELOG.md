@@ -20,6 +20,8 @@ CHANGELOG
    either `NormalizerInterface` or `DenormalizerInterface`
  * deprecated creating a `Serializer` with encoders which do not implement
    either `EncoderInterface` or `DecoderInterface`
+ * added the optional `$objectClassResolver` argument in `AbstractObjectNormalizer`
+   and `ObjectNormalizer` constructor
 
 4.1.0
 -----

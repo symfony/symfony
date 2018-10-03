@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by boscho87 at 2018-09-28T19:52:59Z
+
+@nicolas-grekas i do not find any usages...
+@stof i changed the files (i use linux not Windows)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-29T20:41:44Z
+
+Running `grep getFallbackLocales src/ -rl` on the repository spots the usages, that's where we should start.
+On Linux, you should use `chmod 644` with the name of each file (honestly, I don't know how you ended up changing the mode of these files, maybe some unusual configuration like @stof hinted about?)
+
+---------------------------------------------------------------------------
+
+by boscho87 at 2018-09-29T21:10:05Z
+
+Idk i never before had such problems with changing file permisssions
+
+---------------------------------------------------------------------------
+
+by boscho87 at 2018-09-30T11:03:20Z
+
+Maybe i should not have started this PR... im a bit confused  what is need to be done exactly..
+
+e.g  https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Command/TranslationDebugCommand.php#L321 here ... should this whole method all so be removed and all the stuff who uses tha catalouges too https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Command/TranslationDebugCommand.php#L200
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-30T20:08:55Z
+
+I think there is an easy way to finish this PR, which is reverting the deprecation and add `@internal since Symfony 4.2` on the method instead. This would provide the same.

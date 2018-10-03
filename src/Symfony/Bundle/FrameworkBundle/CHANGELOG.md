@@ -14,6 +14,10 @@ CHANGELOG
  * Removed the `framework.messenger.encoder` and `framework.messenger.decoder` options. Use the `framework.messenger.serializer.id` option to replace the Messenger serializer. 
  * Deprecated the `ContainerAwareCommand` class in favor of `Symfony\Component\Console\Command\Command`
  * Made `debug:container` and `debug:autowiring` ignore backslashes in service ids
+ * Deprecated the `--env` console option and its "-e" shortcut, set
+   the "APP_ENV" environment variable instead.
+ * Deprecated the `--no-debug` console option, set the "APP_DEBUG" 
+   environment variable to "0" instead.
 
 4.1.0
 -----

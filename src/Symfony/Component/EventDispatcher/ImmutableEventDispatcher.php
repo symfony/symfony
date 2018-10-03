@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\TaskInterface;
+
 /**
  * A read-only proxy for an event dispatcher.
  *
@@ -23,6 +25,11 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function process(TaskInterface $event): TaskInterface
+    {
+        return $this->dispatcher->process($event);
     }
 
     /**

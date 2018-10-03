@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\StoppableTaskInterface;
+use Psr\EventDispatcher\TaskInterface;
+
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  *
@@ -31,10 +34,20 @@ class EventDispatcher implements EventDispatcherInterface
     private $listeners = array();
     private $sorted = array();
 
+    public function process(TaskInterface $event): TaskInterface
+    {
+        return $this->executeDispatch(get_class($event), $event);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function dispatch($eventName, Event $event = null)
+    {
+        return $this->executeDispatch($eventName, $event);
+    }
+
+    private function executeDispatch($eventName, $event = null)
     {
         if (null === $event) {
             $event = new Event();
@@ -201,12 +214,12 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @param callable[] $listeners The event listeners
      * @param string     $eventName The name of the event to dispatch
-     * @param Event      $event     The event object to pass to the event handlers/listeners
+     * @param TaskInterface $event The event object to pass to the event handlers/listeners
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function doDispatch($listeners, $eventName, TaskInterface $event)
     {
         foreach ($listeners as $listener) {
-            if ($event->isPropagationStopped()) {
+            if ($event instanceof StoppableTaskInterface && $event->isPropagationStopped()) {
                 break;
             }
             \call_user_func($listener, $event, $eventName, $this);

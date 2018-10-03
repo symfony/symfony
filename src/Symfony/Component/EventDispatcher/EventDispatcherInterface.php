@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\TaskProcessorInterface;
+
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  * Listeners are registered on the manager and events are dispatched through the
@@ -18,7 +20,7 @@ namespace Symfony\Component\EventDispatcher;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface EventDispatcherInterface
+interface EventDispatcherInterface extends TaskProcessorInterface
 {
     /**
      * Dispatches an event to all registered listeners.

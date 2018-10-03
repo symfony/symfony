@@ -20,15 +20,17 @@ use Psr\Container\ContainerInterface;
 class ContainerHandlerLocator extends AbstractHandlerLocator
 {
     private $container;
+    private $handlerKeyFormat;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, string $handlerKeyFormat = 'handler.%s')
     {
         $this->container = $container;
+        $this->handlerKeyFormat = $handlerKeyFormat;
     }
 
     protected function getHandler(string $class)
     {
-        $handlerKey = 'handler.'.$class;
+        $handlerKey = sprintf($this->handlerKeyFormat, $class);
 
         return $this->container->has($handlerKey) ? $this->container->get($handlerKey) : null;
     }

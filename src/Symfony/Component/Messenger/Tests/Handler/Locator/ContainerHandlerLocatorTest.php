@@ -59,4 +59,17 @@ class ContainerHandlerLocatorTest extends TestCase
 
         $this->assertSame($handler, $resolvedHandler);
     }
+
+    public function testLoctesHandlerWithSpecificKeyFormat()
+    {
+        $handler = function () {};
+
+        $container = new Container();
+        $container->set('messages.handler.'.DummyMessage::class, $handler);
+
+        $locator = new ContainerHandlerLocator($container, 'messages.handler.%s');
+        $resolvedHandler = $locator->resolve(new DummyMessage('Hey'));
+
+        $this->assertSame($handler, $resolvedHandler);
+    }
 }

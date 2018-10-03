@@ -78,6 +78,18 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
+     * @internal
+     */
+    public function addContent(string $input)
+    {
+        foreach (explode(PHP_EOL, $input) as $lineContent) {
+            $this->lines += ceil($this->getDisplayLength($lineContent) / $this->terminal->getWidth()) ?: 1;
+            $this->content[] = $lineContent;
+            $this->content[] = PHP_EOL;
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function doWrite($message, $newline)
@@ -88,11 +100,7 @@ class ConsoleSectionOutput extends StreamOutput
 
         $erasedContent = $this->popStreamContentUntilCurrentSection();
 
-        foreach (explode(PHP_EOL, $message) as $lineContent) {
-            $this->lines += ceil($this->getDisplayLength($lineContent) / $this->terminal->getWidth()) ?: 1;
-            $this->content[] = $lineContent;
-            $this->content[] = PHP_EOL;
-        }
+        $this->addContent($message);
 
         parent::doWrite($message, true);
         parent::doWrite($erasedContent, false);

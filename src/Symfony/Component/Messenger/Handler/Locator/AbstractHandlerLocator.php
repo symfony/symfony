@@ -42,5 +42,5 @@ abstract class AbstractHandlerLocator implements HandlerLocatorInterface
         throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $class));
     }
 
-    abstract protected function getHandler(string $class);
+    abstract protected function getHandler(string $class): ?callable;
 }

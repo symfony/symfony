@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-01T21:42:36Z
+
+@fabpot done, thanks for the reminder.
+Also moved to FrameworkBundle, I've been confused by the console recipe relying on them.

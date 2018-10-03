@@ -7,6 +7,15 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.17 (2018-10-03)
+
+ * bug #28604 [Finder] fixed root directory access for ftp/sftp wrapper (DerDu)
+ * bug #28688 [FWBundle] Throw if PropertyInfo is enabled, but the component isn't installed (dunglas)
+ * bug #28648 [PHPUnitBridge] Fix ClockMock microtime() format (acasademont)
+ * bug #28678 [DI] fix dumping setters before their inlined instances (nicolas-grekas)
+ * bug #28672 [DI] fix error in dumped container (nicolas-grekas)
+ * bug #28664 [Console] Don't return early as this bypasses the auto exit feature (duncan3dc)
+
 * 3.4.16 (2018-09-30)
 
  * bug #28376 [TwigBundle] Fixed caching of templates in src/Resources/<BundleName>/views on cache warmup (yceruto)

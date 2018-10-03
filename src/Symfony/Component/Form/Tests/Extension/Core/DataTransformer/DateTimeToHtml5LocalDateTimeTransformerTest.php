@@ -51,6 +51,10 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
             array('UTC', 'UTC', '2010-02-03 04:05:00 UTC', '2010-02-03T04:05'),
             array('America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:00 America/New_York', '2010-02-03T17:05'),
             array('Europe/Amsterdam', 'Europe/Amsterdam', '2013-08-21 10:30:00 Europe/Amsterdam', '2013-08-21T10:30:00'),
+            array('UTC', 'UTC', '2018-09-15T10:00:00Z', '2018-09-15T10:00:00Z'),
+            array('Europe/Berlin', 'Europe/Berlin', '2018-09-15T10:00:00+02:00', '2018-09-15T10:00:00+02:00'),
+            array('Europe/Berlin', 'Europe/Berlin', '2018-09-15T10:00:00+0200', '2018-09-15T10:00:00+0200'),
+            array('UTC', 'UTC', '2018-10-03T10:00:00.000Z', '2018-10-03T10:00:00.000Z'),
         );
     }
 

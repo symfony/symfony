@@ -9,6 +9,7 @@ CHANGELOG
  * deprecated `MessageSelector`, `Interval` and `PluralizationRules`; use `IdentityTranslator` instead
  * Added `IntlMessageFormatter` and `FallbackMessageFormatter`
  * added support for multiple files and directories in `XliffLintCommand`
+ * Marked `Translator::getFallbackLocales()` and `TranslationDataCollector::getFallbackLocales()` as internal
 
 4.1.0
 -----

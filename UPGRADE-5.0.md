@@ -184,6 +184,7 @@ Translation
  * The `TranslationWriter::disableBackup()` method has been removed.
  * The `TranslatorInterface` has been removed in favor of `Symfony\Contracts\Translation\TranslatorInterface`
  * The `MessageSelector`, `Interval` and `PluralizationRules` classes have been removed, use `IdentityTranslator` instead
+ * The `Translator::getFallbackLocales()` and `TranslationDataCollector::getFallbackLocales()` method are now internal
 
 TwigBundle
 ----------

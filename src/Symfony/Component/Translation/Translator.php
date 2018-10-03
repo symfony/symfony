@@ -176,6 +176,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * Gets the fallback locales.
      *
+     * @internal since Symfony 4.2
+     *
      * @return array $locales The fallback locales
      */
     public function getFallbackLocales()

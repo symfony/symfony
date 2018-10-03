@@ -17,6 +17,9 @@ use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\User\UserChecker;
 
+/**
+ * @group legacy
+ */
 class SimpleAuthenticationProviderTest extends TestCase
 {
     /**

@@ -54,8 +54,8 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new RememberMeFactory());
         $extension->addSecurityListenerFactory(new X509Factory());
         $extension->addSecurityListenerFactory(new RemoteUserFactory());
-        $extension->addSecurityListenerFactory(new SimplePreAuthenticationFactory());
-        $extension->addSecurityListenerFactory(new SimpleFormFactory());
+        $extension->addSecurityListenerFactory(new SimplePreAuthenticationFactory(false));
+        $extension->addSecurityListenerFactory(new SimpleFormFactory(false));
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());

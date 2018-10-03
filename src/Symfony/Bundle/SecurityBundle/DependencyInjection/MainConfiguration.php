@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFormFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimplePreAuthenticationFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -264,6 +266,10 @@ class MainConfiguration implements ConfigurationInterface
                 $factoryNode = $firewallNodeBuilder->arrayNode($name)
                     ->canBeUnset()
                 ;
+
+                if ($factory instanceof SimplePreAuthenticationFactory || $factory instanceof SimpleFormFactory) {
+                    $factoryNode->setDeprecated(sprintf('The "%s" security listener is deprecated Symfony 4.2, use Guard instead.', $name));
+                }
 
                 if ($factory instanceof AbstractFactory) {
                     $abstractFactoryKeys[] = $name;

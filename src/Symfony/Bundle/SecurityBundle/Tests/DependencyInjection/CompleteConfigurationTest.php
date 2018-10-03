@@ -147,23 +147,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 ),
                 null,
             ),
-            array(
-                'simple_auth',
-                'security.user_checker',
-                null,
-                true,
-                false,
-                'security.user.provider.concrete.default',
-                'simple_auth',
-                'security.authentication.form_entry_point.simple_auth',
-                null,
-                null,
-                array(
-                    'simple_form',
-                    'anonymous',
-                ),
-                null,
-            ),
         ), $configs);
 
         $this->assertEquals(array(
@@ -191,13 +174,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.context_listener.1',
                 'security.authentication.listener.basic.with_user_checker',
                 'security.authentication.listener.anonymous.with_user_checker',
-                'security.access_listener',
-            ),
-            array(
-                'security.channel_listener',
-                'security.context_listener.2',
-                'security.authentication.listener.simple_form.simple_auth',
-                'security.authentication.listener.anonymous.simple_auth',
                 'security.access_listener',
             ),
         ), $listeners);
@@ -473,6 +449,50 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "simple_form" security listener is deprecated Symfony 4.2, use Guard instead.
+     */
+    public function testSimpleAuth()
+    {
+        $container = $this->getContainer('simple_auth');
+        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
+        $listeners = array();
+        $configs = array();
+        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
+            $contextDef = $container->getDefinition($contextId);
+            $arguments = $contextDef->getArguments();
+            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+
+            $configDef = $container->getDefinition((string) $arguments['index_3']);
+            $configs[] = array_values($configDef->getArguments());
+        }
+
+        $this->assertSame(array(array(
+            'simple_auth',
+            'security.user_checker',
+            null,
+            true,
+            false,
+            'security.user.provider.concrete.default',
+            'simple_auth',
+            'security.authentication.form_entry_point.simple_auth',
+            null,
+            null,
+            array('simple_form', 'anonymous',
+            ),
+            null,
+        )), $configs);
+
+        $this->assertSame(array(array(
+            'security.channel_listener',
+            'security.context_listener.0',
+            'security.authentication.listener.simple_form.simple_auth',
+            'security.authentication.listener.anonymous.simple_auth',
+            'security.access_listener',
+        )), $listeners);
     }
 
     protected function getContainer($file)

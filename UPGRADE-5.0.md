@@ -160,6 +160,9 @@ Security
    the 3rd one must be either a `LogoutListener` instance or `null`.
  * The `AuthenticationTrustResolver` constructor arguments have been removed.
  * A user object that is not an instance of `UserInterface` cannot be accessed from `Security::getUser()` anymore and returns `null` instead.
+ * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
+   `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
+   `SimplePreAuthenticationListener` have been removed. Use Guard instead.
 
 SecurityBundle
 --------------
@@ -171,6 +174,10 @@ SecurityBundle
    now throws a `\TypeError`, pass a `LogoutListener` instance instead.
  * The `security.authentication.trust_resolver.anonymous_class` parameter has been removed.
  * The `security.authentication.trust_resolver.rememberme_class` parameter has been removed.
+ * The `simple_form` and `simple_preauth` authentication listeners have been removed,
+   use Guard instead.
+ * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been removed,
+   use Guard instead.
 
 Serializer
 ----------

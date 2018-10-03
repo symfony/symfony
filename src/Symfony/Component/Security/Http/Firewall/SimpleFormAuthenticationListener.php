@@ -29,8 +29,12 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use Guard instead.', SimpleFormAuthenticationListener::class), E_USER_DEPRECATED);
+
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since Symfony 4.2, use Guard instead.
  */
 class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
 {

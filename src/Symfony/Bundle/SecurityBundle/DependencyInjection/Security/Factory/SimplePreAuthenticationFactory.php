@@ -18,9 +18,18 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since Symfony 4.2, use Guard instead.
  */
 class SimplePreAuthenticationFactory implements SecurityFactoryInterface
 {
+    public function __construct(bool $triggerDeprecation = true)
+    {
+        if ($triggerDeprecation) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use Guard instead.', __CLASS__), E_USER_DEPRECATED);
+        }
+    }
+
     public function getPosition()
     {
         return 'pre_auth';

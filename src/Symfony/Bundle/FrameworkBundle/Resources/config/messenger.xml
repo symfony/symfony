@@ -29,6 +29,9 @@
         <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
             <argument /> <!-- Bus handler resolver -->
         </service>
+        <service id="messenger.middleware.allow_single_handler" class="Symfony\Component\Messenger\Middleware\AllowSingleHandlerMiddleware" abstract="true">
+            <argument /> <!-- Bus handler resolver -->
+        </service>
 
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware" abstract="true">
             <argument type="service" id="validator" />

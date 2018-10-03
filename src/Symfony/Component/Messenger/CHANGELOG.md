@@ -19,6 +19,7 @@ CHANGELOG
  * [BC BREAK] The `EncoderInterface` and `DecoderInterface` have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
  * [BC BREAK] The locator passed to `ContainerHandlerLocator` should not prefix its keys by "handler." anymore
  * [BC BREAK] The `AbstractHandlerLocator::getHandler()` method uses `?callable` as return type
+ * Added `AllowSingleHandlerMiddleware` for message buses which behave like command buses.
 
 4.1.0
 -----

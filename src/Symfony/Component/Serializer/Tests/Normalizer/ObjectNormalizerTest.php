@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -49,8 +50,13 @@ class ObjectNormalizerTest extends TestCase
 
     protected function setUp()
     {
+        $this->createNormalizer();
+    }
+
+    private function createNormalizer(array $defaultContext = array(), ClassMetadataFactoryInterface $classMetadataFactory = null)
+    {
         $this->serializer = $this->getMockBuilder(__NAMESPACE__.'\ObjectSerializerNormalizer')->getMock();
-        $this->normalizer = new ObjectNormalizer();
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -393,8 +399,20 @@ class ObjectNormalizerTest extends TestCase
      */
     public function testCallbacks($callbacks, $value, $result, $message)
     {
-        $this->normalizer->setCallbacks($callbacks);
+        $this->doTestCallbacks($callbacks, $value, $result, $message);
+    }
 
+    /**
+     * @dataProvider provideCallbacks
+     */
+    public function testLegacyCallbacks($callbacks, $value, $result, $message)
+    {
+        $this->doTestCallbacks($callbacks, $value, $result, $message);
+    }
+
+    private function doTestCallbacks($callbacks, $value, $result, $message, bool $legacy = false)
+    {
+        $legacy ? $this->normalizer->setCallbacks($callbacks) : $this->createNormalizer(array(ObjectNormalizer::CALLBACKS => $callbacks));
         $obj = new ObjectConstructorDummy('', $value, true);
 
         $this->assertEquals(
@@ -409,7 +427,21 @@ class ObjectNormalizerTest extends TestCase
      */
     public function testUncallableCallbacks()
     {
-        $this->normalizer->setCallbacks(array('bar' => null));
+        $this->doTestUncallableCallbacks();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLegacyUncallableCallbacks()
+    {
+        $this->doTestUncallableCallbacks(true);
+    }
+
+    private function doTestUncallableCallbacks(bool $legacy = false)
+    {
+        $callbacks = array('bar' => null);
+        $legacy ? $this->normalizer->setCallbacks($callbacks) : $this->createNormalizer(array(ObjectNormalizer::CALLBACKS => $callbacks));
 
         $obj = new ObjectConstructorDummy('baz', 'quux', true);
 
@@ -418,7 +450,18 @@ class ObjectNormalizerTest extends TestCase
 
     public function testIgnoredAttributes()
     {
-        $this->normalizer->setIgnoredAttributes(array('foo', 'bar', 'baz', 'camelCase', 'object'));
+        $this->doTestIgnoredAttributes();
+    }
+
+    public function testLegacyIgnoredAttributes()
+    {
+        $this->doTestIgnoredAttributes(true);
+    }
+
+    private function doTestIgnoredAttributes(bool $legacy = false)
+    {
+        $ignoredAttributes = array('foo', 'bar', 'baz', 'camelCase', 'object');
+        $legacy ? $this->normalizer->setIgnoredAttributes($ignoredAttributes) : $this->createNormalizer(array(ObjectNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes));
 
         $obj = new ObjectDummy();
         $obj->setFoo('foo');
@@ -433,7 +476,18 @@ class ObjectNormalizerTest extends TestCase
 
     public function testIgnoredAttributesDenormalize()
     {
-        $this->normalizer->setIgnoredAttributes(array('fooBar', 'bar', 'baz'));
+        $this->doTestIgnoredAttributesDenormalize();
+    }
+
+    public function testLegacyIgnoredAttributesDenormalize()
+    {
+        $this->doTestIgnoredAttributesDenormalize(true);
+    }
+
+    private function doTestIgnoredAttributesDenormalize(bool $legacy = false)
+    {
+        $ignoredAttributes = array('fooBar', 'bar', 'baz');
+        $legacy ? $this->normalizer->setIgnoredAttributes($ignoredAttributes) : $this->createNormalizer(array(ObjectNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes));
 
         $obj = new ObjectDummy();
         $obj->setFoo('foo');
@@ -466,7 +520,7 @@ class ObjectNormalizerTest extends TestCase
                         $this->assertInstanceOf(ObjectConstructorDummy::class, $object);
                         $this->assertSame('bar', $attributeName);
                         $this->assertSame('any', $format);
-                        $this->assertArrayHasKey('circular_reference_limit', $context);
+                        $this->assertArrayHasKey('circular_reference_limit_counters', $context);
                     },
                 ),
                 'baz',
@@ -532,9 +586,22 @@ class ObjectNormalizerTest extends TestCase
      */
     public function testUnableToNormalizeCircularReference()
     {
+        $this->doTestUnableToNormalizeCircularReference();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
+     */
+    public function testLegacyUnableToNormalizeCircularReference()
+    {
+        $this->doTestUnableToNormalizeCircularReference(true);
+    }
+
+    private function doTestUnableToNormalizeCircularReference(bool $legacy = false)
+    {
+        $legacy ? $this->normalizer->setCircularReferenceLimit(2) : $this->createNormalizer(array(ObjectNormalizer::CIRCULAR_REFERENCE_LIMIT => 2));
         $serializer = new Serializer(array($this->normalizer));
         $this->normalizer->setSerializer($serializer);
-        $this->normalizer->setCircularReferenceLimit(2);
 
         $obj = new CircularReferenceDummy();
 
@@ -558,25 +625,39 @@ class ObjectNormalizerTest extends TestCase
 
     public function testCircularReferenceHandler()
     {
-        $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
-        $this->normalizer->setCircularReferenceHandler(function ($obj) {
+        $this->doTestCircularReferenceHandler();
+    }
+
+    public function testLegacyCircularReferenceHandler()
+    {
+        $this->doTestCircularReferenceHandler(true);
+    }
+
+    private function doTestCircularReferenceHandler(bool $legacy = false)
+    {
+        $this->createNormalizerWithCircularReferenceHandler(function ($obj) {
             return \get_class($obj);
-        });
+        }, $legacy);
 
         $obj = new CircularReferenceDummy();
-
         $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy');
         $this->assertEquals($expected, $this->normalizer->normalize($obj));
 
-        $this->normalizer->setCircularReferenceHandler(function ($obj, string $format, array $context) {
+        $this->createNormalizerWithCircularReferenceHandler(function ($obj, string $format, array $context) {
             $this->assertInstanceOf(CircularReferenceDummy::class, $obj);
             $this->assertSame('test', $format);
             $this->arrayHasKey('foo', $context);
 
             return \get_class($obj);
-        });
+        }, $legacy);
         $this->assertEquals($expected, $this->normalizer->normalize($obj, 'test', array('foo' => 'bar')));
+    }
+
+    private function createNormalizerWithCircularReferenceHandler(callable $handler, bool $legacy)
+    {
+        $legacy ? $this->normalizer->setCircularReferenceHandler($handler) : $this->createNormalizer(array(ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => $handler));
+        $this->serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($this->serializer);
     }
 
     public function testDenormalizeNonExistingAttribute()
@@ -620,11 +701,16 @@ class ObjectNormalizerTest extends TestCase
 
     public function testMaxDepth()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
+        $this->doTestMaxDepth();
+    }
 
+    public function testLegacyMaxDepth()
+    {
+        $this->doTestMaxDepth(true);
+    }
+
+    private function doTestMaxDepth(bool $legacy = false)
+    {
         $level1 = new MaxDepthDummy();
         $level1->foo = 'level1';
 
@@ -636,7 +722,8 @@ class ObjectNormalizerTest extends TestCase
         $level3->foo = 'level3';
         $level2->child = $level3;
 
-        $result = $serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
+        $this->createNormalizerWithMaxDepthHandler(null, $legacy);
+        $result = $this->serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
 
         $expected = array(
             'bar' => null,
@@ -667,14 +754,13 @@ class ObjectNormalizerTest extends TestCase
             ),
         );
 
-        $this->normalizer->setMaxDepthHandler(function ($obj) {
+        $this->createNormalizerWithMaxDepthHandler(function () {
             return 'handler';
-        });
-
-        $result = $serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
+        }, $legacy);
+        $result = $this->serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
         $this->assertEquals($expected, $result);
 
-        $this->normalizer->setMaxDepthHandler(function ($object, $parentObject, $attributeName, $format, $context) {
+        $this->createNormalizerWithMaxDepthHandler(function ($object, $parentObject, $attributeName, $format, $context) {
             $this->assertSame('level3', $object);
             $this->assertInstanceOf(MaxDepthDummy::class, $parentObject);
             $this->assertSame('foo', $attributeName);
@@ -682,9 +768,23 @@ class ObjectNormalizerTest extends TestCase
             $this->assertArrayHasKey(ObjectNormalizer::ENABLE_MAX_DEPTH, $context);
 
             return 'handler';
-        });
+        }, $legacy);
+        $this->serializer->normalize($level1, 'test', array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
+    }
 
-        $serializer->normalize($level1, 'test', array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
+    private function createNormalizerWithMaxDepthHandler(callable $handler = null, bool $legacy = false)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        if ($legacy) {
+            $this->createNormalizer(array(), $classMetadataFactory);
+            if (null !== $handler) {
+                $this->normalizer->setMaxDepthHandler($handler);
+            }
+        } else {
+            $this->createNormalizer(array(ObjectNormalizer::MAX_DEPTH_HANDLER => $handler), $classMetadataFactory);
+        }
+        $this->serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($this->serializer);
     }
 
     /**

@@ -30,20 +30,34 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
     const AS_COLLECTION_KEY = 'as_collection';
 
-    private $delimiter;
-    private $enclosure;
-    private $escapeChar;
-    private $keySeparator;
-    private $escapeFormulas;
     private $formulasStartCharacters = array('=', '-', '+', '@');
+    private $defaultContext = array(
+        self::DELIMITER_KEY => ',',
+        self::ENCLOSURE_KEY => '"',
+        self::ESCAPE_CHAR_KEY => '\\',
+        self::ESCAPE_FORMULAS_KEY => false,
+        self::HEADERS_KEY => array(),
+        self::KEY_SEPARATOR_KEY => '.',
+    );
 
-    public function __construct(string $delimiter = ',', string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
+    /**
+     * @param array $defaultContext
+     */
+    public function __construct($defaultContext = array(), string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
     {
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->escapeChar = $escapeChar;
-        $this->keySeparator = $keySeparator;
-        $this->escapeFormulas = $escapeFormulas;
+        if (!\is_array($defaultContext)) {
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+
+            $defaultContext = array(
+                self::DELIMITER_KEY => (string) $defaultContext,
+                self::ENCLOSURE_KEY => $enclosure,
+                self::ESCAPE_CHAR_KEY => $escapeChar,
+                self::KEY_SEPARATOR_KEY => $keySeparator,
+                self::ESCAPE_FORMULAS_KEY => $escapeFormulas,
+            );
+        }
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -200,14 +214,14 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
     }
 
-    private function getCsvOptions(array $context)
+    private function getCsvOptions(array $context): array
     {
-        $delimiter = isset($context[self::DELIMITER_KEY]) ? $context[self::DELIMITER_KEY] : $this->delimiter;
-        $enclosure = isset($context[self::ENCLOSURE_KEY]) ? $context[self::ENCLOSURE_KEY] : $this->enclosure;
-        $escapeChar = isset($context[self::ESCAPE_CHAR_KEY]) ? $context[self::ESCAPE_CHAR_KEY] : $this->escapeChar;
-        $keySeparator = isset($context[self::KEY_SEPARATOR_KEY]) ? $context[self::KEY_SEPARATOR_KEY] : $this->keySeparator;
-        $headers = isset($context[self::HEADERS_KEY]) ? $context[self::HEADERS_KEY] : array();
-        $escapeFormulas = isset($context[self::ESCAPE_FORMULAS_KEY]) ? $context[self::ESCAPE_FORMULAS_KEY] : $this->escapeFormulas;
+        $delimiter = $context[self::DELIMITER_KEY] ?? $this->defaultContext[self::DELIMITER_KEY];
+        $enclosure = $context[self::ENCLOSURE_KEY] ?? $this->defaultContext[self::ENCLOSURE_KEY];
+        $escapeChar = $context[self::ESCAPE_CHAR_KEY] ?? $this->defaultContext[self::ESCAPE_CHAR_KEY];
+        $keySeparator = $context[self::KEY_SEPARATOR_KEY] ?? $this->defaultContext[self::KEY_SEPARATOR_KEY];
+        $headers = $context[self::HEADERS_KEY] ?? $this->defaultContext[self::HEADERS_KEY];
+        $escapeFormulas = $context[self::ESCAPE_FORMULAS_KEY] ?? $this->defaultContext[self::ESCAPE_FORMULAS_KEY];
 
         if (!\is_array($headers)) {
             throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, \gettype($headers)));

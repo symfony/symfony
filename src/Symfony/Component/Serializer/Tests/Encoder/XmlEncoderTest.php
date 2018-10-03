@@ -47,6 +47,9 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetRootNodeName()
     {
         $obj = new ScalarDummy();
@@ -544,6 +547,16 @@ XML;
 
     public function testDecodePreserveComments()
     {
+        $this->doTestDecodePreserveComments();
+    }
+
+    public function testLegacyDecodePreserveComments()
+    {
+        $this->doTestDecodePreserveComments(true);
+    }
+
+    private function doTestDecodePreserveComments(bool $legacy = false)
+    {
         $source = <<<'XML'
 <?xml version="1.0"?>
 <people>
@@ -559,7 +572,14 @@ XML;
 </people>
 XML;
 
-        $this->encoder = new XmlEncoder('people', null, array(XML_PI_NODE));
+        if ($legacy) {
+            $this->encoder = new XmlEncoder('people', null, array(XML_PI_NODE));
+        } else {
+            $this->encoder = new XmlEncoder(array(
+                XmlEncoder::ROOT_NODE_NAME => 'people',
+                XmlEncoder::DECODER_IGNORED_NODE_TYPES => array(XML_PI_NODE),
+            ));
+        }
         $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
 
@@ -573,7 +593,21 @@ XML;
 
     public function testDecodeAlwaysAsCollection()
     {
-        $this->encoder = new XmlEncoder('response', null);
+        $this->doTestDecodeAlwaysAsCollection();
+    }
+
+    public function testLegacyDecodeAlwaysAsCollection()
+    {
+        $this->doTestDecodeAlwaysAsCollection(true);
+    }
+
+    private function doTestDecodeAlwaysAsCollection(bool $legacy = false)
+    {
+        if ($legacy) {
+            $this->encoder = new XmlEncoder('response', null);
+        } else {
+            $this->encoder = new XmlEncoder(array(XmlEncoder::ROOT_NODE_NAME => 'response'));
+        }
         $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
 
@@ -773,9 +807,26 @@ XML;
         $this->assertEquals($expected, $this->encoder->encode($data, 'xml'));
     }
 
-    public function testEncodeWithoutPI()
+    public function testEncodeWithoutPi()
     {
-        $encoder = new XmlEncoder('response', null, array(), array(XML_PI_NODE));
+        $this->doTestEncodeWithoutPi();
+    }
+
+    public function testLegacyEncodeWithoutPi()
+    {
+        $this->doTestEncodeWithoutPi(true);
+    }
+
+    private function doTestEncodeWithoutPi(bool $legacy = false)
+    {
+        if ($legacy) {
+            $encoder = new XmlEncoder('response', null, array(), array(XML_PI_NODE));
+        } else {
+            $encoder = new XmlEncoder(array(
+                XmlEncoder::ROOT_NODE_NAME => 'response',
+                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => array(XML_PI_NODE),
+            ));
+        }
 
         $expected = '<response/>';
 
@@ -784,7 +835,24 @@ XML;
 
     public function testEncodeWithoutComment()
     {
-        $encoder = new XmlEncoder('response', null, array(), array(XML_COMMENT_NODE));
+        $this->doTestEncodeWithoutComment();
+    }
+
+    public function testLegacyEncodeWithoutComment()
+    {
+        $this->doTestEncodeWithoutComment(true);
+    }
+
+    private function doTestEncodeWithoutComment(bool $legacy = false)
+    {
+        if ($legacy) {
+            $encoder = new XmlEncoder('response', null, array(), array(XML_COMMENT_NODE));
+        } else {
+            $encoder = new XmlEncoder(array(
+                XmlEncoder::ROOT_NODE_NAME => 'response',
+                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => array(XML_COMMENT_NODE),
+            ));
+        }
 
         $expected = <<<'XML'
 <?xml version="1.0"?>

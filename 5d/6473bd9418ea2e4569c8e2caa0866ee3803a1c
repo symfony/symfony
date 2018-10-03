@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by colinodell at 2018-10-02T12:47:03Z
+
+The code standard violation identified by fabbot.io is due to unrelated code in this file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-02T12:48:45Z
+
+> The code standard violation identified by fabbot.io is due to unrelated code in this file.
+
+BTW, I disabled the rule to add the "b" in https://github.com/symfony/symfony/commit/a164bb965df52ac7ca2e7c904ceabff825803047

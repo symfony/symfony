@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-30T17:53:59Z
+
+Thanks for the update. Can you add a test case that throws the new exception please?
+
+---------------------------------------------------------------------------
+
+by codedmonkey at 2018-10-01T14:34:30Z
+
+I removed the additional exception if that's all right with you?

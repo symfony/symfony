@@ -13,16 +13,19 @@ namespace Symfony\Contracts\Tests\Cache;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
-use Symfony\Contracts\Cache\GetForCacheItemPoolTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Cache\CacheTrait;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class GetForCacheItemPoolTraitTest extends TestCase
+class CacheTraitTest extends TestCase
 {
     public function testSave()
     {
         $item = $this->getMockBuilder(CacheItemInterface::class)->getMock();
+        $item->method('set')
+            ->willReturn($item);
         $item->method('isHit')
             ->willReturn(false);
 
@@ -30,7 +33,7 @@ class GetForCacheItemPoolTraitTest extends TestCase
             ->method('set')
             ->with('computed data');
 
-        $cache = $this->getMockBuilder(ClassUsingTrait::class)
+        $cache = $this->getMockBuilder(TestPool::class)
             ->setMethods(array('getItem', 'save'))
             ->getMock();
         $cache->expects($this->once())
@@ -56,7 +59,7 @@ class GetForCacheItemPoolTraitTest extends TestCase
         $item->expects($this->never())
             ->method('set');
 
-        $cache = $this->getMockBuilder(ClassUsingTrait::class)
+        $cache = $this->getMockBuilder(TestPool::class)
             ->setMethods(array('getItem', 'save'))
             ->getMock();
 
@@ -77,6 +80,8 @@ class GetForCacheItemPoolTraitTest extends TestCase
     public function testRecomputeOnBetaInf()
     {
         $item = $this->getMockBuilder(CacheItemInterface::class)->getMock();
+        $item->method('set')
+            ->willReturn($item);
         $item->method('isHit')
             // We want to recompute even if it is a hit
             ->willReturn(true);
@@ -85,7 +90,7 @@ class GetForCacheItemPoolTraitTest extends TestCase
             ->method('set')
             ->with('computed data');
 
-        $cache = $this->getMockBuilder(ClassUsingTrait::class)
+        $cache = $this->getMockBuilder(TestPool::class)
             ->setMethods(array('getItem', 'save'))
             ->getMock();
 
@@ -105,7 +110,7 @@ class GetForCacheItemPoolTraitTest extends TestCase
 
     public function testExceptionOnNegativeBeta()
     {
-        $cache = $this->getMockBuilder(ClassUsingTrait::class)
+        $cache = $this->getMockBuilder(TestPool::class)
             ->setMethods(array('getItem', 'save'))
             ->getMock();
 
@@ -118,15 +123,43 @@ class GetForCacheItemPoolTraitTest extends TestCase
     }
 }
 
-class ClassUsingTrait
+class TestPool implements CacheItemPoolInterface
 {
-    use GetForCacheItemPoolTrait;
+    use CacheTrait;
+
+    public function hasItem($key)
+    {
+    }
+
+    public function deleteItem($key)
+    {
+    }
+
+    public function deleteItems(array $keys = array())
+    {
+    }
 
     public function getItem($key)
     {
     }
 
+    public function getItems(array $key = array())
+    {
+    }
+
+    public function saveDeferred(CacheItemInterface $item)
+    {
+    }
+
     public function save(CacheItemInterface $item)
+    {
+    }
+
+    public function commit()
+    {
+    }
+
+    public function clear()
     {
     }
 }

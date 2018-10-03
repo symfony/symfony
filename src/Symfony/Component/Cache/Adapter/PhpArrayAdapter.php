@@ -17,7 +17,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Component\Cache\Traits\GetTrait;
+use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
@@ -31,7 +31,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     use PhpArrayTrait;
-    use GetTrait;
+    use ContractsTrait;
 
     private $createCacheItem;
 

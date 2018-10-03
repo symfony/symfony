@@ -19,7 +19,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractTrait;
-use Symfony\Component\Cache\Traits\GetTrait;
+use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -28,7 +28,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractTrait;
-    use GetTrait;
+    use ContractsTrait;
 
     private static $apcuSupported;
     private static $phpFilesSupported;

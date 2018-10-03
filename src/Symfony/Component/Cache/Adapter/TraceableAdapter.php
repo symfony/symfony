@@ -237,6 +237,19 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $key): bool
+    {
+        $event = $this->start(__FUNCTION__);
+        try {
+            return $event->result[$key] = $this->pool->deleteItem($key);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
     public function getCalls()
     {
         return $this->calls;

@@ -151,4 +151,12 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     {
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $key): bool
+    {
+        return $this->deleteItem($key);
+    }
 }

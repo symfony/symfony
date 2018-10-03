@@ -16,6 +16,8 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 
 /**
+ * Augments PSR-6's CacheItemInterface with support for tags and metadata.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 interface ItemInterface extends CacheItemInterface

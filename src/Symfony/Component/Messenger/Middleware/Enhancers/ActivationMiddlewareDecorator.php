@@ -35,7 +35,7 @@ class ActivationMiddlewareDecorator implements MiddlewareInterface, EnvelopeAwar
     }
 
     /**
-     * @param Envelope $message
+     * @param Envelope $envelope
      */
     public function handle($envelope, callable $next)
     {

@@ -116,7 +116,20 @@ trait RedisTrait
         if (null === $params['class'] && !\extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
             throw new CacheException(sprintf('Cannot find the "redis" extension, and "predis/predis" is not installed: %s', $dsn));
         }
-        $class = null === $params['class'] ? (\extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
+
+        if (isset($params['predis_options']) && !class_exists(\Predis\Client::class)) {
+            throw new InvalidArgumentException('Invalid connection option: "predis_options" provided but "predis/predis" is not installed.');
+        }
+
+        if (isset($params['predis_options']) && null !== $params['class'] && !is_a($params['class'], \Predis\Client::class, true)) {
+            throw new InvalidArgumentException(sprintf('Invalid connection option: "predis_options" provided but provided class "%s" is not an instance of \Predis\Client', $params['class']));
+        }
+
+        if (isset($params['predis_options'])) {
+            $class = $params['class'] ?? \Predis\Client::class;
+        } else {
+            $class = $params['class'] ?? (\extension_loaded('redis') ? \Redis::class : \Predis\Client::class);
+        }
 
         if (is_a($class, \Redis::class, true)) {
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
@@ -164,7 +177,10 @@ trait RedisTrait
             $params['scheme'] = $scheme;
             $params['database'] = $params['dbindex'] ?: null;
             $params['password'] = $auth;
-            $redis = new $class((new Factory())->create($params));
+
+            $predisOptions = $params['predis_options'] ?? array();
+
+            $redis = new $class((new Factory())->create($params), $predisOptions);
         } elseif (class_exists($class, false)) {
             throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis" or "Predis\Client"', $class));
         } else {

@@ -10,6 +10,7 @@ CHANGELOG
  * added sub-second expiry accuracy for backends that support it
  * added support for phpredis 4 `compression` and `tcp_keepalive` options
  * added automatic table creation when using Doctrine DBAL with PDO-based backends
+ * added support for a `predis_options` array to be passed in the Redis DSN or set in `RedisAdapter` connection options
  * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
  * deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead
  * deprecated the `AbstractAdapter::createSystemCache()` method

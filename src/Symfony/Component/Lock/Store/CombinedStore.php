@@ -17,6 +17,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
+use Symfony\Component\Lock\Exception\NotExpirableStoreException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -114,6 +115,9 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
                 }
 
                 $store->putOffExpiration($key, $adjustedTtl);
+                ++$successCount;
+            } catch (NotExpirableStoreException $e) {
+                $this->logger->notice('The store does not support expiration of locks.', array('store' => $store));
                 ++$successCount;
             } catch (\Exception $e) {
                 $this->logger->warning('One store failed to put off the expiration of the "{resource}" lock.', array('resource' => $key, 'store' => $store, 'exception' => $e));

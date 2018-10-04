@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
+use Symfony\Component\Lock\Exception\NotExpirableStoreException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
@@ -108,7 +109,7 @@ class FlockStore implements StoreInterface
      */
     public function putOffExpiration(Key $key, $ttl)
     {
-        // do nothing, the flock locks forever.
+        throw new NotExpirableStoreException();
     }
 
     /**

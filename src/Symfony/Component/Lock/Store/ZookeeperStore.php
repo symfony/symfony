@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
+use Symfony\Component\Lock\Exception\NotExpirableStoreException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -91,7 +92,7 @@ class ZookeeperStore implements StoreInterface
      */
     public function putOffExpiration(Key $key, $ttl)
     {
-        throw new NotSupportedException();
+        throw new NotExpirableStoreException();
     }
 
     /**

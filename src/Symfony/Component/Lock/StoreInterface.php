@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
+use Symfony\Component\Lock\Exception\NotExpirableStoreException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 
 /**
@@ -49,6 +50,7 @@ interface StoreInterface
      * @param float $ttl amount of second to keep the lock in the store
      *
      * @throws LockConflictedException
+     * @throws NotExpirableStoreException
      * @throws NotSupportedException
      */
     public function putOffExpiration(Key $key, $ttl);

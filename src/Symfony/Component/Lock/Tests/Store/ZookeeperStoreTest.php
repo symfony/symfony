@@ -22,6 +22,8 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  */
 class ZookeeperStoreTest extends AbstractStoreTest
 {
+    use NotExpiringStoreTestTrait;
+
     public function getStore(): ZookeeperStore
     {
         $zookeeper_server = getenv('ZOOKEEPER_HOST').':2181';

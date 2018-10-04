@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Store\FlockStore;
 class FlockStoreTest extends AbstractStoreTest
 {
     use BlockingStoreTestTrait;
+    use NotExpiringStoreTestTrait;
 
     /**
      * {@inheritdoc}

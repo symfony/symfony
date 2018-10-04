@@ -19,6 +19,7 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
+use Symfony\Component\Lock\Exception\NotExpirableStoreException;
 
 /**
  * Lock is the default implementation of the LockInterface.
@@ -124,6 +125,8 @@ final class Lock implements LockInterface, LoggerAwareInterface
             }
 
             $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $ttl));
+        } catch (NotExpirableStoreException $e) {
+            $this->logger->notice('The store does not support expiration of locks.', array('store' => $this->store));
         } catch (LockConflictedException $e) {
             $this->dirty = false;
             $this->logger->notice('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', array('resource' => $this->key));

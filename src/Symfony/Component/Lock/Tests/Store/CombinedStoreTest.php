@@ -15,6 +15,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
+use Symfony\Component\Lock\Store\ZookeeperStore;
 use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
@@ -46,7 +47,10 @@ class CombinedStoreTest extends AbstractStoreTest
             self::markTestSkipped($e->getMessage());
         }
 
-        return new CombinedStore(array(new RedisStore($redis)), new UnanimousStrategy());
+        $zookeeper_server = getenv('ZOOKEEPER_HOST').':2181';
+        $zookeeper = new \Zookeeper(implode(',', array($zookeeper_server)));
+
+        return new CombinedStore(array(new RedisStore($redis), new ZookeeperStore($zookeeper)), new UnanimousStrategy());
     }
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */

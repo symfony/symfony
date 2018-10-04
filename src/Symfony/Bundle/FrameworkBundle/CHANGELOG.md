@@ -91,6 +91,7 @@ CHANGELOG
  * Added a `InMemoryTransport` to Messenger. Use it with a DSN starting with `in-memory://`.
  * Added `framework.property_access.throw_exception_on_invalid_property_path` config option.
  * Added `cache:pool:list` command to list all available cache pools.
+ * Added `debug:autoconfiguration` command to display the autoconfiguration of interfaces/classes 
 
 4.2.0
 -----

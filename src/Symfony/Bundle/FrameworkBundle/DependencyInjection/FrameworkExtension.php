@@ -428,7 +428,9 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)
             ->addTag('kernel.locale_aware');
         $container->registerForAutoconfiguration(ResetInterface::class)
-            ->addTag('kernel.reset', ['method' => 'reset']);
+            ->addTag('kernel.reset', ['method' => 'reset'])
+            ->addTag('kernel.reset2', ['method' => 'reset2'])
+        ;
 
         if (!interface_exists(MarshallerInterface::class)) {
             $container->registerForAutoconfiguration(ResettableInterface::class)

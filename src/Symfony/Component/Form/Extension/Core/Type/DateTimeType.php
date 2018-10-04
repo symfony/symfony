@@ -216,12 +216,12 @@ class DateTimeType extends AbstractType
 
         // Defaults to the value of "widget"
         $dateWidget = function (Options $options) {
-            return $options['widget'];
+            return 'single_text' === $options['widget'] ? null : $options['widget'];
         };
 
         // Defaults to the value of "widget"
         $timeWidget = function (Options $options) {
-            return $options['widget'];
+            return 'single_text' === $options['widget'] ? null : $options['widget'];
         };
 
         $resolver->setDefaults([
@@ -292,6 +292,31 @@ class DateTimeType extends AbstractType
             'text',
             'choice',
         ]);
+
+        $resolver->setDeprecated('date_format', function (Options $options, $dateFormat) {
+            if (null !== $dateFormat && 'single_text' === $options['widget']) {
+                return sprintf('Using the "date_format" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "date_format" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return '';
+        });
+        $resolver->setDeprecated('date_widget', function (Options $options, $dateWidget) {
+            if (null !== $dateWidget && 'single_text' === $options['widget']) {
+                return sprintf('Using the "date_widget" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "date_widget" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return '';
+        });
+        $resolver->setDeprecated('time_widget', function (Options $options, $timeWidget) {
+            if (null !== $timeWidget && 'single_text' === $options['widget']) {
+                return sprintf('Using the "time_widget" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "time_widget" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return '';
+        });
     }
 
     /**

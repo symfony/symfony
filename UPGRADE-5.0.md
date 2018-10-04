@@ -76,6 +76,8 @@ Finder
 Form
 ----
 
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
  * The `getExtendedType()` method was removed from the `FormTypeExtensionInterface`. It is replaced by the the static
    `getExtendedTypes()` method which must return an iterable of extended types.
 

@@ -1506,6 +1506,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [

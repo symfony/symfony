@@ -470,6 +470,9 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
+    /**
+     * @group legacy
+     */
     public function testDontPassHtml5TypeIfNotHtml5Format()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [

@@ -159,6 +159,10 @@ class DateTimeType extends AbstractType
             $dateOptions['input'] = $timeOptions['input'] = 'array';
             $dateOptions['error_bubbling'] = $timeOptions['error_bubbling'] = true;
 
+            if (isset($dateOptions['format']) && DateType::HTML5_FORMAT !== $dateOptions['format']) {
+                $dateOptions['html5'] = false;
+            }
+
             $builder
                 ->addViewTransformer(new DataTransformerChain([
                     new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
@@ -294,6 +298,8 @@ class DateTimeType extends AbstractType
             'choice',
         ]);
 
+        $resolver->setAllowedTypes('input_format', 'string');
+
         $resolver->setDeprecated('date_format', function (Options $options, $dateFormat) {
             if (null !== $dateFormat && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
                 return sprintf('Using the "date_format" option of %s with an HTML5 date widget is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
@@ -318,8 +324,14 @@ class DateTimeType extends AbstractType
 
             return '';
         });
+        $resolver->setDeprecated('html5', function (Options $options, $html5) {
+            if ($html5 && self::HTML5_FORMAT !== $options['format']) {
+                return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "format" option of %s when the "html5" option is disabled.', self::class));
+            }
 
-        $resolver->setAllowedTypes('input_format', 'string');
+            return '';
+        });
     }
 
     /**

@@ -23,6 +23,7 @@ CHANGELOG
  * Deprecated `CachePoolClearerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass` instead.
  * Deprecated `CachePoolPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPass` instead.
  * Deprecated `CachePoolPrunerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass` instead.
+ * Added `debug:autoconfiguration` command to display the autoconfiguration of interfaces/classes 
 
 4.1.0
 -----

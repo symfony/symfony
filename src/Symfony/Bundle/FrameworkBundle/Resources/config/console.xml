@@ -60,6 +60,10 @@
             <tag name="console.command" command="debug:container" />
         </service>
 
+        <service id="console.command.debug_autoconfiguration" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutoconfigurationCommand">
+            <tag name="console.command" command="debug:autoconfiguration" />
+        </service>
+
         <service id="console.command.debug_autowiring" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
             <tag name="console.command" command="debug:autowiring" />
         </service>

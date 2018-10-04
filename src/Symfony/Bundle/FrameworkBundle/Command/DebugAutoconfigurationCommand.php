@@ -121,7 +121,7 @@ EOF
             $tagContainerBuilder->removeDefinition($serviceId);
             $tagContainerBuilder->removeAlias($serviceId);
         }
-        $tagContainerBuilder->addDefinitions([$autoconfiguredInstanceofItem]);
+        $tagContainerBuilder->addDefinitions(array($autoconfiguredInstanceofItem));
 
         $dumper = new YamlDumper($tagContainerBuilder);
         preg_match('/calls\:\n +(.*)\n/', $dumper->dump(), $matches);
@@ -143,7 +143,7 @@ EOF
     private function getContainerBuilder()
     {
         $kernel = $this->getApplication()->getKernel();
-        $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, get_class($kernel));
+        $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
         $container = $buildContainer();
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();

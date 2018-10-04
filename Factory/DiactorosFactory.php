@@ -43,7 +43,9 @@ class DiactorosFactory implements HttpMessageFactoryInterface
      */
     public function createRequest(Request $symfonyRequest)
     {
-        $server = DiactorosRequestFactory::normalizeServer($symfonyRequest->server->all());
+        $server = method_exists('Zend\Diactoros\ServerRequestFactory', 'normalizeServer')
+            ? DiactorosRequestFactory::normalizeServer($symfonyRequest->server->all())
+            : \Zend\Diactoros\normalizeServer($symfonyRequest->server->all());
         $headers = $symfonyRequest->headers->all();
 
         if (PHP_VERSION_ID < 50600) {
@@ -53,9 +55,13 @@ class DiactorosFactory implements HttpMessageFactoryInterface
             $body = new DiactorosStream($symfonyRequest->getContent(true));
         }
 
+        $files = method_exists('Zend\Diactoros\ServerRequestFactory', 'normalizeFiles')
+            ? DiactorosRequestFactory::normalizeFiles($this->getFiles($symfonyRequest->files->all()))
+            : \Zend\Diactoros\normalizeUploadedFiles($this->getFiles($symfonyRequest->files->all()));
+
         $request = new ServerRequest(
             $server,
-            DiactorosRequestFactory::normalizeFiles($this->getFiles($symfonyRequest->files->all())),
+            $files,
             $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getRequestUri(),
             $symfonyRequest->getMethod(),
             $body,

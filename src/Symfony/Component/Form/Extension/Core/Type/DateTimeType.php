@@ -78,7 +78,8 @@ class DateTimeType extends AbstractType
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
                     $options['model_timezone'],
-                    $options['view_timezone']
+                    $options['view_timezone'],
+                    $options['strict_format']
                 ));
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
@@ -218,6 +219,7 @@ class DateTimeType extends AbstractType
             'model_timezone' => null,
             'view_timezone' => null,
             'format' => self::HTML5_FORMAT,
+            'strict_format' => false,
             'date_format' => null,
             'widget' => null,
             'date_widget' => $dateWidget,
@@ -278,6 +280,14 @@ class DateTimeType extends AbstractType
             'text',
             'choice',
         ));
+
+        $resolver->setNormalizer('strict_format', function (Options $options, $strictFormat) {
+            if (!$strictFormat && 'single_text' === 'widget' && self::HTML5_FORMAT === $options['format']) {
+                @trigger_error(sprintf('Setting the "strict_format" option of %s to "false" is deprecated since Symfony 4.2.', self::class), E_USER_DEPRECATED);
+            }
+
+            return $strictFormat;
+        });
     }
 
     /**

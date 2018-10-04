@@ -51,10 +51,6 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
             array('UTC', 'UTC', '2010-02-03 04:05:00 UTC', '2010-02-03T04:05'),
             array('America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:00 America/New_York', '2010-02-03T17:05'),
             array('Europe/Amsterdam', 'Europe/Amsterdam', '2013-08-21 10:30:00 Europe/Amsterdam', '2013-08-21T10:30:00'),
-            array('UTC', 'UTC', '2018-09-15T10:00:00Z', '2018-09-15T10:00:00Z'),
-            array('Europe/Berlin', 'Europe/Berlin', '2018-09-15T10:00:00+02:00', '2018-09-15T10:00:00+02:00'),
-            array('Europe/Berlin', 'Europe/Berlin', '2018-09-15T10:00:00+0200', '2018-09-15T10:00:00+0200'),
-            array('UTC', 'UTC', '2018-10-03T10:00:00.000Z', '2018-10-03T10:00:00.000Z'),
         );
     }
 
@@ -63,7 +59,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
      */
     public function testTransform($fromTz, $toTz, $from, $to)
     {
-        $transformer = new DateTimeToHtml5LocalDateTimeTransformer($fromTz, $toTz);
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer($fromTz, $toTz, true);
 
         $this->assertSame($to, $transformer->transform(null !== $from ? new \DateTime($from) : null));
     }
@@ -73,7 +69,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
      */
     public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to)
     {
-        $transformer = new DateTimeToHtml5LocalDateTimeTransformer($fromTz, $toTz);
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer($fromTz, $toTz, true);
 
         $this->assertSame($to, $transformer->transform(null !== $from ? new \DateTimeImmutable($from) : null));
     }
@@ -83,7 +79,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
      */
     public function testTransformRequiresValidDateTime()
     {
-        $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer(null, null, true);
         $transformer->transform('2010-01-01');
     }
 
@@ -91,6 +87,21 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
      * @dataProvider reverseTransformProvider
      */
     public function testReverseTransform($toTz, $fromTz, $to, $from)
+    {
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer($toTz, $fromTz, true);
+
+        if (null !== $to) {
+            $this->assertEquals(new \DateTime($to), $transformer->reverseTransform($from));
+        } else {
+            $this->assertNull($transformer->reverseTransform($from));
+        }
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider nonHtml5DatesProvider
+     */
+    public function testReverseTransformNonHtml5Dates($toTz, $fromTz, $to, $from)
     {
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer($toTz, $fromTz);
 
@@ -101,12 +112,22 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
         }
     }
 
+    public function nonHtml5DatesProvider()
+    {
+        return array(
+            array('UTC', 'UTC', '2018-09-15T10:00:00Z', '2018-09-15T10:00:00Z'),
+            array('Europe/Berlin', 'Europe/Berlin', '2018-09-15T10:00:00+02:00', '2018-09-15T10:00:00+02:00'),
+            array('Europe/Berlin', 'Europe/Berlin', '2018-09-15T10:00:00+0200', '2018-09-15T10:00:00+0200'),
+            array('UTC', 'UTC', '2018-10-03T10:00:00.000Z', '2018-10-03T10:00:00.000Z'),
+        );
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformRequiresString()
     {
-        $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer(null, null, true);
         $transformer->reverseTransform(12345);
     }
 
@@ -115,7 +136,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
      */
     public function testReverseTransformWithNonExistingDate()
     {
-        $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC', true);
 
         $transformer->reverseTransform('2010-04-31T04:05');
     }
@@ -125,7 +146,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
      */
     public function testReverseTransformExpectsValidDateString()
     {
-        $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
+        $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC', true);
 
         $transformer->reverseTransform('2010-2010-2010');
     }

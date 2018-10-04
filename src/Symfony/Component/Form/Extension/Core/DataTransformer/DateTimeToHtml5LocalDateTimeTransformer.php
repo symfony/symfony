@@ -22,6 +22,19 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 {
     const HTML5_FORMAT = 'Y-m-d\\TH:i:s';
 
+    private $strict;
+
+    public function __construct(string $inputTimezone = null, string $outputTimezone = null, bool $strict = false)
+    {
+        parent::__construct($inputTimezone, $outputTimezone);
+
+        $this->strict = $strict;
+
+        if (!$this->strict) {
+            @trigger_error(sprintf('Parsing dates in %s that are not formatted according to the HTML5 specifications is deprecated since Symfony 4.2.', self::class), E_USER_DEPRECATED);
+        }
+    }
+
     /**
      * Transforms a \DateTime into a local date and time string.
      *
@@ -83,7 +96,13 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 
         // to maintain backwards compatibility we do not strictly validate the submitted date
         // see https://github.com/symfony/symfony/issues/28699
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})[T ]\d{2}:\d{2}(?::\d{2})?/', $dateTimeLocal, $matches)) {
+        if (!$this->strict) {
+            $regex = '/^(\d{4})-(\d{2})-(\d{2})[T ]\d{2}:\d{2}(?::\d{2})?/';
+        } else {
+            $regex = '/^(\d{4})-(\d{2})-(\d{2})[T ]\d{2}:\d{2}(?::\d{2})?$/';
+        }
+
+        if (!preg_match($regex, $dateTimeLocal, $matches)) {
             throw new TransformationFailedException(sprintf('The date "%s" is not a valid date.', $dateTimeLocal));
         }
 

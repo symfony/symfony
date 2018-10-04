@@ -235,6 +235,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'view_timezone' => 'Pacific/Tahiti',
             'widget' => 'single_text',
             'input' => 'datetime',
+            'strict_format' => true,
         ));
 
         $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
@@ -254,6 +255,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'view_timezone' => 'Pacific/Tahiti',
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
+            'strict_format' => true,
         ));
 
         $outputTime = new \DateTimeImmutable('2010-06-02 03:04:00 Pacific/Tahiti');
@@ -274,6 +276,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'view_timezone' => 'UTC',
             'input' => 'string',
             'widget' => 'single_text',
+            'strict_format' => true,
         ));
 
         $form->submit('2010-06-02T03:04:00');
@@ -290,6 +293,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'input' => 'string',
             'widget' => 'single_text',
             'with_seconds' => true,
+            'strict_format' => true,
         ));
 
         $form->submit('2010-06-02T03:04:05');
@@ -328,6 +332,7 @@ class DateTimeTypeTest extends BaseTypeTest
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
+            'strict_format' => true,
         ))
             ->createView();
 
@@ -453,6 +458,7 @@ class DateTimeTypeTest extends BaseTypeTest
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
+            'strict_format' => true,
         ))
             ->createView();
 
@@ -464,6 +470,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
             'html5' => false,
+            'strict_format' => true,
         ))
             ->createView();
 
@@ -621,6 +628,7 @@ class DateTimeTypeTest extends BaseTypeTest
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
+            'strict_format' => true,
         ));
         $form->submit(null);
 

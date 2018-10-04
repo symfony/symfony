@@ -1568,6 +1568,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', array(
             'input' => 'string',
             'widget' => 'single_text',
+            'strict_format' => true,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
         ));
@@ -1589,6 +1590,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'date_widget' => 'choice',
             'time_widget' => 'choice',
             'widget' => 'single_text',
+            'strict_format' => true,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
         ));

@@ -215,7 +215,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', $closure = function ($value) {});
+        $resolver->setDeprecated('foo', $closure = function (Options $options, $value) {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($closure, $debug->getDeprecationMessage('foo'));

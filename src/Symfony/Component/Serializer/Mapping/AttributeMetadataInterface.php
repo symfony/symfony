@@ -58,6 +58,16 @@ interface AttributeMetadataInterface
     public function getMaxDepth();
 
     /**
+     * Sets the serialization name for this attribute.
+     */
+    public function setSerializedName(string $serializedName = null);
+
+    /**
+     * Gets the serialization name for this attribute.
+     */
+    public function getSerializedName(): ?string;
+
+    /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      */
     public function merge(self $attributeMetadata);

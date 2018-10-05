@@ -45,7 +45,7 @@
         "symfony/process": "~3.4|~4.0",
         "symfony/security-core": "~3.4|~4.0",
         "symfony/security-csrf": "~3.4|~4.0",
-        "symfony/serializer": "^4.1",
+        "symfony/serializer": "^4.2",
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/translation": "~4.2",
         "symfony/templating": "~3.4|~4.0",

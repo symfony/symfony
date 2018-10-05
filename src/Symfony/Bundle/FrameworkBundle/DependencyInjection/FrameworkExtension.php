@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -1542,7 +1543,9 @@ class FrameworkExtension extends Extension
             'before' => array(array('id' => 'logging')),
             'after' => array(array('id' => 'send_message'), array('id' => 'handle_message')),
         );
+        $buses = array();
         foreach ($config['buses'] as $busId => $bus) {
+            $buses[$busId] = new Reference($busId);
             $middleware = $bus['middleware'];
 
             if ($bus['default_middleware']) {
@@ -1574,6 +1577,10 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument($busId, MessageBusInterface::class);
             }
         }
+
+        $container->getDefinition('messenger.transport.kernel_terminate.factory')
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
+        ;
 
         $senderAliases = array();
         foreach ($config['transports'] as $name => $transport) {

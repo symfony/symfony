@@ -59,5 +59,11 @@
             <argument type="service" id="messenger.transport.serializer" />
             <argument>%kernel.debug%</argument>
         </service>
+
+        <service id="messenger.transport.kernel_terminate.factory" class="Symfony\Component\Messenger\Transport\KernelTerminateTransportFactory">
+            <argument /> <!-- Message bus locator -->
+            <argument type="service" id="event_dispatcher" />
+            <tag name="messenger.transport_factory" />
+        </service>
     </services>
 </container>

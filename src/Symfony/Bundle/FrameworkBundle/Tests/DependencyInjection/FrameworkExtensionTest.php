@@ -726,6 +726,55 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage No bus with id "messenger.bus.commands" was found in framework.messenger.buses config for transport "kernel_terminate". Known buses are ["messenger.bus.default"].
+     */
+    public function testMessengerKernelTerminateMissingBus()
+    {
+        $this->createContainerFromFile('messenger_kernel_terminate_transport_missing_bus');
+    }
+
+    public function testMessengerKernelTerminateNoBusInOptionsAndMoreThanOneBusConfigured()
+    {
+        $container = $this->createContainerFromFile('messenger_kernel_terminate_no_default_bus');
+
+        $this->assertKernelExceptionTags($container);
+
+        $arguments = $container->getDefinition('messenger.transport.kernel_terminate')->getArguments();
+        $this->assertEquals(array('symfony://kernel.terminate', array()), $arguments);
+    }
+
+    public function testMessengerKernelTerminateNoBusInOptionsAndOneBusConfigured()
+    {
+        $container = $this->createContainerFromFile('messenger_kernel_terminate_one_bus');
+
+        $this->assertKernelExceptionTags($container);
+
+        $arguments = $container->getDefinition('messenger.transport.kernel_terminate')->getArguments();
+        $this->assertEquals(array('symfony://kernel.terminate', array('bus' => 'a_bus')), $arguments);
+    }
+
+    public function testMessengerKernelTerminateNoBusInOptionsDefaultBus()
+    {
+        $container = $this->createContainerFromFile('messenger_kernel_terminate_transport_default_bus');
+
+        $this->assertKernelExceptionTags($container);
+
+        $arguments = $container->getDefinition('messenger.transport.kernel_terminate')->getArguments();
+        $this->assertEquals(array('symfony://kernel.terminate', array('bus' => 'messenger.bus.default', 'an_option' => 'an_option_value')), $arguments);
+    }
+
+    public function testMessengerKernelTerminateBusInOptions()
+    {
+        $container = $this->createContainerFromFile('messenger_kernel_terminate_transport_bus');
+
+        $this->assertKernelExceptionTags($container);
+
+        $arguments = $container->getDefinition('messenger.transport.kernel_terminate')->getArguments();
+        $this->assertEquals(array('symfony://kernel.terminate', array('bus' => 'a_bus')), $arguments);
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
@@ -1456,6 +1505,19 @@ abstract class FrameworkExtensionTest extends TestCase
             default:
                 $this->fail('Unresolved adapter: '.$adapter);
         }
+    }
+
+    private function assertKernelExceptionTags(ContainerInterface $container)
+    {
+        $tags = $container->getDefinition('messenger.transport.kernel_terminate')->getTags();
+
+        $this->assertEquals(
+            array('messenger.receiver' => array(array('alias' => 'kernel_terminate')),
+                'kernel.event_listener' => array(
+                    array('event' => 'kernel.terminate', 'method' => 'flush'),
+                    array('event' => 'kernel.exception', 'method' => 'stop'),
+                ),
+            ), $tags);
     }
 }
 

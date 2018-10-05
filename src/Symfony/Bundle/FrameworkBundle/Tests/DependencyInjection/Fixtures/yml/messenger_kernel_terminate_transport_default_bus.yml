@@ -1,0 +1,8 @@
+framework:
+    messenger:
+        serializer: false
+        transports:
+            kernel_terminate:
+                dsn: 'symfony://kernel.terminate'
+                options:
+                    an_option: an_option_value

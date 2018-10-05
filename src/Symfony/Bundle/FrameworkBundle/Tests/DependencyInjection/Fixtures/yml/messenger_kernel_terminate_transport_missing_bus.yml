@@ -1,0 +1,8 @@
+framework:
+    messenger:
+        serializer: false
+        transports:
+            kernel_terminate:
+                dsn: 'symfony://kernel.terminate'
+                options:
+                    bus: messenger.bus.commands

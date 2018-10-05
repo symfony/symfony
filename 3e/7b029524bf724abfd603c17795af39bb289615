@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-18T21:14:11Z
+
+I think you can add the FrameworkBundle integration in the same PR (but another one is ok too).
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-09-24T20:49:41Z
+
+I would like to start documenting this feature but I don't know where to start. Can someone help me to write it?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-24T20:56:02Z
+
+How about adding it on a new subsection to https://symfony.com/doc/current/components/serializer.html#converting-property-names-when-serializing-and-deserializing

@@ -34,4 +34,9 @@
         <attribute name="foo" />
     </class>
 
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy">
+        <attribute name="ignored1" ignore="true" />
+        <attribute name="ignored2" ignore="true" />
+    </class>
+
 </serializer>

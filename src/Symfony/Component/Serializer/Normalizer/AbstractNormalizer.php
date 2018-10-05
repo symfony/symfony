@@ -239,20 +239,27 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
         $tmpGroups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? null;
         $groups = (\is_array($tmpGroups) || is_scalar($tmpGroups)) ? (array) $tmpGroups : false;
-        if (false === $groups && $allowExtraAttributes) {
-            return false;
-        }
 
         $allowedAttributes = [];
+        $ignoreUsed = false;
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
-            $name = $attributeMetadata->getName();
+            if ($ignore = $attributeMetadata->isIgnored()) {
+                $ignoreUsed = true;
+            }
 
+            // If you update this check, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
             if (
+                !$ignore &&
                 (false === $groups || array_intersect($attributeMetadata->getGroups(), $groups)) &&
-                $this->isAllowedAttribute($classOrObject, $name, null, $context)
+                $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
+        }
+
+        if (!$ignoreUsed && false === $groups && $allowExtraAttributes) {
+            // Backward Compatibility with the code using this method written before the introduction of @Ignore
+            return false;
         }
 
         return $allowedAttributes;

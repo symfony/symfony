@@ -24,3 +24,9 @@
       second: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild'
   attributes:
     foo: ~
+'Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy':
+  attributes:
+    ignored1:
+      ignore: true
+    ignored2:
+      ignore: true

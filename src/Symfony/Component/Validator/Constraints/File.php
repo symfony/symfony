@@ -104,13 +104,15 @@ class File extends Constraint
             'ki' => 1 << 10,
             'm' => 1000000,
             'mi' => 1 << 20,
+            'g' => 1000000000,
+            'gi' => 1 << 30,
         );
         if (ctype_digit((string) $maxSize)) {
             $this->maxSize = (int) $maxSize;
             $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
         } elseif (preg_match('/^(\d++)('.implode('|', array_keys($factors)).')$/i', $maxSize, $matches)) {
             $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
-            $this->binaryFormat = null === $this->binaryFormat ? 2 === strlen($unit) : $this->binaryFormat;
+            $this->binaryFormat = null === $this->binaryFormat ? 2 === \strlen($unit) : $this->binaryFormat;
         } else {
             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $this->maxSize));
         }

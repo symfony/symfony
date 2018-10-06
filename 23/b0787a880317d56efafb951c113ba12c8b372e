@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-06T08:24:22Z
+
+> what should happen when the intl extension is not installed?
+
+I think we should ship with "`SimpleIntlFormat`" that maybe covers some use cases.
+
+> should be ship a command converting from one format to the other in this PR?
+
+I think that is a good idea. But that is not a requirement for this PR (nor for 4.2). But the sooner the better.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-06T08:34:10Z
+
+I think it would be friendly to make migrating to the new format as seamless as possible, running a command to update existing catalogs would be awesome. It should be shipped at the same time as the deprecation to me. If doable of course.
+
+We should also deprecate the twig helpers btw! (as highlighted by the CI ;) )
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-06T08:36:11Z
+
+Okey. I'll will not do it in this PR. It is a lot of code and hard to review already. I will work on a migration script now and add that in a other PR.
+
+> We should also deprecate the twig helpers btw! (as highlighted by the CI ;) )
+
+Thank you. I saw those now. 👍
+
+Label: Needs work
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-06T10:53:35Z
+
+Well, you cannot deprecate the `transChoice`  API if catalogues are still using the old format.
+
+And we also need to figure out the migration path between format.
+And that path should take into account bundles which might need to keep support for 3.4 and 4.1. Forcing bundles to either use the deprecated API or drop support for 3.4 and 4.1 is hurting the upgrade path for bundles (dropping support for the LTS is often not an option for them)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-17T16:44:07Z
+
+This PR is blocked by #28486 and related to #28492.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-21T13:03:24Z
+
+I just rebased+squashed the PR by pushing on your fork.
+There is now #28523 we need to take care of.
+I'd suggest moving forward the implementation [as if MessageFormatter was always available](https://github.com/symfony/polyfill/pull/148).
+We'll then be able to move #28486 forward independently.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-09-22T12:08:04Z
+
+@stof Thank you for the review.
+
+> Well, you cannot deprecate the transChoice API if catalogues are still using the old format.
+
+The migration path would be to run the `translation:convert-to-intl-message`. See #28486
+
+About supporting both formats: That is a fair point, do you have any suggestions?
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-01T19:39:34Z
+
+I pushed a new approach here, see 2nd commit: I think we should not deprecate the current plural format as this would create a too steep migration path for devs. Instead, I think we should make "trans()" able to resolve plurals. That's already the case when using the INTL message format, so let's make it work with the Symfony format.
+
+What is proposed now is to make the `%count%` parameter special: when it is defined and is numeric, then the message is parsed using the plural rules.
+
+For Twig, `{% transchoice 5 %}` is replaced by `{% trans count 5 %}` or `{% trans with {"%count%": 5} %}`
+and `{{ 'message'|transchoice(5) }}` by `{{ 'message'|trans(count=5) }}` or `{{ 'message'|trans({"%count%": 5}) }} `
+
+There is a potential for conflicts with existing messages when these two conditions are met together:
+1. a `%count%` parameter is used with `trans()`,
+2. the message embeds a pipe character (`|`).
+
+We could choose another special parameter name if we think the risk is unreasonable (to me it's OK).
+WDYT?
+
+Ready for review.

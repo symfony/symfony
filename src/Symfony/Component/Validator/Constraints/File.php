@@ -104,6 +104,8 @@ class File extends Constraint
             'ki' => 1 << 10,
             'm' => 1000000,
             'mi' => 1 << 20,
+            'g' => 1000000000,
+            'gi' => 1 << 30,
         );
         if (ctype_digit((string) $maxSize)) {
             $this->maxSize = (int) $maxSize;

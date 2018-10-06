@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mschop at 2018-10-04T12:21:53Z
+
+@chalasr Fixed it. Docs are now equal to the docs from the object constructors (InputArgument/InputOption)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-05T17:42:52Z
+
+For 2.8

@@ -43,16 +43,13 @@ trait TranslatorTrait
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        return strtr((string) $id, $parameters);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
-    {
         $id = (string) $id;
-        $number = (float) $number;
+
+        if (!isset($parameters['%count%']) || !is_numeric($parameters['%count%'])) {
+            return strtr($id, $parameters);
+        }
+
+        $number = (float) $parameters['%count%'];
         $locale = (string) $locale ?: $this->getLocale();
 
         $parts = array();

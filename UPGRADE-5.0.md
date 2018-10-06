@@ -120,6 +120,7 @@ FrameworkBundle
    set the "APP_ENV" environment variable instead.
  * The `--no-debug` console option has been removed, 
    set the "APP_DEBUG" environment variable to "0" instead.
+ * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
 
 HttpFoundation
 --------------
@@ -196,11 +197,13 @@ Translation
  * The `TranslatorInterface` has been removed in favor of `Symfony\Contracts\Translation\TranslatorInterface`
  * The `MessageSelector`, `Interval` and `PluralizationRules` classes have been removed, use `IdentityTranslator` instead
  * The `Translator::getFallbackLocales()` and `TranslationDataCollector::getFallbackLocales()` method are now internal
+ * The `Translator::transChoice()` method has been removed in favor of using `Translator::trans()` with "%count%" as the parameter driving plurals
 
 TwigBundle
 ----------
 
  * The default value (`false`) of the `twig.strict_variables` configuration option has been changed to `%kernel.debug%`.
+ * The `transchoice` tag and filter have been removed, use the `trans` ones instead with a `%count%` parameter.
 
 Validator
 --------

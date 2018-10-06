@@ -50,15 +50,21 @@ class TwigExtractorTest extends TestCase
         }
     }
 
+    /**
+     * @group legacy
+     * @dataProvider getLegacyExtractData
+     */
+    public function testLegacyExtract($template, $messages)
+    {
+        $this->testExtract($template, $messages);
+    }
+
     public function getExtractData()
     {
         return array(
             array('{{ "new key" | trans() }}', array('new key' => 'messages')),
             array('{{ "new key" | trans() | upper }}', array('new key' => 'messages')),
             array('{{ "new key" | trans({}, "domain") }}', array('new key' => 'domain')),
-            array('{{ "new key" | transchoice(1) }}', array('new key' => 'messages')),
-            array('{{ "new key" | transchoice(1) | upper }}', array('new key' => 'messages')),
-            array('{{ "new key" | transchoice(1, {}, "domain") }}', array('new key' => 'domain')),
             array('{% trans %}new key{% endtrans %}', array('new key' => 'messages')),
             array('{% trans %}  new key  {% endtrans %}', array('new key' => 'messages')),
             array('{% trans from "domain" %}new key{% endtrans %}', array('new key' => 'domain')),
@@ -67,11 +73,27 @@ class TwigExtractorTest extends TestCase
 
             // make sure 'trans_default_domain' tag is supported
             array('{% trans_default_domain "domain" %}{{ "new key"|trans }}', array('new key' => 'domain')),
-            array('{% trans_default_domain "domain" %}{{ "new key"|transchoice }}', array('new key' => 'domain')),
             array('{% trans_default_domain "domain" %}{% trans %}new key{% endtrans %}', array('new key' => 'domain')),
 
             // make sure this works with twig's named arguments
             array('{{ "new key" | trans(domain="domain") }}', array('new key' => 'domain')),
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function getLegacyExtractData()
+    {
+        return array(
+            array('{{ "new key" | transchoice(1) }}', array('new key' => 'messages')),
+            array('{{ "new key" | transchoice(1) | upper }}', array('new key' => 'messages')),
+            array('{{ "new key" | transchoice(1, {}, "domain") }}', array('new key' => 'domain')),
+
+            // make sure 'trans_default_domain' tag is supported
+            array('{% trans_default_domain "domain" %}{{ "new key"|transchoice }}', array('new key' => 'domain')),
+
+            // make sure this works with twig's named arguments
             array('{{ "new key" | transchoice(domain="domain", count=1) }}', array('new key' => 'domain')),
         );
     }

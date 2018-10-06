@@ -50,24 +50,24 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithExplicitLocale($expected, $id, $number, $parameters)
+    public function testTransChoiceWithExplicitLocale($expected, $id, $number)
     {
         $translator = $this->getTranslator();
         $translator->setLocale('en');
 
-        $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
+        $this->assertEquals($expected, $translator->trans($id, array('%count%' => $number)));
     }
 
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithDefaultLocale($expected, $id, $number, $parameters)
+    public function testTransChoiceWithDefaultLocale($expected, $id, $number)
     {
         \Locale::setDefault('en');
 
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
+        $this->assertEquals($expected, $translator->trans($id, array('%count%' => $number)));
     }
 
     public function testGetSetLocale()
@@ -103,14 +103,14 @@ class TranslatorTest extends TestCase
     public function getTransChoiceTests()
     {
         return array(
-            array('There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0, array('%count%' => 0)),
-            array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1, array('%count%' => 1)),
-            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10, array('%count%' => 10)),
-            array('There are 0 apples', 'There is 1 apple|There are %count% apples', 0, array('%count%' => 0)),
-            array('There is 1 apple', 'There is 1 apple|There are %count% apples', 1, array('%count%' => 1)),
-            array('There are 10 apples', 'There is 1 apple|There are %count% apples', 10, array('%count%' => 10)),
+            array('There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0),
+            array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1),
+            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10),
+            array('There are 0 apples', 'There is 1 apple|There are %count% apples', 0),
+            array('There is 1 apple', 'There is 1 apple|There are %count% apples', 1),
+            array('There are 10 apples', 'There is 1 apple|There are %count% apples', 10),
             // custom validation messages may be coded with a fixed value
-            array('There are 2 apples', 'There are 2 apples', 2, array('%count%' => 2)),
+            array('There are 2 apples', 'There are 2 apples', 2),
         );
     }
 
@@ -121,7 +121,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->transChoice($interval.' foo|[1,Inf[ bar', $number));
+        $this->assertEquals($expected, $translator->trans($interval.' foo|[1,Inf[ bar', array('%count%' => $number)));
     }
 
     public function getInternal()
@@ -146,14 +146,14 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->transChoice($id, $number));
+        $this->assertEquals($expected, $translator->trans($id, array('%count%' => $number)));
     }
 
     public function testReturnMessageIfExactlyOneStandardRuleIsGiven()
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals('There are two apples', $translator->transChoice('There are two apples', 2));
+        $this->assertEquals('There are two apples', $translator->trans('There are two apples', array('%count%' => 2)));
     }
 
     /**
@@ -164,7 +164,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $translator->transChoice($id, $number);
+        $translator->trans($id, array('%count%' => $number));
     }
 
     public function getNonMatchingMessages()
@@ -186,29 +186,29 @@ class TranslatorTest extends TestCase
 
             array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1),
 
-            array('There are %count% apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10),
-            array('There are %count% apples', '{0} There are no apples|{1} There is one apple|]1,Inf]There are %count% apples', 10),
-            array('There are %count% apples', '{0} There are no apples|{1} There is one apple|]1,Inf]     There are %count% apples', 10),
+            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10),
+            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf]There are %count% apples', 10),
+            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf]     There are %count% apples', 10),
 
-            array('There are %count% apples', 'There is one apple|There are %count% apples', 0),
+            array('There are 0 apples', 'There is one apple|There are %count% apples', 0),
             array('There is one apple', 'There is one apple|There are %count% apples', 1),
-            array('There are %count% apples', 'There is one apple|There are %count% apples', 10),
+            array('There are 10 apples', 'There is one apple|There are %count% apples', 10),
 
-            array('There are %count% apples', 'one: There is one apple|more: There are %count% apples', 0),
+            array('There are 0 apples', 'one: There is one apple|more: There are %count% apples', 0),
             array('There is one apple', 'one: There is one apple|more: There are %count% apples', 1),
-            array('There are %count% apples', 'one: There is one apple|more: There are %count% apples', 10),
+            array('There are 10 apples', 'one: There is one apple|more: There are %count% apples', 10),
 
             array('There are no apples', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 0),
             array('There is one apple', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 1),
-            array('There are %count% apples', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 10),
+            array('There are 10 apples', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 10),
 
             array('', '{0}|{1} There is one apple|]1,Inf] There are %count% apples', 0),
             array('', '{0} There are no apples|{1}|]1,Inf] There are %count% apples', 1),
 
             // Indexed only tests which are Gettext PoFile* compatible strings.
-            array('There are %count% apples', 'There is one apple|There are %count% apples', 0),
+            array('There are 0 apples', 'There is one apple|There are %count% apples', 0),
             array('There is one apple', 'There is one apple|There are %count% apples', 1),
-            array('There are %count% apples', 'There is one apple|There are %count% apples', 2),
+            array('There are 2 apples', 'There is one apple|There are %count% apples', 2),
 
             // Tests for float numbers
             array('There is almost one apple', '{0} There are no apples|]0,1[ There is almost one apple|{1} There is one apple|[1,Inf] There is more than one apple', 0.7),

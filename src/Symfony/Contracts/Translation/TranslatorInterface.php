@@ -19,19 +19,8 @@ interface TranslatorInterface
     /**
      * Translates the given message.
      *
-     * @param string      $id         The message id (may also be an object that can be cast to string)
-     * @param array       $parameters An array of parameters for the message
-     * @param string|null $domain     The domain for the message or null to use the default
-     * @param string|null $locale     The locale or null to use the default
-     *
-     * @return string The translated string
-     *
-     * @throws \InvalidArgumentException If the locale contains invalid characters
-     */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null);
-
-    /**
-     * Translates the given choice message by choosing a translation according to a number.
+     * When a number is provided as a parameter named "%count%", the message is parsed for plural
+     * forms and a translation is chosen according to this number using the following rules:
      *
      * Given a message with different plural translations separated by a
      * pipe (|), this method returns the correct portion of the message based
@@ -64,7 +53,6 @@ interface TranslatorInterface
      * @see https://en.wikipedia.org/wiki/ISO_31-11
      *
      * @param string      $id         The message id (may also be an object that can be cast to string)
-     * @param int         $number     The number to use to find the indice of the message
      * @param array       $parameters An array of parameters for the message
      * @param string|null $domain     The domain for the message or null to use the default
      * @param string|null $locale     The locale or null to use the default
@@ -73,7 +61,7 @@ interface TranslatorInterface
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null);
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null);
 
     /**
      * Sets the current locale.

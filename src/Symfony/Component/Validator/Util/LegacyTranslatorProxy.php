@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @internal to be removed in Symfony 5.0.
  */
-class LegacyTranslatorProxy implements LegacyTranslatorInterface
+class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInterface
 {
     private $translator;
 
@@ -60,6 +60,6 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        return $this->translator->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
     }
 }

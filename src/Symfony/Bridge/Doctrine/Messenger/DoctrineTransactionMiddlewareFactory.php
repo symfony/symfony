@@ -18,7 +18,6 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @experimental in 4.1
  * @final
  */
 class DoctrineTransactionMiddlewareFactory

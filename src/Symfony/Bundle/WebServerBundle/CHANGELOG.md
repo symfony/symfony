@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* Deprecated omitting the `$environment` argument of the `ServerRunCommand` and
+ `ServerStartCommand` constructors
+
 3.4.0
 -----
 

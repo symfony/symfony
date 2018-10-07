@@ -156,11 +156,9 @@ class AutowirePass extends AbstractRecursivePass
             $this->decoratedMethodIndex = $i;
             list($method, $arguments) = $call;
 
-            if ($method instanceof \ReflectionFunctionAbstract) {
-                $reflectionMethod = $method;
-            } else {
-                $reflectionMethod = $this->getReflectionMethod(new Definition($reflectionClass->name), $method);
-            }
+            $reflectionMethod = $method instanceof \ReflectionFunctionAbstract
+                ? $method
+                : $this->getReflectionMethod(new Definition($reflectionClass->name), $method);
 
             $arguments = $this->autowireMethod($reflectionMethod, $arguments);
 

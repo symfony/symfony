@@ -30,7 +30,7 @@ class EnforceNullResultMiddlewareTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Messenger\Exception\NonNullResultException
-     * @expectedExceptionMessage Non null result for message Symfony\Component\Messenger\Tests\Fixtures\DummyMessage.
+     * @expectedExceptionMessage Non null result for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage": at least one handler returned something but this is prohibited by this middleware.
      */
     public function testItThrowExceptionOnNonNullResult()
     {

@@ -22,7 +22,7 @@ class EnforceNullResultMiddleware implements MiddlewareInterface
     {
         $result = $next($message);
         if (null !== $result) {
-            throw new NonNullResultException(sprintf('Non null result for message "%s": at least one handler returned something but this is prohibited by this middleware..', \get_class($message)));
+            throw new NonNullResultException(sprintf('Non null result for message "%s": at least one handler returned something but this is prohibited by this middleware.', \get_class($message)));
         }
 
         return $result;

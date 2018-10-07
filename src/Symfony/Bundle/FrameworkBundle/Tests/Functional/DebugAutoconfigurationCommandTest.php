@@ -33,13 +33,11 @@ class DebugAutoconfigurationCommandTest extends WebTestCase
 Autoconfiguration for "Symfony\Component\Console\Command\Command"
 ==============================================
 
- ----------- ----------------- 
-  Option      Value            
- ----------- ----------------- 
-  Tags        console.command  
-  Public      yes              
-  Shared      yes              
-  Autowired   no
+ -------- ----------------- 
+  Option   Value            
+ -------- ----------------- 
+  Tag      console.command  
+ -------- -----------------
 EOD;
         $this->assertContains($expectedOutput, $tester->getDisplay());
     }
@@ -58,42 +56,68 @@ EOD;
         $this->assertNotContains('Sensio\Bundle\FrameworkExtraBundle', $tester->getDisplay());
     }
 
-    public function testAutoconfigurationWithMethodCall()
+    public function testAutoconfigurationWithMethodCalls()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(array('test_case' => 'DebugAutoconfiguration', 'root_config' => 'config.yml'));
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'PsrLogLoggerAwareInterface'));
+        $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'MethodCalls'));
 
-        $this->assertContains('Psr\Log\LoggerAwareInterface', $tester->getDisplay());
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\MethodCalls', $tester->getDisplay());
         $expectedMethodCallOutput = <<<EOD
-Method call   - [setLogger, ['@logger']]
+  Method call   - [setMethodOne, ['@logger']]             
+                - [setMethodTwo, [[paramOne, paramOne]]]
 EOD;
         $this->assertContains($expectedMethodCallOutput, $tester->getDisplay());
     }
 
-    public function testAutoconfigurationWithTagsAttributes()
+    public function testAutoconfigurationWithMultipleTagsAttributes()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(array('test_case' => 'DebugAutoconfiguration', 'root_config' => 'config.yml'));
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'SymfonyContractsServiceResetInterface'));
+        $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'TagsAttributes'));
 
-        $this->assertContains('Symfony\Contracts\Service\ResetInterface', $tester->getDisplay());
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\TagsAttributes', $tester->getDisplay());
         $expectedTagsAttributesOutput = <<<EOD
-  Tags attributes   [                          
-                      [                        
-                        [                      
-                          "method" => "reset"  
-                        ]                      
-                      ]                        
-                    ]       
+  Tag             debugautoconfiguration.tag1  
+  Tag attribute   [                            
+                    [                          
+                      "method" => "debug"      
+                    ]                          
+                  ]                            
+                                               
+  Tag             debugautoconfiguration.tag2  
+  Tag attribute   [                            
+                    [                          
+                      "test"                   
+                    ]                          
+                  ]                            
+EOD;
+        $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay());
+    }
+
+    public function testAutoconfigurationWithBindings()
+    {
+        static::bootKernel(array('test_case' => 'DebugAutoconfiguration', 'root_config' => 'config.yml'));
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'Bindings'));
+
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\Bindings', $tester->getDisplay());
+        $expectedTagsAttributesOutput = <<<'EOD'
+  Bindings   $paramOne: '@logger'       
+             $paramTwo: 'binding test'  
+
 EOD;
         $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay());
     }

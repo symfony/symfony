@@ -91,21 +91,21 @@ EOF
 
         /** @var ChildDefinition $autoconfiguredInstanceofItem */
         foreach ($autoconfiguredInstanceofItems as $key => $autoconfiguredInstanceofItem) {
-            $tags = $autoconfiguredInstanceofItem->getTags();
             $tableRows = array();
-            if ($tags) {
-                $tableRows[] = array('Tags', implode("\n", array_keys($tags)));
+
+            foreach ($autoconfiguredInstanceofItem->getTags() as $tag => $tagAttributes) {
+                $tableRows[] = array('Tag', $tag);
+                if ($tagAttributes !== array(array())) {
+                    $tableRows[] = array('Tag attribute', $this->dumpTagAttribute($tagAttributes));
+                }
             }
-            $tableRows[] = array('Public', $autoconfiguredInstanceofItem->isPublic() ? 'yes' : 'no');
-            $tableRows[] = array('Shared', $autoconfiguredInstanceofItem->isShared() ? 'yes' : 'no');
-            $tableRows[] = array('Autowired', $autoconfiguredInstanceofItem->isAutowired() ? 'yes' : 'no');
 
             if ($autoconfiguredInstanceofItem->getMethodCalls()) {
                 $tableRows[] = array('Method call', $this->dumpMethodCall($autoconfiguredInstanceofItem));
             }
 
-            if ($tags && array_values($tags) !== array(array(array()))) {
-                $tableRows[] = array('Tags attributes', $this->dumpTagsAttributes($tags));
+            if ($autoconfiguredInstanceofItem->getBindings()) {
+                $tableRows[] = array('Bindings', $this->dumpBindings($autoconfiguredInstanceofItem));
             }
 
             $io->writeln(sprintf("Autoconfiguration for \"%s\"\n==============================================", $key));
@@ -124,17 +124,35 @@ EOF
         $tagContainerBuilder->addDefinitions(array($autoconfiguredInstanceofItem));
 
         $dumper = new YamlDumper($tagContainerBuilder);
-        preg_match('/calls\:\n +(.*)\n/', $dumper->dump(), $matches);
+        preg_match('/calls\:\n((?: +- .+\n)+)/', $dumper->dump(), $matches);
 
-        return $matches[1];
+        return preg_replace('/^\s+/m', '', $matches[1]);
     }
 
-    private function dumpTagsAttributes(array $tags)
+    private function dumpBindings(ChildDefinition $autoconfiguredInstanceofItem)
+    {
+        $tagContainerBuilder = new ContainerBuilder();
+        foreach ($tagContainerBuilder->getServiceIds() as $serviceId) {
+            $tagContainerBuilder->removeDefinition($serviceId);
+            $tagContainerBuilder->removeAlias($serviceId);
+        }
+
+        $dumper = new YamlDumper($tagContainerBuilder);
+        foreach ($autoconfiguredInstanceofItem->getBindings() as $bindingKey => $bindingValue) {
+            $tagContainerBuilder->setParameter($bindingKey, $bindingValue->getValues()[0]);
+        }
+
+        preg_match('/parameters\:\n((?: + .+\n)+)/', $dumper->dump(), $matches);
+
+        return preg_replace('/^\s+/m', '', $matches[1]);
+    }
+
+    private function dumpTagAttribute(array $tagAttribute)
     {
         $cloner = new VarCloner();
         $cliDumper = new CliDumper(null, null, AbstractDumper::DUMP_LIGHT_ARRAY);
 
-        return $cliDumper->dump($cloner->cloneVar(array_values($tags)), true);
+        return $cliDumper->dump($cloner->cloneVar($tagAttribute), true);
     }
 
     /**

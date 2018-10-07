@@ -77,12 +77,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             $class = $metadata->getAssociationTargetClass($property);
 
             if ($metadata->isSingleValuedAssociation($property)) {
+                $nullable = false;
+
                 if ($metadata instanceof ClassMetadataInfo) {
                     $associationMapping = $metadata->getAssociationMapping($property);
 
                     $nullable = $this->isAssociationNullable($associationMapping);
-                } else {
-                    $nullable = false;
                 }
 
                 return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class));

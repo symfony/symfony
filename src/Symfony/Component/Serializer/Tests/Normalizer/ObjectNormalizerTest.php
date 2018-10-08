@@ -867,7 +867,7 @@ class ObjectNormalizerTest extends TestCase
         $data->setFoo('bar');
         $data->bar = 'foo';
 
-        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $normalizer->normalize($data, 'foo_and_bar_included'));
+        $this->assertSame(array('bar' => 'foo', 'foo' => 'bar'), $normalizer->normalize($data, 'foo_and_bar_included'));
     }
 
     public function testExtractAttributesRespectsContext()
@@ -878,7 +878,7 @@ class ObjectNormalizerTest extends TestCase
         $data->setFoo('bar');
         $data->bar = 'foo';
 
-        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $normalizer->normalize($data, null, array('include_foo_and_bar' => true)));
+        $this->assertSame(array('bar' => 'foo', 'foo' => 'bar'), $normalizer->normalize($data, null, array('include_foo_and_bar' => true)));
     }
 
     public function testAttributesContextNormalize()

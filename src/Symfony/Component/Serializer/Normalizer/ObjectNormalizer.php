@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
@@ -32,6 +34,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     private $discriminatorCache = array();
 
+    private $propertyListExtractor;
+
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = array())
     {
         if (!\class_exists(PropertyAccess::class)) {
@@ -41,6 +45,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->propertyListExtractor = $propertyListExtractor ?? new ReflectionExtractor();
     }
 
     /**
@@ -56,55 +61,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function extractAttributes($object, $format = null, array $context = array())
     {
-        // If not using groups, detect manually
-        $attributes = array();
+        $properties = $this->propertyListExtractor->getProperties(get_class($object), ['exclude_static_properties' => true]);
 
-        // methods
-        $reflClass = new \ReflectionClass($object);
-        foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-            if (
-                0 !== $reflMethod->getNumberOfRequiredParameters() ||
-                $reflMethod->isStatic() ||
-                $reflMethod->isConstructor() ||
-                $reflMethod->isDestructor()
-            ) {
-                continue;
-            }
-
-            $name = $reflMethod->name;
-            $attributeName = null;
-
-            if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
-                // getters and hassers
-                $attributeName = substr($name, 3);
-
-                if (!$reflClass->hasProperty($attributeName)) {
-                    $attributeName = lcfirst($attributeName);
-                }
-            } elseif (0 === strpos($name, 'is')) {
-                // issers
-                $attributeName = substr($name, 2);
-
-                if (!$reflClass->hasProperty($attributeName)) {
-                    $attributeName = lcfirst($attributeName);
-                }
-            }
-
-            if (null !== $attributeName && $this->isAllowedAttribute($object, $attributeName, $format, $context)) {
-                $attributes[$attributeName] = true;
-            }
-        }
-
-        // properties
-        foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-            if ($reflProperty->isStatic() || !$this->isAllowedAttribute($object, $reflProperty->name, $format, $context)) {
-                continue;
-            }
-
-            $attributes[$reflProperty->name] = true;
-        }
-
-        return array_keys($attributes);
+        return array_filter($properties, function (string $attribute) use ($object, $format, $context) {
+            return $this->isAllowedAttribute($object, $attribute, $format, $context);
+        });
     }
 
     /**

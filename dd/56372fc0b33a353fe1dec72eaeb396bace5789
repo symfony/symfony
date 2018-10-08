@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-05T14:15:55Z
+
+It wasn't qualified as a bug in https://github.com/symfony/symfony/pull/27429 though
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-10-05T14:19:58Z
+
+Ohhh. So this was already fixed... but on master. I can see arguments both ways about a bug or a feature. This PR was motivated by me being confused by this yesterday... but it could also be “helped” on 3.4 and 4.1 by adding docs about activating it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-06T16:08:13Z
+
+Apparently, tests are broken.

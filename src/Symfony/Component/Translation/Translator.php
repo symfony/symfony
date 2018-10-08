@@ -14,6 +14,8 @@ namespace Symfony\Component\Translation;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -333,6 +335,10 @@ EOF
             $fallbackContent
         );
 
+        foreach ($this->getDirectoryResources($locale) as $dir) {
+            $this->catalogues[$locale]->addResource($dir);
+        }
+
         $cache->write($content, $this->catalogues[$locale]->getResources());
     }
 
@@ -462,5 +468,35 @@ EOF
         }
 
         return $this->configCacheFactory;
+    }
+
+    /**
+     * Fetches a unique list of directories where files were found
+     * for a catalogue.
+     *
+     * @param string $locale
+     *
+     * @return DirectoryResource[]|array
+     */
+    private function getDirectoryResources($locale): array
+    {
+        $directories = array();
+        foreach ($this->catalogues[$locale]->getResources() as $resource) {
+            if (!$resource instanceof FileResource) {
+                continue;
+            }
+
+            $directory = \dirname($resource->getResource());
+            if (!\in_array($directory, $directories, true)) {
+                $directories[] = $directory;
+            }
+        }
+
+        return \array_map(
+            function ($directory) {
+                return new DirectoryResource($directory);
+            },
+            $directories
+        );
     }
 }

@@ -11,25 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3.', RedirectableUrlMatcher::class), E_USER_DEPRECATED);
-
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher as BaseMatcher;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since Symfony 4.3
+ * @internal
  */
-class RedirectableUrlMatcher extends BaseMatcher
+class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
     /**
-     * Redirects the user to another URL.
-     *
-     * @param string $path   The path info to redirect to
-     * @param string $route  The route that matched
-     * @param string $scheme The URL scheme (null to keep the current one)
-     *
-     * @return array An array of parameters
+     * {@inheritdoc}
      */
     public function redirect($path, $route, $scheme = null)
     {

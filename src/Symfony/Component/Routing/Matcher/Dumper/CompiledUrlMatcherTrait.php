@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
  *
  * @internal
  */
-trait PhpMatcherTrait
+trait CompiledUrlMatcherTrait
 {
     private $matchHost = false;
     private $staticRoutes = [];
@@ -126,8 +126,13 @@ trait PhpMatcherTrait
         foreach ($this->regexpList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition)) {
-                    if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
-                        continue;
+                    if (null !== $condition) {
+                        if (0 === $condition) { // marks the last route in the regexp
+                            continue 3;
+                        }
+                        if (!($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
+                            continue;
+                        }
                     }
 
                     if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {

@@ -18,11 +18,17 @@ use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
+use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
 use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
@@ -127,14 +133,14 @@ class Router implements RouterInterface, RequestMatcherInterface
         $this->options = [
             'cache_dir' => null,
             'debug' => false,
-            'generator_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'generator_base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'generator_dumper_class' => 'Symfony\\Component\\Routing\\Generator\\Dumper\\PhpGeneratorDumper',
-            'generator_cache_class' => 'ProjectUrlGenerator',
-            'matcher_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-            'matcher_base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-            'matcher_dumper_class' => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
-            'matcher_cache_class' => 'ProjectUrlMatcher',
+            'generator_class' => CompiledUrlGenerator::class,
+            'generator_base_class' => UrlGenerator::class,
+            'generator_dumper_class' => CompiledUrlGeneratorDumper::class,
+            'generator_cache_class' => 'UrlGenerator',
+            'matcher_class' => CompiledUrlMatcher::class,
+            'matcher_base_class' => UrlMatcher::class,
+            'matcher_dumper_class' => CompiledUrlMatcherDumper::class,
+            'matcher_cache_class' => 'UrlMatcher',
             'resource_type' => null,
             'strict_requirements' => true,
         ];
@@ -273,8 +279,14 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->matcher;
         }
 
+        $compiled = is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true);
+
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $routes = $this->getRouteCollection();
+            if ($compiled) {
+                $routes = (new CompiledUrlMatcherDumper($routes))->getCompiledRoutes();
+            }
+            $this->matcher = new $this->options['matcher_class']($routes, $this->context);
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -302,6 +314,10 @@ class Router implements RouterInterface, RequestMatcherInterface
             }
         );
 
+        if ($compiled) {
+            return $this->matcher = new $this->options['matcher_class'](require $cache->getPath(), $this->context);
+        }
+
         if (!class_exists($this->options['matcher_cache_class'], false)) {
             require_once $cache->getPath();
         }
@@ -320,8 +336,14 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->generator;
         }
 
+        $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true);
+
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $routes = $this->getRouteCollection();
+            if ($compiled) {
+                $routes = (new CompiledUrlGeneratorDumper($routes))->getCompiledRoutes();
+            }
+            $this->generator = new $this->options['generator_class']($routes, $this->context, $this->logger);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
                 function (ConfigCacheInterface $cache) {
@@ -336,11 +358,15 @@ class Router implements RouterInterface, RequestMatcherInterface
                 }
             );
 
-            if (!class_exists($this->options['generator_cache_class'], false)) {
-                require_once $cache->getPath();
-            }
+            if ($compiled) {
+                $this->generator = new $this->options['generator_class'](require $cache->getPath(), $this->context, $this->logger);
+            } else {
+                if (!class_exists($this->options['generator_cache_class'], false)) {
+                    require_once $cache->getPath();
+                }
 
-            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+                $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+            }
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

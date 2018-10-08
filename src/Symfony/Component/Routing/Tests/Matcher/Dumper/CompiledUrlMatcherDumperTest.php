@@ -12,23 +12,15 @@
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * @group legacy
- */
-class PhpMatcherDumperTest extends TestCase
+class CompiledUrlMatcherDumperTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $matcherClass;
-
     /**
      * @var string
      */
@@ -38,8 +30,7 @@ class PhpMatcherDumperTest extends TestCase
     {
         parent::setUp();
 
-        $this->matcherClass = uniqid('ProjectUrlMatcher');
-        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
+        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher').'.php';
     }
 
     protected function tearDown()
@@ -54,13 +45,7 @@ class PhpMatcherDumperTest extends TestCase
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo:bar/'));
 
-        $class = $this->generateDumpedMatcher($collection, true);
-
-        $matcher = $this->getMockBuilder($class)
-                        ->setMethods(['redirect'])
-                        ->setConstructorArgs([new RequestContext()])
-                        ->getMock();
-
+        $matcher = $this->generateDumpedMatcher($collection);
         $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/', 'foo')->willReturn([]);
 
         $matcher->match('/foo%3Abar');
@@ -69,12 +54,12 @@ class PhpMatcherDumperTest extends TestCase
     /**
      * @dataProvider getRouteCollections
      */
-    public function testDump(RouteCollection $collection, $fixture, $options = [])
+    public function testDump(RouteCollection $collection, $fixture)
     {
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 
-        $dumper = new PhpMatcherDumper($collection);
-        $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump($options), '->dump() correctly dumps routes as optimized PHP code.');
+        $dumper = new CompiledUrlMatcherDumper($collection);
+        $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump());
     }
 
     public function getRouteCollections()
@@ -458,38 +443,35 @@ class PhpMatcherDumperTest extends TestCase
         $hostCollection->add('r2', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
 
         return [
-           [new RouteCollection(), 'url_matcher0.php', []],
-           [$collection, 'url_matcher1.php', []],
-           [$redirectCollection, 'url_matcher2.php', ['base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher']],
-           [$rootprefixCollection, 'url_matcher3.php', []],
-           [$headMatchCasesCollection, 'url_matcher4.php', []],
-           [$groupOptimisedCollection, 'url_matcher5.php', ['base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher']],
-           [$trailingSlashCollection, 'url_matcher6.php', []],
-           [$trailingSlashCollection, 'url_matcher7.php', ['base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher']],
-           [$unicodeCollection, 'url_matcher8.php', []],
-           [$hostTreeCollection, 'url_matcher9.php', []],
-           [$chunkedCollection, 'url_matcher10.php', []],
-           [$demoCollection, 'url_matcher11.php', ['base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher']],
-           [$suffixCollection, 'url_matcher12.php', []],
-           [$hostCollection, 'url_matcher13.php', []],
+           [new RouteCollection(), 'compiled_url_matcher0.php'],
+           [$collection, 'compiled_url_matcher1.php'],
+           [$redirectCollection, 'compiled_url_matcher2.php'],
+           [$rootprefixCollection, 'compiled_url_matcher3.php'],
+           [$headMatchCasesCollection, 'compiled_url_matcher4.php'],
+           [$groupOptimisedCollection, 'compiled_url_matcher5.php'],
+           [$trailingSlashCollection, 'compiled_url_matcher6.php'],
+           [$trailingSlashCollection, 'compiled_url_matcher7.php'],
+           [$unicodeCollection, 'compiled_url_matcher8.php'],
+           [$hostTreeCollection, 'compiled_url_matcher9.php'],
+           [$chunkedCollection, 'compiled_url_matcher10.php'],
+           [$demoCollection, 'compiled_url_matcher11.php'],
+           [$suffixCollection, 'compiled_url_matcher12.php'],
+           [$hostCollection, 'compiled_url_matcher13.php'],
         ];
     }
 
-    private function generateDumpedMatcher(RouteCollection $collection, $redirectableStub = false)
+    private function generateDumpedMatcher(RouteCollection $collection)
     {
-        $options = ['class' => $this->matcherClass];
-
-        if ($redirectableStub) {
-            $options['base_class'] = '\Symfony\Component\Routing\Tests\Matcher\Dumper\RedirectableUrlMatcherStub';
-        }
-
-        $dumper = new PhpMatcherDumper($collection);
-        $code = $dumper->dump($options);
+        $dumper = new CompiledUrlMatcherDumper($collection);
+        $code = $dumper->dump();
 
         file_put_contents($this->dumpPath, $code);
-        include $this->dumpPath;
+        $compiledRoutes = require $this->dumpPath;
 
-        return $this->matcherClass;
+        return $this->getMockBuilder(TestCompiledUrlMatcher::class)
+            ->setConstructorArgs([$compiledRoutes, new RequestContext()])
+            ->setMethods(['redirect'])
+            ->getMock();
     }
 
     /**
@@ -500,14 +482,15 @@ class PhpMatcherDumperTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));
-        $dumper = new PhpMatcherDumper($routeCollection);
+        $dumper = new CompiledUrlMatcherDumper($routeCollection);
         $dumper->dump();
     }
 }
 
-abstract class RedirectableUrlMatcherStub extends UrlMatcher implements RedirectableUrlMatcherInterface
+class TestCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
     public function redirect($path, $route, $scheme = null)
     {
+        return [];
     }
 }

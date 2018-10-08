@@ -12,22 +12,23 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
+use Symfony\Bundle\FrameworkBundle\Routing\RedirectableCompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @group legacy
+ * @requires function \Symfony\Component\Routing\Matcher\CompiledUrlMatcher::match
  */
-class RedirectableUrlMatcherTest extends TestCase
+class RedirectableCompiledUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()
     {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo/'));
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo/'));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
         $this->assertEquals([
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -44,10 +45,10 @@ class RedirectableUrlMatcherTest extends TestCase
 
     public function testSchemeRedirect()
     {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo', [], [], [], '', ['https']));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
         $this->assertEquals([
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -60,5 +61,12 @@ class RedirectableUrlMatcherTest extends TestCase
             ],
             $matcher->match('/foo')
         );
+    }
+
+    private function getMatcher(RouteCollection $routes, RequestContext $context)
+    {
+        $dumper = new CompiledUrlMatcherDumper($routes);
+
+        return new RedirectableCompiledUrlMatcher($dumper->getCompiledRoutes(), $context);
     }
 }

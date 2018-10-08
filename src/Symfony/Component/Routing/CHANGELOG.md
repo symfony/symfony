@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added fallback to cultureless locale for internationalized routes
+ * added `CompiledUrlGenerator` and `CompiledUrlGeneratorDumper`
+ * deprecated `PhpUrlGeneratorDumped`
 
 4.0.0
 -----

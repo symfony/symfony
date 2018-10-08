@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Generator\Dumper;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "CompiledUrlGeneratorDumper" instead.', PhpGeneratorDumper::class), E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 
 /**
@@ -18,6 +20,8 @@ use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @deprecated since Symfony 4.2, use CompiledUrlGeneratorDumper instead.
  */
 class PhpGeneratorDumper extends GeneratorDumper
 {

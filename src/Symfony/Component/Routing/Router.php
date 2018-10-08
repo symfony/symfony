@@ -18,6 +18,7 @@ use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -82,6 +83,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      * @var ExpressionFunctionProviderInterface[]
      */
     private $expressionLanguageProviders = array();
+
+    private static $dumpCache = array();
 
     /**
      * @param LoaderInterface $loader   A LoaderInterface instance
@@ -320,8 +323,10 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->generator;
         }
 
+        $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true);
+
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options[$compiled ? 'generator_base_class' : 'generator_class']($this->getRouteCollection(), $this->context, $this->logger);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
                 function (ConfigCacheInterface $cache) {
@@ -336,11 +341,19 @@ class Router implements RouterInterface, RequestMatcherInterface
                 }
             );
 
-            if (!class_exists($this->options['generator_cache_class'], false)) {
-                require_once $cache->getPath();
-            }
+            if ($compiled) {
+                if (!isset(self::$dumpCache[$path = $cache->getPath()])) {
+                    self::$dumpCache[$path] = require $path;
+                }
 
-            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+                $this->generator = new $this->options['generator_class'](self::$dumpCache[$path], $this->context, $this->logger);
+            } else {
+                if (!class_exists($this->options['generator_cache_class'], false)) {
+                    require_once $cache->getPath();
+                }
+
+                $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+            }
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

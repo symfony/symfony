@@ -94,13 +94,13 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = array()): void
+    public function publish(string $body, array $headers = array(), string $routingKey = null): void
     {
         if ($this->debug && $this->shouldSetup()) {
             $this->setup();
         }
 
-        $this->exchange()->publish($body, null, AMQP_NOPARAM, array('headers' => $headers));
+        $this->exchange()->publish($body, $routingKey, AMQP_NOPARAM, array('headers' => $headers));
     }
 
     /**

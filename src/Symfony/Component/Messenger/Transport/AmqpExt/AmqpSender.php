@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\AmqpExt\Stamp\RoutingKeyStamp;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -37,8 +38,13 @@ class AmqpSender implements SenderInterface
      */
     public function send(Envelope $envelope)
     {
+        $routingKey = null;
+        /** @var RoutingKeyStamp|null $routingKeyConfig */
+        if ($routingKeyConfig = $envelope->get(RoutingKeyStamp::class)) {
+            $routingKey = $routingKeyConfig->getRoutingKey();
+        }
         $encodedMessage = $this->serializer->encode($envelope);
 
-        $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
+        $this->connection->publish($encodedMessage['body'], $encodedMessage['headers'], $routingKey);
     }
 }

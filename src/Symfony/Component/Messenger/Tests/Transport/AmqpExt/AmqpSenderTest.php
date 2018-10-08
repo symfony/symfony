@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\AmqpExt\Stamp\RoutingKeyStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -33,6 +34,22 @@ class AmqpSenderTest extends TestCase
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers']);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItSendsWithRoutingKey()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $envelope = $envelope->with(new RoutingKeyStamp('dummy_routing'));
+        $encoded = array('body' => '...', 'headers' => array('type' => DummyMessage::class));
+
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 'dummy_routing');
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);

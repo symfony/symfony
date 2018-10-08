@@ -49,6 +49,7 @@ class ReflectionExtractorTest extends TestCase
                 'h',
                 'i',
                 'j',
+                'k',
                 'emptyVar',
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
@@ -93,6 +94,7 @@ class ReflectionExtractorTest extends TestCase
                 'h',
                 'i',
                 'j',
+                'k',
                 'emptyVar',
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
@@ -129,6 +131,7 @@ class ReflectionExtractorTest extends TestCase
                 'h',
                 'i',
                 'j',
+                'k',
                 'emptyVar',
                 'iteratorCollection',
                 'iteratorCollectionWithKey',
@@ -142,6 +145,50 @@ class ReflectionExtractorTest extends TestCase
             ),
             $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
+    }
+
+    public function testGetPropertiesWithoutStaticProperties()
+    {
+        $this->assertSame(
+            array(
+                'bal',
+                'parent',
+                'collection',
+                'nestedCollection',
+                'mixedCollection',
+                'B',
+                'Guid',
+                'g',
+                'h',
+                'i',
+                'j',
+                'emptyVar',
+                'iteratorCollection',
+                'iteratorCollectionWithKey',
+                'nestedIterators',
+                'foo',
+                'foo2',
+                'foo3',
+                'foo4',
+                'foo5',
+                'files',
+                'a',
+                'DOB',
+                'Id',
+                '123',
+                'self',
+                'realParent',
+                'c',
+                'd',
+                'e',
+                'f',
+            ),
+            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', array(
+                ReflectionExtractor::EXCLUDE_STATIC_PROPERTIES => true,
+            ))
+        );
+
+        $this->assertNull($this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties'));
     }
 
     /**

@@ -27,6 +27,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
 {
+    public const EXCLUDE_STATIC_PROPERTIES = 'exclude_static_properties';
+
     /**
      * @internal
      */
@@ -75,7 +77,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         $properties = array();
         foreach ($reflectionProperties as $reflectionProperty) {
-            if ($reflectionProperty->isPublic()) {
+            if ($reflectionProperty->isPublic() && (!($context[self::EXCLUDE_STATIC_PROPERTIES] ?? false) || !$reflectionProperty->isStatic())) {
                 $properties[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }

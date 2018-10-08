@@ -94,6 +94,11 @@ class Dummy extends ParentDummy
     public $j;
 
     /**
+     * @var ?string
+     */
+    public static $k;
+
+    /**
      * This should not be removed.
      *
      * @var

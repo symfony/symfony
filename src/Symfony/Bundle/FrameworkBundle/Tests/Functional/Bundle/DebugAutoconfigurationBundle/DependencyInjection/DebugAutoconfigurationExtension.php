@@ -15,7 +15,7 @@ class DebugAutoconfigurationExtension extends Extension
     {
         $container->registerForAutoconfiguration(MethodCalls::class)
             ->addMethodCall('setMethodOne', array(new Reference('logger')))
-            ->addMethodCall('setMethodTwo', array(['paramOne', 'paramOne']));
+            ->addMethodCall('setMethodTwo', array(array('paramOne', 'paramOne')));
 
         $container->registerForAutoconfiguration(Bindings::class)
             ->setBindings(array(

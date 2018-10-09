@@ -4,5 +4,4 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfig
 
 class TagsAttributes
 {
-
 }

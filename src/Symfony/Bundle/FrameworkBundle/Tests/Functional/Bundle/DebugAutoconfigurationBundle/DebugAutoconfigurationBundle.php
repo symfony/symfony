@@ -6,5 +6,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class DebugAutoconfigurationBundle extends Bundle
 {
-
 }

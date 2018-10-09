@@ -6,11 +6,9 @@ class MethodCalls
 {
     public function setMethodCallOne()
     {
-
     }
 
     public function setMethodCallTwo()
     {
-
     }
 }

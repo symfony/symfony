@@ -61,11 +61,16 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function extractAttributes($object, $format = null, array $context = array())
     {
-        $properties = $this->propertyListExtractor->getProperties(get_class($object), ['exclude_static_properties' => true]);
+        $properties = $this->propertyListExtractor->getProperties(\get_class($object), array(ReflectionExtractor::EXCLUDE_STATIC_PROPERTIES => true));
 
-        return array_filter($properties, function (string $attribute) use ($object, $format, $context) {
-            return $this->isAllowedAttribute($object, $attribute, $format, $context);
-        });
+        $allowedProperties = array();
+        foreach ($properties as $property) {
+            if ($this->isAllowedAttribute($object, $property, $format, $context)) {
+                $allowedProperties[] = $property;
+            }
+        }
+
+        return $allowedProperties;
     }
 
     /**

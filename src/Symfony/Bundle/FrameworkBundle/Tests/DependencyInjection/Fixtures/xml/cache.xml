@@ -12,6 +12,7 @@
             <framework:pool name="cache.baz" adapter="cache.adapter.filesystem" default-lifetime="7" />
             <framework:pool name="cache.foobar" adapter="cache.adapter.psr6" default-lifetime="10" provider="app.cache_pool" />
             <framework:pool name="cache.def" default-lifetime="11" />
+            <framework:pool name="cache.foobaz" adapter="cache.adapter.php_files" default-lifetime="12" />
         </framework:cache>
     </framework:config>
 </container>

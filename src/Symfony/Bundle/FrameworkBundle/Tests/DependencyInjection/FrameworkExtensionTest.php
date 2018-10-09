@@ -23,6 +23,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -1202,6 +1203,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobaz', 'cache.adapter.php_files', 12);
     }
 
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
@@ -1358,6 +1360,9 @@ abstract class FrameworkExtensionTest extends TestCase
                 // no break
             case 'cache.adapter.filesystem':
                 $this->assertSame(FilesystemAdapter::class, $parentDefinition->getClass());
+                break;
+            case 'cache.adapter.php_files':
+                $this->assertSame(PhpFilesAdapter::class, $parentDefinition->getClass());
                 break;
             case 'cache.adapter.psr6':
                 $this->assertSame(ProxyAdapter::class, $parentDefinition->getClass());

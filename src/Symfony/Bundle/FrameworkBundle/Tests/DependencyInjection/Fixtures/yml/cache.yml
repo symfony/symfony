@@ -17,3 +17,6 @@ framework:
                 provider: app.cache_pool
             cache.def:
                 default_lifetime: 11
+            cache.foobaz:
+                adapter: cache.adapter.php_files
+                default_lifetime: 12

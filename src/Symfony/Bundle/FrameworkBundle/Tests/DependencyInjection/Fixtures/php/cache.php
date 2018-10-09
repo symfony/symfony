@@ -24,6 +24,10 @@ $container->loadFromExtension('framework', array(
             'cache.def' => array(
                 'default_lifetime' => 11,
             ),
+            'cache.foobaz' => array(
+                'adapter' => 'cache.adapter.php_files',
+                'default_lifetime' => 12,
+            ),
         ),
     ),
 ));

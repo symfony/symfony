@@ -7,6 +7,7 @@ CHANGELOG
  * add bundle name suggestion on wrongly overridden templates paths
  * added `name` argument in `debug:twig` command and changed `filter` argument as `--filter` option
  * deprecated the `transchoice` tag and filter, use the `trans` ones instead with a `%count%` parameter
+ * Update `percent_widget` to consider `symbol` option for `PercentType` when displaying the percent symbol
 
 4.1.0
 -----

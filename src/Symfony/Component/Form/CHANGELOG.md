@@ -9,6 +9,7 @@ CHANGELOG
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
  * added a cause when a CSRF error has occurred
  * deprecated the `scale` option of the `IntegerType`
+ * add `symbol` to `PercentType` options and make available as `FormView` vars
 
 4.1.0
 -----

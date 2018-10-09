@@ -106,12 +106,16 @@
 {%- endblock dateinterval_widget %}
 
 {% block percent_widget -%}
-    <div class="input-group">
-        {{- block('form_widget_simple') -}}
-        <div class="input-group-append">
-            <span class="input-group-text">%</span>
+    {%- if symbol -%}
+        <div class="input-group">
+            {{- block('form_widget_simple') -}}
+            <div class="input-group-append">
+                <span class="input-group-text">{{ symbol|default('%') }}</span>
+            </div>
         </div>
-    </div>
+    {%- else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif -%}
 {%- endblock percent_widget %}
 
 {% block file_widget -%}

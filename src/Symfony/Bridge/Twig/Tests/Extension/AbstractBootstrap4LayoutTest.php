@@ -1128,4 +1128,45 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 '
         );
     }
+
+    public function testPercentNoSymbol()
+    {
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, array('symbol' => false));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
+            '/input
+            [@id="my&id"]
+            [@type="text"]
+            [@name="name"]
+            [@class="my&class form-control"]
+            [@value="10"]
+'
+        );
+    }
+
+    public function testPercentCustomSymbol()
+    {
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, array('symbol' => '‱'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
+            '/div
+    [@class="input-group"]
+    [
+        ./input
+            [@id="my&id"]
+            [@type="text"]
+            [@name="name"]
+            [@class="my&class form-control"]
+            [@value="10"]
+            /following-sibling::div
+                [@class="input-group-append"]
+                [
+                    ./span
+                    [@class="input-group-text"]
+                    [contains(.., "‱")]
+                ]
+    ]
+'
+        );
+    }
 }

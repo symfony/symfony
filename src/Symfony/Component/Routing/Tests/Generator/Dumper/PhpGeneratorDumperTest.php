@@ -128,8 +128,8 @@ class PhpGeneratorDumperTest extends TestCase
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test'));
 
         $code = $this->generatorDumper->dump(array(
-        'class' => 'RouteNotFoundLocalizedProjectUrlGenerator',
-      ));
+            'class' => 'RouteNotFoundLocalizedProjectUrlGenerator',
+        ));
         file_put_contents($this->testTmpFilepath, $code);
         include $this->testTmpFilepath;
 

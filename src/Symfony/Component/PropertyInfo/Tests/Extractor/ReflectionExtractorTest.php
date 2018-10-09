@@ -34,161 +34,177 @@ class ReflectionExtractorTest extends TestCase
         $this->extractor = new ReflectionExtractor();
     }
 
-    public function testGetProperties()
+    /**
+     * @dataProvider getPropertiesProvider
+     */
+    public function testGetProperties($class, $expected, $mutatorPrefixes, $accessorPrefixes, $arrayMutatorPrefixes, $context)
     {
-        $this->assertSame(
-            array(
-                'bal',
-                'parent',
-                'collection',
-                'nestedCollection',
-                'mixedCollection',
-                'B',
-                'Guid',
-                'g',
-                'h',
-                'i',
-                'j',
-                'k',
-                'emptyVar',
-                'iteratorCollection',
-                'iteratorCollectionWithKey',
-                'nestedIterators',
-                'foo',
-                'foo2',
-                'foo3',
-                'foo4',
-                'foo5',
-                'files',
-                'a',
-                'DOB',
-                'Id',
-                '123',
-                'self',
-                'realParent',
-                'c',
-                'd',
-                'e',
-                'f',
-            ),
-            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
-        );
+        $extractor = new ReflectionExtractor($mutatorPrefixes, $accessorPrefixes, $arrayMutatorPrefixes);
 
-        $this->assertNull($this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties'));
+        $this->assertSame($expected, $extractor->getProperties($class, $context));
     }
 
-    public function testGetPropertiesWithCustomPrefixes()
+    public function getPropertiesProvider()
     {
-        $customExtractor = new ReflectionExtractor(array('add', 'remove'), array('is', 'can'));
-
-        $this->assertSame(
-            array(
-                'bal',
-                'parent',
-                'collection',
-                'nestedCollection',
-                'mixedCollection',
-                'B',
-                'Guid',
-                'g',
-                'h',
-                'i',
-                'j',
-                'k',
-                'emptyVar',
-                'iteratorCollection',
-                'iteratorCollectionWithKey',
-                'nestedIterators',
-                'foo',
-                'foo2',
-                'foo3',
-                'foo4',
-                'foo5',
-                'files',
-                'c',
-                'd',
-                'e',
-                'f',
-            ),
-            $customExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
-        );
-    }
-
-    public function testGetPropertiesWithNoPrefixes()
-    {
-        $noPrefixExtractor = new ReflectionExtractor(array(), array(), array());
-
-        $this->assertSame(
-            array(
-                'bal',
-                'parent',
-                'collection',
-                'nestedCollection',
-                'mixedCollection',
-                'B',
-                'Guid',
-                'g',
-                'h',
-                'i',
-                'j',
-                'k',
-                'emptyVar',
-                'iteratorCollection',
-                'iteratorCollectionWithKey',
-                'nestedIterators',
-                'foo',
-                'foo2',
-                'foo3',
-                'foo4',
-                'foo5',
-                'files',
-            ),
-            $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
-        );
-    }
-
-    public function testGetPropertiesWithoutStaticProperties()
-    {
-        $this->assertSame(
-            array(
-                'bal',
-                'parent',
-                'collection',
-                'nestedCollection',
-                'mixedCollection',
-                'B',
-                'Guid',
-                'g',
-                'h',
-                'i',
-                'j',
-                'emptyVar',
-                'iteratorCollection',
-                'iteratorCollectionWithKey',
-                'nestedIterators',
-                'foo',
-                'foo2',
-                'foo3',
-                'foo4',
-                'foo5',
-                'files',
-                'a',
-                'DOB',
-                'Id',
-                '123',
-                'self',
-                'realParent',
-                'c',
-                'd',
-                'e',
-                'f',
-            ),
-            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', array(
-                ReflectionExtractor::EXCLUDE_STATIC_PROPERTIES => true,
-            ))
-        );
-
-        $this->assertNull($this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties'));
+        return [
+            [
+                'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
+                array(
+                    'bal',
+                    'parent',
+                    'collection',
+                    'nestedCollection',
+                    'mixedCollection',
+                    'B',
+                    'Guid',
+                    'g',
+                    'h',
+                    'i',
+                    'j',
+                    'k',
+                    'emptyVar',
+                    'iteratorCollection',
+                    'iteratorCollectionWithKey',
+                    'nestedIterators',
+                    'foo',
+                    'foo2',
+                    'foo3',
+                    'foo4',
+                    'foo5',
+                    'files',
+                    'a',
+                    'DOB',
+                    'Id',
+                    '123',
+                    'self',
+                    'realParent',
+                    'c',
+                    'd',
+                    'e',
+                    'f',
+                ),
+                null,
+                null,
+                null,
+                array(),
+            ],
+            [
+                'Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties',
+                null,
+                null,
+                null,
+                null,
+                array(),
+            ],
+            [
+                'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
+                array(
+                    'bal',
+                    'parent',
+                    'collection',
+                    'nestedCollection',
+                    'mixedCollection',
+                    'B',
+                    'Guid',
+                    'g',
+                    'h',
+                    'i',
+                    'j',
+                    'k',
+                    'emptyVar',
+                    'iteratorCollection',
+                    'iteratorCollectionWithKey',
+                    'nestedIterators',
+                    'foo',
+                    'foo2',
+                    'foo3',
+                    'foo4',
+                    'foo5',
+                    'files',
+                    'c',
+                    'd',
+                    'e',
+                    'f',
+                ),
+                array('add', 'remove'),
+                array('is', 'can'),
+                null,
+                array(),
+            ],
+            [
+                'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
+                array(
+                    'bal',
+                    'parent',
+                    'collection',
+                    'nestedCollection',
+                    'mixedCollection',
+                    'B',
+                    'Guid',
+                    'g',
+                    'h',
+                    'i',
+                    'j',
+                    'k',
+                    'emptyVar',
+                    'iteratorCollection',
+                    'iteratorCollectionWithKey',
+                    'nestedIterators',
+                    'foo',
+                    'foo2',
+                    'foo3',
+                    'foo4',
+                    'foo5',
+                    'files',
+                ),
+                array(),
+                array(),
+                array(),
+                array(),
+            ],
+            [
+                'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
+                array(
+                    'bal',
+                    'parent',
+                    'collection',
+                    'nestedCollection',
+                    'mixedCollection',
+                    'B',
+                    'Guid',
+                    'g',
+                    'h',
+                    'i',
+                    'j',
+                    'emptyVar',
+                    'iteratorCollection',
+                    'iteratorCollectionWithKey',
+                    'nestedIterators',
+                    'foo',
+                    'foo2',
+                    'foo3',
+                    'foo4',
+                    'foo5',
+                    'files',
+                    'a',
+                    'DOB',
+                    'Id',
+                    '123',
+                    'self',
+                    'realParent',
+                    'c',
+                    'd',
+                    'e',
+                    'f',
+                ),
+                null,
+                null,
+                null,
+                array(
+                    ReflectionExtractor::EXCLUDE_STATIC_PROPERTIES => true,
+                )
+            ]
+        ];
     }
 
     /**

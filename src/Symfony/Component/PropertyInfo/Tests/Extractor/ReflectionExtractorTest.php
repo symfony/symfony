@@ -46,8 +46,8 @@ class ReflectionExtractorTest extends TestCase
 
     public function getPropertiesProvider()
     {
-        return [
-            [
+        return array(
+            array(
                 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
                 array(
                     'bal',
@@ -87,16 +87,16 @@ class ReflectionExtractorTest extends TestCase
                 null,
                 null,
                 array(),
-            ],
-            [
+            ),
+            array(
                 'Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties',
                 null,
                 null,
                 null,
                 null,
                 array(),
-            ],
-            [
+            ),
+            array(
                 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
                 array(
                     'bal',
@@ -130,8 +130,8 @@ class ReflectionExtractorTest extends TestCase
                 array('is', 'can'),
                 null,
                 array(),
-            ],
-            [
+            ),
+            array(
                 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
                 array(
                     'bal',
@@ -161,8 +161,8 @@ class ReflectionExtractorTest extends TestCase
                 array(),
                 array(),
                 array(),
-            ],
-            [
+            ),
+            array(
                 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy',
                 array(
                     'bal',
@@ -202,9 +202,9 @@ class ReflectionExtractorTest extends TestCase
                 null,
                 array(
                     ReflectionExtractor::EXCLUDE_STATIC_PROPERTIES => true,
-                )
-            ]
-        ];
+                ),
+            ),
+        );
     }
 
     /**

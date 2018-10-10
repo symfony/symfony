@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-10-07T07:25:49Z
+
+Why does it even need a closure, instead of callable in the first place?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-07T07:27:19Z
+
+Because the method is private so it cannot be exported.

@@ -142,6 +142,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->example('^/path to resource/')
                             ->end()
                             ->scalarNode('host')->defaultNull()->end()
+                            ->integerNode('port')->defaultNull()->end()
                             ->arrayNode('ips')
                                 ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                                 ->prototype('scalar')->end()

@@ -78,6 +78,21 @@ class RequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
+    public function testPort()
+    {
+        $matcher = new RequestMatcher();
+        $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => null, 'SERVER_PORT' => 8000));
+
+        $matcher->matchPort(8000);
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchPort(9000);
+        $this->assertFalse($matcher->matches($request));
+
+        $matcher = new RequestMatcher(null, null, null, null, array(), null, 8000);
+        $this->assertTrue($matcher->matches($request));
+    }
+
     public function getHostData()
     {
         return array(

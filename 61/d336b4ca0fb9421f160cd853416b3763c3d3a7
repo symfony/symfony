@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-11T17:30:16Z
+
+Removing the event channel should probably not be harcoded, but moved to the default configuration in Flex/Symfony SE.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-11T19:52:38Z
+
+@fabpot is there a (hacky) way in twig to check if profiler_dump exists? Can we think of one? :)
+
+edit: a wrapper in CodeExtension could do
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-22T18:01:50Z
+
+Instead of complicating things with a new config option to make the list of excluded channels configurable, could we hardcode it? For our own log channels this is correct (event is annoying but the rest are useful). The only problem could be if users want to exclude some custom channels that are also annoying. I'd say: let's not implement that unless a significant number of people ask for it.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-09-24T17:37:54Z
+
+Maybe we could detect if all the informations from the context are used in the message an hide the context in those cases ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T19:28:44Z
+
+Why do we care about _event_ channel, to be excluded here, actually? What we need are [filters](https://github.com/symfony/symfony/pull/24263) right?
+
+Profiler doesnt do this AFAIK.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T18:13:40Z
+
+@javiereguiluz Can you fix @stof comment here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:33:21Z
+
+ping @javiereguiluz should we move this to 4.1?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T16:16:23Z
+
+Moving to 4.1.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-27T14:57:35Z
+
+To not add a hard dependency on VarDumper, I propose a different implementation: the log context is dumped according to what you have installed.
+
+If your app has VarDumper, you see this:
+
+![var_dumper](https://user-images.githubusercontent.com/73419/37975536-dbce0f00-31df-11e8-8eab-f1a0023b5402.png)
+
+If your app has Yaml, you see this:
+
+![yaml](https://user-images.githubusercontent.com/73419/37975553-e1ca1d7c-31df-11e8-8a2a-f79b9f175e76.png)
+
+Otherwise, you see this:
+
+![php](https://user-images.githubusercontent.com/73419/37975570-e874f48a-31df-11e8-8331-a49fd146d2b0.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-27T15:07:18Z
+
+My question ... should we complicate this so much ... or should we just always use `json_encode()` which works reasonable well in all cases?

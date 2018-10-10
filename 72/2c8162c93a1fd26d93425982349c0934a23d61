@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by TheCelavi at 2018-02-22T09:59:52Z
+
+> That's a new feature so it should target master.
+
+Do you want me to create PR on master branch?
+
+> Can you please add some tests also?
+
+I have updated tests to reflect this change, so, it is kinda covered already. Only thin that can be tested is getting the basename of file - do you want me to write that test?

@@ -19,7 +19,6 @@ CHANGELOG
  * Deprecated the `--no-debug` console option, set the "APP_DEBUG" 
    environment variable to "0" instead.
  * Deprecated the `Templating\Helper\TranslatorHelper::transChoice()` method, use the `trans()` one instead with a `%count%` parameter
- * Only display `PercentType` percent symbol if the `symbol` option is `true`
 
 4.1.0
 -----

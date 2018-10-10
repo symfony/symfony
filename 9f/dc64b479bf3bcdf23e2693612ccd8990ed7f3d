@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-04T06:09:16Z
+
+@SailorMax patch updated, can you try the new one please?
+
+---------------------------------------------------------------------------
+
+by SailorMax at 2018-10-04T07:21:05Z
+
+With new patch all my processes has exitCode = 1 and did not work at all. Can't write stdout and stderr to locked files?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-05T07:59:45Z
+
+Thanks, can you try again please? It should be good now (at least appveyor is green.)
+
+---------------------------------------------------------------------------
+
+by SailorMax at 2018-10-05T09:14:32Z
+
+Yes, latest patch work as expected in my case.
+Thank you!
+
+---------------------------------------------------------------------------
+
+by SailorMax at 2018-10-05T09:20:01Z
+
+But after work temp files remain in the temp-directory. Is it feature? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-05T09:25:19Z
+
+It is :) Actually there is no way around: unlinking the file would create race conditions.
+The compromise here is to use incremental numbers for files so that there should be only a limited number of them to keep in the tmp dir.
+We used to use random files to remove any locks, but the outcome was worse: there is no way to delete these tmp files 100% of the time, leading to the tmp dir being filled with empty files on real-world apps. A much worse outcome.
+
+---------------------------------------------------------------------------
+
+by SailorMax at 2018-10-05T09:27:31Z
+
+For me - not a problem :)

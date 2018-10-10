@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method getExtendedTypes(): iterable
  */
 interface FormTypeExtensionInterface
 {
@@ -59,6 +61,8 @@ interface FormTypeExtensionInterface
      * Returns the name of the type being extended.
      *
      * @return string The name of the type being extended
+     *
+     * @deprecated since Symfony 4.2, use getExtendedTypes() instead.
      */
     public function getExtendedType();
 }

@@ -72,6 +72,36 @@ Finder
 Form
 ----
 
+ * The `getExtendedType()` method was removed from the `FormTypeExtensionInterface`. It is replaced by the the static
+   `getExtendedTypes()` method which must return an iterable of extended types.
+
+   Before:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public function getExtendedType()
+       {
+           return FormType::class;
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public static function getExtendedTypes(): iterable
+       {
+           return array(FormType::class);
+       }
+
+       // ...
+   }
+   ```
  * The `scale` option was removed from the `IntegerType`.
  * The `$scale` argument of the `IntegerToLocalizedStringTransformer` was removed.
 

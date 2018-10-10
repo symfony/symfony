@@ -572,6 +572,10 @@ class Filesystem
         }
 
         foreach ($iterator as $file) {
+            if (false === strpos($file->getPath(), $originDir)) {
+                throw new IOException(sprintf('Unable to mirror "%s" directory. If the origin directory is relative, try using "realpath" before calling the mirror method.', $originDir), 0, null, $originDir);
+            }
+
             $target = $targetDir.substr($file->getPathname(), $originDirLen);
 
             if ($copyOnWindows) {

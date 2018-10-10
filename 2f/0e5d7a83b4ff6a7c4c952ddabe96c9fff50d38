@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-28T15:56:59Z
+
+what is the lowest branch where this bug exists? can you check 2.8 please? maybe 3.4 otherwise?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-29T10:55:48Z
+
+ping @iltar @weaverryan
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-29T12:44:37Z
+
+Can you rebase your PR on the 3.4 branch and change the PR target branch accordingly?
+
+---------------------------------------------------------------------------
+
+by gpekz at 2018-07-29T20:05:46Z
+
+@chalasr Rebase is done. I made a mistake during this one, it removed some of your comments and automatically requested a review of dunglas. Sorry for this !
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-30T09:05:44Z
+
+@gpekz No worries :)
+
+---------------------------------------------------------------------------
+
+by gpekz at 2018-07-30T13:11:04Z
+
+@chalasr Thanks for reviewing :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-18T12:20:50Z
+
+friendly ping @gpekz
+
+---------------------------------------------------------------------------
+
+by gpekz at 2018-09-20T14:09:37Z
+
+> friendly ping @gpekz
+
+@nicolas-grekas Before continuing, I would like your opinion on the unresolve discussion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-20T14:37:34Z
+
+I'd need @chalasr @xabbuh @weaverryan to chime in :)

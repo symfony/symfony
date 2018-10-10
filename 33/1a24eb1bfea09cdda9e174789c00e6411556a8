@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-18T08:41:49Z
+
+@chalasr this looks like a useful feature for some people and I can't see any security issue if we introduce this change, but could you please review it? Thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-09-30T15:34:20Z
+
+@roukmoute What's the state of this PR?
+I see that you finally added the `port` option to firewalls as well, no objection from me but it should be covered by tests as for access controls.
+Please tell us when it's ready to review or if you need some help :)

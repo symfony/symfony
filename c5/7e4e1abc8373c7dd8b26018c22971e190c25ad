@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-21T15:57:12Z
+
+> The contents of this PR are the exact same contents given by GitHub when clicking on "Add a Contributor Covenant based CoC".
+
+It should then be updated to match what's in https://symfony.com/doc/current/contributing/code_of_conduct/code_of_conduct.html
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-21T15:59:23Z
+
+But Symfony's CoC is Contributor Covenant 1.4. I tried (very hard) to make some minor changes and all of them were refused.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-21T16:02:24Z
+
+Our CoC mentions the CARE team, that's a requirement!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-09-21T16:03:54Z
+
+I'm going to propose some changes to the Symfony's CoC page. Let's keep this PR as WIP for now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-22T07:47:46Z
+
+Also, we replaced the term "race" by "ethnic origin". This change is lost in this PR.
+
+---------------------------------------------------------------------------
+
+by sstok at 2018-09-23T10:27:06Z
+
+Interesting 🤔 the presence of a file is not enough. it needs actual contents of a CoC, you can't only use a link (like I do), or it may it accepts if it has a title at least (edit: nope 😑 ).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T09:56:24Z
+
+Any news here? What's blocking from "just" copy/pasting the CoC we have?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-10T10:04:16Z
+
+Sorry for the late response! I've copy+pasted the Symfony's CoC, so this is ready. Thanks!

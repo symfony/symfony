@@ -29,7 +29,6 @@
         <!-- FormFactory -->
         <service id="form.factory" class="Symfony\Component\Form\FormFactory" public="true">
             <argument type="service" id="form.registry" />
-            <argument type="service" id="form.resolved_type_factory" />
         </service>
         <service id="Symfony\Component\Form\FormFactoryInterface" alias="form.factory" />
 

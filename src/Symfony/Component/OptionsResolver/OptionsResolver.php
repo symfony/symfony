@@ -38,6 +38,13 @@ class OptionsResolver implements Options
     private $defaults = array();
 
     /**
+     * A list of closure for nested options.
+     *
+     * @var \Closure[][]
+     */
+    private $nested = array();
+
+    /**
      * The names of required options.
      */
     private $required = array();
@@ -130,6 +137,20 @@ class OptionsResolver implements Options
      * is spread across different locations of your code, such as base and
      * sub-classes.
      *
+     * If you want to define nested options, you can pass a closure with the
+     * following signature:
+     *
+     *     $options->setDefault('database', function (OptionsResolver $resolver) {
+     *         $resolver->setDefined(array('dbname', 'host', 'port', 'user', 'pass'));
+     *     }
+     *
+     * To get access to the parent options, add a second argument to the closure's
+     * signature:
+     *
+     *     function (OptionsResolver $resolver, Options $parent) {
+     *         // 'default' === $parent['connection']
+     *     }
+     *
      * @param string $option The name of the option
      * @param mixed  $value  The default value of the option
      *
@@ -167,15 +188,27 @@ class OptionsResolver implements Options
                 $this->lazy[$option][] = $value;
                 $this->defined[$option] = true;
 
-                // Make sure the option is processed
-                unset($this->resolved[$option]);
+                // Make sure the option is processed and is not nested anymore
+                unset($this->resolved[$option], $this->nested[$option]);
+
+                return $this;
+            }
+
+            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && self::class === $class->name && (!isset($params[1]) || (null !== ($class = $params[1]->getClass()) && Options::class === $class->name))) {
+                // Store closure for later evaluation
+                $this->nested[$option][] = $value;
+                $this->defaults[$option] = array();
+                $this->defined[$option] = true;
+
+                // Make sure the option is processed and is not lazy anymore
+                unset($this->resolved[$option], $this->lazy[$option]);
 
                 return $this;
             }
         }
 
-        // This option is not lazy anymore
-        unset($this->lazy[$option]);
+        // This option is not lazy nor nested anymore
+        unset($this->lazy[$option], $this->nested[$option]);
 
         // Yet undefined options can be marked as resolved, because we only need
         // to resolve options with lazy closures, normalizers or validation
@@ -354,18 +387,23 @@ class OptionsResolver implements Options
         return array_keys($this->defined);
     }
 
+    public function isNested(string $option): bool
+    {
+        return isset($this->nested[$option]);
+    }
+
     /**
      * Deprecates an option, allowed types or values.
      *
      * Instead of passing the message, you may also pass a closure with the
      * following signature:
      *
-     *     function ($value) {
+     *     function (Options $options, $value): string {
      *         // ...
      *     }
      *
      * The closure receives the value as argument and should return a string.
-     * Returns an empty string to ignore the option deprecation.
+     * Return an empty string to ignore the option deprecation.
      *
      * The closure is invoked when {@link resolve()} is called. The parameter
      * passed to the closure is the value of the option after validating it
@@ -649,6 +687,7 @@ class OptionsResolver implements Options
 
         $this->defined = array();
         $this->defaults = array();
+        $this->nested = array();
         $this->required = array();
         $this->resolved = array();
         $this->lazy = array();
@@ -767,6 +806,30 @@ class OptionsResolver implements Options
 
         $value = $this->defaults[$option];
 
+        // Resolve the option if it is a nested definition
+        if (isset($this->nested[$option])) {
+            // If the closure is already being called, we have a cyclic dependency
+            if (isset($this->calling[$option])) {
+                throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', array_keys($this->calling))));
+            }
+
+            if (!\is_array($value)) {
+                throw new InvalidOptionsException(sprintf('The nested option "%s" with value %s is expected to be of type array, but is of type "%s".', $option, $this->formatValue($value), $this->formatTypeOf($value, 'array')));
+            }
+
+            // The following section must be protected from cyclic calls.
+            $this->calling[$option] = true;
+            try {
+                $resolver = new self();
+                foreach ($this->nested[$option] as $closure) {
+                    $closure($resolver, $this);
+                }
+                $value = $resolver->resolve($value);
+            } finally {
+                unset($this->calling[$option]);
+            }
+        }
+
         // Resolve the option if the default value is lazily evaluated
         if (isset($this->lazy[$option])) {
             // If the closure is already being called, we have a cyclic
@@ -860,8 +923,20 @@ class OptionsResolver implements Options
         if (isset($this->deprecated[$option])) {
             $deprecationMessage = $this->deprecated[$option];
 
-            if ($deprecationMessage instanceof \Closure && !\is_string($deprecationMessage = $deprecationMessage($value))) {
-                throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", returns an empty string to ignore.', \gettype($deprecationMessage)));
+            if ($deprecationMessage instanceof \Closure) {
+                // If the closure is already being called, we have a cyclic dependency
+                if (isset($this->calling[$option])) {
+                    throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', array_keys($this->calling))));
+                }
+
+                $this->calling[$option] = true;
+                try {
+                    if (!\is_string($deprecationMessage = $deprecationMessage($this, $value))) {
+                        throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", return an empty string to ignore.', \gettype($deprecationMessage)));
+                    }
+                } finally {
+                    unset($this->calling[$option]);
+                }
             }
 
             if ('' !== $deprecationMessage) {

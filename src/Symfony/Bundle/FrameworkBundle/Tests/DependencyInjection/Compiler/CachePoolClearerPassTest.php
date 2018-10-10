@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
+/**
+ * @group legacy
+ */
 class CachePoolClearerPassTest extends TestCase
 {
     public function testPoolRefsAreWeak()

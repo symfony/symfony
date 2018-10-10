@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\FormTypeExtensionInterface;
 
 /**
  * Adds all services with the tags "form.type", "form.type_extension" and
@@ -92,13 +93,27 @@ class FormPass implements CompilerPassInterface
 
             $tag = $serviceDefinition->getTag($this->formTypeExtensionTag);
             if (isset($tag[0]['extended_type'])) {
-                $extendedType = $tag[0]['extended_type'];
-            } else {
-                throw new InvalidArgumentException(sprintf('"%s" tagged services must have the extended type configured using the extended_type/extended-type attribute, none was configured for the "%s" service.', $this->formTypeExtensionTag, $serviceId));
-            }
+                if (!method_exists($serviceDefinition->getClass(), 'getExtendedTypes')) {
+                    @trigger_error(sprintf('Not implementing the static getExtendedTypes() method in %s when implementing the %s is deprecated since Symfony 4.2. The method will be added to the interface in 5.0.', $serviceDefinition->getClass(), FormTypeExtensionInterface::class), E_USER_DEPRECATED);
+                }
 
-            $typeExtensions[$extendedType][] = new Reference($serviceId);
-            $typeExtensionsClasses[] = $serviceDefinition->getClass();
+                $typeExtensions[$tag[0]['extended_type']][] = new Reference($serviceId);
+                $typeExtensionsClasses[] = $serviceDefinition->getClass();
+            } elseif (method_exists($serviceDefinition->getClass(), 'getExtendedTypes')) {
+                $extendsTypes = false;
+
+                foreach ($serviceDefinition->getClass()::getExtendedTypes() as $extendedType) {
+                    $typeExtensions[$extendedType][] = new Reference($serviceId);
+                    $typeExtensionsClasses[] = $serviceDefinition->getClass();
+                    $extendsTypes = true;
+                }
+
+                if (!$extendsTypes) {
+                    throw new InvalidArgumentException(sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
+                }
+            } else {
+                throw new InvalidArgumentException(sprintf('"%s" tagged services have to implement the static getExtendedTypes() method. The class for service "%s" does not implement it.', $this->formTypeExtensionTag, $serviceId));
+            }
         }
 
         foreach ($typeExtensions as $extendedType => $extensions) {

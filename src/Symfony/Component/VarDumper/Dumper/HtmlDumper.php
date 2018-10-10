@@ -23,6 +23,41 @@ class HtmlDumper extends CliDumper
 {
     public static $defaultOutput = 'php://output';
 
+    protected static $themes = array(
+        'dark' => array(
+            'default' => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
+            'num' => 'font-weight:bold; color:#1299DA',
+            'const' => 'font-weight:bold',
+            'str' => 'font-weight:bold; color:#56DB3A',
+            'note' => 'color:#1299DA',
+            'ref' => 'color:#A0A0A0',
+            'public' => 'color:#FFFFFF',
+            'protected' => 'color:#FFFFFF',
+            'private' => 'color:#FFFFFF',
+            'meta' => 'color:#B729D9',
+            'key' => 'color:#56DB3A',
+            'index' => 'color:#1299DA',
+            'ellipsis' => 'color:#FF8400',
+            'ns' => 'user-select:none;',
+        ),
+        'light' => array(
+            'default' => 'background:none; color:#CC7832; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
+            'num' => 'font-weight:bold; color:#1299DA',
+            'const' => 'font-weight:bold',
+            'str' => 'font-weight:bold; color:#629755;',
+            'note' => 'color:#6897BB',
+            'ref' => 'color:#6E6E6E',
+            'public' => 'color:#262626',
+            'protected' => 'color:#262626',
+            'private' => 'color:#262626',
+            'meta' => 'color:#B729D9',
+            'key' => 'color:#789339',
+            'index' => 'color:#1299DA',
+            'ellipsis' => 'color:#CC7832',
+            'ns' => 'user-select:none;',
+        ),
+    );
+
     protected $dumpHeader;
     protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
     protected $dumpSuffix = '</pre><script>Sfdump(%s)</script>';
@@ -30,22 +65,7 @@ class HtmlDumper extends CliDumper
     protected $colors = true;
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
-    protected $styles = array(
-        'default' => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
-        'num' => 'font-weight:bold; color:#1299DA',
-        'const' => 'font-weight:bold',
-        'str' => 'font-weight:bold; color:#56DB3A',
-        'note' => 'color:#1299DA',
-        'ref' => 'color:#A0A0A0',
-        'public' => 'color:#FFFFFF',
-        'protected' => 'color:#FFFFFF',
-        'private' => 'color:#FFFFFF',
-        'meta' => 'color:#B729D9',
-        'key' => 'color:#56DB3A',
-        'index' => 'color:#1299DA',
-        'ellipsis' => 'color:#FF8400',
-        'ns' => 'user-select:none;',
-    );
+    protected $styles;
 
     private $displayOptions = array(
         'maxDepth' => 1,
@@ -62,6 +82,7 @@ class HtmlDumper extends CliDumper
         AbstractDumper::__construct($output, $charset, $flags);
         $this->dumpId = 'sf-dump-'.mt_rand();
         $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->styles = static::$themes['dark'] ?? self::$themes['dark'];
     }
 
     /**
@@ -71,6 +92,15 @@ class HtmlDumper extends CliDumper
     {
         $this->headerIsDumped = false;
         $this->styles = $styles + $this->styles;
+    }
+
+    public function setTheme(string $themeName)
+    {
+        if (!isset(static::$themes[$themeName])) {
+            throw new \InvalidArgumentException(sprintf('Theme "%s" does not exist in class "%s".', $themeName, static::class));
+        }
+
+        $this->setStyles(static::$themes[$themeName]);
     }
 
     /**

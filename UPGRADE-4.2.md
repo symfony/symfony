@@ -55,9 +55,38 @@ Finder
 Form
 ----
 
+ * The `getExtendedType()` method of the `FormTypeExtensionInterface` is deprecated and will be removed in 5.0. Type
+   extensions must implement the static `getExtendedTypes()` method instead and return an iterable of extended types.
+
+   Before:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public function getExtendedType()
+       {
+           return FormType::class;
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public static function getExtendedTypes(): iterable
+       {
+           return array(FormType::class);
+       }
+
+       // ...
+   }
+   ```
  * The `scale` option of the `IntegerType` is deprecated.
  * The `$scale` argument of the `IntegerToLocalizedStringTransformer` is deprecated.
-
  * Deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered.
    Instead of expecting such calls to return empty strings, check if the field has already been rendered.
 

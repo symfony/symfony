@@ -33,10 +33,13 @@
         "doctrine/cache": "~1.6",
         "doctrine/dbal": "~2.5",
         "predis/predis": "~1.0",
+        "symfony/config": "~4.2",
+        "symfony/dependency-injection": "~3.4",
         "symfony/var-dumper": "^4.1.1"
     },
     "conflict": {
         "doctrine/dbal": "<2.5",
+        "symfony/dependency-injection": "<3.4",
         "symfony/var-dumper": "<3.4"
     },
     "autoload": {

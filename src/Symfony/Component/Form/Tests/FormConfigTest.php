@@ -138,14 +138,6 @@ class FormConfigTest extends TestCase
         self::assertSame('PATCH', $formConfigBuilder->getMethod());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
-    public function testSetMethodDoesNotAllowOtherValues()
-    {
-        $this->getConfigBuilder()->setMethod('foo');
-    }
-
     private function getConfigBuilder($name = 'name')
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();

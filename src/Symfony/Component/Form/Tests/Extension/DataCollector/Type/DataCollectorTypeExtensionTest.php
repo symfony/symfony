@@ -32,6 +32,9 @@ class DataCollectorTypeExtensionTest extends TestCase
         $this->extension = new DataCollectorTypeExtension($this->dataCollector);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetExtendedType()
     {
         $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\FormType', $this->extension->getExtendedType());

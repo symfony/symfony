@@ -35,19 +35,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private static $nativeRequestHandler;
 
     /**
-     * The accepted request methods.
-     *
-     * @var array
-     */
-    private static $allowedMethods = array(
-        'GET',
-        'PUT',
-        'POST',
-        'DELETE',
-        'PATCH',
-    );
-
-    /**
      * @var bool
      */
     protected $locked = false;
@@ -788,13 +775,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
         }
 
-        $upperCaseMethod = strtoupper($method);
-
-        if (!\in_array($upperCaseMethod, self::$allowedMethods)) {
-            throw new InvalidArgumentException(sprintf('The form method is "%s", but should be one of "%s".', $method, implode('", "', self::$allowedMethods)));
-        }
-
-        $this->method = $upperCaseMethod;
+        $this->method = strtoupper($method);
 
         return $this;
     }

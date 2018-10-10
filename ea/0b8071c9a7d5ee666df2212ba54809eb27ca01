@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-05-15T07:14:09Z
+
+Depends on where it's used I guess. When it's in the WDT, I'd prefer to keep it dark, but it doesn't seem possible like this (or am I wrong?).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-15T07:24:46Z
+
+@iltar : It'll not be used anywhere in core (appart perhaps if we want to use it for the html output of the `server:dump` command). It's up to you to use it or let the default theme.
+Or perhaps you meant you cannot use both dark and light theme in the same page through this feature?
+That's true, but it's the same for any style set with `HtmlDumper::setStyles`. For such needs, you'll still have to use css.
+
+Point of this is to expose the light theme if you want to exclusively use it instead of the dark theme for your own html dumper usages and also reference this color scheme directly in it rather than having to search it in the profiler css.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-15T07:47:21Z
+
+btw, the fact that tests are passing tells me we are missing tests for the color support of the CliDumper
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-05-17T11:38:26Z
+
+I love this! Also, we need it. In the profiler, we apply special styles to all `profiler_dump()` calls to avoid displaying them with a dark background. So if this gets merged, we can remove all these special styles defined here:
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig#L937-L950
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-21T18:12:25Z
+
+I'm wondering: should we move this to another class, following SRP? This is a helper around "setStyles", so could be decoupled. WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-05-22T07:23:56Z
+
+@nicolas-grekas : Something like a `StyleBuilder/StyleHelper::setTheme(string $theme)|addStyle(string $name, string $value)|apply(CliDumper $dumper)`?
+Or something more like `Symfony\Component\Console\Helper\TableStyle`?
+Is it really worth it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-08T09:00:27Z
+
+@ogizanagi Can we finish this one so that we can merge it for 4.2?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-08T10:45:32Z
+
+@fabpot : Sure, sorry for the lack of answer. But do we agree to keep `HtmlDumper::setTheme()` as is considering @nicolas-grekas 's https://github.com/symfony/symfony/pull/27261#issuecomment-390736674 ? Should we also add it in `CliDumper` (can still do it later anyway)?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-08T10:58:25Z
+
+(Rebased and fixed the exception message)

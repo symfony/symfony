@@ -14,12 +14,19 @@ namespace Symfony\Contracts\Cache;
 use Psr\Cache\InvalidArgumentException;
 
 /**
- * Interface for invalidating cached items using tags.
+ * Allows invalidating cached items using tags.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 interface TagAwareCacheInterface extends CacheInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @param callable(ItemInterface):mixed $callback Should return the computed value for the given key/item
+     */
+    public function get(string $key, callable $callback, float $beta = null);
+
     /**
      * Invalidates cached items using tags.
      *

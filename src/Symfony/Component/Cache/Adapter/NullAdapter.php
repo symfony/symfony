@@ -119,6 +119,14 @@ class NullAdapter implements AdapterInterface, CacheInterface
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $key): bool
+    {
+        return $this->deleteItem($key);
+    }
+
     private function generateItems(array $keys)
     {
         $f = $this->createCacheItem;

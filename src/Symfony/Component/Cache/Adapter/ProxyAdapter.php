@@ -16,7 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Component\Cache\Traits\GetTrait;
+use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
@@ -26,7 +26,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     use ProxyTrait;
-    use GetTrait;
+    use ContractsTrait;
 
     private $namespace;
     private $namespaceLen;

@@ -16,7 +16,7 @@ use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Component\Cache\Traits\GetTrait;
+use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -28,7 +28,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     const TAGS_PREFIX = "\0tags\0";
 
     use ProxyTrait;
-    use GetTrait;
+    use ContractsTrait;
 
     private $deferred = array();
     private $createCacheItem;

@@ -16,6 +16,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\LockRegistry;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\CacheTrait;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
@@ -23,8 +24,12 @@ use Symfony\Contracts\Cache\ItemInterface;
  *
  * @internal
  */
-trait GetTrait
+trait ContractsTrait
 {
+    use CacheTrait {
+        doGet as private contractsGet;
+    }
+
     private $callbackWrapper = array(LockRegistry::class, 'compute');
 
     /**
@@ -42,45 +47,10 @@ trait GetTrait
         return $previousWrapper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function get(string $key, callable $callback, float $beta = null)
-    {
-        return $this->doGet($this, $key, $callback, $beta);
-    }
-
     private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta)
     {
         if (0 > $beta = $beta ?? 1.0) {
             throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', \get_class($this), $beta));
-        }
-
-        $t = 0;
-        $item = $pool->getItem($key);
-        $recompute = !$item->isHit() || INF === $beta;
-
-        if (0 < $beta) {
-            if ($recompute) {
-                $t = microtime(true);
-            } else {
-                $metadata = $item->getMetadata();
-                $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;
-                $ctime = $metadata[ItemInterface::METADATA_CTIME] ?? false;
-
-                if ($ctime && $expiry) {
-                    $t = microtime(true);
-                    $recompute = $expiry <= $t - $ctime / 1000 * $beta * log(random_int(1, PHP_INT_MAX) / PHP_INT_MAX);
-                }
-            }
-            if ($recompute) {
-                // force applying defaultLifetime to expiry
-                $item->expiresAt(null);
-            }
-        }
-
-        if (!$recompute) {
-            return $item->get();
         }
 
         static $save;
@@ -99,16 +69,19 @@ trait GetTrait
             CacheItem::class
         );
 
-        // don't wrap nor save recursive calls
-        if (null === $callbackWrapper = $this->callbackWrapper) {
-            return $callback($item);
-        }
-        $this->callbackWrapper = null;
+        return $this->contractsGet($pool, $key, function (CacheItem $item) use ($pool, $callback, $save) {
+            // don't wrap nor save recursive calls
+            if (null === $callbackWrapper = $this->callbackWrapper) {
+                return $callback($item);
+            }
+            $this->callbackWrapper = null;
+            $t = microtime(true);
 
-        try {
-            return $save($pool, $item, $callbackWrapper($item, $callback, $pool), $t);
-        } finally {
-            $this->callbackWrapper = $callbackWrapper;
-        }
+            try {
+                return $save($pool, $item, $callbackWrapper($item, $callback, $pool), $t);
+            } finally {
+                $this->callbackWrapper = $callbackWrapper;
+            }
+        }, $beta);
     }
 }

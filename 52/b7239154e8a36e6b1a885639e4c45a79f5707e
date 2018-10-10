@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-12T10:23:37Z
+
+changelog and upgrade files need to be updated
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-10-12T10:33:07Z
+
+Great!
+
+By the way, does it make sense to be able to extend multiple types with one extension?
+Can it be implemented?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-12T12:26:00Z
+
+@vudaltsov Implementing it wouldn't be hard. But IMO it's not really worth it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-12T12:32:24Z
+
+We could also think about deprecating the `FormTypeExtensionInterface::getExtendedType()` method (providing an implementation in `AbstractTypeExtension` for a smooth upgrade path) as it will be pretty useless in Symfony 5.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-23T09:56:38Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-01-29T23:09:02Z
+
+This needs a rebase. Also I think we don't necessarily need to deprecate `extended_type` tag attribute. Just making it optional and using the static `extendsType` method by default should be enough. This covers 99% of the cases. If someone uses the same class with different services instances for different extensions, they can still use the `extended_type` attribute. This would then be similar to the  `command` attribute of the `console.command` tag.
+
+Also this change allows to autoconfigure form type extensions. So I guess this should be added as well.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-22T14:50:22Z
+
+Based on the feedback I have entirely reworked the implementation. There is now a new `SelfConfigurableFormTypeExtension` interface . If your form type extension implements its static `extendsType()` method, the registration of the extension does not require the `extended-type` attribute anymore.
+
+The only thing that is open now is to find a better name for the new interface as I am not very happy with it.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-22T15:14:07Z
+
+Oh very nice feature. I'm currently upgrading an app to the new architecture and I hit this "not so good DX" where I had to add the tag explicitly.
+
+About the naming I have no strong opinion but what about: `GetExtentedTypeInterface`? Because it's quite explicite about what it does
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-23T08:25:16Z
+
+And of course we can now also autoconfigure these form type extensions.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-09T08:17:06Z
+
+@symfony/deciders I would like to hear your opinions on this proposal. :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-09T10:29:50Z
+
+I like this feature a lot ... but I dislike the proposed implementation. I understand that there are some technical constraints that prevent us from doing it better ... but the proposed resulting code is too verbose and a bit ugly:
+
+```php
+class DataCollectorTypeExtension
+      extends AbstractTypeExtension
+      implements SelfConfigurableFormTypeExtension
+{
+    // ...
+}
+```
+
+* Using both `extends` and `implements` is a bit ... ugly
+* One of them is called just "type" (...TypeExtension) but the other is "form type" (...FormTypeExtension)
+* "SelfConfigurable..." prefix is a bit ugly too.
+
+Now, I'll make a proposal (but I don't know forms, so maybe it won't work). What if we add the new `extendsType(): string` method to the existing `AbstractTypeExtension` and we add this code to it:
+
+```php
+public static function extendsType()
+{
+    throw new \RuntimeException('...');
+}
+```
+
+And the error message should say:
+
+* You are relying on form type autoconfiguration but you haven't defined the new `extendsType()` method. You have two options:
+  * Either configure the form type service manually...
+  * ...or implement the `extendsType()` method to return the same value as `getExtendedType()`
+
+If this works, we could even deprecate the `getExtendedType()` method at the same time?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-09T12:07:16Z
+
+@javiereguiluz Most of what you suggest could be implemented. There is just one single drawback with not having a dedicated interface: We would not be able to support autoconfiguration of form type extensions. This could only happen as of Symfony 5 where we could introduce a new method in the interface.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-09T12:15:19Z
+
+Thinking more about it here is what we could do:
+
+* deprecate `FormTypeExtensionInterface::getExtendedType()`
+* implement `extendsType()` in `AbstractTypeExtension` but let it throw an exception
+* skip definitions in the compiler pass  that are tagged with `form.type_extension` without additional attributes, but whose classes do not implement the `extendsType()` method or where the implementation comes from `AbstractTypeExtension`
+* trigger deprecations when a class implementing the `FormTypeExtensionInterface` does not implement `extendsType()`
+* autoconfigure service definitions implementing `FormTypeExtensionInterface`
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-03T08:51:47Z
+
+I think this PR is now ready for a final review. I removed the interface in favour of a static `getExtendedTypes()` method which adds support for extending multiple types as described in #27906.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-10-03T09:19:31Z
+
+@xabbuh , I propose to make `getExtendedTypes()` return `: iterable`. Then it will be easier to yield types like this:
+
+```php
+public static function getExtendedTypes(): iterable
+{
+    yield FormType::class;
+
+    if (class_exists(OptionalComponentClass::class) {
+        yield OptionalComponentType::class;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-04T09:28:45Z
+
+@Tobion Thank you for the review. I think I addressed all your comments.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-08T21:31:45Z
+
+@Tobion I added some deprecation triggers at some places where type extensions are registered. This also allowed me to discover some places that still needed to be updated.

@@ -58,9 +58,7 @@ class MainConfiguration implements ConfigurationInterface
                     return false;
                 })
                 ->then(function ($v) {
-                    $v['access_decision_manager'] = array(
-                        'strategy' => AccessDecisionManager::STRATEGY_AFFIRMATIVE,
-                    );
+                    $v['access_decision_manager']['strategy'] = AccessDecisionManager::STRATEGY_AFFIRMATIVE;
 
                     return $v;
                 })

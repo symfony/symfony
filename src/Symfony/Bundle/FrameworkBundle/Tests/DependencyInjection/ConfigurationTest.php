@@ -218,7 +218,7 @@ class ConfigurationTest extends TestCase
                 'throw_exception_on_invalid_index' => false,
             ),
             'property_info' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
             ),
             'router' => array(
                 'enabled' => false,

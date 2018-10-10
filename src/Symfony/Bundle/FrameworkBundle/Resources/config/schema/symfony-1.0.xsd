@@ -260,6 +260,8 @@
             <xsd:element name="default-memcached-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="pool" type="cache_pool" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
+
+        <xsd:attribute name="prefix-seed" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="cache_pool">

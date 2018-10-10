@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-05T14:33:27Z
+
+> We're in time to change the arguments position (Options $options, $value) to be consistent with other closure signatures.
+
+Yes, let's do that. Otherwise, it will become hard to remember when arguments are passed in which order.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-05T19:11:54Z
+
+@xabbuh comments addressed.
+
+I'm preparing the doc PR right now.

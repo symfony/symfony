@@ -1,0 +1,299 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-19T18:15:01Z
+
+Logs panel (profiler) has a significantly slower page load, basically renders before tabs are applied.
+
+My experience is this is not really related to debug/deprecation/container logs, but (duplicate) var dumping.
+
+<details><summary>This</summary>
+
+![image](https://user-images.githubusercontent.com/1047696/30607950-1736d0f2-9d77-11e7-834a-b478c8867c52.png)
+
+</details> times 60+.
+
+edit: on the upside.. they are all searchable :sweat:
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2017-09-20T21:14:02Z
+
+👍🏻 This is good :)
+Nice to see your implementation
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-21T07:01:22Z
+
+@ro0NL I appreciate your efforts here a lot. I like the idea and I want to have this in Symfony ... but I don't like the implementation. Also, I think it's too late to make this right on time for Symfony 3.4 feature freeze.
+
+In my opinion, the interface should be like this: the table headers (Channel and Level) should be intelligent and include the following elements.
+
+1) The channel table header should work like this GitHub element:
+
+![channel-filter](https://user-images.githubusercontent.com/73419/30682769-19bf09f4-9eab-11e7-9ead-c1c6962717bb.png)
+
+That's how I can easily filter log messages by any channel ... and it doesn't matter how many channels there are.
+
+2) The level table header should display a range slider to select the minimum level of the log messages you want to see. I wouldn't let the user freely select anything ("I want to see critical and debug messages" <-- it doesn't make sense to me). I prefer to let the user select "debug or higher", "critical or higher", etc.
+
+Something like this, but not so ugly:
+
+![level-slider](https://user-images.githubusercontent.com/73419/30682830-5ce1c334-9eab-11e7-8230-c896ec01d634.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-21T14:08:18Z
+
+Well.. if we can filter by level *and* channel; that be awesome. I can imagine it's useful with lots of (user-defined) channels within the debug level.
+
+I like the slider approach; intuitively raising the log level. However this does not solve my real usecase; disable debug to expose what's critical.
+
+edit:
+
+> "critical or higher", etc.
+
+(Lets say "warning or higher", or only critical ;)) that's exactly what's needed yes. Your slider UI probably implies both points can be set, thats cool :tada:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-21T17:33:13Z
+
+Also see #24244 which improves the overall experience on heavy requests/logs panel, addresses https://github.com/symfony/symfony/pull/24263#issuecomment-330625566
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-22T15:19:16Z
+
+nice idea @ro0NL :+1: !
+just few comments from my side
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-22T17:21:42Z
+
+@keradus comments addressed. For now all open :) as @javiereguiluz mentioned; this might be too simple. Yet as first step to proper log filtering i hope to see something in 3.4 yes.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2017-09-25T06:09:48Z
+
+@ro0NL ( cc @javiereguiluz )
+
+As I said in my issue https://github.com/symfony/symfony/issues/23038 early june, I think it could be a really cool tool (even in a simple implementation) for 3.4 launch
+
+Many thanks !
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-27T15:34:00Z
+
+I like this. But... it's not mission critical and we don't want to release something that's not as polished as it could be. I tend to agree with @javiereguiluz when it comes to visual things. Though... is it possible to merge this before feature freeze and tweak the visuals after? @ro0NL would you be able to tweak the visuals like Javier talked about? Or would @javiereguiluz need to  do that (and does he have the bandwidth... I'm terrible at design stuff)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T17:49:54Z
+
+@weaverryan if we leave out channel filtering first, i might give this a try this weekend. So focus on the level filter, which is what this PR is about really :) (but filtering channels is valid, for sure).
+
+Hope to get @ogizanagi pov as welll, since he wrote the var-dumper search UI. Perhaps he has a plan...
+
+First thought was; `<input type="range" multiple>` and be done. That doesnt exist today though, but we do have HTML5 drag&drop api.
+
+> I'm terrible at design stuff
+
+Yep. This needs to be prepared, but first we need a plan :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-27T18:13:58Z
+
+I love @javiereguiluz examples:
+- The channel UI suggestion based on the Github labels filters UI would be perfect as is.
+- For the log level selection, indeed a [multiple range widget](http://leaverou.github.io/multirange/) with ticks and labels would be great, but has to be done manually as there is no native way to achieve it AFAIK.
+
+No plan right now, I can give it a try...but that'll wait for 4.1 I think 😅
+
+---
+
+_📝 might be useful: https://codepen.io/trevanhetzel/pen/rOVrGK_
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-27T19:27:56Z
+
+I think it would be fine to do log level now, then channel filtering later. It may still be a challenge to get something quickly (and dependably) that looks nice. But, I'd love if you could make that happen @ro0NL :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T19:31:15Z
+
+Range inputs can be [styled](https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/) native actually. Shocking.
+
+Maybe combine to range inputs for lower/upper bound. I believe @javiereguiluz proposal implies that.. going to jsfiddle NOW :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T21:32:01Z
+
+Got something https://jsfiddle.net/z2ov274f/
+
+Let me know if this works for you. I think it just might do :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-28T06:31:56Z
+
+@ro0NL I think you are over-delivering here 😄  I don't think we need a multi-range slider. A user wants to see *"debug logs or higher"*, *"info logs or higher"*, *"warning logs or higher"*, etc. A step-by-step slider like this one would be enough:
+
+![slider](https://user-images.githubusercontent.com/73419/30952281-70902caa-a427-11e7-9031-6fdcd7d0b9cb.gif)
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2017-09-28T06:42:52Z
+
+Yes indeed, simple is better :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-28T06:48:45Z
+
+The problem is we always include debug then; thus the noise.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-28T06:52:05Z
+
+@ro0NL make "info" the initial value of the slider. Problem solved!
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2017-09-28T07:22:22Z
+
+@ro0NL DYT my idea of [filter logs by channel](https://github.com/symfony/symfony/issues/23038) can be acheived in this same PR?
+
+I am really sure it is a good feature for a developer
+
+The use case is simple, when we reach this section of profiler's log, we come here for a very specific reason, so the more specific the data is visualy, the best it is :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-28T07:34:13Z
+
+@javiereguiluz you're right. Increasing the slider, means indeed "info/warning/etc. or higher". I had this mindset where it increases from the first level (debug till warning, debug till error, etc.).
+
+The right boundary is fixed, not the left one :)
+
+Anyway made the multiple range thingy a gist, can probably use it sometime :-) Ill try to finish this one this weekend. @noniagriconomie ill check channels as well, to see if something simple is possible.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-28T09:10:09Z
+
+Latest version after some discussion with @javiereguiluz
+
+https://jsfiddle.net/m2xq73ba/
+
+Almost there.
+
+edit: i also just realized for this UX to be right we need to go from critical to debug, so left-to-right.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-29T21:24:06Z
+
+It's kinda working :) Screenshot updated.
+
+- buttons only, range slider removed (it did not bring much value). yet it still works as a slider!
+- css colors picked with care
+- debug disabled by default in twigbundle
+- i suggest to remove tabs profiler in favor of log level filters (container tab excluded) so that both tables (twig+profiler) are the same.
+- what about level DEBUG for missing translations only in debug mode?
+
+https://jsfiddle.net/po23sLge/ :joy:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-29T21:37:50Z
+
+Indeed, I'd be in favor of removing the `Debug` tab to be merged in the first one (but deprecations should be kept appart. Not sure about silenced notices), and keep debug disabled by default, like it is on exception pages. It also have another advantage: it's didactic and hints you can change the levels to show:
+
+<img width="1040" alt="screenshot 2017-09-29 a 23 31 43" src="https://user-images.githubusercontent.com/2211145/31036914-9d03abfc-a56e-11e7-9734-d650b7a6c1db.PNG">
+
+> I see both active and inactive pills. I understand I can disable some levels.
+
+<img width="1040" alt="screenshot 2017-09-29 a 23 35 02" src="https://user-images.githubusercontent.com/2211145/31036968-da26d838-a56e-11e7-9c2a-e4bd99869cb7.PNG">
+
+> I can't see any difference, wrongly assume these are tabs.
+
+Perhaps that's where the slider was more obvious. But clearly, I'd not put both.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-09-30T07:26:02Z
+
+What about pills with a checkbox? (like a filter).
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2017-10-02T05:52:41Z
+
+IMO multi select input would be better (and take less space in the view)
+and after it could be easier to duplicate with channels's multi select input
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-02T08:41:33Z
+
+About the checkbox/filter issues... im not sure =/ i tend to agree with @javiereguiluz
+
+> I wouldn't let the user freely select anything ("I want to see critical and debug messages" <-- it doesn't make sense to me).
+
+It's about increasing/decreasing severity, not necessarily "filter by field".
+
+> and after it could be easier to duplicate with channels's multi select input
+
+Im not aiming for channel filters anymore with this PR, so should not be a blocker, nor do they have to be the same widget style in the future.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:33:41Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by maff at 2017-10-09T07:28:32Z
+
+Just for the record: #23247 is about filtering logs completely so they aren't even written to the profiler (for performance reasons) while this PR is about filtering logs when viewing them in the profiler.
+
+👍  for this feature, would be a nice addition!
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2017-10-09T08:47:34Z
+
+Why 4.x ? and not into 3.4 (LTS)
+We are going to wait years if we want this feature :(
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-20T16:44:20Z
+
+I'm willing to finish this, and quite happy with my work so far actually :)
+
+But there are many ways we can solve this UX-wise, and perhaps we should aim for a simpler approach.
+
+Im curious if e.g. @javiereguiluz @ogizanagi ... has some time to help me move forward, or willing to takeover from here on.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T09:24:44Z
+
+Can we resume the work here. It seems that we are almost there. Having this in 4.2 would be great. @javiereguiluz ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T12:15:54Z
+
+For merge on master of course

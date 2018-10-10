@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * added support for nested options definition
  * added `setDeprecated` and `isDeprecated` methods
 
 3.4.0

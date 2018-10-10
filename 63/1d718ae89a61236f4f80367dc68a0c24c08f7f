@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-02-27T19:22:08Z
+
+Can we just remove that `in_array` check? As far as I can see it's not influencing anything internally...
+It could be a question of security but it should be solved not by forms but by server configuration.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-03-20T11:02:00Z
+
+What if if we move the check from `setMethod()` to `$optionsResolver->setAllowedValues('method', [])`?
+
+This will give developers a possibility to write an extension for the `FormType` with `$resolver->addAllowedValues('method', ['RESET'])` and everyone will be happy :)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-08-29T20:54:28Z
+
+@alekitto , why don't you like my solution? Forms have a clear extension mechanism - that is `OptionsResolver`. Let's use it here!
+
+---------------------------------------------------------------------------
+
+by alekitto at 2018-08-29T21:31:45Z
+
+@vudaltsov in fact i’ve used it in my last revision. I moved the allowedMethods const in FormType and used it to set the ‘method’ option allowed values
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-08-29T21:42:22Z
+
+@alekitto , I am so sorry, I missed that! Thank you :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-30T00:34:07Z
+
+My doubt at this point: `setMethod()` will accept any custom value but `method` option only the allowed by default, why not open this option too? (i.e. without allowed values) Otherwise, these paths are inconsistent (according to previous behavior).
+
+---------------------------------------------------------------------------
+
+by alekitto at 2018-08-30T12:18:38Z
+
+@yceruto My first proposal on the issue was to remove the check entirely. You can find the reason for maintaining these checks in [this comment](https://github.com/symfony/symfony/issues/26287#issuecomment-368216743)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-30T13:18:12Z
+
+@alekitto Yes, I agree, but this proposal open `setMethod()` without restriction...and if we can do this now:
+```php
+$this->createFormBuilder()->setMethod('RESET');
+```
+why can't I do this too (without add a type extension):
+```php
+$this->createFormBuilder(null, ['method' => 'RESET']);
+```
+?
+
+Note that the first alternative doesn't comply with the [ref comment](https://github.com/symfony/symfony/issues/26287#issuecomment-368216743).
+
+---------------------------------------------------------------------------
+
+by alekitto at 2018-08-31T14:14:39Z
+
+@yceruto You've got a point. I'm still thinking that the best option is to remove the checks and suggest to *always* use `Request::METHOD_*` constants to avoid misspelling. 
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-31T16:08:40Z
+
+@alekitto I bet on that too :+1:
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-08-31T16:12:20Z
+
+So you suggest one check in `setMethod()` doing `in_array($upperCasedMethod, [Request::METHOD_HEAD...])`?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-08-31T16:55:17Z
+
+@vudaltsov I understood: `remove the checks` at all and documenting: `**suggest** to always use Request::METHOD_* constants to avoid misspelling.`.
+
+Is there any restriction to use a custom request method in HTTP world? if no: IMHO, it is not worth sacrificing this natural possibility in favor of the DX misspelling feature.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-01T08:31:12Z
+
+Technically the standard IIRC does not make any restriction on which HTTP methods you can use. There are some defined in the RFCs for which you are able to infer some semantics but that doesn't stop you from using your own methods. So maybe just removing the check here is the way to go.
+
+---------------------------------------------------------------------------
+
+by alekitto at 2018-09-01T08:52:28Z
+
+@xabbuh Correct. The RFC 7231 defines some method names (GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE) and others have been registered in different RFCs, but does not restrict method names at all.
+In fact, it simply defines `method = token` and then lists some standardized methods.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-09T16:58:27Z
+
+@alekitto Can you also add an entry to the component's changelog file?
+
+---------------------------------------------------------------------------
+
+by alekitto at 2018-10-09T23:40:07Z
+
+@xabbuh Ok, done 👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-10T09:18:39Z
+
+The build failure is not related, but requires a fix on how we run tests on Travis CI (#28788 or something like that).

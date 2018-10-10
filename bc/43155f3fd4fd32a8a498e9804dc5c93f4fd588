@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-29T11:18:04Z
+
+This requires adding `conflict` rules with all older versions of the components (or updating the min version in the `require` key in case of mandatory requirements) in the FrameworkBundle composer.json. Otherwise, we might end up installing an older version of the component, and have it half-configured due to not running the compiler pass.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-03T13:17:33Z
+
+@Korbeil you also need to remove theses line: https://github.com/symfony/symfony/blob/master/.github/CODEOWNERS#L25-L26
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2018-07-11T12:14:23Z
+
+After quick talk with @nicolas-grekas I choosed to split this PR for each component
+
+Now this one contains only moved CompilerPass for Cache component.
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2018-09-24T12:25:34Z
+
+Hi @nicolas-grekas, anymore work to do here?

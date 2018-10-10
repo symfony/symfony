@@ -360,12 +360,12 @@ class OptionsResolver implements Options
      * Instead of passing the message, you may also pass a closure with the
      * following signature:
      *
-     *     function ($value) {
+     *     function (Options $options, $value): string {
      *         // ...
      *     }
      *
      * The closure receives the value as argument and should return a string.
-     * Returns an empty string to ignore the option deprecation.
+     * Return an empty string to ignore the option deprecation.
      *
      * The closure is invoked when {@link resolve()} is called. The parameter
      * passed to the closure is the value of the option after validating it
@@ -860,8 +860,20 @@ class OptionsResolver implements Options
         if (isset($this->deprecated[$option])) {
             $deprecationMessage = $this->deprecated[$option];
 
-            if ($deprecationMessage instanceof \Closure && !\is_string($deprecationMessage = $deprecationMessage($value))) {
-                throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", returns an empty string to ignore.', \gettype($deprecationMessage)));
+            if ($deprecationMessage instanceof \Closure) {
+                // If the closure is already being called, we have a cyclic dependency
+                if (isset($this->calling[$option])) {
+                    throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', array_keys($this->calling))));
+                }
+
+                $this->calling[$option] = true;
+                try {
+                    if (!\is_string($deprecationMessage = $deprecationMessage($this, $value))) {
+                        throw new InvalidOptionsException(sprintf('Invalid type for deprecation message, expected string but got "%s", return an empty string to ignore.', \gettype($deprecationMessage)));
+                    }
+                } finally {
+                    unset($this->calling[$option]);
+                }
             }
 
             if ('' !== $deprecationMessage) {

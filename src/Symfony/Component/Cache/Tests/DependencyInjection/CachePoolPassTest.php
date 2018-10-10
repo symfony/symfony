@@ -9,19 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPass;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * @group legacy
- */
 class CachePoolPassTest extends TestCase
 {
     private $cachePoolPass;

@@ -11,51 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
-use Symfony\Component\Cache\Adapter\TraceableAdapter;
-use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass as BaseCacheCollectorPass;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" instead.', CacheCollectorPass::class, BaseCacheCollectorPass::class), E_USER_DEPRECATED);
 
 /**
  * Inject a data collector to all the cache services to be able to get detailed statistics.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @deprecated since Symfony 4.2, use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass instead.
  */
-class CacheCollectorPass implements CompilerPassInterface
+class CacheCollectorPass extends BaseCacheCollectorPass
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('data_collector.cache')) {
-            return;
-        }
-
-        $collectorDefinition = $container->getDefinition('data_collector.cache');
-        foreach ($container->findTaggedServiceIds('cache.pool') as $id => $attributes) {
-            $definition = $container->getDefinition($id);
-            if ($definition->isAbstract()) {
-                continue;
-            }
-
-            $recorder = new Definition(is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class);
-            $recorder->setTags($definition->getTags());
-            $recorder->setPublic($definition->isPublic());
-            $recorder->setArguments(array(new Reference($innerId = $id.'.recorder_inner')));
-
-            $definition->setTags(array());
-            $definition->setPublic(false);
-
-            $container->setDefinition($innerId, $definition);
-            $container->setDefinition($id, $recorder);
-
-            // Tell the collector to add the new instance
-            $collectorDefinition->addMethodCall('addInstance', array($id, new Reference($id)));
-            $collectorDefinition->setPublic(false);
-        }
-    }
 }

@@ -19,6 +19,10 @@ CHANGELOG
  * Deprecated the `--no-debug` console option, set the "APP_DEBUG" 
    environment variable to "0" instead.
  * Deprecated the `Templating\Helper\TranslatorHelper::transChoice()` method, use the `trans()` one instead with a `%count%` parameter
+ * Deprecated `CacheCollectorPass`. Use `Symfony\Component\Cache\DependencyInjection\CacheCollectorPass` instead.
+ * Deprecated `CachePoolClearerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass` instead.
+ * Deprecated `CachePoolPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPass` instead.
+ * Deprecated `CachePoolPrunerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass` instead.
 
 4.1.0
 -----

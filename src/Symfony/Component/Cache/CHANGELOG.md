@@ -14,6 +14,10 @@ CHANGELOG
  * deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead
  * deprecated the `AbstractAdapter::createSystemCache()` method
  * deprecated the `AbstractAdapter::unserialize()` and `AbstractCache::unserialize()` methods
+ * added `CacheCollectorPass` (originally in `FrameworkBundle`)
+ * added `CachePoolClearerPass` (originally in `FrameworkBundle`)
+ * added `CachePoolPass` (originally in `FrameworkBundle`)
+ * added `CachePoolPrunerPass` (originally in `FrameworkBundle`)
 
 3.4.0
 -----

@@ -27,6 +27,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\CacheInterface;
+use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\ResettableInterface;
@@ -1611,7 +1612,7 @@ class FrameworkExtension extends Extension
         }
         foreach (array('doctrine', 'psr6', 'redis', 'memcached', 'pdo') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
-                $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
+                $container->setAlias('cache.'.$name, new Alias(CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }
         }
         foreach (array('app', 'system') as $name) {

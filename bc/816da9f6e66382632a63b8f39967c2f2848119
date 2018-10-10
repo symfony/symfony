@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-07-17T11:52:04Z
+
+@stof I addressed your comments. Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-23T09:08:33Z
+
+> If you don't sort, you can not reverse the sort
+
+we can, e.g. with a `SortableIterator::SORT_NONE = 0` const
+
+> Composition is a better design
+
+not always: here, composition forces a double call to iterator_to_array + an extra call to array_reverse, while `SortableIterator` could handle that in one run by multiplying the return values of the comparator functions with 1/-1 depending on the sorting direction.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-04T17:32:35Z
+
+ping @lyrixx

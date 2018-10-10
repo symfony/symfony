@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jralph at 2018-10-04T16:52:20Z
+
+This seems like it covers the caching and clustering well! Also fixes a bug with the `dbindex` param being passed through the query params not having any effect, we just noticed that today.

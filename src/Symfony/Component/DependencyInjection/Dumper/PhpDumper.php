@@ -519,10 +519,6 @@ EOF;
             }
         }
 
-        if (false !== strpos($this->dumpLiteralClass($this->dumpValue($definition->getClass())), '$')) {
-            return false;
-        }
-
         return true;
     }
 
@@ -589,18 +585,16 @@ EOF;
         $return = array();
 
         if ($class = $definition->getClass()) {
-            $class = $this->container->resolveEnvPlaceholders($class);
+            $class = $class instanceof Parameter ? '%'.$class.'%' : $this->container->resolveEnvPlaceholders($class);
             $return[] = sprintf(0 === strpos($class, '%') ? '@return object A %1$s instance' : '@return \%s', ltrim($class, '\\'));
         } elseif ($definition->getFactory()) {
             $factory = $definition->getFactory();
             if (\is_string($factory)) {
                 $return[] = sprintf('@return object An instance returned by %s()', $factory);
             } elseif (\is_array($factory) && (\is_string($factory[0]) || $factory[0] instanceof Definition || $factory[0] instanceof Reference)) {
-                if (\is_string($factory[0]) || $factory[0] instanceof Reference) {
-                    $return[] = sprintf('@return object An instance returned by %s::%s()', (string) $factory[0], $factory[1]);
-                } elseif ($factory[0] instanceof Definition) {
-                    $return[] = sprintf('@return object An instance returned by %s::%s()', $factory[0]->getClass(), $factory[1]);
-                }
+                $class = $factory[0] instanceof Definition ? $factory[0]->getClass() : (string) $factory[0];
+                $class = $class instanceof Parameter ? '%'.$class.'%' : $this->container->resolveEnvPlaceholders($class);
+                $return[] = sprintf('@return object An instance returned by %s::%s()', $class, $factory[1]);
             }
         }
 
@@ -696,7 +690,7 @@ EOF;
             if (\is_array($argument)) {
                 $hasSelfRef = $this->addInlineVariables($head, $tail, $id, $argument, $forConstructor) || $hasSelfRef;
             } elseif ($argument instanceof Reference) {
-                $hasSelfRef = $this->addInlineReference($head, $tail, $id, $argument, $forConstructor) || $hasSelfRef;
+                $hasSelfRef = $this->addInlineReference($head, $id, $argument, $forConstructor) || $hasSelfRef;
             } elseif ($argument instanceof Definition) {
                 $hasSelfRef = $this->addInlineService($head, $tail, $id, $argument, $forConstructor) || $hasSelfRef;
             }
@@ -705,37 +699,31 @@ EOF;
         return $hasSelfRef;
     }
 
-    private function addInlineReference(string &$head, string &$tail, string $id, string $targetId, bool $forConstructor): bool
+    private function addInlineReference(string &$code, string $id, string $targetId, bool $forConstructor): bool
     {
+        $hasSelfRef = isset($this->circularReferences[$id][$targetId]);
+
         if ('service_container' === $targetId || isset($this->referenceVariables[$targetId])) {
-            return isset($this->circularReferences[$id][$targetId]);
+            return $hasSelfRef;
         }
 
         list($callCount, $behavior) = $this->serviceCalls[$targetId];
 
-        if (2 > $callCount && (!$forConstructor || !isset($this->circularReferences[$id][$targetId]))) {
-            return isset($this->circularReferences[$id][$targetId]);
+        if (2 > $callCount && (!$hasSelfRef || !$forConstructor)) {
+            return $hasSelfRef;
         }
 
         $name = $this->getNextVariableName();
         $this->referenceVariables[$targetId] = new Variable($name);
 
         $reference = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $behavior ? new Reference($targetId, $behavior) : null;
-        $code = sprintf("        \$%s = %s;\n", $name, $this->getServiceCall($targetId, $reference));
+        $code .= sprintf("        \$%s = %s;\n", $name, $this->getServiceCall($targetId, $reference));
 
-        if (!isset($this->circularReferences[$id][$targetId])) {
-            $head .= $code;
-
-            return false;
+        if (!$hasSelfRef || !$forConstructor) {
+            return $hasSelfRef;
         }
 
-        if (!$forConstructor) {
-            $tail .= $code;
-
-            return true;
-        }
-
-        $head .= $code.sprintf(<<<'EOTXT'
+        $code .= sprintf(<<<'EOTXT'
 
         if (isset($this->%s['%s'])) {
             return $this->%1$s['%2$s'];
@@ -758,7 +746,7 @@ EOTXT
 
         $arguments = array($definition->getArguments(), $definition->getFactory());
 
-        if (2 > $this->inlinedDefinitions[$definition] && !$definition->getMethodCalls() && !$definition->getProperties() && !$definition->getConfigurator() && false === strpos($this->dumpValue($definition->getClass()), '$')) {
+        if (2 > $this->inlinedDefinitions[$definition] && !$definition->getMethodCalls() && !$definition->getProperties() && !$definition->getConfigurator()) {
             return $this->addInlineVariables($head, $tail, $id, $arguments, $forConstructor);
         }
 
@@ -766,9 +754,13 @@ EOTXT
         $this->definitionVariables[$definition] = new Variable($name);
 
         $code = '';
-        $hasSelfRef = $this->addInlineVariables($code, $tail, $id, $arguments, $forConstructor);
+        if ($forConstructor) {
+            $hasSelfRef = $this->addInlineVariables($code, $tail, $id, $arguments, $forConstructor);
+        } else {
+            $hasSelfRef = $this->addInlineVariables($code, $code, $id, $arguments, $forConstructor);
+        }
         $code .= $this->addNewInstance($definition, '        $'.$name.' = ', $id);
-        $hasSelfRef ? $tail .= ('' !== $tail ? "\n" : '').$code : $head .= ('' !== $head ? "\n" : '').$code;
+        $hasSelfRef && !$forConstructor ? $tail .= ('' !== $tail ? "\n" : '').$code : $head .= ('' !== $head ? "\n" : '').$code;
 
         $code = '';
         $arguments = array($definition->getProperties(), $definition->getMethodCalls(), $definition->getConfigurator());

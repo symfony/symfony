@@ -7,6 +7,17 @@ in 4.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.1.0...v4.1.1
 
+* 4.1.6 (2018-10-03)
+
+ * bug #28604 [Finder] fixed root directory access for ftp/sftp wrapper (DerDu)
+ * bug #28688 [FWBundle] Throw if PropertyInfo is enabled, but the component isn't installed (dunglas)
+ * bug #28638 [Console] Fix clearing sections containing questions (chalasr)
+ * bug #28690 [FrameworkBundle] dont suggest hidden services in debug:container and debug:autow commands (nicolas-grekas)
+ * bug #28648 [PHPUnitBridge] Fix ClockMock microtime() format (acasademont)
+ * bug #28678 [DI] fix dumping setters before their inlined instances (nicolas-grekas)
+ * bug #28672 [DI] fix error in dumped container (nicolas-grekas)
+ * bug #28664 [Console] Don't return early as this bypasses the auto exit feature (duncan3dc)
+
 * 4.1.5 (2018-09-30)
 
  * bug #28636 [HttpFoundation] X-Accel-Mapping does not use HTTP key=value syntax (c960657)

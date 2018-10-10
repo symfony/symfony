@@ -21,9 +21,9 @@ class WrapIntoReceivedMessage implements ReceiverInterface
 {
     private $decoratedReceiver;
 
-    public function __construct(ReceiverInterface $decoratedConsumer)
+    public function __construct(ReceiverInterface $decoratedReceiver)
     {
-        $this->decoratedReceiver = $decoratedConsumer;
+        $this->decoratedReceiver = $decoratedReceiver;
     }
 
     public function receive(callable $handler): void

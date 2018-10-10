@@ -253,6 +253,13 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 
+        if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
+        } else {
+            $container->removeDefinition('console.command.messenger_consume_messages');
+            $container->removeDefinition('console.command.messenger_debug');
+        }
+
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
@@ -280,13 +287,6 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
-        }
-
-        if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
-        } else {
-            $container->removeDefinition('console.command.messenger_consume_messages');
-            $container->removeDefinition('console.command.messenger_debug');
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {

@@ -68,7 +68,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
             return;
         }
 
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2})?(?:\.\d)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))$/', $rfc3339, $matches)) {
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))$/', $rfc3339, $matches)) {
             throw new TransformationFailedException(sprintf('The date "%s" is not a valid date.', $rfc3339));
         }
 

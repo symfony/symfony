@@ -41,6 +41,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfiguration
  *
  * It manages an environment made of bundles.
  *
+ * Environment names must always start with a letter and
+ * they must only contain letters and numbers.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Kernel implements KernelInterface, RebootableInterface, TerminableInterface

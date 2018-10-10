@@ -818,7 +818,6 @@ class OptionsResolver implements Options
             }
 
             // The following section must be protected from cyclic calls.
-            // BEGIN
             $this->calling[$option] = true;
             try {
                 $resolver = new self();
@@ -829,7 +828,6 @@ class OptionsResolver implements Options
             } finally {
                 unset($this->calling[$option]);
             }
-            // END
         }
 
         // Resolve the option if the default value is lazily evaluated

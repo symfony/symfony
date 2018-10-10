@@ -94,6 +94,10 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
     }
 
     /**
+     * Returns an ApcuAdapter if supported, a PhpFilesAdapter otherwise.
+     *
+     * Using ApcuAdapter makes system caches compatible with read-only filesystems.
+     *
      * @param string               $namespace
      * @param int                  $defaultLifetime
      * @param string               $version
@@ -101,36 +105,20 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      * @param LoggerInterface|null $logger
      *
      * @return AdapterInterface
-     *
-     * @deprecated since Symfony 4.2
      */
     public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-
         if (null === self::$apcuSupported) {
             self::$apcuSupported = ApcuAdapter::isSupported();
         }
 
-        if (!self::$apcuSupported && null === self::$phpFilesSupported) {
-            self::$phpFilesSupported = PhpFilesAdapter::isSupported();
-        }
-
-        if (self::$phpFilesSupported) {
-            $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory);
+        if (!self::$apcuSupported) {
+            $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory, true);
             if (null !== $logger) {
                 $opcache->setLogger($logger);
             }
 
             return $opcache;
-        }
-
-        $fs = new FilesystemAdapter($namespace, $defaultLifetime, $directory);
-        if (null !== $logger) {
-            $fs->setLogger($logger);
-        }
-        if (!self::$apcuSupported) {
-            return $fs;
         }
 
         $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
@@ -140,7 +128,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             $apcu->setLogger($logger);
         }
 
-        return new ChainAdapter(array($apcu, $fs));
+        return $apcu;
     }
 
     public static function createConnection($dsn, array $options = array())

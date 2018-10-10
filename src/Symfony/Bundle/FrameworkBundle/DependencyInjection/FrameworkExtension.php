@@ -1601,6 +1601,7 @@ class FrameworkExtension extends Extension
 
         $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
+        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
         if (isset($config['prefix_seed'])) {

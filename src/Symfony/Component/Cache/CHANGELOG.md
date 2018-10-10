@@ -12,7 +12,6 @@ CHANGELOG
  * added automatic table creation when using Doctrine DBAL with PDO-based backends
  * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
  * deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead
- * deprecated the `AbstractAdapter::createSystemCache()` method
  * deprecated the `AbstractAdapter::unserialize()` and `AbstractCache::unserialize()` methods
  * added `CacheCollectorPass` (originally in `FrameworkBundle`)
  * added `CachePoolClearerPass` (originally in `FrameworkBundle`)

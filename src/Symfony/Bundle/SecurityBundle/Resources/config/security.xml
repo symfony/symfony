@@ -160,6 +160,12 @@
             <argument />                   <!-- switch_user -->
         </service>
 
+        <service id="security.impersonate_url_generator" class="Symfony\Component\Security\Http\Logout\ImpersonateUrlGenerator">
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="router" />
+            <argument type="service" id="security.token_storage" on-invalid="null" />
+        </service>
+
         <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator">
             <argument type="service" id="request_stack" on-invalid="null" />
             <argument type="service" id="router" on-invalid="null" />

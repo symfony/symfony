@@ -250,26 +250,6 @@ class ResponseHeaderBagTest extends TestCase
         $bag->getCookies('invalid_argument');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMakeDispositionInvalidDisposition()
-    {
-        $headers = new ResponseHeaderBag();
-
-        $headers->makeDisposition('invalid', 'foo.html');
-    }
-
-    /**
-     * @dataProvider provideMakeDisposition
-     */
-    public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)
-    {
-        $headers = new ResponseHeaderBag();
-
-        $this->assertEquals($expected, $headers->makeDisposition($disposition, $filename, $filenameFallback));
-    }
-
     public function testToStringDoesntMessUpHeaders()
     {
         $headers = new ResponseHeaderBag();
@@ -282,41 +262,6 @@ class ResponseHeaderBagTest extends TestCase
         $allHeaders = $headers->allPreserveCase();
         $this->assertEquals(array('http://www.symfony.com'), $allHeaders['Location']);
         $this->assertEquals(array('text/html'), $allHeaders['Content-type']);
-    }
-
-    public function provideMakeDisposition()
-    {
-        return array(
-            array('attachment', 'foo.html', 'foo.html', 'attachment; filename=foo.html'),
-            array('attachment', 'foo.html', '', 'attachment; filename=foo.html'),
-            array('attachment', 'foo bar.html', '', 'attachment; filename="foo bar.html"'),
-            array('attachment', 'foo "bar".html', '', 'attachment; filename="foo \\"bar\\".html"'),
-            array('attachment', 'foo%20bar.html', 'foo bar.html', 'attachment; filename="foo bar.html"; filename*=utf-8\'\'foo%2520bar.html'),
-            array('attachment', 'föö.html', 'foo.html', 'attachment; filename=foo.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html'),
-        );
-    }
-
-    /**
-     * @dataProvider provideMakeDispositionFail
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMakeDispositionFail($disposition, $filename)
-    {
-        $headers = new ResponseHeaderBag();
-
-        $headers->makeDisposition($disposition, $filename);
-    }
-
-    public function provideMakeDispositionFail()
-    {
-        return array(
-            array('attachment', 'foo%20bar.html'),
-            array('attachment', 'foo/bar.html'),
-            array('attachment', '/foo.html'),
-            array('attachment', 'foo\bar.html'),
-            array('attachment', '\foo.html'),
-            array('attachment', 'föö.html'),
-        );
     }
 
     public function testDateHeaderAddedOnCreation()

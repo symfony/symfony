@@ -45,7 +45,7 @@ class AttributeBagTest extends TestCase
                 ),
             ),
         );
-        $this->bag = new AttributeBag('_sf2');
+        $this->bag = new AttributeBag('_sf');
         $this->bag->initialize($this->array);
     }
 
@@ -67,7 +67,7 @@ class AttributeBagTest extends TestCase
 
     public function testGetStorageKey()
     {
-        $this->assertEquals('_sf2', $this->bag->getStorageKey());
+        $this->assertEquals('_sf', $this->bag->getStorageKey());
         $attributeBag = new AttributeBag('test');
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }

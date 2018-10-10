@@ -31,8 +31,6 @@ class GenericEventTest extends TestCase
      */
     protected function setUp()
     {
-        parent::setUp();
-
         $this->subject = new \stdClass();
         $this->event = new GenericEvent($this->subject, array('name' => 'Event'));
     }
@@ -44,8 +42,6 @@ class GenericEventTest extends TestCase
     {
         $this->subject = null;
         $this->event = null;
-
-        parent::tearDown();
     }
 
     public function testConstruct()

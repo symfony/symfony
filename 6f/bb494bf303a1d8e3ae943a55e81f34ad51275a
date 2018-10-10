@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-18T12:50:54Z
+
+We've removed usage or `realpath` in the past for various reasons. I don't think reintroducing here is a good idea.
+
+---------------------------------------------------------------------------
+
+by fxbt at 2018-07-19T07:18:56Z
+
+I wasn't aware of this, but it makes sense.
+
+What do you think the correct approach is ? Throwing an exception to avoid mirroring a bunch of useless data ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-19T07:21:39Z
+
+Throwing might be a good idea (calling `realpath` in user's code is indeed a better "fix").
+
+---------------------------------------------------------------------------
+
+by fxbt at 2018-07-19T10:26:31Z
+
+An exception is now thrown and I tried to be explicit with the error message.
+
+The fabbot failure is a false negative.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-26T09:32:59Z
+
+(could you please rebase on latest 2.8 and fix the CS issues fabbot is reporting?)
+
+---------------------------------------------------------------------------
+
+by fxbt at 2018-07-26T09:44:19Z
+
+Done!

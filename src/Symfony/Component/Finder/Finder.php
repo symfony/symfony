@@ -750,13 +750,8 @@ class Finder implements \IteratorAggregate, \Countable
             $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
         }
 
-        if ($this->sort) {
-            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
-            $iterator = $iteratorAggregate->getIterator();
-        }
-
-        if ($this->reverseSorting) {
-            $iteratorAggregate = new Iterator\ReverseSortingIterator($iterator);
+        if ($this->sort || $this->reverseSorting) {
+            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort, $this->reverseSorting);
             $iterator = $iteratorAggregate->getIterator();
         }
 

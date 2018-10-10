@@ -18,6 +18,7 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class SortableIterator implements \IteratorAggregate
 {
+    const SORT_BY_NONE = 0;
     const SORT_BY_NAME = 1;
     const SORT_BY_TYPE = 2;
     const SORT_BY_ACCESSED_TIME = 3;
@@ -34,40 +35,43 @@ class SortableIterator implements \IteratorAggregate
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(\Traversable $iterator, $sort)
+    public function __construct(\Traversable $iterator, $sort, bool $reverseOrder = false)
     {
         $this->iterator = $iterator;
+        $order = $reverseOrder ? -1 : 1;
 
         if (self::SORT_BY_NAME === $sort) {
-            $this->sort = function ($a, $b) {
-                return strcmp($a->getRealpath() ?: $a->getPathname(), $b->getRealpath() ?: $b->getPathname());
+            $this->sort = function ($a, $b) use ($order) {
+                return $order * strcmp($a->getRealpath() ?: $a->getPathname(), $b->getRealpath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_NAME_NATURAL === $sort) {
-            $this->sort = function ($a, $b) {
-                return strnatcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            $this->sort = function ($a, $b) use ($order) {
+                return $order * strnatcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_TYPE === $sort) {
-            $this->sort = function ($a, $b) {
+            $this->sort = function ($a, $b) use ($order) {
                 if ($a->isDir() && $b->isFile()) {
-                    return -1;
+                    return -$order;
                 } elseif ($a->isFile() && $b->isDir()) {
-                    return 1;
+                    return $order;
                 }
 
-                return strcmp($a->getRealpath() ?: $a->getPathname(), $b->getRealpath() ?: $b->getPathname());
+                return $order * strcmp($a->getRealpath() ?: $a->getPathname(), $b->getRealpath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
-            $this->sort = function ($a, $b) {
-                return $a->getATime() - $b->getATime();
+            $this->sort = function ($a, $b) use ($order) {
+                return $order * ($a->getATime() - $b->getATime());
             };
         } elseif (self::SORT_BY_CHANGED_TIME === $sort) {
-            $this->sort = function ($a, $b) {
-                return $a->getCTime() - $b->getCTime();
+            $this->sort = function ($a, $b) use ($order) {
+                return $order * ($a->getCTime() - $b->getCTime());
             };
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
-            $this->sort = function ($a, $b) {
-                return $a->getMTime() - $b->getMTime();
+            $this->sort = function ($a, $b) use ($order) {
+                return $order * ($a->getMTime() - $b->getMTime());
             };
+        } elseif (self::SORT_BY_NONE === $sort) {
+            $this->sort = $order;
         } elseif (\is_callable($sort)) {
             $this->sort = $sort;
         } else {
@@ -77,8 +81,17 @@ class SortableIterator implements \IteratorAggregate
 
     public function getIterator()
     {
+        if (1 === $this->sort) {
+            return $this->iterator;
+        }
+
         $array = iterator_to_array($this->iterator, true);
-        uasort($array, $this->sort);
+
+        if (-1 === $this->sort) {
+            $array = array_reverse($array);
+        } else {
+            uasort($array, $this->sort);
+        }
 
         return new \ArrayIterator($array);
     }

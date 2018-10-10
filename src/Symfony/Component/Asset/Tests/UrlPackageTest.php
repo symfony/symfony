@@ -33,21 +33,28 @@ class UrlPackageTest extends TestCase
             array('http://example.net', '', 'http://example.com/foo', 'http://example.com/foo'),
             array('http://example.net', '', 'https://example.com/foo', 'https://example.com/foo'),
             array('http://example.net', '', '//example.com/foo', '//example.com/foo'),
+            array('file:///example/net', '', 'file:///example/com/foo', 'file:///example/com/foo'),
+            array('ftp://example.net', '', 'ftp://example.com', 'ftp://example.com'),
 
             array('http://example.com', '', '/foo', 'http://example.com/foo?v1'),
             array('http://example.com', '', 'foo', 'http://example.com/foo?v1'),
             array('http://example.com/', '', 'foo', 'http://example.com/foo?v1'),
             array('http://example.com/foo', '', 'foo', 'http://example.com/foo/foo?v1'),
             array('http://example.com/foo/', '', 'foo', 'http://example.com/foo/foo?v1'),
+            array('file:///example/com/foo/', '', 'foo', 'file:///example/com/foo/foo?v1'),
 
             array(array('http://example.com'), '', '/foo', 'http://example.com/foo?v1'),
             array(array('http://example.com', 'http://example.net'), '', '/foo', 'http://example.com/foo?v1'),
             array(array('http://example.com', 'http://example.net'), '', '/fooa', 'http://example.net/fooa?v1'),
+            array(array('file:///example/com', 'file:///example/net'), '', '/foo', 'file:///example/com/foo?v1'),
+            array(array('ftp://example.com', 'ftp://example.net'), '', '/fooa', 'ftp://example.net/fooa?v1'),
 
             array('http://example.com', 'version-%2$s/%1$s', '/foo', 'http://example.com/version-v1/foo'),
             array('http://example.com', 'version-%2$s/%1$s', 'foo', 'http://example.com/version-v1/foo'),
             array('http://example.com', 'version-%2$s/%1$s', 'foo/', 'http://example.com/version-v1/foo/'),
             array('http://example.com', 'version-%2$s/%1$s', '/foo/', 'http://example.com/version-v1/foo/'),
+            array('file:///example/com', 'version-%2$s/%1$s', '/foo/', 'file:///example/com/version-v1/foo/'),
+            array('ftp://example.com', 'version-%2$s/%1$s', '/foo/', 'ftp://example.com/version-v1/foo/'),
         );
     }
 
@@ -97,11 +104,21 @@ class UrlPackageTest extends TestCase
     }
 
     /**
+     * @dataProvider getWrongBaseUrlConfig
+     *
      * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
      */
-    public function testWrongBaseUrl()
+    public function testWrongBaseUrl($baseUrls)
     {
-        new UrlPackage(array('not-a-url'), new EmptyVersionStrategy());
+        new UrlPackage($baseUrls, new EmptyVersionStrategy());
+    }
+
+    public function getWrongBaseUrlConfig()
+    {
+        return array(
+            array('not-a-url'),
+            array('not-a-url-with-query?query=://'),
+        );
     }
 
     private function getContext($secure)

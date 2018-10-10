@@ -26,14 +26,14 @@
 {%- endblock money_widget %}
 
 {% block percent_widget -%}
-    {% if symbol == true %}
+    {%- if symbol == true -%}
     <div class="input-group">
         {{- block('form_widget_simple') -}}
         <span class="input-group-addon">%</span>
     </div>
-    {% else %}
+    {%- else -%}
     {{- block('form_widget_simple') -}}
-    {% endif %}
+    {%- endif -%}
 {%- endblock percent_widget %}
 
 {% block datetime_widget -%}

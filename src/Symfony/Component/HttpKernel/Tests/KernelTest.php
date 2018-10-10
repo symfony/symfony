@@ -75,7 +75,7 @@ class KernelTest extends TestCase
         $kernel->boot();
 
         $containerDir = __DIR__.'/Fixtures/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
-        $this->assertTrue(unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta'));
+        $this->assertTrue(unlink(__DIR__.'/Fixtures/cache/custom/FixturesSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileNotExists($containerDir.'.legacy');
 
@@ -302,6 +302,9 @@ EOF;
         $this->assertEquals(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures', realpath($kernel->getRootDir()));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetName()
     {
         $kernel = new KernelForTest('test', true);
@@ -309,6 +312,9 @@ EOF;
         $this->assertEquals('Fixtures', $kernel->getName());
     }
 
+    /**
+     * @group legacy
+     */
     public function testOverrideGetName()
     {
         $kernel = new KernelForOverrideName('test', true);
@@ -506,6 +512,9 @@ EOF;
         $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testKernelRootDirNameStartingWithANumber()
     {
         $dir = __DIR__.'/Fixtures/123';
@@ -532,14 +541,14 @@ EOF;
 
         $containerClass = \get_class($kernel->getContainer());
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
-        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+        unlink(__DIR__.'/Fixtures/cache/custom/FixturesSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
         $this->assertInstanceOf($containerClass, $kernel->getContainer());
         $this->assertFileExists($containerFile);
-        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+        unlink(__DIR__.'/Fixtures/cache/custom/FixturesSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
         $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();
@@ -707,9 +716,9 @@ class CustomProjectDirKernel extends Kernel
     private $buildContainer;
     private $httpKernel;
 
-    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $name = 'custom')
+    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $env = 'custom')
     {
-        parent::__construct($name, true);
+        parent::__construct($env, true);
 
         $this->baseDir = 'foo';
         $this->buildContainer = $buildContainer;
@@ -723,6 +732,11 @@ class CustomProjectDirKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
+    }
+
+    protected function getContainerClass()
+    {
+        return $this->name.parent::getContainerClass();
     }
 
     public function getProjectDir()

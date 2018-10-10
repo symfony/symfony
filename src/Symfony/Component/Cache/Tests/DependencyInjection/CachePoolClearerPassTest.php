@@ -27,7 +27,7 @@ class CachePoolClearerPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.root_dir', 'foo');
 

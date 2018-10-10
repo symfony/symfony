@@ -46,13 +46,9 @@ class AppKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getContainerClass()
     {
-        if (null === $this->name) {
-            $this->name = parent::getName().substr(md5($this->rootConfig), -16);
-        }
-
-        return $this->name;
+        return parent::getContainerClass().substr(md5($this->rootConfig), -16);
     }
 
     public function registerBundles()

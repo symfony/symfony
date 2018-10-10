@@ -71,7 +71,6 @@ EOT
             array('<info>Kernel</>'),
             new TableSeparator(),
             array('Type', \get_class($kernel)),
-            array('Name', $kernel->getName()),
             array('Environment', $kernel->getEnvironment()),
             array('Debug', $kernel->isDebug() ? 'true' : 'false'),
             array('Charset', $kernel->getCharset()),

@@ -51,8 +51,7 @@ class DumpListenerTest extends TestCase
 
             VarDumper::dump('foo');
             VarDumper::dump('bar');
-
-            $this->assertSame('+foo-+bar-', ob_get_clean());
+            $this->assertSame('+'.__FILE__.' on line '.(__LINE__ - 2).':-+foo-+'.__FILE__.' on line '.(__LINE__ - 1).':-+bar-', ob_get_clean());
         } catch (\Exception $exception) {
         }
 

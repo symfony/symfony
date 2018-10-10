@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\Server\Connection;
 use Symfony\Component\VarDumper\VarDumper;
@@ -46,6 +48,20 @@ class DumpListener implements EventSubscriberInterface
             $data = $cloner->cloneVar($var);
 
             if (!$connection || !$connection->write($data)) {
+                list('name' => $name, 'file' => $file, 'line' => $line) = (new SourceContextProvider())->getContext();
+                if (\is_string($file)) {
+                    $name = $file;
+                }
+
+                if ($dumper instanceof CliDumper) {
+                    (function (string $name, int $line) {
+                        $this->line = $this->style('meta', $name).' on line '.$this->style('meta', $line).':';
+                        $this->dumpLine(0);
+                    })->bindTo($dumper, $dumper)($name, $line);
+                } else {
+                    $dumper->dump($cloner->cloneVar($name.' on line '.$line.':'));
+                }
+
                 $dumper->dump($data);
             }
         });

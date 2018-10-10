@@ -15,8 +15,6 @@ namespace Symfony\Component\Inflector;
  * Converts words between singular and plural forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @internal
  */
 final class Inflector
 {
@@ -156,8 +154,6 @@ final class Inflector
      *
      * @return string|array The singular form or an array of possible singular
      *                      forms
-     *
-     * @internal
      */
     public static function singularize(string $plural)
     {

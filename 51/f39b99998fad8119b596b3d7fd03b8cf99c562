@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-06T09:01:15Z
+
+Thank you @ostrolucky and @Nyholm for the review.
+I updated the docblocks and renamed a few things (I kept `CacheInterface` but the trait is now simply `CacheTrait` in contracts (and `ContractsTrait` in the component, but that's internal).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-10-06T16:11:35Z
+
+> I've been hesitating a lot on this topic, but I think we should add a delete() method to CacheInterface.
+> Deleting is a very common invalidation strategy and invalidating by passing $beta=INF to get() has the drawback of requiring a fetch+unserialize+save-with-past-expiration. That's complexity that a delete removes.
+
+Im not convinced this PR is needed. Doing fetch, unserialize before save is an implementation detail.
+
+It might be easier to use though...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-06T16:28:57Z
+
+> fetch, unserialize before save is an implementation detail
+
+yes, I used that as a hint, but my main reasoning is that it should be a common use case to invalidate by deletion. I consider I've been misled by what we do in core: we never delete. But that's because we deal with append-only pools. Working with data from models, deleting is just usual business.
+That's why I changed my mind and I think we need delete().

@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by Doctrs at 2018-05-18T22:04:59Z
+
+What about access to children data or parent data in lazy options?
+And as I see we cant add normalize or set required for nested options after defined main data
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-19T01:33:54Z
+
+> What about access to children data or parent data in lazy options?
+
+Access to children data in lazy options is already covered.
+
+For the rest you're right :+1: I'm thinking in another solution to allow that, so
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-19T04:05:18Z
+
+The strategy has changed a bit, now instead of passing an instance of `OptionsResolver` as default value, you can pass a closure with `OptionsResolver` argument, thus subdefinitions can alter the previous definition and you can access to parent resolved options.
+
+> What about access to ... parent data in lazy options?
+
+Done! :tada: don't directly in lazy option but explicit in nested configuration.
+
+> And as I see we cant add normalize or set required for nested options after defined main data
+
+Done as well :tada:
+
+Description updated.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-05-20T00:49:35Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-19T12:57:25Z
+
+Does this replace #27251 completely?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-06-20T13:27:02Z
+
+> Does this replace #27251 completely?
+
+I think so, this introduces the same features as #27251:
+ * Nested options definition
+ * Access to the children resolved options from a parent definition
+ * Access to the parent resolved options from a child definition
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-07-02T23:03:21Z
+
+PR update:
+ * Added `isNested` method to know whether an option is nested or not.
+ * Updated PHPDoc of the `setDefault` method about how to define nested options.
+ * Added and improved test cases
+ * Updated PR description and added documentation PR https://github.com/symfony/symfony-docs/pull/9995.
+
+It would be great if someone could check this, thanks. (Travis failures unrelated)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-10T12:49:48Z
+
+@beoboo thanks for trying it. I hope this takes enough attention to merge into 4.2. Also, there is another PR proposing the same feature (https://github.com/symfony/symfony/pull/27251), so the members/deciders should pick one of the approaches.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-12T21:59:32Z
+
+Just rebased, no changes ;)
+
+See LDAP Connection revamping with this feature: https://github.com/yceruto/symfony/compare/nested_options_resolver...yceruto:ldap-revamping?diff=unified
+
+I'll expose some project examples soon.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-13T18:31:11Z
+
+Some research in `SonataAdminBundle` where this feature can be applied:
+* [AdminType.php](https://github.com/sonata-project/SonataAdminBundle/blob/9aa22d45178a923e6557bcafc2ea5e9844df2cd4/src/Form/Type/AdminType.php#L104-L110)
+* [ModelAutocompleteType.php](https://github.com/sonata-project/SonataAdminBundle/blob/9aa22d45178a923e6557bcafc2ea5e9844df2cd4/src/Form/Type/ModelAutocompleteType.php#L136)
+
+Even fixing bugs explained by https://github.com/symfony/symfony/issues/4833
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-09-17T01:12:54Z
+
+Hey! You can see now a demo for this feature in https://github.com/yceruto/nested-optionsresolver-demo, just clone it and play with nested options.

@@ -175,17 +175,13 @@ class ContextListener implements ListenerInterface
 
                 // tokens can be deauthenticated if the user has been changed.
                 if (!$newToken->isAuthenticated()) {
-                    if ($this->logoutOnUserChange) {
-                        $userDeauthenticated = true;
+                    $userDeauthenticated = true;
 
-                        if (null !== $this->logger) {
-                            $this->logger->debug('Cannot refresh token because user has changed.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
-                        }
-
-                        continue;
+                    if (null !== $this->logger) {
+                        $this->logger->debug('Cannot refresh token because user has changed.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
                     }
 
-                    return null;
+                    continue;
                 }
 
                 $token->setUser($refreshedUser);

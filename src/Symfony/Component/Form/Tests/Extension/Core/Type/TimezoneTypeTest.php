@@ -34,6 +34,13 @@ class TimezoneTypeTest extends BaseTypeTest
         parent::testSubmitNull($expected, $norm, '');
     }
 
+    public function testFilterByRegionsAndByCountry()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('regions' => \DateTimeZone::PER_COUNTRY, 'country' => 'US'))
+            ->createView()->vars['choices'];
+        $this->assertEquals(new ChoiceView('America/Adak', 'America/Adak', 'Adak'), $choices['America']->getIterator()[0]);
+    }
+
     public function testDateTimeZoneInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), array('input' => 'datetimezone'));

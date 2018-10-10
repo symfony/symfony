@@ -38,19 +38,22 @@ class TimezoneType extends AbstractType
         $resolver->setDefaults(array(
             'choice_loader' => function (Options $options) {
                 $regions = $options['regions'];
+                $country = $options['country'];
 
-                return new CallbackChoiceLoader(function () use ($regions) {
-                    return self::getTimezones($regions);
+                return new CallbackChoiceLoader(function () use ($regions, $country) {
+                    return self::getTimezones($regions, $country);
                 });
             },
             'choice_translation_domain' => false,
             'input' => 'string',
-            'regions' => \DateTimeZone::ALL,
+            'regions' => isset($options['country']) ? \DateTimeZone::PER_COUNTRY : \DateTimeZone::ALL,
+            'country' => null,
         ));
 
         $resolver->setAllowedValues('input', array('string', 'datetimezone'));
 
         $resolver->setAllowedTypes('regions', 'int');
+        $resolver->setAllowedTypes('country', array('string', 'null'));
     }
 
     /**
@@ -72,11 +75,11 @@ class TimezoneType extends AbstractType
     /**
      * Returns a normalized array of timezone choices.
      */
-    private static function getTimezones(int $regions): array
+    private static function getTimezones(int $regions, ?string $country = null): array
     {
         $timezones = array();
 
-        foreach (\DateTimeZone::listIdentifiers($regions) as $timezone) {
+        foreach (\DateTimeZone::listIdentifiers($regions, $country) as $timezone) {
             $parts = explode('/', $timezone);
 
             if (\count($parts) > 2) {

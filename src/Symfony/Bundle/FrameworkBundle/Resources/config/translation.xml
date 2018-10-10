@@ -19,6 +19,7 @@
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>
+            <tag name="kernel.locale_aware" />
         </service>
         <service id="Symfony\Component\Translation\TranslatorInterface" alias="translator" />
         <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="translator" />
@@ -139,12 +140,6 @@
             <tag name="container.service_subscriber" id="translator" />
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="Psr\Container\ContainerInterface" />
-        </service>
-
-        <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener">
-            <argument type="service" id="translator" />
-            <argument type="service" id="request_stack" />
-            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 </container>

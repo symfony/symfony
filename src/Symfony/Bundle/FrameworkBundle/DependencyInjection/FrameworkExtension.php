@@ -119,6 +119,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * FrameworkExtension.
@@ -370,6 +371,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
+        $container->registerForAutoconfiguration(LocaleAwareInterface::class)
+            ->addTag('kernel.locale_aware');
         $container->registerForAutoconfiguration(ResetInterface::class)
             ->addTag('kernel.reset', ['method' => 'reset']);
 

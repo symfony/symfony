@@ -112,5 +112,11 @@
             <argument type="service_locator" />
         </service>
         <service id="Symfony\Component\DependencyInjection\ReverseContainer" alias="reverse_container" />
+
+        <service id="locale_aware_listener" class="Symfony\Component\HttpKernel\EventListener\LocaleAwareListener">
+            <argument type="collection" /> <!-- locale aware services -->
+            <argument type="service" id="request_stack" />
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

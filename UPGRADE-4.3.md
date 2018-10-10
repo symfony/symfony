@@ -86,6 +86,7 @@ HttpKernel
  * Renamed `GetResponseForControllerResultEvent` to `ViewEvent`
  * Renamed `GetResponseForExceptionEvent` to `ExceptionEvent`
  * Renamed `PostResponseEvent` to `TerminateEvent`
+ * Deprecated `TranslatorListener` in favor of `LocaleAwareListener`
 
 Messenger
 ---------

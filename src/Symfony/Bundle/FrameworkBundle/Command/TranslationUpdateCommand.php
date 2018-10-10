@@ -120,11 +120,11 @@ EOF
         $kernel = $this->getApplication()->getKernel();
 
         // Define Root Paths
-        $transPaths = array($kernel->getRootDir().'/Resources/translations');
+        $transPaths = array($kernel->getRootDir(false).'/Resources/translations');
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = array($kernel->getRootDir().'/Resources/views');
+        $viewsPaths = array($kernel->getRootDir(false).'/Resources/views');
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
@@ -138,12 +138,12 @@ EOF
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath.'/'.$foundBundle->getName();
                 }
-                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(), $foundBundle->getName());
+                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(false), $foundBundle->getName());
                 $viewsPaths = array($foundBundle->getPath().'/Resources/views');
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$foundBundle->getName();
                 }
-                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(), $foundBundle->getName());
+                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(false), $foundBundle->getName());
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path

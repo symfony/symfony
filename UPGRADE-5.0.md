@@ -177,6 +177,12 @@ HttpFoundation
  * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
    changed respectively from "false" to "null" and from "null" to "lax".
 
+HttpKernel
+----------
+
+ * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
+ * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
+
 Monolog
 -------
 

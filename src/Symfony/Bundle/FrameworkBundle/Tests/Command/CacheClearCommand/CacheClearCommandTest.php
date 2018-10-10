@@ -27,20 +27,20 @@ class CacheClearCommandTest extends TestCase
     private $kernel;
     /** @var Filesystem */
     private $fs;
-    private $rootDir;
+    private $projectDir;
 
     protected function setUp()
     {
         $this->fs = new Filesystem();
         $this->kernel = new TestAppKernel('test', true);
-        $this->rootDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_cache_', true);
-        $this->kernel->setRootDir($this->rootDir);
-        $this->fs->mkdir($this->rootDir);
+        $this->projectDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_cache_', true);
+        $this->kernel->setProjectDir($this->projectDir);
+        $this->fs->mkdir($this->projectDir);
     }
 
     protected function tearDown()
     {
-        $this->fs->remove($this->rootDir);
+        $this->fs->remove($this->projectDir);
     }
 
     public function testCacheIsFreshAfterCacheClearedWithWarmup()

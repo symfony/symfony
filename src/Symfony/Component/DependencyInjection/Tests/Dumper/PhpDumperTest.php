@@ -863,6 +863,28 @@ class PhpDumperTest extends TestCase
         $this->assertEquals((object) array('p2' => (object) array('p3' => (object) array())), $container->get('foo')->bClone);
     }
 
+    public function testInlineSelfRef()
+    {
+        $container = new ContainerBuilder();
+
+        $bar = (new Definition('App\Bar'))
+            ->setProperty('foo', new Reference('App\Foo'));
+
+        $baz = (new Definition('App\Baz'))
+            ->setProperty('bar', $bar)
+            ->addArgument($bar);
+
+        $container->register('App\Foo')
+            ->setPublic(true)
+            ->addArgument($baz);
+
+        $passConfig = $container->getCompiler()->getPassConfig();
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_inline_self_ref.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Inline_Self_Ref')));
+    }
+
     public function testHotPathOptimizations()
     {
         $container = include self::$fixturesPath.'/containers/container_inline_requires.php';
@@ -938,6 +960,18 @@ class PhpDumperTest extends TestCase
 
         $container->set('foo', (object) array(123));
         $this->assertEquals((object) array('foo' => (object) array(123)), $container->get('bar'));
+    }
+
+    public function testAdawsonContainer()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_adawson.yml');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump();
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_adawson.php', $dumper->dump());
     }
 
     /**

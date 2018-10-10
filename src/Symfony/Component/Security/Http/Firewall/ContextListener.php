@@ -161,6 +161,7 @@ class ContextListener implements ListenerInterface
         }
 
         $userNotFoundByProvider = false;
+        $userDeauthenticated = false;
 
         foreach ($this->userProviders as $provider) {
             if (!$provider instanceof UserProviderInterface) {
@@ -169,20 +170,25 @@ class ContextListener implements ListenerInterface
 
             try {
                 $refreshedUser = $provider->refreshUser($user);
-                $token->setUser($refreshedUser);
+                $newToken = unserialize(serialize($token));
+                $newToken->setUser($refreshedUser);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if (!$token->isAuthenticated()) {
+                if (!$newToken->isAuthenticated()) {
                     if ($this->logoutOnUserChange) {
+                        $userDeauthenticated = true;
+
                         if (null !== $this->logger) {
-                            $this->logger->debug('Token was deauthenticated after trying to refresh it.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
+                            $this->logger->debug('Cannot refresh token because user has changed.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
                         }
 
-                        return null;
+                        continue;
                     }
 
                     @trigger_error('Refreshing a deauthenticated user is deprecated as of 3.4 and will trigger a logout in 4.0.', E_USER_DEPRECATED);
                 }
+
+                $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
                     $context = array('provider' => \get_class($provider), 'username' => $refreshedUser->getUsername());
@@ -207,6 +213,14 @@ class ContextListener implements ListenerInterface
 
                 $userNotFoundByProvider = true;
             }
+        }
+
+        if ($userDeauthenticated) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Token was deauthenticated after trying to refresh it.');
+            }
+
+            return null;
         }
 
         if ($userNotFoundByProvider) {

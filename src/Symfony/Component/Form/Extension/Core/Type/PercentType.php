@@ -33,7 +33,7 @@ class PercentType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['symbol'] = isset($options['symbol']) ? $options['symbol'] : true;
+        $view->vars['symbol'] = $options['symbol'];
     }
 
     /**

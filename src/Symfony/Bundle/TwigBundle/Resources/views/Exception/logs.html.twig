@@ -29,7 +29,12 @@
                     {{ log.channel }}
                 </td>
             {% endif %}
-            <td>{{ log.message|format_log_message(log.context) }}</td>
+            <td>
+                {{ log.message|format_log_message(log.context) }}
+                {% if log.context ?? false %}
+                    <pre class="text-muted prewrap m-t-5">{{ log.context|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES')) }}</pre>
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
     </tbody>

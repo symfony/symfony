@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2018-07-16T10:29:44Z
+
+Hello @iltar what's the state of this PR? :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-07-16T10:46:18Z
+
+@Nek- it's your PR, so I'm not sure what you mean 😅
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-07-16T11:53:25Z
+
+@iltar sorry you're so active on PRs that I thought you were in the core team 😅!
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-07-16T11:55:54Z
+
+ping @romainneutron @nicolas-grekas then :)
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-10-05T07:42:25Z
+
+Annnnnd... Rebased again. ping @romainneutron @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-10-05T13:05:07Z
+
+Error on CI not related.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:45:33Z
+
+Can you also add some notes in the CHANGELOG file of the component?
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-10-11T16:03:23Z
+
+@fabpot changes done.

@@ -504,7 +504,7 @@ final class ProgressBar
     private static function initPlaceholderFormatters()
     {
         return array(
-            'bar' => function (ProgressBar $bar, OutputInterface $output) {
+            'bar' => function (self $bar, OutputInterface $output) {
                 $completeBars = floor($bar->getMaxSteps() > 0 ? $bar->getProgressPercent() * $bar->getBarWidth() : $bar->getProgress() % $bar->getBarWidth());
                 $display = str_repeat($bar->getBarCharacter(), $completeBars);
                 if ($completeBars < $bar->getBarWidth()) {
@@ -514,10 +514,10 @@ final class ProgressBar
 
                 return $display;
             },
-            'elapsed' => function (ProgressBar $bar) {
+            'elapsed' => function (self $bar) {
                 return Helper::formatTime(time() - $bar->getStartTime());
             },
-            'remaining' => function (ProgressBar $bar) {
+            'remaining' => function (self $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
@@ -530,7 +530,7 @@ final class ProgressBar
 
                 return Helper::formatTime($remaining);
             },
-            'estimated' => function (ProgressBar $bar) {
+            'estimated' => function (self $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
@@ -543,16 +543,16 @@ final class ProgressBar
 
                 return Helper::formatTime($estimated);
             },
-            'memory' => function (ProgressBar $bar) {
+            'memory' => function (self $bar) {
                 return Helper::formatMemory(memory_get_usage(true));
             },
-            'current' => function (ProgressBar $bar) {
+            'current' => function (self $bar) {
                 return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
             },
-            'max' => function (ProgressBar $bar) {
+            'max' => function (self $bar) {
                 return $bar->getMaxSteps();
             },
-            'percent' => function (ProgressBar $bar) {
+            'percent' => function (self $bar) {
                 return floor($bar->getProgressPercent() * 100);
             },
         );

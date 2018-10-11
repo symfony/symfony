@@ -240,13 +240,13 @@ class ProgressIndicator
     private static function initPlaceholderFormatters()
     {
         return array(
-            'indicator' => function (ProgressIndicator $indicator) {
+            'indicator' => function (self $indicator) {
                 return $indicator->indicatorValues[$indicator->indicatorCurrent % \count($indicator->indicatorValues)];
             },
-            'message' => function (ProgressIndicator $indicator) {
+            'message' => function (self $indicator) {
                 return $indicator->message;
             },
-            'elapsed' => function (ProgressIndicator $indicator) {
+            'elapsed' => function (self $indicator) {
                 return Helper::formatTime(time() - $indicator->startTime);
             },
             'memory' => function () {

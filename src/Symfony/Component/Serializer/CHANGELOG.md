@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * `AbstractNormalizer::handleCircularReference` is now final, and receives two optional extra arguments: the format and the context
+* `YamlEncoder` now handle the `.yml` extension too
 
 4.1.0
 -----

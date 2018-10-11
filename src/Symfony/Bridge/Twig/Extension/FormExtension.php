@@ -54,6 +54,7 @@ class FormExtension extends AbstractExtension
             new TwigFunction('form_start', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
             new TwigFunction('form_end', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
             new TwigFunction('csrf_token', ['Symfony\Component\Form\FormRenderer', 'renderCsrfToken']),
+            new TwigFunction('parent_form', 'Symfony\Bridge\Twig\Extension\twig_get_parent_form'),
         ];
     }
 
@@ -114,4 +115,12 @@ function twig_is_selected_choice(ChoiceView $choice, $selectedValue)
 function twig_is_root_form(FormView $formView)
 {
     return null === $formView->parent;
+}
+
+/**
+ * @internal
+ */
+function twig_get_parent_form(FormView $formView): ?FormView
+{
+    return $formView->parent;
 }

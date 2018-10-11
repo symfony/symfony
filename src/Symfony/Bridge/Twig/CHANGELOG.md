@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added the `parent_form()` function that allows to reliably retrieve the parent form in Twig templates
+
 4.2.0
 -----
 

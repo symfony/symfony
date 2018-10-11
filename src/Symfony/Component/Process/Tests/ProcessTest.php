@@ -133,6 +133,33 @@ class ProcessTest extends TestCase
         $this->assertLessThan(15, microtime(true) - $start);
     }
 
+    public function testWaitUntilSpecificOutput()
+    {
+        $p = $this->getProcess(array(self::$phpBin, __DIR__.'/KillableProcessWithOutput.php'));
+        $p->start();
+
+        $start = microtime(true);
+
+        $completeOutput = '';
+        $p->waitUntil(function ($type, $output) use (&$completeOutput) {
+            $completeOutput .= $output;
+            if (false !== strpos($output, 'One more')) {
+                return true;
+            }
+
+            return false;
+        });
+        $p->stop();
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            // Windows is slower
+            $this->assertLessThan(15, microtime(true) - $start);
+        } else {
+            $this->assertLessThan(2, microtime(true) - $start);
+        }
+        $this->assertEquals("First iteration output\nSecond iteration output\nOne more iteration output\n", $completeOutput);
+    }
+
     public function testAllOutputIsActuallyReadOnTermination()
     {
         // this code will result in a maximum of 2 reads of 8192 bytes by calling

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-10-11T12:47:54Z
+
+`yml` is not a format. It is an alternative *extension* for the YAML format. I would find it bad to see some constants calling it a format.
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-10-11T13:02:54Z
+
+Well, it's related to https://github.com/symfony/symfony/issues/28768 and was somehow validated by @nicolas-grekas

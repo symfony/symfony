@@ -257,10 +257,10 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * Should be set to true only for root forms.
      *
-     * @param bool $initialize True to initialize the form automatically,
+     * @param bool $initialize true to initialize the form automatically,
      *                         false to suppress automatic initialization.
      *                         In the second case, you need to call
-     *                         {@link FormInterface::initialize()} manually.
+     *                         {@link FormInterface::initialize()} manually
      *
      * @return $this The configuration object
      */

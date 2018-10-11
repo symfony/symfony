@@ -595,7 +595,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequest($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
         $values = array(
@@ -643,7 +643,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
 
@@ -691,7 +691,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
 
@@ -728,7 +728,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
 

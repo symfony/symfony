@@ -20,7 +20,7 @@ class ChainCacheClearerTest extends TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf2_cache_clearer_dir');
+        self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf_cache_clearer_dir');
     }
 
     public static function tearDownAfterClass()

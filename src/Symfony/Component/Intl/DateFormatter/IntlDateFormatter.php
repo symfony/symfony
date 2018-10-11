@@ -506,9 +506,9 @@ class IntlDateFormatter
     /**
      * Set the formatter's timezone identifier.
      *
-     * @param string $timeZoneId The time zone ID string of the time zone to use.
+     * @param string $timeZoneId the time zone ID string of the time zone to use.
      *                           If NULL or the empty string, the default time zone for the
-     *                           runtime is used.
+     *                           runtime is used
      *
      * @return bool true on success or false on failure
      *

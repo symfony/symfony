@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface, ProcessorInterface
+class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
 {
     public function __construct(array $extraFields = null)
     {

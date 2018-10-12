@@ -171,7 +171,7 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new DotEnv())->load($path1, $path2);
+        (new Dotenv())->load($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -199,7 +199,7 @@ class DotenvTest extends TestCase
     {
         $originalValue = $_SERVER['argc'];
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('argc' => 'new_value'));
 
         $this->assertSame($originalValue, $_SERVER['argc']);
@@ -210,7 +210,7 @@ class DotenvTest extends TestCase
         putenv('TEST_ENV_VAR=original_value');
         $_SERVER['TEST_ENV_VAR'] = 'original_value';
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'));
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
@@ -220,7 +220,7 @@ class DotenvTest extends TestCase
     {
         $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('HTTP_TEST_ENV_VAR' => 'env_value'));
 
         $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
@@ -242,7 +242,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('APP_DEBUG' => '1', 'DATABASE_URL' => 'mysql://root@localhost/db'));
 
         $this->assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
@@ -259,7 +259,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('APP_DEBUG' => '0', 'DATABASE_URL' => 'mysql://root@localhost/db'));
         $dotenv->populate(array('DATABASE_URL' => 'sqlite:///somedb.sqlite'));
 
@@ -275,7 +275,7 @@ class DotenvTest extends TestCase
         putenv('BAZ=baz');
         putenv('DOCUMENT_ROOT=/var/www');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot'));
 
         $this->assertSame('foo1', getenv('FOO'));

@@ -1,0 +1,39 @@
+{
+    "name": "symfony/mercure",
+    "type": "library",
+    "description": "Symfony Mercure Component",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "dunglas@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3"
+    },
+    "require-dev": {
+        "symfony/messenger": "~3.4|~4.0"
+    },
+    "suggest": {
+        "symfony/messenger": "For using the Messenger integration."
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mercure\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.2-dev"
+        }
+    }
+}

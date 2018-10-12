@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-02-15T14:19:20Z
+
+That's not entirely true. The password encoder also supports other ways to use argon2i (but the part about upgrading to PHP 7.2 indeed needs to mention this flag)
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-02-15T14:21:37Z
+
+@stof point is, even with sodium loaded, Argon2i is unuseable
+
+`./configure --help` shows the following:
+```
+  --with-sodium=DIR     Include sodium support
+  --with-password-argon2=DIR           Include Argon2 support in password_*. DIR is the Argon2 shared library path]
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-15T14:24:06Z
+
+Note that the existing message is talking about the libsodium extension (i.e. the one from Pecl supporting older version), not about the sodium one (the core one added in PHP 7.2).
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-02-15T14:25:39Z
+
+@stof fixed up the error message
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-02-15T15:30:36Z
+
+@chalasr implemented your requested change
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-15T15:40:27Z
+
+Please revert your last commit as it will cause conflicts when merging lower branches
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-02-15T15:49:03Z
+
+Squashed the commit
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-02-15T16:06:08Z
+
+@stof I think the new error should do fine, apart from a grammar check (install vs installing)
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-02-15T23:12:18Z
+
+@stof found out the root cause, libsodium `1.0.9` added Argon2 support...
+As you also know, Heroku will not support Argon2 until at least April 2018 when they release the Heroku 18 stack.
+
+So, I've also added a specific message for Heroku users that are under the impression they use sodium with Argon2 that it isn't supported, since it took me a good while and a lot of digging to find out why Argon2 isn't available.
+
+I'm also checking for the libsodium version now and showing a specific message for that as well.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-12T07:49:51Z
+
+I agree with @greg0ire: we should use the following generic check and show a generic error message too (*"The installed libsodium version doesn't have support for Argon2i. Use Bcrypt instead."*):
+
+```php
+if (!defined('SODIUM_CRYPTO_PWHASH_SALTBYTES')) {
+    echo "skip libsodium without argon2i";
+}
+```
+
+@Coffee2CodeNL will you have some time to make this change? Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-07-19T06:56:34Z
+
+What's the status of this PR? @Coffee2CodeNL Can you take the comments into account?
+
+---------------------------------------------------------------------------
+
+by Coffee2CodeNL at 2018-07-23T14:46:55Z
+
+Will do this ASAP, been going through a rough patch
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T09:46:21Z
+
+@Coffee2CodeNL Gentle ping :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T11:46:05Z
+
+Anyone willing to take over this one? /cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-12T20:53:02Z
+
+PR reworked, ready on my side.

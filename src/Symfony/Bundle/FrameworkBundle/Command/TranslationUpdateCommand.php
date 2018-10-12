@@ -138,6 +138,8 @@ EOF
             $this->reader = $this->getContainer()->get('translation.reader');
             $this->extractor = $this->getContainer()->get('translation.extractor');
             $this->defaultLocale = $this->getContainer()->getParameter('kernel.default_locale');
+            $this->defaultTransPath = $this->getContainer()->getParameter('translator.default_path');
+            $this->defaultViewsPath = $this->getContainer()->getParameter('twig.default_path');
         }
 
         $io = new SymfonyStyle($input, $output);

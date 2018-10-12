@@ -106,7 +106,7 @@
 {%- endblock dateinterval_widget %}
 
 {% block percent_widget -%}
-    {%- if symbol == true -%}
+    {%- if symbol -%}
         <div class="input-group">
             {{- block('form_widget_simple') -}}
             <div class="input-group-append">

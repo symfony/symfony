@@ -238,6 +238,7 @@ TwigBundle
 Validator
 --------
 
+ * The `checkMX` and `checkHost` properties of the Email constraint were removed
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
  * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.
  * Removed the `checkDNS` and `dnsMessage` options from the `Url` constraint.

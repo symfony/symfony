@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by veewee at 2018-07-02T05:10:07Z
+
+Hi @chalasr,
+
+Thanks for the feedback!
+I am not sure what you are expecting from me at this point. Do I need to create a patch for 2.8, another one for 4.1 (since the code has changed there) and a new feature request using the validator for master?
+
+The way I see it:
+2.8 until 4.1.1 worked "fine": it used the default value without any lookups in the choices.
+From 4.1.1 on, the code selects an index from the choices list which breaks in non-interactive multiselect mode.
+
+The only thing I did in this PR, is made the defaults parameter work in the same way it does in interactive mode. It is not really a behaviour change, but an inconsistency between operation modes which could be considered a bug.
+
+Can you provide me some additional feedback? Thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-07-03T09:57:07Z
+
+@veewee The updated code looks the same in 2.8 and 4.1 to me (the PR that introduced the bug is part of 2.8). Am I missing something that makes 2.8 free of this bug? Otherwise, this PR needs to be rebased on 2.8 being the lowest branch where the bug applies.
+
+About making use of the validator in non-interactive mode, it potentially changes the return value of the method. Could be considered as a bugfix but anyways I think it should be discussed in a dedicated PR as it is not related to the bug fixed here.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-09-08T12:53:36Z
+
+ping @veewee :) should we close/take over?
+
+---------------------------------------------------------------------------
+
+by veewee at 2018-09-28T07:11:48Z
+
+Hi @chalasr,
+
+Sorry for the delay.
+
+To me, it is not very clear what the type of the 'default' parameter should be. For single options it makes sense to provide a key or name, but for multiple options it makes more sense to just provide the array of defaults instead of a comma separated string of indexes / names. Maybe the validator lookup is just overkill in this case... But that's up to you guys to decide.
+
+Besides that, I also do not know which versions this affects and how it should be fixed in the different affected versions.
+
+Since I have a lot of open questions about the subject, feel free to take this one over.
+
+With kind regards.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:40:10Z
+
+@chalasr Can you take over this one?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-12T15:59:36Z
+
+@fabpot PR reworked, ready on my side.

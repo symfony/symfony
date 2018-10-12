@@ -62,11 +62,11 @@ class OrderedHashMapIterator implements \Iterator
      *                              keys
      * @param array $orderedKeys    The keys of the map in the order in which
      *                              they should be iterated
-     * @param array $managedCursors An array from which to reference the
+     * @param array $managedCursors an array from which to reference the
      *                              iterator's cursor as long as it is alive.
      *                              This array is managed by the corresponding
      *                              {@link OrderedHashMap} instance to support
-     *                              recognizing the deletion of elements.
+     *                              recognizing the deletion of elements
      */
     public function __construct(array &$elements, array &$orderedKeys, array &$managedCursors)
     {

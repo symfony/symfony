@@ -367,7 +367,6 @@
         "ms": "malaiji",
         "mt": "malta",
         "mua": "mundang",
-        "mul": "useita kieliä",
         "mus": "creek",
         "mwl": "mirandeesi",
         "mwr": "marwari",
@@ -570,7 +569,6 @@
         "uga": "ugarit",
         "uk": "ukraina",
         "umb": "mbundu",
-        "und": "tuntematon kieli",
         "ur": "urdu",
         "uz": "uzbekki",
         "vai": "vai",
@@ -615,7 +613,6 @@
         "zh_Hant": "perinteinen kiina",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "ei kielellistä sisältöä",
         "zza": "zaza"
     }
 }

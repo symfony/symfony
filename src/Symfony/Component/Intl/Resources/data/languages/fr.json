@@ -364,7 +364,6 @@
         "ms": "malais",
         "mt": "maltais",
         "mua": "moundang",
-        "mul": "multilingue",
         "mus": "creek",
         "mwl": "mirandais",
         "mwr": "marwarî",
@@ -567,7 +566,6 @@
         "uga": "ougaritique",
         "uk": "ukrainien",
         "umb": "oumboundou",
-        "und": "langue indéterminée",
         "ur": "ourdou",
         "uz": "ouzbek",
         "vai": "vaï",
@@ -612,7 +610,6 @@
         "zh_Hant": "chinois traditionnel",
         "zu": "zoulou",
         "zun": "zuñi",
-        "zxx": "sans contenu linguistique",
         "zza": "zazaki"
     }
 }

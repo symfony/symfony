@@ -368,7 +368,6 @@
         "ms": "Malayca",
         "mt": "Maltaca",
         "mua": "Mundang",
-        "mul": "Birden Fazla Dil",
         "mus": "Krikçe",
         "mwl": "Miranda dili",
         "mwr": "Marvari",
@@ -571,7 +570,6 @@
         "uga": "Ugarit dili",
         "uk": "Ukraynaca",
         "umb": "Umbundu",
-        "und": "Bilinmeyen Dil",
         "ur": "Urduca",
         "uz": "Özbekçe",
         "vai": "Vai",
@@ -616,7 +614,6 @@
         "zh_Hant": "Geleneksel Çince",
         "zu": "Zuluca",
         "zun": "Zunice",
-        "zxx": "Dilbilim içeriği yok",
         "zza": "Zazaca"
     }
 }

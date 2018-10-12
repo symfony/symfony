@@ -305,7 +305,6 @@
         "ms": "malajski",
         "mt": "malteški",
         "mua": "mundang",
-        "mul": "više jezika",
         "mus": "kriški",
         "mwl": "mirandeški",
         "mwr": "marvari",
@@ -475,7 +474,6 @@
         "uga": "ugaritski",
         "uk": "ukrajinski",
         "umb": "umbundu",
-        "und": "nepoznati jezik",
         "ur": "urdu",
         "uz": "uzbečki",
         "vai": "vai",
@@ -511,7 +509,6 @@
         "zh_Hant": "kineski (tradicionalni)",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "bez lingvističkog sadržaja",
         "zza": "zaza"
     }
 }

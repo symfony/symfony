@@ -264,7 +264,6 @@
         "mr": "marathi",
         "ms": "malaic",
         "mt": "maltais",
-        "mul": "pluriling",
         "mus": "creek",
         "mwl": "mirandais",
         "mwr": "marwari",
@@ -408,7 +407,6 @@
         "uga": "ugaritic",
         "uk": "ucranais",
         "umb": "mbundu",
-        "und": "linguas betg determinadas",
         "ur": "urdu",
         "uz": "usbec",
         "vai": "vai",
@@ -436,7 +434,6 @@
         "zh_Hant": "chinais tradiziunal",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "nagins cuntegns linguistics",
         "zza": "zaza"
     }
 }

@@ -320,7 +320,6 @@
         "ms": "malajisk",
         "mt": "maltesisk",
         "mua": "mundang",
-        "mul": "flere sprog",
         "mus": "creek",
         "mwl": "mirandesisk",
         "mwr": "marwari",
@@ -493,7 +492,6 @@
         "uga": "ugaristisk",
         "uk": "ukrainsk",
         "umb": "umbundu",
-        "und": "ukendt sprog",
         "ur": "urdu",
         "uz": "usbekisk",
         "vai": "vai",
@@ -530,7 +528,6 @@
         "zh_Hant": "traditionelt kinesisk",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "intet sprogligt indhold",
         "zza": "zaza"
     }
 }

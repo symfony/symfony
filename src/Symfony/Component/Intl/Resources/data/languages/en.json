@@ -369,7 +369,6 @@
         "ms": "Malay",
         "mt": "Maltese",
         "mua": "Mundang",
-        "mul": "Multiple languages",
         "mus": "Creek",
         "mwl": "Mirandese",
         "mwr": "Marwari",
@@ -573,7 +572,6 @@
         "uga": "Ugaritic",
         "uk": "Ukrainian",
         "umb": "Umbundu",
-        "und": "Unknown language",
         "ur": "Urdu",
         "uz": "Uzbek",
         "vai": "Vai",
@@ -618,7 +616,6 @@
         "zh_Hant": "Traditional Chinese",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "No linguistic content",
         "zza": "Zaza"
     }
 }

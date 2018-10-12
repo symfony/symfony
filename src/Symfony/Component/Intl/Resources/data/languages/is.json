@@ -308,7 +308,6 @@
         "ms": "malaíska",
         "mt": "maltneska",
         "mua": "mundang",
-        "mul": "margvísleg mál",
         "mus": "krík",
         "mwl": "mirandesíska",
         "mwr": "marvarí",
@@ -478,7 +477,6 @@
         "uga": "úgarítíska",
         "uk": "úkraínska",
         "umb": "úmbúndú",
-        "und": "óþekkt tungumál",
         "ur": "úrdú",
         "uz": "úsbekska",
         "vai": "vaí",
@@ -514,7 +512,6 @@
         "zh_Hant": "kínverska (hefðbundin)",
         "zu": "súlú",
         "zun": "súní",
-        "zxx": "ekkert tungumálaefni",
         "zza": "zázáíska"
     }
 }

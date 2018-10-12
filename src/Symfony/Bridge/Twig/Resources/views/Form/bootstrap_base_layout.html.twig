@@ -27,12 +27,12 @@
 
 {% block percent_widget -%}
     {%- if symbol == true -%}
-    <div class="input-group">
-        {{- block('form_widget_simple') -}}
-        <span class="input-group-addon">%</span>
-    </div>
+        <div class="input-group">
+            {{- block('form_widget_simple') -}}
+            <span class="input-group-addon">%</span>
+        </div>
     {%- else -%}
-    {{- block('form_widget_simple') -}}
+        {{- block('form_widget_simple') -}}
     {%- endif -%}
 {%- endblock percent_widget %}
 

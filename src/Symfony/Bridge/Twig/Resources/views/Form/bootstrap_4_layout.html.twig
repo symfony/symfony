@@ -107,14 +107,14 @@
 
 {% block percent_widget -%}
     {%- if symbol == true -%}
-    <div class="input-group">
-        {{- block('form_widget_simple') -}}
-        <div class="input-group-append">
-            <span class="input-group-text">%</span>
+        <div class="input-group">
+            {{- block('form_widget_simple') -}}
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
+            </div>
         </div>
-    </div>
     {%- else -%}
-    {{- block('form_widget_simple') -}}
+        {{- block('form_widget_simple') -}}
     {%- endif -%}
 {%- endblock percent_widget %}
 

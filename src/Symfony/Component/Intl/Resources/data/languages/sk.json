@@ -317,7 +317,6 @@
         "ms": "malajčina",
         "mt": "maltčina",
         "mua": "mundang",
-        "mul": "viaceré jazyky",
         "mus": "kríkčina",
         "mwl": "mirandčina",
         "mwr": "marwari",
@@ -490,7 +489,6 @@
         "uga": "ugaritčina",
         "uk": "ukrajinčina",
         "umb": "umbundu",
-        "und": "neznámy jazyk",
         "ur": "urdčina",
         "uz": "uzbečtina",
         "vai": "vai",
@@ -526,7 +524,6 @@
         "zh_Hant": "čínština (tradičná)",
         "zu": "zuluština",
         "zun": "zuniština",
-        "zxx": "bez jazykového obsahu",
         "zza": "zaza"
     }
 }

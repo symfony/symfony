@@ -307,7 +307,6 @@
         "ms": "malajiešu",
         "mt": "maltiešu",
         "mua": "mundangu",
-        "mul": "vairākas valodas",
         "mus": "krīku",
         "mwl": "mirandiešu",
         "mwr": "marvaru",
@@ -478,7 +477,6 @@
         "uga": "ugaritiešu",
         "uk": "ukraiņu",
         "umb": "umbundu",
-        "und": "nezināma valoda",
         "ur": "urdu",
         "uz": "uzbeku",
         "vai": "vaju",
@@ -514,7 +512,6 @@
         "zh_Hant": "ķīniešu tradicionālā",
         "zu": "zulu",
         "zun": "zunju",
-        "zxx": "bez lingvistiska satura",
         "zza": "zazaki"
     }
 }

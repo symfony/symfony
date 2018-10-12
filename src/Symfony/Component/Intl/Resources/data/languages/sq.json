@@ -237,7 +237,6 @@
         "ms": "malajisht",
         "mt": "maltisht",
         "mua": "mundangisht",
-        "mul": "gjuhë të shumëfishta",
         "mus": "krikisht",
         "mwl": "mirandisht",
         "my": "birmanisht",
@@ -371,7 +370,6 @@
         "ug": "ujgurisht",
         "uk": "ukrainisht",
         "umb": "umbunduisht",
-        "und": "E panjohur",
         "ur": "urduisht",
         "uz": "uzbekisht",
         "vai": "vaisht",
@@ -397,7 +395,6 @@
         "zh": "kinezisht",
         "zu": "zuluisht",
         "zun": "zunisht",
-        "zxx": "nuk ka përmbajtje gjuhësore",
         "zza": "zazaisht"
     }
 }

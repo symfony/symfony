@@ -97,7 +97,6 @@
         "mr": "marathiagbe",
         "ms": "malaygbe",
         "mt": "maltagbe",
-        "mul": "gbegbɔgblɔ sɔgbɔwo",
         "my": "burmagbe",
         "nb": "nɔweigbe bokmål",
         "nd": "dziehe ndebelegbe",
@@ -159,7 +158,6 @@
         "ty": "tahitigbe",
         "ug": "uighurgbe",
         "uk": "ukraingbe",
-        "und": "gbegbɔgblɔ manya",
         "ur": "urdugbe",
         "uz": "uzbekistangbe",
         "ve": "vendagbe",
@@ -172,7 +170,6 @@
         "zh": "Chinagbe",
         "zh_Hans": "tsainagbe",
         "zh_Hant": "blema tsainagbe",
-        "zu": "zulugbe",
-        "zxx": "gbegbɔgblɔ manɔmee"
+        "zu": "zulugbe"
     }
 }

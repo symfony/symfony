@@ -82,6 +82,12 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'za' => 'zha',
         'zh' => 'zho',
     );
+    private static $blacklist = array(
+        'mul' => true, // Multiple languages
+        'mis' => true, // Uncoded language
+        'und' => true, // Unknown language
+        'zxx' => true, // No linguistic content
+    );
 
     /**
      * Collects all available language codes.
@@ -126,7 +132,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
             $data = array(
                 'Version' => $localeBundle['Version'],
-                'Names' => iterator_to_array($localeBundle['Languages']),
+                'Names' => self::generateLanguageNames($localeBundle),
             );
 
             $this->languageCodes = array_merge($this->languageCodes, array_keys($data['Names']));
@@ -160,6 +166,11 @@ class LanguageDataGenerator extends AbstractDataGenerator
             'Aliases' => array_column(iterator_to_array($metadataBundle['alias']['language']), 'replacement'),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
         );
+    }
+
+    private static function generateLanguageNames(ArrayAccessibleResourceBundle $localeBundle): array
+    {
+        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$blacklist);
     }
 
     private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle)

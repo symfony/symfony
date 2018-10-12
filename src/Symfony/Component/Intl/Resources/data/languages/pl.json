@@ -367,7 +367,6 @@
         "ms": "malajski",
         "mt": "maltański",
         "mua": "mundang",
-        "mul": "wiele języków",
         "mus": "krik",
         "mwl": "mirandyjski",
         "mwr": "marwari",
@@ -570,7 +569,6 @@
         "uga": "ugarycki",
         "uk": "ukraiński",
         "umb": "umbundu",
-        "und": "nieznany język",
         "ur": "urdu",
         "uz": "uzbecki",
         "vai": "wai",
@@ -615,7 +613,6 @@
         "zh_Hant": "chiński tradycyjny",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "brak treści o charakterze językowym",
         "zza": "zazaki"
     }
 }

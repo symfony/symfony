@@ -366,7 +366,6 @@
         "ms": "malajiečių",
         "mt": "maltiečių",
         "mua": "mundangų",
-        "mul": "kelios kalbos",
         "mus": "krykų",
         "mwl": "mirandezų",
         "mwr": "marvari",
@@ -569,7 +568,6 @@
         "uga": "ugaritų",
         "uk": "ukrainiečių",
         "umb": "umbundu",
-        "und": "nežinoma kalba",
         "ur": "urdų",
         "uz": "uzbekų",
         "vai": "vai",
@@ -614,7 +612,6 @@
         "zh_Hant": "tradicinė kinų",
         "zu": "zulų",
         "zun": "Zuni",
-        "zxx": "nėra kalbinio turinio",
         "zza": "zaza"
     }
 }

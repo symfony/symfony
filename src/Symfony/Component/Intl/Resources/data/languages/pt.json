@@ -311,7 +311,6 @@
         "ms": "malaio",
         "mt": "maltês",
         "mua": "mundang",
-        "mul": "múltiplos idiomas",
         "mus": "creek",
         "mwl": "mirandês",
         "mwr": "marwari",
@@ -483,7 +482,6 @@
         "uga": "ugarítico",
         "uk": "ucraniano",
         "umb": "umbundu",
-        "und": "idioma desconhecido",
         "ur": "urdu",
         "uz": "uzbeque",
         "vai": "vai",
@@ -520,7 +518,6 @@
         "zh_Hant": "chinês tradicional",
         "zu": "zulu",
         "zun": "zunhi",
-        "zxx": "sem conteúdo linguístico",
         "zza": "zazaki"
     }
 }

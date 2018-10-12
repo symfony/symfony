@@ -48,7 +48,7 @@
                 {{- block('form_widget_simple') -}}
             </div>
             <div class="small-3 large-2 columns">
-                <span class="postfix">%</span>
+                <span class="postfix">{{ symbol|default('%') }}</span>
             </div>
         {%- else -%}
             <div class="small-12 large-12 columns">

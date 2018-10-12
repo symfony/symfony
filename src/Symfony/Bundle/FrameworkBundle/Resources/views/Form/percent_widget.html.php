@@ -9,4 +9,5 @@
  * file that was distributed with this source code.
  */
 
-echo $view['form']->block($form, 'form_widget_simple', array('type' => isset($type) ? $type : 'text')) . (isset($symbol) && $symbol ? ' %': '') ?>
+$symbol = $symbol !== false ? (!empty($symbol) ? ' ' . $symbol : ' %') : '';
+echo $view['form']->block($form, 'form_widget_simple', array('type' => isset($type) ? $type : 'text')) . $symbol; ?>

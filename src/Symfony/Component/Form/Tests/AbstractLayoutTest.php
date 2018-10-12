@@ -1922,6 +1922,20 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
+    public function testPercentCustomSymbol()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, array('symbol' => '‱'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@value="10"]
+    [contains(.., "‱")]
+'
+        );
+    }
+
     public function testCheckedRadio()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', true);

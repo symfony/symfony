@@ -110,7 +110,7 @@
         <div class="input-group">
             {{- block('form_widget_simple') -}}
             <div class="input-group-append">
-                <span class="input-group-text">%</span>
+                <span class="input-group-text">{{ symbol|default('%') }}</span>
             </div>
         </div>
     {%- else -%}

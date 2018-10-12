@@ -43,7 +43,7 @@ class PercentType extends AbstractType
     {
         $resolver->setDefaults(array(
             'scale' => 0,
-            'symbol' => true,
+            'symbol' => '%',
             'type' => 'fractional',
             'compound' => false,
         ));
@@ -54,7 +54,7 @@ class PercentType extends AbstractType
         ));
 
         $resolver->setAllowedTypes('scale', 'int');
-        $resolver->setAllowedTypes('symbol', 'bool');
+        $resolver->setAllowedTypes('symbol', array( 'bool', 'string'));
     }
 
     /**

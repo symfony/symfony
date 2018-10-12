@@ -350,12 +350,14 @@ abstract class AbstractDoctrineExtension extends Extension
             case 'memcached':
                 if ($container->hasParameter($this->getObjectManagerElementName('cache.memcached.class'))) {
                     @trigger_error(
-                        'Usage of class parameter for memcache class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                        'Usage of class parameter for memcache class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.',
+                        E_USER_DEPRECATED
                     );
                 }
                 if ($container->hasParameter($this->getObjectManagerElementName('cache.memcached_instance.class'))) {
                     @trigger_error(
-                        'Usage of class parameter for memcached_instance class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                        'Usage of class parameter for memcached_instance class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.',
+                        E_USER_DEPRECATED
                     );
                 }
                 $memcachedClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%' . $this->getObjectManagerElementName('cache.memcached.class') . '%';
@@ -378,13 +380,15 @@ abstract class AbstractDoctrineExtension extends Extension
             case 'redis':
                 if ($container->hasParameter($this->getObjectManagerElementName('cache.redis.class'))) {
                     @trigger_error(
-                        'Usage of class parameter for redis class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                        'Usage of class parameter for redis class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.',
+                        E_USER_DEPRECATED
                     );
                 }
 
                 if ($container->hasParameter($this->getObjectManagerElementName('cache.redis_instance.class'))) {
                     @trigger_error(
-                        'Usage of class parameter for redis_instance class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.'
+                        'Usage of class parameter for redis_instance class is deprecated since version 4.2 and will be removed in 5.0. Use configuration values instead.',
+                        E_USER_DEPRECATED
                     );
                 }
                 $redisClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%' . $this->getObjectManagerElementName('cache.redis.class') . '%';

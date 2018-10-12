@@ -12,6 +12,7 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
@@ -62,19 +63,17 @@ class Query extends AbstractQuery
 
             $con = $this->connection->getResource();
 
-            switch ($this->options['scope']) {
-                case static::SCOPE_BASE:
-                    $func = 'ldap_read';
-                    break;
-                case static::SCOPE_ONE:
-                    $func = 'ldap_list';
-                    break;
-                case static::SCOPE_SUB:
-                    $func = 'ldap_search';
-                    break;
-                default:
-                    throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope']));
+            $funcMap = array(
+                QueryInterface::SCOPE_BASE => 'ldap_read',
+                QueryInterface::SCOPE_ONE => 'ldap_list',
+                QueryInterface::SCOPE_SUB => 'ldap_search',
+            );
+
+            if (!isset($funcMap[$this->options['scope']])) {
+                throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope']));
             }
+
+            $func = $funcMap[$this->options['scope']];
 
             $this->search = @$func(
                 $con,

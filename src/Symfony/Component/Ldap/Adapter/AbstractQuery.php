@@ -32,12 +32,12 @@ abstract class AbstractQuery implements QueryInterface
             'maxItems' => 0,
             'sizeLimit' => 0,
             'timeout' => 0,
-            'deref' => static::DEREF_NEVER,
+            'deref' => QueryInterface::DEREF_NEVER,
             'attrsOnly' => 0,
-            'scope' => static::SCOPE_SUB,
+            'scope' => QueryInterface::SCOPE_SUB,
         ));
-        $resolver->setAllowedValues('deref', array(static::DEREF_ALWAYS, static::DEREF_NEVER, static::DEREF_FINDING, static::DEREF_SEARCHING));
-        $resolver->setAllowedValues('scope', array(static::SCOPE_BASE, static::SCOPE_ONE, static::SCOPE_SUB));
+        $resolver->setAllowedValues('deref', array(QueryInterface::DEREF_ALWAYS, QueryInterface::DEREF_NEVER, QueryInterface::DEREF_FINDING, QueryInterface::DEREF_SEARCHING));
+        $resolver->setAllowedValues('scope', array(QueryInterface::SCOPE_BASE, QueryInterface::SCOPE_ONE, QueryInterface::SCOPE_SUB));
 
         $resolver->setNormalizer('filter', function (Options $options, $value) {
             return \is_array($value) ? $value : array($value);

@@ -23,7 +23,7 @@ use Symfony\Component\Yaml\Parser;
 class YamlEncoder implements EncoderInterface, DecoderInterface
 {
     const FORMAT = 'yaml';
-    const ALTERNATIVE_FORMAT = 'yml';
+    private const ALTERNATIVE_FORMAT = 'yml';
 
     private $dumper;
     private $parser;

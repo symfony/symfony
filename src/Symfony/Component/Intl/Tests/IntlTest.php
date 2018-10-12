@@ -24,21 +24,33 @@ class IntlTest extends TestCase
         $this->assertTrue(Intl::isExtensionLoaded());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetCurrencyBundleCreatesTheCurrencyBundle()
     {
         $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface', Intl::getCurrencyBundle());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetLanguageBundleCreatesTheLanguageBundle()
     {
         $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface', Intl::getLanguageBundle());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetLocaleBundleCreatesTheLocaleBundle()
     {
         $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface', Intl::getLocaleBundle());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetRegionBundleCreatesTheRegionBundle()
     {
         $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\RegionBundleInterface', Intl::getRegionBundle());
@@ -65,6 +77,7 @@ class IntlTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @requires extension intl
      */
     public function testLocaleAliasesAreLoaded()

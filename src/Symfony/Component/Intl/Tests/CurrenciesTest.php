@@ -9,22 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\Data\Provider;
+namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Component\Intl\Data\Provider\CurrencyDataProvider;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Intl\Locale;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @group legacy
+ * @group intl-data
  */
-abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
+class CurrenciesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $currencies = [
+    private static $currencies = [
         'ADP',
         'AED',
         'AFA',
@@ -317,7 +314,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         'ZWR',
     ];
 
-    protected static $alpha3ToNumeric = [
+    private static $alpha3ToNumeric = [
         'AFA' => 4,
         'ALK' => 8,
         'ALL' => 8,
@@ -588,26 +585,9 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         'USS' => 998,
     ];
 
-    /**
-     * @var CurrencyDataProvider
-     */
-    protected $dataProvider;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->dataProvider = new CurrencyDataProvider(
-            $this->getDataDirectory().'/'.Intl::CURRENCY_DIR,
-            $this->createEntryReader()
-        );
-    }
-
-    abstract protected function getDataDirectory();
-
     public function testGetCurrencies()
     {
-        $this->assertSame(static::$currencies, $this->dataProvider->getCurrencies());
+        $this->assertSame(self::$currencies, Currencies::getCurrencyCodes());
     }
 
     /**
@@ -615,30 +595,27 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNames($displayLocale)
     {
-        $names = $this->dataProvider->getNames($displayLocale);
+        $names = Currencies::getNames($displayLocale);
 
         $keys = array_keys($names);
 
         sort($keys);
 
-        $this->assertEquals(static::$currencies, $keys);
+        $this->assertSame(self::$currencies, $keys);
 
         // Names should be sorted
         $sortedNames = $names;
         $collator = new \Collator($displayLocale);
         $collator->asort($names);
 
-        $this->assertEquals($sortedNames, $names);
+        $this->assertSame($sortedNames, $names);
     }
 
     public function testGetNamesDefaultLocale()
     {
         Locale::setDefault('de_AT');
 
-        $this->assertSame(
-            $this->dataProvider->getNames('de_AT'),
-            $this->dataProvider->getNames()
-        );
+        $this->assertSame(Currencies::getNames('de_AT'), Currencies::getNames());
     }
 
     /**
@@ -649,10 +626,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(
-            $this->dataProvider->getNames($ofLocale),
-            $this->dataProvider->getNames($alias)
-        );
+        $this->assertEquals(Currencies::getNames($ofLocale), Currencies::getNames($alias));
     }
 
     /**
@@ -660,11 +634,11 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetName($displayLocale)
     {
-        $expected = $this->dataProvider->getNames($displayLocale);
+        $expected = Currencies::getNames($displayLocale);
         $actual = [];
 
         foreach ($expected as $currency => $name) {
-            $actual[$currency] = $this->dataProvider->getName($currency, $displayLocale);
+            $actual[$currency] = Currencies::getName($currency, $displayLocale);
         }
 
         $this->assertSame($expected, $actual);
@@ -674,11 +648,11 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     {
         Locale::setDefault('de_AT');
 
-        $expected = $this->dataProvider->getNames('de_AT');
+        $expected = Currencies::getNames('de_AT');
         $actual = [];
 
         foreach ($expected as $currency => $name) {
-            $actual[$currency] = $this->dataProvider->getName($currency);
+            $actual[$currency] = Currencies::getName($currency);
         }
 
         $this->assertSame($expected, $actual);
@@ -689,10 +663,10 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetSymbol($displayLocale)
     {
-        $currencies = $this->dataProvider->getCurrencies();
+        $currencies = Currencies::getCurrencyCodes();
 
         foreach ($currencies as $currency) {
-            $this->assertGreaterThan(0, mb_strlen($this->dataProvider->getSymbol($currency, $displayLocale)));
+            $this->assertGreaterThan(0, mb_strlen(Currencies::getSymbol($currency, $displayLocale)));
         }
     }
 
@@ -700,7 +674,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     {
         return array_map(
             function ($currency) { return [$currency]; },
-            static::$currencies
+            self::$currencies
         );
     }
 
@@ -709,7 +683,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetFractionDigits($currency)
     {
-        $this->assertInternalType('numeric', $this->dataProvider->getFractionDigits($currency));
+        $this->assertInternalType('numeric', Currencies::getFractionDigits($currency));
     }
 
     /**
@@ -717,14 +691,14 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetRoundingIncrement($currency)
     {
-        $this->assertInternalType('numeric', $this->dataProvider->getRoundingIncrement($currency));
+        $this->assertInternalType('numeric', Currencies::getRoundingIncrement($currency));
     }
 
     public function provideCurrenciesWithNumericEquivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_keys(static::$alpha3ToNumeric)
+            array_keys(self::$alpha3ToNumeric)
         );
     }
 
@@ -733,14 +707,14 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNumericCode($currency)
     {
-        $this->assertSame(static::$alpha3ToNumeric[$currency], $this->dataProvider->getNumericCode($currency));
+        $this->assertSame(self::$alpha3ToNumeric[$currency], Currencies::getNumericCode($currency));
     }
 
     public function provideCurrenciesWithoutNumericEquivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_diff(static::$currencies, array_keys(static::$alpha3ToNumeric))
+            array_diff(self::$currencies, array_keys(self::$alpha3ToNumeric))
         );
     }
 
@@ -750,7 +724,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->dataProvider->getNumericCode($currency);
+        Currencies::getNumericCode($currency);
     }
 
     public function provideValidNumericCodes()
@@ -769,13 +743,13 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testForNumericCode($numeric, $expected)
     {
-        $actual = $this->dataProvider->forNumericCode($numeric);
+        $actual = Currencies::forNumericCode($numeric);
 
         // Make sure that a different array order doesn't break the test
         sort($actual);
         sort($expected);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function provideInvalidNumericCodes()
@@ -795,14 +769,14 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
-        $this->dataProvider->forNumericCode($currency);
+        Currencies::forNumericCode($currency);
     }
 
     private function getNumericToAlpha3Mapping()
     {
         $numericToAlpha3 = [];
 
-        foreach (static::$alpha3ToNumeric as $alpha3 => $numeric) {
+        foreach (self::$alpha3ToNumeric as $alpha3 => $numeric) {
             if (!isset($numericToAlpha3[$numeric])) {
                 $numericToAlpha3[$numeric] = [];
             }

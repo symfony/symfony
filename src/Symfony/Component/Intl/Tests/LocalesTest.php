@@ -9,44 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\Data\Provider;
+namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
+use Symfony\Component\Intl\Locales;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @group legacy
+ * @group intl-data
  */
-abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
+class LocalesTest extends ResourceBundleTestCase
 {
-    /**
-     * @var LocaleDataProvider
-     */
-    protected $dataProvider;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->dataProvider = new LocaleDataProvider(
-            $this->getDataDirectory().'/'.Intl::LOCALE_DIR,
-            $this->createEntryReader()
-        );
-    }
-
-    abstract protected function getDataDirectory();
-
     public function testGetLocales()
     {
-        $this->assertSame($this->getLocales(), $this->dataProvider->getLocales());
+        $this->assertSame($this->getLocales(), Locales::getLocales());
     }
 
     public function testGetLocaleAliases()
     {
-        $this->assertSame($this->getLocaleAliases(), $this->dataProvider->getAliases());
+        $this->assertSame($this->getLocaleAliases(), Locales::getAliases());
     }
 
     /**
@@ -54,7 +34,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNames($displayLocale)
     {
-        $locales = array_keys($this->dataProvider->getNames($displayLocale));
+        $locales = array_keys(Locales::getNames($displayLocale));
 
         sort($locales);
 
@@ -68,10 +48,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     {
         Locale::setDefault('de_AT');
 
-        $this->assertSame(
-            $this->dataProvider->getNames('de_AT'),
-            $this->dataProvider->getNames()
-        );
+        $this->assertSame(Locales::getNames('de_AT'), Locales::getNames());
     }
 
     /**
@@ -82,10 +59,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(
-            $this->dataProvider->getNames($ofLocale),
-            $this->dataProvider->getNames($alias)
-        );
+        $this->assertEquals(Locales::getNames($ofLocale), Locales::getNames($alias));
     }
 
     /**
@@ -93,10 +67,10 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetName($displayLocale)
     {
-        $names = $this->dataProvider->getNames($displayLocale);
+        $names = Locales::getNames($displayLocale);
 
         foreach ($names as $locale => $name) {
-            $this->assertSame($name, $this->dataProvider->getName($locale, $displayLocale));
+            $this->assertSame($name, Locales::getName($locale, $displayLocale));
         }
     }
 
@@ -104,10 +78,10 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     {
         Locale::setDefault('de_AT');
 
-        $names = $this->dataProvider->getNames('de_AT');
+        $names = Locales::getNames('de_AT');
 
         foreach ($names as $locale => $name) {
-            $this->assertSame($name, $this->dataProvider->getName($locale));
+            $this->assertSame($name, Locales::getName($locale));
         }
     }
 }

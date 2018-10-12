@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Intl\NumberFormatter;
 
+use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale\Locale;
 
 /**
@@ -318,8 +318,8 @@ class NumberFormatter
             return $this->format($value);
         }
 
-        $symbol = Intl::getCurrencyBundle()->getCurrencySymbol($currency, 'en');
-        $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits($currency);
+        $symbol = Currencies::getSymbol($currency, 'en');
+        $fractionDigits = Currencies::getFractionDigits($currency);
 
         $value = $this->roundCurrency($value, $currency);
 
@@ -682,8 +682,8 @@ class NumberFormatter
      */
     private function roundCurrency($value, $currency)
     {
-        $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits($currency);
-        $roundingIncrement = Intl::getCurrencyBundle()->getRoundingIncrement($currency);
+        $fractionDigits = Currencies::getFractionDigits($currency);
+        $roundingIncrement = Currencies::getRoundingIncrement($currency);
 
         // Round with the formatter rounding mode
         $value = $this->round($value, $fractionDigits);

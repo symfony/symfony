@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Regions;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -42,14 +42,13 @@ class CountryValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        if (!class_exists(Intl::class)) {
+        if (!class_exists(Regions::class)) {
             throw new LogicException('The "symfony/intl" component is required to use the Country constraint.');
         }
 
         $value = (string) $value;
-        $countries = Intl::getRegionBundle()->getCountryNames();
 
-        if (!isset($countries[$value])) {
+        if (!Regions::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Country::NO_SUCH_COUNTRY_ERROR)

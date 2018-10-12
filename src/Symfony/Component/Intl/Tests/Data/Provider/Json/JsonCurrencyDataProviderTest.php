@@ -19,6 +19,7 @@ use Symfony\Component\Intl\Tests\Data\Provider\AbstractCurrencyDataProviderTest;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group intl-data
+ * @group legacy
  */
 class JsonCurrencyDataProviderTest extends AbstractCurrencyDataProviderTest
 {

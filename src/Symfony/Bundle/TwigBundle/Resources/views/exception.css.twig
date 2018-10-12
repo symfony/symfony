@@ -17,9 +17,11 @@ table { background: #FFF; border: 1px solid #E0E0E0; box-shadow: 0px 0px 1px rgb
 table th, table td { border: solid #E0E0E0; border-width: 1px 0; padding: 8px 10px; }
 table th { background-color: #E0E0E0; font-weight: bold; text-align: left; }
 
+.m-t-5 { margin-top: 5px; }
 .hidden-xs-down { display: none; }
 .block { display: block; }
 .hidden { display: none; }
+.prewrap { white-space: pre-wrap; }
 .nowrap { white-space: nowrap; }
 .newline { display: block; }
 .break-long-words { word-wrap: break-word; overflow-wrap: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto; min-width: 0; }
@@ -122,6 +124,14 @@ header .container { display: flex; justify-content: space-between; }
 .trace-code li code { color: #222; white-space: nowrap; }
 
 .trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
+
+table.logs tr td:last-child { width: 100%; }
+
+.log-levels { width: 100%; margin: 0; padding: 0; display: flex; align-items: center; list-style: none; }
+.log-levels li { width: 100%; padding: 3px; margin: 0; cursor: pointer; text-align: center; border: 2px dashed #e0e0e0; border-radius: 5px; color: #888; }
+.log-levels li + li { margin-left: 10px; }
+.log-levels li.active { background: #eee; color: #666; border-style: solid; border-width: 1px; padding: 4px; border-color: #aaa; }
+.log-levels li.last-active { cursor: not-allowed; }
 
 @media (min-width: 575px) {
     .hidden-xs-down { display: initial; }

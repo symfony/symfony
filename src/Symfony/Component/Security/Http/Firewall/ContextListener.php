@@ -161,6 +161,7 @@ class ContextListener implements ListenerInterface
         }
 
         $userNotFoundByProvider = false;
+        $userDeauthenticated = false;
 
         foreach ($this->userProviders as $provider) {
             if (!$provider instanceof UserProviderInterface) {
@@ -169,16 +170,21 @@ class ContextListener implements ListenerInterface
 
             try {
                 $refreshedUser = $provider->refreshUser($user);
-                $token->setUser($refreshedUser);
+                $newToken = unserialize(serialize($token));
+                $newToken->setUser($refreshedUser);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if (!$token->isAuthenticated()) {
+                if (!$newToken->isAuthenticated()) {
+                    $userDeauthenticated = true;
+
                     if (null !== $this->logger) {
-                        $this->logger->debug('Token was deauthenticated after trying to refresh it.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
+                        $this->logger->debug('Cannot refresh token because user has changed.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
                     }
 
-                    return null;
+                    continue;
                 }
+
+                $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
                     $context = array('provider' => \get_class($provider), 'username' => $refreshedUser->getUsername());
@@ -203,6 +209,14 @@ class ContextListener implements ListenerInterface
 
                 $userNotFoundByProvider = true;
             }
+        }
+
+        if ($userDeauthenticated) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Token was deauthenticated after trying to refresh it.');
+            }
+
+            return null;
         }
 
         if ($userNotFoundByProvider) {

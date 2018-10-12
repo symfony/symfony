@@ -4,7 +4,8 @@ CHANGELOG
 4.2.0
 -----
 
- * added support for configuring multiple Memcached servers in one DSN
+ * added support for connecting to Redis clusters via DSN
+ * added support for configuring multiple Memcached servers via DSN
  * added `MarshallerInterface` and `DefaultMarshaller` to allow changing the serializer and provide one that automatically uses igbinary when available
  * added `CacheInterface`, which provides stampede protection via probabilistic early expiration and should become the preferred way to use a cache
  * added sub-second expiry accuracy for backends that support it
@@ -12,7 +13,6 @@ CHANGELOG
  * added automatic table creation when using Doctrine DBAL with PDO-based backends
  * throw `LogicException` when `CacheItem::tag()` is called on an item coming from a non tag-aware pool
  * deprecated `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead
- * deprecated the `AbstractAdapter::createSystemCache()` method
  * deprecated the `AbstractAdapter::unserialize()` and `AbstractCache::unserialize()` methods
  * added `CacheCollectorPass` (originally in `FrameworkBundle`)
  * added `CachePoolClearerPass` (originally in `FrameworkBundle`)

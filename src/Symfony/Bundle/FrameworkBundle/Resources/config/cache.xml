@@ -35,16 +35,15 @@
             <tag name="cache.pool" />
         </service>
 
-        <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\PhpFilesAdapter" abstract="true">
+        <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
+            <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
             <tag name="cache.pool" clearer="cache.system_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
+            <argument /> <!-- version -->
             <argument>%kernel.cache_dir%/pools</argument>
-            <argument>true</argument>
-            <call method="setLogger">
-                <argument type="service" id="logger" on-invalid="ignore" />
-            </call>
+            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">

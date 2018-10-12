@@ -138,10 +138,12 @@ class FileValidator extends ConstraintValidator
         }
 
         $sizeInBytes = filesize($path);
+        $basename = $value instanceof UploadedFile ? $value->getClientOriginalName() : basename($path);
 
         if (0 === $sizeInBytes) {
             $this->context->buildViolation($constraint->disallowEmptyMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
+                ->setParameter('{{ name }}', $this->formatValue($basename))
                 ->setCode(File::EMPTY_ERROR)
                 ->addViolation();
 
@@ -158,6 +160,7 @@ class FileValidator extends ConstraintValidator
                     ->setParameter('{{ size }}', $sizeAsString)
                     ->setParameter('{{ limit }}', $limitAsString)
                     ->setParameter('{{ suffix }}', $suffix)
+                    ->setParameter('{{ name }}', $this->formatValue($basename))
                     ->setCode(File::TOO_LARGE_ERROR)
                     ->addViolation();
 
@@ -189,6 +192,7 @@ class FileValidator extends ConstraintValidator
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setParameter('{{ type }}', $this->formatValue($mime))
                 ->setParameter('{{ types }}', $this->formatValues($mimeTypes))
+                ->setParameter('{{ name }}', $this->formatValue($basename))
                 ->setCode(File::INVALID_MIME_TYPE_ERROR)
                 ->addViolation();
         }

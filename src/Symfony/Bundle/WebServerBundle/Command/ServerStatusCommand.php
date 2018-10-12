@@ -40,7 +40,7 @@ class ServerStatusCommand extends Command
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'The value to display (one of port, host, or address)'),
             ))
-            ->setDescription('Outputs the status of the local web server for the given address')
+            ->setDescription('Outputs the status of the local web server')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> shows the details of the given local web
 server, such as the address and port where it is listening to:

@@ -260,6 +260,15 @@ class ContextListenerTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
+    public function testIfTokenIsNotDeauthenticated()
+    {
+        $tokenStorage = new TokenStorage();
+        $badRefreshedUser = new User('foobar', 'baz');
+        $goodRefreshedUser = new User('foobar', 'bar');
+        $this->handleEventWithPreviousSession($tokenStorage, array(new SupportingUserProvider($badRefreshedUser), new SupportingUserProvider($goodRefreshedUser)), $goodRefreshedUser, true);
+        $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
+    }
+
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()
     {
         $tokenStorage = new TokenStorage();

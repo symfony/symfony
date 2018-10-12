@@ -1,0 +1,28 @@
+services:
+    App\Db:
+        public: true
+        properties:
+            schema: '@App\Schema'
+
+    App\Bus:
+        public: true
+        arguments: ['@App\Db']
+        properties:
+            handler1: '@App\Handler1'
+            handler2: '@App\Handler2'
+
+    App\Handler1:
+        ['@App\Db', '@App\Schema', '@App\Processor']
+
+    App\Handler2:
+        ['@App\Db', '@App\Schema', '@App\Processor']
+
+    App\Processor:
+        ['@App\Registry', '@App\Db']
+
+    App\Registry:
+        properties:
+            processor: ['@App\Db', '@App\Bus']
+
+    App\Schema:
+        arguments: ['@App\Db']

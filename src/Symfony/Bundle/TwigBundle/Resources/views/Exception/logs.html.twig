@@ -1,6 +1,5 @@
 {% set channel_is_defined = (logs|first).channel is defined %}
-
-<table class="logs">
+<table class="logs" data-log-levels="Emergency,Alert,Critical,Error,Warning,Notice,Info,Debug" data-default-log-level="Info">
     <thead>
         <tr>
             <th>Level</th>
@@ -19,7 +18,7 @@
             {% set severity = log.context.exception.severity|default(false) %}
             {% set status = severity is constant('E_DEPRECATED') or severity is constant('E_USER_DEPRECATED') ? 'warning' : 'normal' %}
         {% endif %}
-        <tr class="status-{{ status }}">
+        <tr class="status-{{ status }}" data-log-level="{{ log.priorityName|lower }}">
             <td class="text-small" nowrap>
                 <span class="colored text-bold">{{ log.priorityName }}</span>
                 <span class="text-muted newline">{{ log.timestamp|date('H:i:s') }}</span>
@@ -29,7 +28,12 @@
                     {{ log.channel }}
                 </td>
             {% endif %}
-            <td>{{ log.message|format_log_message(log.context) }}</td>
+            <td>
+                {{ log.message|format_log_message(log.context) }}
+                {% if log.context ?? false %}
+                    <pre class="text-muted prewrap m-t-5">{{ log.context|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES')) }}</pre>
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
     </tbody>

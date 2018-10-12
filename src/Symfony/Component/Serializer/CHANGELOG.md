@@ -23,6 +23,7 @@ CHANGELOG
  * added the optional `$objectClassResolver` argument in `AbstractObjectNormalizer`
    and `ObjectNormalizer` constructor
  * added `MetadataAwareNameConverter` to configure the serialized name of properties through metadata
+ * `YamlEncoder` now handles the `.yml` extension too
 
 4.1.0
 -----

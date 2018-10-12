@@ -34,7 +34,7 @@ class TranslationUpdateCommandTest extends TestCase
     public function testDumpMessagesAndCleanInRootDirectory()
     {
         $this->fs->remove($this->translationDir);
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
@@ -71,7 +71,7 @@ class TranslationUpdateCommandTest extends TestCase
     public function testWriteMessagesInRootDirectory()
     {
         $this->fs->remove($this->translationDir);
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
@@ -90,7 +90,7 @@ class TranslationUpdateCommandTest extends TestCase
     protected function setUp()
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
         $this->fs->mkdir($this->translationDir.'/Resources/translations');
         $this->fs->mkdir($this->translationDir.'/Resources/views');
         $this->fs->mkdir($this->translationDir.'/translations');

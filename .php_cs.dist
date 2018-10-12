@@ -16,6 +16,8 @@ return PhpCsFixer\Config::create()
         'protected_to_private' => false,
         // Part of @Symfony:risky in PHP-CS-Fixer 2.13.0. To be removed from the config file once upgrading
         'native_function_invocation' => array('include' => array('@compiler_optimized'), 'scope' => 'namespaced'),
+        // Part of future @Symfony ruleset in PHP-CS-Fixer To be removed from the config file once upgrading
+        'phpdoc_types_order' => array('null_adjustment' => 'always_last', 'sort_algorithm' => 'none'),
     ))
     ->setRiskyAllowed(true)
     ->setFinder(

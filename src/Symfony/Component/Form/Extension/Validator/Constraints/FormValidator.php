@@ -162,13 +162,13 @@ class FormValidator extends ConstraintValidator
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->setConstraint($constraint);
                 $this->context->buildViolation($config->getOption('extra_fields_message'))
-                    ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))
+                    ->setParameter('{{ extra_fields }}', '"'.implode('", "', array_keys($form->getExtraData())).'"')
                     ->setInvalidValue($form->getExtraData())
                     ->setCode(Form::NO_SUCH_FIELD_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($config->getOption('extra_fields_message'))
-                    ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))
+                    ->setParameter('{{ extra_fields }}', '"'.implode('", "', array_keys($form->getExtraData())).'"')
                     ->setInvalidValue($form->getExtraData())
                     ->setCode(Form::NO_SUCH_FIELD_ERROR)
                     ->addViolation();

@@ -206,7 +206,7 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new DotEnv())->overload($path1, $path2);
+        (new Dotenv())->overload($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -267,7 +267,7 @@ class DotenvTest extends TestCase
     {
         putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('TEST_ENV_VAR_OVERRIDEN' => 'new_value'), true);
 
         $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));

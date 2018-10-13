@@ -4,7 +4,6 @@ CHANGELOG
 4.2.0
 -----
 
- * added `ProcessorInterface`: an optional interface to allow autoconfiguration of Monolog processors
  * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()`
    and `Logger::countErrors()` will have a new `$request` argument in version 5.0, not defining
    it is deprecated

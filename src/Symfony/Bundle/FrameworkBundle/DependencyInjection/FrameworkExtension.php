@@ -17,7 +17,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
-use Symfony\Bridge\Monolog\Processor\ProcessorInterface;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
@@ -343,8 +342,6 @@ class FrameworkExtension extends Extension
                 ->addTag('kernel.reset', array('method' => 'reset'));
         }
 
-        $container->registerForAutoconfiguration(ProcessorInterface::class)
-            ->addTag('monolog.processor');
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)

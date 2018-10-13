@@ -1608,7 +1608,7 @@ class FrameworkExtension extends Extension
         }
 
         $defaultMiddleware = [
-            'before' => [],
+            'before' => [['id' => 'dispatch_after_current_bus']],
             'after' => [['id' => 'send_message'], ['id' => 'handle_message']],
         ];
         foreach ($config['buses'] as $busId => $bus) {

@@ -39,7 +39,7 @@ Autoconfiguration for "Symfony\Component\Console\Command\Command"
   Tag      console.command  
  -------- -----------------
 EOD;
-        $this->assertContains($expectedOutput, $tester->getDisplay());
+        $this->assertContains($expectedOutput, $tester->getDisplay(true));
     }
 
     public function testSearchArgument()
@@ -52,8 +52,8 @@ EOD;
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'logger'));
 
-        $this->assertContains('Psr\Log\LoggerAwareInterface', $tester->getDisplay());
-        $this->assertNotContains('Sensio\Bundle\FrameworkExtraBundle', $tester->getDisplay());
+        $this->assertContains('Psr\Log\LoggerAwareInterface', $tester->getDisplay(true));
+        $this->assertNotContains('Sensio\Bundle\FrameworkExtraBundle', $tester->getDisplay(true));
     }
 
     public function testAutoconfigurationWithMethodCalls()
@@ -66,12 +66,12 @@ EOD;
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'MethodCalls'));
 
-        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\MethodCalls', $tester->getDisplay());
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\MethodCalls', $tester->getDisplay(true));
         $expectedMethodCallOutput = <<<EOD
   Method call   - [setMethodOne, ['@logger']]             
                 - [setMethodTwo, [[paramOne, paramOne]]]
 EOD;
-        $this->assertContains($expectedMethodCallOutput, $tester->getDisplay());
+        $this->assertContains($expectedMethodCallOutput, $tester->getDisplay(true));
     }
 
     public function testAutoconfigurationWithMultipleTagsAttributes()
@@ -84,7 +84,7 @@ EOD;
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'TagsAttributes'));
 
-        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\TagsAttributes', $tester->getDisplay());
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\TagsAttributes', $tester->getDisplay(true));
         $expectedTagsAttributesOutput = <<<EOD
   Tag             debugautoconfiguration.tag1  
   Tag attribute   [                            
@@ -100,7 +100,7 @@ EOD;
                     ]                          
                   ]                            
 EOD;
-        $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay());
+        $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay(true));
     }
 
     public function testAutoconfigurationWithBindings()
@@ -113,13 +113,13 @@ EOD;
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'Bindings'));
 
-        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\Bindings', $tester->getDisplay());
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\Bindings', $tester->getDisplay(true));
         $expectedTagsAttributesOutput = <<<'EOD'
   Bindings   $paramOne: '@logger'       
              $paramTwo: 'binding test'  
 
 EOD;
-        $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay());
+        $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay(true));
     }
 
     public function testSearchIgnoreBackslashWhenFindingInterfaceOrClass()
@@ -131,7 +131,7 @@ EOD;
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:autoconfiguration', 'search' => 'PsrLogLoggerAwareInterface'));
-        $this->assertContains('Psr\Log\LoggerAwareInterface', $tester->getDisplay());
+        $this->assertContains('Psr\Log\LoggerAwareInterface', $tester->getDisplay(true));
     }
 
     public function testSearchNoResults()

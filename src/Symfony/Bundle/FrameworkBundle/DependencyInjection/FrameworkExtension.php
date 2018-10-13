@@ -79,6 +79,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
+use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
@@ -724,6 +726,10 @@ class FrameworkExtension extends Extension
         $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
+        }
+        if (!class_exists(CompiledUrlGenerator::class)) {
+            $argument['generator_class'] = $argument['generator_base_class'];
+            $argument['generator_dumper_class'] = PhpGeneratorDumper::class;
         }
         $router->replaceArgument(2, $argument);
 

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\Mercure;
+namespace Symfony\Component\Mercure\Jwt;
 
 /**
  * Provides a JWT passed as a configuration parameter.

@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\Mercure\Tests;
+namespace Symfony\Component\Mercure\Tests\Jwt;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mercure\StaticJwtProvider;
+use Symfony\Component\Mercure\Jwt\StaticJwtProvider;
 
 class StaticJwtProviderTest extends TestCase
 {

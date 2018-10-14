@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-14T16:38:20Z
+
+Should target 3.4 is suppose. Could you please add a test case also?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-10-14T16:48:42Z
+
+@nicolas-grekas , typehints were added in 4.0 with php 7.0. In 3.4 everything should work fine (see https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Process/Process.php#L1714).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-14T17:16:41Z
+
+OK, so maybe only the test case should target 3.4 then?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-10-14T17:19:12Z
+
+Rebased onto 4.1, since 4.0 is for security fixes only.
+
+Ok, I will add another PR with a test case for 3.4 soon.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-10-14T17:37:08Z
+
+@nicolas-grekas , a test case is ready in #28864
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-10-14T19:39:21Z
+
+Ready!
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-10-14T20:10:12Z
+
+@nicolas-grekas ,  addressed your comment

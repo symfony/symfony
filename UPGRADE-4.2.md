@@ -16,6 +16,7 @@ Config
 
  * Deprecated constructing a `TreeBuilder` without passing root node information.
  * Deprecated `FileLoaderLoadException`, use `LoaderLoadException` instead.
+ * Deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
 
 Console
 -------

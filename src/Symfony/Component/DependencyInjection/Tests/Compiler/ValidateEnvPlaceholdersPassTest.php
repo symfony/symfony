@@ -210,6 +210,38 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    /**
+     * NOT LEGACY (test exception in 5.0).
+     *
+     * @group legacy
+     * @expectedDeprecation Setting path "env_extension.scalar_node_not_empty_validated" to an environment variable is deprecated since Symfony 4.2. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.
+     */
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
+            'scalar_node_not_empty_validated' => '%env(SOME)%',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
+    public function testPartialEnvWhichCannotBeEmptyForScalarNode(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
+            'scalar_node_not_empty_validated' => 'foo %env(SOME)% bar',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
     public function testEnvWithVariableNode(): void
     {
         $container = new ContainerBuilder();
@@ -281,6 +313,14 @@ class EnvConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('scalar_node')->end()
                 ->scalarNode('scalar_node_not_empty')->cannotBeEmpty()->end()
+                ->scalarNode('scalar_node_not_empty_validated')
+                    ->cannotBeEmpty()
+                    ->validate()
+                        ->always(function ($value) {
+                            return $value;
+                        })
+                    ->end()
+                ->end()
                 ->integerNode('int_node')->end()
                 ->floatNode('float_node')->end()
                 ->booleanNode('bool_node')->end()

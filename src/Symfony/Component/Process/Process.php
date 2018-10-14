@@ -1530,13 +1530,13 @@ class Process implements \IteratorAggregate
     /**
      * Escapes a string to be used as a shell argument.
      */
-    private function escapeArgument(string $argument): string
+    private function escapeArgument(?string $argument): string
     {
+        if ('' === $argument || null === $argument) {
+            return '""';
+        }
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             return "'".str_replace("'", "'\\''", $argument)."'";
-        }
-        if ('' === $argument = (string) $argument) {
-            return '""';
         }
         if (false !== strpos($argument, "\0")) {
             $argument = str_replace("\0", '?', $argument);

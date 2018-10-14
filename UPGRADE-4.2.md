@@ -104,6 +104,8 @@ Form
    {% endfor %}
    ```
 
+ * The `regions` option of the `TimezoneType` is deprecated.
+
 HttpFoundation
 --------------
 

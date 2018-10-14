@@ -236,7 +236,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             // ensure that we actually have an error response
             if ($e instanceof HttpExceptionInterface) {
                 // keep the HTTP status code and headers
-                $response->setStatusCode($response->getStatusCode());
                 $response->headers->add($e->getHeaders());
             } else {
                 $response->setStatusCode(500);

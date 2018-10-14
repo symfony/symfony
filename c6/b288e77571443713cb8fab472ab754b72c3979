@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by magnetik at 2018-10-04T10:30:15Z
+
++1 for being clearer about what should work and not to be able to be stricter in the future
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-04T10:33:51Z
+
+@HeahDude Yeah, I am already preparing some PRs to improve DX around this.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-04T11:43:08Z
+
+@HeahDude see #28724
+
+---------------------------------------------------------------------------
+
+by danrot at 2018-10-04T14:08:07Z
+
+@xabbuh Do you already know if this will be accepted? Because if it is not we have to fix our JS, otherwise we would only have to add this version as conflict, and we could release a new working version immediately.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-04T14:48:27Z
+
+@danrot Adding the conflict rule will be enough.
+
+---------------------------------------------------------------------------
+
+by danrot at 2018-10-10T12:00:28Z
+
+I've added the conflict for symfony 3.4.16 and 3.4.17 in our [composer.json](https://github.com/sulu/sulu/blob/master/composer.json#L68), but if you don't set our latest version (1.6.22) as minimum in the project composer.json, composer will install Sulu 1.6.21, so that it can use Symfony 3.4.17, which then still breaks the installation (hope you understand what I mean, otherwise I can elaborate further :see_no_evil:).
+
+So people are really struggling with the installation of our product... Is there any other thing we can do, apart from kindly asking you to get this merged and release it? :blush:
+
+---------------------------------------------------------------------------
+
+by YetiCGN at 2018-10-10T12:05:01Z
+
+> I've added the conflict for symfony 3.4.16 and 3.4.17 in our [composer.json](https://github.com/sulu/sulu/blob/master/composer.json#L68), but if you don't set our latest version (1.6.22) as minimum in the project composer.json, composer will install Sulu 1.6.21, so that it can use Symfony 3.4.17, which then still breaks the installation (hope you understand what I mean, otherwise I can elaborate further 🙈).
+
+Huh? I have ` "sulu/sulu": "~1.6.0",` as a dependency in several projects (all of our Sulu projects, actually) and `composer update` correctly installs Sulu 1.6.22. The only time this would fail is if people did the update last week when Sulu 1.6.22 wasn't out yet but Symfony 3.4.17 was already - like we did. But even then an Update after the release of Sulu 1.6.22 fixed it. Why would you think people are locked to Sulu 1.6.21?
+
+---------------------------------------------------------------------------
+
+by danrot at 2018-10-10T12:19:23Z
+
+Just tested it again, had a project with `"sulu/sulu": "~1.6.22"`, where 1.6.22 was installed, no surpirse so far. Then I changed my `composer.json` in the following way (I assume that's what most Sulu users have in their `composer.json`):
+
+```diff
+-        "sulu/sulu": "~1.6.22",
++        "sulu/sulu": "~1.6.0",
+```
+
+Then I executed another `composer update`, and that's the output:
+
+```
+daniel@macbook ~/D/s/sulu-standard $ composer update
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Package operations: 0 installs, 3 updates, 0 removals
+  - Updating symfony/symfony (v3.4.15 => v3.4.17): Loading from cache
+  - Downgrading sulu/sulu (1.6.22 => 1.6.21):  Checking out c0c04cd95e
+  - Updating dantleech/phpcr-migrations-bundle (1.0.0 => 1.1.0): Loading from cache
+```
+
+In addition to that composer even tells me that Symfony is the reason for not installing 1.6.22:
+```
+daniel@macbook ~/D/s/sulu-standard $ composer why-not sulu/sulu 1.6.22
+sulu/sulu  1.6.22  conflicts  symfony/symfony (2.8.10 || 3.4.12 || 3.4.16 || 3.4.17)
+```
+
+Just realized that it works, if the `"sulu/sulu"` require is before the `"symfony/symfony"` require :confused: Feels a bit weird, but we can't fix that for existing projects :disappointed:
+
+---------------------------------------------------------------------------
+
+by YetiCGN at 2018-10-10T12:34:43Z
+
+> Just realized that it works, if the `"sulu/sulu"` require is before the `"symfony/symfony"` require 😕 Feels a bit weird, but we can't fix that for existing projects 😞
+
+Ah! See, we have ` "config": {
+        "sort-packages": true
+    },` in all our projects, which puts Sulu before Symfony. 🙂
+
+---------------------------------------------------------------------------
+
+by danrot at 2018-10-10T12:54:32Z
+
+And since `sort-packages` will be the default with symfony flex, that doesn't make me feel more comfortable :see_no_evil: That means that if we have a conflict with a package that is ordered after sulu alphabetically there is no way to fix this :confused:
+
+---------------------------------------------------------------------------
+
+by YetiCGN at 2018-10-10T12:58:38Z
+
+Anyhow, please somebody merge this to the LTS branches 2.8 and 3.4 so we can safely rely on backwards compatibility again. 🙂

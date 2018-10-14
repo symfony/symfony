@@ -69,7 +69,7 @@ EOD;
         $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\MethodCalls', $tester->getDisplay(true));
         $expectedMethodCallOutput = <<<EOD
   Method call   - [setMethodOne, ['@logger']]             
-                - [setMethodTwo, [[paramOne, paramOne]]]
+                - [setMethodTwo, [[paramOne, paramOne]]]  
 EOD;
         $this->assertContains($expectedMethodCallOutput, $tester->getDisplay(true));
     }
@@ -112,8 +112,7 @@ EOD;
         $this->assertContains('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DebugAutoconfigurationBundle\Autoconfiguration\Bindings', $tester->getDisplay(true));
         $expectedTagsAttributesOutput = <<<'EOD'
   Bindings   $paramOne: '@logger'       
-             $paramTwo: 'binding test'  
-
+             $paramTwo: 'binding test'
 EOD;
         $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay(true));
     }

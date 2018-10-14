@@ -28,6 +28,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     private $strategy;
     private $voters = array();
     private $decisionLog = array();
+    private $decisionRunning = array();
 
     public function __construct(AccessDecisionManagerInterface $manager)
     {
@@ -49,13 +50,22 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
+        if (!$decisionAlreadyRunning = $this->decisionRunning) {
+            $this->decisionRunning = true;
+        }
+
         $result = $this->manager->decide($token, $attributes, $object);
 
-        $this->decisionLog[] = array(
-            'attributes' => $attributes,
-            'object' => $object,
-            'result' => $result,
-        );
+        // decide can be called by voters, don't log these calls
+        if (!$decisionAlreadyRunning) {
+            $this->decisionRunning = false;
+
+            $this->decisionLog[] = array(
+                'attributes' => $attributes,
+                'object' => $object,
+                'result' => $result,
+            );
+        }
 
         return $result;
     }

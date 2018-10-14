@@ -31,7 +31,7 @@ class ExceptionControllerTest extends TestCase
 
         $response = $controller->showAction($request, $exception, null);
 
-        $this->assertEquals(200, $response->getStatusCode()); // successful request
+        $this->assertEquals(404, $response->getStatusCode()); // successful request
         $this->assertEquals('<html>not found</html>', $response->getContent());
     }
 

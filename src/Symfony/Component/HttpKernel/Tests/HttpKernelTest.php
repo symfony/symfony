@@ -102,7 +102,7 @@ class HttpKernelTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
-            $event->setResponse(new Response($event->getException()->getMessage()));
+            $event->setResponse(new Response($event->getException()->getMessage(), $event->getException()->getStatusCode()));
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new MethodNotAllowedHttpException(array('POST')); });

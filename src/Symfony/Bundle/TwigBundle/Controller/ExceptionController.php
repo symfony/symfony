@@ -68,7 +68,7 @@ class ExceptionController
                 'logger' => $logger,
                 'currentContent' => $currentContent,
             )
-        ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
+        ), $exception->getStatusCode(), array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
     }
 
     /**

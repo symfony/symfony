@@ -232,11 +232,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $response = $event->getResponse();
 
         // the developer asked for a specific status code
-        if (!$event->isAllowingCustomResponseCode() && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+        if (!$event->isAllowingCustomResponseCode()) {
             // ensure that we actually have an error response
             if ($e instanceof HttpExceptionInterface) {
                 // keep the HTTP status code and headers
-                $response->setStatusCode($e->getStatusCode());
+                $response->setStatusCode($response->getStatusCode());
                 $response->headers->add($e->getHeaders());
             } else {
                 $response->setStatusCode(500);

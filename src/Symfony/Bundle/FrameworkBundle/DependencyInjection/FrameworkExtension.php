@@ -67,6 +67,9 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Mercure\Jwt\StaticJwtProvider;
+use Symfony\Component\Mercure\Publisher;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -287,6 +290,10 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['mercure'])) {
+            $this->registerMercureConfiguration($config['mercure'], $container);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
@@ -1666,6 +1673,44 @@ class FrameworkExtension extends Extension
                 $propertyAccessDefinition->setArguments(array(0, false));
             }
         }
+    }
+
+    private function registerMercureConfiguration(array $config, ContainerBuilder $container)
+    {
+        if (!class_exists(Update::class)) {
+            throw new LogicException('Mercure support cannot be enabled as the Mercure component is not installed. Try running "composer require symfony/mercure".');
+        }
+
+        if (!$config['hubs']) {
+            return;
+        }
+
+        $defaultHub = $config['default_hub'] ?? null;
+        foreach ($config['hubs'] as $name => $hub) {
+            if (isset($hub['jwt'])) {
+                $jwtProvider = sprintf('mercure.hub.%s.jwt_provider', $name);
+                $container->register($jwtProvider, StaticJwtProvider::class)->addArgument($hub['jwt']);
+            } else {
+                $jwtProvider = $hub['jwt_provider'];
+            }
+
+            $hubId = sprintf('mercure.hub.%s.publisher', $name);
+            if (!$defaultHub) {
+                $defaultHub = $hubId;
+            }
+
+            $publisherDefinition = $container->register($hubId, Publisher::class)
+                ->addArgument($hub['url'])
+                ->addArgument(new Reference($jwtProvider));
+
+            $bus = $hub['bus'] ?? null;
+            if ($this->messengerConfigEnabled && false !== $bus) {
+                $attributes = null === $bus ? array() : array('bus' => $hub['bus']);
+                $publisherDefinition->addTag('messenger.message_handler', $attributes);
+            }
+        }
+
+        $container->setAlias(Publisher::class, $defaultHub);
     }
 
     /**

@@ -32,6 +32,7 @@
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="mercure" type="mercure" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -416,5 +417,20 @@
             <xsd:element name="argument" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="mercure">
+        <xsd:sequence>
+            <xsd:element name="hub" type="mercure_hub" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="default-hub" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="mercure_hub">
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="url" type="xsd:string" use="required" />
+        <xsd:attribute name="jwt" type="xsd:string" />
+        <xsd:attribute name="jwt_provider" type="xsd:string" />
+        <xsd:attribute name="bus" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

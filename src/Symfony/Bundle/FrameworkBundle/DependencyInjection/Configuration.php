@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
+use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -35,6 +37,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
@@ -106,6 +109,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
         $this->addMessengerSection($rootNode);
+        $this->addMercureSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1127,6 +1131,38 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addMercureSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('mercure')
+                    ->info('Mercure configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(Update::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->fixXmlConfig('hub')
+                    ->children()
+                        ->arrayNode('hubs')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('url')->info('URL of the hub\'s publish endpoint')->example('https://demo.mercure.rocks/publish')->end()
+                                    ->scalarNode('jwt')->info('JSON Web Token to use to publish to this hub.')->end()
+                                    ->scalarNode('jwt_provider')->info('The ID of a service to call to generate the JSON Web Token.')->end()
+                                    ->scalarNode('bus')->info('Name of the Messenger bus where the handler for this hub must be registered. Default to the default bus if Messenger is enabled.')->end()
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) { return isset($v['jwt']) && isset($v['jwt_provider']); })
+                                    ->thenInvalid('"jwt" and "jwt_provider" cannot be used together.')
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('default_hub')->end()
                     ->end()
                 ->end()
             ->end()

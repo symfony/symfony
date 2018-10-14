@@ -16,6 +16,8 @@ namespace Symfony\Component\Mercure;
 /**
  * Publishes an update to the hub.
  *
+ * Can be used as a Symfony Messenger handler too.
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Publisher
@@ -24,7 +26,6 @@ final class Publisher
     private $jwtProvider;
     private $httpClient;
 
-    // TODO: choose a HTTP client library
     public function __construct(string $publishEndpoint, callable $jwtProvider, callable $httpClient = null)
     {
         $this->publishEndpoint = $publishEndpoint;
@@ -86,7 +87,7 @@ final class Publisher
         ))));
 
         if (false === $result) {
-            throw new \RuntimeException('Unable to publish the update to the Mercure hub.');
+            throw new \RuntimeException(sprintf('Unable to publish the update to the Mercure hub: %s', error_get_last()));
         }
     }
 }

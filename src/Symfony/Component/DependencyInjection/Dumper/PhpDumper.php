@@ -233,7 +233,9 @@ class PhpDumper extends Dumper
         $strip = '' === $this->docStar && method_exists('Symfony\Component\HttpKernel\Kernel', 'stripComments');
 
         foreach ($definitions as $definition) {
-            $proxyCode = "\n".$this->getProxyDumper()->getProxyCode($definition);
+            if ("\n" === $proxyCode = "\n".$this->getProxyDumper()->getProxyCode($definition)) {
+                continue;
+            }
             if ($strip) {
                 $proxyCode = "<?php\n".$proxyCode;
                 $proxyCode = substr(Kernel::stripComments($proxyCode), 5);

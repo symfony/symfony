@@ -173,13 +173,15 @@ before_install:
               [[ -e $ext_cache ]] || (tfold ext.symfony_debug "cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && mv modules/symfony_debug.so $ext_cache && phpize --clean")
               echo extension = $ext_cache >> $INI
           elif [[ $PHP = 7.* ]]; then
-              # install libsodium
-              sudo add-apt-repository ppa:ondrej/php -y
-              sudo apt-get update -q
-              sudo apt-get install libsodium-dev -y
+              if ! php --ri sodium > /dev/null; then
+                  # install libsodium
+                  sudo add-apt-repository ppa:ondrej/php -y
+                  sudo apt-get update -q
+                  sudo apt-get install libsodium-dev -y
+                  tfold ext.libsodium tpecl libsodium sodium.so $INI
+              fi
 
               tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-              tfold ext.libsodium tpecl libsodium sodium.so $INI
               tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
           fi
       done

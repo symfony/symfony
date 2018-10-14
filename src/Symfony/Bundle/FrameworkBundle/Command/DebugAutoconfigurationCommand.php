@@ -152,7 +152,7 @@ EOF
         $cloner = new VarCloner();
         $cliDumper = new CliDumper(null, null, AbstractDumper::DUMP_LIGHT_ARRAY);
 
-        return $cliDumper->dump($cloner->cloneVar($tagAttribute), true);
+        return $cliDumper->dump($cloner->cloneVar(current($tagAttribute)), true);
     }
 
     /**

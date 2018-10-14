@@ -88,16 +88,12 @@ EOD;
         $expectedTagsAttributesOutput = <<<EOD
   Tag             debugautoconfiguration.tag1  
   Tag attribute   [                            
-                    [                          
-                      "method" => "debug"      
-                    ]                          
+                    "method" => "debug"        
                   ]                            
                                                
   Tag             debugautoconfiguration.tag2  
   Tag attribute   [                            
-                    [                          
-                      "test"                   
-                    ]                          
+                    "test"                     
                   ]                            
 EOD;
         $this->assertContains($expectedTagsAttributesOutput, $tester->getDisplay(true));

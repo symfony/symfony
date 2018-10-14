@@ -336,7 +336,9 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(ResetInterface::class)
-            ->addTag('kernel.reset', array('method' => 'reset'));
+            ->addTag('kernel.reset', array('method' => 'reset'))
+            ->addTag('kernel.reset2', array('method' => 'reset2'))
+        ;
 
         if (!interface_exists(MarshallerInterface::class)) {
             $container->registerForAutoconfiguration(ResettableInterface::class)

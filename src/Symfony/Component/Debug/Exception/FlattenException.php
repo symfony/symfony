@@ -27,6 +27,7 @@ class FlattenException
     private $code;
     private $previous;
     private $trace;
+    private $traceAsString;
     private $class;
     private $statusCode;
     private $headers;
@@ -239,6 +240,8 @@ class FlattenException
 
     public function setTraceFromThrowable(\Throwable $throwable)
     {
+        $this->traceAsString = $throwable->getTraceAsString();
+
         return $this->setTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
     }
 
@@ -323,5 +326,34 @@ class FlattenException
         $array = new \ArrayObject($value);
 
         return $array['__PHP_Incomplete_Class_Name'];
+    }
+
+    public function getTraceAsString()
+    {
+        return $this->traceAsString;
+    }
+
+    public function getAsString()
+    {
+        $message = '';
+        $next = false;
+
+        foreach (array_reverse(array_merge([$this], $this->getAllPrevious())) as $exception) {
+            if ($next) {
+                $message .= 'Next ';
+            } else {
+                $next = true;
+            }
+            $message .= $exception->getClass();
+
+            if ('' != $exception->getMessage()) {
+                $message .= ': '.$exception->getMessage();
+            }
+
+            $message .= ' in '.$exception->getFile().':'.$exception->getLine().
+                "\nStack trace:\n".$exception->getTraceAsString()."\n\n";
+        }
+
+        return rtrim($message);
     }
 }

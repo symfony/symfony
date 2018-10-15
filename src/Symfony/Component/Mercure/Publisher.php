@@ -81,8 +81,8 @@ final class Publisher
     private function publish(string $url, string $jwt, string $postData)
     {
         $result = @file_get_contents($this->publishEndpoint, false, stream_context_create(array('http' => array(
-            'method'  => 'POST',
-            'header'  => "Content-type: application/x-www-form-urlencoded\r\nAuthorization: Bearer $jwt",
+            'method' => 'POST',
+            'header' => "Content-type: application/x-www-form-urlencoded\r\nAuthorization: Bearer $jwt",
             'content' => $postData,
         ))));
 

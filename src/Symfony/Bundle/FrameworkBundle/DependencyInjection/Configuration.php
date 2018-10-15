@@ -15,7 +15,6 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
-use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

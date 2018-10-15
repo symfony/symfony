@@ -238,7 +238,7 @@ class DateType extends AbstractType
         };
 
         $format = function (Options $options) {
-            return 'single_text' === $options['widget'] ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
+            return 'single_text' === $options['widget'] ? self::HTML5_FORMAT : self::DEFAULT_FORMAT;
         };
 
         $resolver->setDefaults(array(

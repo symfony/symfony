@@ -754,10 +754,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *  * The parameter bag is frozen;
      *  * Extension loading is disabled.
      *
-     * @param bool $resolveEnvPlaceholders Whether %env()% parameters should be resolved using the current
+     * @param bool $resolveEnvPlaceholders whether %env()% parameters should be resolved using the current
      *                                     env vars or be replaced by uniquely identifiable placeholders.
      *                                     Set to "true" when you want to use the current ContainerBuilder
-     *                                     directly, keep to "false" when the container is dumped instead.
+     *                                     directly, keep to "false" when the container is dumped instead
      */
     public function compile(/*$resolveEnvPlaceholders = false*/)
     {

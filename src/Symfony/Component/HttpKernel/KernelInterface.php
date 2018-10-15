@@ -100,6 +100,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Gets the name of the kernel.
      *
      * @return string The kernel name
+     *
+     * @deprecated since Symfony 4.2
      */
     public function getName();
 

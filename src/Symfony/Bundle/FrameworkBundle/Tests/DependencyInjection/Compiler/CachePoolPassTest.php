@@ -35,7 +35,7 @@ class CachePoolPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.root_dir', 'foo');
         $adapter = new Definition();
@@ -57,7 +57,7 @@ class CachePoolPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.root_dir', 'foo');
 
         $container->register('cache.adapter.array', ArrayAdapter::class)->addArgument(0);
@@ -75,7 +75,7 @@ class CachePoolPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('cache.prefix.seed', 'foo');
         $cachePool = new Definition();
@@ -100,7 +100,7 @@ class CachePoolPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('cache.prefix.seed', 'foo');
         $cachePool = new Definition();
@@ -126,7 +126,7 @@ class CachePoolPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.root_dir', 'foo');
         $adapter = new Definition();

@@ -271,7 +271,7 @@ class DoctrineExtensionTest extends TestCase
             'kernel.cache_dir' => __DIR__,
             'kernel.debug' => false,
             'kernel.environment' => 'test',
-            'kernel.name' => 'kernel',
+            'kernel.container_class' => 'kernel',
             'kernel.root_dir' => __DIR__,
         ), $data)));
     }

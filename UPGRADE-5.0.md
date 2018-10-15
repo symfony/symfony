@@ -104,6 +104,22 @@ Form
    ```
  * The `scale` option was removed from the `IntegerType`.
  * The `$scale` argument of the `IntegerToLocalizedStringTransformer` was removed.
+ * Calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+   throws an exception instead of returning empty strings:
+
+   Before:
+   ```twig
+   {% for field in fieldsWithPotentialDuplicates %}
+      {{ form_widget(field) }}
+   {% endfor %}
+   ```
+
+   After:
+   ```twig
+   {% for field in fieldsWithPotentialDuplicates if not field.rendered %}
+      {{ form_widget(field) }}
+   {% endfor %}
+   ```
 
 FrameworkBundle
 ---------------

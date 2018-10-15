@@ -81,11 +81,11 @@ class Email extends Constraint
         }
 
         if (\is_array($options) && array_key_exists('checkMX', $options)) {
-            @trigger_error('The "checkMX" property is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
+            @trigger_error('The "checkMX" option is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
         }
 
         if (\is_array($options) && array_key_exists('checkHost', $options)) {
-            @trigger_error('The "checkHost" property is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
+            @trigger_error('The "checkHost" option is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
         }
 
         if (\is_array($options) && array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {

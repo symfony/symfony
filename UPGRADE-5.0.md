@@ -277,4 +277,4 @@ WebServerBundle
 ---------------
 
 * Omitting the `$environment` argument of  the `ServerRunCommand` and
-  `ServerStartCommand` constructors now throws a `\TypeError.
+  `ServerStartCommand` constructors now throws a `\TypeError`.

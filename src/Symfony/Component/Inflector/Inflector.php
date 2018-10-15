@@ -103,8 +103,8 @@ final class Inflector
         // drives (drive)
         array('sevird', 6, false, true, 'drive'),
 
-        // lives (life), wives (wife)
-        array('sevi', 4, false, true, 'ife'),
+        // lives (life), wives (wife), lives (lives)
+        array('sevi', 4, false, true, 'ife', 'ives'),
 
         // moves (move)
         array('sevom', 5, true, true, 'move'),

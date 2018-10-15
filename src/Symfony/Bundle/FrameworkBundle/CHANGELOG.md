@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * Added a `AbstractController::addLink()` method to add Link headers to the current response
  * Allowed configuring taggable cache pools via a new `framework.cache.pools.tags` option (bool|service-id)
  * Allowed configuring PDO-based cache pools via a new `cache.adapter.pdo` abstract service
  * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead

@@ -41,9 +41,15 @@ final class Envelope
      *
      * @param Envelope|object $message
      */
-    public static function wrap($message): self
+    public static function wrap($message, string $name = null): self
     {
-        return $message instanceof self ? $message : new self($message);
+        $envelope = $message instanceof self ? clone $message : new self($message);
+        if (null !== $name) {
+            return $envelope->with(new MessageConfiguration($name));
+        }
+        unset($envelope->items[MessageConfiguration::class]);
+
+        return $envelope;
     }
 
     /**
@@ -54,15 +60,6 @@ final class Envelope
         $cloned = clone $this;
 
         $cloned->items[\get_class($item)] = $item;
-
-        return $cloned;
-    }
-
-    public function withMessage($message): self
-    {
-        $cloned = clone $this;
-
-        $cloned->message = $message;
 
         return $cloned;
     }
@@ -88,14 +85,10 @@ final class Envelope
         return $this->message;
     }
 
-    /**
-     * @param object $target
-     *
-     * @return Envelope|object The original message or the envelope if the target supports it
-     *                         (i.e implements {@link EnvelopeAwareInterface}).
-     */
-    public function getMessageFor($target)
+    public function getMessageName(): ?string
     {
-        return $target instanceof EnvelopeAwareInterface ? $this : $this->message;
+        $config = $this->items[MessageConfiguration::class] ?? null;
+
+        return $config ? $config->getName() : null;
     }
 }

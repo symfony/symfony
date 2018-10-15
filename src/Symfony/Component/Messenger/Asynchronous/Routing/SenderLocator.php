@@ -38,7 +38,7 @@ class SenderLocator extends AbstractSenderLocator
         }
 
         if (!$sender instanceof SenderInterface) {
-            throw new RuntimeException(sprintf('The sender instance provided for message "%s" should be of type "%s" but got "%s".', \get_class($envelope->getMessage()), SenderInterface::class, \is_object($sender) ? \get_class($sender) : \gettype($sender)));
+            throw new RuntimeException(sprintf('The sender instance provided for message "%s" should be of type "%s" but got "%s".', $envelope->getMessageName() ?? \get_class($envelope->getMessage()), SenderInterface::class, \is_object($sender) ? \get_class($sender) : \gettype($sender)));
         }
 
         return $sender;

@@ -39,7 +39,7 @@ class MessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message): void
+    public function dispatch($message, string $name = null): void
     {
         if (!\is_object($message)) {
             throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
@@ -48,34 +48,15 @@ class MessageBus implements MessageBusInterface
         $middlewareIterator = $this->middlewareAggregate->getIterator();
 
         foreach ($middlewareIterator as $middleware) {
-            $currentEnvelope = Envelope::wrap($message);
-
-            // Do not provide the envelope if the middleware cannot read it:
-            $message = $middleware instanceof EnvelopeAwareInterface ? $currentEnvelope : $currentEnvelope->getMessage();
-
-            $next = static function ($message) use ($middlewareIterator, &$currentEnvelope, &$next) {
+            $next = static function ($envelope) use ($middlewareIterator, &$next) {
                 $middlewareIterator->next();
 
-                if (!$middlewareIterator->valid()) {
-                    return;
+                if ($middlewareIterator->valid()) {
+                    $middlewareIterator->current()->handle($envelope, $next);
                 }
-
-                $middleware = $middlewareIterator->current();
-
-                if ($message instanceof Envelope) {
-                    $currentEnvelope = $message;
-                } else {
-                    $message = $currentEnvelope->withMessage($message);
-                }
-
-                if (!$middleware instanceof EnvelopeAwareInterface) {
-                    $message = $message->getMessage();
-                }
-
-                $middleware->handle($message, $next);
             };
 
-            $middleware->handle($message, $next);
+            $middleware->handle(Envelope::wrap($message), $next);
         }
     }
 }

@@ -22,6 +22,12 @@ abstract class AbstractSenderLocator implements SenderLocatorInterface
 {
     public static function getValueFromMessageRouting(array $mapping, Envelope $envelope)
     {
+        $name = $envelope->getMessageName();
+
+        if (null !== $name && isset($mapping[$name])) {
+            return $mapping[$name];
+        }
+
         if (isset($mapping[$class = \get_class($envelope->getMessage())])) {
             return $mapping[$class];
         }

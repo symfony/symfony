@@ -852,8 +852,8 @@ class HandlerOnUndefinedBus implements MessageSubscriberInterface
 
 class UselessMiddleware implements MiddlewareInterface
 {
-    public function handle($message, callable $next): void
+    public function handle(Envelope $envelope, callable $next): void
     {
-        $next($message);
+        $next($envelope);
     }
 }

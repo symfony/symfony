@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
@@ -19,7 +20,7 @@ class ChainHandlerTest extends TestCase
 {
     public function testItCallsTheHandlers()
     {
-        $message = new DummyMessage('Hey');
+        $message = new Envelope(new DummyMessage('Hey'));
 
         $handler1 = $this->createPartialMock(\stdClass::class, array('__invoke'));
         $handler1

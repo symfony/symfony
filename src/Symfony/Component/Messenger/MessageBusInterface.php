@@ -20,6 +20,8 @@ interface MessageBusInterface
      * Dispatches the given message.
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     * @param string|null     $name    The name to use as dispatching key; when not provided,
+     *                                 this name is derived from the type of the message
      */
-    public function dispatch($message): void;
+    public function dispatch($message, string $name = null): void;
 }

@@ -15,14 +15,13 @@ use Symfony\Component\Messenger\Asynchronous\Routing\AbstractSenderLocator;
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
+class SendMessageMiddleware implements MiddlewareInterface
 {
     private $senderLocator;
     private $messagesToSendAndHandleMapping;
@@ -34,11 +33,9 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
     }
 
     /**
-     * @param Envelope $envelope
-     *
      * {@inheritdoc}
      */
-    public function handle($envelope, callable $next): void
+    public function handle(Envelope $envelope, callable $next): void
     {
         if ($envelope->get(ReceivedMessage::class)) {
             // It's a received message. Do not send it back:

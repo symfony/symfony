@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Store\PdoStore;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -40,7 +41,7 @@ class PdoStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 1000000;
     }
@@ -48,7 +49,7 @@ class PdoStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): StoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);
     }

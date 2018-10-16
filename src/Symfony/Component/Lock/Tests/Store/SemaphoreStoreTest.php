@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -26,7 +27,7 @@ class SemaphoreStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    protected function getStore()
+    protected function getStore(): StoreInterface
     {
         return new SemaphoreStore();
     }

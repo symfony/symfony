@@ -27,7 +27,7 @@ final class Key
         $this->resource = $resource;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }
@@ -52,7 +52,7 @@ final class Key
         return $this->state[$stateKey];
     }
 
-    public function resetLifetime()
+    public function resetLifetime(): void
     {
         $this->expiringTime = null;
     }
@@ -60,7 +60,7 @@ final class Key
     /**
      * @param float $ttl the expiration delay of locks in seconds
      */
-    public function reduceLifetime($ttl)
+    public function reduceLifetime($ttl): void
     {
         $newTime = microtime(true) + $ttl;
 
@@ -82,7 +82,7 @@ final class Key
     /**
      * @return bool
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }

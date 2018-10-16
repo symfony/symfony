@@ -29,7 +29,7 @@ interface StoreInterface
      * @throws LockAcquiringException
      * @throws LockConflictedException
      */
-    public function save(Key $key);
+    public function save(Key $key): void;
 
     /**
      * Waits until a key becomes free, then stores the resource.
@@ -39,7 +39,7 @@ interface StoreInterface
      * @throws LockConflictedException
      * @throws NotSupportedException
      */
-    public function waitAndSave(Key $key);
+    public function waitAndSave(Key $key): void;
 
     /**
      * Extends the ttl of a resource.
@@ -51,19 +51,19 @@ interface StoreInterface
      * @throws LockConflictedException
      * @throws NotSupportedException
      */
-    public function putOffExpiration(Key $key, $ttl);
+    public function putOffExpiration(Key $key, $ttl): void;
 
     /**
      * Removes a resource from the storage.
      *
      * @throws LockReleasingException
      */
-    public function delete(Key $key);
+    public function delete(Key $key): void;
 
     /**
      * Returns whether or not the resource exists in the storage.
      *
      * @return bool
      */
-    public function exists(Key $key);
+    public function exists(Key $key): bool;
 }

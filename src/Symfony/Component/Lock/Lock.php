@@ -66,7 +66,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function acquire($blocking = false)
+    public function acquire($blocking = false): bool
     {
         try {
             if ($blocking) {
@@ -105,7 +105,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function refresh($ttl = null)
+    public function refresh($ttl = null): void
     {
         if (null === $ttl) {
             $ttl = $this->ttl;
@@ -137,7 +137,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function isAcquired()
+    public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
@@ -145,7 +145,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function release()
+    public function release(): void
     {
         try {
             try {
@@ -169,7 +169,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return $this->key->isExpired();
     }

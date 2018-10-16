@@ -29,7 +29,7 @@ class MemcachedStore implements StoreInterface
     /** @var bool */
     private $useExtendedReturn;
 
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return \extension_loaded('memcached');
     }
@@ -55,7 +55,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $token = $this->getUniqueToken($key);
         $key->reduceLifetime($this->initialTtl);
@@ -69,7 +69,7 @@ class MemcachedStore implements StoreInterface
         }
     }
 
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
@@ -77,7 +77,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         if ($ttl < 1) {
             throw new InvalidArgumentException(sprintf('%s() expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
@@ -118,7 +118,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $token = $this->getUniqueToken($key);
 
@@ -142,7 +142,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
     }
@@ -157,7 +157,7 @@ class MemcachedStore implements StoreInterface
         return $key->getState(__CLASS__);
     }
 
-    private function getValueAndCas(Key $key)
+    private function getValueAndCas(Key $key): array
     {
         if (null === $this->useExtendedReturn) {
             $this->useExtendedReturn = version_compare(phpversion('memcached'), '2.9.9', '>');

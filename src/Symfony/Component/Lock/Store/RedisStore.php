@@ -50,7 +50,7 @@ class RedisStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $script = '
             if redis.call("GET", KEYS[1]) == ARGV[1] then
@@ -72,7 +72,7 @@ class RedisStore implements StoreInterface
         }
     }
 
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
@@ -80,7 +80,7 @@ class RedisStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         $script = '
             if redis.call("GET", KEYS[1]) == ARGV[1] then
@@ -103,7 +103,7 @@ class RedisStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $script = '
             if redis.call("GET", KEYS[1]) == ARGV[1] then
@@ -119,7 +119,7 @@ class RedisStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $this->redis->get((string) $key) === $this->getUniqueToken($key);
     }

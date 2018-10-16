@@ -49,7 +49,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $this->decorated->save($key);
     }
@@ -57,7 +57,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         $retry = 0;
         $sleepRandomness = (int) ($this->retrySleep / 10);
@@ -79,7 +79,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         $this->decorated->putOffExpiration($key, $ttl);
     }
@@ -87,7 +87,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $this->decorated->delete($key);
     }
@@ -95,7 +95,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $this->decorated->exists($key);
     }

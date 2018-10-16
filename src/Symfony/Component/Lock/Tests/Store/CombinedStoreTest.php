@@ -29,7 +29,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 250000;
     }
@@ -37,7 +37,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): StoreInterface
     {
         $redis = new \Predis\Client('tcp://'.getenv('REDIS_HOST').':6379');
         try {

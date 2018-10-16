@@ -37,7 +37,7 @@ class CachePoolPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.project_dir', 'foo');
         $adapter = new Definition();
         $adapter->setAbstract(true);
         $adapter->addTag('cache.pool');
@@ -58,7 +58,7 @@ class CachePoolPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.container_class', 'app');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.project_dir', 'foo');
 
         $container->register('cache.adapter.array', ArrayAdapter::class)->addArgument(0);
 
@@ -128,7 +128,7 @@ class CachePoolPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.project_dir', 'foo');
         $adapter = new Definition();
         $adapter->setAbstract(true);
         $adapter->addTag('cache.pool');

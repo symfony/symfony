@@ -29,7 +29,7 @@ class CachePoolClearerPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.project_dir', 'foo');
 
         $globalClearer = new Definition(Psr6CacheClearer::class);
         $container->setDefinition('cache.global_clearer', $globalClearer);

@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * deprecated `Kernel::getRootDir()` and the `kernel.root_dir` parameter
  * deprecated `KernelInterface::getName()` and the `kernel.name` parameter
 
 4.1.0

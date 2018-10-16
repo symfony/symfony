@@ -365,7 +365,7 @@ abstract class AbstractDoctrineExtension extends Extension
             if ($container->hasParameter('cache.prefix.seed')) {
                 $seed = '.'.$container->getParameterBag()->resolveValue($container->getParameter('cache.prefix.seed'));
             } else {
-                $seed = '_'.$container->getParameter('kernel.root_dir');
+                $seed = '_'.$container->getParameter('kernel.project_dir');
             }
             $seed .= '.'.$container->getParameter('kernel.container_class').'.'.$container->getParameter('kernel.environment').'.'.$container->getParameter('kernel.debug');
             $namespace = 'sf_'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.ContainerBuilder::hash($seed);

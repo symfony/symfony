@@ -54,6 +54,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected $bundles = array();
 
     protected $container;
+    /**
+     * @deprecated since Symfony 4.2
+     */
     protected $rootDir;
     protected $environment;
     protected $debug;
@@ -83,7 +86,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     {
         $this->environment = $environment;
         $this->debug = $debug;
-        $this->rootDir = $this->getRootDir();
+        $this->rootDir = $this->getRootDir(false);
         $this->name = $this->getName(false);
     }
 
@@ -281,7 +284,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if (null === $this->name) {
-            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->getProjectDir()));
             if (ctype_digit($this->name[0])) {
                 $this->name = '_'.$this->name;
             }
@@ -308,9 +311,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 4.2, use getProjectDir() instead
      */
-    public function getRootDir()
+    public function getRootDir(/* $triggerDeprecation = true */)
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use getProjectDir() instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         if (null === $this->rootDir) {
             $r = new \ReflectionObject($this);
             $this->rootDir = \dirname($r->getFileName());
@@ -370,7 +379,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getCacheDir()
     {
-        return $this->rootDir.'/cache/'.$this->environment;
+        return $this->getProjectDir().'/var/cache/'.$this->environment;
     }
 
     /**
@@ -378,7 +387,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getLogDir()
     {
-        return $this->rootDir.'/logs';
+        return $this->getProjectDir().'/var/log';
     }
 
     /**
@@ -582,6 +591,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         return array(
+            /*
+             * @deprecated since Symfony 4.2, use kernel.project_dir instead
+             */
             'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,

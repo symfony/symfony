@@ -26,9 +26,19 @@ class TestAppKernel extends Kernel
         );
     }
 
-    public function setRootDir($rootDir)
+    public function setProjectDir($projectDir)
     {
-        $this->rootDir = $rootDir;
+        $this->projectDir = $projectDir;
+    }
+
+    public function getCacheDir()
+    {
+        return $this->getProjectDir().'/Tests/Fixtures/cache.'.$this->environment;
+    }
+
+    public function getLogDir()
+    {
+        return $this->getProjectDir().'/Tests/Fixtures/logs';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

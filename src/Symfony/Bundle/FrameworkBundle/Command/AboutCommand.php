@@ -74,7 +74,6 @@ EOT
             array('Environment', $kernel->getEnvironment()),
             array('Debug', $kernel->isDebug() ? 'true' : 'false'),
             array('Charset', $kernel->getCharset()),
-            array('Root directory', self::formatPath($kernel->getRootDir(), $kernel->getProjectDir())),
             array('Cache directory', self::formatPath($kernel->getCacheDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'),
             array('Log directory', self::formatPath($kernel->getLogDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getLogDir()).'</>)'),
             new TableSeparator(),

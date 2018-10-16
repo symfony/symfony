@@ -272,7 +272,7 @@ class DoctrineExtensionTest extends TestCase
             'kernel.debug' => false,
             'kernel.environment' => 'test',
             'kernel.container_class' => 'kernel',
-            'kernel.root_dir' => __DIR__,
+            'kernel.project_dir' => __DIR__,
         ), $data)));
     }
 }

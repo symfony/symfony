@@ -26,9 +26,7 @@ class CachePoolClearerPassTest extends TestCase
     public function testPoolRefsAreWeak()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
         $container->setParameter('kernel.container_class', 'app');
-        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.project_dir', 'foo');
 
         $globalClearer = new Definition(Psr6CacheClearer::class);

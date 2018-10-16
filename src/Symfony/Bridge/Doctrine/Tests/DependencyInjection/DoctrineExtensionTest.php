@@ -269,8 +269,6 @@ class DoctrineExtensionTest extends TestCase
         return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir' => __DIR__,
-            'kernel.debug' => false,
-            'kernel.environment' => 'test',
             'kernel.container_class' => 'kernel',
             'kernel.project_dir' => __DIR__,
         ), $data)));

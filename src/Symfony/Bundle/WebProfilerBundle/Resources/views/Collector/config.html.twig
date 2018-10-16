@@ -154,13 +154,6 @@
                 <span class="label">Symfony version</span>
             </div>
 
-            {% if 'n/a' != collector.appname %}
-                <div class="metric">
-                    <span class="value">{{ collector.appname }}</span>
-                    <span class="label">Application name</span>
-                </div>
-            {% endif %}
-
             {% if 'n/a' != collector.env %}
                 <div class="metric">
                     <span class="value">{{ collector.env }}</span>

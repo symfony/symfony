@@ -96,6 +96,7 @@ class InflectorTest extends TestCase
             array('leaves', array('leaf', 'leave', 'leaff')),
             array('lice', 'louse'),
             array('lives', 'life'),
+            array('lives', 'live'),
             array('matrices', array('matrex', 'matrix', 'matrice')),
             array('matrixes', 'matrix'),
             array('men', 'man'),

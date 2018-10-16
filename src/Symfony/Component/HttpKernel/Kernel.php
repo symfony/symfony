@@ -276,6 +276,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 4.2
      */
     public function getName(/* $triggerDeprecation = true */)
     {
@@ -440,7 +442,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function getContainerClass()
     {
-        return str_replace('\\', '_', \get_class($this)).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
+        return $this->name.str_replace('\\', '_', \get_class($this)).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
     }
 
     /**

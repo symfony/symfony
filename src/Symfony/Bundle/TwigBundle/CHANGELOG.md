@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated support for legacy templates directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`, use `templates/` and `templates/bundles/<BundleName>/` instead.
+
 4.1.0
 -----
 

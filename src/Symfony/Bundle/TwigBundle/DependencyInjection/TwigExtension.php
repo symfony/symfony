@@ -74,6 +74,7 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.form.resources', $config['form_themes']);
         $container->setParameter('twig.default_path', $config['default_path']);
+        $defaultTwigPath = $container->getParameterBag()->resolveValue($config['default_path']);
 
         $envConfiguratorDefinition = $container->getDefinition('twig.configurator.environment');
         $envConfiguratorDefinition->replaceArgument(0, $config['date']['format']);
@@ -115,14 +116,18 @@ class TwigExtension extends Extension
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+            if ($dir !== $defaultTwigPath) {
+                @trigger_error(sprintf('Templates directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultTwigPath), E_USER_DEPRECATED);
+            }
+
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
         $container->addResource(new FileExistenceResource($dir));
 
-        if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']))) {
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+        if (file_exists($defaultTwigPath)) {
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($defaultTwigPath));
         }
-        $container->addResource(new FileExistenceResource($dir));
+        $container->addResource(new FileExistenceResource($defaultTwigPath));
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
@@ -164,15 +169,19 @@ class TwigExtension extends Extension
     {
         $bundleHierarchy = array();
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
+            $defaultOverrideBundlePath = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name;
+
             if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+                @trigger_error(sprintf('Templates directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultOverrideBundlePath), E_USER_DEPRECATED);
+
                 $bundleHierarchy[$name][] = $dir;
             }
             $container->addResource(new FileExistenceResource($dir));
 
-            if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name)) {
-                $bundleHierarchy[$name][] = $dir;
+            if (file_exists($defaultOverrideBundlePath)) {
+                $bundleHierarchy[$name][] = $defaultOverrideBundlePath;
             }
-            $container->addResource(new FileExistenceResource($dir));
+            $container->addResource(new FileExistenceResource($defaultOverrideBundlePath));
 
             if (file_exists($dir = $bundle['path'].'/Resources/views')) {
                 $bundleHierarchy[$name][] = $dir;

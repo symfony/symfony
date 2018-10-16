@@ -521,7 +521,7 @@ EOF;
         $kernel->boot();
 
         $this->assertSame(__DIR__.'/Fixtures', $kernel->getProjectDir());
-        $this->assertSame(__DIR__.'/Fixtures', $kernel->getContainer()->getParameter('kernel.project_dir'));
+        $this->assertSame(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures', $kernel->getContainer()->getParameter('kernel.project_dir'));
     }
 
     public function testKernelReset()

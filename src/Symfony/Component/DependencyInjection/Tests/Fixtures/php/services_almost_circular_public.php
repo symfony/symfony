@@ -48,6 +48,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'logger' => 'getLoggerService',
             'manager' => 'getManagerService',
             'manager2' => 'getManager2Service',
+            'root' => 'getRootService',
             'subscriber' => 'getSubscriberService',
         );
 
@@ -79,7 +80,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'bar6' => true,
             'config' => true,
             'config2' => true,
+            'level2' => true,
+            'level3' => true,
+            'level4' => true,
+            'level5' => true,
+            'level6' => true,
             'logger2' => true,
+            'multiuse1' => true,
             'subscriber2' => true,
         );
     }
@@ -176,7 +183,6 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $this->services['connection2'] = $instance = new \stdClass(($this->services['dispatcher2'] ?? $this->getDispatcher2Service()), $a);
 
         $b = new \stdClass($instance);
-
         $b->handler2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
 
         $a->logger2 = $b;
@@ -397,6 +403,22 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     }
 
     /**
+     * Gets the public 'root' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getRootService()
+    {
+        $a = new \Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCalls();
+
+        $b = new \stdClass();
+
+        $a->call(new \stdClass(new \stdClass($b, ($this->privates['level5'] ?? $this->getLevel5Service()))));
+
+        return $this->services['root'] = new \stdClass($a, $b);
+    }
+
+    /**
      * Gets the public 'subscriber' shared service.
      *
      * @return \stdClass
@@ -420,5 +442,21 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         }
 
         return $this->privates['bar6'] = new \stdClass($a);
+    }
+
+    /**
+     * Gets the private 'level5' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getLevel5Service()
+    {
+        $a = new \Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCalls();
+
+        $this->privates['level5'] = $instance = new \stdClass($a);
+
+        $a->call($instance);
+
+        return $instance;
     }
 }

@@ -105,7 +105,6 @@
 
         <service id="twig.runtime.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelRuntime">
             <argument type="service" id="fragment.handler" />
-            <tag name="twig.runtime" />
         </service>
 
         <service id="twig.extension.httpfoundation" class="Symfony\Bridge\Twig\Extension\HttpFoundationExtension">

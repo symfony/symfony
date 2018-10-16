@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-10T16:25:23Z
+
+You meant `kernel.root_dir` :)
+
+```diff
+- Remove internal usage of kernel.project_dir when possible
++ Remove internal usage of kernel.root_dir when possible
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T16:31:53Z
+
+indeed, fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T17:30:15Z
+
+Ok, now with the deprecation of the `getRootDir()` method.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-15T20:04:28Z
+
+Should be good now.

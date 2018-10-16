@@ -128,13 +128,14 @@ EOF
         $domain = $input->getOption('domain');
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
+        $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
-        $transPaths = array($kernel->getRootDir(false).'/Resources/translations');
+        $transPaths = array($rootDir.'/Resources/translations');
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = array($kernel->getRootDir(false).'/Resources/views');
+        $viewsPaths = array($rootDir.'/Resources/views');
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
@@ -147,12 +148,12 @@ EOF
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath.'/'.$bundle->getName();
                 }
-                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(false), $bundle->getName());
+                $transPaths[] = sprintf('%s/Resources/%s/translations', $rootDir, $bundle->getName());
                 $viewsPaths = array($bundle->getPath().'/Resources/views');
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$bundle->getName();
                 }
-                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(false), $bundle->getName());
+                $viewsPaths[] = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName());
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
                 $transPaths = array($input->getArgument('bundle').'/Resources/translations');
@@ -168,12 +169,12 @@ EOF
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath.'/'.$bundle->getName();
                 }
-                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(false), $bundle->getName());
+                $transPaths[] = sprintf('%s/Resources/%s/translations', $rootDir, $bundle->getName());
                 $viewsPaths[] = $bundle->getPath().'/Resources/views';
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$bundle->getName();
                 }
-                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(false), $bundle->getName());
+                $viewsPaths[] = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName());
             }
         }
 

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel;
 
@@ -178,18 +179,16 @@ class TranslationDebugCommandTest extends TestCase
 
         $kernel
             ->expects($this->any())
-            ->method('getRootDir')
-            ->will($this->returnValue($this->translationDir));
-
-        $kernel
-            ->expects($this->any())
             ->method('getBundles')
             ->will($this->returnValue(array()));
+
+        $container = new Container();
+        $container->setParameter('kernel.root_dir', $this->translationDir);
 
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
+            ->will($this->returnValue($container));
 
         $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates');
 

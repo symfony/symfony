@@ -17,18 +17,13 @@ use Symfony\Component\Templating\Helper\Helper;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal
+ * @internal since Symfony 4.2, all properties will be private in 5.0
  */
 class CodeHelper extends Helper
 {
     protected $fileLinkFormat;
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    protected $rootDir;
+    protected $rootDir; // to be renamed $projectDir in 5.0
     protected $charset;
-
-    private $projectDir;
 
     /**
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
@@ -38,8 +33,7 @@ class CodeHelper extends Helper
     public function __construct($fileLinkFormat, string $projectDir, string $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        $this->projectDir = str_replace('\\', '/', $projectDir).'/';
-        $this->rootDir = $this->projectDir;
+        $this->rootDir = str_replace('\\', '/', $projectDir).'/';
         $this->charset = $charset;
     }
 
@@ -164,10 +158,10 @@ class CodeHelper extends Helper
         if (null === $text) {
             $file = trim($file);
             $fileStr = $file;
-            if (0 === strpos($fileStr, $this->projectDir)) {
-                $fileStr = str_replace(array('\\', $this->projectDir), array('/', ''), $fileStr);
+            if (0 === strpos($fileStr, $this->rootDir)) {
+                $fileStr = str_replace(array('\\', $this->rootDir), array('/', ''), $fileStr);
                 $fileStr = htmlspecialchars($fileStr, $flags, $this->charset);
-                $fileStr = sprintf('<abbr title="%s">kernel.project_dir</abbr>/%s', htmlspecialchars($this->projectDir, $flags, $this->charset), $fileStr);
+                $fileStr = sprintf('<abbr title="%s">kernel.project_dir</abbr>/%s', htmlspecialchars($this->rootDir, $flags, $this->charset), $fileStr);
             }
 
             $text = sprintf('%s at line %d', $fileStr, $line);

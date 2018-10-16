@@ -123,6 +123,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Gets the application root dir (path of the project's Kernel class).
      *
      * @return string The Kernel root dir
+     *
+     * @deprecated since Symfony 4.2
      */
     public function getRootDir();
 

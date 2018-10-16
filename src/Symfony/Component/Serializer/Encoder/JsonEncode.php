@@ -36,6 +36,10 @@ class JsonEncode implements EncoderInterface
     {
         $context = $this->resolveContext($context);
 
+        if (($rootKey = $context['json_root_key'])) {
+            $data = array($rootKey => $data);
+        }
+
         $encodedJson = json_encode($data, $context['json_encode_options']);
 
         if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($context['json_encode_options'] & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
@@ -60,6 +64,6 @@ class JsonEncode implements EncoderInterface
      */
     private function resolveContext(array $context = array())
     {
-        return array_merge(array('json_encode_options' => $this->options), $context);
+        return array_merge(array('json_encode_options' => $this->options, 'json_root_key' => null), $context);
     }
 }

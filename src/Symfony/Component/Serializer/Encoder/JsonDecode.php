@@ -42,7 +42,7 @@ class JsonDecode implements DecoderInterface
      *
      * @param string $data    The encoded JSON string to decode
      * @param string $format  Must be set to JsonEncoder::FORMAT
-     * @param array  $context An optional set of options for the JSON decoder; see below
+     * @param array  $context an optional set of options for the JSON decoder; see below
      *
      * The $context array is a simple key=>value array, with the following supported keys:
      *
@@ -57,6 +57,9 @@ class JsonDecode implements DecoderInterface
      *
      * json_decode_options: integer
      *      Specifies additional options as per documentation for json_decode.
+     *
+     * json_root_key: string
+     *      Specifies root key and allow to unwrap data
      *
      * @return mixed
      *
@@ -76,6 +79,16 @@ class JsonDecode implements DecoderInterface
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new NotEncodableValueException(json_last_error_msg());
+        }
+
+        if ($rootKey = $context['json_root_key']) {
+            if (\is_array($decodedData) && array_key_exists($rootKey, $decodedData)) {
+                $decodedData = $decodedData[$rootKey];
+            } elseif (\is_object($decodedData) && property_exists($decodedData, $rootKey)) {
+                $decodedData = $decodedData->$rootKey;
+            } else {
+                $decodedData = null;
+            }
         }
 
         return $decodedData;
@@ -100,6 +113,7 @@ class JsonDecode implements DecoderInterface
             'json_decode_associative' => $this->associative,
             'json_decode_recursion_depth' => $this->recursionDepth,
             'json_decode_options' => 0,
+            'json_root_key' => null,
         );
 
         return array_merge($defaultOptions, $context);

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel;
 
@@ -80,6 +81,23 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Storing translations in the "%ssf_translation%s/Resources/translations" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/translations" directory instead.
+     * @expectedDeprecation Storing templates in the "%ssf_translation%s/Resources/views" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/templates" directory instead.
+     */
+    public function testWriteMessagesInLegacyRootDirectory()
+    {
+        $this->fs->remove($this->translationDir);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->fs->mkdir($this->translationDir.'/Resources/translations');
+        $this->fs->mkdir($this->translationDir.'/Resources/views');
+
+        $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo')));
+        $tester->execute(array('command' => 'translation:update', 'locale' => 'en', '--force' => true));
+        $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
+    }
+
     public function testWriteMessagesForSpecificDomain()
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo'), 'mydomain' => array('bar' => 'bar')));
@@ -91,8 +109,6 @@ class TranslationUpdateCommandTest extends TestCase
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
-        $this->fs->mkdir($this->translationDir.'/Resources/translations');
-        $this->fs->mkdir($this->translationDir.'/Resources/views');
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }
@@ -174,10 +190,12 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getBundles')
             ->will($this->returnValue(array()));
 
+        $container = new Container();
+        $container->setParameter('kernel.root_dir', $this->translationDir);
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
+            ->will($this->returnValue($container));
 
         $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates');
 

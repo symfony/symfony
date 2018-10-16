@@ -80,7 +80,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
         $this
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
                 new InputOption('no-prefix', null, InputOption::VALUE_NONE, '[DEPRECATED] If set, no prefix is added to the translations'),
                 new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
@@ -93,7 +93,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
-of a given bundle or the app folder. It can display them or merge the new ones into the translation files.
+of a given bundle or the default translations directory. It can display them or merge the new ones into the translation files.
 
 When new translation strings are found it can automatically add a prefix to the translation
 message.
@@ -102,7 +102,7 @@ Example running against a Bundle (AcmeBundle)
   <info>php %command.full_name% --dump-messages en AcmeBundle</info>
   <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
 
-Example running against app messages (app/Resources folder)
+Example running against default messages directory
   <info>php %command.full_name% --dump-messages en</info>
   <info>php %command.full_name% --force --prefix="new_" fr</info>
 EOF
@@ -171,7 +171,7 @@ EOF
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
-        $currentName = 'app folder';
+        $currentName = 'default directory';
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {

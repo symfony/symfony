@@ -131,7 +131,7 @@ class MessengerPass implements CompilerPassInterface
                         $method = $method['method'] ?? '__invoke';
                     }
 
-                    if (!\class_exists($messageClass) && !\interface_exists($messageClass)) {
+                    if (!\class_exists($messageClass) && !\interface_exists($messageClass, false)) {
                         $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : $r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
 
                         throw new RuntimeException(sprintf('Invalid handler service "%s": message class "%s" %s does not exist.', $serviceId, $messageClass, $messageClassLocation));

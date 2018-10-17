@@ -38,13 +38,13 @@ class MessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message)
+    public function dispatch($message): void
     {
         if (!\is_object($message)) {
             throw new InvalidArgumentException(sprintf('Invalid type for message argument. Expected object, but got "%s".', \gettype($message)));
         }
 
-        return \call_user_func($this->callableForNextMiddleware(0, Envelope::wrap($message)), $message);
+        \call_user_func($this->callableForNextMiddleware(0, Envelope::wrap($message)), $message);
     }
 
     private function callableForNextMiddleware(int $index, Envelope $currentEnvelope): callable
@@ -71,7 +71,7 @@ class MessageBus implements MessageBusInterface
                 $message = $message->getMessage();
             }
 
-            return $middleware->handle($message, $this->callableForNextMiddleware($index + 1, $currentEnvelope));
+            $middleware->handle($message, $this->callableForNextMiddleware($index + 1, $currentEnvelope));
         };
     }
 }

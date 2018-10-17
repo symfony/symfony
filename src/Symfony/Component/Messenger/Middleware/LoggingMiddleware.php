@@ -28,12 +28,12 @@ class LoggingMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle($message, callable $next)
+    public function handle($message, callable $next): void
     {
         $this->logger->debug('Starting handling message {class}', $this->createContext($message));
 
         try {
-            $result = $next($message);
+            $next($message);
         } catch (\Throwable $e) {
             $this->logger->warning('An exception occurred while handling message {class}', array_merge(
                 $this->createContext($message),
@@ -44,8 +44,6 @@ class LoggingMiddleware implements MiddlewareInterface
         }
 
         $this->logger->debug('Finished handling message {class}', $this->createContext($message));
-
-        return $result;
     }
 
     private function createContext($message): array

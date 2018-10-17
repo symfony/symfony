@@ -33,7 +33,7 @@ class TraceableMiddlewareTest extends TestCase
             ->method('handle')
             ->with($message, $this->anything())
             ->will($this->returnCallback(function ($message, callable $next) {
-                return $next($message);
+                $next($message);
             }))
         ;
 
@@ -42,7 +42,6 @@ class TraceableMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('__invoke')
             ->with($message)
-            ->willReturn($expectedReturnedValue = 'Hello')
         ;
 
         $stopwatch = $this->createMock(Stopwatch::class);
@@ -58,7 +57,7 @@ class TraceableMiddlewareTest extends TestCase
 
         $traced = new TraceableMiddleware($middleware, $stopwatch, $busId);
 
-        $this->assertSame($expectedReturnedValue, $traced->handle($envelope, $next));
+        $traced->handle($envelope, $next);
     }
 
     /**
@@ -75,7 +74,7 @@ class TraceableMiddlewareTest extends TestCase
             ->method('handle')
             ->with($message, $this->anything())
             ->will($this->returnCallback(function ($message, callable $next) {
-                return $next($message);
+                $next($message);
             }))
         ;
 

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * The component is not experimental anymore
+ * [BC BREAK] `MessageBusInterface::dispatch()` and `MiddlewareInterface::handle()` now return `void`
  * [BC BREAK] The signature of `Amqp*` classes changed to take a `Connection` as a first argument and an optional
    `Serializer` as a second argument.
  * [BC BREAK] `SenderLocator` has been renamed to `ContainerSenderLocator`

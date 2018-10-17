@@ -27,7 +27,7 @@ class TraceableMessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message)
+    public function dispatch($message): void
     {
         $caller = $this->getCaller();
         $callTime = microtime(true);
@@ -35,17 +35,14 @@ class TraceableMessageBus implements MessageBusInterface
         $envelopeItems = $message instanceof Envelope ? array_values($message->all()) : null;
 
         try {
-            $result = $this->decoratedBus->dispatch($message);
+            $this->decoratedBus->dispatch($message);
 
             $this->dispatchedMessages[] = array(
                 'envelopeItems' => $envelopeItems,
                 'message' => $messageToTrace,
-                'result' => $result,
                 'callTime' => $callTime,
                 'caller' => $caller,
             );
-
-            return $result;
         } catch (\Throwable $e) {
             $this->dispatchedMessages[] = array(
                 'envelopeItems' => $envelopeItems,

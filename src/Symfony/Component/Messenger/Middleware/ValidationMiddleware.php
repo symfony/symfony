@@ -32,7 +32,7 @@ class ValidationMiddleware implements MiddlewareInterface, EnvelopeAwareInterfac
     /**
      * @param Envelope $envelope
      */
-    public function handle($envelope, callable $next)
+    public function handle($envelope, callable $next): void
     {
         $message = $envelope->getMessage();
         $groups = null;
@@ -46,6 +46,6 @@ class ValidationMiddleware implements MiddlewareInterface, EnvelopeAwareInterfac
             throw new ValidationFailedException($message, $violations);
         }
 
-        return $next($envelope);
+        $next($envelope);
     }
 }

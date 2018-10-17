@@ -75,7 +75,12 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return null;
         }
 
-        return $this->metadataFactory->getMetadataFor($class)->getAttributesMetadata()[$propertyName]->getSerializedName() ?? null;
+        $attributesMetadata = $this->metadataFactory->getMetadataFor($class)->getAttributesMetadata();
+        if (!isset($attributesMetadata[$propertyName])) {
+            return null;
+        }
+
+        return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
     }
 
     private function normalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = array()): string

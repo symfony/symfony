@@ -694,6 +694,7 @@
                         var bullet = document.createElement('li');
                         bullet.innerText = level;
                         bullet.setAttribute('data-log-level', String(i));
+                        bullet.setAttribute('title', 'Show logs of level ' + level + ' or higher');
                         bullets.appendChild(bullet);
                         addEventListener(bullet, 'click', function() {
                             if (i === this.parentNode.querySelectorAll('.active').length - 1) {

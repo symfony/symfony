@@ -168,16 +168,6 @@
                     {% endfor %}
                 </td>
             </tr>
-            <tr>
-                <td class="text-bold">Result</td>
-                <td>
-                    {% if dispatchCall.result is defined %}
-                        {{ profiler_dump(dispatchCall.result.seek('value'), maxDepth=2) }}
-                    {% elseif dispatchCall.exception is defined %}
-                        <span class="text-danger">No result as an exception occurred</span>
-                    {% endif %}
-                </td>
-            </tr>
             {% if dispatchCall.exception is defined %}
             <tr>
                 <td class="text-bold">Exception</td>

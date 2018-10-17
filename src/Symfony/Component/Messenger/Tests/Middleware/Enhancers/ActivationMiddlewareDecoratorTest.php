@@ -32,11 +32,11 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $next->expects($this->never())->method('__invoke');
 
         $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($message, $next)->willReturn('Hello from middleware');
+        $middleware->expects($this->once())->method('handle')->with($message, $next);
 
         $decorator = new ActivationMiddlewareDecorator($middleware, true);
 
-        $this->assertSame('Hello from middleware', $decorator->handle($envelope, $next));
+        $decorator->handle($envelope, $next);
     }
 
     public function testExecuteMiddlewareOnActivatedWithCallable()
@@ -51,11 +51,11 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $next->expects($this->never())->method('__invoke');
 
         $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($message, $next)->willReturn('Hello from middleware');
+        $middleware->expects($this->once())->method('handle')->with($message, $next);
 
         $decorator = new ActivationMiddlewareDecorator($middleware, $activated);
 
-        $this->assertSame('Hello from middleware', $decorator->handle($envelope, $next));
+        $decorator->handle($envelope, $next);
     }
 
     public function testExecuteEnvelopeAwareMiddlewareWithEnvelope()
@@ -67,11 +67,11 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $next->expects($this->never())->method('__invoke');
 
         $middleware = $this->createMock(array(MiddlewareInterface::class, EnvelopeAwareInterface::class));
-        $middleware->expects($this->once())->method('handle')->with($envelope, $next)->willReturn('Hello from middleware');
+        $middleware->expects($this->once())->method('handle')->with($envelope, $next);
 
         $decorator = new ActivationMiddlewareDecorator($middleware, true);
 
-        $this->assertSame('Hello from middleware', $decorator->handle($envelope, $next));
+        $decorator->handle($envelope, $next);
     }
 
     public function testExecuteMiddlewareOnDeactivated()
@@ -80,13 +80,13 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $envelope = Envelope::wrap($message);
 
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->once())->method('__invoke')->with($envelope)->willReturn('Hello from $next');
+        $next->expects($this->once())->method('__invoke')->with($envelope);
 
         $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware->expects($this->never())->method('handle');
 
         $decorator = new ActivationMiddlewareDecorator($middleware, false);
 
-        $this->assertSame('Hello from $next', $decorator->handle($envelope, $next));
+        $decorator->handle($envelope, $next);
     }
 }

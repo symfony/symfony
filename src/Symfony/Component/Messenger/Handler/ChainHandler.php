@@ -39,12 +39,8 @@ class ChainHandler
 
     public function __invoke($message)
     {
-        $results = array();
-
         foreach ($this->handlers as $handler) {
-            $results[] = $handler($message);
+            $handler($message);
         }
-
-        return $results;
     }
 }

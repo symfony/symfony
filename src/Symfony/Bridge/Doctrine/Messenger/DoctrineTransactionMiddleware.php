@@ -31,7 +31,7 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
         $this->entityManagerName = $entityManagerName;
     }
 
-    public function handle($message, callable $next)
+    public function handle($message, callable $next): void
     {
         $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
 
@@ -41,7 +41,7 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
 
         $entityManager->getConnection()->beginTransaction();
         try {
-            $result = $next($message);
+            $next($message);
             $entityManager->flush();
             $entityManager->getConnection()->commit();
         } catch (\Throwable $exception) {
@@ -49,7 +49,5 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
 
             throw $exception;
         }
-
-        return $result;
     }
 }

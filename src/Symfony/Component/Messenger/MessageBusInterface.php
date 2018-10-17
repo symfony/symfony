@@ -19,11 +19,7 @@ interface MessageBusInterface
     /**
      * Dispatches the given message.
      *
-     * The bus can return a value coming from handlers, but is not required to do so.
-     *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
-     *
-     * @return mixed
      */
-    public function dispatch($message);
+    public function dispatch($message): void;
 }

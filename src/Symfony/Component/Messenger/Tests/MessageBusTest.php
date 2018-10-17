@@ -39,7 +39,7 @@ class MessageBusTest extends TestCase
         (new MessageBus())->dispatch('wrong');
     }
 
-    public function testItCallsMiddlewareAndChainTheReturnValue()
+    public function testItCallsMiddleware()
     {
         $message = new DummyMessage('Hello');
         $responseFromDepthMiddleware = 1234;
@@ -49,21 +49,21 @@ class MessageBusTest extends TestCase
             ->method('handle')
             ->with($message, $this->anything())
             ->will($this->returnCallback(function ($message, $next) {
-                return $next($message);
+                $next($message);
             }));
 
         $secondMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $secondMiddleware->expects($this->once())
             ->method('handle')
             ->with($message, $this->anything())
-            ->willReturn($responseFromDepthMiddleware);
+        ;
 
         $bus = new MessageBus(array(
             $firstMiddleware,
             $secondMiddleware,
         ));
 
-        $this->assertEquals($responseFromDepthMiddleware, $bus->dispatch($message));
+        $bus->dispatch($message);
     }
 
     public function testItKeepsTheEnvelopeEvenThroughAMiddlewareThatIsNotEnvelopeAware()
@@ -76,7 +76,7 @@ class MessageBusTest extends TestCase
             ->method('handle')
             ->with($message, $this->anything())
             ->will($this->returnCallback(function ($message, $next) {
-                return $next($message);
+                $next($message);
             }));
 
         $secondMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();
@@ -104,7 +104,7 @@ class MessageBusTest extends TestCase
             ->method('handle')
             ->with($envelope, $this->anything())
             ->will($this->returnCallback(function ($message, $next) {
-                return $next($message->with(new AnEnvelopeStamp()));
+                $next($message->with(new AnEnvelopeStamp()));
             }));
 
         $secondMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
@@ -112,7 +112,7 @@ class MessageBusTest extends TestCase
             ->method('handle')
             ->with($message, $this->anything())
             ->will($this->returnCallback(function ($message, $next) {
-                return $next($message);
+                $next($message);
             }));
 
         $thirdMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();
@@ -143,7 +143,7 @@ class MessageBusTest extends TestCase
             ->method('handle')
             ->with($message, $this->anything())
             ->will($this->returnCallback(function ($message, $next) use ($changedMessage) {
-                return $next($changedMessage);
+                $next($changedMessage);
             }));
 
         $secondMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();

@@ -18,10 +18,10 @@ use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
  */
 class AllowNoHandlerMiddleware implements MiddlewareInterface
 {
-    public function handle($message, callable $next)
+    public function handle($message, callable $next): void
     {
         try {
-            return $next($message);
+            $next($message);
         } catch (NoHandlerForMessageException $e) {
             // We allow not having a handler for this message.
         }

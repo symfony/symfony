@@ -48,14 +48,14 @@ class MessengerDataCollectorTest extends TestCase
 
         $collector->lateCollect();
 
-        $messages = $collector->getMessages();
+        $messages = iterator_to_array($collector->getMessages());
         $this->assertCount(1, $messages);
 
         $file = __FILE__;
         $expected = <<<DUMP
 array:4 [
   "bus" => "default"
-  "stamps" => null
+  "stamps" => []
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
@@ -93,14 +93,14 @@ DUMP;
 
         $collector->lateCollect();
 
-        $messages = $collector->getMessages();
+        $messages = iterator_to_array($collector->getMessages());
         $this->assertCount(1, $messages);
 
         $file = __FILE__;
         $this->assertStringMatchesFormat(<<<DUMP
 array:5 [
   "bus" => "default"
-  "stamps" => null
+  "stamps" => []
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
@@ -141,7 +141,7 @@ DUMP
 
         $collector->lateCollect();
 
-        $messages = $collector->getMessages();
+        $messages = iterator_to_array($collector->getMessages());
         $this->assertCount(5, $messages);
 
         $this->assertSame('#1', $messages[0]['message']['value']['message']);

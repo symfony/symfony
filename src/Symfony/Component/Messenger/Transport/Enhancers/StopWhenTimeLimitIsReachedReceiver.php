@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Enhancers;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
@@ -32,13 +33,13 @@ class StopWhenTimeLimitIsReachedReceiver implements ReceiverInterface
 
     public function receive(callable $handler): void
     {
-        $startTime = time();
+        $startTime = microtime(true);
         $endTime = $startTime + $this->timeLimitInSeconds;
 
-        $this->decoratedReceiver->receive(function ($message) use ($handler, $endTime) {
-            $handler($message);
+        $this->decoratedReceiver->receive(function (?Envelope $envelope) use ($handler, $endTime) {
+            $handler($envelope);
 
-            if ($endTime < time()) {
+            if ($endTime < microtime(true)) {
                 $this->stop();
                 if (null !== $this->logger) {
                     $this->logger->info('Receiver stopped due to time limit of {timeLimit}s reached', array('timeLimit' => $this->timeLimitInSeconds));

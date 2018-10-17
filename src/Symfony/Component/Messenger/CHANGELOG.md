@@ -27,6 +27,12 @@ CHANGELOG
  * `Envelope`'s constructor and `with()` method now accept `StampInterface` objects as variadic parameters
  * Renamed and moved `ReceivedMessage`, `ValidationConfiguration` and `SerializerConfiguration` in the `Stamp` namespace
  * Removed the `WrapIntoReceivedMessage`
+ * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
+ * `MessengerDataCollector::getMessages()` returns an iterable, not just an array anymore
+ * `AbstractHandlerLocator` is now internal
+ * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope)`
+ * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
+ * `SenderInterface::send()` returns `void`
 
 4.1.0
 -----

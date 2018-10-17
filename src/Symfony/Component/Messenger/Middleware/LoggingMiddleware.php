@@ -32,27 +32,21 @@ class LoggingMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, callable $next): void
     {
         $message = $envelope->getMessage();
-        $this->logger->debug('Starting handling message {class}', $this->createContext($message));
+        $context = array(
+            'message' => $message,
+            'name' => \get_class($message),
+        );
+        $this->logger->debug('Starting handling message {name}', $context);
 
         try {
             $next($envelope);
         } catch (\Throwable $e) {
-            $this->logger->warning('An exception occurred while handling message {class}', array_merge(
-                $this->createContext($message),
-                array('exception' => $e)
-            ));
+            $context['exception'] = $e;
+            $this->logger->warning('An exception occurred while handling message {name}', $context);
 
             throw $e;
         }
 
-        $this->logger->debug('Finished handling message {class}', $this->createContext($message));
-    }
-
-    private function createContext($message): array
-    {
-        return array(
-            'message' => $message,
-            'class' => \get_class($message),
-        );
+        $this->logger->debug('Finished handling message {name}', $context);
     }
 }

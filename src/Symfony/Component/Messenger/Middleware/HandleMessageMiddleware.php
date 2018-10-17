@@ -19,11 +19,11 @@ use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {
-    private $messageHandlerResolver;
+    private $messageHandlerLocator;
 
-    public function __construct(HandlerLocatorInterface $messageHandlerResolver)
+    public function __construct(HandlerLocatorInterface $messageHandlerLocator)
     {
-        $this->messageHandlerResolver = $messageHandlerResolver;
+        $this->messageHandlerLocator = $messageHandlerLocator;
     }
 
     /**
@@ -31,10 +31,8 @@ class HandleMessageMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, callable $next): void
     {
-        $message = $envelope->getMessage();
-        $handler = $this->messageHandlerResolver->resolve($message);
-        $handler($message);
-
+        $handler = $this->messageHandlerLocator->getHandler($envelope);
+        $handler($envelope->getMessage());
         $next($envelope);
     }
 }

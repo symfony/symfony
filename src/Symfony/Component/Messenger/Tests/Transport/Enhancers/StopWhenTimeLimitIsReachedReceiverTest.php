@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Enhancers;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\CallbackReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Enhancers\StopWhenTimeLimitIsReachedReceiver;
@@ -25,7 +26,7 @@ class StopWhenTimeLimitIsReachedReceiverTest extends TestCase
     public function testReceiverStopsWhenTimeLimitIsReached()
     {
         $callable = function ($handler) {
-            $handler(new DummyMessage('API'));
+            $handler(new Envelope(new DummyMessage('API')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)

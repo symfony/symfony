@@ -11,30 +11,33 @@
 
 namespace Symfony\Component\Messenger\Handler\Locator;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 
 /**
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @internal
  */
 abstract class AbstractHandlerLocator implements HandlerLocatorInterface
 {
-    public function resolve($message): callable
+    public function getHandler(Envelope $envelope): callable
     {
-        $class = \get_class($message);
+        $class = \get_class($envelope->getMessage());
 
-        if ($handler = $this->getHandler($class)) {
+        if ($handler = $this->getHandlerByName($class)) {
             return $handler;
         }
 
-        foreach (class_implements($class, false) as $interface) {
-            if ($handler = $this->getHandler($interface)) {
+        foreach (class_parents($class) as $name) {
+            if ($handler = $this->getHandlerByName($name)) {
                 return $handler;
             }
         }
 
-        foreach (class_parents($class, false) as $parent) {
-            if ($handler = $this->getHandler($parent)) {
+        foreach (class_implements($class) as $name) {
+            if ($handler = $this->getHandlerByName($name)) {
                 return $handler;
             }
         }
@@ -42,5 +45,5 @@ abstract class AbstractHandlerLocator implements HandlerLocatorInterface
         throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $class));
     }
 
-    abstract protected function getHandler(string $class): ?callable;
+    abstract protected function getHandlerByName(string $name): ?callable;
 }

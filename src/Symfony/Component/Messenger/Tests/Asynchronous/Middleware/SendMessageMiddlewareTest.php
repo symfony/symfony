@@ -158,7 +158,7 @@ class InMemorySenderLocator implements SenderLocatorInterface
         $this->sender = $sender;
     }
 
-    public function getSenderForMessage($message): ?SenderInterface
+    public function getSender(Envelope $envelope): ?SenderInterface
     {
         return $this->sender;
     }

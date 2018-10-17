@@ -44,21 +44,17 @@ class SendMessageMiddleware implements MiddlewareInterface
             return;
         }
 
-        $sender = $this->senderLocator->getSenderForMessage($envelope->getMessage());
+        $sender = $this->senderLocator->getSender($envelope);
 
         if ($sender) {
             $sender->send($envelope);
 
-            if (!$this->mustSendAndHandle($envelope->getMessage())) {
+            if (!AbstractSenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $envelope)) {
+                // message has no corresponding handler
                 return;
             }
         }
 
         $next($envelope);
-    }
-
-    private function mustSendAndHandle($message): bool
-    {
-        return (bool) AbstractSenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $message);
     }
 }

@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-30T08:04:03Z
+
+Is this still needed given that #26332 was merged?
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-06-30T08:29:28Z
+
+This follow the last, this PR add a 'help_attr', like 'label_attr' for exemple. That permit to configure the 'help' entry.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-15T09:54:37Z
+
+@mpiot LGTM, can you please rebase here?
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-09-15T11:22:14Z
+
+@xabbuh yes, I do that on Monday ;-) And I'll see to add a part about that in the doc
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-21T09:21:51Z
+
+We need to update the constraints for the Form component in the `composer.json` file of the Twig bridge to conflict with releases before 4.2.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-09-21T10:16:38Z
+
+Mmm, sorry I don't really know what to do :-/
+Change the:
+    "require-dev": {
+        ...
+        "symfony/form": "^4.1",
+        ...
+    },
+    "conflict": {
+        ...
+        "symfony/form": "^4.1",
+        ...
+    },
+
+I replace all 4.1 per ... ? 4.2 ? But I need to declare somewhere the version change ?
+
+And I need to do the same in the Twig Bridge ?
+
+I'm so sorry, I don't really know how it works.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-09-26T11:31:50Z
+
+@xabbuh Thanks
+
+ I try to understand errors with deps=high. On my machine when I do something like:
+
+    cd src/Symfony/Bundle/FrameworkBundle/
+    composer update --no-progress --no-suggest --ansi
+    phpunit --exclude-group tty,benchmark,intl-data
+
+And tests are OK, I don't see the difference with Travis, because I use the same commands as in the travis test.
+
+Edit: I try to add the form version requirement in the FrameworkBundle too
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-01T09:53:52Z
+
+@mpiot This is a bit tricky. We use Travis to ensure that 4.1 versions of components work with 4.2 dependencies. The form theme tests are not very flexible as they mainly just compare the rendered HTML. I try to find a way to relax them a bit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T11:21:58Z
+
+I've not reviewed this PR but I've spotted a merge commit in the history. @mpiot Can you rebase to get rid of it (as PR with merge commits cannot be merged)? Thank you.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-10-16T09:49:03Z
+
+@xabbuh thanks, so there's no way to pass the tests right now?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-16T10:45:39Z
+
+@mpiot I try to look into it tonight.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-16T20:10:43Z
+
+If I don't miss anything here, tests would pass just when we merge this into the `master` branch. We *could* skip the new tests in case the Form component is not available in a compatible version, but that would only be needed for this PR. Afterwards, FrameworkBundle as well as TwigBridge will conflict with these versions of the Form component. So IMO not worth it to me and I vote for just merging as is.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-10-16T20:21:08Z
+
+Thank you for the time you spent watching this :-)
+
+I'll write the doc asap :-)

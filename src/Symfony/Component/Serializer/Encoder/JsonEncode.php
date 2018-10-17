@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
@@ -21,10 +22,12 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 class JsonEncode implements EncoderInterface
 {
     private $options;
+    private $propertyAccessor;
 
     public function __construct(int $bitmask = 0)
     {
         $this->options = $bitmask;
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -36,8 +39,8 @@ class JsonEncode implements EncoderInterface
     {
         $context = $this->resolveContext($context);
 
-        if (($rootKey = $context['json_root_key'])) {
-            $data = array($rootKey => $data);
+        if ($propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH]) {
+            $data = $this->wrapEncodableData($propertyPath, $data);
         }
 
         $encodedJson = json_encode($data, $context['json_encode_options']);
@@ -64,6 +67,23 @@ class JsonEncode implements EncoderInterface
      */
     private function resolveContext(array $context = array())
     {
-        return array_merge(array('json_encode_options' => $this->options, 'json_root_key' => null), $context);
+        return array_merge(array('json_encode_options' => $this->options, JsonEncoder::JSON_PROPERTY_PATH => null), $context);
+    }
+
+    /**
+     * Wrap data before encoding.
+     *
+     * @param string $propertyPath
+     * @param mixed  $data
+     *
+     * @return array
+     */
+    private function wrapEncodableData($propertyPath, $data)
+    {
+        $wrappedData = array();
+
+        $this->propertyAccessor->setValue($wrappedData, $propertyPath, $data);
+
+        return $wrappedData;
     }
 }

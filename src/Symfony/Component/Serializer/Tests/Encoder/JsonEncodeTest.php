@@ -46,7 +46,7 @@ class JsonEncodeTest extends TestCase
         return array(
             array(array(), '[]', array()),
             array(array(), '{}', array('json_encode_options' => JSON_FORCE_OBJECT)),
-            array(array('bar' => 'foo'), '{"baz":{"bar":"foo"}}', array('json_root_key' => 'baz')),
+            array(array('bar' => 'foo'), '{"baz":{"bar":"foo"}}', array(JsonEncoder::JSON_PROPERTY_PATH => '[baz]')),
         );
     }
 

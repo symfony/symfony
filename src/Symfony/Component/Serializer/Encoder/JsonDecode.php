@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
@@ -24,6 +25,7 @@ class JsonDecode implements DecoderInterface
 
     private $associative;
     private $recursionDepth;
+    private $propertyAccessor;
 
     /**
      * Constructs a new JsonDecode instance.
@@ -35,6 +37,7 @@ class JsonDecode implements DecoderInterface
     {
         $this->associative = $associative;
         $this->recursionDepth = $depth;
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -58,8 +61,8 @@ class JsonDecode implements DecoderInterface
      * json_decode_options: integer
      *      Specifies additional options as per documentation for json_decode.
      *
-     * json_root_key: string
-     *      Specifies root key and allow to unwrap data
+     * JSON_PROPERTY_PATH: string
+     *      Specifies property path and allow to unwrap data
      *
      * @return mixed
      *
@@ -81,11 +84,9 @@ class JsonDecode implements DecoderInterface
             throw new NotEncodableValueException(json_last_error_msg());
         }
 
-        if ($rootKey = $context['json_root_key']) {
-            if (\is_array($decodedData) && array_key_exists($rootKey, $decodedData)) {
-                $decodedData = $decodedData[$rootKey];
-            } elseif (\is_object($decodedData) && property_exists($decodedData, $rootKey)) {
-                $decodedData = $decodedData->$rootKey;
+        if ($propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH]) {
+            if ($this->propertyAccessor->isReadable($decodedData, $propertyPath)) {
+                $decodedData = $this->propertyAccessor->getValue($decodedData, $propertyPath);
             } else {
                 $decodedData = null;
             }
@@ -113,7 +114,7 @@ class JsonDecode implements DecoderInterface
             'json_decode_associative' => $this->associative,
             'json_decode_recursion_depth' => $this->recursionDepth,
             'json_decode_options' => 0,
-            'json_root_key' => null,
+            JsonEncoder::JSON_PROPERTY_PATH => null,
         );
 
         return array_merge($defaultOptions, $context);

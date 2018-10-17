@@ -51,6 +51,26 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
+    public function testHelpAttr()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'Help text test!',
+            'help_attr' => array(
+                'class' => 'class-test',
+            ),
+        ));
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="class-test help-text"]
+    [.="[trans]Help text test![/trans]"]
+'
+        );
+    }
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported

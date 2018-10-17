@@ -17,6 +17,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   empty_data               
   error_bubbling           
   help                     
+  help_attr                
   inherit_data             
   label                    
   label_attr               

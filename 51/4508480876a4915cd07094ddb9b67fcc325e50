@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-12T16:09:12Z
+
+I think the intention was to have something like `This form should not contain extra fields: "notes1", "notes2", "notes3"`
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2018-10-12T16:13:50Z
+
+Congrats on your first Symfony pull request! :tada:
+
+For the merger team: an alternative could be add the extra quotes before and after the imploded fields, but I agree with the style proposed (it's unlikely that form field names will contain commas, and the extra quotes get escaped in APIs using JSON format making it look ugly).
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by danielkay at 2018-10-15T08:58:29Z
+
+@fabpot Unfortunately it isn't doing so... I feel we should take the code one way or the other - would with quotes or without quotes be better? Without the first and last quote feels weird...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-16T00:56:29Z
+
+I would add the missing quotes instead of removing them to be consistent with the way we display other error messages.
+
+---------------------------------------------------------------------------
+
+by danielkay at 2018-10-17T11:31:22Z
+
+added missing quotes as per suggestion from @fabpot

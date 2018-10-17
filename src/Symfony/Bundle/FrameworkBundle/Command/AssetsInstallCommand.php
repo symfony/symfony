@@ -22,6 +22,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Command that places bundle web assets into a given directory.
@@ -89,11 +90,12 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!is_dir($targetArg)) {
-            $targetArg = $kernel->getContainer()->getParameter('kernel.project_dir').'/'.$targetArg;
+            $targetArg = $kernel->getProjectDir().'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
                 throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));

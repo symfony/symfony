@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T16:19:49Z
+
+To further clarify, this makes the `null` value explicit. It can only come from a default parameter (`env(SOME): ~`). A real env can never be `null`, so without a default, passing `""` is the better assumption.

@@ -60,7 +60,6 @@ EOT
 
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
-        $projectDir = $kernel->getContainer()->getParameter('kernel.project_dir');
 
         $rows = array(
             array('<info>Symfony</>'),
@@ -75,8 +74,8 @@ EOT
             array('Environment', $kernel->getEnvironment()),
             array('Debug', $kernel->isDebug() ? 'true' : 'false'),
             array('Charset', $kernel->getCharset()),
-            array('Cache directory', self::formatPath($kernel->getCacheDir(), $projectDir).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'),
-            array('Log directory', self::formatPath($kernel->getLogDir(), $projectDir).' (<comment>'.self::formatFileSize($kernel->getLogDir()).'</>)'),
+            array('Cache directory', self::formatPath($kernel->getCacheDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'),
+            array('Log directory', self::formatPath($kernel->getLogDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getLogDir()).'</>)'),
             new TableSeparator(),
             array('<info>PHP</>'),
             new TableSeparator(),

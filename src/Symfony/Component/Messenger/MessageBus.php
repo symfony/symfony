@@ -11,28 +11,39 @@
 
 namespace Symfony\Component\Messenger;
 
-use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Matthias Noback <matthiasnoback@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class MessageBus implements MessageBusInterface
 {
-    private $middlewareHandlers;
-
-    /**
-     * @var MiddlewareInterface[]|null
-     */
-    private $indexedMiddlewareHandlers;
+    private $middlewareAggregate;
 
     /**
      * @param MiddlewareInterface[]|iterable $middlewareHandlers
      */
     public function __construct(iterable $middlewareHandlers = array())
     {
-        $this->middlewareHandlers = $middlewareHandlers;
+        if ($middlewareHandlers instanceof \IteratorAggregate) {
+            $this->middlewareAggregate = $middlewareHandlers;
+        } elseif (\is_array($middlewareHandlers)) {
+            $this->middlewareAggregate = new \ArrayObject($middlewareHandlers);
+        } else {
+            $this->middlewareAggregate = new class() {
+                public $aggregate;
+                public $iterator;
+
+                public function getIterator()
+                {
+                    return $this->aggregate = new \ArrayObject(iterator_to_array($this->iterator, false));
+                }
+            };
+            $this->middlewareAggregate->aggregate = &$this->middlewareAggregate;
+            $this->middlewareAggregate->iterator = $middlewareHandlers;
+        }
     }
 
     /**
@@ -41,24 +52,26 @@ class MessageBus implements MessageBusInterface
     public function dispatch($message): void
     {
         if (!\is_object($message)) {
-            throw new InvalidArgumentException(sprintf('Invalid type for message argument. Expected object, but got "%s".', \gettype($message)));
+            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
         }
+        $middlewareIterator = $this->middlewareAggregate->getIterator();
 
-        $this->callableForNextMiddleware(0)($message instanceof Envelope ? $message : new Envelope($message));
-    }
-
-    private function callableForNextMiddleware(int $index): callable
-    {
-        if (null === $this->indexedMiddlewareHandlers) {
-            $this->indexedMiddlewareHandlers = \is_array($this->middlewareHandlers) ? array_values($this->middlewareHandlers) : iterator_to_array($this->middlewareHandlers, false);
+        while ($middlewareIterator instanceof \IteratorAggregate) {
+            $middlewareIterator = $middlewareIterator->getIterator();
         }
+        $middlewareIterator->rewind();
 
-        if (!isset($this->indexedMiddlewareHandlers[$index])) {
-            return static function () {};
+        if (!$middlewareIterator->valid()) {
+            return;
         }
+        $next = static function (Envelope $envelope) use ($middlewareIterator, &$next) {
+            $middlewareIterator->next();
 
-        return function (Envelope $envelope) use ($index) {
-            $this->indexedMiddlewareHandlers[$index]->handle($envelope, $this->callableForNextMiddleware($index + 1));
+            if ($middlewareIterator->valid()) {
+                $middlewareIterator->current()->handle($envelope, $next);
+            }
         };
+
+        $middlewareIterator->current()->handle($message instanceof Envelope ? $message : new Envelope($message), $next);
     }
 }

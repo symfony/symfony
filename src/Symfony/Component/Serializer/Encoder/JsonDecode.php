@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
@@ -38,7 +39,9 @@ class JsonDecode implements DecoderInterface
         self::ASSOCIATIVE => false,
         self::OPTIONS => 0,
         self::RECURSION_DEPTH => 512,
+        JsonEncoder::JSON_PROPERTY_PATH => null,
     ];
+    private $propertyAccessor;
 
     /**
      * Constructs a new JsonDecode instance.
@@ -57,6 +60,7 @@ class JsonDecode implements DecoderInterface
         }
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -64,7 +68,7 @@ class JsonDecode implements DecoderInterface
      *
      * @param string $data    The encoded JSON string to decode
      * @param string $format  Must be set to JsonEncoder::FORMAT
-     * @param array  $context An optional set of options for the JSON decoder; see below
+     * @param array  $context an optional set of options for the JSON decoder; see below
      *
      * The $context array is a simple key=>value array, with the following supported keys:
      *
@@ -80,6 +84,9 @@ class JsonDecode implements DecoderInterface
      * json_decode_options: integer
      *      Specifies additional options as per documentation for json_decode
      *
+     * JSON_PROPERTY_PATH: string
+     *      Specifies property path and allow to unwrap data
+     *
      * @return mixed
      *
      * @throws NotEncodableValueException
@@ -91,11 +98,19 @@ class JsonDecode implements DecoderInterface
         $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
         $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
         $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
-
+        $propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH] ?? $this->defaultContext[JsonEncoder::JSON_PROPERTY_PATH];
         $decodedData = json_decode($data, $associative, $recursionDepth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new NotEncodableValueException(json_last_error_msg());
+        }
+
+        if ($propertyPath) {
+            if ($this->propertyAccessor->isReadable($decodedData, $propertyPath)) {
+                $decodedData = $this->propertyAccessor->getValue($decodedData, $propertyPath);
+            } else {
+                $decodedData = null;
+            }
         }
 
         return $decodedData;

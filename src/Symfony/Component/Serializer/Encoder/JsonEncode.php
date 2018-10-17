@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
@@ -24,13 +25,16 @@ class JsonEncode implements EncoderInterface
 
     private $defaultContext = [
         self::OPTIONS => 0,
+        JsonEncoder::JSON_PROPERTY_PATH => null,
     ];
+    private $propertyAccessor;
 
     /**
      * @param array $defaultContext
      */
     public function __construct($defaultContext = [])
     {
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         if (!\is_array($defaultContext)) {
             @trigger_error(sprintf('Passing an integer as first parameter of the "%s()" method is deprecated since Symfony 4.2, use the "json_encode_options" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
 
@@ -48,8 +52,12 @@ class JsonEncode implements EncoderInterface
     public function encode($data, $format, array $context = [])
     {
         $jsonEncodeOptions = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
-        $encodedJson = json_encode($data, $jsonEncodeOptions);
+        $propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH] ?? $this->defaultContext[JsonEncoder::JSON_PROPERTY_PATH];
 
+        if ($propertyPath) {
+            $data = $this->wrapEncodableData($propertyPath, $data);
+        }
+        $encodedJson = json_encode($data, $jsonEncodeOptions);
         if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($jsonEncodeOptions & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
             throw new NotEncodableValueException(json_last_error_msg());
         }
@@ -63,5 +71,22 @@ class JsonEncode implements EncoderInterface
     public function supportsEncoding($format)
     {
         return JsonEncoder::FORMAT === $format;
+    }
+
+    /**
+     * Wrap data before encoding.
+     *
+     * @param string $propertyPath
+     * @param mixed  $data
+     *
+     * @return array
+     */
+    private function wrapEncodableData($propertyPath, $data)
+    {
+        $wrappedData = array();
+
+        $this->propertyAccessor->setValue($wrappedData, $propertyPath, $data);
+
+        return $wrappedData;
     }
 }

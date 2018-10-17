@@ -49,10 +49,15 @@ class JsonDecodeTest extends TestCase
 
         $assoc = ['foo' => 'bar'];
 
-        return [
-            ['{"foo": "bar"}', $stdClass, []],
-            ['{"foo": "bar"}', $assoc, ['json_decode_associative' => true]],
-        ];
+        return array(
+            array('{"foo": "bar"}', $stdClass, array()),
+            array('{"foo": "bar"}', $assoc, array('json_decode_associative' => true)),
+            array('{"baz": {"foo": "bar"}}', $stdClass, array(JsonEncoder::JSON_PROPERTY_PATH => 'baz')),
+            array('{"baz": {"foo": "bar"}}', null, array(JsonEncoder::JSON_PROPERTY_PATH => 'baz.inner')),
+            array('{"baz": {"foo": "bar"}}', $assoc, array(JsonEncoder::JSON_PROPERTY_PATH => '[baz]', 'json_decode_associative' => true)),
+            array('{"baz": {"foo": "bar"}}', $assoc, array(JsonEncoder::JSON_PROPERTY_PATH => '[baz]', 'json_decode_associative' => true)),
+            array('{"baz": {"foo": "bar", "inner": {"key": "value"}}}', array('key' => 'value'), array(JsonEncoder::JSON_PROPERTY_PATH => '[baz][inner]', 'json_decode_associative' => true)),
+        );
     }
 
     /**

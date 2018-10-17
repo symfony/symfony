@@ -18,7 +18,8 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 class JsonEncoder implements EncoderInterface, DecoderInterface
 {
-    const FORMAT = 'json';
+    public const FORMAT = 'json';
+    public const JSON_PROPERTY_PATH = 'json_property_path';
 
     protected $encodingImpl;
     protected $decodingImpl;

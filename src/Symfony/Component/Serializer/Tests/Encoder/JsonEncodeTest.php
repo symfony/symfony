@@ -46,6 +46,7 @@ class JsonEncodeTest extends TestCase
         return [
             [[], '[]', []],
             [[], '{}', ['json_encode_options' => JSON_FORCE_OBJECT]],
+            [['bar' => 'foo'], '{"baz":{"bar":"foo"}}', [JsonEncoder::JSON_PROPERTY_PATH => '[baz]']],
         ];
     }
 

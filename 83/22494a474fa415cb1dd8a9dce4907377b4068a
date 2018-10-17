@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Koc at 2018-10-11T16:40:14Z
+
+seems like this PR also fixes #8467, but not sure
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-17T12:12:12Z
+
+@Koc I'm linking your issue as being fixed by this PR. I'll let you reopen an issue if that's not the case.

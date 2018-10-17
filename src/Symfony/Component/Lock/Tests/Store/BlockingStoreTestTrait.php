@@ -25,7 +25,7 @@ trait BlockingStoreTestTrait
      *
      * @return StoreInterface
      */
-    abstract protected function getStore();
+    abstract protected function getStore(): StoreInterface;
 
     /**
      * Tests blocking locks thanks to pcntl.

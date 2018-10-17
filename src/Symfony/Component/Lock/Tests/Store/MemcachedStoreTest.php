@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Store\MemcachedStore;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -37,7 +38,7 @@ class MemcachedStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 1000000;
     }
@@ -45,7 +46,7 @@ class MemcachedStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): StoreInterface
     {
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);

@@ -13,7 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\StoreFactory;
-use Symfony\Component\Lock\Store\ZookeeperStore;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
@@ -22,7 +22,7 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  */
 class ZookeeperStoreTest extends AbstractStoreTest
 {
-    public function getStore(): ZookeeperStore
+    public function getStore(): StoreInterface
     {
         $zookeeper_server = getenv('ZOOKEEPER_HOST').':2181';
 

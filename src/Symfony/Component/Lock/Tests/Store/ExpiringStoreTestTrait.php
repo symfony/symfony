@@ -24,12 +24,12 @@ trait ExpiringStoreTestTrait
      *
      * @return int
      */
-    abstract protected function getClockDelay();
+    abstract protected function getClockDelay(): int;
 
     /**
      * @see AbstractStoreTest::getStore()
      */
-    abstract protected function getStore();
+    abstract protected function getStore(): StoreInterface;
 
     /**
      * Tests the store automatically delete the key when it expire.

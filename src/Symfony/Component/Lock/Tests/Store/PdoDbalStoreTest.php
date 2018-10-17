@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Lock\Store\PdoStore;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -41,7 +42,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 1000000;
     }
@@ -49,7 +50,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): StoreInterface
     {
         return new PdoStore(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)));
     }

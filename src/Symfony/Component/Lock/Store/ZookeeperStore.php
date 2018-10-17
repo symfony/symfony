@@ -35,7 +35,7 @@ class ZookeeperStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         if ($this->exists($key)) {
             return;
@@ -50,7 +50,7 @@ class ZookeeperStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         if (!$this->exists($key)) {
             return;
@@ -81,7 +81,7 @@ class ZookeeperStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         throw new NotSupportedException();
     }
@@ -89,7 +89,7 @@ class ZookeeperStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         throw new NotSupportedException();
     }
@@ -103,7 +103,7 @@ class ZookeeperStore implements StoreInterface
      * @throws LockConflictedException
      * @throws LockAcquiringException
      */
-    private function createNewLock(string $node, string $value)
+    private function createNewLock(string $node, string $value): void
     {
         // Default Node Permissions
         $acl = array(array('perms' => \Zookeeper::PERM_ALL, 'scheme' => 'world', 'id' => 'anyone'));

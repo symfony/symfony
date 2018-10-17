@@ -58,7 +58,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $successCount = 0;
         $failureCount = 0;
@@ -90,7 +90,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
@@ -98,7 +98,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         $successCount = 0;
         $failureCount = 0;
@@ -144,7 +144,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         foreach ($this->stores as $store) {
             try {
@@ -158,7 +158,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $successCount = 0;
         $failureCount = 0;

@@ -11,28 +11,30 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class HandleMessageMiddleware implements MiddlewareInterface
+class HandleMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
 {
-    private $messageHandlerResolver;
+    private $messageHandlerLocator;
 
-    public function __construct(HandlerLocatorInterface $messageHandlerResolver)
+    public function __construct(HandlerLocatorInterface $messageHandlerLocator)
     {
-        $this->messageHandlerResolver = $messageHandlerResolver;
+        $this->messageHandlerLocator = $messageHandlerLocator;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Envelope $envelope
      */
-    public function handle($message, callable $next): void
+    public function handle($envelope, callable $next): void
     {
-        $handler = $this->messageHandlerResolver->resolve($message);
-        $handler($message);
+        $handler = $this->messageHandlerLocator->getHandler($envelope);
+        $handler($envelope->getMessage());
 
-        $next($message);
+        $next($envelope);
     }
 }

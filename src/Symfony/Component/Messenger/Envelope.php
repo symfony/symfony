@@ -27,6 +27,9 @@ final class Envelope
      */
     public function __construct($message, array $items = array())
     {
+        if (!\is_object($message)) {
+            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object but got %s.', __METHOD__, \gettype($message)));
+        }
         $this->message = $message;
         foreach ($items as $item) {
             $this->items[\get_class($item)] = $item;

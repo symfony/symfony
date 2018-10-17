@@ -20,6 +20,12 @@ CHANGELOG
  * [BC BREAK] The `EncoderInterface` and `DecoderInterface` have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
  * [BC BREAK] The locator passed to `ContainerHandlerLocator` should not prefix its keys by "handler." anymore
  * [BC BREAK] The `AbstractHandlerLocator::getHandler()` method uses `?callable` as return type
+ * [BC BREAK] `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
+ * [BC BREAK] `MessengerDataCollector::getMessages()` returns an iterable, not just an array anymore
+ * [BC BREAK] `AbstractHandlerLocator` is now internal
+ * [BC BREAK] `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope, bool $allowNoHandler = false)`
+ * [BC BREAK] `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
+ * [BC BREAK] `SenderInterface::send()` returns `void`
 
 4.1.0
 -----

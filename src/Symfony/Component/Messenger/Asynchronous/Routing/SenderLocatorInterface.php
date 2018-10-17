@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Asynchronous\Routing;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 
 /**
@@ -21,10 +22,6 @@ interface SenderLocatorInterface
 {
     /**
      * Gets the sender (if applicable) for the given message object.
-     *
-     * @param object $message
-     *
-     * @return SenderInterface|null
      */
-    public function getSenderForMessage($message): ?SenderInterface;
+    public function getSender(Envelope $envelope): ?SenderInterface;
 }

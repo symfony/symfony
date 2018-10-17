@@ -29,8 +29,8 @@ class HandlerLocator extends AbstractHandlerLocator
     /**
      * {@inheritdoc}
      */
-    protected function getHandler(string $class): ?callable
+    protected function getHandlerByName(string $name): ?callable
     {
-        return $this->messageToHandlerMapping[$class] ?? null;
+        return $this->messageToHandlerMapping[$name] ?? null;
     }
 }

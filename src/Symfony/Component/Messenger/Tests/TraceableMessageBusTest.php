@@ -32,7 +32,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
-            'envelopeItems' => null,
+            'envelopeItems' => array(),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
@@ -82,7 +82,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertArraySubset(array(
             'message' => $message,
             'exception' => $exception,
-            'envelopeItems' => null,
+            'envelopeItems' => array(),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,

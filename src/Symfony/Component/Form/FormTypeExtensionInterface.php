@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @method getExtendedTypes(): iterable
+ * @method static iterable getExtendedTypes() Gets the extended types - not implementing it is deprecated since Symfony 4.2
  */
 interface FormTypeExtensionInterface
 {

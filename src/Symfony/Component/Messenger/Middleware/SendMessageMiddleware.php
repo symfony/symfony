@@ -34,11 +34,11 @@ class SendMessageMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, callable $next): void
+    public function handle(Envelope $envelope, StackInterface $stack): void
     {
         if ($envelope->get(ReceivedStamp::class)) {
             // It's a received message. Do not send it back:
-            $next($envelope);
+            $stack->next()->handle($envelope, $stack);
 
             return;
         }
@@ -54,6 +54,6 @@ class SendMessageMiddleware implements MiddlewareInterface
             }
         }
 
-        $next($envelope);
+        $stack->next()->handle($envelope, $stack);
     }
 }

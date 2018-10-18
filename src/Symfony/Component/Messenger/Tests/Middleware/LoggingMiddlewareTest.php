@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
-class LoggingMiddlewareTest extends TestCase
+class LoggingMiddlewareTest extends MiddlewareTestCase
 {
     public function testDebugLogAndNextMiddleware()
     {
@@ -29,14 +29,8 @@ class LoggingMiddlewareTest extends TestCase
             ->expects($this->exactly(2))
             ->method('debug')
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($envelope)
-        ;
 
-        (new LoggingMiddleware($logger))->handle($envelope, $next);
+        (new LoggingMiddleware($logger))->handle($envelope, $this->getStackMock());
     }
 
     /**
@@ -56,14 +50,13 @@ class LoggingMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('warning')
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
+        $stack = $this->createMock(StackInterface::class);
+        $stack
             ->expects($this->once())
-            ->method('__invoke')
-            ->with($envelope)
+            ->method('next')
             ->willThrowException(new \Exception())
         ;
 
-        (new LoggingMiddleware($logger))->handle($envelope, $next);
+        (new LoggingMiddleware($logger))->handle($envelope, $stack);
     }
 }

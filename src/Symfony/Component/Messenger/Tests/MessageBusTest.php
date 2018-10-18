@@ -48,8 +48,8 @@ class MessageBusTest extends TestCase
         $firstMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
-            ->will($this->returnCallback(function ($envelope, $next) {
-                $next($envelope);
+            ->will($this->returnCallback(function ($envelope, $stack) {
+                $stack->next()->handle($envelope, $stack);
             }));
 
         $secondMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
@@ -76,16 +76,16 @@ class MessageBusTest extends TestCase
         $firstMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
-            ->will($this->returnCallback(function ($envelope, $next) {
-                $next($envelope->with(new AnEnvelopeStamp()));
+            ->will($this->returnCallback(function ($envelope, $stack) {
+                $stack->next()->handle($envelope->with(new AnEnvelopeStamp()), $stack);
             }));
 
         $secondMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $secondMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelopeWithAnotherStamp, $this->anything())
-            ->will($this->returnCallback(function ($envelope, $next) {
-                $next($envelope);
+            ->will($this->returnCallback(function ($envelope, $stack) {
+                $stack->next()->handle($envelope, $stack);
             }));
 
         $thirdMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
@@ -115,8 +115,8 @@ class MessageBusTest extends TestCase
         $firstMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
-            ->will($this->returnCallback(function ($message, $next) use ($expectedEnvelope) {
-                $next($expectedEnvelope);
+            ->will($this->returnCallback(function ($envelope, $stack) use ($expectedEnvelope) {
+                $stack->next()->handle($expectedEnvelope, $stack);
             }));
 
         $secondMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();

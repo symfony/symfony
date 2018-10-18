@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -64,14 +65,8 @@ class MessageBus implements MessageBusInterface
         if (!$middlewareIterator->valid()) {
             return;
         }
-        $next = static function (Envelope $envelope) use ($middlewareIterator, &$next) {
-            $middlewareIterator->next();
+        $stack = new StackMiddleware($middlewareIterator);
 
-            if ($middlewareIterator->valid()) {
-                $middlewareIterator->current()->handle($envelope, $next);
-            }
-        };
-
-        $middlewareIterator->current()->handle($message instanceof Envelope ? $message : new Envelope($message), $next);
+        $middlewareIterator->current()->handle($message instanceof Envelope ? $message : new Envelope($message), $stack);
     }
 }

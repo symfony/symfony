@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 
 /**
@@ -30,21 +31,19 @@ class ChainHandler
      */
     public function __construct(array $handlers)
     {
-        if (empty($handlers)) {
+        if (!$handlers) {
             throw new InvalidArgumentException('A collection of message handlers requires at least one handler.');
         }
 
         $this->handlers = $handlers;
     }
 
-    public function __invoke($message)
+    public function __invoke(Envelope $envelope)
     {
-        $results = array();
+        $message = $envelope->getMessage();
 
         foreach ($this->handlers as $handler) {
-            $results[] = $handler($message);
+            $handler($message);
         }
-
-        return $results;
     }
 }

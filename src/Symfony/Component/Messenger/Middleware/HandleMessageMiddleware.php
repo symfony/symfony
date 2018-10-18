@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
 
 /**
@@ -18,23 +19,20 @@ use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {
-    private $messageHandlerResolver;
+    private $messageHandlerLocator;
 
-    public function __construct(HandlerLocatorInterface $messageHandlerResolver)
+    public function __construct(HandlerLocatorInterface $messageHandlerLocator, bool $allowNoHandler = false)
     {
-        $this->messageHandlerResolver = $messageHandlerResolver;
+        $this->messageHandlerLocator = $messageHandlerLocator;
+        $this->allowNoHandler = $allowNoHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle($message, callable $next)
+    public function handle(Envelope $envelope, callable $next): void
     {
-        $handler = $this->messageHandlerResolver->resolve($message);
-        $result = $handler($message);
+        if ($handler = $this->messageHandlerLocator->getHandler($envelope, $this->allowNoHandler)) {
+            $handler($envelope->getMessage());
+        }
 
-        $next($message);
-
-        return $result;
+        $next($envelope);
     }
 }

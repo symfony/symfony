@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware\Enhancers;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
@@ -20,7 +19,7 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class ActivationMiddlewareDecorator implements MiddlewareInterface, EnvelopeAwareInterface
+class ActivationMiddlewareDecorator implements MiddlewareInterface
 {
     private $inner;
     private $activated;
@@ -35,14 +34,14 @@ class ActivationMiddlewareDecorator implements MiddlewareInterface, EnvelopeAwar
     }
 
     /**
-     * @param Envelope $envelope
+     * {@inheritdoc}
      */
-    public function handle($envelope, callable $next)
+    public function handle(Envelope $envelope, callable $next): void
     {
         if (\is_callable($this->activated) ? ($this->activated)($envelope) : $this->activated) {
-            return $this->inner->handle($envelope->getMessageFor($this->inner), $next);
+            $this->inner->handle($envelope, $next);
+        } else {
+            $next($envelope);
         }
-
-        return $next($envelope);
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Asynchronous\Routing;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
@@ -18,21 +20,30 @@ namespace Symfony\Component\Messenger\Asynchronous\Routing;
  */
 abstract class AbstractSenderLocator implements SenderLocatorInterface
 {
-    public static function getValueFromMessageRouting(array $mapping, $message)
+    public static function getValueFromMessageRouting(array $mapping, Envelope $envelope)
     {
-        if (isset($mapping[\get_class($message)])) {
-            return $mapping[\get_class($message)];
-        }
-        if ($parentsMapping = array_intersect_key($mapping, class_parents($message))) {
-            return current($parentsMapping);
-        }
-        if ($interfaceMapping = array_intersect_key($mapping, class_implements($message))) {
-            return current($interfaceMapping);
-        }
-        if (isset($mapping['*'])) {
-            return $mapping['*'];
+        $name = $envelope->getMessageName();
+
+        if (null !== $name && isset($mapping[$name])) {
+            return $mapping[$name];
         }
 
-        return null;
+        if (isset($mapping[$class = \get_class($envelope->getMessage())])) {
+            return $mapping[$class];
+        }
+
+        foreach (class_parents($class) as $name) {
+            if (isset($mapping[$name])) {
+                return $mapping[$name];
+            }
+        }
+
+        foreach (class_implements($class) as $name) {
+            if (isset($mapping[$name])) {
+                return $mapping[$name];
+            }
+        }
+
+        return $mapping['*'] ?? null;
     }
 }

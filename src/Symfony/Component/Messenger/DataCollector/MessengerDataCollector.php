@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\VarDumper\Caster\ClassStub;
-use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -55,14 +54,10 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         }
 
         // Order by call time
-        usort($messages, function (array $a, array $b): int {
-            return $a[1] > $b[1] ? 1 : -1;
-        });
+        usort($messages, function ($a, $b) { return $a[1] <=> $b[1]; });
 
         // Keep the messages clones only
-        $this->data['messages'] = array_map(function (array $item): Data {
-            return $item[0];
-        }, $messages);
+        $this->data['messages'] = array_column($messages, 0);
     }
 
     /**
@@ -98,14 +93,6 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
             'caller' => $tracedMessage['caller'],
         );
 
-        if (array_key_exists('result', $tracedMessage)) {
-            $result = $tracedMessage['result'];
-            $debugRepresentation['result'] = array(
-                'type' => \is_object($result) ? \get_class($result) : \gettype($result),
-                'value' => $result,
-            );
-        }
-
         if (isset($tracedMessage['exception'])) {
             $exception = $tracedMessage['exception'];
 
@@ -120,18 +107,21 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
 
     public function getExceptionsCount(string $bus = null): int
     {
-        return array_reduce($this->getMessages($bus), function (int $carry, Data $message) {
-            return $carry += isset($message['exception']) ? 1 : 0;
-        }, 0);
+        $count = 0;
+        foreach ($this->getMessages($bus) as $message) {
+            $count += (int) isset($message['exception']);
+        }
+
+        return $count;
     }
 
-    public function getMessages(string $bus = null): array
+    public function getMessages(string $bus = null): iterable
     {
-        $messages = $this->data['messages'] ?? array();
-
-        return $bus ? array_filter($messages, function (Data $message) use ($bus): bool {
-            return $bus === $message['bus'];
-        }) : $messages;
+        foreach ($this->data['messages'] ?? array() as $message) {
+            if (null === $bus || $bus === $message['bus']) {
+                yield $message;
+            }
+        }
     }
 
     public function getBuses(): array

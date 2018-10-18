@@ -38,12 +38,9 @@ class ValidationMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('__invoke')
             ->with($envelope)
-            ->willReturn('Hello')
         ;
 
-        $result = (new ValidationMiddleware($validator))->handle($envelope, $next);
-
-        $this->assertSame('Hello', $result);
+        (new ValidationMiddleware($validator))->handle($envelope, $next);
     }
 
     public function testValidateWithConfigurationAndNextMiddleware()
@@ -61,12 +58,9 @@ class ValidationMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('__invoke')
             ->with($envelope)
-            ->willReturn('Hello')
         ;
 
-        $result = (new ValidationMiddleware($validator))->handle($envelope, $next);
-
-        $this->assertSame('Hello', $result);
+        (new ValidationMiddleware($validator))->handle($envelope, $next);
     }
 
     /**

@@ -101,8 +101,8 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
         $this->assertSame($expectedOutput.<<<'TXT'
 Get envelope with message: Symfony\Component\Messenger\Tests\Fixtures\DummyMessage
-with items: [
-    "Symfony\\Component\\Messenger\\Asynchronous\\Transport\\ReceivedMessage"
+with stamps: [
+    "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp"
 ]
 Done.
 

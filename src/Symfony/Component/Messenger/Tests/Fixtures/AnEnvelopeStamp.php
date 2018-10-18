@@ -9,15 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger;
+namespace Symfony\Component\Messenger\Tests\Fixtures;
 
-/**
- * An envelope item related to a message.
- *
- * This item must be serializable for transport.
- *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- */
-interface EnvelopeItemInterface
+use Symfony\Component\Messenger\Stamp\StampInterface;
+
+class AnEnvelopeStamp implements StampInterface
 {
 }

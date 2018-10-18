@@ -13,10 +13,10 @@ namespace Symfony\Component\Messenger\Asynchronous\Middleware;
 
 use Symfony\Component\Messenger\Asynchronous\Routing\AbstractSenderLocator;
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
-use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -40,7 +40,7 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
      */
     public function handle($envelope, callable $next)
     {
-        if ($envelope->get(ReceivedMessage::class)) {
+        if ($envelope->get(ReceivedStamp::class)) {
             // It's a received message. Do not send it back:
             return $next($envelope);
         }

@@ -159,9 +159,9 @@
                 <td>{{ profiler_dump(dispatchCall.message.value, maxDepth=2) }}</td>
             </tr>
             <tr>
-                <td class="text-bold">Envelope items</td>
+                <td class="text-bold">Envelope stamps</td>
                 <td>
-                    {% for item in dispatchCall.envelopeItems %}
+                    {% for item in dispatchCall.stamps %}
                         {{ profiler_dump(item) }}
                     {% else %}
                         <span class="text-muted">No items</span>

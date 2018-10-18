@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Asynchronous\Transport;
+namespace Symfony\Component\Messenger\Stamp;
 
 use Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware;
-use Symfony\Component\Messenger\EnvelopeItemInterface;
 
 /**
  * Marker config for a received message.
@@ -24,6 +23,6 @@ use Symfony\Component\Messenger\EnvelopeItemInterface;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-final class ReceivedMessage implements EnvelopeItemInterface
+final class ReceivedStamp implements StampInterface
 {
 }

@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeItem;
+use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
 
@@ -34,7 +34,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertArraySubset(array(
             'message' => $message,
             'result' => $result,
-            'envelopeItems' => null,
+            'stamps' => null,
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
@@ -45,7 +45,7 @@ class TraceableMessageBusTest extends TestCase
 
     public function testItTracesResultWithEnvelope()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hello'))->with($envelopeItem = new AnEnvelopeItem());
+        $envelope = Envelope::wrap($message = new DummyMessage('Hello'))->with($stamp = new AnEnvelopeStamp());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
         $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($result = array('foo' => 'bar'));
@@ -57,7 +57,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertArraySubset(array(
             'message' => $message,
             'result' => $result,
-            'envelopeItems' => array($envelopeItem),
+            'stamps' => array($stamp),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
@@ -86,7 +86,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertArraySubset(array(
             'message' => $message,
             'exception' => $exception,
-            'envelopeItems' => null,
+            'stamps' => null,
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,

@@ -13,8 +13,8 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
+use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -46,9 +46,9 @@ class ValidationMiddlewareTest extends TestCase
         $this->assertSame('Hello', $result);
     }
 
-    public function testValidateWithConfigurationAndNextMiddleware()
+    public function testValidateWithStampAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
+        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationStamp($groups = array('Default', 'Extra')));
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
             ->expects($this->once())

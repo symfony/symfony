@@ -14,8 +14,8 @@ namespace Symfony\Component\Messenger\Tests\Asynchronous\Middleware;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
-use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
@@ -135,7 +135,7 @@ class SendMessageMiddlewareTest extends TestCase
 
     public function testItSkipsReceivedMessages()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Hey'))->with(new ReceivedMessage());
+        $envelope = Envelope::wrap(new DummyMessage('Hey'))->with(new ReceivedStamp());
 
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));

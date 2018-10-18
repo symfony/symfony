@@ -32,7 +32,7 @@ $worker = new Worker($receiver, new class() implements MessageBusInterface {
     public function dispatch($envelope)
     {
         echo 'Get envelope with message: '.get_class($envelope->getMessage())."\n";
-        echo sprintf("with items: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));
+        echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));
 
         sleep(30);
         echo "Done.\n";

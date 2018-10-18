@@ -12,18 +12,18 @@
 namespace Symfony\Component\Messenger\Tests\Asynchronous\Serialization;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration;
+use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class SerializerConfigurationTest extends TestCase
+class SerializerStampTest extends TestCase
 {
     public function testSerializable()
     {
-        $config = new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('Default', 'Extra')));
+        $stamp = new SerializerStamp(array(ObjectNormalizer::GROUPS => array('Default', 'Extra')));
 
-        $this->assertEquals($config, unserialize(serialize($config)));
+        $this->assertEquals($stamp, unserialize(serialize($stamp)));
     }
 }

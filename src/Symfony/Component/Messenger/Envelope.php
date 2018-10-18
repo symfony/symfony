@@ -11,25 +11,27 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Stamp\StampInterface;
+
 /**
- * A message wrapped in an envelope with items (configurations, markers, ...).
+ * A message wrapped in an envelope with stamps (configurations, markers, ...).
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
 final class Envelope
 {
-    private $items = array();
+    private $stamps = array();
     private $message;
 
     /**
-     * @param object                  $message
-     * @param EnvelopeItemInterface[] $items
+     * @param object $message
      */
-    public function __construct($message, array $items = array())
+    public function __construct($message, StampInterface ...$stamps)
     {
         $this->message = $message;
-        foreach ($items as $item) {
-            $this->items[\get_class($item)] = $item;
+
+        foreach ($stamps as $stamp) {
+            $this->stamps[\get_class($stamp)] = $stamp;
         }
     }
 
@@ -44,13 +46,15 @@ final class Envelope
     }
 
     /**
-     * @return Envelope a new Envelope instance with additional item
+     * @return Envelope a new Envelope instance with additional stamp
      */
-    public function with(EnvelopeItemInterface $item): self
+    public function with(StampInterface ...$stamps): self
     {
         $cloned = clone $this;
 
-        $cloned->items[\get_class($item)] = $item;
+        foreach ($stamps as $stamp) {
+            $cloned->stamps[\get_class($stamp)] = $stamp;
+        }
 
         return $cloned;
     }
@@ -64,17 +68,17 @@ final class Envelope
         return $cloned;
     }
 
-    public function get(string $itemFqcn): ?EnvelopeItemInterface
+    public function get(string $stampFqcn): ?StampInterface
     {
-        return $this->items[$itemFqcn] ?? null;
+        return $this->stamps[$stampFqcn] ?? null;
     }
 
     /**
-     * @return EnvelopeItemInterface[] indexed by fqcn
+     * @return StampInterface[] indexed by fqcn
      */
     public function all(): array
     {
-        return $this->items;
+        return $this->stamps;
     }
 
     /**

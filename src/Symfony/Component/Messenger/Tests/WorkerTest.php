@@ -27,14 +27,14 @@ class WorkerTest extends TestCase
         $ipaMessage = new DummyMessage('IPA');
 
         $receiver = new CallbackReceiver(function ($handler) use ($apiMessage, $ipaMessage) {
-            $handler(Envelope::wrap($apiMessage));
-            $handler(Envelope::wrap($ipaMessage));
+            $handler(new Envelope($apiMessage));
+            $handler(new Envelope($ipaMessage));
         });
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with(Envelope::wrap($apiMessage)->with(new ReceivedStamp()));
-        $bus->expects($this->at(1))->method('dispatch')->with(Envelope::wrap($ipaMessage)->with(new ReceivedStamp()));
+        $bus->expects($this->at(0))->method('dispatch')->with((new Envelope($apiMessage))->with(new ReceivedStamp()));
+        $bus->expects($this->at(1))->method('dispatch')->with((new Envelope($ipaMessage))->with(new ReceivedStamp()));
 
         $worker = new Worker($receiver, $bus);
         $worker->run();
@@ -42,7 +42,7 @@ class WorkerTest extends TestCase
 
     public function testWorkerDoesNotWrapMessagesAlreadyWrappedWithReceivedMessage()
     {
-        $envelop = Envelope::wrap(new DummyMessage('API'))->with(new ReceivedStamp());
+        $envelop = (new Envelope(new DummyMessage('API')))->with(new ReceivedStamp());
         $receiver = new CallbackReceiver(function ($handler) use ($envelop) {
             $handler($envelop);
         });
@@ -59,7 +59,7 @@ class WorkerTest extends TestCase
     {
         $receiver = new CallbackReceiver(function ($handler) {
             try {
-                $handler(Envelope::wrap(new DummyMessage('Hello')));
+                $handler(new Envelope(new DummyMessage('Hello')));
 
                 $this->assertTrue(false, 'This should not be called because the exception is sent back to the generator.');
             } catch (\InvalidArgumentException $e) {

@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests\Middleware\Enhancers;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\Enhancers\ActivationMiddlewareDecorator;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -26,13 +25,13 @@ class ActivationMiddlewareDecoratorTest extends TestCase
     public function testExecuteMiddlewareOnActivated()
     {
         $message = new DummyMessage('Hello');
-        $envelope = Envelope::wrap($message);
+        $envelope = new Envelope($message);
 
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
         $next->expects($this->never())->method('__invoke');
 
         $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($message, $next);
+        $middleware->expects($this->once())->method('handle')->with($envelope, $next);
 
         $decorator = new ActivationMiddlewareDecorator($middleware, true);
 
@@ -42,7 +41,7 @@ class ActivationMiddlewareDecoratorTest extends TestCase
     public function testExecuteMiddlewareOnActivatedWithCallable()
     {
         $message = new DummyMessage('Hello');
-        $envelope = Envelope::wrap($message);
+        $envelope = new Envelope($message);
 
         $activated = $this->createPartialMock(\stdClass::class, array('__invoke'));
         $activated->expects($this->once())->method('__invoke')->with($envelope)->willReturn(true);
@@ -51,25 +50,9 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $next->expects($this->never())->method('__invoke');
 
         $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($message, $next);
-
-        $decorator = new ActivationMiddlewareDecorator($middleware, $activated);
-
-        $decorator->handle($envelope, $next);
-    }
-
-    public function testExecuteEnvelopeAwareMiddlewareWithEnvelope()
-    {
-        $message = new DummyMessage('Hello');
-        $envelope = Envelope::wrap($message);
-
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->never())->method('__invoke');
-
-        $middleware = $this->createMock(array(MiddlewareInterface::class, EnvelopeAwareInterface::class));
         $middleware->expects($this->once())->method('handle')->with($envelope, $next);
 
-        $decorator = new ActivationMiddlewareDecorator($middleware, true);
+        $decorator = new ActivationMiddlewareDecorator($middleware, $activated);
 
         $decorator->handle($envelope, $next);
     }
@@ -77,7 +60,7 @@ class ActivationMiddlewareDecoratorTest extends TestCase
     public function testExecuteMiddlewareOnDeactivated()
     {
         $message = new DummyMessage('Hello');
-        $envelope = Envelope::wrap($message);
+        $envelope = new Envelope($message);
 
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
         $next->expects($this->once())->method('__invoke')->with($envelope);

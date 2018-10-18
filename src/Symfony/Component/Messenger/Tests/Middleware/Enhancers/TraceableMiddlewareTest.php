@@ -26,14 +26,14 @@ class TraceableMiddlewareTest extends TestCase
     public function testHandle()
     {
         $busId = 'command_bus';
-        $envelope = Envelope::wrap($message = new DummyMessage('Hello'));
+        $envelope = new Envelope($message = new DummyMessage('Hello'));
 
         $middleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $middleware->expects($this->once())
             ->method('handle')
-            ->with($message, $this->anything())
-            ->will($this->returnCallback(function ($message, callable $next) {
-                $next($message);
+            ->with($envelope, $this->anything())
+            ->will($this->returnCallback(function ($envelope, callable $next) {
+                $next($envelope);
             }))
         ;
 
@@ -41,7 +41,7 @@ class TraceableMiddlewareTest extends TestCase
         $next
             ->expects($this->once())
             ->method('__invoke')
-            ->with($message)
+            ->with($envelope)
         ;
 
         $stopwatch = $this->createMock(Stopwatch::class);
@@ -67,14 +67,14 @@ class TraceableMiddlewareTest extends TestCase
     public function testHandleWithException()
     {
         $busId = 'command_bus';
-        $envelope = Envelope::wrap($message = new DummyMessage('Hello'));
+        $envelope = new Envelope($message = new DummyMessage('Hello'));
 
         $middleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $middleware->expects($this->once())
             ->method('handle')
-            ->with($message, $this->anything())
-            ->will($this->returnCallback(function ($message, callable $next) {
-                $next($message);
+            ->with($envelope, $this->anything())
+            ->will($this->returnCallback(function ($envelope, callable $next) {
+                $next($envelope);
             }))
         ;
 

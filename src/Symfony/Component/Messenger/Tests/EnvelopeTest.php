@@ -32,20 +32,9 @@ class EnvelopeTest extends TestCase
         $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class]);
     }
 
-    public function testWrap()
-    {
-        $first = Envelope::wrap($dummy = new DummyMessage('dummy'));
-
-        $this->assertInstanceOf(Envelope::class, $first);
-        $this->assertSame($dummy, $first->getMessage());
-
-        $envelope = Envelope::wrap($first);
-        $this->assertSame($first, $envelope);
-    }
-
     public function testWithReturnsNewInstance()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'));
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'));
 
         $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp()));
     }
@@ -61,7 +50,7 @@ class EnvelopeTest extends TestCase
 
     public function testAll()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'))
+        $envelope = (new Envelope($dummy = new DummyMessage('dummy')))
             ->with($receivedStamp = new ReceivedStamp())
             ->with($validationStamp = new ValidationStamp(array('foo')))
         ;

@@ -43,7 +43,8 @@ class TraceableMessageBusTest extends TestCase
 
     public function testItTracesDispatchWithEnvelope()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hello'))->with($stamp = new AnEnvelopeStamp());
+        $message = new DummyMessage('Hello');
+        $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 

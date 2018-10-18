@@ -26,9 +26,9 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
     public function testReceiverStopsWhenMaximumCountExceeded($max, $shouldStop)
     {
         $callable = function ($handler) {
-            $handler(Envelope::wrap(new DummyMessage('First message')));
-            $handler(Envelope::wrap(new DummyMessage('Second message')));
-            $handler(Envelope::wrap(new DummyMessage('Third message')));
+            $handler(new Envelope(new DummyMessage('First message')));
+            $handler(new Envelope(new DummyMessage('Second message')));
+            $handler(new Envelope(new DummyMessage('Third message')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
@@ -79,7 +79,7 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
     public function testReceiverLogsMaximumCountExceededWhenLoggerIsGiven()
     {
         $callable = function ($handler) {
-            $handler(Envelope::wrap(new DummyMessage('First message')));
+            $handler(new Envelope(new DummyMessage('First message')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)

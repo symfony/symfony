@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Mapping\Factory;
 
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
@@ -70,14 +69,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     public function hasMetadataFor($value)
     {
-        try {
-            $this->getClass($value);
-
-            return true;
-        } catch (InvalidArgumentException $invalidArgumentException) {
-            // Return false in case of exception
-        }
-
-        return false;
+        return \is_object($value) || (\is_string($value) && (\class_exists($value) || \interface_exists($value, false)));
     }
 }

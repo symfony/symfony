@@ -285,7 +285,7 @@ class Configuration implements ConfigurationInterface
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                             ->validate()
-                                                ->ifTrue(function ($v) { return !class_exists($v) && !interface_exists($v); })
+                                                ->ifTrue(function ($v) { return !class_exists($v) && !interface_exists($v, false); })
                                                 ->thenInvalid('The supported class or interface "%s" does not exist.')
                                             ->end()
                                         ->end()

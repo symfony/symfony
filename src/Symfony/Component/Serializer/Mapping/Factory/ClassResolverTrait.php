@@ -34,7 +34,7 @@ trait ClassResolverTrait
     private function getClass($value)
     {
         if (\is_string($value)) {
-            if (!class_exists($value) && !interface_exists($value)) {
+            if (!class_exists($value) && !interface_exists($value, false)) {
                 throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $value));
             }
 

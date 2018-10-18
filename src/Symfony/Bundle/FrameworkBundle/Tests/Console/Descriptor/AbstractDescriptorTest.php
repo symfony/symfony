@@ -69,6 +69,19 @@ abstract class AbstractDescriptorTest extends TestCase
         return $this->getContainerBuilderDescriptionTestData(ObjectsProvider::getContainerBuilders());
     }
 
+    /**
+     * @dataProvider getDescribeContainerExistingClassDefinitionTestData
+     */
+    public function testDescribeContainerExistingClassDefinition(Definition $definition, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $definition);
+    }
+
+    public function getDescribeContainerExistingClassDefinitionTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerDefinitionsWithExistingClasses());
+    }
+
     /** @dataProvider getDescribeContainerDefinitionTestData */
     public function testDescribeContainerDefinition(Definition $definition, $expectedDescription)
     {

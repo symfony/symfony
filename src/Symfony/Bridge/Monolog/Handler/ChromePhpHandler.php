@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  * ChromePhpHandler.
  *
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @final since Symfony 4.3
  */
 class ChromePhpHandler extends BaseChromePhpHandler
 {

@@ -40,7 +40,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->equalTo(SecurityEvents::INTERACTIVE_LOGIN), $this->equalTo($loginEvent))
+            ->with($this->equalTo($loginEvent), $this->equalTo(SecurityEvents::INTERACTIVE_LOGIN))
         ;
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);

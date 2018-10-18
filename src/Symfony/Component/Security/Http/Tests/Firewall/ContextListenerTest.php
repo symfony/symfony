@@ -13,12 +13,13 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -41,7 +42,7 @@ class ContextListenerTest extends TestCase
     public function testItRequiresContextKey()
     {
         new ContextListener(
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
+            $this->getMockBuilder(TokenStorageInterface::class)->getMock(),
             [],
             ''
         );
@@ -105,8 +106,8 @@ class ContextListenerTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
-        $event = new FilterResponseEvent(
-            $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
+        $event = new ResponseEvent(
+            $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             new Response()
@@ -124,8 +125,8 @@ class ContextListenerTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
-        $event = new FilterResponseEvent(
-            $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
+        $event = new ResponseEvent(
+            $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             new Response()
@@ -142,8 +143,8 @@ class ContextListenerTest extends TestCase
      */
     public function testInvalidTokenInSession($token)
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
@@ -167,7 +168,7 @@ class ContextListenerTest extends TestCase
             ->with(null);
 
         $listener = new ContextListener($tokenStorage, [], 'key123');
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function provideInvalidToken()
@@ -183,9 +184,9 @@ class ContextListenerTest extends TestCase
 
     public function testHandleAddsKernelResponseListener()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -202,14 +203,14 @@ class ContextListenerTest extends TestCase
             ->method('addListener')
             ->with(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testOnKernelResponseListenerRemovesItself()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterResponseEvent')
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $event = $this->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -239,16 +240,16 @@ class ContextListenerTest extends TestCase
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request->expects($this->any())->method('hasPreviousSession')->will($this->returnValue(false));
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $event = $this->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage->expects($this->once())->method('setToken')->with(null);
 
         $listener = new ContextListener($tokenStorage, [], 'key123');
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testIfTokenIsDeauthenticated()
@@ -327,8 +328,8 @@ class ContextListenerTest extends TestCase
         $request->setSession($session);
         $request->cookies->set('MOCKSESSID', true);
 
-        $event = new FilterResponseEvent(
-            $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
+        $event = new ResponseEvent(
+            $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             new Response()
@@ -351,7 +352,7 @@ class ContextListenerTest extends TestCase
         $request->cookies->set('MOCKSESSID', true);
 
         $listener = new ContextListener($tokenStorage, $userProviders, 'context_key');
-        $listener->handle(new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 }
 

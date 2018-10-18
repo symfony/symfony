@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -26,9 +25,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
- * ExceptionListener.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class ExceptionListener implements EventSubscriberInterface
 {
@@ -96,7 +95,7 @@ class ExceptionListener implements EventSubscriberInterface
         $event->setResponse($response);
 
         if ($this->debug && $eventDispatcher instanceof EventDispatcherInterface) {
-            $cspRemovalListener = function (FilterResponseEvent $event) use (&$cspRemovalListener, $eventDispatcher) {
+            $cspRemovalListener = function ($event) use (&$cspRemovalListener, $eventDispatcher) {
                 $event->getResponse()->headers->remove('Content-Security-Policy');
                 $eventDispatcher->removeListener(KernelEvents::RESPONSE, $cspRemovalListener);
             };

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Tests\Http\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Security;
@@ -66,14 +66,14 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ['require_previous_session' => false]
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($request))
         ;
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     /**
@@ -95,8 +95,8 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
-        $listener->handle($event);
+        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $listener($event);
     }
 
     /**
@@ -118,8 +118,8 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
-        $listener->handle($event);
+        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $listener($event);
     }
 
     /**
@@ -141,8 +141,8 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
-        $listener->handle($event);
+        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $listener($event);
     }
 
     /**
@@ -168,8 +168,8 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
-        $listener->handle($event);
+        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $listener($event);
     }
 
     public function postOnlyDataProvider()

@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -36,7 +37,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     public function __construct(EventDispatcherInterface $dispatcher, Stopwatch $stopwatch, LoggerInterface $logger = null)
     {
-        $this->dispatcher = $dispatcher;
+        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
         $this->stopwatch = $stopwatch;
         $this->logger = $logger;
         $this->wrappedListeners = [];
@@ -121,15 +122,28 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|null $eventName
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($event/*, string $eventName = null*/)
     {
         if (null === $this->callStack) {
             $this->callStack = new \SplObjectStorage();
         }
 
-        if (null === $event) {
-            $event = new Event();
+        $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
+
+        if ($event instanceof Event) {
+            $eventName = $eventName ?? \get_class($event);
+        } else {
+            @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
+            $swap = $event;
+            $event = $eventName ?? new Event();
+            $eventName = $swap;
+
+            if (!$event instanceof Event) {
+                throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of %s, %s given.', EventDispatcherInterface::class, Event::class, \is_object($event) ? \get_class($event) : \gettype($event)));
+            }
         }
 
         if (null !== $this->logger && $event->isPropagationStopped()) {
@@ -142,7 +156,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             try {
                 $e = $this->stopwatch->start($eventName, 'section');
                 try {
-                    $this->dispatcher->dispatch($eventName, $event);
+                    $this->dispatcher->dispatch($event, $eventName);
                 } finally {
                     if ($e->isStarted()) {
                         $e->stop();

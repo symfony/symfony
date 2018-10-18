@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  * FirePHPHandler.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @final since Symfony 4.3
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {

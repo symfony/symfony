@@ -85,7 +85,7 @@ class GuardAuthenticationListenerTest extends TestCase
             ->expects($this->never())
             ->method('loginSuccess');
 
-        $listener->handle($this->event);
+        $listener($this->event);
     }
 
     public function testHandleSuccessStopsAfterResponseIsSet()
@@ -119,7 +119,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->logger
         );
 
-        $listener->handle($this->event);
+        $listener($this->event);
     }
 
     public function testHandleSuccessWithRememberMe()
@@ -167,7 +167,7 @@ class GuardAuthenticationListenerTest extends TestCase
             ->expects($this->once())
             ->method('loginSuccess');
 
-        $listener->handle($this->event);
+        $listener($this->event);
     }
 
     public function testHandleCatchesAuthenticationException()
@@ -203,7 +203,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->logger
         );
 
-        $listener->handle($this->event);
+        $listener($this->event);
     }
 
     public function testSupportsReturnFalseSkipAuth()
@@ -229,7 +229,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->logger
         );
 
-        $listener->handle($this->event);
+        $listener($this->event);
     }
 
     /**
@@ -259,7 +259,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->logger
         );
 
-        $listener->handle($this->event);
+        $listener($this->event);
     }
 
     protected function setUp()
@@ -274,7 +274,7 @@ class GuardAuthenticationListenerTest extends TestCase
 
         $this->request = new Request([], [], [], [], [], []);
 
-        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\RequestEvent')
             ->disableOriginalConstructor()
             ->setMethods(['getRequest'])
             ->getMock();

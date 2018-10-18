@@ -25,7 +25,7 @@ final class KernelEvents
      * This event allows you to create a response for a request before any
      * other code in the framework is executed.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\GetResponseEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\RequestEvent")
      */
     const REQUEST = 'kernel.request';
 
@@ -35,7 +35,7 @@ final class KernelEvents
      * This event allows you to create a response for a thrown exception or
      * to modify the thrown exception.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\ExceptionEvent")
      */
     const EXCEPTION = 'kernel.exception';
 
@@ -46,7 +46,7 @@ final class KernelEvents
      * This event allows you to create a response for the return value of the
      * controller.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\ViewEvent")
      */
     const VIEW = 'kernel.view';
 
@@ -57,7 +57,7 @@ final class KernelEvents
      * This event allows you to change the controller that will handle the
      * request.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\FilterControllerEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\ControllerEvent")
      */
     const CONTROLLER = 'kernel.controller';
 
@@ -67,7 +67,7 @@ final class KernelEvents
      * This event allows you to change the arguments that will be passed to
      * the controller.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent")
      */
     const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
 
@@ -78,7 +78,7 @@ final class KernelEvents
      * This event allows you to modify or replace the response that will be
      * replied.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\FilterResponseEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\ResponseEvent")
      */
     const RESPONSE = 'kernel.response';
 
@@ -87,7 +87,7 @@ final class KernelEvents
      *
      * This event allows you to run expensive post-response jobs.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\PostResponseEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\TerminateEvent")
      */
     const TERMINATE = 'kernel.terminate';
 

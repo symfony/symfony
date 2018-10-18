@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Firewall\ChannelListener;
 
 class ChannelListenerTest extends TestCase
@@ -40,7 +41,7 @@ class ChannelListenerTest extends TestCase
             ->method('start')
         ;
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -52,7 +53,7 @@ class ChannelListenerTest extends TestCase
         ;
 
         $listener = new ChannelListener($accessMap, $entryPoint);
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleWithSecuredRequestAndHttpsChannel()
@@ -78,7 +79,7 @@ class ChannelListenerTest extends TestCase
             ->method('start')
         ;
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -90,7 +91,7 @@ class ChannelListenerTest extends TestCase
         ;
 
         $listener = new ChannelListener($accessMap, $entryPoint);
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleWithNotSecuredRequestAndHttpsChannel()
@@ -120,7 +121,7 @@ class ChannelListenerTest extends TestCase
             ->will($this->returnValue($response))
         ;
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -133,7 +134,7 @@ class ChannelListenerTest extends TestCase
         ;
 
         $listener = new ChannelListener($accessMap, $entryPoint);
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleWithSecuredRequestAndHttpChannel()
@@ -163,7 +164,7 @@ class ChannelListenerTest extends TestCase
             ->will($this->returnValue($response))
         ;
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -176,6 +177,6 @@ class ChannelListenerTest extends TestCase
         ;
 
         $listener = new ChannelListener($accessMap, $entryPoint);
-        $listener->handle($event);
+        $listener($event);
     }
 }

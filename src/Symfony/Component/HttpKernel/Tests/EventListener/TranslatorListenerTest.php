@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\TranslatorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -39,7 +39,7 @@ class TranslatorListenerTest extends TestCase
             ->method('setLocale')
             ->with($this->equalTo('fr'));
 
-        $event = new GetResponseEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
@@ -54,7 +54,7 @@ class TranslatorListenerTest extends TestCase
             ->method('setLocale')
             ->with($this->equalTo('en'));
 
-        $event = new GetResponseEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 

@@ -23,7 +23,7 @@
     },
     "require-dev": {
         "symfony/config": "~3.4|~4.0",
-        "symfony/event-dispatcher": "~3.4|~4.0",
+        "symfony/event-dispatcher": "^4.3",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/lock": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
@@ -40,6 +40,7 @@
     },
     "conflict": {
         "symfony/dependency-injection": "<3.4",
+        "symfony/event-dispatcher": "<4.3",
         "symfony/process": "<3.3"
     },
     "autoload": {

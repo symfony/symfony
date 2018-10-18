@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
@@ -19,16 +20,23 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  * Wraps a security listener for calls record.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
+ *
+ * @internal since Symfony 4.3
  */
 final class WrappedListener implements ListenerInterface
 {
+    use LegacyListenerTrait;
+
     private $response;
     private $listener;
     private $time;
     private $stub;
     private static $hasVarDumper;
 
-    public function __construct(ListenerInterface $listener)
+    /**
+     * @param callable $listener
+     */
+    public function __construct($listener)
     {
         $this->listener = $listener;
 
@@ -40,10 +48,15 @@ final class WrappedListener implements ListenerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $startTime = microtime(true);
-        $this->listener->handle($event);
+        if (\is_callable($this->listener)) {
+            ($this->listener)($event);
+        } else {
+            @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, implement "__invoke()" instead.', \get_class($this)), E_USER_DEPRECATED);
+            $this->listener->handle($event);
+        }
         $this->time = microtime(true) - $startTime;
         $this->response = $event->getResponse();
     }
@@ -56,7 +69,7 @@ final class WrappedListener implements ListenerInterface
         return $this->listener->{$method}(...$arguments);
     }
 
-    public function getWrappedListener(): ListenerInterface
+    public function getWrappedListener()
     {
         return $this->listener;
     }

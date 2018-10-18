@@ -38,6 +38,8 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * Response instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class ExceptionListener
 {

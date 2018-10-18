@@ -4,6 +4,38 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
+    <parameters>
+        <!-- this parameter is used at compile time in RegisterListenersPass -->
+        <parameter key="event_dispatcher.event_aliases" type="collection">
+            <parameter key="Symfony\Component\Console\Event\ConsoleCommandEvent">console.command</parameter>
+            <parameter key="Symfony\Component\Console\Event\ConsoleErrorEvent">console.error</parameter>
+            <parameter key="Symfony\Component\Console\Event\ConsoleTerminateEvent">console.terminate</parameter>
+            <parameter key="Symfony\Component\Form\Event\PreSubmitEvent">form.pre_submit</parameter>
+            <parameter key="Symfony\Component\Form\Event\SubmitEvent">form.submit</parameter>
+            <parameter key="Symfony\Component\Form\Event\PostSubmitEvent">form.post_submit</parameter>
+            <parameter key="Symfony\Component\Form\Event\PreSetDataEvent">form.pre_set_data</parameter>
+            <parameter key="Symfony\Component\Form\Event\PostSetDataEvent">form.post_set_data</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent">kernel.controller_arguments</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\ControllerEvent">kernel.controller</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\ResponseEvent">kernel.response</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\FinishRequestEvent">kernel.finish_request</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\RequestEvent">kernel.request</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\ViewEvent">kernel.view</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\ExceptionEvent">kernel.exception</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\TerminateEvent">kernel.terminate</parameter>
+            <parameter key="Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent">security.authentication.success</parameter>
+            <parameter key="Symfony\Component\Security\Core\Event\AuthenticationFailureEvent">security.authentication.failure</parameter>
+            <parameter key="Symfony\Component\Security\Http\Event\InteractiveLoginEvent">security.interactive_login</parameter>
+            <parameter key="Symfony\Component\Security\Http\Event\SwitchUserEvent">security.switch_user</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\GuardEvent">workflow.guard</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\LeaveEvent">workflow.leave</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\TransitionEvent">workflow.transition</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\EnterEvent">workflow.enter</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\EnteredEvent">workflow.entered</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\CompletedEvent">workflow.completed</parameter>
+            <parameter key="Symfony\Component\Workflow\Event\AnnounceEvent">workflow.announce</parameter>
+        </parameter>
+    </parameters>
     <services>
         <defaults public="false" />
 

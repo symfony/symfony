@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class LogoutListenerTest extends TestCase
@@ -32,7 +33,7 @@ class LogoutListenerTest extends TestCase
             ->with($request, $options['logout_path'])
             ->will($this->returnValue(false));
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleMatchedPathWithSuccessHandlerAndCsrfValidation()
@@ -79,7 +80,7 @@ class LogoutListenerTest extends TestCase
 
         $listener->addHandler($handler);
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleMatchedPathWithoutSuccessHandlerAndCsrfValidation()
@@ -119,7 +120,7 @@ class LogoutListenerTest extends TestCase
 
         $listener->addHandler($handler);
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     /**
@@ -143,7 +144,7 @@ class LogoutListenerTest extends TestCase
             ->with($request)
             ->will($this->returnValue(null));
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     /**
@@ -168,7 +169,7 @@ class LogoutListenerTest extends TestCase
             ->method('isTokenValid')
             ->will($this->returnValue(false));
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     private function getTokenManager()
@@ -183,7 +184,7 @@ class LogoutListenerTest extends TestCase
 
     private function getGetResponseEvent()
     {
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $event = $this->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 

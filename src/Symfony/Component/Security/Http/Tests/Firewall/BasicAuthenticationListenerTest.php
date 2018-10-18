@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -57,14 +58,14 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($request))
         ;
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleWhenAuthenticationFails()
@@ -104,7 +105,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $authenticationEntryPoint
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -116,7 +117,7 @@ class BasicAuthenticationListenerTest extends TestCase
             ->with($this->equalTo($response))
         ;
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleWithNoUsernameServerParameter()
@@ -136,14 +137,14 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($request))
         ;
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     public function testHandleWithASimilarAuthenticatedToken()
@@ -172,14 +173,14 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($request))
         ;
 
-        $listener->handle($event);
+        $listener($event);
     }
 
     /**
@@ -233,7 +234,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $authenticationEntryPoint
         );
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -245,6 +246,6 @@ class BasicAuthenticationListenerTest extends TestCase
             ->with($this->equalTo($response))
         ;
 
-        $listener->handle($event);
+        $listener($event);
     }
 }

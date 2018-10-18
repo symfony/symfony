@@ -30,6 +30,8 @@ use Twig\Environment;
  * This means that the WDT is never included in sub-requests or ESI requests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {

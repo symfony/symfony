@@ -13,10 +13,11 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -40,9 +41,13 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  * an authentication via a JSON document composed of a username and a password.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since Symfony 4.3
  */
 class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
 {
+    use LegacyListenerTrait;
+
     private $tokenStorage;
     private $authenticationManager;
     private $httpUtils;
@@ -64,7 +69,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $this->successHandler = $successHandler;
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -72,7 +77,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
         if (false === strpos($request->getRequestFormat(), 'json')
@@ -147,7 +152,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
 
         if (null !== $this->eventDispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->eventDispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+            $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
         }
 
         if (!$this->successHandler) {

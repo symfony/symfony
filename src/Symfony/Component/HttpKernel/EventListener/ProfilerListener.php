@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  * ProfilerListener collects data for the current request by listening to the kernel events.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class ProfilerListener implements EventSubscriberInterface
 {

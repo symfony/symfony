@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -28,7 +28,7 @@ class DisallowRobotsIndexingListenerTest extends TestCase
     {
         $listener = new DisallowRobotsIndexingListener();
 
-        $event = new FilterResponseEvent($this->createMock(HttpKernelInterface::class), $this->createMock(Request::class), KernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $this->createMock(Request::class), KernelInterface::MASTER_REQUEST, $response);
 
         $listener->onResponse($event);
 

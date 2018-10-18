@@ -21,6 +21,11 @@ Config
 
  * Deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
 
+EventDispatcher
+---------------
+
+ * The signature of the `EventDispatcherInterface::dispatch()` method should be updated to `dispatch($event, string $eventName = null)`, not doing so is deprecated
+
 Form
 ----
 
@@ -55,7 +60,14 @@ HttpFoundation
 HttpKernel
 ----------
 
- * renamed `Client` to `HttpKernelBrowser`
+ * Renamed `Client` to `HttpKernelBrowser`
+ * Renamed `FilterControllerArgumentsEvent` to `ControllerArgumentsEvent`
+ * Renamed `FilterControllerEvent` to `ControllerEvent`
+ * Renamed `FilterResponseEvent` to `ResponseEvent`
+ * Renamed `GetResponseEvent` to `RequestEvent`
+ * Renamed `GetResponseForControllerResultEvent` to `ViewEvent`
+ * Renamed `GetResponseForExceptionEvent` to `ExceptionEvent`
+ * Renamed `PostResponseEvent` to `TerminateEvent`
 
 Messenger
 ---------
@@ -80,6 +92,8 @@ Security
    Use the `getReachableRoleNames()` method instead.
  * The `getRoles()` method of the `TokenInterface` is deprecated. Tokens must implement the `getRoleNames()`
    method instead and return roles as strings.
+ * The `ListenerInterface` is deprecated, turn your listeners into callables instead.
+ * The `Firewall::handleRequest()` method is deprecated, use `Firewall::callListeners()` instead.
  * The `AbstractToken::serialize()`, `AbstractToken::unserialize()`,
    `AuthenticationException::serialize()` and `AuthenticationException::unserialize()`
    methods are now final, use `getState()` and `setState()` instead.

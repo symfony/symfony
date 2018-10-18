@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * RouterDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterDataCollector extends DataCollector
@@ -68,6 +66,8 @@ class RouterDataCollector extends DataCollector
 
     /**
      * Remembers the controller associated to each request.
+     *
+     * @final since Symfony 4.3
      */
     public function onKernelController(FilterControllerEvent $event)
     {

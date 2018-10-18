@@ -112,7 +112,7 @@ class DebugHandlersListenerTest extends TestCase
         set_error_handler([$eHandler, 'handleError']);
         set_exception_handler([$eHandler, 'handleException']);
         try {
-            $dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+            $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         } catch (\Exception $exception) {
         }
         restore_exception_handler();

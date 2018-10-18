@@ -24,6 +24,8 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  * Synchronizes the locale between the request and the translator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class TranslatorListener implements EventSubscriberInterface
 {

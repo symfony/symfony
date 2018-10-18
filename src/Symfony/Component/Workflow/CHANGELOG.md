@@ -6,6 +6,13 @@ CHANGELOG
 
  * Trigger `entered` event for subject entering in the Workflow for the first time
  * Added a context to `Workflow::apply()`. The `MethodMarkingStore` could be used to leverage this feature.
+ * Dispatch `GuardEvent` on `workflow.guard`
+ * Dispatch `LeaveEvent` on `workflow.leave`
+ * Dispatch `TransitionEvent` on `workflow.transition`
+ * Dispatch `EnterEvent` on `workflow.enter`
+ * Dispatch `EnteredEvent` on `workflow.entered`
+ * Dispatch `CompletedEvent` on `workflow.completed`
+ * Dispatch `AnnounceEvent` on `workflow.announce`
 
 4.1.0
 -----

@@ -32,6 +32,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @internal since Symfony 4.3
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {

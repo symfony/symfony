@@ -27,7 +27,8 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     private $manager;
     private $strategy;
     private $voters = array();
-    private $decisionLog = array();
+    private $decisionLog = array(); // All decision logs
+    private $currentLog = array();  // Logs being filled in
 
     public function __construct(AccessDecisionManagerInterface $manager)
     {
@@ -49,15 +50,38 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
-        $result = $this->manager->decide($token, $attributes, $object);
-
-        $this->decisionLog[] = array(
+        $currentDecisionLog = array(
             'attributes' => $attributes,
             'object' => $object,
-            'result' => $result,
+            'voterDetails' => array(),
         );
 
+        $this->currentLog[] = &$currentDecisionLog;
+
+        $result = $this->manager->decide($token, $attributes, $object);
+
+        $currentDecisionLog['result'] = $result;
+
+        $this->decisionLog[] = array_pop($this->currentLog); // Using a stack since decide can be called by voters
+
         return $result;
+    }
+
+    /**
+     * Adds voter vote and class to the voter details.
+     *
+     * @param VoterInterface $voter      voter
+     * @param array          $attributes attributes used for the vote
+     * @param int            $vote       vote of the voter
+     */
+    public function addVoterVote(VoterInterface $voter, array $attributes, int $vote)
+    {
+        $currentLogIndex = \count($this->currentLog) - 1;
+        $this->currentLog[$currentLogIndex]['voterDetails'][] = array(
+            'voter' => $voter,
+            'attributes' => $attributes,
+            'vote' => $vote,
+        );
     }
 
     /**

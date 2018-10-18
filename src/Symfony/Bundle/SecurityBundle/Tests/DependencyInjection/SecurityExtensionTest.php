@@ -346,6 +346,8 @@ class SecurityExtensionTest extends TestCase
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
         $security = new SecurityExtension();
         $container->registerExtension($security);
 

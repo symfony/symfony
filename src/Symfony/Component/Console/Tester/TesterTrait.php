@@ -29,31 +29,21 @@ trait TesterTrait
     /**
      * Gets the display returned by the last execution of the command or application.
      *
-     * @param bool $normalize Whether to normalize end of lines to \n or not
-     *
      * @return string The display
      */
-    public function getDisplay($normalize = false)
+    public function getDisplay()
     {
         rewind($this->output->getStream());
 
-        $display = stream_get_contents($this->output->getStream());
-
-        if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
-        }
-
-        return $display;
+        return stream_get_contents($this->output->getStream());
     }
 
     /**
      * Gets the output written to STDERR by the application.
      *
-     * @param bool $normalize Whether to normalize end of lines to \n or not
-     *
      * @return string
      */
-    public function getErrorOutput($normalize = false)
+    public function getErrorOutput()
     {
         if (!$this->captureStreamsIndependently) {
             throw new \LogicException('The error output is not available when the tester is run without "capture_stderr_separately" option set.');
@@ -61,13 +51,7 @@ trait TesterTrait
 
         rewind($this->output->getErrorOutput()->getStream());
 
-        $display = stream_get_contents($this->output->getErrorOutput()->getStream());
-
-        if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
-        }
-
-        return $display;
+        return stream_get_contents($this->output->getErrorOutput()->getStream());
     }
 
     /**
@@ -162,7 +146,7 @@ trait TesterTrait
     {
         $stream = fopen('php://memory', 'r+', false);
 
-        fwrite($stream, implode(PHP_EOL, $inputs));
+        fwrite($stream, implode("\n", $inputs));
         rewind($stream);
 
         return $stream;

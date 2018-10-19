@@ -54,7 +54,7 @@ Service form types
 
 
 TXT
-        , $tester->getDisplay(true));
+        , $tester->getDisplay());
     }
 
     public function testDebugSingleFormType()
@@ -121,7 +121,7 @@ TXT;
         $tester->execute(array('class' => 'AmbiguousType'), array('decorated' => false, 'interactive' => true));
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
-        $output = $tester->getDisplay(true);
+        $output = $tester->getDisplay();
         $this->assertStringMatchesFormat(<<<TXT
 
  The type "AmbiguousType" is ambiguous.

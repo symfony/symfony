@@ -71,7 +71,7 @@ class StreamOutput extends Output
     protected function doWrite($message, $newline)
     {
         if ($newline) {
-            $message .= PHP_EOL;
+            $message .= "\n";
         }
 
         if (false === @fwrite($this->stream, $message)) {

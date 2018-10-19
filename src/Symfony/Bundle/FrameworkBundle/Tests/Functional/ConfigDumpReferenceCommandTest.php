@@ -57,7 +57,7 @@ array:
 
 
 EOL
-            , $tester->getDisplay(true));
+            , $tester->getDisplay());
     }
 
     public function testDumpAtPathXml()

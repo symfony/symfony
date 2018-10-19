@@ -45,7 +45,7 @@ list   Lists commands
 
 EOF;
 
-        $this->assertEquals($output, $commandTester->getDisplay(true));
+        $this->assertEquals($output, $commandTester->getDisplay());
     }
 
     public function testExecuteListsCommandsWithNamespaceArgument()
@@ -60,7 +60,7 @@ foo:bar   The foo:bar command
 
 EOF;
 
-        $this->assertEquals($output, $commandTester->getDisplay(true));
+        $this->assertEquals($output, $commandTester->getDisplay());
     }
 
     public function testExecuteListsCommandsOrder()
@@ -92,7 +92,7 @@ Available commands:
   0foo:bar  0foo:bar command
 EOF;
 
-        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+        $this->assertEquals($output, trim($commandTester->getDisplay()));
     }
 
     public function testExecuteListsCommandsOrderRaw()
@@ -108,6 +108,6 @@ list       Lists commands
 0foo:bar   0foo:bar command
 EOF;
 
-        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+        $this->assertEquals($output, trim($commandTester->getDisplay()));
     }
 }

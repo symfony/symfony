@@ -49,7 +49,7 @@ class SymfonyStyleTest extends TestCase
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
         $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay());
     }
 
     /**
@@ -60,7 +60,7 @@ class SymfonyStyleTest extends TestCase
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
         $this->tester->execute(array(), array('interactive' => true, 'decorated' => false));
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay());
     }
 
     public function inputInteractiveCommandToOutputFilesProvider()

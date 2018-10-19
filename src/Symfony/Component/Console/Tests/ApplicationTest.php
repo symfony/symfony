@@ -62,11 +62,6 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/TestToto.php';
     }
 
-    protected function normalizeLineBreaks($text)
-    {
-        return str_replace(PHP_EOL, "\n", $text);
-    }
-
     /**
      * Replaces the dynamic placeholders of the command help text with a static version.
      * The placeholder %command.full_name% includes the script path that is not predictable
@@ -110,7 +105,7 @@ class ApplicationTest extends TestCase
     public function testHelp()
     {
         $application = new Application();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $this->normalizeLineBreaks($application->getHelp()), '->getHelp() returns a help message');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $application->getHelp(), '->getHelp() returns a help message');
     }
 
     public function testAll()
@@ -228,7 +223,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('-h' => true, '-q' => true), array('decorated' => false));
 
-        $this->assertEmpty($tester->getDisplay(true));
+        $this->assertEmpty($tester->getDisplay());
     }
 
     /**
@@ -474,7 +469,7 @@ class ApplicationTest extends TestCase
       foo                                                 
                                                           
 
-', $tester->getDisplay(true));
+', $tester->getDisplay());
     }
 
     public function testCanRunAlternativeCommandName()
@@ -485,7 +480,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->setInputs(array('y'));
         $tester->run(array('command' => 'foos'), array('decorated' => false));
-        $display = trim($tester->getDisplay(true));
+        $display = trim($tester->getDisplay());
         $this->assertContains('Command "foos" is not defined', $display);
         $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
         $this->assertContains('called', $display);
@@ -500,7 +495,7 @@ class ApplicationTest extends TestCase
         $tester->setInputs(array('n'));
         $exitCode = $tester->run(array('command' => 'foos'), array('decorated' => false));
         $this->assertSame(1, $exitCode);
-        $display = trim($tester->getDisplay(true));
+        $display = trim($tester->getDisplay());
         $this->assertContains('Command "foos" is not defined', $display);
         $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
     }
@@ -698,11 +693,11 @@ class ApplicationTest extends TestCase
         $this->assertTrue($application->areExceptionsCaught());
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(true), '->setCatchExceptions() sets the catch exception flag');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(), '->setCatchExceptions() sets the catch exception flag');
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(true), '->setCatchExceptions() sets the catch exception flag');
-        $this->assertSame('', $tester->getDisplay(true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(), '->setCatchExceptions() sets the catch exception flag');
+        $this->assertSame('', $tester->getDisplay());
 
         $application->setCatchExceptions(false);
         try {
@@ -731,18 +726,18 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exception');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(), '->renderException() renders a pretty exception');
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE, 'capture_stderr_separately' => true));
         $this->assertContains('Exception trace', $tester->getErrorOutput(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
         $tester->run(array('command' => 'list', '--foo' => true), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getErrorOutput(true), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getErrorOutput(), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
 
         $application->add(new \Foo3Command());
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getErrorOutput(), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
         $this->assertRegExp('/\[Exception\]\s*First exception/', $tester->getDisplay(), '->renderException() renders a pretty exception without code exception when code exception is default and verbosity is verbose');
@@ -750,10 +745,10 @@ class ApplicationTest extends TestCase
         $this->assertRegExp('/\[Exception \(404\)\]\s*Third exception/', $tester->getDisplay(), '->renderException() renders a pretty exception with code exception when code exception is 404 and verbosity is verbose');
 
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3decorated.txt', $tester->getDisplay(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3decorated.txt', $tester->getDisplay(), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => true, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3decorated.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3decorated.txt', $tester->getErrorOutput(), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -761,7 +756,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false,  'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $tester->getErrorOutput(true), '->renderException() wraps messages when they are bigger than the terminal');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $tester->getErrorOutput(), '->renderException() wraps messages when they are bigger than the terminal');
         putenv('COLUMNS=120');
     }
 
@@ -776,10 +771,10 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_doublewidth1.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_doublewidth1.txt', $tester->getErrorOutput(), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $tester->run(array('command' => 'foo'), array('decorated' => true, 'capture_stderr_separately' => true));
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_doublewidth1decorated.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_doublewidth1decorated.txt', $tester->getErrorOutput(), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -789,7 +784,7 @@ class ApplicationTest extends TestCase
         });
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_doublewidth2.txt', $tester->getErrorOutput(true), '->renderException() wraps messages when they are bigger than the terminal');
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_doublewidth2.txt', $tester->getErrorOutput(), '->renderException() wraps messages when they are bigger than the terminal');
         putenv('COLUMNS=120');
     }
 
@@ -804,7 +799,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_escapeslines.txt', $tester->getDisplay(true), '->renderException() escapes lines containing formatting');
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_escapeslines.txt', $tester->getDisplay(), '->renderException() escapes lines containing formatting');
         putenv('COLUMNS=120');
     }
 
@@ -821,7 +816,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(true), '->renderException() keep multiple line breaks');
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(), '->renderException() keep multiple line breaks');
     }
 
     public function testRenderAnonymousException()
@@ -835,7 +830,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertContains('[InvalidArgumentException@anonymous]', $tester->getDisplay(true));
+        $this->assertContains('[InvalidArgumentException@anonymous]', $tester->getDisplay());
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -846,7 +841,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertContains('Dummy type "@anonymous" is invalid.', $tester->getDisplay(true));
+        $this->assertContains('Dummy type "@anonymous" is invalid.', $tester->getDisplay());
     }
 
     public function testRun()
@@ -872,19 +867,19 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array(), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $tester->getDisplay(true), '->run() runs the list command if no argument is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $tester->getDisplay(), '->run() runs the list command if no argument is passed');
 
         $tester->run(array('--help' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(true), '->run() runs the help command if --help is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(), '->run() runs the help command if --help is passed');
 
         $tester->run(array('-h' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(true), '->run() runs the help command if -h is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(), '->run() runs the help command if -h is passed');
 
         $tester->run(array('command' => 'list', '--help' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(true), '->run() displays the help if --help is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(), '->run() displays the help if --help is passed');
 
         $tester->run(array('command' => 'list', '-h' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(true), '->run() displays the help if -h is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(), '->run() displays the help if -h is passed');
 
         $tester->run(array('--ansi' => true));
         $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
@@ -893,10 +888,10 @@ class ApplicationTest extends TestCase
         $this->assertFalse($tester->getOutput()->isDecorated(), '->run() forces color output to be disabled if --no-ansi is passed');
 
         $tester->run(array('--version' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(true), '->run() displays the program version if --version is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(), '->run() displays the program version if --version is passed');
 
         $tester->run(array('-V' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(true), '->run() displays the program version if -v is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(), '->run() displays the program version if -v is passed');
 
         $tester->run(array('command' => 'list', '--quiet' => true));
         $this->assertSame('', $tester->getDisplay(), '->run() removes all output if --quiet is passed');
@@ -937,10 +932,10 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo:bar', '--no-interaction' => true), array('decorated' => false));
-        $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if --no-interaction is passed');
+        $this->assertSame("called\n", $tester->getDisplay(), '->run() does not call interact() if --no-interaction is passed');
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
-        $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
+        $this->assertSame("called\n", $tester->getDisplay(), '->run() does not call interact() if -n is passed');
     }
 
     /**
@@ -1226,7 +1221,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertEquals('before.foo.after.'.PHP_EOL, $tester->getDisplay());
+        $this->assertEquals("before.foo.after.\n", $tester->getDisplay());
     }
 
     /**
@@ -1514,7 +1509,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array(), array('interactive' => false));
-        $this->assertEquals('called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+        $this->assertEquals("called\n", $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
 
         $application = new CustomDefaultCommandApplication();
         $application->setAutoExit(false);
@@ -1522,7 +1517,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array(), array('interactive' => false));
 
-        $this->assertEquals('called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+        $this->assertEquals("called\n", $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
     public function testSetRunCustomDefaultCommandWithOption()
@@ -1537,7 +1532,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('--fooopt' => 'opt'), array('interactive' => false));
 
-        $this->assertEquals('called'.PHP_EOL.'opt'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+        $this->assertEquals("called\nopt\n", $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
     public function testSetRunCustomSingleCommand()
@@ -1593,13 +1588,13 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'lazy:command'));
-        $this->assertSame("lazy-command called\n", $tester->getDisplay(true));
+        $this->assertSame("lazy-command called\n", $tester->getDisplay());
 
         $tester->run(array('command' => 'lazy:alias'));
-        $this->assertSame("lazy-command called\n", $tester->getDisplay(true));
+        $this->assertSame("lazy-command called\n", $tester->getDisplay());
 
         $tester->run(array('command' => 'lazy:alias2'));
-        $this->assertSame("lazy-command called\n", $tester->getDisplay(true));
+        $this->assertSame("lazy-command called\n", $tester->getDisplay());
 
         $command = $application->get('lazy:command');
         $this->assertSame(array('lazy:alias', 'lazy:alias2'), $command->getAliases());

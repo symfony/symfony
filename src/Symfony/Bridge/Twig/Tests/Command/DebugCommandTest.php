@@ -39,7 +39,7 @@ class DebugCommandTest extends TestCase
         );
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
+        $this->assertEquals($expected, json_decode($tester->getDisplay(), true));
     }
 
     /**
@@ -60,7 +60,7 @@ class DebugCommandTest extends TestCase
         $ret = $tester->execute($input, array('decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringMatchesFormat($output, $tester->getDisplay(true));
+        $this->assertStringMatchesFormat($output, $tester->getDisplay());
     }
 
     public function getDebugTemplateNameTestData()

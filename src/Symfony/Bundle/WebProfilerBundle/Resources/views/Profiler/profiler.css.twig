@@ -892,6 +892,9 @@ tr.status-warning td {
     background-color: var(--base-5);
     color: var(--base-2);
 }
+.tab-content {
+    position: relative;
+}
 .tab-content > *:first-child {
     margin-top: 0;
 }
@@ -957,11 +960,43 @@ table.logs .metadata {
 }
 table.logs tr td:last-child { width: 100%; }
 
-.log-levels { width: 100%; margin: 0; padding: 0; display: flex; align-items: center; list-style: none; }
-.log-levels li { width: 100%; padding: 3px; margin: 0; cursor: pointer; text-align: center; border: 2px dashed #e0e0e0; border-radius: 5px; color: #888; }
-.log-levels li + li { margin-left: 10px; }
-.log-levels li.active { background: #eee; color: #666; border-style: solid; border-width: 1px; padding: 4px; border-color: #aaa; }
-.log-levels li.last-active { cursor: not-allowed; }
+.log-levels { position: absolute; right: 5px; top: 33px; }
+.log-levels { border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-end; }
+.log-levels:before {
+    content: "Filter";
+    cursor: pointer;
+    /* "filter" icon provided by FontAwesome - CC BY 4.0 License
+       https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt */
+    background: var(--table-background) no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23999" d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z" class=""></path></svg>');
+    background-position: 6px 6px;
+    background-size: 14px 14px;
+    padding: 4px 10px 4px 24px;
+    position: absolute;
+    top: -28px;
+}
+.log-levels:hover li { display: inline-flex; }
+.log-levels li {
+    background: var(--tab-disabled-background);
+    border-bottom: var(--border);
+    color: var(--tab-disabled-color);
+    cursor: s-resize;
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 5px 10px;
+    text-align: left;
+    width: 100%;
+}
+.log-levels li.active {
+    background: var(--tab-background);
+    color: var(--tab-color);
+    cursor: n-resize;
+}
+.log-levels li.last-active {
+    background: var(--tab-active-background);
+    color: var(--tab-active-color);
+    cursor: unset;
+}
 
 {# Doctrine panel
    ========================================================================= #}

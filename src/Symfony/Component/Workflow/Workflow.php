@@ -118,6 +118,11 @@ class Workflow implements WorkflowInterface
 
             $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
+            // For case of non unique transition names exit the loop on transition that is supposed to be validated.
+            // Else we might get different blocker list containing blockedByMarking instead of blocker from the guard event.
+            // Reason is if you have transition "t" from "a" to "c" and transition "t" from "b" to "c" and you are in place "a"
+            // transitions loop might exit in transition with "from" place "b"
+            // which means you would get $transitionBlockerList containing blockedByMarking instead of guard blocker or none.
             foreach ($transition->getFroms() as $place) {
                 if ($marking->has($place)) {
                     break 2;

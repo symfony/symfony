@@ -7,7 +7,7 @@ CHANGELOG
  * added support for connecting to Redis clusters via DSN
  * added support for configuring multiple Memcached servers via DSN
  * added `MarshallerInterface` and `DefaultMarshaller` to allow changing the serializer and provide one that automatically uses igbinary when available
- * added `CacheInterface`, which provides stampede protection via probabilistic early expiration and should become the preferred way to use a cache
+ * implemented `CacheInterface`, which provides stampede protection via probabilistic early expiration and should become the preferred way to use a cache
  * added sub-second expiry accuracy for backends that support it
  * added support for phpredis 4 `compression` and `tcp_keepalive` options
  * added automatic table creation when using Doctrine DBAL with PDO-based backends

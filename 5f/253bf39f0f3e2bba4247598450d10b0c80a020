@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-19T11:52:18Z
+
+Seems like it's used actually.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-10-19T12:00:45Z
+
+@chalasr where ? I was not able to find usage and tests are OK
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-19T12:11:11Z
+
+@lyrixx https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Security/Guard/Authenticator/AbstractFormLoginAuthenticator.php#L77 and https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Security/Http/Authentication/DefaultAuthenticationSuccessHandler.php#L110
+(tests aren't ok, see travis)
+
+Seems relevant for AbstractFormLoginAuthenticator only starting from 4.1.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-10-19T12:20:52Z
+
+Arf! Sorry. Indeed I mixed Symfony versions. Should be better now

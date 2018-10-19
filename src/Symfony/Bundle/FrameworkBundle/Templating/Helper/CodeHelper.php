@@ -211,6 +211,8 @@ class CodeHelper extends Helper
 
     protected static function fixCodeMarkup($line)
     {
+        $line = trim($line);
+
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');
         $closing = strpos($line, '</span>');
@@ -220,8 +222,7 @@ class CodeHelper extends Helper
 
         // missing </span> tag at the end of line
         $opening = strpos($line, '<span');
-        $closing = strpos($line, '</span>');
-        if (false !== $opening && (false === $closing || $closing > $opening)) {
+        if (false !== $opening && '</span>' !== substr($line, -7)) {
             $line .= '</span>';
         }
 

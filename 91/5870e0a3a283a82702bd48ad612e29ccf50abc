@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-17T12:21:13Z
+
+Thanks for spotting this! However, could you add a test to cover the bug you are fixing?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T15:00:47Z
+
+Hi @Britaliope thanks for the PR.
+You submitted this on master, but we merge bug fixes on the lowest branches where they exist (and then we merge lower branches to upper ones.)
+Which is the lowest branch where this bug exists? It can be either 2.8, 3.4 or 4.1.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-20T15:46:02Z
+
+This bug was introduced by the upcoming @SerializedName feature.

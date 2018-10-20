@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by olvlvl at 2018-10-14T16:51:46Z
+
+Looks like there's an issue during the php7.2 build.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-14T21:07:36Z
+
+Note that while the code may not work correctly when no code is returned, I'm not sure it's legit to return nothing:
+looking at your work in https://github.com/olvlvl/symfony-dependency-injection-proxy, I see that you generate proxies as anonymous classes. But this means that if the same interface (or set of interfaces) is proxied several times for several different services, the implementation for the proxy is going to be duplicated as many times.
+Might be better to consider returning nothing is unsupported and dedup proxies on your side?

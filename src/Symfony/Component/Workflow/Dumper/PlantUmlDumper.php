@@ -14,6 +14,7 @@ namespace Symfony\Component\Workflow\Dumper;
 use InvalidArgumentException;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Metadata\GetMetadataTrait;
 
 /**
  * PlantUmlDumper dumps a workflow as a PlantUML file.
@@ -26,6 +27,8 @@ use Symfony\Component\Workflow\Marking;
  */
 class PlantUmlDumper implements DumperInterface
 {
+    use GetMetadataTrait;
+
     private const INITIAL = '<<initial>>';
     private const MARKED = '<<marked>>';
 
@@ -51,6 +54,7 @@ class PlantUmlDumper implements DumperInterface
     );
 
     private $transitionType = self::STATEMACHINE_TRANSITION;
+    private $workflowMetadata;
 
     public function __construct(string $transitionType = null)
     {
@@ -64,6 +68,7 @@ class PlantUmlDumper implements DumperInterface
     {
         $options = array_replace_recursive(self::DEFAULT_OPTIONS, $options);
         $code = $this->initialize($options);
+        $this->workflowMetadata = $definition->getMetadataStore();
         foreach ($definition->getPlaces() as $place) {
             $placeEscaped = $this->escape($place);
             $code[] =
@@ -83,10 +88,14 @@ class PlantUmlDumper implements DumperInterface
                 $fromEscaped = $this->escape($from);
                 foreach ($transition->getTos() as $to) {
                     $toEscaped = $this->escape($to);
+                    $transitionColor = $this->workflowMetadata->getMetadata('color', $transition) ?? '';
+                    if (!empty($transitionColor)) {
+                        $transitionColor = sprintf('[#%s]', $transitionColor);
+                    }
                     if ($this->isWorkflowTransitionType()) {
                         $lines = array(
-                            "$fromEscaped --> $transitionEscaped",
-                            "$transitionEscaped --> $toEscaped",
+                            "$fromEscaped -${transitionColor}-> $transitionEscaped",
+                            "$transitionEscaped -${transitionColor}-> $toEscaped",
                         );
                         foreach ($lines as $line) {
                             if (!\in_array($line, $code)) {
@@ -94,7 +103,7 @@ class PlantUmlDumper implements DumperInterface
                             }
                         }
                     } else {
-                        $code[] = "$fromEscaped --> $toEscaped: $transitionEscaped";
+                        $code[] = "$fromEscaped -${transitionColor}-> $toEscaped: $transitionEscaped";
                     }
                 }
             }

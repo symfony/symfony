@@ -3,6 +3,7 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
@@ -14,12 +15,17 @@ trait WorkflowBuilderTrait
         $transitions = array();
         $transitions[] = new Transition('t1', 'a', array('b', 'c'));
         $transitions[] = new Transition('t2', array('b', 'c'), 'd');
-        $transitions[] = new Transition('t3', 'd', 'e');
+        $transitionWithMetadataColorGreen = new Transition('t3', 'd', 'e');
+        $transitions[] = $transitionWithMetadataColorGreen;
         $transitions[] = new Transition('t4', 'd', 'f');
         $transitions[] = new Transition('t5', 'e', 'g');
         $transitions[] = new Transition('t6', 'f', 'g');
 
-        return new Definition($places, $transitions);
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithMetadataColorGreen] = array('color' => 'Green');
+        $inMemoryMetadataStore = new InMemoryMetadataStore(array(), array(), $transitionsMetadata);
+
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
 
         // The graph looks like:
         // +---+     +----+     +---+     +----+     +----+     +----+     +----+     +----+     +---+
@@ -38,10 +44,17 @@ trait WorkflowBuilderTrait
         $places = range('a', 'c');
 
         $transitions = array();
-        $transitions[] = new Transition('t1', 'a', 'b');
-        $transitions[] = new Transition('t2', 'b', 'c');
+        $transitionWithMetadataColorPurple = new Transition('t1', 'a', 'b');
+        $transitions[] = $transitionWithMetadataColorPurple;
+        $transitionWithMetadataColorPink = new Transition('t2', 'b', 'c');
+        $transitions[] = $transitionWithMetadataColorPink;
 
-        return new Definition($places, $transitions);
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithMetadataColorPurple] = array('color' => 'Purple');
+        $transitionsMetadata[$transitionWithMetadataColorPink] = array('color' => 'Pink');
+        $inMemoryMetadataStore = new InMemoryMetadataStore(array(), array(), $transitionsMetadata);
+
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
 
         // The graph looks like:
         // +---+     +----+     +---+     +----+     +---+
@@ -82,13 +95,18 @@ trait WorkflowBuilderTrait
         $places = array('a', 'b', 'c', 'd');
 
         $transitions[] = new Transition('t1', 'a', 'b');
-        $transitions[] = new Transition('t1', 'd', 'b');
-        $transitions[] = new Transition('t2', 'b', 'c');
+        $transitionWithMetadataColorRed = new Transition('t1', 'd', 'b');
+        $transitions[] = $transitionWithMetadataColorRed;
+        $transitionWithMetadataColorBlue = new Transition('t2', 'b', 'c');
+        $transitions[] = $transitionWithMetadataColorBlue;
         $transitions[] = new Transition('t3', 'b', 'd');
 
-        $definition = new Definition($places, $transitions);
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithMetadataColorRed] = array('color' => 'Red');
+        $transitionsMetadata[$transitionWithMetadataColorBlue] = array('color' => 'Blue');
+        $inMemoryMetadataStore = new InMemoryMetadataStore(array(), array(), $transitionsMetadata);
 
-        return $definition;
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
 
         // The graph looks like:
         //                     t1

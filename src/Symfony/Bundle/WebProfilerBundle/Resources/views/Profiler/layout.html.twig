@@ -16,6 +16,10 @@
                                 <a href="{{ profile.url }}">{{ profile.url }}</a>
                             {% else %}
                                 {{ profile.url }}
+                                {% set referer = profile.collector('request').requestheaders.get('referer') %}
+                                {% if referer %}
+                                    <a href="{{ referer }}" class="referer">Replay referer URL</a>
+                                {% endif %}
                             {% endif %}
                         </h2>
 

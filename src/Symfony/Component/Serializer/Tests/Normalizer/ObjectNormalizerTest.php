@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -29,6 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\NotSerializedConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 
 /**
@@ -362,6 +364,27 @@ class ObjectNormalizerTest extends TestCase
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
             ), 'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy', null, array(ObjectNormalizer::GROUPS => array('name_converter')))
+        );
+    }
+
+    public function testMetadataAwareNameConvertorWithNotSerializedConstructorParameter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new NotSerializedConstructorArgumentDummy('buz');
+        $obj->setBar('xyz');
+
+        $this->assertEquals(
+            $obj,
+            $this->normalizer->denormalize(array('bar' => 'xyz'),
+                'Symfony\Component\Serializer\Tests\Fixtures\NotSerializedConstructorArgumentDummy',
+                null,
+                array(ObjectNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS => array(
+                    'Symfony\Component\Serializer\Tests\Fixtures\NotSerializedConstructorArgumentDummy' => array('foo' => 'buz'),
+                ))
+            )
         );
     }
 

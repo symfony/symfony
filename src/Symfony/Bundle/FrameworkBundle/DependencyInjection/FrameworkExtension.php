@@ -25,7 +25,6 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
-use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -101,6 +100,7 @@ use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 

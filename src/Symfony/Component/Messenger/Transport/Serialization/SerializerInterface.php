@@ -31,7 +31,7 @@ interface SerializerInterface
     public function decode(array $encodedEnvelope): Envelope;
 
     /**
-     * Encodes an envelope content (message & items) to a common format understandable by transports.
+     * Encodes an envelope content (message & stamps) to a common format understandable by transports.
      * The encoded array should only contain scalars and arrays.
      *
      * The most common keys of the encoded array are:

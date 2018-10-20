@@ -13,10 +13,10 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
+use Symfony\Component\Messenger\Stamp\SerializerStamp;
+use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -34,15 +34,15 @@ class SerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
     }
 
-    public function testEncodedWithConfigurationIsDecodable()
+    public function testEncodedWithStampsIsDecodable()
     {
         $serializer = new Serializer(
             new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
         );
 
         $envelope = Envelope::wrap(new DummyMessage('Hello'))
-            ->with(new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
-            ->with(new ValidationConfiguration(array('foo', 'bar')))
+            ->with(new SerializerStamp(array(ObjectNormalizer::GROUPS => array('foo'))))
+            ->with(new ValidationStamp(array('foo', 'bar')))
         ;
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
@@ -59,7 +59,6 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('body', $encoded);
         $this->assertArrayHasKey('headers', $encoded);
         $this->assertArrayHasKey('type', $encoded['headers']);
-        $this->assertArrayNotHasKey('X-Message-Envelope-Items', $encoded['headers']);
         $this->assertEquals(DummyMessage::class, $encoded['headers']['type']);
     }
 
@@ -80,7 +79,7 @@ class SerializerTest extends TestCase
         $this->assertSame($message, $decoded->getMessage());
     }
 
-    public function testEncodedWithSymfonySerializerForItems()
+    public function testEncodedWithSymfonySerializerForStamps()
     {
         $serializer = new Serializer(
             new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder())),
@@ -89,8 +88,8 @@ class SerializerTest extends TestCase
         );
 
         $envelope = Envelope::wrap(new DummyMessage('Hello'))
-            ->with($serializerConfiguration = new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
-            ->with($validationConfiguration = new ValidationConfiguration(array('foo', 'bar')))
+            ->with($serializerStamp = new SerializerStamp(array(ObjectNormalizer::GROUPS => array('foo'))))
+            ->with($validationStamp = new ValidationStamp(array('foo', 'bar')))
         ;
 
         $encoded = $serializer->encode($envelope);
@@ -98,12 +97,12 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('body', $encoded);
         $this->assertArrayHasKey('headers', $encoded);
         $this->assertArrayHasKey('type', $encoded['headers']);
-        $this->assertArrayHasKey('X-Message-Envelope-Symfony\Component\Messenger\Transport\Serialization\SerializerConfiguration', $encoded['headers']);
-        $this->assertArrayHasKey('X-Message-Envelope-Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration', $encoded['headers']);
+        $this->assertArrayHasKey('X-Message-Stamp-'.SerializerStamp::class, $encoded['headers']);
+        $this->assertArrayHasKey('X-Message-Stamp-'.ValidationStamp::class, $encoded['headers']);
 
         $decoded = $serializer->decode($encoded);
 
-        $this->assertEquals($serializerConfiguration, $decoded->get(SerializerConfiguration::class));
-        $this->assertEquals($validationConfiguration, $decoded->get(ValidationConfiguration::class));
+        $this->assertEquals($serializerStamp, $decoded->get(SerializerStamp::class));
+        $this->assertEquals($validationStamp, $decoded->get(ValidationStamp::class));
     }
 }

@@ -9,15 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Middleware\Configuration;
+namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\Messenger\EnvelopeItemInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-final class ValidationConfiguration implements EnvelopeItemInterface
+final class ValidationStamp implements StampInterface
 {
     private $groups;
 

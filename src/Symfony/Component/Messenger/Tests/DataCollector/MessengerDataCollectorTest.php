@@ -62,7 +62,7 @@ class MessengerDataCollectorTest extends TestCase
         $file = __FILE__;
         $messageDump = <<<DUMP
   "bus" => "default"
-  "envelopeItems" => null
+  "stamps" => null
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
@@ -145,7 +145,7 @@ DUMP
         $this->assertStringMatchesFormat(<<<DUMP
 array:5 [
   "bus" => "default"
-  "envelopeItems" => null
+  "stamps" => null
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A

@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Transport\Serialization;
-
-use Symfony\Component\Messenger\EnvelopeItemInterface;
+namespace Symfony\Component\Messenger\Stamp;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-final class SerializerConfiguration implements EnvelopeItemInterface
+final class SerializerStamp implements StampInterface
 {
     private $context;
 

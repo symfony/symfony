@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-16T13:03:23Z
+
+@fbourigault this looks very promising. Thanks!
+
+A quick question: why are performance improvements massive for 4.1 and minimal for 3.4?
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-16T13:12:40Z
+
+The 3.4 vs this PR comparison is here to show that we are almost back at 3.4 performance level (the class discriminator feature was introduced in 4.1).
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-17T07:54:31Z
+
+What about storing in a cache the `ClassDiscriminatorResolverInterface::getMappingForClass`, `ClassDiscriminatorResolverInterface::getMappingForMappedObject` and `ClassDiscriminatorResolverInterface::getTypeForMappedObject` results using the class name as key? With a decorate we should be able to reduce the calls to `ClassMetadataFactoryInterface` to only one per class. This could be done in an other PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-17T08:43:01Z
+
+@fbourigault sounds good to me
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-17T08:43:41Z
+
+The v2.1 of this PR use much more memory than the v1.
+
+4.1 vs #28889 v1 : https://blackfire.io/profiles/compare/6cf63a44-65ef-4fb6-90e2-7de049c846fc/graph
+4.1 vs #28889 v2.1 : https://blackfire.io/profiles/compare/00c4aa38-97d3-41c3-928c-84c5e909cdde/graph
+
+I think this is because the benchmark use a lot of the same class objects which would mimic a collection serialization.
+
+This may require profiling with more objects of different type (more like a single object serialization).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-17T09:13:04Z
+
+Can you try if using an associative array with the result of `spl_object_hash()` as key, instead of an `SplObjectMap` reduces the memory footprint?
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-17T09:50:28Z
+
+Yes it is (https://blackfire.io/profiles/compare/20ead249-0e98-430f-9b8d-906f464b1854/graph)
+
+It's also faster than using `SplObjectStorage` (https://blackfire.io/profiles/compare/eeb2fad7-73d5-4072-8190-5cc3f77d113f/graph).
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-18T08:17:43Z
+
+I just pushed v4, which use `get_class($object)` as cache key. This is working because we were already storing the name of the discriminator field into the cache and of course, it's always the same for a given class.
+
+This is the best improvement we can do as it totally kills the class discriminator overhead!
+- [3.4 vs #28889 v4](https://blackfire.io/profiles/compare/58ea48cb-1a2b-4f4d-b273-955efbb6f443/graph)
+- [4.1 vs #28889 v4](https://blackfire.io/profiles/compare/d604531b-27d4-4761-92a8-bf29c0dc30aa/graph)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T21:20:37Z
+
+Thank you @fbourigault.

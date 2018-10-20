@@ -1,3 +1,5 @@
+{# This file is partially duplicated in TwigBundle/Resources/views/exceotion.css.twig.
+   If you make any change in this file, verify the same change is needed in the other file. #}
 {# Normalization
    (normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css)
    ========================================================================= #}
@@ -7,7 +9,7 @@
     --font-sans-serif: 'Helvetica, Arial, sans-serif';
     --page-background: #f9f9f9;
     --color-text: #222;
-    --color-muted: #777;
+    --color-muted: #999;
     /* when updating any of these colors, do the same in toolbar.css.twig */
     --color-success: #4f805d;
     --color-warning: #a46a1f;
@@ -28,7 +30,6 @@
     --table-header: #e0e0e0;
     --shadow: 0px 0px 1px rgba(128, 128, 128, .2);
     --border: 1px solid #e0e0e0;
-    --color-muted: #999;
     --base-0: #fff;
     --base-1: #f5f5f5;
     --base-2: #e0e0e0;
@@ -892,9 +893,6 @@ tr.status-warning td {
     background-color: var(--base-5);
     color: var(--base-2);
 }
-.tab-content {
-    position: relative;
-}
 .tab-content > *:first-child {
     margin-top: 0;
 }
@@ -916,6 +914,42 @@ tr.status-warning td {
 .sf-toggle-content.sf-toggle-visible {
     display: block;
 }
+
+{# Filters
+   ========================================================================= #}
+[data-filters] { position: relative; }
+[data-filtered] { cursor: pointer; }
+[data-filtered]:after { content: '\00a0\25BE'; }
+[data-filtered]:hover .filter-list li { display: inline-flex; }
+[class*="filter-hidden-"] { display: none; }
+.filter-list { position: absolute; border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; }
+.filter-list :after { content: ''; }
+.filter-list li {
+    background: var(--tab-disabled-background);
+    border-bottom: var(--border);
+    color: var(--tab-disabled-color);
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 5px 10px;
+    text-align: left;
+    font-weight: normal;
+}
+.filter-list li.active {
+    background: var(--tab-background);
+    color: var(--tab-color);
+}
+.filter-list li.last-active {
+    background: var(--tab-active-background);
+    color: var(--tab-active-color);
+}
+
+.filter-list-level li { cursor: s-resize; }
+.filter-list-level li.active { cursor: n-resize; }
+.filter-list-level li.last-active { cursor: default; }
+.filter-list-level li.last-active:before { content: '\2714\00a0'; }
+.filter-list-choice li:before { content: '\2714\00a0'; color: var(--tab-background); }
+.filter-list-choice li.active:before { color: unset; }
 
 {# Twig panel
    ========================================================================= #}
@@ -957,45 +991,6 @@ tr.status-warning td {
 table.logs .metadata {
     display: block;
     font-size: 12px;
-}
-table.logs tr td:last-child { width: 100%; }
-
-.log-levels { position: absolute; right: 5px; top: 33px; }
-.log-levels { border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-end; }
-.log-levels:before {
-    content: "Filter";
-    cursor: pointer;
-    /* "filter" icon provided by FontAwesome - CC BY 4.0 License
-       https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt */
-    background: var(--table-background) no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23999" d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z" class=""></path></svg>');
-    background-position: 6px 6px;
-    background-size: 14px 14px;
-    padding: 4px 10px 4px 24px;
-    position: absolute;
-    top: -28px;
-}
-.log-levels:hover li { display: inline-flex; }
-.log-levels li {
-    background: var(--tab-disabled-background);
-    border-bottom: var(--border);
-    color: var(--tab-disabled-color);
-    cursor: s-resize;
-    display: none;
-    list-style: none;
-    margin: 0;
-    padding: 5px 10px;
-    text-align: left;
-    width: 100%;
-}
-.log-levels li.active {
-    background: var(--tab-background);
-    color: var(--tab-color);
-    cursor: n-resize;
-}
-.log-levels li.last-active {
-    background: var(--tab-active-background);
-    color: var(--tab-active-color);
-    cursor: unset;
 }
 
 {# Doctrine panel

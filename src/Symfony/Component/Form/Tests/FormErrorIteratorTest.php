@@ -23,7 +23,7 @@ class FormErrorIteratorTest extends TestCase
     /**
      * @dataProvider findByCodesProvider
      */
-    public function testFindByCodes($code, $violationsCount)
+    public function testFindByCodesWhenAllCausesAreViolationConstraints($code, $violationsCount)
     {
         if (!class_exists(ConstraintViolation::class)) {
             $this->markTestSkipped('Validator component required.');
@@ -45,6 +45,43 @@ class FormErrorIteratorTest extends TestCase
         $form->addError(new FormError('Error 2!', null, array(), null, $cause));
         $cause = new ConstraintViolation('Error 3!', null, array(), null, '', null, null, 'code2');
         $form->addError(new FormError('Error 3!', null, array(), null, $cause));
+        $formErrors = $form->getErrors();
+
+        $specificFormErrors = $formErrors->findByCodes($code);
+        $this->assertInstanceOf(FormErrorIterator::class, $specificFormErrors);
+        $this->assertCount($violationsCount, $specificFormErrors);
+    }
+
+    /**
+     * @dataProvider findByCodesProvider
+     */
+    public function testFindByCodesWhenAllCausesAreVariousObjectsOrSimpleStrings($code, $violationsCount)
+    {
+        if (!class_exists(ConstraintViolation::class)) {
+            $this->markTestSkipped('Validator component required.');
+        }
+
+        $formBuilder = new FormBuilder(
+            'form',
+            null,
+            new EventDispatcher(),
+            $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock(),
+            array()
+        );
+
+        $form = $formBuilder->getForm();
+
+        $cause = new ConstraintViolation('Error 1!', null, array(), null, '', null, null, 'code1');
+        $form->addError(new FormError('Error 1!', null, array(), null, $cause));
+        $cause = new class() {
+            public function __toString()
+            {
+                return 'code1';
+            }
+        };
+
+        $form->addError(new FormError('Error 2!', null, array(), null, $cause));
+        $form->addError(new FormError('Error 3!', null, array(), null, 'code2'));
         $formErrors = $form->getErrors();
 
         $specificFormErrors = $formErrors->findByCodes($code);

@@ -39,6 +39,7 @@ CHANGELOG
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
  * added a cause when a CSRF error has occurred
  * deprecated the `scale` option of the `IntegerType`
+ * findByCodes of `FormErrorIterator` is able to also filter causes that are string or objects that implement the `__toString` method
  * removed restriction on allowed HTTP methods
 
 4.1.0

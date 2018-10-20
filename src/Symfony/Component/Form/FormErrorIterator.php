@@ -267,6 +267,16 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
             $cause = $error->getCause();
             if ($cause instanceof ConstraintViolation && \in_array($cause->getCode(), $codes, true)) {
                 $errors[] = $error;
+                continue;
+            }
+
+            if (!is_scalar($cause) && !(\is_object($cause) && method_exists($cause, '__toString'))) {
+                continue;
+            }
+
+            $cause = (string) $cause;
+            if (\in_array($cause, $codes, true)) {
+                $errors[] = $error;
             }
         }
 

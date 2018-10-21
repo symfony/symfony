@@ -585,9 +585,18 @@ tr.status-warning td {
     font-size: 21px;
     margin: 0;
     text-decoration: none;
+    vertical-align: middle;
 }
 #summary h2 a:hover {
     text-decoration: underline;
+}
+#summary h2 a.referer {
+    margin-left: .5em;
+    font-size: 75%;
+    color: rgba(255, 255, 255, 0.5);
+}
+#summary h2 a.referer:before {
+    content: '\1F503\00a0';
 }
 
 #summary .status-success { background: var(--color-success); }

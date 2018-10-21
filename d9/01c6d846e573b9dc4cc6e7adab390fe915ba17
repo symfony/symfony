@@ -1,0 +1,232 @@
+---------------------------------------------------------------------------
+
+by SpacePossum at 2018-10-17T17:26:21Z
+
+:+1: shipit :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-10-17T19:48:57Z
+
+Does `ChainHandler` used somewhere internally? What use cases for it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-17T19:51:21Z
+
+Yes: it's used when several handlers are configured for a message, using the `messenger.message_handler` tag.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-10-17T20:51:11Z
+
+I'm :-1: here, the messenger component can be used for things like query buses where being able to return a result makes sense.
+
+Setting the result on the query would force to transform a code like this
+```
+$result = $bus->dispatch(new Query());
+```
+into
+```
+$query = new Query();
+$bus->dispatch($query);
+$result = $query->getResult();
+```
+which would makes it really annoying to use.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-17T21:37:01Z
+
+This change would exclude using the messenger component as query bus and command pattern bus.
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-10-18T05:57:44Z
+
+@nicolas-grekas can you please open also PR into docs repository and describe how to properly configure query bus? I hope it removes all the questions.
+
+> or better, a callback set on the command object
+
+Would be nice have some example.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T06:22:27Z
+
+Basically these two alternatives, which both allow specifying the expected type:
+This first one already written above:
+```
+$query = new Query();
+$bus->dispatch($query);
+$result = $query->getResult();
+```
+Or better:
+```
+$bus->dispatch(new Query([$this, 'onResult']));
+```
+It may not be as simple to write as `$result = $bus->dispatch(new Query());`, but it allows enforcing the expected return type, which is just basic requirements for any maintainable software design. People cannot want typed properties and reject the type system at the same time.
+We spent years killing public services because they rely on hard coupling with the configuration and hide deps. Here it's exactly the same drawbacks, except it is for return types instead of arguments.
+
+DX will be improved by allowing both readers and the IDE to know what they can expect (and suggest for autocompletion.)
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-18T07:28:45Z
+
+> `$bus->dispatch(new Query([$this, 'onResult']));`
+
+Wouldn't this fail because any message may at some point be serialized?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T07:38:33Z
+
+@fbourigault if you expect any results back from a query bus, it means the bus is synchronous. Only asynchronous messages are serialized.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-10-18T07:39:08Z
+
+> $bus->dispatch(new Query([$this, 'onResult']));
+
+This doesn't work if you are in a controller and need the result to return a response which is a common use case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T07:42:13Z
+
+@jvasseur sure, but as you wrote yourself, you know how to do otherwise.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T07:46:49Z
+
+One thing that we could return is the passed object if that makes sense to others:
+`$bus->dispatch(new Query())->getResult();`
+EventDispatcher does something similar.
+But since PHP doesn't have generics, the result cannot be autocompleted without extra rules for the IDE (the return type is still locally known, but cannot be expressed in PHP.)
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-10-18T07:47:56Z
+
+> @fbourigault if you expect any results back from a query bus, it means the bus is synchronous. Only asynchronous messages are serialized.
+
+I know but it's so easy to switch from sync to async that things would break so easily which is not so good for DX.
+
+Anyway, you convinced me and I prefer having a robust component that can't return than having one that may return but is more fragile.
+
+Maybe in the future, we will be able to ship a robust bus which can return a result but mixing both non-returning and returning buses in the same interface is too dangerous.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T07:50:21Z
+
+@fbourigault it's impossible to switch from sync to async if you expect any results back.
+That's why I wrote that this return value blurs the line of the component in the description. If you use the result in any way, you're de facto opting out of async in the near future.
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-10-18T07:53:18Z
+
+> @fbourigault it's impossible to switch from sync to async if you expect any results back.
+
+@nicolas-grekas  Internally it could be async (RPC over MQ with reply queue involved, for example). For a client, it still looks like a sync command but internally it is not.
+
+Not sure it is possible to do such thing in the messenger.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T09:26:06Z
+
+@makasim how can you do that in PHP? I'm not aware of any way to do that without using non-standard extensions...
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-10-18T09:35:04Z
+
+> how can you do that in PHP? I'm not aware of any way to do that without using non-standard extensions...
+
+what do you mean by non-standard extensions? You can do it with AMQP for example. In a nutshell, send a message to one queue and wait for a reply on reply queue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T09:39:54Z
+
+@makasim I don't understand what you're talking about in the context of this PR.
+My previous statement is the following:
+code like `$result = $bus->dispatch(new Query());` or `$bus->dispatch(new Query())->getResult();` or `$bus->dispatch(new Query([$this, 'onResult']));` are fundamentally incompatible with async in PHP.
+If you write the code in some other way, of course, async is possible. But with these very pieces of code, getting the result is by definition synchronous (I'm not considering that serializing "$this" is a viable way to make calling "onResult" async).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-18T12:48:56Z
+
+@nicolas-grekas : The component allows to handle both sync & async a single command with `send_and_handle` (cf https://symfony.com/doc/current/messenger.html#routing).
+However, I never had a use-case for this, so I cannot provide more feedback.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T12:55:48Z
+
+@ogizanagi sure, and this PR doesn't prevent this use case. It just enforces doing it in a way that is friendly to the type system and to software design. That's our responsibility as framework authors.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-18T13:05:01Z
+
+But would just prevent naively using `[$this, 'onResult']` as the message will be serialized. At least nobody wants the Messenger Serializer to try serializing this callable. Do we care?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T13:06:37Z
+
+At some point, people are responsible for the way they configure their buses.
+If one wants a query bus and wires the serializer on it, that's their will.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T13:08:13Z
+
+Side note: I think EventDispatcher is equally fine for creating command/query buses. The central innovations that Messenger adds to the Symfony stack are buses with transports.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T13:14:55Z
+
+Personally, I would even go one step further and require messages to be cloneable - and clone them before dispatching to middlewares... (this could be implemented as a middleware :) )
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-10-18T18:16:26Z
+
+closes #28758
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-10-19T13:19:28Z
+
+This makes a lot of sense to me. Nicolas listed may reasons (https://github.com/symfony/symfony/pull/28909#issue-223686182) why the return value is problematic in general for this component. SimpleBus's implementation returns void for these exact reasons (https://github.com/SimpleBus/MessageBus/issues/52).
+
+Should we support make sure QueryBus implementations are possible? Of course! And there are some examples in this issue of how we can continue to do it. It *does* increase the lines/characters of code slightly. But you also get proper return type / auto-completion - e.g. `$result = $bus->dispatch(new Query());` does not guarantee you know what `$result` is and you won't get auto-completion. Now you *would*, which is safer and a step forward for DX.
+
+👍
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T13:19:08Z
+
+While discussing this on Slack with @weaverryan, we figured out that it's very easy to wrap the `dispatch()` call in a helper method:
+```php
+private function query(MyQueryInterface $query): MyReturnType
+{
+    $this->bus->dispatch($query);
+    return $query->getResult();
+}
+```
+
+and then use `$result = $this->query(new MyQuery());`.
+I love this because it makes everything explicit, types wise: userland are encouraged to declare their contracts and get nice autocompletion in return, and maintainers get enough guarantees to not be blocked by external configuration or behavior, allowing to use the BC promise, the deprecation policy and other processes in place to maintain/enhance the component in the future.

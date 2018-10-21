@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Asynchronous\Routing;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\SenderInterface;
 
 /**
@@ -31,9 +32,9 @@ class ContainerSenderLocator extends AbstractSenderLocator
     /**
      * {@inheritdoc}
      */
-    public function getSenderForMessage($message): ?SenderInterface
+    public function getSender(Envelope $envelope): ?SenderInterface
     {
-        $senderId = self::getValueFromMessageRouting($this->messageToSenderIdMapping, $message);
+        $senderId = self::getValueFromMessageRouting($this->messageToSenderIdMapping, $envelope);
 
         return $senderId ? $this->senderServiceLocator->get($senderId) : null;
     }

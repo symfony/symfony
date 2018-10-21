@@ -29,8 +29,8 @@ class ContainerHandlerLocator extends AbstractHandlerLocator
     /**
      * {@inheritdoc}
      */
-    protected function getHandler(string $class): ?callable
+    protected function getHandlerByName(string $name): ?callable
     {
-        return $this->container->has($class) ? $this->container->get($class) : null;
+        return $this->container->has($name) ? $this->container->get($name) : null;
     }
 }

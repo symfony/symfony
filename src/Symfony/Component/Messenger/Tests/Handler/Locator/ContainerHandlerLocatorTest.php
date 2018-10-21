@@ -4,6 +4,7 @@ namespace Symfony\Component\Messenger\Tests\Handler\Locator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -19,7 +20,7 @@ class ContainerHandlerLocatorTest extends TestCase
         $container->set(DummyMessage::class, $handler);
 
         $locator = new ContainerHandlerLocator($container);
-        $resolvedHandler = $locator->resolve(new DummyMessage('Hey'));
+        $resolvedHandler = $locator->getHandler(new Envelope(new DummyMessage('Hey')));
 
         $this->assertSame($handler, $resolvedHandler);
     }
@@ -31,10 +32,10 @@ class ContainerHandlerLocatorTest extends TestCase
     public function testThrowsNoHandlerException()
     {
         $locator = new ContainerHandlerLocator(new Container());
-        $locator->resolve(new DummyMessage('Hey'));
+        $locator->getHandler(new Envelope(new DummyMessage('Hey')));
     }
 
-    public function testResolveMessageViaTheirInterface()
+    public function testGetHandlerViaInterface()
     {
         $handler = function () {};
 
@@ -42,12 +43,12 @@ class ContainerHandlerLocatorTest extends TestCase
         $container->set(DummyMessageInterface::class, $handler);
 
         $locator = new ContainerHandlerLocator($container);
-        $resolvedHandler = $locator->resolve(new DummyMessage('Hey'));
+        $resolvedHandler = $locator->getHandler(new Envelope(new DummyMessage('Hey')));
 
         $this->assertSame($handler, $resolvedHandler);
     }
 
-    public function testResolveMessageViaTheirParentClass()
+    public function testGetHandlerViaParentClass()
     {
         $handler = function () {};
 
@@ -55,7 +56,7 @@ class ContainerHandlerLocatorTest extends TestCase
         $container->set(DummyMessage::class, $handler);
 
         $locator = new ContainerHandlerLocator($container);
-        $resolvedHandler = $locator->resolve(new ChildDummyMessage('Hey'));
+        $resolvedHandler = $locator->getHandler(new Envelope(new ChildDummyMessage('Hey')));
 
         $this->assertSame($handler, $resolvedHandler);
     }

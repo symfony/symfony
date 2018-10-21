@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Asynchronous\Routing;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Asynchronous\Routing\ContainerSenderLocator;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
@@ -32,8 +33,8 @@ class ContainerSenderLocatorTest extends TestCase
             DummyMessage::class => 'my_amqp_sender',
         ));
 
-        $this->assertSame($sender, $locator->getSenderForMessage(new DummyMessage('Hello')));
-        $this->assertNull($locator->getSenderForMessage(new SecondMessage()));
+        $this->assertSame($sender, $locator->getSender(new Envelope(new DummyMessage('Hello'))));
+        $this->assertNull($locator->getSender(new Envelope(new SecondMessage())));
     }
 
     public function testItReturnsTheSenderBasedOnTheMessageParentClass()
@@ -51,8 +52,8 @@ class ContainerSenderLocatorTest extends TestCase
             DummyMessage::class => 'my_amqp_sender',
         ));
 
-        $this->assertSame($sender, $locator->getSenderForMessage(new ChildDummyMessage('Hello')));
-        $this->assertNull($locator->getSenderForMessage(new SecondMessage()));
+        $this->assertSame($sender, $locator->getSender(new Envelope(new ChildDummyMessage('Hello'))));
+        $this->assertNull($locator->getSender(new Envelope(new SecondMessage())));
     }
 
     public function testItReturnsTheSenderBasedOnTheMessageInterface()
@@ -66,8 +67,8 @@ class ContainerSenderLocatorTest extends TestCase
             DummyMessageInterface::class => 'my_amqp_sender',
         ));
 
-        $this->assertSame($sender, $locator->getSenderForMessage(new DummyMessage('Hello')));
-        $this->assertNull($locator->getSenderForMessage(new SecondMessage()));
+        $this->assertSame($sender, $locator->getSender(new Envelope(new DummyMessage('Hello'))));
+        $this->assertNull($locator->getSender(new Envelope(new SecondMessage())));
     }
 
     public function testItSupportsAWildcardInsteadOfTheMessageClass()
@@ -85,7 +86,7 @@ class ContainerSenderLocatorTest extends TestCase
             '*' => 'my_api_sender',
         ));
 
-        $this->assertSame($sender, $locator->getSenderForMessage(new DummyMessage('Hello')));
-        $this->assertSame($apiSender, $locator->getSenderForMessage(new SecondMessage()));
+        $this->assertSame($sender, $locator->getSender(new Envelope(new DummyMessage('Hello'))));
+        $this->assertSame($apiSender, $locator->getSender(new Envelope(new SecondMessage())));
     }
 }

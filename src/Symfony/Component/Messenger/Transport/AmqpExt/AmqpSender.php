@@ -35,7 +35,7 @@ class AmqpSender implements SenderInterface
     /**
      * {@inheritdoc}
      */
-    public function send(Envelope $envelope)
+    public function send(Envelope $envelope): void
     {
         $encodedMessage = $this->serializer->encode($envelope);
 

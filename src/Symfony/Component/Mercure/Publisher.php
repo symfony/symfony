@@ -33,7 +33,7 @@ final class Publisher
         $this->httpClient = $httpClient ?? array($this, 'publish');
     }
 
-    public function __invoke(Update $update)
+    public function __invoke(Update $update): string
     {
         $postData = array(
             'topic' => $update->getTopics(),
@@ -44,7 +44,7 @@ final class Publisher
             'retry' => $update->getRetry(),
         );
 
-        ($this->httpClient)($this->publishEndpoint, ($this->jwtProvider)(), $this->buildQuery($postData));
+        return ($this->httpClient)($this->publishEndpoint, ($this->jwtProvider)(), $this->buildQuery($postData));
     }
 
     /**
@@ -78,7 +78,7 @@ final class Publisher
         return sprintf('%s=%s', $key, urlencode($value));
     }
 
-    private function publish(string $url, string $jwt, string $postData)
+    private function publish(string $url, string $jwt, string $postData): string
     {
         $result = @file_get_contents($this->publishEndpoint, false, stream_context_create(array('http' => array(
             'method' => 'POST',
@@ -89,5 +89,7 @@ final class Publisher
         if (false === $result) {
             throw new \RuntimeException(sprintf('Unable to publish the update to the Mercure hub: %s', error_get_last()));
         }
+
+        return $result;
     }
 }

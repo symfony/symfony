@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware\Enhancers;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -21,7 +20,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class TraceableMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
+class TraceableMiddleware implements MiddlewareInterface
 {
     private $inner;
     private $stopwatch;
@@ -37,9 +36,9 @@ class TraceableMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
     }
 
     /**
-     * @param Envelope $envelope
+     * {@inheritdoc}
      */
-    public function handle($envelope, callable $next): void
+    public function handle(Envelope $envelope, callable $next): void
     {
         $class = \get_class($this->inner);
         $eventName = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
@@ -51,9 +50,9 @@ class TraceableMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
         $this->stopwatch->start($eventName, $this->eventCategory);
 
         try {
-            $this->inner->handle($envelope->getMessageFor($this->inner), function ($message) use ($next, $eventName) {
+            $this->inner->handle($envelope, function (Envelope $envelope) use ($next, $eventName) {
                 $this->stopwatch->stop($eventName);
-                $next($message);
+                $next($envelope);
                 $this->stopwatch->start($eventName, $this->eventCategory);
             });
         } finally {

@@ -670,7 +670,7 @@ class DummyReceiver implements ReceiverInterface
     public function receive(callable $handler): void
     {
         for ($i = 0; $i < 3; ++$i) {
-            $handler(Envelope::wrap(new DummyMessage("Dummy $i")));
+            $handler(new Envelope(new DummyMessage("Dummy $i")));
         }
     }
 
@@ -852,7 +852,7 @@ class HandlerOnUndefinedBus implements MessageSubscriberInterface
 
 class UselessMiddleware implements MiddlewareInterface
 {
-    public function handle($message, callable $next): void
+    public function handle(Envelope $message, callable $next): void
     {
         $next($message);
     }

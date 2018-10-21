@@ -26,7 +26,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
     public function testReceiverStopsWhenMemoryLimitExceeded(int $memoryUsage, int $memoryLimit, bool $shouldStop)
     {
         $callable = function ($handler) {
-            $handler(Envelope::wrap(new DummyMessage('API')));
+            $handler(new Envelope(new DummyMessage('API')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
@@ -59,7 +59,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
     public function testReceiverLogsMemoryExceededWhenLoggerIsGiven()
     {
         $callable = function ($handler) {
-            $handler(Envelope::wrap(new DummyMessage('API')));
+            $handler(new Envelope(new DummyMessage('API')));
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)

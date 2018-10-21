@@ -36,16 +36,6 @@ final class Envelope
     }
 
     /**
-     * Wrap a message into an envelope if not already wrapped.
-     *
-     * @param Envelope|object $message
-     */
-    public static function wrap($message): self
-    {
-        return $message instanceof self ? $message : new self($message);
-    }
-
-    /**
      * @return Envelope a new Envelope instance with additional stamp
      */
     public function with(StampInterface ...$stamps): self
@@ -55,15 +45,6 @@ final class Envelope
         foreach ($stamps as $stamp) {
             $cloned->stamps[\get_class($stamp)] = $stamp;
         }
-
-        return $cloned;
-    }
-
-    public function withMessage($message): self
-    {
-        $cloned = clone $this;
-
-        $cloned->message = $message;
 
         return $cloned;
     }
@@ -87,16 +68,5 @@ final class Envelope
     public function getMessage()
     {
         return $this->message;
-    }
-
-    /**
-     * @param object $target
-     *
-     * @return Envelope|object The original message or the envelope if the target supports it
-     *                         (i.e implements {@link EnvelopeAwareInterface}).
-     */
-    public function getMessageFor($target)
-    {
-        return $target instanceof EnvelopeAwareInterface ? $this : $this->message;
     }
 }

@@ -44,7 +44,7 @@ class AmqpTransportTest extends TestCase
         $amqpEnvelope->method('getBody')->willReturn('body');
         $amqpEnvelope->method('getHeaders')->willReturn(array('my' => 'header'));
 
-        $serializer->method('decode')->with(array('body' => 'body', 'headers' => array('my' => 'header')))->willReturn(Envelope::wrap($decodedMessage));
+        $serializer->method('decode')->with(array('body' => 'body', 'headers' => array('my' => 'header')))->willReturn(new Envelope($decodedMessage));
         $connection->method('get')->willReturn($amqpEnvelope);
 
         $transport->receive(function (Envelope $envelope) use ($transport, $decodedMessage) {

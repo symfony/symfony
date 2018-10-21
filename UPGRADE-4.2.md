@@ -257,6 +257,7 @@ TwigBundle
 ----------
 
  * The `transchoice` tag and filter have been deprecated, use the `trans` ones instead with a `%count%` parameter.
+ * Deprecated support for legacy templates directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`, use `templates/` and `templates/bundles/<BundleName>/` instead.
 
 Validator
 ---------

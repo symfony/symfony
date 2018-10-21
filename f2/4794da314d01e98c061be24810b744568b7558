@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T18:57:34Z
+
+> Should we remove Envelope::wrap()
+
+yes! same for `Envelope->withMessage()` as it's unused anymore. Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-21T13:09:45Z
+
+(rebased, ready)

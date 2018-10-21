@@ -1,0 +1,12 @@
+{
+    "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ClassWithoutDocComment",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "file": null,
+    "tags": []
+}

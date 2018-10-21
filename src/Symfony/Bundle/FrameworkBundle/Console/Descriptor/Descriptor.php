@@ -303,9 +303,11 @@ abstract class Descriptor implements DescriptorInterface
         try {
             $reflectionProperty = new \ReflectionClass($class);
 
-            return DocBlockFactory::createInstance()
-                ->create($reflectionProperty->getDocComment())
-                ->getSummary();
+            if ($docComment = $reflectionProperty->getDocComment()) {
+                return DocBlockFactory::createInstance()
+                    ->create($docComment)
+                    ->getSummary();
+            }
         } catch (\ReflectionException $e) {
         }
 

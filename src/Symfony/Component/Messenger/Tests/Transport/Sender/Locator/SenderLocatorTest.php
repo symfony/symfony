@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Sender\Locator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -28,8 +27,8 @@ class SenderLocatorTest extends TestCase
             DummyMessage::class => $sender,
         ));
 
-        $this->assertSame($sender, $locator->getSender(new Envelope(new DummyMessage('Hello'))));
-        $this->assertNull($locator->getSender(new Envelope(new SecondMessage())));
+        $this->assertSame($sender, $locator->getSender(DummyMessage::class));
+        $this->assertNull($locator->getSender(SecondMessage::class));
     }
 
     public function testItThrowsExceptionIfConfigurationIsWrong()
@@ -39,6 +38,6 @@ class SenderLocatorTest extends TestCase
         ));
 
         $this->expectException(RuntimeException::class);
-        $locator->getSender(new Envelope(new DummyMessage('Hello')));
+        $locator->getSender(DummyMessage::class);
     }
 }

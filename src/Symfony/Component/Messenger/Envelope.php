@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TopicStamp;
 
 /**
  * A message wrapped in an envelope with stamps (configurations, markers, ...).
@@ -36,6 +37,18 @@ final class Envelope
         foreach ($stamps as $stamp) {
             $this->stamps[\get_class($stamp)] = $stamp;
         }
+    }
+
+    /**
+     * Wraps a message into an envelope if not already wrapped.
+     *
+     * @param Envelope|object $message
+     */
+    public static function wrap($message, ?string $topic): self
+    {
+        $envelope = $message instanceof self ? $message : new self($message);
+
+        return null !== $topic ? $envelope->with(new TopicStamp($topic)) : $envelope;
     }
 
     /**
@@ -71,5 +84,14 @@ final class Envelope
     public function getMessage()
     {
         return $this->message;
+    }
+
+    public function getTopic(): string
+    {
+        if (null !== $topic = $this->stamps[TopicStamp::class] ?? null) {
+            return $topic->getName();
+        }
+
+        return \get_class($this->message);
     }
 }

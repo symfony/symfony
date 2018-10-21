@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Messenger\Handler\Locator;
 
-use Symfony\Component\Messenger\Envelope;
-
 /**
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -21,21 +19,23 @@ use Symfony\Component\Messenger\Envelope;
  */
 abstract class AbstractHandlerLocator implements HandlerLocatorInterface
 {
-    public function getHandler(Envelope $envelope): ?callable
+    public function getHandler(string $topic): ?callable
     {
-        $class = \get_class($envelope->getMessage());
-
-        if ($handler = $this->getHandlerByName($class)) {
+        if ($handler = $this->getHandlerByName($topic)) {
             return $handler;
         }
 
-        foreach (class_parents($class) as $name) {
+        if (!class_exists($topic) && !interface_exists($topic, false)) {
+            return null;
+        }
+
+        foreach (class_parents($topic) as $name) {
             if ($handler = $this->getHandlerByName($name)) {
                 return $handler;
             }
         }
 
-        foreach (class_implements($class) as $name) {
+        foreach (class_implements($topic) as $name) {
             if ($handler = $this->getHandlerByName($name)) {
                 return $handler;
             }

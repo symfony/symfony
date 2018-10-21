@@ -23,12 +23,12 @@ use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
 class SendMessageMiddleware implements MiddlewareInterface
 {
     private $senderLocator;
-    private $messagesToSendAndHandleMapping;
+    private $topicsToSendAndHandle;
 
-    public function __construct(SenderLocatorInterface $senderLocator, array $messagesToSendAndHandleMapping = array())
+    public function __construct(SenderLocatorInterface $senderLocator, array $topicsToSendAndHandle = array())
     {
         $this->senderLocator = $senderLocator;
-        $this->messagesToSendAndHandleMapping = $messagesToSendAndHandleMapping;
+        $this->topicsToSendAndHandle = $topicsToSendAndHandle;
     }
 
     /**
@@ -41,13 +41,13 @@ class SendMessageMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $sender = $this->senderLocator->getSender($envelope);
+        $sender = $this->senderLocator->getSender($envelope->getTopic());
 
         if ($sender) {
             $envelope = $sender->send($envelope);
 
-            if (!AbstractSenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $envelope)) {
-                // message has no corresponding handler
+            if (!AbstractSenderLocator::getValueFromMessageRouting($this->topicsToSendAndHandle, $envelope->getTopic())) {
+                // message should only be sent and be not handled by the next middleware
                 return $envelope;
             }
         }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport\Sender\Locator;
 
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
@@ -23,5 +22,5 @@ interface SenderLocatorInterface
     /**
      * Gets the sender (if applicable) for the given message object.
      */
-    public function getSender(Envelope $envelope): ?SenderInterface;
+    public function getSender(string $topic): ?SenderInterface;
 }

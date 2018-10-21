@@ -13,8 +13,8 @@ $container->loadFromExtension('framework', array(
             'messenger.bus.queries' => array(
                 'default_middleware' => false,
                 'middleware' => array(
-                    'route_messages',
-                    'call_message_handler',
+                    'send_message',
+                    'handle_message',
                 ),
             ),
         ),

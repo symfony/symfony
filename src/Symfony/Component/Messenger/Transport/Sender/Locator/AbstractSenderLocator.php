@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport\Sender\Locator;
 
-use Symfony\Component\Messenger\Envelope;
-
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
@@ -20,19 +18,23 @@ use Symfony\Component\Messenger\Envelope;
  */
 abstract class AbstractSenderLocator implements SenderLocatorInterface
 {
-    public static function getValueFromMessageRouting(array $mapping, Envelope $envelope)
+    public static function getValueFromMessageRouting(array $mapping, string $topic)
     {
-        if (isset($mapping[$class = \get_class($envelope->getMessage())])) {
-            return $mapping[$class];
+        if (isset($mapping[$topic])) {
+            return $mapping[$topic];
         }
 
-        foreach (class_parents($class) as $name) {
+        if (!class_exists($topic) && !interface_exists($topic, false)) {
+            return $mapping['*'] ?? null;
+        }
+
+        foreach (class_parents($topic) as $name) {
             if (isset($mapping[$name])) {
                 return $mapping[$name];
             }
         }
 
-        foreach (class_implements($class) as $name) {
+        foreach (class_implements($topic) as $name) {
             if (isset($mapping[$name])) {
                 return $mapping[$name];
             }

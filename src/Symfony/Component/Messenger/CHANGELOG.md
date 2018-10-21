@@ -7,6 +7,7 @@ CHANGELOG
  * The component is not experimental anymore
  * All the changes below are BC BREAKS
  * `MessageBusInterface::dispatch()`, `MiddlewareInterface::handle()` and `SenderInterface::send()` return `Envelope`
+ * `MessageBusInterface::dispatch()` now takes a second `string $topic = null` argument
  * `MiddlewareInterface::handle()` now require an `Envelope` as first argument and a `StackInterface` as second
  * `EnvelopeAwareInterface` has been removed
  * The signature of `Amqp*` classes changed to take a `Connection` as a first argument and an optional
@@ -21,16 +22,14 @@ CHANGELOG
    as first constructor argument
  * The `EncoderInterface` and `DecoderInterface` have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
  * The locator passed to `ContainerHandlerLocator` should not prefix its keys by "handler." anymore
- * The `AbstractHandlerLocator::getHandler()` method uses `?callable` as return type
  * Renamed `EnvelopeItemInterface` to `StampInterface`
  * `Envelope`'s constructor and `with()` method now accept `StampInterface` objects as variadic parameters
  * Renamed and moved `ReceivedMessage`, `ValidationConfiguration` and `SerializerConfiguration` in the `Stamp` namespace
  * Removed the `WrapIntoReceivedMessage`
- * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
  * `MessengerDataCollector::getMessages()` returns an iterable, not just an array anymore
  * `AbstractHandlerLocator` is now internal
- * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope): ?callable` and shouldn't throw when no handlers are found
- * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
+ * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(string $topic): ?callable` and shouldn't throw when no handlers are found
+ * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(string $topic): ?SenderInterface`
  * Classes in the `Middleware\Enhancers` sub-namespace have been moved to the `Middleware` one
  * Classes in the `Asynchronous\Routing` sub-namespace have been moved to the `Transport\Sender\Locator` sub-namespace
  * The `Asynchronous/Middleware/SendMessageMiddleware` class has been moved to the `Middleware` namespace

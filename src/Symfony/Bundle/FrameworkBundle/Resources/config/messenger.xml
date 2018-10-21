@@ -12,7 +12,7 @@
             <argument type="service" id="messenger.sender_locator" />
             <argument type="collection" /> <!-- Message to sender ID mapping -->
         </service>
-        <service id="messenger.middleware.route_messages" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
+        <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
             <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
             <argument type="collection" /> <!-- Message to send and handle mapping -->
         </service>
@@ -25,7 +25,7 @@
         </service>
 
         <!-- Middleware -->
-        <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
+        <service id="messenger.middleware.handle_message" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
             <argument /> <!-- Bus handler resolver -->
         </service>
 

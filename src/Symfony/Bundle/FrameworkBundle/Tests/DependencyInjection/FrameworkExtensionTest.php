@@ -564,7 +564,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('messenger_routing');
         $senderLocatorDefinition = $container->getDefinition('messenger.asynchronous.routing.sender_locator');
-        $sendMessageMiddlewareDefinition = $container->getDefinition('messenger.middleware.route_messages');
+        $sendMessageMiddlewareDefinition = $container->getDefinition('messenger.middleware.send_message');
 
         $messageToSenderIdsMapping = array(
             DummyMessage::class => '.messenger.chain_sender.'.DummyMessage::class,
@@ -619,22 +619,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array(), $container->getDefinition('messenger.bus.commands')->getArgument(0));
         $this->assertEquals(array(
             array('id' => 'logging'),
-            array('id' => 'route_messages'),
-            array('id' => 'call_message_handler'),
+            array('id' => 'send_message'),
+            array('id' => 'handle_message'),
         ), $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.events')->getArgument(0));
         $this->assertEquals(array(
             array('id' => 'logging'),
             array('id' => 'with_factory', 'arguments' => array('foo', true, array('bar' => 'baz'))),
-            array('id' => 'route_messages'),
-            array('id' => 'call_message_handler'),
+            array('id' => 'send_message'),
+            array('id' => 'handle_message'),
         ), $container->getParameter('messenger.bus.events.middleware'));
         $this->assertTrue($container->has('messenger.bus.queries'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
         $this->assertEquals(array(
-            array('id' => 'route_messages', 'arguments' => array()),
-            array('id' => 'call_message_handler', 'arguments' => array()),
+            array('id' => 'send_message', 'arguments' => array()),
+            array('id' => 'handle_message', 'arguments' => array()),
         ), $container->getParameter('messenger.bus.queries.middleware'));
 
         $this->assertTrue($container->hasAlias('message_bus'));

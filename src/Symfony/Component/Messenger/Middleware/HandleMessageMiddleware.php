@@ -36,7 +36,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if (null !== $handler = $this->messageHandlerLocator->getHandler($envelope)) {
+        if (null !== $handler = $this->messageHandlerLocator->getHandler($envelope->getTopic())) {
             $handler($envelope->getMessage());
         } elseif (!$this->allowNoHandlers) {
             throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));

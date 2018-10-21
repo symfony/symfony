@@ -1521,7 +1521,7 @@ class FrameworkExtension extends Extension
 
         $defaultMiddleware = array(
             'before' => array(array('id' => 'logging')),
-            'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
+            'after' => array(array('id' => 'send_message'), array('id' => 'handle_message')),
         );
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
@@ -1572,31 +1572,27 @@ class FrameworkExtension extends Extension
             $senderAliases[$name] = $transportId;
         }
 
-        $messageToSenderIdMapping = array();
-        $messageToSendAndHandleMapping = array();
-        foreach ($config['routing'] as $message => $messageConfiguration) {
-            if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
-            }
-
-            if (1 < \count($messageConfiguration['senders'])) {
+        $topicToSenderIdMapping = array();
+        $topicsToSendAndHandle = array();
+        foreach ($config['routing'] as $topic => $topicConfiguration) {
+            if (1 < \count($topicConfiguration['senders'])) {
                 $senders = array_map(function ($sender) use ($senderAliases) {
                     return new Reference($senderAliases[$sender] ?? $sender);
-                }, $messageConfiguration['senders']);
+                }, $topicConfiguration['senders']);
                 $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
                 $chainSenderDefinition->addTag('messenger.sender');
-                $chainSenderId = '.messenger.chain_sender.'.$message;
+                $chainSenderId = '.messenger.chain_sender.'.$topic;
                 $container->setDefinition($chainSenderId, $chainSenderDefinition);
-                $messageToSenderIdMapping[$message] = $chainSenderId;
+                $topicToSenderIdMapping[$topic] = $chainSenderId;
             } else {
-                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
+                $topicToSenderIdMapping[$topic] = $topicConfiguration['senders'][0];
             }
 
-            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
+            $topicsToSendAndHandle[$topic] = $topicConfiguration['send_and_handle'];
         }
 
-        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
-        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
+        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $topicToSenderIdMapping);
+        $container->getDefinition('messenger.middleware.send_message')->replaceArgument(1, $topicsToSendAndHandle);
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

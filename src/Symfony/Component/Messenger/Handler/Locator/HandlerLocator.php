@@ -17,13 +17,13 @@ namespace Symfony\Component\Messenger\Handler\Locator;
 class HandlerLocator extends AbstractHandlerLocator
 {
     /**
-     * Maps a message (its class) to a given handler.
+     * Maps a topic to a given handler.
      */
-    private $messageToHandlerMapping;
+    private $topicToHandlerMapping;
 
-    public function __construct(array $messageToHandlerMapping = array())
+    public function __construct(array $topicToHandlerMapping = array())
     {
-        $this->messageToHandlerMapping = $messageToHandlerMapping;
+        $this->topicToHandlerMapping = $topicToHandlerMapping;
     }
 
     /**
@@ -31,6 +31,6 @@ class HandlerLocator extends AbstractHandlerLocator
      */
     protected function getHandlerByName(string $name): ?callable
     {
-        return $this->messageToHandlerMapping[$name] ?? null;
+        return $this->topicToHandlerMapping[$name] ?? null;
     }
 }

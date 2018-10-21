@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport\Sender\Locator;
 
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
@@ -20,25 +19,25 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
  */
 class SenderLocator extends AbstractSenderLocator
 {
-    private $messageToSenderMapping;
+    private $topicToSenderMapping;
 
-    public function __construct(array $messageToSenderMapping)
+    public function __construct(array $topicToSenderMapping)
     {
-        $this->messageToSenderMapping = $messageToSenderMapping;
+        $this->topicToSenderMapping = $topicToSenderMapping;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSender(Envelope $envelope): ?SenderInterface
+    public function getSender(string $topic): ?SenderInterface
     {
-        $sender = self::getValueFromMessageRouting($this->messageToSenderMapping, $envelope);
+        $sender = self::getValueFromMessageRouting($this->topicToSenderMapping, $topic);
         if (null === $sender) {
             return null;
         }
 
         if (!$sender instanceof SenderInterface) {
-            throw new RuntimeException(sprintf('The sender instance provided for message "%s" should be of type "%s" but got "%s".', \get_class($envelope->getMessage()), SenderInterface::class, \is_object($sender) ? \get_class($sender) : \gettype($sender)));
+            throw new RuntimeException(sprintf('The sender instance provided for message "%s" should be of type "%s" but got "%s".', $topic, SenderInterface::class, \is_object($sender) ? \get_class($sender) : \gettype($sender)));
         }
 
         return $sender;

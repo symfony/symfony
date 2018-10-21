@@ -391,17 +391,19 @@ trait ControllerTrait
     /**
      * Dispatches a message to the bus.
      *
-     * @param object $message The message to dispatch
+     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     * @param string|null     $topic   The topic that senders and/or handlers can subscribe to to get the message;
+     *                                 if not provided, the topic is the class of the message
      *
      * @final
      */
-    protected function dispatchMessage($message): Envelope
+    protected function dispatchMessage($message, string $topic = null): Envelope
     {
         if (!$this->container->has('message_bus')) {
             throw new \LogicException('The message bus is not enabled in your application. Try running "composer require symfony/messenger".');
         }
 
-        return $this->container->get('message_bus')->dispatch($message);
+        return $this->container->get('message_bus')->dispatch($message, $topic);
     }
 
     /**

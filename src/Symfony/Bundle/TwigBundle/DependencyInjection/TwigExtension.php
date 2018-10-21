@@ -36,10 +36,13 @@ class TwigExtension extends Extension
         $loader->load('twig.xml');
 
         $container->getDefinition('twig.profile')->setPrivate(true);
-        $container->getDefinition('twig.runtime.httpkernel')->setPrivate(true);
         $container->getDefinition('twig.translation.extractor')->setPrivate(true);
         $container->getDefinition('workflow.twig_extension')->setPrivate(true);
         $container->getDefinition('twig.exception_listener')->setPrivate(true);
+
+        if ($container->has('fragment.handler')) {
+            $container->getDefinition('twig.runtime.httpkernel')->setPrivate(true);
+        }
 
         if (class_exists('Symfony\Component\Form\Form')) {
             $loader->load('form.xml');

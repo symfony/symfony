@@ -41,15 +41,26 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(\extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
         $this->assertSame(\extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "$name" argument in method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::__construct()" is deprecated since Symfony 4.2.
+     * @expectedDeprecation The "$version" argument in method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::__construct()" is deprecated since Symfony 4.2.
+     * @expectedDeprecation The method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::getApplicationName()" is deprecated since Symfony 4.2.
+     * @expectedDeprecation The method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::getApplicationVersion()" is deprecated since Symfony 4.2.
+     */
+    public function testLegacy()
+    {
+        $c = new ConfigDataCollector('name', null);
+        $c->collect(new Request(), new Response());
+
+        $this->assertSame('name', $c->getApplicationName());
+        $this->assertNull($c->getApplicationVersion());
+    }
 }
 
 class KernelForTest extends Kernel
 {
-    public function getName()
-    {
-        return 'testkernel';
-    }
-
     public function registerBundles()
     {
     }

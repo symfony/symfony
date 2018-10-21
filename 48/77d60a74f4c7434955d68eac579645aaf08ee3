@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-10-16T17:09:07Z
+
+`twig.runtime.httpkernel` having a reference to the fragment handler service is not an issue. We should only move the `twig.runtime` tag to the compiler pass, as done for the extension itself. If the service does not exist, the compiler pass would not tag it as a twig runtime, and so nothing references it (and the service gets removed, and so the non-existing reference is not an issue). So I would keep the argument in the XML file, which makes it more readable when looking at the service definition.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2018-10-18T09:19:02Z
+
+Updated

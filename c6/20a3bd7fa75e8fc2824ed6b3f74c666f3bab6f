@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-16T17:02:36Z
+
+Ready! (AppVeyor failure is unrelated)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-17T12:53:55Z
+
+> after this we can safely remove the `Resources/views` paths in `TemplateIterator` and `TemplateFinder`, correct?
+
+Yeah, in 5.0 :)
+
+> What about TemplateReference?
+
+It's part of the Templating layer of the FB, no related IMO.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-17T13:50:35Z
+
+@chalasr comments addressed, thanks. (Ready)

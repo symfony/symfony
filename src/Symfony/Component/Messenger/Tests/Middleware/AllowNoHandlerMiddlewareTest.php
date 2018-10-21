@@ -18,15 +18,15 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class AllowNoHandlerMiddlewareTest extends TestCase
 {
-    public function testItCallsNextMiddlewareAndReturnsItsResult()
+    public function testItCallsNextMiddleware()
     {
         $message = new DummyMessage('Hey');
 
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->once())->method('__invoke')->with($message)->willReturn('Foo');
+        $next->expects($this->once())->method('__invoke')->with($message);
 
         $middleware = new AllowNoHandlerMiddleware();
-        $this->assertSame('Foo', $middleware->handle($message, $next));
+        $middleware->handle($message, $next);
     }
 
     public function testItCatchesTheNoHandlerException()

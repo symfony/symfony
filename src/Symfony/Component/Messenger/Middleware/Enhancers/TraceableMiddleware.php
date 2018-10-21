@@ -39,7 +39,7 @@ class TraceableMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
     /**
      * @param Envelope $envelope
      */
-    public function handle($envelope, callable $next)
+    public function handle($envelope, callable $next): void
     {
         $class = \get_class($this->inner);
         $eventName = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
@@ -51,19 +51,15 @@ class TraceableMiddleware implements MiddlewareInterface, EnvelopeAwareInterface
         $this->stopwatch->start($eventName, $this->eventCategory);
 
         try {
-            $result = $this->inner->handle($envelope->getMessageFor($this->inner), function ($message) use ($next, $eventName) {
+            $this->inner->handle($envelope->getMessageFor($this->inner), function ($message) use ($next, $eventName) {
                 $this->stopwatch->stop($eventName);
-                $result = $next($message);
+                $next($message);
                 $this->stopwatch->start($eventName, $this->eventCategory);
-
-                return $result;
             });
         } finally {
             if ($this->stopwatch->isStarted($eventName)) {
                 $this->stopwatch->stop($eventName);
             }
         }
-
-        return $result;
     }
 }

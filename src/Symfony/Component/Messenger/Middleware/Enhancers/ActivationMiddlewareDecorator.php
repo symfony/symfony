@@ -37,12 +37,12 @@ class ActivationMiddlewareDecorator implements MiddlewareInterface, EnvelopeAwar
     /**
      * @param Envelope $envelope
      */
-    public function handle($envelope, callable $next)
+    public function handle($envelope, callable $next): void
     {
         if (\is_callable($this->activated) ? ($this->activated)($envelope) : $this->activated) {
-            return $this->inner->handle($envelope->getMessageFor($this->inner), $next);
+            $this->inner->handle($envelope->getMessageFor($this->inner), $next);
+        } else {
+            $next($envelope);
         }
-
-        return $next($envelope);
     }
 }

@@ -23,7 +23,6 @@ class HandleMessageMiddlewareTest extends TestCase
         $message = new DummyMessage('Hey');
 
         $handler = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $handler->method('__invoke')->willReturn('Hello');
 
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 

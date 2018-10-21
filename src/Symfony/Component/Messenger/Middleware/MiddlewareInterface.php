@@ -18,8 +18,6 @@ interface MiddlewareInterface
 {
     /**
      * @param object $message
-     *
-     * @return mixed
      */
-    public function handle($message, callable $next);
+    public function handle($message, callable $next): void;
 }

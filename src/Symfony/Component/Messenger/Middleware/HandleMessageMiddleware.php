@@ -28,13 +28,11 @@ class HandleMessageMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle($message, callable $next)
+    public function handle($message, callable $next): void
     {
         $handler = $this->messageHandlerResolver->resolve($message);
-        $result = $handler($message);
+        $handler($message);
 
         $next($message);
-
-        return $result;
     }
 }

@@ -32,12 +32,9 @@ class LoggingMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('__invoke')
             ->with($message)
-            ->willReturn('Hello')
         ;
 
-        $result = (new LoggingMiddleware($logger))->handle($message, $next);
-
-        $this->assertSame('Hello', $result);
+        (new LoggingMiddleware($logger))->handle($message, $next);
     }
 
     /**

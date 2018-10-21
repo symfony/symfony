@@ -90,10 +90,10 @@ class MessengerPassTest extends TestCase
             ->setAbstract(true)
         ;
 
-        $middlewares = array(array('id' => 'call_message_handler'));
+        $middlewareHandlers = array(array('id' => 'call_message_handler'));
 
-        $container->setParameter($commandBusId.'.middleware', $middlewares);
-        $container->setParameter($queryBusId.'.middleware', $middlewares);
+        $container->setParameter($commandBusId.'.middleware', $middlewareHandlers);
+        $container->setParameter($queryBusId.'.middleware', $middlewareHandlers);
 
         $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', array('bus' => $commandBusId));
         $container->register(DummyQueryHandler::class)->addTag('messenger.message_handler', array('bus' => $queryBusId));
@@ -607,10 +607,10 @@ class MessengerPassTest extends TestCase
 
         $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument(array());
 
-        $middlewares = array(array('id' => 'call_message_handler'));
+        $middlewareHandlers = array(array('id' => 'call_message_handler'));
 
-        $container->setParameter($commandBusId.'.middleware', $middlewares);
-        $container->setParameter($queryBusId.'.middleware', $middlewares);
+        $container->setParameter($commandBusId.'.middleware', $middlewareHandlers);
+        $container->setParameter($queryBusId.'.middleware', $middlewareHandlers);
 
         $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', array('bus' => $commandBusId));
         $container->register(DummyQueryHandler::class)->addTag('messenger.message_handler', array('bus' => $queryBusId));

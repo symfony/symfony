@@ -424,11 +424,12 @@
             <xsd:element name="hub" type="mercure_hub" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="default-hub" type="xsd:string" />
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="mercure_hub">
-        <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="url" type="xsd:string" use="required" />
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="url" type="xsd:string" />
         <xsd:attribute name="jwt" type="xsd:string" />
         <xsd:attribute name="jwt_provider" type="xsd:string" />
         <xsd:attribute name="bus" type="xsd:string" />

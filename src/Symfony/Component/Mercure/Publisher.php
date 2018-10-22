@@ -22,13 +22,17 @@ namespace Symfony\Component\Mercure;
  */
 final class Publisher
 {
-    private $publishEndpoint;
+    private $hubUrl;
     private $jwtProvider;
     private $httpClient;
 
-    public function __construct(string $publishEndpoint, callable $jwtProvider, callable $httpClient = null)
+    /**
+     * @param callable(): string                                        $jwtProvider
+     * @param null|callable(string, callable(): string, string): string $httpClient
+     */
+    public function __construct(string $hubUrl, callable $jwtProvider, callable $httpClient = null)
     {
-        $this->publishEndpoint = $publishEndpoint;
+        $this->hubUrl = $hubUrl;
         $this->jwtProvider = $jwtProvider;
         $this->httpClient = $httpClient ?? array($this, 'publish');
     }
@@ -44,7 +48,10 @@ final class Publisher
             'retry' => $update->getRetry(),
         );
 
-        return ($this->httpClient)($this->publishEndpoint, ($this->jwtProvider)(), $this->buildQuery($postData));
+        $jwt = ($this->jwtProvider)();
+        $this->validateJwt($jwt);
+
+        return ($this->httpClient)($this->hubUrl, $jwt, $this->buildQuery($postData));
     }
 
     /**
@@ -80,16 +87,32 @@ final class Publisher
 
     private function publish(string $url, string $jwt, string $postData): string
     {
-        $result = @file_get_contents($this->publishEndpoint, false, stream_context_create(array('http' => array(
+        $result = @file_get_contents($this->hubUrl, false, stream_context_create(array('http' => array(
             'method' => 'POST',
             'header' => "Content-type: application/x-www-form-urlencoded\r\nAuthorization: Bearer $jwt",
             'content' => $postData,
         ))));
 
         if (false === $result) {
-            throw new \RuntimeException(sprintf('Unable to publish the update to the Mercure hub: %s', error_get_last()));
+            throw new \RuntimeException(sprintf('Unable to publish the update to the Mercure hub: %s', error_get_last()['message'] ?? 'unknown error'));
         }
 
         return $result;
+    }
+
+    /**
+     * Regex ported from Windows Azure Active Directory IdentityModel Extensions for .Net.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @license MIT
+     * @copyright Copyright (c) Microsoft Corporation
+     * @see https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/blob/6e7a53e241e4566998d3bf365f03acd0da699a31/src/Microsoft.IdentityModel.JsonWebTokens/JwtConstants.cs#L58
+     */
+    private function validateJwt(string $jwt): void
+    {
+        if (!preg_match('/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/', $jwt)) {
+            throw new \InvalidArgumentException('The provided JWT is not valid');
+        }
     }
 }

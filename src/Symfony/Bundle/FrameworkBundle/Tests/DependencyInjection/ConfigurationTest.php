@@ -300,6 +300,10 @@ class ConfigurationTest extends TestCase
                 'default_bus' => null,
                 'buses' => array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())),
             ),
+            'mercure' => array(
+                'enabled' => !class_exists(FullStack::class) && class_exists(Update::class),
+                'hubs' => array(),
+            ),
         );
     }
 }

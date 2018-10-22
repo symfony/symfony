@@ -45,4 +45,18 @@ class PublisherTest extends TestCase
 
         $this->assertSame('id', $id);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The provided JWT is not valid
+     */
+    public function testInvalidJwt()
+    {
+        $jwtProvider = function () {
+            return "invalid\r\njwt";
+        };
+
+        $publisher = new Publisher(self::URL, $jwtProvider);
+        $publisher(new Update('https://demo.mercure.rocks/demo/books/1.jsonld', 'Hi from Symfony!'));
+    }
 }

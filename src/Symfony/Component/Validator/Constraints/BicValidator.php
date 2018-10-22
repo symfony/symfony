@@ -12,8 +12,12 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -24,6 +28,13 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class BicValidator extends ConstraintValidator
 {
+    private $propertyAccessor;
+
+    public function __construct(PropertyAccessor $propertyAccessor = null)
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -95,5 +106,39 @@ class BicValidator extends ConstraintValidator
 
             return;
         }
+
+        // check against an IBAN
+        $iban = $constraint->iban;
+        $path = $constraint->ibanPropertyPath;
+        if ($path && null !== $object = $this->context->getObject()) {
+            try {
+                $iban = $this->getPropertyAccessor()->getValue($object, $path);
+            } catch (NoSuchPropertyException $e) {
+                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $path, \get_class($constraint), $e->getMessage()), 0, $e);
+            }
+        }
+        if (!$iban) {
+            return;
+        }
+        $ibanCountryCode = substr($iban, 0, 2);
+        if (ctype_alpha($ibanCountryCode) && substr($canonicalize, 4, 2) !== $ibanCountryCode) {
+            $this->context->buildViolation($constraint->ibanMessage)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setParameter('{{ iban }}', $iban)
+                ->setCode(Bic::INVALID_IBAN_COUNTRY_CODE_ERROR)
+                ->addViolation();
+        }
+    }
+
+    private function getPropertyAccessor(): PropertyAccessor
+    {
+        if (null === $this->propertyAccessor) {
+            if (!class_exists(PropertyAccess::class)) {
+                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed.');
+            }
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

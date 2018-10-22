@@ -36,6 +36,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1241,6 +1242,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testMercure()
     {
+        if (!class_exists(Update::class)) {
+            $this->markTestSkipped('The Mercure Component has been introduced in Symfony 4.2.');
+        }
+
         $container = $this->createContainerFromFile('mercure');
         $this->assertTrue($container->hasDefinition('mercure.hub.default.jwt_provider'));
         $this->assertTrue($container->hasDefinition('mercure.hub.default.publisher'));

@@ -1081,7 +1081,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('buses')
                             ->defaultValue(array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())))
                             ->useAttributeAsKey('name')
-                            ->prototype('array')
+                            ->arrayPrototype()
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->booleanNode('default_middleware')->defaultTrue()->end()
@@ -1093,7 +1093,7 @@ class Configuration implements ConfigurationInterface
                                             })
                                         ->end()
                                         ->defaultValue(array())
-                                        ->prototype('array')
+                                        ->arrayPrototype()
                                             ->beforeNormalization()
                                                 ->always()
                                                 ->then(function ($middleware): array {

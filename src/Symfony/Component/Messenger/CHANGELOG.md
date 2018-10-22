@@ -33,6 +33,8 @@ CHANGELOG
  * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope)`
  * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
  * `SenderInterface::send()` returns `void`
+ * `AllowNoHandlerMiddleware` has removed in favor of a new constructor argument on `HandleMessageMiddleware`
+ * `HandlerLocatorInterface::getHandler()` now returns `?callable` and shouldn't throw when no handlers are found
 
 4.1.0
 -----

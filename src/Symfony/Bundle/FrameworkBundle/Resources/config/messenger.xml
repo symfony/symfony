@@ -25,9 +25,9 @@
         </service>
 
         <!-- Middleware -->
-        <service id="messenger.middleware.allow_no_handler" class="Symfony\Component\Messenger\Middleware\AllowNoHandlerMiddleware" abstract="true" />
         <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
             <argument /> <!-- Bus handler resolver -->
+            <argument>false</argument> <!-- Allow no handlers -->
         </service>
 
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware" abstract="true">

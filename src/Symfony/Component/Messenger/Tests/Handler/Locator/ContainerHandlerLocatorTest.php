@@ -25,14 +25,10 @@ class ContainerHandlerLocatorTest extends TestCase
         $this->assertSame($handler, $resolvedHandler);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\NoHandlerForMessageException
-     * @expectedExceptionMessage No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
-     */
-    public function testThrowsNoHandlerException()
+    public function testNoHandlersReturnsNull()
     {
         $locator = new ContainerHandlerLocator(new Container());
-        $locator->getHandler(new Envelope(new DummyMessage('Hey')));
+        $this->assertNull($locator->getHandler(new Envelope(new DummyMessage('Hey'))));
     }
 
     public function testGetHandlerViaInterface()

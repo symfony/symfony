@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
 
 /**
@@ -20,19 +21,26 @@ use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
 class HandleMessageMiddleware implements MiddlewareInterface
 {
     private $messageHandlerLocator;
+    private $allowNoHandlers;
 
-    public function __construct(HandlerLocatorInterface $messageHandlerLocator)
+    public function __construct(HandlerLocatorInterface $messageHandlerLocator, bool $allowNoHandlers = false)
     {
         $this->messageHandlerLocator = $messageHandlerLocator;
+        $this->allowNoHandlers = $allowNoHandlers;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws NoHandlerForMessageException When no handler is found and $allowNoHandlers is false
      */
     public function handle(Envelope $envelope, callable $next): void
     {
-        $handler = $this->messageHandlerLocator->getHandler($envelope);
-        $handler($envelope->getMessage());
-        $next($envelope);
+        if (null !== $handler = $this->messageHandlerLocator->getHandler($envelope)) {
+            $handler($envelope->getMessage());
+            $next($envelope);
+        } elseif (!$this->allowNoHandlers) {
+            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));
+        }
     }
 }

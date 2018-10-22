@@ -21,8 +21,6 @@ interface HandlerLocatorInterface
 {
     /**
      * Returns the handler for the given message.
-     *
-     * @throws NoHandlerForMessageException When no handler is found
      */
-    public function getHandler(Envelope $envelope): callable;
+    public function getHandler(Envelope $envelope): ?callable;
 }

@@ -627,7 +627,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(
             array('id' => 'logging'),
             array('id' => 'with_factory', 'arguments' => array('foo', true, array('bar' => 'baz'))),
-            array('id' => 'allow_no_handler', 'arguments' => array()),
             array('id' => 'route_messages'),
             array('id' => 'call_message_handler'),
         ), $container->getParameter('messenger.bus.events.middleware'));
@@ -635,7 +634,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
         $this->assertEquals(array(
             array('id' => 'route_messages', 'arguments' => array()),
-            array('id' => 'allow_no_handler', 'arguments' => array()),
             array('id' => 'call_message_handler', 'arguments' => array()),
         ), $container->getParameter('messenger.bus.queries.middleware'));
 

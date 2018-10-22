@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+* made the `ErrorHandler` and `ExceptionHandler` classes final
+
 4.0.0
 -----
 

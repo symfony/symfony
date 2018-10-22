@@ -699,7 +699,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('en'))
                         ->end()
                         ->booleanNode('logging')->defaultValue(false)->end()
-                        ->scalarNode('formatter')->defaultValue(class_exists(\MessageFormatter::class) ? 'translator.formatter.default' : 'translator.formatter.symfony')->end()
+                        ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->scalarNode('default_path')
                             ->info('The default path used to load translations')
                             ->defaultValue('%kernel.project_dir%/translations')

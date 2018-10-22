@@ -12,29 +12,26 @@
 namespace Symfony\Component\Translation\Tests\Formatter;
 
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\Formatter\IntlMessageFormatter;
+use Symfony\Component\Translation\Formatter\IntlFormatter;
+use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
 
-class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
+/**
+ * @requires extension intl
+ */
+class IntlFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
-    {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('The Intl extension is not available.');
-        }
-    }
-
     /**
      * @dataProvider provideDataForFormat
      */
     public function testFormat($expected, $message, $arguments)
     {
-        $this->assertEquals($expected, trim((new IntlMessageFormatter())->format($message, 'en', $arguments)));
+        $this->assertEquals($expected, trim((new IntlFormatter())->formatIntl($message, 'en', $arguments)));
     }
 
     public function testInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
-        (new IntlMessageFormatter())->format('{foo', 'en', array(2));
+        (new IntlFormatter())->formatIntl('{foo', 'en', array(2));
     }
 
     public function testFormatWithNamedArguments()
@@ -62,7 +59,7 @@ class IntlMessageFormatterTest extends \PHPUnit\Framework\TestCase
      other {{host} invites {guest} as one of the # people invited to their party.}}}}
 _MSG_;
 
-        $message = (new IntlMessageFormatter())->format($chooseMessage, 'en', array(
+        $message = (new IntlFormatter())->formatIntl($chooseMessage, 'en', array(
             'gender_of_host' => 'male',
             'num_guests' => 10,
             'host' => 'Fabien',
@@ -86,5 +83,14 @@ _MSG_;
                 array(4560, 123, 4560 / 123),
             ),
         );
+    }
+
+    public function testPercentsAndBracketsAreTrimmed()
+    {
+        $formatter = new IntlFormatter();
+        $this->assertInstanceof(IntlFormatterInterface::class, $formatter);
+        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', array('name' => 'Fab')));
+        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', array('%name%' => 'Fab')));
+        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', array('{{ name }}' => 'Fab')));
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Formatter\ChoiceMessageFormatterInterface;
+use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -80,6 +81,8 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     private $parentLocales;
 
+    private $hasIntlFormatter;
+
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
@@ -94,6 +97,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
         $this->formatter = $formatter;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
+        $this->hasIntlFormatter = $formatter instanceof IntlFormatterInterface;
     }
 
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
@@ -196,7 +200,26 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
             $domain = 'messages';
         }
 
-        return $this->formatter->format($this->getCatalogue($locale)->get((string) $id, $domain), $locale, $parameters);
+        $id = (string) $id;
+        $catalogue = $this->getCatalogue($locale);
+        $locale = $catalogue->getLocale();
+        $intlDomain = $this->hasIntlFormatter ? $domain.IntlFormatterInterface::DOMAIN_SUFFIX : null;
+        while (true) {
+            if (null !== $intlDomain && $catalogue->defines($id, $intlDomain)) {
+                return $this->formatter->formatIntl($catalogue->get($id, $intlDomain), $locale, $parameters);
+            }
+            if ($catalogue->defines($id, $domain)) {
+                break;
+            }
+            if ($cat = $catalogue->getFallbackCatalogue()) {
+                $catalogue = $cat;
+                $locale = $catalogue->getLocale();
+            } else {
+                break;
+            }
+        }
+
+        return $this->formatter->format($catalogue->get($id, $domain), $locale, $parameters);
     }
 
     /**

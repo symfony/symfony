@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Handler\Locator;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -21,8 +20,6 @@ interface HandlerLocatorInterface
 {
     /**
      * Returns the handler for the given message.
-     *
-     * @throws NoHandlerForMessageException When no handler is found
      */
-    public function getHandler(Envelope $envelope): callable;
+    public function getHandler(Envelope $envelope): ?callable;
 }

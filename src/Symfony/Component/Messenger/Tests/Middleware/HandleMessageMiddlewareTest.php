@@ -37,4 +37,22 @@ class HandleMessageMiddlewareTest extends TestCase
 
         $middleware->handle($envelope, $next);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Messenger\Exception\NoHandlerForMessageException
+     * @expectedExceptionMessage No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
+     */
+    public function testThrowsNoHandlerException()
+    {
+        $middleware = new HandleMessageMiddleware(new HandlerLocator(array()));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey')), function () {});
+    }
+
+    public function testAllowNoHandlers()
+    {
+        $middleware = new HandleMessageMiddleware(new HandlerLocator(array()), true);
+
+        $this->assertNull($middleware->handle(new Envelope(new DummyMessage('Hey')), function () {}));
+    }
 }

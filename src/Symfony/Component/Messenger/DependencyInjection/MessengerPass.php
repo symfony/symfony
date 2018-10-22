@@ -22,10 +22,10 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
-use Symfony\Component\Messenger\Middleware\Enhancers\TraceableMiddleware;
+use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\TraceableMessageBus;
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

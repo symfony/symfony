@@ -9,11 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Transport\Enhancers;
+namespace Symfony\Component\Messenger\Transport\Receiver;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
 
 /**
  * @author Simon Delicata <simon.delicata@free.fr>

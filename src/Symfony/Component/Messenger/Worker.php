@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

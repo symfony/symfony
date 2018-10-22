@@ -8,11 +8,11 @@
         <defaults public="false" />
 
         <!-- Asynchronous -->
-        <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Asynchronous\Routing\ContainerSenderLocator">
+        <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Transport\Sender\Locator\ContainerSenderLocator">
             <argument type="service" id="messenger.sender_locator" />
             <argument type="collection" /> <!-- Message to sender ID mapping -->
         </service>
-        <service id="messenger.middleware.route_messages" class="Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware">
+        <service id="messenger.middleware.route_messages" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
             <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
             <argument type="collection" /> <!-- Message to send and handle mapping -->
         </service>

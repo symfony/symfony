@@ -9,13 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Asynchronous\Middleware;
+namespace Symfony\Component\Messenger\Middleware;
 
-use Symfony\Component\Messenger\Asynchronous\Routing\AbstractSenderLocator;
-use Symfony\Component\Messenger\Asynchronous\Routing\SenderLocatorInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Transport\Sender\Locator\AbstractSenderLocator;
+use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

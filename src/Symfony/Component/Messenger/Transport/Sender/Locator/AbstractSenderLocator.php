@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Asynchronous\Routing;
+namespace Symfony\Component\Messenger\Transport\Sender\Locator;
 
 use Symfony\Component\Messenger\Envelope;
 

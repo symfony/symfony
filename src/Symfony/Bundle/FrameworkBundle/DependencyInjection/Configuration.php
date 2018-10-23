@@ -1150,7 +1150,7 @@ class Configuration implements ConfigurationInterface
                             ->normalizeKeys(false)
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('url')->info('URL of the hub\'s publish endpoint')->example('https://demo.mercure.rocks/publish')->end()
+                                    ->scalarNode('url')->info('URL of the hub\'s publish endpoint')->example('https://demo.mercure.rocks/hub')->end()
                                     ->scalarNode('jwt')->info('JSON Web Token to use to publish to this hub.')->end()
                                     ->scalarNode('jwt_provider')->info('The ID of a service to call to generate the JSON Web Token.')->end()
                                     ->scalarNode('bus')->info('Name of the Messenger bus where the handler for this hub must be registered. Default to the default bus if Messenger is enabled.')->end()

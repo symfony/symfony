@@ -107,6 +107,7 @@ final class Publisher
      *
      * @license MIT
      * @copyright Copyright (c) Microsoft Corporation
+     *
      * @see https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/blob/6e7a53e241e4566998d3bf365f03acd0da699a31/src/Microsoft.IdentityModel.JsonWebTokens/JwtConstants.cs#L58
      */
     private function validateJwt(string $jwt): void

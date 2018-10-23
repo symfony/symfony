@@ -24,6 +24,18 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    const INSTANCE = 'instance';
+    const STATUS = 'status';
+    const TITLE = 'title';
+    const TYPE = 'type';
+
+    private $defaultContext;
+
+    public function __construct($defaultContext = array())
+    {
+        $this->defaultContext = $defaultContext;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -49,17 +61,17 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         }
 
         $result = array(
-            'type' => $context['type'] ?? 'https://symfony.com/errors/validation',
-            'title' => $context['title'] ?? 'Validation Failed',
+            'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE] ?? 'https://symfony.com/errors/validation',
+            'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE] ?? 'Validation Failed',
         );
-        if (isset($context['status'])) {
-            $result['status'] = $context['status'];
+        if (null !== $status = ($context[self::STATUS] ?? $this->defaultContext[self::STATUS] ?? null)) {
+            $result['status'] = $status;
         }
         if ($messages) {
             $result['detail'] = implode("\n", $messages);
         }
-        if (isset($context['instance'])) {
-            $result['instance'] = $context['instance'];
+        if (null !== $instance = ($context[self::INSTANCE] ?? $this->defaultContext[self::INSTANCE] ?? null)) {
+            $result['instance'] = $instance;
         }
 
         return $result + array('violations' => $violations);

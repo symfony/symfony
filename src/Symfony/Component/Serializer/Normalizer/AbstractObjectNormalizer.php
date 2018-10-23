@@ -36,12 +36,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
     const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
     const SKIP_NULL_VALUES = 'skip_null_values';
+    const MAX_DEPTH_HANDLER = 'max_depth_handler';
+    const EXCLUDE_FROM_CACHE_KEY = 'exclude_from_cache_key';
 
     private $propertyTypeExtractor;
     private $typesCache = array();
     private $attributesCache = array();
 
     /**
+     * @deprecated since Symfony 4.2
+     *
      * @var callable|null
      */
     private $maxDepthHandler;
@@ -52,9 +56,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = array())
     {
-        parent::__construct($classMetadataFactory, $nameConverter);
+        parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
+        $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array(self::CIRCULAR_REFERENCE_LIMIT_COUNTERS);
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
 
@@ -91,20 +96,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $attributes = $this->getAttributes($object, $format, $context);
         $class = $this->objectClassResolver ? \call_user_func($this->objectClassResolver, $object) : \get_class($object);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
+        $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER] ?? $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
 
         foreach ($attributes as $attribute) {
             $maxDepthReached = false;
-            if (null !== $attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$this->maxDepthHandler) {
+            if (null !== $attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
                 continue;
             }
 
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
             if ($maxDepthReached) {
-                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue, $object, $attribute, $format, $context);
+                $attributeValue = \call_user_func($maxDepthHandler, $attributeValue, $object, $attribute, $format, $context);
             }
 
-            if (isset($this->callbacks[$attribute])) {
-                $attributeValue = \call_user_func($this->callbacks[$attribute], $attributeValue, $object, $attribute, $format, $context);
+            /**
+             * @var $callback callable|null
+             */
+            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? $this->callbacks[$attribute] ?? null;
+            if ($callback) {
+                $attributeValue = $callback($attributeValue, $object, $attribute, $format, $context);
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -175,7 +185,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $allowedAttributes;
         }
 
-        if (isset($context['attributes'])) {
+        if ($context[self::ATTRIBUTES] ?? $this->defaultContext[self::ATTRIBUTES] ?? false) {
             return $this->extractAttributes($object, $format, $context);
         }
 
@@ -217,9 +227,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Sets a handler function that will be called when the max depth is reached.
+     *
+     * @deprecated since Symfony 4.2
      */
     public function setMaxDepthHandler(?callable $handler): void
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "max_depth_handler" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+
         $this->maxDepthHandler = $handler;
     }
 
@@ -253,7 +267,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
-                if (isset($context[self::ALLOW_EXTRA_ATTRIBUTES]) && !$context[self::ALLOW_EXTRA_ATTRIBUTES]) {
+                if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])) {
                     $extraAttributes[] = $attribute;
                 }
 
@@ -354,7 +368,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        if (!empty($context[self::DISABLE_TYPE_ENFORCEMENT])) {
+        if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {
             return $data;
         }
 
@@ -405,7 +419,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function updateData(array $data, string $attribute, $attributeValue, string $class, ?string $format, array $context): array
     {
-        if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? false)) {
+        if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
             return $data;
         }
 
@@ -425,16 +439,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
+        $enableMaxDepth = $context[self::ENABLE_MAX_DEPTH] ?? $this->defaultContext[self::ENABLE_MAX_DEPTH] ?? false;
         if (
-            !isset($context[static::ENABLE_MAX_DEPTH]) ||
-            !$context[static::ENABLE_MAX_DEPTH] ||
+            !$enableMaxDepth ||
             !isset($attributesMetadata[$attribute]) ||
             null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
         ) {
             return false;
         }
 
-        $key = sprintf(static::DEPTH_KEY_PATTERN, $class, $attribute);
+        $key = sprintf(self::DEPTH_KEY_PATTERN, $class, $attribute);
         if (!isset($context[$key])) {
             $context[$key] = 1;
 
@@ -457,6 +471,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function getCacheKey(?string $format, array $context)
     {
+        foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
+            unset($context[$key]);
+        }
+        unset($context[self::EXCLUDE_FROM_CACHE_KEY]);
+
         try {
             return md5($format.serialize($context));
         } catch (\Exception $exception) {

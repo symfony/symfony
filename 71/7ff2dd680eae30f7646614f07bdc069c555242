@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by svandervlugt at 2018-10-08T09:50:23Z
+
+I don't know why 2 of the 3 travis CI builds suddenly fail. I'm not sure whether this is related to my changes as the unittests fail in the Lock-component and the Translator in the FrameworkBundle.
+
+---------------------------------------------------------------------------
+
+by svandervlugt at 2018-10-10T08:09:21Z
+
+Another failing build. Still not convinced it is my changes.
+appveyor was successful before my last commit, now fails with  ```..KO src\Symfony/Bundle/SecurityBundle```. and no further error.
+
+One of the three travis-builds fails on the FrameworkBundle, Translation component and Validator component. Before each of these a ```  - Installing symfony/dependency-injection (dev-master 88f240c): Loading from cache``` is done. Doesn't this effectively overwrite my changes?
+
+---------------------------------------------------------------------------
+
+by svandervlugt at 2018-10-16T12:37:51Z
+
+@nicolas-grekas the PR has been updated with the requested changes.
+After the last rebase all checks have passed.

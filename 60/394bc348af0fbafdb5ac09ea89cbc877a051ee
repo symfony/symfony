@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-08-14T16:08:07Z
+
+Tests are fine in unix, will check on windows.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-14T16:09:53Z
+
+> Tests are fine in unix, will check on windows.
+
+Not on Travis, see e.g. https://travis-ci.org/symfony/symfony/jobs/415858572
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-08-14T16:14:41Z
+
+It's complaining about something I haven't changed `PHP Fatal error:  Class 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingClass' not found in /home/travis/build/symfony/symfony/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Prototype/BadClasses/MissingParent.php on line 5`
+Will check anyway but might be a glitch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-08-14T16:17:55Z
+
+This test is directly related actually. We need to figure out why and how. But that's not a glitch nor a transient test. Only this PR has it for now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T17:01:58Z
+
+@gonzalovilaseca Do you need help here?
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-09-04T19:32:50Z
+
+@fabpot Sorry, got distracted with other friends projects. I'm resuming this today, managed to debug it but haven't found the issue yet. Will ask for help if I can't fix it in the following days.
+Thanks though!
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-09-29T20:45:22Z
+
+PR updated!
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-10-01T20:20:59Z
+
+I’m happy to change it to what both of you decide
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-10-11T20:05:32Z
+
+@nicolas-grekas @stof Can you have nother look please?
+
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-10-11T22:43:39Z
+
+Thxs!

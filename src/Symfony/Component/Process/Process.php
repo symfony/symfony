@@ -450,27 +450,28 @@ class Process implements \IteratorAggregate
         }
         $callback = $this->buildCallback($callback);
 
-        $wait = true;
-        do {
+        $ready = false;
+        while (true) {
             $this->checkTimeout();
             $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
             $output = $this->processPipes->readAndWrite($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
 
             foreach ($output as $type => $data) {
                 if (3 !== $type) {
-                    $wait = !$callback(self::STDOUT === $type ? self::OUT : self::ERR, $data);
+                    $ready = $ready || $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data);
                 } elseif (!isset($this->fallbackStatus['signaled'])) {
                     $this->fallbackStatus['exitcode'] = (int) $data;
                 }
             }
-            if ($wait && !$this->isRunning()) {
+            if ($ready) {
+                return true;
+            }
+            if (!$running) {
                 return false;
             }
 
             usleep(1000);
-        } while ($wait);
-
-        return true;
+        }
     }
 
     /**

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-03T20:25:29Z
+
+@nicolas-grekas thanks for the review! All comments resolved.
+The fabbot's failure is a false positive (applying its patch triggers an error in PHPStorm).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T19:42:39Z
+
+(rebase needed + some comments to fix)

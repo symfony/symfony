@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% block menu %}
-<span class="label {{ collector.exceptionsCount ? 'label-status-error' }}">
+<span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
     <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
     <strong>Messages</strong>
 

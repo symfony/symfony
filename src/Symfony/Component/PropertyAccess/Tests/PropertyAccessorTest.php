@@ -681,9 +681,8 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new TestSingularAndPluralProps();
 
-        if ($this->propertyAccessor->isWritable($object, 'email')) {
-            $this->propertyAccessor->setValue($object, 'email', 'test@email.com');
-        }
+        $this->propertyAccessor->isWritable($object, 'email'); //cache access info
+        $this->propertyAccessor->setValue($object, 'email', 'test@email.com');
 
         self::assertEquals('test@email.com', $object->getEmail());
         self::assertEmpty($object->getEmails());
@@ -693,9 +692,8 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new TestSingularAndPluralProps();
 
-        if ($this->propertyAccessor->isWritable($object, 'emails')) {
-            $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
-        }
+        $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
+        $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
 
         self::assertEquals(array('test@email.com'), $object->getEmails());
         self::assertNull($object->getEmail());

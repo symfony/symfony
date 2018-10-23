@@ -19,6 +19,8 @@ namespace Symfony\Component\Mercure;
  * Can be used as a Symfony Messenger handler too.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @experimental
  */
 final class Publisher
 {

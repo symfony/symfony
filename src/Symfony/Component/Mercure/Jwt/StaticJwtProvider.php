@@ -17,6 +17,8 @@ namespace Symfony\Component\Mercure\Jwt;
  * Provides a JWT passed as a configuration parameter.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @experimental
  */
 final class StaticJwtProvider
 {

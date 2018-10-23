@@ -20,6 +20,8 @@ namespace Symfony\Component\Mercure;
  * @see https://github.com/dunglas/mercure/blob/master/hub/update.go
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @experimental
  */
 final class Update
 {

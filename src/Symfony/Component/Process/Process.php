@@ -436,12 +436,10 @@ class Process implements \IteratorAggregate
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param callable $callback
-     *
      * @throws RuntimeException When process timed out
      * @throws LogicException   When process is not yet started
      */
-    public function waitUntil(callable $callback)
+    public function waitUntil(callable $callback): bool
     {
         $this->requireProcessIsStarted(__FUNCTION__);
         $this->updateStatus(false);
@@ -465,7 +463,14 @@ class Process implements \IteratorAggregate
                     $this->fallbackStatus['exitcode'] = (int) $data;
                 }
             }
+            if ($wait && !$this->isRunning()) {
+                return false;
+            }
+
+            usleep(1000);
         } while ($wait);
+
+        return true;
     }
 
     /**

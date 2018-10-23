@@ -6,6 +6,9 @@ CHANGELOG
 
  * deprecated `KernelInterface::getRootDir()` and the `kernel.root_dir` parameter
  * deprecated `KernelInterface::getName()` and the `kernel.name` parameter
+ * deprecated the first and second constructor argument of `ConfigDataCollector` 
+ * deprecated `ConfigDataCollector::getApplicationName()` 
+ * deprecated `ConfigDataCollector::getApplicationVersion()`
 
 4.1.0
 -----

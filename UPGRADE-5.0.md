@@ -182,6 +182,9 @@ HttpKernel
 
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
+ * Removed the first and second constructor argument of `ConfigDataCollector`
+ * Removed `ConfigDataCollector::getApplicationName()` 
+ * Removed `ConfigDataCollector::getApplicationVersion()`
 
 Monolog
 -------

@@ -111,6 +111,15 @@ HttpFoundation
    will respectively change from "false" to "null" and from "null" to "lax" in Symfony
    5.0, you should define their values explicitly or use "Cookie::create()" instead.
 
+HttpKernel
+----------
+
+ * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been deprecated
+ * The `KernelInterface::getName()` and the `kernel.name` parameter have been deprecated
+ * Deprecated the first and second constructor argument of `ConfigDataCollector` 
+ * Deprecated `ConfigDataCollector::getApplicationName()` 
+ * Deprecated `ConfigDataCollector::getApplicationVersion()`
+
 FrameworkBundle
 ---------------
 

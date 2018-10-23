@@ -24,6 +24,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -674,5 +675,29 @@ class PropertyAccessorTest extends TestCase
         $object = new ReturnTyped();
 
         $this->propertyAccessor->setValue($object, 'name', 'foo');
+    }
+
+    public function testWriteToSingularPropertyWhilePluralOneExists()
+    {
+        $object = new TestSingularAndPluralProps();
+
+        if ($this->propertyAccessor->isWritable($object, 'email')) {
+            $this->propertyAccessor->setValue($object, 'email', 'test@email.com');
+        }
+
+        self::assertEquals('test@email.com', $object->getEmail());
+        self::assertEmpty($object->getEmails());
+    }
+
+    public function testWriteToPluralPropertyWhileSingularOneExists()
+    {
+        $object = new TestSingularAndPluralProps();
+
+        if ($this->propertyAccessor->isWritable($object, 'emails')) {
+            $this->propertyAccessor->setValue($object, 'emails', ['test@email.com']);
+        }
+
+        self::assertEquals(['test@email.com'], $object->getEmails());
+        self::assertNull($object->getEmail());
     }
 }

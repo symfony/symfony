@@ -93,7 +93,7 @@ abstract class FileLoader extends Loader
     /**
      * @internal
      */
-    protected function glob(string $pattern, bool $recursive, &$resource = null, bool $ignoreErrors = false)
+    protected function glob(string $pattern, bool $recursive, &$resource = null, bool $ignoreErrors = false, bool $forExclusion = false, array $excluded = array())
     {
         if (\strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
@@ -120,7 +120,7 @@ abstract class FileLoader extends Loader
 
             return;
         }
-        $resource = new GlobResource($prefix, $pattern, $recursive);
+        $resource = new GlobResource($prefix, $pattern, $recursive, $forExclusion, $excluded);
 
         foreach ($resource as $path => $info) {
             yield $path => $info;

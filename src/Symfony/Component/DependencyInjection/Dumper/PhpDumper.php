@@ -80,6 +80,7 @@ class PhpDumper extends Dumper
     private $addGetService = false;
     private $locatedIds = array();
     private $serviceLocatorTag;
+    private $exportedVariables = array();
 
     /**
      * @var ProxyDumper
@@ -125,6 +126,7 @@ class PhpDumper extends Dumper
         $this->locatedIds = array();
         $this->targetDirRegex = null;
         $this->inlinedRequires = array();
+        $this->exportedVariables = array();
         $options = array_merge(array(
             'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
@@ -304,6 +306,7 @@ EOF;
         $this->inlinedRequires = array();
         $this->circularReferences = array();
         $this->locatedIds = array();
+        $this->exportedVariables = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -1768,6 +1771,10 @@ EOF;
 
     private function doExport($value, $resolveEnv = false)
     {
+        $shouldCacheValue = $resolveEnv && \is_string($value);
+        if ($shouldCacheValue && isset($this->exportedVariables[$value])) {
+            return $this->exportedVariables[$value];
+        }
         if (\is_string($value) && false !== strpos($value, "\n")) {
             $cleanParts = explode("\n", $value);
             $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
@@ -1787,6 +1794,10 @@ EOF;
             if ("'" === $export[1]) {
                 $export = substr($export, 3);
             }
+        }
+
+        if ($shouldCacheValue) {
+            $this->exportedVariables[$value] = $export;
         }
 
         return $export;

@@ -1251,6 +1251,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('mercure.hub.default.publisher'));
         $this->assertSame('https://demo.mercure.rocks/hub', $container->getDefinition('mercure.hub.default.publisher')->getArgument(0));
         $this->assertSame('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.HB0k08BaV8KlLZ3EafCRlTDGbkd9qdznCzJQ_l8ELTU', $container->getDefinition('mercure.hub.default.jwt_provider')->getArgument(0));
+        $this->assertSame(array('default' => 'https://demo.mercure.rocks/hub'), $container->getParameter('mercure.hubs'));
+        $this->assertSame('https://demo.mercure.rocks/hub', $container->getParameter('mercure.default_hub'));
     }
 
     protected function createContainer(array $data = array())

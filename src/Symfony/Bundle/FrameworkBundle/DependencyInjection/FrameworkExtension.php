@@ -1686,6 +1686,8 @@ class FrameworkExtension extends Extension
         }
 
         $defaultHub = $config['default_hub'] ?? null;
+        $hubUrls = array();
+        $defaultHubUrl = null;
         foreach ($config['hubs'] as $name => $hub) {
             if (isset($hub['jwt'])) {
                 $jwtProvider = sprintf('mercure.hub.%s.jwt_provider', $name);
@@ -1694,8 +1696,10 @@ class FrameworkExtension extends Extension
                 $jwtProvider = $hub['jwt_provider'];
             }
 
+            $hubUrls[$name] = $hub['url'];
             $hubId = sprintf('mercure.hub.%s.publisher', $name);
             if (!$defaultHub) {
+                $defaultHubUrl = $hub['url'];
                 $defaultHub = $hubId;
             }
 
@@ -1711,6 +1715,8 @@ class FrameworkExtension extends Extension
         }
 
         $container->setAlias(Publisher::class, $defaultHub);
+        $container->setParameter('mercure.hubs', $hubUrls);
+        $container->setParameter('mercure.default_hub', $defaultHubUrl);
     }
 
     /**

@@ -176,7 +176,7 @@ class HttpUtils
         return $url;
     }
 
-    public static function createForRuntime(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, string $cookieSecure = null, string $domainRegexp = null)
+    public static function constructForRuntime(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, string $cookieSecure = null, string $domainRegexp = null)
     {
         if (null === $cookieSecure && null === $domainRegexp) {
             return new self($urlGenerator, $urlMatcher, null, null);

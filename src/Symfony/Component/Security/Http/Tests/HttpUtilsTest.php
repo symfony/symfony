@@ -303,6 +303,65 @@ class HttpUtilsTest extends TestCase
         $utils->generateUri(new Request(), 'route_name');
     }
 
+    public function testUrlGeneratorAndUrlMatcherDontMutate()
+    {
+        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $utils = HttpUtils::constructForRuntime($urlGenerator = $this->getUrlGenerator(), $urlMatcher);
+
+        $this->assertEquals(array($urlGenerator, $urlMatcher, null, null), $this->getPrivateProperties($utils));
+    }
+
+    public function testCookieSecureNullAndDomainRegexpNull()
+    {
+        $utils = HttpUtils::constructForRuntime();
+
+        $this->assertEquals(array(null, null, null, null), $this->getPrivateProperties($utils));
+    }
+
+    public function testCookieSecureNullAndDomainRegexpNotNull()
+    {
+        $utils = HttpUtils::constructForRuntime(null, null, null, '#^https?://%s$#i');
+
+        $this->assertEquals(array(null, null, '{^https?://#^https?://%s$#i$}i', null), $this->getPrivateProperties($utils));
+    }
+
+    public function testCookieSecureAutoAndDomainRegexpNull()
+    {
+        $utils = HttpUtils::constructForRuntime(null, null, 'auto');
+
+        $this->assertEquals(array(null, null, '{^https?://$}i', '{^https://$}i'), $this->getPrivateProperties($utils));
+    }
+
+    public function testCookieSecureAutoAndDomainRegexpNotNull()
+    {
+        $utils = HttpUtils::constructForRuntime(null, null, 'auto', '#^https?://%s$#i');
+
+        $this->assertEquals(array(null, null, '{^https?://#^https?://%s$#i$}i', '{^https://#^https?://%s$#i$}i'), $this->getPrivateProperties($utils));
+    }
+
+    public function testCookieSecureNotAutoAndDomainRegexpNull()
+    {
+        $utils = HttpUtils::constructForRuntime(null, null, 'notAuto', null);
+
+        $this->assertEquals(array(null, null, '{^https://$}i', null), $this->getPrivateProperties($utils));
+    }
+
+    public function testCookieSecureNotAutoAndDomainRegexpNotNull()
+    {
+        $utils = HttpUtils::constructForRuntime(null, null, 'notAuto', '#^https?://%s$#i');
+
+        $this->assertEquals(array(null, null, '{^https://#^https?://%s$#i$}i', null), $this->getPrivateProperties($utils));
+    }
+
+    private function getPrivateProperties(HttpUtils $utils)
+    {
+        $privateProperties = \Closure::bind(function (HttpUtils $utils) {
+            return array($utils->urlGenerator, $utils->urlMatcher, $utils->domainRegexp, $utils->secureDomainRegexp);
+        }, null, 'Symfony\Component\Security\Http\HttpUtils');
+
+        return $privateProperties($utils);
+    }
+
     private function getUrlGenerator($generatedUrl = '/foo/bar')
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();

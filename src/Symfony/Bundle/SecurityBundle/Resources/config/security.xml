@@ -190,7 +190,7 @@
         <service id="security.user.provider.chain" class="Symfony\Component\Security\Core\User\ChainUserProvider" abstract="true" />
 
         <service id="security.http_utils" class="Symfony\Component\Security\Http\HttpUtils">
-            <factory class="Symfony\Component\Security\Http\HttpUtils" method="creatForRuntime" />
+            <factory class="Symfony\Component\Security\Http\HttpUtils" method="constructForRuntime" />
             <argument type="service" id="router" on-invalid="null" />
             <argument type="service" id="router" on-invalid="null" />
         </service>

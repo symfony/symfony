@@ -141,7 +141,7 @@ class ProcessTest extends TestCase
         $start = microtime(true);
 
         $completeOutput = '';
-        $p->waitUntil(function ($type, $output) use (&$completeOutput) {
+        $result = $p->waitUntil(function ($type, $output) use (&$completeOutput) {
             $completeOutput .= $output;
             if (false !== strpos($output, 'One more')) {
                 return true;
@@ -150,6 +150,7 @@ class ProcessTest extends TestCase
             return false;
         });
         $p->stop();
+        $this->assertTrue($result);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             // Windows is slower
@@ -158,6 +159,13 @@ class ProcessTest extends TestCase
             $this->assertLessThan(2, microtime(true) - $start);
         }
         $this->assertEquals("First iteration output\nSecond iteration output\nOne more iteration output\n", $completeOutput);
+    }
+
+    public function testWaitUntilCanReturnFalse()
+    {
+        $p = $this->getProcess('echo foo');
+        $p->start();
+        $this->assertFalse($p->waitUntil(function () { return false; }));
     }
 
     public function testAllOutputIsActuallyReadOnTermination()

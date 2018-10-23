@@ -22,9 +22,9 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
-use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -694,10 +694,10 @@ class PropertyAccessorTest extends TestCase
         $object = new TestSingularAndPluralProps();
 
         if ($this->propertyAccessor->isWritable($object, 'emails')) {
-            $this->propertyAccessor->setValue($object, 'emails', ['test@email.com']);
+            $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
         }
 
-        self::assertEquals(['test@email.com'], $object->getEmails());
+        self::assertEquals(array('test@email.com'), $object->getEmails());
         self::assertNull($object->getEmail());
     }
 }

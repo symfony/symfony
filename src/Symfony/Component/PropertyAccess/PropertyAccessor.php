@@ -607,7 +607,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         $camelized = $this->camelize($property);
         $singulars = (array) Inflector::singularize($camelized);
 
-
         if (!isset($access[self::ACCESS_TYPE])) {
             $setter = 'set'.$camelized;
             $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)

@@ -13,7 +13,7 @@ namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 /**
  * Notice we don't have getter/setter for emails
- * because we count on adder/remover
+ * because we count on adder/remover.
  */
 class TestSingularAndPluralProps
 {
@@ -21,10 +21,10 @@ class TestSingularAndPluralProps
     private $email;
 
     /** @var array */
-    private $emails = [];
+    private $emails = array();
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getEmail(): ?string
     {
@@ -32,7 +32,7 @@ class TestSingularAndPluralProps
     }
 
     /**
-     * @param null|string $email
+     * @param string|null $email
      */
     public function setEmail(?string $email): void
     {
@@ -60,6 +60,6 @@ class TestSingularAndPluralProps
      */
     public function removeEmail(string $email): void
     {
-        $this->emails = array_diff($this->emails, [$email]);
+        $this->emails = array_diff($this->emails, array($email));
     }
 }

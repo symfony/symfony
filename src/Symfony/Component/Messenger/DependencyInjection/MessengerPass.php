@@ -65,9 +65,11 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
-        $this->registerReceivers($container);
-        $this->registerSenders($container);
-        $this->registerHandlers($container, $busIds);
+        if (!empty($busIds)) {
+            $this->registerReceivers($container);
+            $this->registerSenders($container);
+            $this->registerHandlers($container, $busIds);
+        }
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds)

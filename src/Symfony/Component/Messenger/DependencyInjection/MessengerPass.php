@@ -51,10 +51,6 @@ class MessengerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('message_bus')) {
-            return;
-        }
-
         $busIds = array();
         foreach ($container->findTaggedServiceIds($this->busTag) as $busId => $tags) {
             $busIds[] = $busId;

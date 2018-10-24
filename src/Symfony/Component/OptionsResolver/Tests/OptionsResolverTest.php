@@ -754,6 +754,9 @@ class OptionsResolverTest extends TestCase
         yield 'It explicitly ignores a depreciation' => array(
             function (OptionsResolver $resolver) {
                 $resolver
+                    ->setDefault('baz', function (Options $options) {
+                        return $options->offsetGet('foo', false);
+                    })
                     ->setDefault('foo', null)
                     ->setDeprecated('foo')
                     ->setDefault('bar', function (Options $options) {

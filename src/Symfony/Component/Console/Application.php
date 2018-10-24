@@ -201,23 +201,7 @@ class Application
 
         $name = $this->getCommandName($input);
         if (true === $input->hasParameterOption(array('--help', '-h'), true)) {
-            if (!$name) {
-                $name = 'help';
-                $input = new ArrayInput(array('command_name' => $this->defaultCommand));
-            } else {
-                $this->wantHelps = true;
-            }
-        }
-
-        if (!$name) {
-            $name = $this->defaultCommand;
-            $definition = $this->getDefinition();
-            $definition->setArguments(array_merge(
-                $definition->getArguments(),
-                array(
-                    'command' => new InputArgument('command', InputArgument::OPTIONAL, $definition->getArgument('command')->getDescription(), $name),
-                )
-            ));
+            $this->wantHelps = true;
         }
 
         try {
@@ -940,7 +924,13 @@ class Application
      */
     protected function getCommandName(InputInterface $input)
     {
-        return $this->singleCommand ? $this->defaultCommand : $input->getFirstArgument();
+        if ($this->singleCommand) {
+            return $this->defaultCommand;
+        } elseif ($firstArgument = $input->getFirstArgument()) {
+            return $firstArgument;
+        }
+
+        return $this->defaultCommand;
     }
 
     /**

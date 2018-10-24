@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.88",
     "Names": {
         "aa": "afar",
         "ab": "abjasio",
@@ -351,7 +351,7 @@
         "non": "nórdico antiguo",
         "nqo": "n’ko",
         "nr": "ndebele meridional",
-        "nso": "sesotho septentrional",
+        "nso": "sotho septentrional",
         "nus": "nuer",
         "nv": "navajo",
         "nwc": "newari clásico",
@@ -445,7 +445,7 @@
         "srr": "serer",
         "ss": "suazi",
         "ssy": "saho",
-        "st": "sesotho meridional",
+        "st": "sotho meridional",
         "su": "sundanés",
         "suk": "sukuma",
         "sus": "susu",

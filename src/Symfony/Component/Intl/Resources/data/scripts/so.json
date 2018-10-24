@@ -1,6 +1,13 @@
 {
-    "Version": "2.1.38.69",
+    "Version": "2.1.43.94",
     "Names": {
+        "Arab": "Carabi",
+        "Cyrl": "Siriylik",
+        "Hans": "La fududeeyay",
+        "Hant": "Hore",
+        "Jpan": "Jabaaniis",
+        "Kore": "Kuuriyaan",
+        "Latn": "Laatiin",
         "Zxxx": "Aan la qorin",
         "Zzzz": "Far aan la aqoon amase aan saxnayn"
     }

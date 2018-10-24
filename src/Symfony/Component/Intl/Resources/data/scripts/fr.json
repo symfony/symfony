@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "Arab": "arabe",
         "Armi": "araméen impérial",
@@ -24,7 +24,7 @@
         "Cprt": "syllabaire chypriote",
         "Cyrl": "cyrillique",
         "Cyrs": "cyrillique (variante slavonne)",
-        "Deva": "dévanâgarî",
+        "Deva": "dévanagari",
         "Dsrt": "déséret",
         "Egyd": "démotique égyptien",
         "Egyh": "hiératique égyptien",
@@ -84,7 +84,7 @@
         "Ogam": "ogam",
         "Olck": "ol tchiki",
         "Orkh": "orkhon",
-        "Orya": "oriya",
+        "Orya": "odia",
         "Osma": "osmanais",
         "Perm": "ancien permien",
         "Phag": "phags pa",
@@ -102,7 +102,7 @@
         "Saur": "saurashtra",
         "Sgnw": "écriture des signes",
         "Shaw": "shavien",
-        "Sinh": "cinghalais",
+        "Sinh": "cingalais",
         "Sund": "sundanais",
         "Sylo": "sylotî nâgrî",
         "Syrc": "syriaque",

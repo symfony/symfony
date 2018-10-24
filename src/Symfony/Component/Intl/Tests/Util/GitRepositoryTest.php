@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Util\GitRepository;
 
 /**
@@ -38,7 +39,11 @@ class GitRepositoryTest extends TestCase
 
     public function testItThrowsAnExceptionIfInitialisedWithNonGitDirectory()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(RuntimeException::class);
+        } else {
+            $this->setExpectedException(RuntimeException::class);
+        }
 
         @mkdir($this->targetDir, '0777', true);
 
@@ -49,8 +54,8 @@ class GitRepositoryTest extends TestCase
     {
         $git = GitRepository::download(self::REPO_URL, $this->targetDir);
 
-        $this->assertInstanceOf('Symfony\Component\Intl\Util\GitRepository', $git);
-        $this->assertDirectoryExists($this->targetDir.'/.git');
+        $this->assertInstanceOf(GitRepository::class, $git);
+        $this->assertTrue(is_dir($this->targetDir.'/.git'));
         $this->assertSame($this->targetDir, $git->getPath());
         $this->assertSame(self::REPO_URL, $git->getUrl());
         $this->assertRegExp('#^[0-9a-z]{40}$#', $git->getLastCommitHash());

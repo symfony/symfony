@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Peso Sileach"
+        ],
+        "CNH": [
+            "CNH",
+            "Yuan Sìneach (far-thìreach)"
         ],
         "CNX": [
             "CNX",
@@ -1039,6 +1043,10 @@
         ],
         "VEF": [
             "VEF",
+            "Bolívar Bheinisealach (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Bolívar Bheinisealach"
         ],
         "VND": [

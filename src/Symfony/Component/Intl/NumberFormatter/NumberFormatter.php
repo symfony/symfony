@@ -236,8 +236,8 @@ class NumberFormatter
     );
 
     private static $enTextAttributes = array(
-        self::DECIMAL => array('', '', '-', '', ' ', '', ''),
-        self::CURRENCY => array('¤', '', '-¤', '', ' ', ''),
+        self::DECIMAL => array('', '', '-', '', ' ', 'XXX', ''),
+        self::CURRENCY => array('¤', '', '-¤', '', ' ', 'XXX'),
     );
 
     /**
@@ -331,7 +331,8 @@ class NumberFormatter
 
         $value = $this->formatNumber($value, $fractionDigits);
 
-        $ret = $symbol.$value;
+        // There's a non-breaking space after the currency code (i.e. CRC 100), but not if the currency has a symbol (i.e. £100).
+        $ret = $symbol.(mb_strlen($symbol, 'UTF-8') > 2 ? "\xc2\xa0" : '').$value;
 
         return $negative ? '-'.$ret : $ret;
     }
@@ -513,17 +514,20 @@ class NumberFormatter
             return false;
         }
 
-        $groupSep = $this->getAttribute(self::GROUPING_USED) ? ',' : '';
-
-        // Any string before the numeric value causes error in the parsing
-        if (preg_match("/^-?(?:\.\d++|([\d{$groupSep}]++)(?:\.\d*+)?)/", $value, $matches)) {
+        // Any invalid number at the end of the string is removed.
+        // Only numbers and the fraction separator is expected in the string.
+        // If grouping is used, grouping separator also becomes a valid character.
+        $groupingMatch = $this->getAttribute(self::GROUPING_USED) ? '|(?P<grouping>\d++(,{1}\d+)++(\.\d*+)?)' : '';
+        if (preg_match("/^-?(?:\.\d++{$groupingMatch}|\d++(\.\d*+)?)/", $value, $matches)) {
             $value = $matches[0];
             $position = \strlen($value);
-            if ($error = $groupSep && isset($matches[1]) && !preg_match('/^\d{1,3}+(?:(?:,\d{3})++|\d*+)$/', $matches[1])) {
-                $position -= \strlen(preg_replace('/^\d{1,3}+(?:(?:,\d++)++|\d*+)/', '', $matches[1]));
+            // value is not valid if grouping is used, but digits are not grouped in groups of three
+            if ($error = isset($matches['grouping']) && !preg_match('/^-?(?:\d{1,3}+)?(?:(?:,\d{3})++|\d*+)(?:\.\d*+)?$/', $value)) {
+                // the position on error is 0 for positive and 1 for negative numbers
+                $position = 0 === strpos($value, '-') ? 1 : 0;
             }
         } else {
-            $error = 1;
+            $error = true;
             $position = 0;
         }
 
@@ -585,6 +589,10 @@ class NumberFormatter
 
         if (self::$supportedAttributes['FRACTION_DIGITS'] == $attr) {
             $value = $this->normalizeFractionDigitsValue($value);
+            if ($value < 0) {
+                // ignore negative values but do not raise an error
+                return true;
+            }
         }
 
         $this->attributes[$attr] = $value;
@@ -868,8 +876,7 @@ class NumberFormatter
     }
 
     /**
-     * Returns the normalized value for the FRACTION_DIGITS attribute. The value is converted to int and if negative,
-     * the returned value will be 0.
+     * Returns the normalized value for the FRACTION_DIGITS attribute.
      *
      * @param mixed $value The value to be normalized
      *
@@ -877,8 +884,6 @@ class NumberFormatter
      */
     private function normalizeFractionDigitsValue($value)
     {
-        $value = (int) $value;
-
-        return (0 > $value) ? 0 : $value;
+        return (int) $value;
     }
 }

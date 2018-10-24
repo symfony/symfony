@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasais",
@@ -312,6 +312,7 @@
         "ln": "Lingala",
         "lo": "Làtho",
         "lol": "Mongo",
+        "lou": "Crìtheol Louisiana",
         "loz": "Lozi",
         "lrc": "Luri Thuathach",
         "lt": "Liotuainis",

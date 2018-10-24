@@ -458,7 +458,7 @@ class Process implements \IteratorAggregate
 
             foreach ($output as $type => $data) {
                 if (3 !== $type) {
-                    $ready = $ready || $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data);
+                    $ready = $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data) || $ready;
                 } elseif (!isset($this->fallbackStatus['signaled'])) {
                     $this->fallbackStatus['exitcode'] = (int) $data;
                 }

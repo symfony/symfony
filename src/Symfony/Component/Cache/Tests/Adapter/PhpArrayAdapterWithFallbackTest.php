@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -41,7 +42,7 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
         $this->createCachePool()->clear();
 
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
-            FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+            (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
         }
     }
 

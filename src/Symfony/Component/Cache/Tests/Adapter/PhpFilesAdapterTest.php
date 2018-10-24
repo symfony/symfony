@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -30,7 +31,7 @@ class PhpFilesAdapterTest extends AdapterTestCase
 
     public static function tearDownAfterClass(): void
     {
-        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+        (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool

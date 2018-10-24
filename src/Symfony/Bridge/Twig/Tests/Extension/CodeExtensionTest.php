@@ -25,7 +25,7 @@ class CodeExtensionTest extends TestCase
 
     public function testFileRelative()
     {
-        $this->assertEquals('CodeExtensionTest.php', $this->getExtension()->getFileRelative(__FILE__));
+        $this->assertEquals('file.txt', $this->getExtension()->getFileRelative(\DIRECTORY_SEPARATOR.'project'.\DIRECTORY_SEPARATOR.'file.txt'));
     }
 
     /**
@@ -69,6 +69,6 @@ class CodeExtensionTest extends TestCase
 
     protected function getExtension()
     {
-        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), '/root', 'UTF-8', __DIR__);
+        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), \DIRECTORY_SEPARATOR.'project', 'UTF-8');
     }
 }

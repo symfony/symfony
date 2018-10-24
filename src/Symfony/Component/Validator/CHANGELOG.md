@@ -4,6 +4,8 @@ CHANGELOG
 4.2.0
 -----
 
+ * added a new `UnexpectedValueException` that can be thrown by constraint validators, these exceptions are caught by
+   the validator and are converted into constraint violations
  * added `DivisibleBy` constraint
  * decoupled from `symfony/translation` by using `Symfony\Contracts\Translation\TranslatorInterface`
  * deprecated `ValidatorBuilderInterface`

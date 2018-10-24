@@ -65,7 +65,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     /**
      * @group legacy
      * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
     public function testLegacyExpectsStringCompatibleType()
     {
@@ -73,7 +73,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
     public function testExpectsStringCompatibleType()
     {

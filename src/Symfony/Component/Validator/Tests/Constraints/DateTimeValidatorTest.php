@@ -59,7 +59,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
     public function testExpectsStringCompatibleType()
     {

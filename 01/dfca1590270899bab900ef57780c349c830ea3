@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-23T15:28:21Z
+
+Great work Roland! I've tested this in the Symfony Demo app. I only have minor remarks.
+
+**First:** "Ghost filters": when loading the page, filters are displayed by default and they disappear when they shouldn't be displayed. This GIF shows a force reload in the page:
+
+![ghost-filters](https://user-images.githubusercontent.com/73419/47371702-8c55f380-d6e8-11e8-98ef-2d2151585fc5.gif)
+
+Maybe it's better to "hide by default" and display when appropriate?
+
+**Second:** "Moving filters":
+
+Right now, the multiple choice filters "move" under some circumstances. See hwen I deselect all of channels and icons disappear:
+
+![channel-filter](https://user-images.githubusercontent.com/73419/47371813-be675580-d6e8-11e8-8d38-bccbbd71bb23.gif)
+
+This kind of movements are distracting and user may click wrongly because of these element displacements. What if we replace the showing/hiding icon by a form checkbox? It doesn't have to be a real form, just a clickable checkbox. Stripe does something similar:
+
+![stripe-filter](https://user-images.githubusercontent.com/73419/47371891-e8b91300-d6e8-11e8-876f-cf4fd03cda83.gif)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-23T16:11:54Z
+
+I think i've addressed both issues.
+
+![image](https://user-images.githubusercontent.com/1047696/47374779-04271c80-d6ef-11e8-9291-7cafcd5bab31.png)

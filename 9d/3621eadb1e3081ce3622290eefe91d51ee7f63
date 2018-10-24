@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-15T17:35:10Z
+
+There is still a desicion to make here to complete this patch:
+
+> https://github.com/symfony/symfony/issues/28848#issuecomment-429877228 ... (but there should be a way to opt-out of the deprecation to be able to write a BC layer)
+
+> https://github.com/symfony/symfony/pull/28860#discussion_r225246950 `offsetGet($option/*, bool $triggerDeprecation = true*/)` seems fine? That be the easiest :) It's not needed yet, but surely sooner or later, for lib owners a must (so we should ship it as a feature)
+
+See example in https://github.com/symfony/symfony/pull/28860/files#diff-c6198934d4f35bc102ff362d40b71285R40
+
+WDYT about the @ro0NL's idea? thoughts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T19:41:03Z
+
+> offsetGet($option/*, bool $triggerDeprecation = true*/)
+
+looks like this is the way to go, isn't it?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-21T22:51:08Z
+
+It should be ready now.

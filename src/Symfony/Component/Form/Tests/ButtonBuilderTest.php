@@ -28,7 +28,6 @@ class ButtonBuilderTest extends TestCase
             ['foo'],
             ['0'],
             [0],
-            ['button[]'],
         ];
     }
 
@@ -38,6 +37,14 @@ class ButtonBuilderTest extends TestCase
     public function testValidNames($name)
     {
         $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNameContainingIllegalCharacters()
+    {
+        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder('button[]'));
     }
 
     public function getInvalidNames()

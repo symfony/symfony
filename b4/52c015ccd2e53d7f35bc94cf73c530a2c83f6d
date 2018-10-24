@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-15T11:42:39Z
+
+what about `Request::addWebLink()`? does it make sense.. currently the feat. is still tied to AbstractController, that's a bummer :(
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-15T11:53:26Z
+
+@ro0NL very good idea. Updated accordingly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-16T00:39:04Z
+
+Having the method on `Request`  looks really weird to me as it is really about the Response.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-16T06:12:11Z
+
+@fabpot I thought the same thing, but the current, temporary, list of values must be stored in request attributes. Then the header is added to the response by the listener.
+Maybe can we just find a better name? Like `addLinkToResponse` or `storeLink`?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T14:43:43Z
+
+maybe it should be dealt by a new service, provided by WebLink  component.
+
+Something like `ResponseLinkManagerInterface`, though we should try to find some better name then "manager", but that's what it is :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-16T14:57:35Z
+
+My preference would be the original proposal from Kévin: `AbstractController::addLink()`  I know that there are some developers that prefer not to use `AbstractController` but in my experience they are a minority.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-16T15:37:56Z
+
+And they can always use `_links` manually. I preserved the initial commit. I can revert the last one.
+
+(Actually I prefer having it in `Request`, but I also don't feel confortable with the DX problem rose by Fabien, so the initial commit can be a good compromise)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T15:50:37Z
+
+> Actually I prefer having it in Request
+
+i see why we might favor `AbstracController::addLink` over `Request::addLink` in terms of semantics. But fact is, links are _already_ stored in/tied to `Request` (as attributes), to me that legitimates `Request::addLink` on the technical level at least.
+
+Speaking about DX, right now standalone it's
+
+```
+$linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+$request->attributes->set('_links', $linkProvider->withLink($link));
+```
+
+over  `$request->addLink($link)`.. just saying ;)
+
+:+1: for AbstractController, that means working with attribtues remains the "true" API. We can live with that i guess.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-21T10:45:35Z
+
+Last commit reverted and typo fixed.
+Even if this feature partially work without the listener, I think we should check that the listener is present and that the header will be generated, especially now that it's in FrameworkBundle.

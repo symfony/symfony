@@ -16,6 +16,8 @@ CHANGELOG
  * Deprecated the `simple_form` and `simple_preauth` authentication listeners, use Guard instead.
  * Deprecated the `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes, use Guard instead.
  * Added `port` in access_control
+ * Added a `Symfony\Bundle\SecurityBundle\Security\TargetPathHelper` class and service to help saving or getting 
+   the target path from the session
  
 4.1.0
 -----

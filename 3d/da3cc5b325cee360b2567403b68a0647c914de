@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-23T13:54:22Z
+
+Nice. Would it possible to cover this by a test case?
+
+---------------------------------------------------------------------------
+
+by dbu at 2018-10-23T14:34:39Z
+
+good point with the tests. did need to move getting the request up... i think its ok to expand on the existing test and make it do a bit more, rather than create a separate test. okay like this?

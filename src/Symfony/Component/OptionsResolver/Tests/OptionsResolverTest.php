@@ -491,12 +491,12 @@ class OptionsResolverTest extends TestCase
     public function testLazyDeprecationFailsIfInvalidDeprecationMessageType()
     {
         $this->resolver
-            ->setDefault('foo', true)
+            ->setDefined('foo')
             ->setDeprecated('foo', function (Options $options, $value) {
                 return false;
             })
         ;
-        $this->resolver->resolve();
+        $this->resolver->resolve(array('foo' => null));
     }
 
     /**
@@ -506,8 +506,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfCyclicDependencyBetweenDeprecation()
     {
         $this->resolver
-            ->setDefault('foo', null)
-            ->setDefault('bar', null)
+            ->setDefined(array('foo', 'bar'))
             ->setDeprecated('foo', function (Options $options, $value) {
                 $options['bar'];
             })
@@ -515,7 +514,7 @@ class OptionsResolverTest extends TestCase
                 $options['foo'];
             })
         ;
-        $this->resolver->resolve();
+        $this->resolver->resolve(array('foo' => null, 'bar' => null));
     }
 
     public function testIsDeprecated()
@@ -539,10 +538,15 @@ class OptionsResolverTest extends TestCase
     /**
      * @dataProvider provideDeprecationData
      */
-    public function testDeprecationMessages(\Closure $configureOptions, array $options, ?array $expectedError)
+    public function testDeprecationMessages(\Closure $configureOptions, array $options, ?array $expectedError, int $expectedCount)
     {
+        $count = 0;
         error_clear_last();
-        set_error_handler(function () { return false; });
+        set_error_handler(function () use (&$count) {
+            ++$count;
+
+            return false;
+        });
         $e = error_reporting(0);
 
         $configureOptions($this->resolver);
@@ -555,6 +559,7 @@ class OptionsResolverTest extends TestCase
         unset($lastError['file'], $lastError['line']);
 
         $this->assertSame($expectedError, $lastError);
+        $this->assertSame($expectedCount, $count);
     }
 
     public function provideDeprecationData()
@@ -571,6 +576,7 @@ class OptionsResolverTest extends TestCase
                 'type' => E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ),
+            1,
         );
 
         yield 'It deprecates an option with custom message' => array(
@@ -588,20 +594,27 @@ class OptionsResolverTest extends TestCase
                 'type' => E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated, use "bar" option instead.',
             ),
+            2,
         );
 
-        yield 'It deprecates a missing option with default value' => array(
+        yield 'It deprecates an option evaluated in another definition' => array(
             function (OptionsResolver $resolver) {
+                // defined by superclass
                 $resolver
-                    ->setDefaults(array('foo' => null, 'bar' => null))
+                    ->setDefault('foo', null)
                     ->setDeprecated('foo')
                 ;
+                // defined by subclass
+                $resolver->setDefault('bar', function (Options $options) {
+                    return $options['foo']; // It triggers a deprecation
+                });
             },
-            array('bar' => 'baz'),
+            array(),
             array(
                 'type' => E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ),
+            1,
         );
 
         yield 'It deprecates allowed type and value' => array(
@@ -623,20 +636,46 @@ class OptionsResolverTest extends TestCase
                 'type' => E_USER_DEPRECATED,
                 'message' => 'Passing an instance of "stdClass" to option "foo" is deprecated, pass its FQCN instead.',
             ),
+            1,
         );
 
-        yield 'It ignores deprecation for missing option without default value' => array(
+        yield 'It triggers a deprecation based on the value only if option is provided by the user' => array(
             function (OptionsResolver $resolver) {
                 $resolver
-                    ->setDefined(array('foo', 'bar'))
-                    ->setDeprecated('foo')
+                    ->setDefined('foo')
+                    ->setAllowedTypes('foo', array('null', 'bool'))
+                    ->setDeprecated('foo', function (Options $options, $value) {
+                        if (!\is_bool($value)) {
+                            return 'Passing a value different than true or false is deprecated.';
+                        }
+
+                        return '';
+                    })
+                    ->setDefault('baz', null)
+                    ->setAllowedTypes('baz', array('null', 'int'))
+                    ->setDeprecated('baz', function (Options $options, $value) {
+                        if (!\is_int($value)) {
+                            return 'Not passing an integer is deprecated.';
+                        }
+
+                        return '';
+                    })
+                    ->setDefault('bar', function (Options $options) {
+                        $options['baz']; // It does not triggers a deprecation
+
+                        return $options['foo']; // It does not triggers a deprecation
+                    })
                 ;
             },
-            array('bar' => 'baz'),
-            null,
+            array('foo' => null), // It triggers a deprecation
+            array(
+                'type' => E_USER_DEPRECATED,
+                'message' => 'Passing a value different than true or false is deprecated.',
+            ),
+            1,
         );
 
-        yield 'It ignores deprecation if closure returns an empty string' => array(
+        yield 'It ignores a deprecation if closure returns an empty string' => array(
             function (OptionsResolver $resolver) {
                 $resolver
                     ->setDefault('foo', null)
@@ -647,6 +686,7 @@ class OptionsResolverTest extends TestCase
             },
             array('foo' => Bar::class),
             null,
+            0,
         );
 
         yield 'It deprecates value depending on other option value' => array(
@@ -668,6 +708,62 @@ class OptionsResolverTest extends TestCase
                 'type' => E_USER_DEPRECATED,
                 'message' => 'Using the "date_format" option when the "widget" option is set to "single_text" is deprecated.',
             ),
+            1,
+        );
+
+        yield 'It triggers a deprecation for each evaluation' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    // defined by superclass
+                    ->setDefined('foo')
+                    ->setDeprecated('foo')
+                    // defined by subclass
+                    ->setDefault('bar', function (Options $options) {
+                        return $options['foo']; // It triggers a deprecation
+                    })
+                    ->setNormalizer('bar', function (Options $options, $value) {
+                        $options['foo']; // It triggers a deprecation
+                        $options['foo']; // It triggers a deprecation
+
+                        return $value;
+                    })
+                ;
+            },
+            array('foo' => 'baz'), // It triggers a deprecation
+            array(
+                'type' => E_USER_DEPRECATED,
+                'message' => 'The option "foo" is deprecated.',
+            ),
+            4,
+        );
+
+        yield 'It ignores a deprecation if no option is provided by the user' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefined('foo')
+                    ->setDefault('bar', null)
+                    ->setDeprecated('foo')
+                    ->setDeprecated('bar')
+                ;
+            },
+            array(),
+            null,
+            0,
+        );
+
+        yield 'It explicitly ignores a depreciation' => array(
+            function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefault('foo', null)
+                    ->setDeprecated('foo')
+                    ->setDefault('bar', function (Options $options) {
+                        return $options->offsetGet('foo', false);
+                    })
+                ;
+            },
+            array(),
+            null,
+            0,
         );
     }
 

@@ -89,6 +89,11 @@ class OptionsResolver implements Options
     private $deprecated = array();
 
     /**
+     * The list of options provided by the user.
+     */
+    private $given = array();
+
+    /**
      * Whether the instance is locked for reading.
      *
      * Once locked, the options cannot be changed anymore. This is
@@ -744,6 +749,7 @@ class OptionsResolver implements Options
 
         // Override options set by the user
         foreach ($options as $option => $value) {
+            $clone->given[$option] = true;
             $clone->defaults[$option] = $value;
             unset($clone->resolved[$option], $clone->lazy[$option]);
         }
@@ -772,7 +778,8 @@ class OptionsResolver implements Options
     /**
      * Returns the resolved value of an option.
      *
-     * @param string $option The option name
+     * @param string $option             The option name
+     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not (true by default)
      *
      * @return mixed The option value
      *
@@ -784,14 +791,20 @@ class OptionsResolver implements Options
      * @throws OptionDefinitionException If there is a cyclic dependency between
      *                                   lazy options and/or normalizers
      */
-    public function offsetGet($option)
+    public function offsetGet($option/*, bool $triggerDeprecation = true*/)
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
         }
 
+        $triggerDeprecation = 1 === \func_num_args() || \func_get_arg(1);
+
         // Shortcut for resolved options
         if (array_key_exists($option, $this->resolved)) {
+            if ($triggerDeprecation && isset($this->deprecated[$option]) && \is_string($this->deprecated[$option])) {
+                @trigger_error(strtr($this->deprecated[$option], array('%name%' => $option)), E_USER_DEPRECATED);
+            }
+
             return $this->resolved[$option];
         }
 
@@ -920,7 +933,8 @@ class OptionsResolver implements Options
         }
 
         // Check whether the option is deprecated
-        if (isset($this->deprecated[$option])) {
+        // and it is provided by the user or is being called from a lazy evaluation
+        if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || ($this->calling && \is_string($this->deprecated[$option])))) {
             $deprecationMessage = $this->deprecated[$option];
 
             if ($deprecationMessage instanceof \Closure) {

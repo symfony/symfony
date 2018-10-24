@@ -16,6 +16,8 @@ namespace Symfony\Component\OptionsResolver;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @method mixed offsetGet(string $option, bool $triggerDeprecation = true)
  */
 interface Options extends \ArrayAccess, \Countable
 {

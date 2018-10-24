@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-10T13:54:16Z
+
+This change would fix issues like #14943 (and many other related issues). I didn't add any tests yet, but would like to get some feedback first as setting them up seems to be quite complex. I am not sure if anyone could have actually relied on the previous behaviour. If we think that this was a supported use case, we will probably have to make this feature opt-in.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-10T13:56:54Z
+
+Shouldnt we, for consistency, raise a violation per case:
+
+https://github.com/symfony/symfony/blob/3cfdc9e9d739dda0bc8d222d458e6bbb34c10c72/src/Symfony/Component/Validator/Constraints/RangeValidator.php#L36-L43
+
+and basically get rid of `UnexpectedTypeException` for this case.
+
+---------------------------------------------------------------------------
+
+by stoccc at 2018-07-10T19:57:15Z
+
+Imho a validator should not throw exceptions if you ask to validate unexpected data types, that could come from user or whatever untrusted, it should just add violations.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-07-11T06:26:36Z
+
+I agree with @ro0NL , we should handle it per case in each validator. Relates to https://github.com/symfony/symfony/pull/26477#issuecomment-372298311 too where I also suggested this. Handling this properly in each validator would not interrupt the validation and keep adding other violations (and answer the AllValidator issue too).
+Also we cannot just catch `UnexpectedTypeException` as this can also be logic exceptions due to a developer mistake that should be fixed (i.e the constraint class check).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-11T07:06:19Z
+
+Also i was wondering if we can somehow leverage the `Type` constraint/validator, in terms of forwarding this validation. To do all the work basically, more concise and to avoid a new error code/message for each constraint i guess.
+
+Maybe with some helper, it could also ease the migration of custom constraint validators.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-24T08:42:04Z
+
+@ro0NL Your example in https://github.com/symfony/symfony/pull/27917#issuecomment-403831488 is IMO not good in terms of DX. The goal of this PR is precisely to lower the burden when writing constraint validators. But @ogizanagi has a valid point in the exception could as well have been thrown because of the wrong constraint being passed.
+
+What do you think about a different approach like the one @webmozart suggested in #12312?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-24T08:50:47Z
+
+Oh wow :) @webmozart created all the tickets already :D
+
+His suggestion indeed looks very good! Except im not sure about proposed strict/loose varying in `Type`.. we dont really need that IMHO (now we have normalizers as well).
+
+We still agree a constraint violation should be favored over an exception right?
+
+>  Your example in #27917 (comment) is IMO not good in terms of DX
+
+Still.., we need to trigger type validation _somewhere_ right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-24T10:18:16Z
+
+@ro0NL I still think it's okay to throw an exception in the validator which will then be transformed into a proper constraint violation.
+
+@ogizanagi made another good suggestion in https://github.com/symfony/symfony/pull/26477#issuecomment-372298311:
+
+> Or perhaps we should introduce a new `UnexpectedValueTypeException` extending `UnexpectedTypeException` that'll be caught and transformed into a violation by the component.
+We should also inspect more thoroughly other validators.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-24T10:25:30Z
+
+:+1: for `UnexpectedValueTypeException`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-25T08:49:54Z
+
+PR updated with a new `UnexpectedValueException` which will be caught by the validator and transformed into a constraint violation
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-04T09:12:12Z
+
+From https://github.com/symfony/symfony/pull/28645#discussion_r222388525 not sure the current approach is blocking for @nicolas-grekas
+
+Alternatively, what about exposing the variables and pre-validate as such in i.e. `abstract SimpleConstraintValidator`:
+
+```
+getConstraintClasses(): array { return [Some::class]; }
+getValidTypes(): array { return ['string']; }
+allowsNull(): bool { return true; }
+```
+
+E.g. `getConstraintClasses()` could be guessed, similar like bundle extension class is guessed.
+
+Also https://github.com/symfony/symfony/pull/27917#issuecomment-404067244 is still considerable IMHO, that solves translation messages, complex type validation and overall consistency.
+
+> Your example in #27917 (comment) is IMO not good in terms of DX. The goal of this PR is precisely to lower the burden when writing constraint validators
+
+I think we can simplify it by adding some util to the base class, e.g. `$this->validType()`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-04T09:37:02Z
+
+Well, the main idea for this PR is not to centralise logic. I mean I would be fine with adding more code to our core constraint validators to achieve the same. The code added here is more important for individual constraint validators written for applications where users do not want to deal with more code.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-04T09:46:43Z
+
+> Well, the main idea for this PR is not to centralise logic.
+
+But it does exactly that, inferring the constraint violation thru exception in `RecursiveContextualValidator`. Meaning the constraint might behave differently between validator implementations? It feels a  bit like a trick, compared to raising a pure violation from the constraint validator (one way or another).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T20:54:30Z
+
+Do you think we can resolve this before the end of the month to have it in 4.2?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-21T09:19:41Z
+
+From my point of view the PR is finished. Do you think we should take another direction?

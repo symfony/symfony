@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-24T14:54:59Z
+
+can you have a look at the failure on Windows?
+```
+-'some/File.txt'
++'/some/File.txt'
+C:\projects\symfony\src\Symfony\Bridge\Twig\Tests\Extension\CodeExtensionTest.php:28
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-24T14:56:06Z
+
+and the failure on Travis btw - looks like the composer.json change allowed spotting an issue :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-24T18:16:14Z
+
+Im not sure the appveyor failure is still related, looks like it's not.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-24T19:58:29Z
+
+The `CodeHelper` looks like
+
+https://github.com/symfony/symfony/blob/8c24c35fe86efbdb5f5d74c58d89518cb2865ea8/src/Symfony/Bundle/FrameworkBundle/Templating/Helper/CodeHelper.php#L33-L38
+
+so i tend to keep the slash normalization actually =/

@@ -66,7 +66,7 @@ class StateMachineTest extends TestCase
         $net = new StateMachine($definition);
         $subject = new \stdClass();
 
-        // If you are in place "b" you should be able to apply "t1" and "t2"
+        // If you are in place "b" you should be able to apply "t2" and "t3"
         $subject->marking = 'b';
         $this->assertTrue($net->buildTransitionBlockerList($subject, 't2')->isEmpty());
         $this->assertTrue($net->buildTransitionBlockerList($subject, 't3')->isEmpty());
@@ -91,7 +91,7 @@ class StateMachineTest extends TestCase
         // we are currently in place "a". Method buildTransitionBlockerList first processes transition "t1" with from place "a"
         // but there is no break so it continues to transition "t1" with from place "d" where it exits loop because there are no more
         // transitions with name "t1". So returned transition blocker list contains result of transition "t1" with from place "d" because
-        // it was executed lastest. This result is incorrect because we got "Blocked by marking" transition blocker of transition "t1"
+        // it was executed latest. This result is incorrect because we got "Blocked by marking" transition blocker of transition "t1"
         // with from place "d" instead of guard blocker "Transition blocker of place a" of transition "t1" with from place "a".
         // This test checks if this bug does not happen.
 

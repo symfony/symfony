@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-10-25T09:18:39Z
+
+For the records, now, to allow no handlers on a given bus, here is the following configuration:
+```yaml
+framework:
+  messenger:
+    buses:
+      events:
+        default_middleware: allow_no_handlers
+```

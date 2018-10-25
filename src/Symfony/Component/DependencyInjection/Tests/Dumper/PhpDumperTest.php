@@ -497,6 +497,52 @@ class PhpDumperTest extends TestCase
         $this->assertSame('foobaz', $container->getParameter('hello-bar'));
     }
 
+    public function testDumpedUrlEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', 'postgres://user@localhost:5432/database?sslmode=disable');
+        $container->setParameter('hello', '%env(url:foo)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_url_env.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_UrlParameters']));
+
+        require self::$fixturesPath.'/php/services_url_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_UrlParameters();
+        $this->assertSame([
+            'scheme' => 'postgres',
+            'host' => 'localhost',
+            'port' => 5432,
+            'user' => 'user',
+            'path' => 'database',
+            'query' => 'sslmode=disable',
+            'pass' => null,
+            'fragment' => null,
+        ], $container->getParameter('hello'));
+    }
+
+    public function testDumpedQueryEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', 'foo=bar&baz[]=qux');
+        $container->setParameter('hello', '%env(query_string:foo)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_query_string_env.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_QueryStringParameters']));
+
+        require self::$fixturesPath.'/php/services_query_string_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_QueryStringParameters();
+        $this->assertSame([
+            'foo' => 'bar',
+            'baz' => ['qux'],
+        ], $container->getParameter('hello'));
+    }
+
     public function testDumpedJsonEnvParameters()
     {
         $container = new ContainerBuilder();

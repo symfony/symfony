@@ -6,6 +6,8 @@ CHANGELOG
 
  * added `%env(trim:...)%` processor to trim a string value
  * added `%env(default:param_name:...)%` processor to fallback to a parameter or to null when using `%env(default::...)%`
+ * added `%env(url:...)%` processor to convert an URL or DNS into an array of components
+ * added `%env(query_string:...)%` processor to convert a query string into an array of key values
  * added support for deprecating aliases
  * made `ContainerParametersResource` final and not implement `Serializable` anymore
  * added ability to define an index for a tagged collection

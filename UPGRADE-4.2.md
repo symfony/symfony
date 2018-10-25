@@ -175,7 +175,7 @@ Messenger
    After:
    ```php
    yield FirstMessage::class => ['priority' => 0];
-   yield SecondMessage::class => ['priority => -10];
+   yield SecondMessage::class => ['priority' => -10];
    ```
 
    Before:

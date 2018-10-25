@@ -27,7 +27,7 @@ class TraceableMessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message): void
+    public function dispatch($message): Envelope
     {
         $envelope = $message instanceof Envelope ? $message : new Envelope($message);
         $context = array(
@@ -38,7 +38,7 @@ class TraceableMessageBus implements MessageBusInterface
         );
 
         try {
-            $this->decoratedBus->dispatch($message);
+            return $this->decoratedBus->dispatch($message);
         } catch (\Throwable $e) {
             $context['exception'] = $e;
 

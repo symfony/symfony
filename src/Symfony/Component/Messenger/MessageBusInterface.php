@@ -21,5 +21,5 @@ interface MessageBusInterface
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
      */
-    public function dispatch($message): void;
+    public function dispatch($message): Envelope;
 }

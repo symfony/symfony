@@ -34,26 +34,24 @@ class SendMessageMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if ($envelope->get(ReceivedStamp::class)) {
             // It's a received message. Do not send it back:
-            $stack->next()->handle($envelope, $stack);
-
-            return;
+            return $stack->next()->handle($envelope, $stack);
         }
 
         $sender = $this->senderLocator->getSender($envelope);
 
         if ($sender) {
-            $sender->send($envelope);
+            $envelope = $sender->send($envelope);
 
             if (!AbstractSenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $envelope)) {
                 // message has no corresponding handler
-                return;
+                return $envelope;
             }
         }
 
-        $stack->next()->handle($envelope, $stack);
+        return $stack->next()->handle($envelope, $stack);
     }
 }

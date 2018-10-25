@@ -6,7 +6,7 @@ CHANGELOG
 
  * The component is not experimental anymore
  * All the changes below are BC BREAKS
- * `MessageBusInterface::dispatch()` and `MiddlewareInterface::handle()` now return `void`
+ * `MessageBusInterface::dispatch()`, `MiddlewareInterface::handle()` and `SenderInterface::send()` return `Envelope`
  * `MiddlewareInterface::handle()` now require an `Envelope` as first argument and a `StackInterface` as second
  * `EnvelopeAwareInterface` has been removed
  * The signature of `Amqp*` classes changed to take a `Connection` as a first argument and an optional
@@ -31,7 +31,6 @@ CHANGELOG
  * `AbstractHandlerLocator` is now internal
  * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope): ?callable` and shouldn't throw when no handlers are found
  * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
- * `SenderInterface::send()` returns `void`
  * Classes in the `Middleware\Enhancers` sub-namespace have been moved to the `Middleware` one
  * Classes in the `Asynchronous\Routing` sub-namespace have been moved to the `Transport\Sender\Locator` sub-namespace
  * The `Asynchronous/Middleware/SendMessageMiddleware` class has been moved to the `Middleware` namespace

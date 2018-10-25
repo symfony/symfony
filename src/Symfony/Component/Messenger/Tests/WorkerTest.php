@@ -33,8 +33,8 @@ class WorkerTest extends TestCase
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with((new Envelope($apiMessage))->with(new ReceivedStamp()));
-        $bus->expects($this->at(1))->method('dispatch')->with((new Envelope($ipaMessage))->with(new ReceivedStamp()));
+        $bus->expects($this->at(0))->method('dispatch')->with(($envelope = new Envelope($apiMessage))->with(new ReceivedStamp()))->willReturn($envelope);
+        $bus->expects($this->at(1))->method('dispatch')->with(($envelope = new Envelope($ipaMessage))->with(new ReceivedStamp()))->willReturn($envelope);
 
         $worker = new Worker($receiver, $bus);
         $worker->run();
@@ -42,14 +42,13 @@ class WorkerTest extends TestCase
 
     public function testWorkerDoesNotWrapMessagesAlreadyWrappedWithReceivedMessage()
     {
-        $envelop = (new Envelope(new DummyMessage('API')))->with(new ReceivedStamp());
-        $receiver = new CallbackReceiver(function ($handler) use ($envelop) {
-            $handler($envelop);
+        $envelope = (new Envelope(new DummyMessage('API')))->with(new ReceivedStamp());
+        $receiver = new CallbackReceiver(function ($handler) use ($envelope) {
+            $handler($envelope);
         });
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-
-        $bus->expects($this->at(0))->method('dispatch')->with($envelop);
+        $bus->expects($this->at(0))->method('dispatch')->with($envelope)->willReturn($envelope);
 
         $worker = new Worker($receiver, $bus);
         $worker->run();

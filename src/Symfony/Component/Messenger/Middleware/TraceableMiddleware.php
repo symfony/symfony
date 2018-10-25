@@ -37,7 +37,7 @@ class TraceableMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $class = \get_class($this->inner);
         $eventName = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
@@ -49,7 +49,7 @@ class TraceableMiddleware implements MiddlewareInterface
         $this->stopwatch->start($eventName, $this->eventCategory);
 
         try {
-            $this->inner->handle($envelope, new TraceableInnerMiddleware($stack, $this->stopwatch, $eventName, $this->eventCategory));
+            return $this->inner->handle($envelope, new TraceableInnerMiddleware($stack, $this->stopwatch, $eventName, $this->eventCategory));
         } finally {
             if ($this->stopwatch->isStarted($eventName)) {
                 $this->stopwatch->stop($eventName);
@@ -79,15 +79,17 @@ class TraceableInnerMiddleware implements MiddlewareInterface, StackInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $this->stopwatch->stop($this->eventName);
         if ($this === $stack) {
-            $this->stack->next()->handle($envelope, $this->stack);
+            $envelope = $this->stack->next()->handle($envelope, $this->stack);
         } else {
-            $stack->next()->handle($envelope, $stack);
+            $envelope = $stack->next()->handle($envelope, $stack);
         }
         $this->stopwatch->start($this->eventName, $this->eventCategory);
+
+        return $envelope;
     }
 
     /**

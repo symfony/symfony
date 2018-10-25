@@ -21,5 +21,5 @@ interface SenderInterface
     /**
      * Sends the given envelope.
      */
-    public function send(Envelope $envelope): void;
+    public function send(Envelope $envelope): Envelope;
 }

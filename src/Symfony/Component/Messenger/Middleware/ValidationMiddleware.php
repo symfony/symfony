@@ -31,7 +31,7 @@ class ValidationMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $message = $envelope->getMessage();
         $groups = null;
@@ -45,6 +45,6 @@ class ValidationMiddleware implements MiddlewareInterface
             throw new ValidationFailedException($message, $violations);
         }
 
-        $stack->next()->handle($envelope, $stack);
+        return $stack->next()->handle($envelope, $stack);
     }
 }

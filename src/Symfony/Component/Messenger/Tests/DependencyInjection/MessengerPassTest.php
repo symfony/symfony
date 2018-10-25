@@ -847,8 +847,8 @@ class HandlerOnUndefinedBus implements MessageSubscriberInterface
 
 class UselessMiddleware implements MiddlewareInterface
 {
-    public function handle(Envelope $message, StackInterface $stack): void
+    public function handle(Envelope $message, StackInterface $stack): Envelope
     {
-        $stack->next()->handle($message, $stack);
+        return $stack->next()->handle($message, $stack);
     }
 }

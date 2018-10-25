@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
@@ -36,9 +37,10 @@ class MessengerDataCollectorTest extends TestCase
     public function testHandle()
     {
         $message = new DummyMessage('dummy message');
+        $envelope = new Envelope($message);
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->method('dispatch')->with($message);
+        $bus->method('dispatch')->with($message)->willReturn($envelope);
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -124,9 +126,11 @@ DUMP
     public function testKeepsOrderedDispatchCalls()
     {
         $firstBus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $firstBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $firstBus = new TraceableMessageBus($firstBus);
 
         $secondBus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $secondBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $secondBus = new TraceableMessageBus($secondBus);
 
         $collector = new MessengerDataCollector();

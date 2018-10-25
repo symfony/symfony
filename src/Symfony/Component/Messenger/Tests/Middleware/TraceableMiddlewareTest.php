@@ -33,7 +33,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
             ->method('handle')
             ->with($envelope, $this->anything())
             ->will($this->returnCallback(function ($envelope, StackInterface $stack) {
-                $stack->next()->handle($envelope, $stack);
+                return $stack->next()->handle($envelope, $stack);
             }))
         ;
 
@@ -67,7 +67,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
             ->method('handle')
             ->with($envelope, $this->anything())
             ->will($this->returnCallback(function ($envelope, StackInterface $stack) {
-                $stack->next()->handle($envelope, $stack);
+                return $stack->next()->handle($envelope, $stack);
             }))
         ;
 

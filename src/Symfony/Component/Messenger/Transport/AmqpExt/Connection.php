@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  * An AMQP connection.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @final
  */
 class Connection
 {

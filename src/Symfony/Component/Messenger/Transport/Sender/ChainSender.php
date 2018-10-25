@@ -31,10 +31,12 @@ class ChainSender implements SenderInterface
     /**
      * {@inheritdoc}
      */
-    public function send(Envelope $message): void
+    public function send(Envelope $envelope): Envelope
     {
         foreach ($this->senders as $sender) {
-            $sender->send($message);
+            $envelope = $sender->send($envelope);
         }
+
+        return $envelope;
     }
 }

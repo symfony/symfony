@@ -41,8 +41,8 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
         return $iterator->current();
     }
 
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        // no-op: this is the last null middleware
+        return $envelope;
     }
 }

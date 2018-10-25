@@ -1524,7 +1524,16 @@ class FrameworkExtension extends Extension
             'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
         );
         foreach ($config['buses'] as $busId => $bus) {
-            $middleware = $bus['default_middleware'] ? array_merge($defaultMiddleware['before'], $bus['middleware'], $defaultMiddleware['after']) : $bus['middleware'];
+            $middleware = $bus['middleware'];
+
+            if ($bus['default_middleware']) {
+                if ('allow_no_handlers' === $bus['default_middleware']) {
+                    $defaultMiddleware['after'][1]['arguments'] = array(true);
+                } else {
+                    unset($defaultMiddleware['after'][1]['arguments']);
+                }
+                $middleware = array_merge($defaultMiddleware['before'], $middleware, $defaultMiddleware['after']);
+            }
 
             foreach ($middleware as $middlewareItem) {
                 if (!$validationConfig['enabled'] && 'messenger.middleware.validation' === $middlewareItem['id']) {

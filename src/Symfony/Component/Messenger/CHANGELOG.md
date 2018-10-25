@@ -30,7 +30,7 @@ CHANGELOG
  * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
  * `MessengerDataCollector::getMessages()` returns an iterable, not just an array anymore
  * `AbstractHandlerLocator` is now internal
- * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope)`
+ * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope): ?callable` and shouldn't throw when no handlers are found
  * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
  * `SenderInterface::send()` returns `void`
  * Classes in the `Middleware\Enhancers` sub-namespace have been moved to the `Middleware` one
@@ -39,6 +39,7 @@ CHANGELOG
  * `SenderInterface` and `ChainSender` classes have been moved to the `Transport\Sender` sub-namespace
  * `ReceiverInterface` and its implementations have been moved to the `Transport\Receiver` sub-namespace
  * `ActivationMiddlewareDecorator` has been renamed `ActivationMiddleware`
+ * `AllowNoHandlerMiddleware` has been removed in favor of a new constructor argument on `HandleMessageMiddleware`
 
 4.1.0
 -----

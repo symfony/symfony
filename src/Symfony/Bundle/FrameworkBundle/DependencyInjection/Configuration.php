@@ -1081,19 +1081,20 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('buses')
                             ->defaultValue(array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())))
                             ->useAttributeAsKey('name')
-                            ->prototype('array')
+                            ->arrayPrototype()
                                 ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->booleanNode('default_middleware')->defaultTrue()->end()
+                                    ->enumNode('default_middleware')
+                                        ->values(array(true, false, 'allow_no_handlers'))
+                                        ->defaultTrue()
+                                    ->end()
                                     ->arrayNode('middleware')
                                         ->beforeNormalization()
-                                            ->ifString()
-                                            ->then(function (string $middleware) {
-                                                return array($middleware);
-                                            })
+                                            ->ifTrue(function ($v) { return \is_string($v) || !\is_int(key($v)); })
+                                            ->then(function ($v) { return array($v); })
                                         ->end()
                                         ->defaultValue(array())
-                                        ->prototype('array')
+                                        ->arrayPrototype()
                                             ->beforeNormalization()
                                                 ->always()
                                                 ->then(function ($middleware): array {
@@ -1103,8 +1104,8 @@ class Configuration implements ConfigurationInterface
                                                     if (isset($middleware['id'])) {
                                                         return $middleware;
                                                     }
-                                                    if (\count($middleware) > 1) {
-                                                        throw new \InvalidArgumentException(sprintf('There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "%s".', json_encode($middleware)));
+                                                    if (1 < \count($middleware)) {
+                                                        throw new \InvalidArgumentException(sprintf('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, %s given.', json_encode($middleware)));
                                                     }
 
                                                     return array(

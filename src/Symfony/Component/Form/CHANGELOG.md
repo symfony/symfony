@@ -40,6 +40,7 @@ CHANGELOG
  * added a cause when a CSRF error has occurred
  * deprecated the `scale` option of the `IntegerType`
  * removed restriction on allowed HTTP methods
+ * deprecated the `regions` option of the `TimezoneType`
 
 4.1.0
 -----

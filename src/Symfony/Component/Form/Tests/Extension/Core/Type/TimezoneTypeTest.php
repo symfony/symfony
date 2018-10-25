@@ -53,6 +53,10 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertEquals(array(new \DateTimeZone('Europe/Amsterdam'), new \DateTimeZone('Europe/Paris')), $form->getData());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
+     */
     public function testFilterByRegions()
     {
         $choices = $this->factory->create(static::TESTED_TYPE, null, array('regions' => \DateTimeZone::EUROPE))

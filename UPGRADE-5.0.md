@@ -121,6 +121,8 @@ Form
    {% endfor %}
    ```
 
+ * The `regions` option was removed from the `TimezoneType`.
+
 FrameworkBundle
 ---------------
 

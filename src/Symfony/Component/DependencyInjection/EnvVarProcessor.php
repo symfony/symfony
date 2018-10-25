@@ -44,6 +44,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'json' => 'array',
             'key' => 'bool|int|float|string|array',
             'resolve' => 'string',
+            'default' => 'bool|int|float|string|array',
             'string' => 'string',
         );
     }
@@ -57,7 +58,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('key' === $prefix) {
             if (false === $i) {
-                throw new RuntimeException(sprintf('Invalid configuration: env var "key:%s" does not contain a key specifier.', $name));
+                throw new RuntimeException(sprintf('Invalid env "key:%s": a key specifier should be provided.', $name));
             }
 
             $next = substr($name, $i + 1);
@@ -67,11 +68,31 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             if (!\is_array($array)) {
                 throw new RuntimeException(sprintf('Resolved value of "%s" did not result in an array value.', $next));
             }
-            if (!array_key_exists($key, $array)) {
-                throw new RuntimeException(sprintf('Key "%s" not found in "%s" (resolved from "%s")', $key, json_encode($array), $next));
+
+            if (!isset($array[$key]) && !array_key_exists($key, $array)) {
+                throw new EnvNotFoundException(sprintf('Key "%s" not found in "%s" (resolved from "%s").', $key, json_encode($array), $next));
             }
 
             return $array[$key];
+        }
+
+        if ('default' === $prefix) {
+            if (false === $i) {
+                throw new RuntimeException(sprintf('Invalid env "default:%s": a fallback parameter should be provided.', $name));
+            }
+
+            $next = substr($name, $i + 1);
+            $default = substr($name, 0, $i);
+
+            if (!$this->container->hasParameter($default)) {
+                throw new RuntimeException(sprintf('Invalid env fallback in "default:%s": parameter "%s" not found.', $name, $default));
+            }
+
+            try {
+                return $getEnv($next);
+            } catch (EnvNotFoundException $e) {
+                return $this->container->getParameter($default);
+            }
         }
 
         if ('file' === $prefix) {
@@ -79,7 +100,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Invalid file name: env var "%s" is non-scalar.', $name));
             }
             if (!file_exists($file)) {
-                throw new RuntimeException(sprintf('Env "file:%s" not found: %s does not exist.', $name, $file));
+                throw new EnvNotFoundException(sprintf('File "%s" not found (resolved from "%s").', $file, $name));
             }
 
             return file_get_contents($file);
@@ -95,7 +116,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             $env = $_SERVER[$name];
         } elseif (false === ($env = getenv($name)) || null === $env) { // null is a possible value because of thread safety issues
             if (!$this->container->hasParameter("env($name)")) {
-                throw new EnvNotFoundException($name);
+                throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
             }
 
             if (null === $env = $this->container->getParameter("env($name)")) {

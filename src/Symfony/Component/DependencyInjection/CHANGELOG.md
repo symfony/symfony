@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `%env(default:...)%` processor to fallback to a default value
+
 4.2.0
 -----
 

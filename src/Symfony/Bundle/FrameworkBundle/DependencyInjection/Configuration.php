@@ -1090,7 +1090,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->arrayNode('middleware')
                                         ->beforeNormalization()
-                                            ->ifTrue(function ($v) { return \is_string($v) || !\is_int(key($v)); })
+                                            ->ifTrue(function ($v) { return \is_string($v) || (\is_array($v) && !\is_int(key($v))); })
                                             ->then(function ($v) { return array($v); })
                                         ->end()
                                         ->defaultValue(array())

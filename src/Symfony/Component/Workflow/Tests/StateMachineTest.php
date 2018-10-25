@@ -49,7 +49,6 @@ class StateMachineTest extends TestCase
         $net = new StateMachine($definition);
         $subject = new \stdClass();
 
-        // If you are in place "a" you should be able to apply "t1"
         $subject->marking = 'a';
         $this->assertTrue($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
         $subject->marking = 'd';
@@ -59,14 +58,13 @@ class StateMachineTest extends TestCase
         $this->assertFalse($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
     }
 
-    public function testBuildTransitionBlockerListWithMultipleTransition()
+    public function testBuildTransitionBlockerListWithMultipleTransitions()
     {
         $definition = $this->createComplexStateMachineDefinition();
 
         $net = new StateMachine($definition);
         $subject = new \stdClass();
 
-        // If you are in place "b" you should be able to apply "t2" and "t3"
         $subject->marking = 'b';
         $this->assertTrue($net->buildTransitionBlockerList($subject, 't2')->isEmpty());
         $this->assertTrue($net->buildTransitionBlockerList($subject, 't3')->isEmpty());
@@ -85,15 +83,9 @@ class StateMachineTest extends TestCase
 
         $subject = new \stdClass();
 
-        // When there are multiple transitions with the same name then method buildTransitionBlockerList might
-        // return result of different transition than expected.
-        // For example: buildTransitionBlockerList foreach two transitions "t1" where one starts in place "a" and second in place "d" and
-        // we are currently in place "a". Method buildTransitionBlockerList first processes transition "t1" with from place "a"
-        // but there is no break so it continues to transition "t1" with from place "d" where it exits loop because there are no more
-        // transitions with name "t1". So returned transition blocker list contains result of transition "t1" with from place "d" because
-        // it was executed latest. This result is incorrect because we got "Blocked by marking" transition blocker of transition "t1"
-        // with from place "d" instead of guard blocker "Transition blocker of place a" of transition "t1" with from place "a".
-        // This test checks if this bug does not happen.
+        // There may be multiple transitions with the same name. Make sure that transitions
+        // that are not enabled by the marking are evaluated.
+        // see https://github.com/symfony/symfony/issues/28432
 
         // Test if when you are in place "a" applying transition "t1" then returned blocker list contains guard blocker instead blockedByMarking
         $subject->marking = 'a';

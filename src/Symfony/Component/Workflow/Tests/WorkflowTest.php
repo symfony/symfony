@@ -208,8 +208,6 @@ class WorkflowTest extends TestCase
         $subject->marking = array('b' => 1);
 
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
-        // In a workflow net, all "from" places should contain a token to enable
-        // the transition.
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
         $subject->marking = array('b' => 1, 'c' => 1);

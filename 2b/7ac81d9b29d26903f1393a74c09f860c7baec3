@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-22T20:41:27Z
+
+> How do you feel with the AmqpExt
+
+I think they're OK in their own sub-namespace - same for other future transports - unless they need just one class I suppose.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-10-25T04:43:41Z
+
+The suffix Decorator on `ActivationMiddlewareDecorator` is not consistent with the rest. All other decorators don't have this suffix like `TraceableMiddleware`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-25T07:47:29Z
+
+> The suffix Decorator on ActivationMiddlewareDecorator is not consistent with the rest
+
+makes sense, removed.

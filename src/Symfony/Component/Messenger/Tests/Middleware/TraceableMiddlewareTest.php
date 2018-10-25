@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -55,7 +56,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Foo exception from next callable
+     * @expectedExceptionMessage Thrown from next middleware.
      */
     public function testHandleWithException()
     {
@@ -71,12 +72,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
             }))
         ;
 
-        $stack = $this->createMock(StackInterface::class);
-        $stack
-            ->expects($this->once())
-            ->method('next')
-            ->willThrowException(new \RuntimeException('Foo exception from next callable'))
-        ;
+        $stack = $this->getThrowingStackMock();
 
         $stopwatch = $this->createMock(Stopwatch::class);
         $stopwatch->expects($this->once())->method('isStarted')->willReturn(true);

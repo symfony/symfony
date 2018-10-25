@@ -23,21 +23,19 @@ use Twig\TwigFilter;
 class CodeExtension extends AbstractExtension
 {
     private $fileLinkFormat;
-    private $rootDir;
     private $charset;
     private $projectDir;
 
     /**
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
-     * @param string                   $rootDir        The project root directory
+     * @param string                   $projectDir     The project directory
      * @param string                   $charset        The charset
      */
-    public function __construct($fileLinkFormat, string $rootDir, string $charset, string $projectDir = null)
+    public function __construct($fileLinkFormat, string $projectDir, string $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        $this->rootDir = str_replace('/', \DIRECTORY_SEPARATOR, \dirname($rootDir)).\DIRECTORY_SEPARATOR;
+        $this->projectDir = str_replace('\\', '/', $projectDir).'/';
         $this->charset = $charset;
-        $this->projectDir = $projectDir;
     }
 
     /**
@@ -176,11 +174,10 @@ class CodeExtension extends AbstractExtension
         $file = trim($file);
 
         if (null === $text) {
-            $text = str_replace('/', \DIRECTORY_SEPARATOR, $file);
-            if (0 === strpos($text, $this->rootDir)) {
-                $text = substr($text, \strlen($this->rootDir));
-                $text = explode(\DIRECTORY_SEPARATOR, $text, 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->rootDir, $text[0], isset($text[1]) ? \DIRECTORY_SEPARATOR.$text[1] : '');
+            $text = $file;
+            if (null !== $rel = $this->getFileRelative($text)) {
+                $rel = explode('/', $rel, 2);
+                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->projectDir, $rel[0], '/'.($rel[1] ?? ''));
             }
         }
 
@@ -214,8 +211,10 @@ class CodeExtension extends AbstractExtension
 
     public function getFileRelative(string $file): ?string
     {
+        $file = str_replace('\\', '/', $file);
+
         if (null !== $this->projectDir && 0 === strpos($file, $this->projectDir)) {
-            return ltrim(substr($file, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+            return ltrim(substr($file, \strlen($this->projectDir)), '/');
         }
 
         return null;

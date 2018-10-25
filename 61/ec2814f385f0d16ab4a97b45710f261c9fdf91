@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-10-25T10:19:45Z
+
+Maybe we can simplify the `$next` (and get out of the inner-stack), instead of having a function, we could give it the stack in the middleware:
+
+```php
+public function handle(Envelope $envelope, StackInterface $stack): Envelope
+{
+    // ...
+
+    return $stack->next()->handle($envelope, $stack);
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-25T12:48:38Z
+
+> public function handle(Envelope $envelope, StackInterface $stack)
+
+I love that ;) @stof that fixes also your comment.
+Now implemented. Ready.

@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Middleware\Enhancers;
+namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\Enhancers\ActivationMiddlewareDecorator;
+use Symfony\Component\Messenger\Middleware\ActivationMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class ActivationMiddlewareDecoratorTest extends TestCase
+class ActivationMiddlewareTest extends TestCase
 {
     public function testExecuteMiddlewareOnActivated()
     {
@@ -33,7 +33,7 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware->expects($this->once())->method('handle')->with($envelope, $next);
 
-        $decorator = new ActivationMiddlewareDecorator($middleware, true);
+        $decorator = new ActivationMiddleware($middleware, true);
 
         $decorator->handle($envelope, $next);
     }
@@ -52,7 +52,7 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware->expects($this->once())->method('handle')->with($envelope, $next);
 
-        $decorator = new ActivationMiddlewareDecorator($middleware, $activated);
+        $decorator = new ActivationMiddleware($middleware, $activated);
 
         $decorator->handle($envelope, $next);
     }
@@ -68,7 +68,7 @@ class ActivationMiddlewareDecoratorTest extends TestCase
         $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware->expects($this->never())->method('handle');
 
-        $decorator = new ActivationMiddlewareDecorator($middleware, false);
+        $decorator = new ActivationMiddleware($middleware, false);
 
         $decorator->handle($envelope, $next);
     }

@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Asynchronous\Routing;
+namespace Symfony\Component\Messenger\Tests\Transport\Sender\Locator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Messenger\Asynchronous\Routing\ContainerSenderLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
-use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\Locator\ContainerSenderLocator;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class ContainerSenderLocatorTest extends TestCase
 {

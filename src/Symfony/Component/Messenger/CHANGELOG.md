@@ -33,6 +33,12 @@ CHANGELOG
  * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(Envelope $envelope)`
  * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(Envelope $envelope)`
  * `SenderInterface::send()` returns `void`
+ * Classes in the `Middleware\Enhancers` sub-namespace have been moved to the `Middleware` one
+ * Classes in the `Asynchronous\Routing` sub-namespace have been moved to the `Transport\Sender\Locator` sub-namespace
+ * The `Asynchronous/Middleware/SendMessageMiddleware` class has been moved to the `Middleware` namespace
+ * `SenderInterface` and `ChainSender` classes have been moved to the `Transport\Sender` sub-namespace
+ * `ReceiverInterface` and its implementations have been moved to the `Transport\Receiver` sub-namespace
+ * `ActivationMiddlewareDecorator` has been renamed `ActivationMiddleware`
 
 4.1.0
 -----

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Asynchronous\Routing;
+namespace Symfony\Component\Messenger\Transport\Sender\Locator;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

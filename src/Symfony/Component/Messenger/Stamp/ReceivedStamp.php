@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 
 /**
  * Marker config for a received message.

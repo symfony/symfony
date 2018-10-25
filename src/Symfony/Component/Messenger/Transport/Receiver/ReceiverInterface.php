@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Transport;
+namespace Symfony\Component\Messenger\Transport\Receiver;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

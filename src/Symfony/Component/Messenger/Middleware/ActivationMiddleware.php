@@ -9,17 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Middleware\Enhancers;
+namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * Execute the inner middleware according to an activation strategy.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class ActivationMiddlewareDecorator implements MiddlewareInterface
+class ActivationMiddleware implements MiddlewareInterface
 {
     private $inner;
     private $activated;

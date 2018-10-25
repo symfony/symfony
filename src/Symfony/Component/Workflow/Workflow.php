@@ -92,7 +92,11 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            try {
+                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            } catch (NotEnabledTransitionException $e) {
+                $transitionBlockerList = $e->getTransitionBlockerList();
+            }
 
             if ($transitionBlockerList->isEmpty()) {
                 return true;
@@ -116,17 +120,13 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            try {
+                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
-            // For case of non unique transition names exit the loop on transition that is supposed to be validated.
-            // Else we might get different blocker list containing blockedByMarking instead of blocker from the guard event.
-            // Reason is if you have transition "t" from "a" to "c" and transition "t" from "b" to "c" and you are in place "a"
-            // transitions loop might exit in transition with "from" place "b"
-            // which means you would get $transitionBlockerList containing blockedByMarking instead of guard blocker or none.
-            foreach ($transition->getFroms() as $place) {
-                if ($marking->has($place)) {
-                    break 2;
-                }
+                return $transitionBlockerList;
+            } catch (NotEnabledTransitionException $e) {
+                // a transition with the same name is defined for other places too
+                $transitionBlockerList = $e->getTransitionBlockerList();
             }
         }
 
@@ -153,11 +153,15 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
-            if (!$transitionBlockerList->isEmpty()) {
-                continue;
+            try {
+                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            } catch (NotEnabledTransitionException $e) {
+                $transitionBlockerList = $e->getTransitionBlockerList();
             }
-            $approvedTransitionQueue[] = $transition;
+
+            if ($transitionBlockerList->isEmpty()) {
+                $approvedTransitionQueue[] = $transition;
+            }
         }
 
         foreach ($approvedTransitionQueue as $transition) {
@@ -198,7 +202,12 @@ class Workflow implements WorkflowInterface
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            try {
+                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            } catch (NotEnabledTransitionException $e) {
+                $transitionBlockerList = $e->getTransitionBlockerList();
+            }
+
             if ($transitionBlockerList->isEmpty()) {
                 $enabledTransitions[] = $transition;
             }
@@ -243,9 +252,7 @@ class Workflow implements WorkflowInterface
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
-                return new TransitionBlockerList(array(
-                    TransitionBlocker::createBlockedByMarking($marking),
-                ));
+                throw new NotEnabledTransitionException($subject, $transition->getName(), $this, new TransitionBlockerList(array(TransitionBlocker::createBlockedByMarking($marking))));
             }
         }
 

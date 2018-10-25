@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T12:22:56Z
+
+to go after #28878
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-24T03:25:18Z
+
+#28878 has been merged now
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-24T08:22:49Z
+
+@yceruto a deprecated option doesnt behave correct yet, the opt-out isnt working. Each test triggers still
+
+```
+  15x: The option "regions" is deprecated since Symfony 4.2.
+    2x in TimezoneTypeTest::testDateTimeZoneInput from Symfony\Component\Form\Tests\Extension\Core\Type
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-24T11:10:06Z
+
+@ro0NL Travis only shows these https://travis-ci.org/symfony/symfony/jobs/445514267#L2911
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-24T11:11:36Z
+
+That should be fixed updating the composer constraint of the FB I guess.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-24T11:33:30Z
+
+Ups! I just saw this https://travis-ci.org/symfony/symfony/jobs/445514267#L3728
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-24T12:09:49Z
+
+Fixed in https://github.com/symfony/symfony/pull/28968
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-25T09:31:35Z
+
+Status: needs review

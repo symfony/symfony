@@ -7,7 +7,7 @@ CHANGELOG
  * The component is not experimental anymore
  * All the changes below are BC BREAKS
  * `MessageBusInterface::dispatch()` and `MiddlewareInterface::handle()` now return `void`
- * `MiddlewareInterface::handle()` now require an `Envelope` as first argument
+ * `MiddlewareInterface::handle()` now require an `Envelope` as first argument and a `StackInterface` as second
  * `EnvelopeAwareInterface` has been removed
  * The signature of `Amqp*` classes changed to take a `Connection` as a first argument and an optional
    `Serializer` as a second argument.
@@ -16,7 +16,6 @@ CHANGELOG
    Instead, it accepts the sender instance itself instead of its identifier in the container.
  * `MessageSubscriberInterface::getHandledMessages()` return value has changed. The value of an array item
    needs to be an associative array or the method name.
- * `ValidationMiddleware::handle()` and `SendMessageMiddleware::handle()` now require an `Envelope` object
  * `StampInterface` replaces `EnvelopeItemInterface` and doesn't extend `Serializable` anymore
  * The `ConsumeMessagesCommand` class now takes an instance of `Psr\Container\ContainerInterface`
    as first constructor argument

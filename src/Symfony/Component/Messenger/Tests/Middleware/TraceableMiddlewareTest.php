@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -21,7 +21,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class TraceableMiddlewareTest extends TestCase
+class TraceableMiddlewareTest extends MiddlewareTestCase
 {
     public function testHandle()
     {
@@ -32,16 +32,9 @@ class TraceableMiddlewareTest extends TestCase
         $middleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
-            ->will($this->returnCallback(function ($envelope, callable $next) {
-                $next($envelope);
+            ->will($this->returnCallback(function ($envelope, StackInterface $stack) {
+                $stack->next()->handle($envelope, $stack);
             }))
-        ;
-
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($envelope)
         ;
 
         $stopwatch = $this->createMock(Stopwatch::class);
@@ -57,7 +50,7 @@ class TraceableMiddlewareTest extends TestCase
 
         $traced = new TraceableMiddleware($middleware, $stopwatch, $busId);
 
-        $traced->handle($envelope, $next);
+        $traced->handle($envelope, $this->getStackMock());
     }
 
     /**
@@ -73,15 +66,15 @@ class TraceableMiddlewareTest extends TestCase
         $middleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
-            ->will($this->returnCallback(function ($envelope, callable $next) {
-                $next($envelope);
+            ->will($this->returnCallback(function ($envelope, StackInterface $stack) {
+                $stack->next()->handle($envelope, $stack);
             }))
         ;
 
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
+        $stack = $this->createMock(StackInterface::class);
+        $stack
             ->expects($this->once())
-            ->method('__invoke')
+            ->method('next')
             ->willThrowException(new \RuntimeException('Foo exception from next callable'))
         ;
 
@@ -98,6 +91,6 @@ class TraceableMiddlewareTest extends TestCase
         ;
 
         $traced = new TraceableMiddleware($middleware, $stopwatch, $busId);
-        $traced->handle($envelope, $next);
+        $traced->handle($envelope, $stack);
     }
 }

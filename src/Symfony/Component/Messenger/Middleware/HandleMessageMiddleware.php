@@ -34,11 +34,11 @@ class HandleMessageMiddleware implements MiddlewareInterface
      *
      * @throws NoHandlerForMessageException When no handler is found and $allowNoHandlers is false
      */
-    public function handle(Envelope $envelope, callable $next): void
+    public function handle(Envelope $envelope, StackInterface $stack): void
     {
         if (null !== $handler = $this->messageHandlerLocator->getHandler($envelope)) {
             $handler($envelope->getMessage());
-            $next($envelope);
+            $stack->next()->handle($envelope, $stack);
         } elseif (!$this->allowNoHandlers) {
             throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));
         }

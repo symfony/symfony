@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
  * Wraps all handlers in a single doctrine transaction.
@@ -35,7 +36,7 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, callable $next): void
+    public function handle(Envelope $envelope, StackInterface $stack): void
     {
         $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
 
@@ -45,7 +46,7 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
 
         $entityManager->getConnection()->beginTransaction();
         try {
-            $next($envelope);
+            $stack->next()->handle($envelope, $stack);
             $entityManager->flush();
             $entityManager->getConnection()->commit();
         } catch (\Throwable $exception) {

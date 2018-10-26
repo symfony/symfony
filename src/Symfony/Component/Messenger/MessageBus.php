@@ -50,11 +50,12 @@ class MessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message): void
+    public function dispatch($message): Envelope
     {
         if (!\is_object($message)) {
             throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
         }
+        $envelope = $message instanceof Envelope ? $message : new Envelope($message);
         $middlewareIterator = $this->middlewareAggregate->getIterator();
 
         while ($middlewareIterator instanceof \IteratorAggregate) {
@@ -63,10 +64,10 @@ class MessageBus implements MessageBusInterface
         $middlewareIterator->rewind();
 
         if (!$middlewareIterator->valid()) {
-            return;
+            return $envelope;
         }
         $stack = new StackMiddleware($middlewareIterator);
 
-        $middlewareIterator->current()->handle($message instanceof Envelope ? $message : new Envelope($message), $stack);
+        return $middlewareIterator->current()->handle($envelope, $stack);
     }
 }

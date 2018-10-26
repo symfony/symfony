@@ -31,7 +31,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $stack->expects($this->never())->method('next');
 
         $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($envelope, $stack);
+        $middleware->expects($this->once())->method('handle')->with($envelope, $stack)->willReturn($envelope);
 
         $decorator = new ActivationMiddleware($middleware, true);
 
@@ -50,7 +50,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $stack->expects($this->never())->method('next');
 
         $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($envelope, $stack);
+        $middleware->expects($this->once())->method('handle')->with($envelope, $stack)->willReturn($envelope);
 
         $decorator = new ActivationMiddleware($middleware, $activated);
 

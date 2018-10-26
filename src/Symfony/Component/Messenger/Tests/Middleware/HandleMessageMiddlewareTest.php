@@ -50,6 +50,6 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
     {
         $middleware = new HandleMessageMiddleware(new HandlerLocator(array()), true);
 
-        $this->assertNull($middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
+        $this->assertInstanceOf(Envelope::class, $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
     }
 }

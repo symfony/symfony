@@ -35,12 +35,12 @@ class ActivationMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (\is_callable($this->activated) ? ($this->activated)($envelope) : $this->activated) {
-            $this->inner->handle($envelope, $stack);
-        } else {
-            $stack->next()->handle($envelope, $stack);
+            return $this->inner->handle($envelope, $stack);
         }
+
+        return $stack->next()->handle($envelope, $stack);
     }
 }

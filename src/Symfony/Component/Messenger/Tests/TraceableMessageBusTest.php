@@ -25,10 +25,11 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn(new Envelope($message));
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
-        $this->assertNull($traceableBus->dispatch($message));
+        $this->assertInstanceOf(Envelope::class, $traceableBus->dispatch($message));
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
@@ -47,10 +48,11 @@ class TraceableMessageBusTest extends TestCase
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($envelope);
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
-        $this->assertNull($traceableBus->dispatch($envelope));
+        $this->assertInstanceOf(Envelope::class, $traceableBus->dispatch($envelope));
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,

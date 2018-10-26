@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -394,7 +395,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function dispatchMessage($message)
+    protected function dispatchMessage($message): Envelope
     {
         if (!$this->container->has('message_bus')) {
             throw new \LogicException('The message bus is not enabled in your application. Try running "composer require symfony/messenger".');

@@ -29,7 +29,7 @@ class LoggingMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $message = $envelope->getMessage();
         $context = array(
@@ -39,7 +39,7 @@ class LoggingMiddleware implements MiddlewareInterface
         $this->logger->debug('Starting handling message {name}', $context);
 
         try {
-            $stack->next()->handle($envelope, $stack);
+            $envelope = $stack->next()->handle($envelope, $stack);
         } catch (\Throwable $e) {
             $context['exception'] = $e;
             $this->logger->warning('An exception occurred while handling message {name}', $context);
@@ -48,5 +48,7 @@ class LoggingMiddleware implements MiddlewareInterface
         }
 
         $this->logger->debug('Finished handling message {name}', $context);
+
+        return $envelope;
     }
 }

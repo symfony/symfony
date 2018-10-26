@@ -23,6 +23,9 @@ abstract class MiddlewareTestCase extends TestCase
         $nextMiddleware
             ->expects($nextIsCalled ? $this->once() : $this->never())
             ->method('handle')
+            ->will($this->returnCallback(function ($envelope, StackInterface $stack) {
+                return $envelope;
+            }))
         ;
 
         $stack = $this->createMock(StackInterface::class);

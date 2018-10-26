@@ -21,6 +21,7 @@ use Symfony\Component\Process\Process;
  * Manages .env files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Dotenv
 {
@@ -39,29 +40,57 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param string    $path  A file to load
-     * @param ...string $paths A list of additional files to load
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function load(string $path, string ...$paths): void
+    public function load(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(false, $path, $paths);
+        $this->doLoad(false, false, \func_get_args());
+    }
+
+    /**
+     * Loads one or several .env and the corresponding env.$env, env.local and env.$env.local files if they exist.
+     *
+     * .env.local is always ignored in test env because tests should produce the same results for everyone.
+     *
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
+     *
+     * @throws FormatException when a file has a syntax error
+     * @throws PathException   when a file does not exist or is not readable
+     *
+     * @see https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
+     */
+    public function loadForEnv(string $env, string $path, string ...$extraPaths): void
+    {
+        $paths = \func_get_args();
+        for ($i = 1; $i < \func_num_args(); ++$i) {
+            $path = $paths[$i];
+            $pathList = array($path, "$path.$env");
+            if ('test' !== $env) {
+                $pathList[] = "$path.local";
+            }
+            $pathList[] = "$path.$env.local";
+
+            $this->doLoad(false, true, $pathList);
+        }
     }
 
     /**
      * Loads one or several .env files and enables override existing vars.
      *
-     * @param string    $path  A file to load
-     * @param ...string $paths A list of additional files to load
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function overload(string $path, string ...$paths): void
+    public function overload(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(true, $path, $paths);
+        $this->doLoad(true, false, \func_get_args());
     }
 
     /**
@@ -405,16 +434,14 @@ final class Dotenv
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }
 
-    private function doLoad(bool $overrideExistingVars, string $path, array $paths): void
+    private function doLoad(bool $overrideExistingVars, bool $ignoreMissingExtraPaths, array $paths): void
     {
-        array_unshift($paths, $path);
-
-        foreach ($paths as $path) {
-            if (!is_readable($path) || is_dir($path)) {
+        foreach ($paths as $i => $path) {
+            if (is_readable($path) && !is_dir($path)) {
+                $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+            } elseif (!$ignoreMissingExtraPaths || 0 === $i) {
                 throw new PathException($path);
             }
-
-            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
         }
     }
 }

@@ -15,103 +15,140 @@
 
 error_reporting(-1);
 
-$getEnvVar = function ($name, $default = false) {
-    if (false !== $value = getenv($name)) {
-        return $value;
+// ------------------------------------------------------------------ //
+// Helper Functions                                                   //
+// ------------------------------------------------------------------ //
+
+/**
+ * Read environment variable from system or given phpunit config file.
+ *
+ * @param string $phpUnitConfigFile
+ * @param string $name
+ * @param bool|string $default
+ *
+ * @return bool|string
+ */
+$getEnvVar = function ($phpUnitConfigFile, $name, $default = false)
+{
+    $value = getenv($name);
+
+    if (file_exists($phpUnitConfigFile)) {
+        // Load phpunit config files and search for the env variable
+        $phpUnitConfig = new DomDocument();
+        $phpUnitConfig->load($phpUnitConfigFile);
+
+        $var = new DOMXpath($phpUnitConfig);
+        foreach ($var->query('//php/env[@name="'.$name.'"]') as $var) {
+            $currentValue = $var->getAttribute('value');
+
+            if ('true' === $var->getAttribute('force')) {
+                return $currentValue;
+            } elseif (false === $value) {
+                return $currentValue;
+            }
+        }
     }
 
-    static $phpunitConfig = null;
-    if (null === $phpunitConfig) {
-        $phpunitConfigFilename = null;
-        if (file_exists('phpunit.xml')) {
-            $phpunitConfigFilename = 'phpunit.xml';
-        } elseif (file_exists('phpunit.xml.dist')) {
-            $phpunitConfigFilename = 'phpunit.xml.dist';
-        }
-        if ($phpunitConfigFilename) {
-            $phpunitConfig = new DomDocument();
-            $phpunitConfig->load($phpunitConfigFilename);
-        } else {
-            $phpunitConfig = false;
-        }
-    }
-    if (false !== $phpunitConfig) {
-        $var = new DOMXpath($phpunitConfig);
-        foreach ($var->query('//php/env[@name="'.$name.'"]') as $var) {
-            return $var->getAttribute('value');
-        }
+    if (false !== $value) {
+        return $value;
     }
 
     return $default;
 };
 
-if (PHP_VERSION_ID >= 70100) {
-    // PHPUnit 7 requires PHP 7.1+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.4');
-} elseif (PHP_VERSION_ID >= 70000) {
-    // PHPUnit 6 requires PHP 7.0+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '6.5');
-} elseif (PHP_VERSION_ID >= 50600) {
-    // PHPUnit 5 requires PHP 5.6+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '5.7');
-} else {
-    $PHPUNIT_VERSION = '4.8';
-}
+/**
+ * Get the phpunit binary if not exist download phpunit install it with given configuration.
+ *
+ * @param string $PHP
+ * @param callable $getEnvVar
+ * @param string $phpUnitVersion
+ * @param string|null $phpUnitConfigFile
+ *
+ * @return string
+ */
+$getPHPUnit = function ($PHP, $getEnvVar, $phpUnitVersion, $phpUnitConfigFile = null)
+{
+    // Get project root directory where composer.json exists
+    static $root;
 
-$COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
+    if (!$root) {
+        $root = getenv('SYMFONY_PHPUNIT_ROOT_DIRECTORY');
 
-$root = __DIR__;
-while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {
-    if ($root === dirname($root)) {
-        break;
+        $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
+
+        if (!$root) {
+            // Go the folders up until find a composer.json file
+            $root = __DIR__;
+            while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {
+                if ($root === dirname($root)) {
+                    break;
+                }
+                $root = dirname($root);
+            }
+        }
     }
-    $root = dirname($root);
-}
 
-$oldPwd = getcwd();
-$PHPUNIT_DIR = $getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit');
-$PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
-$PHP = escapeshellarg($PHP);
-if ('phpdbg' === PHP_SAPI) {
-    $PHP .= ' -qrr';
-}
+    // Get directory where the phpunit versions get installed
+    $PHPUNIT_DIR = $getEnvVar($phpUnitConfigFile, 'SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit');
 
-$defaultEnvs = array(
-    'COMPOSER' => 'composer.json',
-    'COMPOSER_VENDOR_DIR' => 'vendor',
-    'COMPOSER_BIN_DIR' => 'bin',
-);
+    $phpUnit = $PHPUNIT_DIR . '/phpunit-' . $phpUnitVersion;
 
-foreach ($defaultEnvs as $envName => $envValue) {
-    if ($envValue !== getenv($envName)) {
-        putenv("$envName=$envValue");
-        $_SERVER[$envName] = $_ENV[$envName] = $envValue;
+    // make own phpunit version when dependencies are removed
+    $SYMFONY_PHPUNIT_REMOVE = $getEnvVar($phpUnitConfigFile, 'SYMFONY_PHPUNIT_REMOVE', '');
+
+    if ($SYMFONY_PHPUNIT_REMOVE) {
+        $phpUnit .= '-remove-' . str_replace(array('/', ' '), array('_', '-'), $SYMFONY_PHPUNIT_REMOVE);
     }
-}
 
-$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
-    ? $PHP.' '.escapeshellarg($COMPOSER)
-    : 'composer';
+    $phpUnit .= '/phpunit';
 
+    // If phpunit was installed before return path to binary.
+    if (file_exists($phpUnit)) {
+        return $phpUnit;
+    }
 
-$SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy symfony/yaml');
-
-if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
+    $oldPwd = getcwd();
+
+    // Override COMPOSER_VENDOR_DIR and COMPOSER_BIN_DIR with their default values in PHPUnit Bridge
+    $defaultEnvs = array(
+        'COMPOSER' => 'composer.json',
+        'COMPOSER_VENDOR_DIR' => 'vendor',
+        'COMPOSER_BIN_DIR' => 'bin',
+    );
+
+    foreach ($defaultEnvs as $envName => $envValue) {
+        if ($envValue !== getenv($envName)) {
+            putenv("$envName=$envValue");
+            $_SERVER[$envName] = $_ENV[$envName] = $envValue;
+        }
+    }
+
+    // Get composer binary for phpunit installation
+    $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
+        ? $PHP.' '.escapeshellarg($COMPOSER)
+        : 'composer';
 
     @mkdir($PHPUNIT_DIR, 0777, true);
     chdir($PHPUNIT_DIR);
-    if (file_exists("phpunit-$PHPUNIT_VERSION")) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION.old"));
-        rename("phpunit-$PHPUNIT_VERSION", "phpunit-$PHPUNIT_VERSION.old");
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION.old"));
+
+    $phpUnitDirectory = basename(dirname($phpUnit));
+    $extractDirectory = getcwd() . '/extract-' . $phpUnitDirectory;
+
+    if (file_exists($extractDirectory)) {
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL': 'rm -rf %s', "$extractDirectory.old"));
+        rename($extractDirectory, "$extractDirectory.old");
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s': 'rm -rf %s', "$extractDirectory.old"));
     }
-    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");
-    chdir("phpunit-$PHPUNIT_VERSION");
+
+    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $extractDirectory \"$phpUnitVersion.*\"");
+    chdir($extractDirectory);
+
+    // Remove dependencies like symfony/yaml and prophecy
     if ($SYMFONY_PHPUNIT_REMOVE) {
         passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
     }
-    if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
+    if (5.1 <= $phpUnitVersion && $phpUnitVersion < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
@@ -124,7 +161,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
     }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
-    putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
+    putenv("COMPOSER_ROOT_VERSION=$phpUnitVersion.99");
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
     $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
@@ -152,69 +189,187 @@ Symfony\Bridge\PhpUnit\TextUI\Command::main();
 
 EOPHP
     );
-    chdir('..');
-    file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE);
+
+    // After finishing dependency install move directory to correct place
+    rename($extractDirectory, $PHPUNIT_DIR . '/' . $phpUnitDirectory);
+
     chdir($oldPwd);
 
-}
+    return $phpUnit;
+};
 
-global $argv, $argc;
+/**
+ * Get the phpunit version from SYMFONY_PHPUNIT_VERSION env variable or the given phpunit config file.
+ *
+ * @param callable $getEnvVar
+ * @param string|null $phpUnitConfigFile
+ *
+ * @return mixed|string
+ */
+$getPHPUnitVersion = function ($getEnvVar, $phpUnitConfigFile = null)
+{
+    if (PHP_VERSION_ID >= 70100) {
+        // PHPUnit 7 is required for PHP 7.1+
+        $phpUnitVersion = $getEnvVar($phpUnitConfigFile, 'SYMFONY_PHPUNIT_VERSION', '7.4');
+    } elseif (PHP_VERSION_ID >= 70000) {
+        // PHPUnit 6 does not support PHP 7.0
+        $phpUnitVersion = $getEnvVar($phpUnitConfigFile, 'SYMFONY_PHPUNIT_VERSION', '6.5');
+    } elseif (PHP_VERSION_ID >= 50600) {
+        // PHPUnit 5 requires PHP 5.6+
+        $phpUnitVersion = $getEnvVar($phpUnitConfigFile, 'SYMFONY_PHPUNIT_VERSION', '5.7');
+    } else {
+        $phpUnitVersion = '4.8';
+    }
+
+    return $phpUnitVersion;
+};
+
+/**
+ * Find all phpunit config files by given arguments.
+ *
+ * bin/simple-phpunit -> return root phpunit config file
+ * bin/simple-phpunit -c path/to/phpunit.xml.dist -> return given phpunit file
+ * bin/simple-phpunit path/to/folder -> return all phpunit config files in given folder
+ *
+ * @param array $argv
+ *
+ * @return array
+ */
+$loadPHPUnitConfigFiles = function (&$argv) {
+    $outputError = function($text, $exitCode = 1)
+    {
+        echo "\033[41m" . $text . "\033[0m" . PHP_EOL;
+
+        exit($exitCode);
+    };
+
+    $phpUnitConfigFiles = array();
+
+    // Use configuration file current folder when no arguments given
+    if (!isset($argv[1])) {
+        if (file_exists('phpunit.xml')) {
+            $phpUnitConfigFiles[] = realpath('phpunit.xml');
+        } elseif (file_exists('phpunit.xml.dist')) {
+            $phpUnitConfigFiles[] = realpath('phpunit.xml.dist');
+        } else {
+            $outputError('No phpunit.xml.dist file found!');
+        }
+
+        return $phpUnitConfigFiles;
+    }
+
+    // Use config file when given it over -c or --configuration argument
+    if (($configArgumentNr = array_search('-c', $argv))
+        || ($configArgumentNr = array_search('--configuration', $argv)))
+    {
+        ++$configArgumentNr;
+
+        if (!isset($argv[$configArgumentNr])) {
+            $outputError('Please provide a configuration file when using "-c" argument!');
+
+            exit(1);
+        }
+
+        $phpUnitConfigFiles[] = realpath($argv[$configArgumentNr]);
+
+        // Following arguments are given manually to the phpunit process
+        unset($argv[$configArgumentNr]);
+        unset($argv[$configArgumentNr - 1]);
+
+        return $phpUnitConfigFiles;
+    }
+
+    // If symfony if given set the folder to src/Symfony
+    if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file_exists('src/Symfony')) {
+        $argv[1] = 'src/Symfony';
+    }
+
+    // Find all config file when folder given
+    if (is_dir($argv[1])) {
+        $finder = new RecursiveDirectoryIterator($argv[1], FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
+        $finder = new RecursiveIteratorIterator($finder);
+        $finder->setMaxDepth(getenv('SYMFONY_PHPUNIT_MAX_DEPTH') ?: 3);
+
+        foreach ($finder as $file => $fileInfo) {
+            // Prefer phpunit.xml over phpunit.xml.dist file
+            $component = dirname($fileInfo->getPathname());
+            if ('phpunit.xml.dist' === $file && !isset($phpUnitConfigFiles[$component])) {
+                $phpUnitConfigFiles[$component] = realpath($fileInfo->getPathname());
+            } elseif ('phpunit.xml' === $file) {
+                $phpUnitConfigFiles[$component] = realpath($fileInfo->getPathname());
+            }
+        }
+
+        ksort($phpUnitConfigFiles);
+
+        array_values($phpUnitConfigFiles);
+
+        if (0 === count($phpUnitConfigFiles)) {
+            $outputError('No configuration files found in: ' . getcwd() . $argv[1]);
+        }
+
+        unset($argv[1]); // $argv[1] should not provided to phpunit process
+    } elseif(file_exists($argv[1])) {
+        $phpUnitConfigFiles[] = $argv[1];
+
+        unset($argv[1]); // $argv[1] should not provided to phpunit process
+    }
+
+    return $phpUnitConfigFiles;
+};
+
+// ------------------------------------------------------------------ //
+// Helper Functions End                                               //
+// ------------------------------------------------------------------ //
+
 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
 $argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
-$components = array();
-$cmd = array_map('escapeshellarg', $argv);
+$PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
+
+$phpUnitConfigFiles = $loadPHPUnitConfigFiles($argv);
+
+$runningProcs = array();
 $exit = 0;
 
-if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file_exists('src/Symfony')) {
-    $argv[1] = 'src/Symfony';
-}
-if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.dist')) {
-    // Find Symfony components in plain PHP for Windows portability
-
-    $finder = new RecursiveDirectoryIterator($argv[1], FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
-    $finder = new RecursiveIteratorIterator($finder);
-    $finder->setMaxDepth(getenv('SYMFONY_PHPUNIT_MAX_DEPTH') ?: 3);
-
-    foreach ($finder as $file => $fileInfo) {
-        if ('phpunit.xml.dist' === $file) {
-            $components[] = dirname($fileInfo->getPathname());
-        }
-    }
-    if ($components) {
-        array_shift($cmd);
-    }
+if (!isset($argv[1]) || 'install' !== $argv[1]) {
+    array_splice($argv, 1, 0, array('--colors=always'));
 }
 
-$cmd[0] = sprintf('%s %s --colors=always', $PHP, escapeshellarg("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit"));
-$cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
+$phpUnitVersion = $getPHPUnitVersion($getEnvVar);
+$phpUnitConfigFile = null;
 
-if ('\\' === DIRECTORY_SEPARATOR) {
-    $cmd = 'cmd /v:on /d /c "('.$cmd.')%2$s"';
+if (1 === count($phpUnitConfigFiles)) {
+    // When only one phpunit config file run it directly in current process for streamed output
+    $phpUnitConfigFile = reset($phpUnitConfigFiles);
+    $phpUnitVersion = $getPHPUnitVersion($getEnvVar, $phpUnitConfigFile);
+    $argv[] = '-c';
+    $argv[] = $phpUnitConfigFile;
 } else {
-    $cmd .= '%2$s';
-}
+    foreach ($phpUnitConfigFiles as $phpUnitConfigFile) {
+        $phpUnitVersion = $getPHPUnitVersion($getEnvVar, $phpUnitConfigFile);
+        $phpUnit = $getPHPUnit($PHP, $getEnvVar, $phpUnitVersion, $phpUnitConfigFile);
+        $component = dirname($phpUnitConfigFile);
 
-if ($components) {
-    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
-    $runningProcs = array();
+        $cmd = sprintf('%s %s -c %s %s > %s/phpunit.stdout 2> %s/phpunit.stderr',
+            escapeshellcmd($PHP),
+            escapeshellcmd($phpUnit),
+            escapeshellarg($phpUnitConfigFile),
+            implode(' ', array_map('escapeshellarg', array_slice($argv, 1))),
+            escapeshellarg($component),
+            escapeshellarg($component)
+        );
 
-    foreach ($components as $component) {
-        // Run phpunit tests in parallel
-
-        if ($skippedTests) {
-            putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
-        }
-
-        $c = escapeshellarg($component);
-
-        if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), array(), $pipes)) {
+        if ($proc = proc_open($cmd, array(), $pipes)) {
             $runningProcs[$component] = $proc;
         } else {
             $exit = 1;
             echo "\033[41mKO\033[0m $component\n\n";
         }
     }
+}
 
+if (count($runningProcs)) {
+    // Wait for the processes to be finished and output there result
     while ($runningProcs) {
         usleep(300000);
         $terminatedProcs = array();
@@ -228,7 +383,7 @@ if ($components) {
         }
 
         foreach ($terminatedProcs as $component => $procStatus) {
-            foreach (array('out', 'err') as $file) {
+            foreach (['out', 'err'] as $file) {
                 $file = "$component/phpunit.std$file";
                 readfile($file);
                 unlink($file);
@@ -246,14 +401,20 @@ if ($components) {
             }
         }
     }
-} elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
+} elseif (isset($argv[1]) && 'install' === $argv[1] || file_exists('install')) {
+    // If not yet installed install phpunit
+    if (0 === count($phpUnitConfigFiles)) {
+        $getPHPUnit($PHP, $getEnvVar, $phpUnitVersion, $phpUnitConfigFile);
+    }
+} else {
+    // If only one configuration file is found call phpunit directly
     if (!class_exists('SymfonyBlacklistSimplePhpunit', false)) {
         class SymfonyBlacklistSimplePhpunit {}
     }
-    array_splice($argv, 1, 0, array('--colors=always'));
+
     $_SERVER['argv'] = $argv;
     $_SERVER['argc'] = ++$argc;
-    include "$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit";
+    include $getPHPUnit($PHP, $getEnvVar, $phpUnitVersion, $phpUnitConfigFile);
 }
 
 exit($exit);

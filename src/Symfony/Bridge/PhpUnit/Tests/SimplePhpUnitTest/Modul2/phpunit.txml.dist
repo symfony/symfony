@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.5/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+>
+    <php>
+        <ini name="memory_limit" value="-1" />
+        <ini name="precision" value="9" />
+        <server name="SERVER_VAR" value="SERVER_VAR_MODUL_2"/>
+        <!-- to avoid conflicts with global env force=true is added for this test in CI -->
+        <env name="ENV_VAR" value="ENV_VAR_MODUL_2" force="true" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" force="true" />
+        <env name="SYMFONY_PHPUNIT_REMOVE" value="phpspec/prophecy symfony/yaml" force="true" />
+        <env name="SYMFONY_PHPUNIT_VERSION" value="7.4" force="true" />
+    </php>
+
+    <testsuites>
+        <testsuite name="Modul2 Test Suite">
+            <directory suffix=".tphp">tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>.</directory>
+        </whitelist>
+    </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+    </listeners>
+</phpunit>

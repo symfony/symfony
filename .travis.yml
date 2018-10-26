@@ -69,7 +69,7 @@ before_install:
       [ -d ~/.composer ] || mkdir ~/.composer
       cp .composer/* ~/.composer/
       export PHPUNIT=$(readlink -f ./phpunit)
-      export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
+      export PHPUNIT_X="$PHPUNIT --bootstrap vendor/autoload.php --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       find ~/.phpenv -name xdebug.ini -delete
@@ -238,10 +238,10 @@ install:
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
-              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
+              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --bootstrap vendor/autoload.php --group tty
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
-                  tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/
+                  tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --bootstrap vendor/autoload.php --colors=always src/Symfony/Component/Process/
               fi
           fi
       }

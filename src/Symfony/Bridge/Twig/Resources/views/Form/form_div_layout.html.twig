@@ -232,7 +232,16 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+
+    {%- if icon is not empty -%}
+        {%- if icon is iterable and icon.name is defined and icon.align is defined and icon.align == "right" -%}
+            <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }} <i class="{{ icon.name }}"></i></button>
+        {%- else -%}
+            <button type="{{ type|default('button') }}" {{ block('button_attributes') }}><i class="{{ icon.name is defined ? icon.name : icon }}"></i> {{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+        {%- endif -%}
+    {% else %}
+        <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+    {%- endif -%}
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}

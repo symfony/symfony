@@ -6,6 +6,7 @@ CHANGELOG
 
  * The component is not experimental anymore
  * All the changes below are BC BREAKS
+ * subscribing to messages based on their interfaces or parent classes has been removed in favor of topic-based subscription
  * `MessageBusInterface::dispatch()`, `MiddlewareInterface::handle()` and `SenderInterface::send()` return `Envelope`
  * `MessageBusInterface::dispatch()` now takes a second `string $topic = null` argument
  * `MiddlewareInterface::handle()` now require an `Envelope` as first argument and a `StackInterface` as second
@@ -27,7 +28,7 @@ CHANGELOG
  * Renamed and moved `ReceivedMessage`, `ValidationConfiguration` and `SerializerConfiguration` in the `Stamp` namespace
  * Removed the `WrapIntoReceivedMessage`
  * `MessengerDataCollector::getMessages()` returns an iterable, not just an array anymore
- * `AbstractHandlerLocator` is now internal
+ * The `AbstractHandlerLocator` and `AbstractSenderLocator` classes have been removed
  * `HandlerLocatorInterface::resolve()` has been replaced by `getHandler(string $topic): ?callable` and shouldn't throw when no handlers are found
  * `SenderLocatorInterface::getSenderForMessage()` has been replaced by `getSender(string $topic): ?SenderInterface`
  * Classes in the `Middleware\Enhancers` sub-namespace have been moved to the `Middleware` one

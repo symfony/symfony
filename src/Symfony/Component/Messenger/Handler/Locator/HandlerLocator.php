@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Handler\Locator;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class HandlerLocator extends AbstractHandlerLocator
+class HandlerLocator implements HandlerLocatorInterface
 {
     /**
      * Maps a topic to a given handler.
@@ -29,8 +29,8 @@ class HandlerLocator extends AbstractHandlerLocator
     /**
      * {@inheritdoc}
      */
-    protected function getHandlerByName(string $name): ?callable
+    public function getHandler(string $topic): ?callable
     {
-        return $this->topicToHandlerMapping[$name] ?? null;
+        return $this->topicToHandlerMapping[$topic] ?? null;
     }
 }

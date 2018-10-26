@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SenderLocator extends AbstractSenderLocator
+class SenderLocator implements SenderLocatorInterface
 {
     private $topicToSenderMapping;
 
@@ -31,8 +31,7 @@ class SenderLocator extends AbstractSenderLocator
      */
     public function getSender(string $topic): ?SenderInterface
     {
-        $sender = self::getValueFromMessageRouting($this->topicToSenderMapping, $topic);
-        if (null === $sender) {
+        if (null === $sender = $this->topicToSenderMapping[$topic] ?? $this->topicToSenderMapping['*'] ?? null) {
             return null;
         }
 

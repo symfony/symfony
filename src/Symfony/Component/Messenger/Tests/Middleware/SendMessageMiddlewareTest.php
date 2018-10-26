@@ -15,9 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
@@ -56,36 +54,6 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
             DummyMessage::class => true,
-        ));
-
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
-
-        $middleware->handle($envelope, $this->getStackMock());
-    }
-
-    public function testItAlsoCallsTheNextMiddlewareBasedOnTheMessageParentClass()
-    {
-        $message = new ChildDummyMessage('Hey');
-        $envelope = new Envelope($message);
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
-            DummyMessage::class => true,
-        ));
-
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
-
-        $middleware->handle($envelope, $this->getStackMock());
-    }
-
-    public function testItAlsoCallsTheNextMiddlewareBasedOnTheMessageInterface()
-    {
-        $message = new DummyMessage('Hey');
-        $envelope = new Envelope($message);
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
-            DummyMessageInterface::class => true,
         ));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);

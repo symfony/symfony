@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Transport\Sender\Locator\AbstractSenderLocator;
 use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
 
 /**
@@ -46,7 +45,7 @@ class SendMessageMiddleware implements MiddlewareInterface
         if ($sender) {
             $envelope = $sender->send($envelope);
 
-            if (!AbstractSenderLocator::getValueFromMessageRouting($this->topicsToSendAndHandle, $envelope->getTopic())) {
+            if (!($this->topicsToSendAndHandle[$envelope->getTopic()] ?? $this->topicsToSendAndHandle['*'] ?? false)) {
                 // message should only be sent and be not handled by the next middleware
                 return $envelope;
             }

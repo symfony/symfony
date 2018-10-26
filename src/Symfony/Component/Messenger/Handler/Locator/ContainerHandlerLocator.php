@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class ContainerHandlerLocator extends AbstractHandlerLocator
+class ContainerHandlerLocator implements HandlerLocatorInterface
 {
     private $container;
 
@@ -29,8 +29,8 @@ class ContainerHandlerLocator extends AbstractHandlerLocator
     /**
      * {@inheritdoc}
      */
-    protected function getHandlerByName(string $name): ?callable
+    public function getHandler(string $topic): ?callable
     {
-        return $this->container->has($name) ? $this->container->get($name) : null;
+        return $this->container->has($topic) ? $this->container->get($topic) : null;
     }
 }

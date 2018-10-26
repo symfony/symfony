@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests\Transport\Sender\Locator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -30,40 +29,6 @@ class ContainerSenderLocatorTest extends TestCase
 
         $locator = new ContainerSenderLocator($container, array(
             DummyMessage::class => 'my_amqp_sender',
-        ));
-
-        $this->assertSame($sender, $locator->getSender(DummyMessage::class));
-        $this->assertNull($locator->getSender(SecondMessage::class));
-    }
-
-    public function testItReturnsTheSenderBasedOnTheMessageParentClass()
-    {
-        $container = new Container();
-
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-        $container->set('my_amqp_sender', $sender);
-
-        $apiSender = $this->getMockBuilder(SenderInterface::class)->getMock();
-        $container->set('my_api_sender', $apiSender);
-
-        $locator = new ContainerSenderLocator($container, array(
-            DummyMessageInterface::class => 'my_api_sender',
-            DummyMessage::class => 'my_amqp_sender',
-        ));
-
-        $this->assertSame($sender, $locator->getSender(ChildDummyMessage::class));
-        $this->assertNull($locator->getSender(SecondMessage::class));
-    }
-
-    public function testItReturnsTheSenderBasedOnTheMessageInterface()
-    {
-        $container = new Container();
-
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-        $container->set('my_amqp_sender', $sender);
-
-        $locator = new ContainerSenderLocator($container, array(
-            DummyMessageInterface::class => 'my_amqp_sender',
         ));
 
         $this->assertSame($sender, $locator->getSender(DummyMessage::class));

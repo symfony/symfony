@@ -394,8 +394,8 @@ class YamlFileLoaderTest extends TestCase
         $resources = $container->getResources();
 
         $fixturesDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR;
-        $this->assertTrue(false !== array_search(new FileResource($fixturesDir.'yaml'.\DIRECTORY_SEPARATOR.'services_prototype.yml'), $resources));
-        $this->assertTrue(false !== array_search(new GlobResource($fixturesDir.'Prototype', '', true), $resources));
+        $this->assertContains(new FileResource($fixturesDir . 'yaml' . \DIRECTORY_SEPARATOR . 'services_prototype.yml'), $resources);
+        $this->assertContains(new GlobResource($fixturesDir . 'Prototype', '', true), $resources);
         $resources = array_map('strval', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);

@@ -504,6 +504,9 @@ return function (root, x) {
             if (currentNode) {
                 reveal(currentNode);
                 highlight(root, currentNode, state.nodes);
+                if ('scrollIntoView' in currentNode) {
+                    currentNode.scrollIntoView();
+                }
             }
             counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' of ' + state.count();
         }

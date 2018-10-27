@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.50",
     "Names": {
         "aa": "afarisht",
         "ab": "abkazisht",
@@ -395,6 +395,8 @@
         "yue": "kantonezisht",
         "zgh": "tamaziatishte standarde marokene",
         "zh": "kinezisht",
+        "zh_Hans": "kinezishte e thjeshtuar",
+        "zh_Hant": "kinezishte tradicionale",
         "zu": "zuluisht",
         "zun": "zunisht",
         "zxx": "nuk ka përmbajtje gjuhësore",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.94",
     "Names": {
         "Adlm": "adlamiska",
         "Afak": "afakiska",
@@ -42,6 +42,7 @@
         "Geok": "kutsuri",
         "Geor": "georgiska",
         "Glag": "glagolitiska",
+        "Gong": "gunjalgondiska",
         "Gonm": "masaram-gondi",
         "Goth": "gotiska",
         "Gran": "gammaltamilska",
@@ -128,6 +129,7 @@
         "Plrd": "pollardtecken",
         "Prti": "tidig parthianska",
         "Rjng": "rejang",
+        "Rohg": "hanifiska",
         "Roro": "rongo-rongo",
         "Runr": "runor",
         "Samr": "samaritiska",
@@ -140,6 +142,8 @@
         "Sidd": "siddhamska",
         "Sind": "sindhiska",
         "Sinh": "singalesiska",
+        "Sogd": "sogdiska",
+        "Sogo": "gammalsogdiska",
         "Sora": "sora sompeng",
         "Soyo": "soyombo",
         "Sund": "sundanesiska",

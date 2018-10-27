@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.50",
     "Names": {
         "ADP": [
             "ADP",
@@ -683,7 +683,7 @@
         ],
         "MRO": [
             "MRO",
-            "mauritanijska ouguja (1973–2017)"
+            "mauritanijska ouguja (1973. – 2017.)"
         ],
         "MRU": [
             "MRU",
@@ -1043,6 +1043,10 @@
         ],
         "VEF": [
             "VEF",
+            "venezuelanski bolivar (2008. – 2018.)"
+        ],
+        "VES": [
+            "VES",
             "venezuelanski bolivar"
         ],
         "VND": [

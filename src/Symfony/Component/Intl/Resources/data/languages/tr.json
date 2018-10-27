@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "Afar",
         "ab": "Abhazca",
@@ -37,7 +37,7 @@
         "as": "Assamca",
         "asa": "Asu",
         "ase": "Amerikan İşaret Dili",
-        "ast": "Asturyasca",
+        "ast": "Asturyasça",
         "av": "Avar Dili",
         "avk": "Kotava",
         "awa": "Awadhi",
@@ -167,8 +167,8 @@
         "fi": "Fince",
         "fil": "Filipince",
         "fit": "Tornedalin Fincesi",
-        "fj": "Fiji Dili",
-        "fo": "Faroe Dili",
+        "fj": "Fiji dili",
+        "fo": "Faroe dili",
         "fon": "Fon",
         "fr": "Fransızca",
         "fr_CA": "Kanada Fransızcası",

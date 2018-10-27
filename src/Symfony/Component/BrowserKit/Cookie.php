@@ -110,7 +110,7 @@ class Cookie
         }
 
         if (null !== $this->samesite) {
-            $str .= '; samesite='.$this->samesite;
+            $cookie .= '; samesite='.$this->samesite;
         }
 
         return $cookie;

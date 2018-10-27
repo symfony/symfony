@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-14T08:15:26Z
+
+Positioning it fixed relative to the main `pre.sf-dump` should be easy, but you cannot combine float and `position: fixed`. So that means the search bar would be over the content and thus hide part of it instead of "pushing it". It can be tricky for its width too. Both these issues can be annoying in narrow places (like in the profiler) where it's used. So not sure it's worth it, but I'll have a look.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-14T10:11:08Z
+
+> So not sure it's worth it, but I'll have a look.
+
+Maybe using flex display will do? But no blocker for me.. the keyboard shortcuts work either way.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-14T10:17:30Z
+
+Actually I don't see how using a flex display could help for this :/
+The only "working" solution to me is having a toolbar on top of the dump content instead of being inside.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-14T10:50:20Z
+
+:+1: for a fixed top bar, that reduces the possible min. width as well. Let me know if i should have a look in this PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-27T08:35:34Z
+
+friendly ping for 4.2 as-is :)

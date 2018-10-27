@@ -12,9 +12,9 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
@@ -114,7 +114,6 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator(null));
-        $handler = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
 
         $middleware->handle($envelope, $this->getStackMock());
     }

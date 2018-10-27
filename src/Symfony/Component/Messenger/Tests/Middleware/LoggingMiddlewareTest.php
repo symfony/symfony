@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
-use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class LoggingMiddlewareTest extends MiddlewareTestCase
@@ -34,7 +34,8 @@ class LoggingMiddlewareTest extends MiddlewareTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Thrown from next middleware.
      */
     public function testWarningLogOnException()
     {
@@ -50,12 +51,7 @@ class LoggingMiddlewareTest extends MiddlewareTestCase
             ->expects($this->once())
             ->method('warning')
         ;
-        $stack = $this->createMock(StackInterface::class);
-        $stack
-            ->expects($this->once())
-            ->method('next')
-            ->willThrowException(new \Exception())
-        ;
+        $stack = $this->getThrowingStackMock();
 
         (new LoggingMiddleware($logger))->handle($envelope, $stack);
     }

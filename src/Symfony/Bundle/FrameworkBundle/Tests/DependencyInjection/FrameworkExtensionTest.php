@@ -691,6 +691,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('fr'), $calls[1][1][0]);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Translations directory "%s/Resources/translations" is deprecated since Symfony 4.2, use "%s/translations" instead.
+     */
+    public function testLegacyTranslationsDirectory()
+    {
+        $container = $this->createContainerFromFile('full', array('kernel.root_dir' => __DIR__.'/Fixtures'));
+        $options = $container->getDefinition('translator.default')->getArgument(4);
+        $files = array_map('realpath', $options['resource_files']['en']);
+
+        $dir = str_replace('/', \DIRECTORY_SEPARATOR, __DIR__.'/Fixtures/Resources/translations/test_default.en.xlf');
+        $this->assertContains($dir, $files, '->registerTranslatorConfiguration() finds translation resources in legacy directory');
+    }
+
     public function testTranslatorMultipleFallbacks()
     {
         $container = $this->createContainerFromFile('translator_fallbacks');

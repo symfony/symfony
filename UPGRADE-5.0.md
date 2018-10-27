@@ -169,6 +169,7 @@ FrameworkBundle
  * The `--no-debug` console option has been removed, 
    set the "APP_DEBUG" environment variable to "0" instead.
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
+ * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
 
 HttpFoundation
 --------------

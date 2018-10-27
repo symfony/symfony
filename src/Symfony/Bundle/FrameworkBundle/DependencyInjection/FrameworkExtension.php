@@ -1009,6 +1009,8 @@ class FrameworkExtension extends Extension
                 $dirs[] = $dir;
             }
             if ($container->fileExists($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
+                @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
+
                 $dirs[] = $dir;
             }
         }
@@ -1025,6 +1027,10 @@ class FrameworkExtension extends Extension
             $dirs[] = $defaultDir;
         }
         if ($container->fileExists($dir = $rootDir.'/Resources/translations')) {
+            if ($dir !== $defaultDir) {
+                @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
+            }
+
             $dirs[] = $dir;
         }
 
@@ -1307,7 +1313,7 @@ class FrameworkExtension extends Extension
 
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
-                 array(new Reference('annotation_reader'))
+                array(new Reference('annotation_reader'))
             );
             $annotationLoader->setPublic(false);
 

@@ -65,6 +65,23 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Storing translations in the "%ssf_translation%s/Resources/translations" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/translations" directory instead.
+     * @expectedDeprecation Storing templates in the "%ssf_translation%s/Resources/views" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/templates" directory instead.
+     */
+    public function testDebugLegacyDefaultDirectory()
+    {
+        $this->fs->mkdir($this->translationDir.'/Resources/translations');
+        $this->fs->mkdir($this->translationDir.'/Resources/views');
+
+        $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'));
+        $tester->execute(array('locale' => 'en'));
+
+        $this->assertRegExp('/missing/', $tester->getDisplay());
+        $this->assertRegExp('/unused/', $tester->getDisplay());
+    }
+
     public function testDebugDefaultRootDirectory()
     {
         $this->fs->remove($this->translationDir);
@@ -82,14 +99,16 @@ class TranslationDebugCommandTest extends TestCase
 
     public function testDebugCustomDirectory()
     {
+        $this->fs->mkdir($this->translationDir.'/customDir/translations');
+        $this->fs->mkdir($this->translationDir.'/customDir/templates');
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
-            ->with($this->equalTo($this->translationDir))
+            ->with($this->equalTo($this->translationDir.'/customDir'))
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'), $kernel);
-        $tester->execute(array('locale' => 'en', 'bundle' => $this->translationDir));
+        $tester->execute(array('locale' => 'en', 'bundle' => $this->translationDir.'/customDir'));
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
         $this->assertRegExp('/unused/', $tester->getDisplay());
@@ -114,8 +133,6 @@ class TranslationDebugCommandTest extends TestCase
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
-        $this->fs->mkdir($this->translationDir.'/Resources/translations');
-        $this->fs->mkdir($this->translationDir.'/Resources/views');
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }

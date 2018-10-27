@@ -94,7 +94,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     protected function tearDown()
     {
-        $this->request = null;
+        $this->requestWithoutSession = null;
         $this->requestWithSession = null;
     }
 }

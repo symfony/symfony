@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2018-10-25T08:57:23Z
+
+It's a work in progress since I still have to make all the tests pass.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-10-26T22:12:50Z
+
+All tests passing. PR ready.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-27T04:04:44Z
+
+@jakzal Thanks for working on this. I'm wondering if we could add your Github's comment directly as comments in the code. They are valuable and should be kept close to the code IMHO. WDYT?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-10-27T09:07:57Z
+
+Good point. Added comments.

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-27T15:19:57Z
+
+should we actually use it? #28999
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-27T16:05:56Z
+
+@ro0NL : Done and added `MiddlewareTestCase::getThrowingStackMock()`.
+Thanks for pointing this out

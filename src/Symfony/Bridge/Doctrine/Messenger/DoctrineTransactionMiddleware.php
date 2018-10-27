@@ -36,7 +36,7 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Envelope $envelope, StackInterface $stack): void
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
 
@@ -46,9 +46,11 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
 
         $entityManager->getConnection()->beginTransaction();
         try {
-            $stack->next()->handle($envelope, $stack);
+            $envelope = $stack->next()->handle($envelope, $stack);
             $entityManager->flush();
             $entityManager->getConnection()->commit();
+
+            return $envelope;
         } catch (\Throwable $exception) {
             $entityManager->getConnection()->rollBack();
 

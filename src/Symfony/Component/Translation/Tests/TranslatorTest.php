@@ -541,6 +541,21 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @requires extension intl
+     */
+    public function testIntlFormattedDomain()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+
+        $translator->addResource('array', array('some_message' => 'Hello %name%'), 'en');
+        $this->assertSame('Hello Bob', $translator->trans('some_message', array('%name%' => 'Bob')));
+
+        $translator->addResource('array', array('some_message' => 'Hi {name}'), 'en', 'messages+intl-icu');
+        $this->assertSame('Hi Bob', $translator->trans('some_message', array('%name%' => 'Bob')));
+    }
+
+    /**
      * @group legacy
      */
     public function testTransChoiceFallback()

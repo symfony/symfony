@@ -1,0 +1,174 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-10T11:19:47Z
+
+@l-vo this is something we definitely want to improve. Thanks!  If possible, please paste a before/after screenshot comparison.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-07-10T11:20:33Z
+
+I didn't understand what CHANGELOG file I should update ? There is not CHANGELOG.md file and the CHANGELOG-4.1.md not seems to me the good file since I think my PR is for the 4.2 version.
+EDIT: Found the file, I Iooked for it in the symfony project root, not in the component/bundle... I'm going to add changelog shortly.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-07-10T11:31:51Z
+
+@javiereguiluz : screenshots added, thanks !
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-13T11:52:35Z
+
+I'd like to see the "Show/hide voter details" toggle per row in the initial table (right column), toggling a single new table of voter details underneath it. Yes, there'd be always 1 active table with voter details.
+
+Currently it looks cluttered, and unclear which table belongs to what.
+
+edit; but wait for @javiereguiluz's opion :wink:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-07-13T13:29:14Z
+
+@ro0NL that's exactly what I was thinking. It's like the "Show more" link that GitHub uses in some places:
+
+![show-more](https://user-images.githubusercontent.com/73419/42694093-77c47d06-86b1-11e8-964a-059aff95c2f0.gif)
+
+My idea was going to wait until this PR was merged and then tweak its design a bit in another PR. I have some sketches ready, but need time to polish it.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-07-14T14:31:44Z
+
+Add PR changes to CHANGELOG files
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-07-14T14:36:30Z
+
+@ro0NL @javiereguiluz ok for doing that in this way, I was not really inspired for how changing the current interface efficiently.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-08-26T08:33:17Z
+
+Branch rebased and conflicts resolved.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-08-28T06:49:15Z
+
+@ro0NL @javiereguiluz Can you chime in here about the UI?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-09-25T14:11:12Z
+
+@ro0NL @javiereguiluz I slightly improved the UI.
+
+<img width="1093" alt="capture d ecran 2018-10-10 a 21 35 30" src="https://user-images.githubusercontent.com/15314293/46761852-dea11880-ccd5-11e8-8d06-ddf993e94e97.png">
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-09-25T14:11:43Z
+
+Deprecation flag is not needed anymore.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-01T05:08:44Z
+
+@xabbuh I fixed the things you reported. Could you (or anyone else) remove the deprecated flag which is not needed anymore ? Thanks in advance :)
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-01T10:49:05Z
+
+@xabbuh thanks :), last reports fixed except the return of `getVoterDetails` but I'm not sure my implementation is wrong.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-05T09:27:29Z
+
+@xabbuh conflicts resolved :)
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-10T20:09:37Z
+
+@stof implementation reworked, thanks !
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-10T20:12:55Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-11T06:01:42Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-11T06:05:14Z
+
+Status changed back to needs work, missing the edge case of unanimous strategy where the voter is called for each attribute. (Need to display voter attribute in the details on this case).
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-11T11:35:45Z
+
+Screenshot with unanimous voter:
+![capture d ecran 2018-10-11 a 14 02 21](https://user-images.githubusercontent.com/15314293/46802699-5adf3e80-cd5e-11e8-99e7-8ebc91c8728d.png)
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-11T16:05:36Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-18T18:17:30Z
+
+@fabpot PR reworked, the event is dispatched by a voter decorator now. This decorator is only created in debug mode.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-18T18:17:59Z
+
+status:  needs review
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-19T12:30:16Z
+
+@ro0NL It makes sense, done, thanks :)
+@fabpot Last modifications done, thanks !
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-19T12:30:28Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-28T11:25:22Z
+
+Great work so far, but https://github.com/symfony/symfony/pull/27914#discussion_r222969725 is not fully resolved, right?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-28T12:57:27Z
+
+@chalasr It is fully resolved. This problem occured when `TraceableVoter` stored consecutive votes of its decorated voter. Using events and storing this information at AccessDecisionManager level solves this issue.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-28T17:34:25Z
+
+Fixed some minors things, `VoteListener` class description and Security `CHANGELOG` (see self-review above). No code modified.

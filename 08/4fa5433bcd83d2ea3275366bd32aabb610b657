@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-10-22T18:54:47Z
+
+There is one downside to this compared to the `FallbackFormatter`, you won't be able to use ICU formatted messages with the validator component since the domain is configured for the whole component. But maybe this is something that should be fixed in the Validator component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-22T18:58:46Z
+
+~@jvasseur we should work on this separately I suppose when preparing 4.3.~ see resolution below
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-23T09:51:08Z
+
+The current proposal (adding `+intl-icu` suffix) looks the best one to me ... but I wonder if this could break things (for naming files like `messages+intl-icu.en.xlf` instead of `messages.en.xlf`). But I can't think of concrete examples where things will break. It's just a thought.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-23T11:42:01Z
+
+> I wonder if this could break things (for naming files like messages+intl-icu.en.xlf instead of messages.en.xlf)
+
+nothing I can think of: a `+` is a legal char in a filename, and also in a domain name, so all good.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-23T13:14:50Z
+
+This requires updating all places using the translator to use an explicit domain though, making the migrating painful.
+Could we rely on some catalogue metadata instead of relying on the domain name instead ? Adding some metadata about which keys are Intl ones would require cooperation from loaders (to fill the info based on some opt-in for the resource), but that's doable as we implement them (and custom loaders would keep registering their keys as non-ICU until they support this opt-in, but I think that's fine as there are much less projects writing custom loaders than projects using the translator).
+This way, we would not need to allow changing the translation domain in many places (to be able to switch between the normal one and the `+intl-icu` one).
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-23T13:16:16Z
+
+the question of course would be: what is the way for loaders to decide whether the resource they load is using the Intl-ICU format or the Symfony one ?
+For domain-based opt-in, the domain name is the opt-in.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-23T13:20:38Z
+
+hmm, actually, looking at the implementation, the `+intl-icu` suffix is handled internally in the translator, by checking the ICU catalogue first and then the normal one. So there is no change in places *using* the translator (and so this fixes the concerns of @jvasseur as well).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-23T13:27:23Z
+
+> looking at the implementation, the +intl-icu suffix is handled internally in the translator
+
+Yes! Sorry if that wasn't clear. I updated the PR description.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-28T10:56:03Z
+
+Ping @symfony/deciders

@@ -92,9 +92,7 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      */
     private function getEncoder($format, array $context)
     {
-        if (isset($this->encoderByFormat[$format])
-            && isset($this->encoders[$this->encoderByFormat[$format]])
-        ) {
+        if (isset($this->encoderByFormat[$format], $this->encoders[$this->encoderByFormat[$format]])) {
             return $this->encoders[$this->encoderByFormat[$format]];
         }
 

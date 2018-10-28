@@ -205,7 +205,7 @@ class YamlFileLoader extends FileLoader
         if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".', $path, $name, implode('", "', $extraKeys), implode('", "', self::$availableKeys)));
         }
-        if (isset($config['resource']) && isset($config['path'])) {
+        if (isset($config['resource'], $config['path'])) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "resource" key and the "path" key for "%s". Choose between an import and a route definition.', $path, $name));
         }
         if (!isset($config['resource']) && isset($config['type'])) {
@@ -214,7 +214,7 @@ class YamlFileLoader extends FileLoader
         if (!isset($config['resource']) && !isset($config['path'])) {
             throw new \InvalidArgumentException(sprintf('You must define a "path" for the route "%s" in file "%s".', $name, $path));
         }
-        if (isset($config['controller']) && isset($config['defaults']['_controller'])) {
+        if (isset($config['controller'], $config['defaults']['_controller'])) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "controller" key and the defaults key "_controller" for "%s".', $path, $name));
         }
     }

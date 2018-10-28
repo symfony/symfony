@@ -97,12 +97,12 @@ class FormRenderer implements FormRendererInterface
         }
 
         // Merge the passed with the existing attributes
-        if (isset($variables['attr']) && isset($scopeVariables['attr'])) {
+        if (isset($variables['attr'], $scopeVariables['attr'])) {
             $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
         }
 
         // Merge the passed with the exist *label* attributes
-        if (isset($variables['label_attr']) && isset($scopeVariables['label_attr'])) {
+        if (isset($variables['label_attr'], $scopeVariables['label_attr'])) {
             $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
         }
 
@@ -227,12 +227,12 @@ class FormRenderer implements FormRendererInterface
         }
 
         // Merge the passed with the existing attributes
-        if (isset($variables['attr']) && isset($scopeVariables['attr'])) {
+        if (isset($variables['attr'], $scopeVariables['attr'])) {
             $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
         }
 
         // Merge the passed with the exist *label* attributes
-        if (isset($variables['label_attr']) && isset($scopeVariables['label_attr'])) {
+        if (isset($variables['label_attr'], $scopeVariables['label_attr'])) {
             $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
         }
 

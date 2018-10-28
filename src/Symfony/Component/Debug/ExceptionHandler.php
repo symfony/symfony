@@ -242,7 +242,7 @@ EOF
                     if ($trace['function']) {
                         $content .= sprintf('at <span class="trace-class">%s</span><span class="trace-type">%s</span><span class="trace-method">%s</span>(<span class="trace-arguments">%s</span>)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                     }
-                    if (isset($trace['file']) && isset($trace['line'])) {
+                    if (isset($trace['file'], $trace['line'])) {
                         $content .= $this->formatPath($trace['file'], $trace['line']);
                     }
                     $content .= "</td></tr>\n";

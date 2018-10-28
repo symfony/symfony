@@ -489,7 +489,7 @@ class Filesystem
 
         // Find for which directory the common path stops
         $index = 0;
-        while (isset($startPathArr[$index]) && isset($endPathArr[$index]) && $startPathArr[$index] === $endPathArr[$index]) {
+        while (isset($startPathArr[$index], $endPathArr[$index]) && $startPathArr[$index] === $endPathArr[$index]) {
             ++$index;
         }
 

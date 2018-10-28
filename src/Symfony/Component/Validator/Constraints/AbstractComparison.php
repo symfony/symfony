@@ -41,7 +41,7 @@ abstract class AbstractComparison extends Constraint
                 throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires either the "value" or "propertyPath" option to be set.', \get_class($this)));
             }
 
-            if (isset($options['value']) && isset($options['propertyPath'])) {
+            if (isset($options['value'], $options['propertyPath'])) {
                 throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "value" or "propertyPath" options to be set, not both.', \get_class($this)));
             }
 

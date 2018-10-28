@@ -68,9 +68,7 @@ class ChainDecoder implements DecoderInterface /*, ContextAwareDecoderInterface*
      */
     private function getDecoder($format, array $context)
     {
-        if (isset($this->decoderByFormat[$format])
-            && isset($this->decoders[$this->decoderByFormat[$format]])
-        ) {
+        if (isset($this->decoderByFormat[$format], $this->decoders[$this->decoderByFormat[$format]])) {
             return $this->decoders[$this->decoderByFormat[$format]];
         }
 

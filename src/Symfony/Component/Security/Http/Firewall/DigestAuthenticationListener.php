@@ -180,7 +180,7 @@ class DigestData
         $this->header = $header;
         preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
-            if (isset($match[1]) && isset($match[3])) {
+            if (isset($match[1], $match[3])) {
                 $this->elements[$match[1]] = isset($match[4]) ? $match[4] : $match[3];
             }
         }

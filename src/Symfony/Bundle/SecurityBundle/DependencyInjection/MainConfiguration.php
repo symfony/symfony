@@ -91,7 +91,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['strategy']) && isset($v['service']); })
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['service']); })
                         ->thenInvalid('"strategy" and "service" cannot be used together.')
                     ->end()
                 ->end()

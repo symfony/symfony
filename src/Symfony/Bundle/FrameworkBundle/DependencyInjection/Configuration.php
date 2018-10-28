@@ -314,7 +314,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                         ->end()
                                         ->validate()
-                                            ->ifTrue(function ($v) { return isset($v['type']) && isset($v['service']); })
+                                            ->ifTrue(function ($v) { return isset($v['type'], $v['service']); })
                                             ->thenInvalid('"type" and "service" cannot be used together.')
                                         ->end()
                                         ->validate()
@@ -610,19 +610,19 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version_strategy']) && isset($v['version']);
+                            return isset($v['version_strategy'], $v['version']);
                         })
                         ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets".')
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                            return isset($v['version_strategy'], $v['json_manifest_path']);
                         })
                         ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".')
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version']) && isset($v['json_manifest_path']);
+                            return isset($v['version'], $v['json_manifest_path']);
                         })
                         ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets".')
                     ->end()
@@ -654,19 +654,19 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version_strategy']) && isset($v['version']);
+                                        return isset($v['version_strategy'], $v['version']);
                                     })
                                     ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets" packages.')
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                                        return isset($v['version_strategy'], $v['json_manifest_path']);
                                     })
                                     ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.')
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version']) && isset($v['json_manifest_path']);
+                                        return isset($v['version'], $v['json_manifest_path']);
                                     })
                                     ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.')
                                 ->end()

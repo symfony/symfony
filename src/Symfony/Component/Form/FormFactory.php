@@ -117,7 +117,7 @@ class FormFactory implements FormFactoryInterface
         if ($typeGuess) {
             $attrs = array();
             $typeGuessOptions = $typeGuess->getOptions();
-            if (isset($typeGuessOptions['attr']) && isset($options['attr'])) {
+            if (isset($typeGuessOptions['attr'], $options['attr'])) {
                 $attrs = array('attr' => array_merge($typeGuessOptions['attr'], $options['attr']));
             }
 

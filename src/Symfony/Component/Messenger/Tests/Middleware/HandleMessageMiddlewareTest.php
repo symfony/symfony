@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Handler\Locator\HandlerLocator;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
@@ -27,8 +27,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $handler = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array(
-            DummyMessage::class => $handler,
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array(
+            DummyMessage::class => array($handler),
         )));
 
         $handler->expects($this->once())->method('__invoke')->with($message);
@@ -42,14 +42,14 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
      */
     public function testThrowsNoHandlerException()
     {
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array()));
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array()));
 
         $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
     }
 
     public function testAllowNoHandlers()
     {
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array()), true);
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array()), true);
 
         $this->assertInstanceOf(Envelope::class, $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
     }

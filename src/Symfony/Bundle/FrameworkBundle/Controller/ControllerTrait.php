@@ -391,14 +391,15 @@ trait ControllerTrait
     /**
      * Dispatches a message to the bus.
      *
-     * @param object $message The message to dispatch
+     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
      *
      * @final
      */
     protected function dispatchMessage($message): Envelope
     {
         if (!$this->container->has('message_bus')) {
-            throw new \LogicException('The message bus is not enabled in your application. Try running "composer require symfony/messenger".');
+            $message = class_exists(Envelope::class) ? 'You need to define the "messenger.default_bus" configuration option.' : 'Try running "composer require symfony/messenger".';
+            throw new \LogicException('The message bus is not enabled in your application. '.$message);
         }
 
         return $this->container->get('message_bus')->dispatch($message);

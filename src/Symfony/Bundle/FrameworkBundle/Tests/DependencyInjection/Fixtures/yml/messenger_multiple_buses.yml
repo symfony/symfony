@@ -9,5 +9,5 @@ framework:
             messenger.bus.queries:
                 default_middleware: false
                 middleware:
-                    - "route_messages"
-                    - "call_message_handler"
+                    - "send_message"
+                    - "handle_message"

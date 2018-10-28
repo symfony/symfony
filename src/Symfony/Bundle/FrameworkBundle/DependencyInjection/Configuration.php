@@ -1077,7 +1077,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
-                        ->scalarNode('default_bus')->defaultValue(null)->end()
+                        ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
                             ->defaultValue(array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())))
                             ->useAttributeAsKey('name')

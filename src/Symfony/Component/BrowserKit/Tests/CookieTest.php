@@ -29,6 +29,9 @@ class CookieTest extends TestCase
 
         $cookie = new Cookie('foo', 'bar', 0, '/', '');
         $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; httponly', (string) $cookie);
+
+        $cookie = new Cookie('foo', 'bar', 2, '/', '', true, true, false, 'lax');
+        $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:02 GMT; path=/; secure; httponly; samesite=lax', (string) $cookie);
     }
 
     /**

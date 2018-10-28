@@ -283,11 +283,7 @@ class SecurityExtension extends Extension
         $contextKey = null;
         // Context serializer listener
         if (false === $firewall['stateless']) {
-            $contextKey = $id;
-            if (isset($firewall['context'])) {
-                $contextKey = $firewall['context'];
-            }
-
+            $contextKey = $firewall['context'] ?? $id;
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
             $sessionStrategyId = 'security.authentication.session_strategy';
         } else {

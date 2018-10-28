@@ -86,19 +86,27 @@ class Filesystem
     /**
      * Creates a directory recursively.
      *
-     * @param string|iterable $dirs The directory path
-     * @param int             $mode The directory mode
+     * @param string|iterable $dirs    The directory path
+     * @param int             $mode    The directory mode
+     * @param resource|null   $context
      *
      * @throws IOException On any directory creation failure
      */
-    public function mkdir($dirs, $mode = 0777)
+    public function mkdir($dirs, $mode = 0777/*, $context = null*/)
     {
+        $context = 3 <= \func_num_args() ? \func_get_arg(2) : null;
+
         foreach ($this->toIterable($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;
             }
 
-            if (!self::box('mkdir', $dir, $mode, true)) {
+            $args = array($dir, $mode, true);
+            if (null !== $context) {
+                $args[] = $context;
+            }
+
+            if (!self::box('mkdir', ...$args)) {
                 if (!is_dir($dir)) {
                     // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message if we have one
                     if (self::$lastError) {

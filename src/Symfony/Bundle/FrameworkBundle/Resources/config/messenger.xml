@@ -33,11 +33,14 @@
             <argument type="service" id="validator" />
         </service>
 
+        <service id="messenger.middleware.traceable" class="Symfony\Component\Messenger\Middleware\TraceableMiddleware" abstract="true">
+            <argument type="service" id="debug.stopwatch" />
+        </service>
+
         <!-- Logging -->
         <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware" abstract="true">
-            <argument type="service" id="logger" />
-
             <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="logger" />
         </service>
 
         <!-- Discovery -->
@@ -56,10 +59,9 @@
         </service>
 
         <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
+            <tag name="messenger.transport_factory" />
             <argument type="service" id="messenger.transport.serializer" />
             <argument>%kernel.debug%</argument>
-
-            <tag name="messenger.transport_factory" />
         </service>
     </services>
 </container>

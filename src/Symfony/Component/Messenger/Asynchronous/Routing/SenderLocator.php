@@ -57,6 +57,7 @@ class SenderLocator implements SenderLocatorInterface
         if ($interfaceMapping = array_intersect_key($mapping, class_implements($message))) {
             return current($interfaceMapping);
         }
+
         return $mapping['*'] ?? null;
     }
 }

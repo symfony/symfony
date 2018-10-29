@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class TwigExtensionTest extends TestCase
 {
@@ -72,11 +73,12 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('@qux', $calls[3][1][1], '->load() allows escaping of service identifiers');
         $this->assertEquals('pi', $calls[4][1][0], '->load() registers variables as Twig globals');
         $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
+        $this->assertEquals(new Expression("service('bar')"), $calls[5][1][1], '->load() registers expression as Twig globals');
 
         // Yaml and Php specific configs
         if (\in_array($format, array('yml', 'php'))) {
-            $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[5][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals('bad', $calls[6][1][0], '->load() registers variables as Twig globals');
+            $this->assertEquals(array('key' => 'foo'), $calls[6][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options

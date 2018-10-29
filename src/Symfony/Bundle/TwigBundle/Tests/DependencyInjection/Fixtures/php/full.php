@@ -8,6 +8,7 @@ $container->loadFromExtension('twig', array(
         'foo' => '@bar',
         'baz' => '@@qux',
         'pi' => 3.14,
+        'expr' => "@=service('bar')",
         'bad' => array('key' => 'foo'),
     ),
     'auto_reload' => true,

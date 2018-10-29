@@ -52,7 +52,7 @@ final class Dotenv
     }
 
     /**
-     * Loads one or several .env and the corresponding env.$env, env.local and env.$env.local files if they exist.
+     * Loads one or several .env and the corresponding .env.$env, .env.local and .env.$env.local files if they exist.
      *
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      *

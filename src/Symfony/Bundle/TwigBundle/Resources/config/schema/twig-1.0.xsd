@@ -49,10 +49,12 @@
         <xsd:attribute name="key" type="xsd:string" use="required" />
         <xsd:attribute name="type" type="global_type" />
         <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="expr" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:simpleType name="global_type">
         <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="expression" />
             <xsd:enumeration value="service" />
         </xsd:restriction>
     </xsd:simpleType>

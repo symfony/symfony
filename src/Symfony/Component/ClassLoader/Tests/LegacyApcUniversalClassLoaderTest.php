@@ -21,7 +21,7 @@ class LegacyApcUniversalClassLoaderTest extends TestCase
 {
     protected function setUp()
     {
-        if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
+        if (filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
             apcu_clear_cache();
         } else {
             $this->markTestSkipped('APC is not enabled.');
@@ -30,7 +30,7 @@ class LegacyApcUniversalClassLoaderTest extends TestCase
 
     protected function tearDown()
     {
-        if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
+        if (filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
             apcu_clear_cache();
         }
     }

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * TwigExtension configuration structure.
@@ -78,6 +79,16 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()
+                            ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@='); })
+                            ->then(function ($v) {
+                                if (!class_exists(Expression::class)) {
+                                    throw new \LogicException(sprintf('The "@=" expression syntax cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".'));
+                                }
+
+                                return array('expr' => substr($v, 2), 'type' => 'expression');
+                            })
+                        ->end()
+                        ->beforeNormalization()
                             ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {
                                 if (0 === strpos($v, '@@')) {
@@ -93,7 +104,7 @@ class Configuration implements ConfigurationInterface
                                     $keys = array_keys($v);
                                     sort($keys);
 
-                                    return $keys !== array('id', 'type') && $keys !== array('value');
+                                    return $keys !== array('id', 'type') && $keys !== array('expr', 'type') && $keys !== array('value');
                                 }
 
                                 return true;
@@ -102,9 +113,10 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->children()
                             ->scalarNode('id')->end()
+                            ->scalarNode('expr')->end()
                             ->scalarNode('type')
                                 ->validate()
-                                    ->ifNotInArray(array('service'))
+                                    ->ifNotInArray(array('service', 'expression'))
                                     ->thenInvalid('The %s type is not supported')
                                 ->end()
                             ->end()

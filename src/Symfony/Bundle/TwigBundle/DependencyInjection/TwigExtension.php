@@ -18,6 +18,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Translation\Translator;
 use Twig\Extension\ExtensionInterface;
@@ -132,7 +133,9 @@ class TwigExtension extends Extension
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
             foreach ($config['globals'] as $key => $global) {
-                if (isset($global['type']) && 'service' === $global['type']) {
+                if (isset($global['type']) && 'expression' === $global['type']) {
+                    $def->addMethodCall('addGlobal', array($key, new Expression($global['expr'])));
+                } elseif (isset($global['type']) && 'service' === $global['type']) {
                     $def->addMethodCall('addGlobal', array($key, new Reference($global['id'])));
                 } else {
                     $def->addMethodCall('addGlobal', array($key, $global['value']));

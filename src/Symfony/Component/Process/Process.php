@@ -416,11 +416,8 @@ class Process implements \IteratorAggregate
             $this->checkTimeout();
             $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
             $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
-        } while ($running);
-
-        while ($this->isRunning()) {
             usleep(1000);
-        }
+        } while ($running);
 
         if ($this->processInformation['signaled'] && $this->processInformation['termsig'] !== $this->latestSignal) {
             throw new ProcessSignaledException($this);

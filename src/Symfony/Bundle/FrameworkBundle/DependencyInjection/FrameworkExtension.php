@@ -1640,8 +1640,10 @@ class FrameworkExtension extends Extension
                 $pool['adapter'] = '.'.$pool['adapter'].'.inner';
             }
             $definition = new ChildDefinition($pool['adapter']);
-            $container->registerAliasForArgument($name, CacheInterface::class);
-            $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            if (!\in_array($name, array('cache.app', 'cache.system'), true)) {
+                $container->registerAliasForArgument($name, CacheInterface::class);
+                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            }
 
             if ($pool['tags']) {
                 if ($config['pools'][$pool['tags']]['tags'] ?? false) {

@@ -65,7 +65,7 @@ class AcceptHeaderItem
     }
 
     /**
-     * Returns header  value's string representation.
+     * Returns header value's string representation.
      *
      * @return string
      */

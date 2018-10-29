@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-master
+4.3.0
 ------
 
 * add support for complex expressions in twig globals

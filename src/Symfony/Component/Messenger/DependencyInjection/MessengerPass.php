@@ -319,7 +319,8 @@ class MessengerPass implements CompilerPassInterface
             if (($definition = $container->findDefinition($messengerMiddlewareId))->isAbstract()) {
                 $childDefinition = new ChildDefinition($messengerMiddlewareId);
                 $count = \count($definition->getArguments());
-                foreach (array_values($arguments ?? array()) as $key => $argument) {
+
+                foreach (($arguments ?? array()) as $key => $argument) {
                     // Parent definition can provide default arguments.
                     // Replace each explicitly or add if not set:
                     $key < $count ? $childDefinition->replaceArgument($key, $argument) : $childDefinition->addArgument($argument);

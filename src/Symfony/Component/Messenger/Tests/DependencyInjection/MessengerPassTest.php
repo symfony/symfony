@@ -494,12 +494,14 @@ class MessengerPassTest extends TestCase
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
         $container->register('middleware_with_factory', UselessMiddleware::class)->addArgument('some_default')->setAbstract(true);
         $container->register('middleware_with_factory_using_default', UselessMiddleware::class)->addArgument('some_default')->setAbstract(true);
+        $container->register('middleware_with_factory_using_a_lot_of_defaults', UselessMiddleware::class)->setArguments(array('one', 'two', 'three'))->setAbstract(true);
         $container->register(UselessMiddleware::class, UselessMiddleware::class);
 
         $container->setParameter($middlewareParameter = $fooBusId.'.middleware', array(
             array('id' => UselessMiddleware::class),
             array('id' => 'middleware_with_factory', 'arguments' => array('foo', 'bar')),
             array('id' => 'middleware_with_factory_using_default'),
+            array('id' => 'middleware_with_factory_using_a_lot_of_defaults', 'arguments' => array(1 => '2', 3 => 'four')),
         ));
 
         (new MessengerPass())->process($container);
@@ -519,10 +521,18 @@ class MessengerPassTest extends TestCase
             'parent default argument is used'
         );
 
+        $this->assertTrue($container->hasDefinition($factoryWithALotOfDefaultsChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_a_lot_of_defaults'));
+        $this->assertEquals(
+            array('one', '2', 'three', 'four'),
+            $container->getDefinition($factoryWithALotOfDefaultsChildMiddlewareId)->getArguments(),
+            'parent arguments are not overwritten'
+        );
+
         $this->assertEquals(array(
             new Reference(UselessMiddleware::class),
             new Reference($factoryChildMiddlewareId),
             new Reference($factoryWithDefaultChildMiddlewareId),
+            new Reference($factoryWithALotOfDefaultsChildMiddlewareId),
         ), $container->getDefinition($fooBusId)->getArgument(0)->getValues());
         $this->assertFalse($container->hasParameter($middlewareParameter));
     }

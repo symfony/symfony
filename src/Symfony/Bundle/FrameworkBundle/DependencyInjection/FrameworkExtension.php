@@ -1548,7 +1548,7 @@ class FrameworkExtension extends Extension
             }
 
             if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
-                array_unshift($middleware, array('id' => 'traceable', 'arguments' => array($busId)));
+                array_unshift($middleware, array('id' => 'traceable', 'arguments' => array(1 => $busId)));
             }
 
             $container->setParameter($busId.'.middleware', $middleware);

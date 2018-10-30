@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "AED": [
             "AED",
@@ -395,7 +395,7 @@
         ],
         "MRU": [
             "MRU",
-            "Mauritanian Ouguiya"
+            "Ouguiya ng Mauritania"
         ],
         "MUR": [
             "MUR",
@@ -555,7 +555,7 @@
         ],
         "STN": [
             "STN",
-            "São Tomé & Príncipe Dobra"
+            "São Tomé & Príncipe Dobra (2018)"
         ],
         "SYP": [
             "SYP",
@@ -627,6 +627,10 @@
         ],
         "VEF": [
             "VEF",
+            "Bolívar ng Venezuela (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Bolívar ng Venezuela"
         ],
         "VND": [

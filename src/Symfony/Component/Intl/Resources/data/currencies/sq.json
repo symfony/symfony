@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.50",
     "Names": {
         "AED": [
             "AED",
@@ -599,7 +599,11 @@
         ],
         "VEF": [
             "VEF",
-            "Bolivari venezuelian"
+            "Bolivari venezuelian (2008–2018)"
+        ],
+        "VES": [
+            "VES",
+            "Bolivari venezuelas"
         ],
         "VND": [
             "₫",

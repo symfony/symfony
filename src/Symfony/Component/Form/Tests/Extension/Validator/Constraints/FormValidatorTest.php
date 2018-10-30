@@ -592,8 +592,29 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($form, new Form());
 
         $this->buildViolation('Extra!')
-            ->setParameter('{{ extra_fields }}', 'foo')
+            ->setParameter('{{ extra_fields }}', '"foo"')
             ->setInvalidValue(array('foo' => 'bar'))
+            ->setCode(Form::NO_SUCH_FIELD_ERROR)
+            ->assertRaised();
+    }
+
+    public function testViolationFormatIfMultipleExtraFields()
+    {
+        $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->submit(array('foo' => 'bar', 'baz' => 'qux', 'quux' => 'quuz'));
+
+        $this->expectNoValidate();
+
+        $this->validator->validate($form, new Form());
+
+        $this->buildViolation('Extra!')
+            ->setParameter('{{ extra_fields }}', '"foo", "baz", "quux"')
+            ->setInvalidValue(array('foo' => 'bar', 'baz' => 'qux', 'quux' => 'quuz'))
             ->setCode(Form::NO_SUCH_FIELD_ERROR)
             ->assertRaised();
     }

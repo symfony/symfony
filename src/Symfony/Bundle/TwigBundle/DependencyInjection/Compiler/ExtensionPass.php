@@ -64,6 +64,7 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->has('fragment.handler')) {
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
+            $container->getDefinition('twig.runtime.httpkernel')->addTag('twig.runtime');
 
             // inject Twig in the hinclude service if Twig is the only registered templating engine
             if ((!$container->hasParameter('templating.engines') || array('twig') == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
@@ -72,6 +73,10 @@ class ExtensionPass implements CompilerPassInterface
                     ->replaceArgument(0, new Reference('twig'))
                 ;
             }
+        }
+
+        if (!$container->has('http_kernel')) {
+            $container->removeDefinition('twig.controller.preview_error');
         }
 
         if ($container->has('request_stack')) {

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.94",
     "Names": {
         "ADP": [
             "ADP",
@@ -288,7 +288,7 @@
         ],
         "GIP": [
             "GIP",
-            "libra xibraltareña"
+            "Libra xibraltareña"
         ],
         "GMD": [
             "GMD",
@@ -772,6 +772,10 @@
         ],
         "VEF": [
             "VEF",
+            "Bolívar venezolano (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Bolívar venezolano"
         ],
         "VND": [

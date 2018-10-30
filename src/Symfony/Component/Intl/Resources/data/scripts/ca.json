@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "Adlm": "adlam",
         "Afak": "afaka",
@@ -47,7 +47,7 @@
         "Grek": "grec",
         "Gujr": "gujarati",
         "Guru": "gurmukhi",
-        "Hanb": "hanb",
+        "Hanb": "han amb bopomofo",
         "Hang": "hangul",
         "Hani": "han",
         "Hano": "hanunoo",

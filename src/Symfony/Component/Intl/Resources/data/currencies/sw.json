@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "AED": [
             "AED",
@@ -167,7 +167,7 @@
         ],
         "DZD": [
             "DZD",
-            "Dinar ya Algeria"
+            "Dinar ya Aljeria"
         ],
         "EGP": [
             "EGP",
@@ -619,6 +619,10 @@
         ],
         "VEF": [
             "VEF",
+            "Bolivar ya Venezuela (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Bolivar ya Venezuela"
         ],
         "VND": [

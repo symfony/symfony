@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "ADP": [
             "ADP",
@@ -683,11 +683,11 @@
         ],
         "MRO": [
             "MRO",
-            "Moritanya Ouguiyası (1973–2017)"
+            "Moritanya Ugiyası (1973–2017)"
         ],
         "MRU": [
             "MRU",
-            "Moritanya Ouguiyası"
+            "Moritanya Ugiyası"
         ],
         "MTL": [
             "MTL",
@@ -1044,6 +1044,10 @@
         ],
         "VEF": [
             "VEF",
+            "Venezuela Bolivarı (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Venezuela Bolivarı"
         ],
         "VND": [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.91",
     "Names": {
         "ADP": [
             "ADP",
@@ -170,7 +170,7 @@
             "cruzeiro"
         ],
         "BSD": [
-            "$BS",
+            "BSD",
             "dollar bahaméen"
         ],
         "BTN": [
@@ -975,6 +975,10 @@
         ],
         "VEF": [
             "VEF",
+            "bolivar vénézuélien (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "bolivar vénézuélien"
         ],
         "VND": [

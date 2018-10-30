@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.50",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -119,6 +119,7 @@
         "enm": "srednjeengleski",
         "eo": "esperanto",
         "es": "španski",
+        "es_ES": "španski (Evropa)",
         "et": "estonski",
         "eu": "baskijski",
         "ewo": "evondo",

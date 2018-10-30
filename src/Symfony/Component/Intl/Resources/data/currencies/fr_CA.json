@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.73",
+    "Version": "2.1.43.65",
     "Names": {
         "ARS": [
             "ARS",
@@ -9,6 +9,10 @@
             "$ AU",
             "dollar australien"
         ],
+        "AZN": [
+            "AZN",
+            "manat azerbaïdjanais"
+        ],
         "BMD": [
             "BMD",
             "dollar bermudien"
@@ -16,10 +20,6 @@
         "BND": [
             "BND",
             "dollar brunéien"
-        ],
-        "BSD": [
-            "BSD",
-            "dollar bahaméen"
         ],
         "BZD": [
             "BZD",
@@ -40,6 +40,10 @@
         "COP": [
             "COP",
             "peso colombien"
+        ],
+        "CVE": [
+            "CVE",
+            "escudo cap-verdien"
         ],
         "FJD": [
             "FJD",
@@ -81,6 +85,10 @@
             "KRW",
             "won sud-coréen"
         ],
+        "LAK": [
+            "LAK",
+            "kip laotien"
+        ],
         "LBP": [
             "LBP",
             "livre libanaise"
@@ -101,6 +109,18 @@
             "OMR",
             "rial omanais"
         ],
+        "PEN": [
+            "PEN",
+            "nouveau sol péruvien"
+        ],
+        "PGK": [
+            "PGK",
+            "kina papou-néo-guinéen"
+        ],
+        "QAR": [
+            "QAR",
+            "riyal du Qatar"
+        ],
         "SAR": [
             "SAR",
             "rial saoudien"
@@ -115,7 +135,7 @@
         ],
         "SRD": [
             "SRD",
-            "dollar surinamais"
+            "dollar du Suriname"
         ],
         "TOP": [
             "TOP",
@@ -136,6 +156,14 @@
         "VND": [
             "VND",
             "dông vietnamien"
+        ],
+        "VUV": [
+            "VUV",
+            "vatu"
+        ],
+        "WST": [
+            "WST",
+            "tala"
         ],
         "XAF": [
             "XAF",

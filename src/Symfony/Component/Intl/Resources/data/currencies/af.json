@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "AED": [
             "AED",
@@ -183,7 +183,7 @@
         ],
         "EUR": [
             "€",
-            "Euro"
+            "euro"
         ],
         "FJD": [
             "FJD",
@@ -628,6 +628,10 @@
         "VEF": [
             "VEF",
             "Venezolaanse bolivar"
+        ],
+        "VES": [
+            "VES",
+            "Venezolaanse Bolívar"
         ],
         "VND": [
             "₫",

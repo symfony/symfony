@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.86",
     "Names": {
         "aa": "afar",
         "ab": "abcaso",
@@ -30,7 +30,7 @@
         "aro": "araona",
         "arp": "arapaho",
         "arq": "arabo algerino",
-        "ars": "arabo, najd",
+        "ars": "arabo najd",
         "arw": "aruaco",
         "ary": "arabo marocchino",
         "arz": "arabo egiziano",
@@ -297,7 +297,7 @@
         "kut": "kutenai",
         "kv": "komi",
         "kw": "cornico",
-        "ky": "chirghiso",
+        "ky": "kirghiso",
         "la": "latino",
         "lad": "giudeo-spagnolo",
         "lag": "langi",
@@ -409,7 +409,7 @@
         "oc": "occitano",
         "oj": "ojibwa",
         "om": "oromo",
-        "or": "oriya",
+        "or": "odia",
         "os": "ossetico",
         "osa": "osage",
         "ota": "turco ottomano",

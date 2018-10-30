@@ -1,10 +1,6 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.9",
     "Names": {
-        "AED": [
-            "AED",
-            "Dirham dos Emirados Árabes Unidos"
-        ],
         "AFA": [
             "AFA",
             "Afeghani (1927–2002)"
@@ -20,6 +16,10 @@
         "AMD": [
             "AMD",
             "Dram arménio"
+        ],
+        "AOA": [
+            "AOA",
+            "kwanza angolano"
         ],
         "ARS": [
             "ARS",
@@ -60,6 +60,10 @@
         "BHD": [
             "BHD",
             "Dinar baremita"
+        ],
+        "BIF": [
+            "BIF",
+            "franco burundiano"
         ],
         "BMD": [
             "BMD",
@@ -104,6 +108,10 @@
         "CAD": [
             "CA$",
             "dólar canadiano"
+        ],
+        "CDF": [
+            "CDF",
+            "franco congolês"
         ],
         "CHF": [
             "CHF",
@@ -151,7 +159,7 @@
         ],
         "DJF": [
             "DJF",
-            "Franco jibutiano"
+            "franco jibutiano"
         ],
         "DKK": [
             "DKK",
@@ -168,6 +176,14 @@
         "EGP": [
             "EGP",
             "libra egípcia"
+        ],
+        "ERN": [
+            "ERN",
+            "nakfa eritreia"
+        ],
+        "ETB": [
+            "ETB",
+            "birr etíope"
         ],
         "EUR": [
             "€",
@@ -187,7 +203,7 @@
         ],
         "GHS": [
             "GHS",
-            "Cedi de Gana"
+            "cedi ganês"
         ],
         "GIP": [
             "GIP",
@@ -195,11 +211,11 @@
         ],
         "GMD": [
             "GMD",
-            "Dalasi da Gâmbia"
+            "dalasi gambiano"
         ],
         "GNF": [
             "GNF",
-            "Franco guineense"
+            "franco guineense"
         ],
         "GTQ": [
             "GTQ",
@@ -221,13 +237,25 @@
             "HUF",
             "forint húngaro"
         ],
+        "ILS": [
+            "₪",
+            "Sheqel novo israelita"
+        ],
         "ISK": [
             "ISK",
             "coroa islandesa"
         ],
+        "KES": [
+            "KES",
+            "xelim queniano"
+        ],
         "KGS": [
             "KGS",
             "Som do Quirguistão"
+        ],
+        "KMF": [
+            "KMF",
+            "franco comoriano"
         ],
         "KYD": [
             "KYD",
@@ -241,9 +269,9 @@
             "LAK",
             "Kip de Laos"
         ],
-        "LKR": [
-            "LKR",
-            "Rupia do Sri Lanka"
+        "LRD": [
+            "LRD",
+            "dólar liberiano"
         ],
         "LTL": [
             "LTL",
@@ -267,7 +295,7 @@
         ],
         "MGA": [
             "MGA",
-            "Ariari de Madagáscar"
+            "ariari malgaxe"
         ],
         "MKD": [
             "MKD",
@@ -281,17 +309,17 @@
             "MNT",
             "Tugrik da Mongólia"
         ],
-        "MOP": [
-            "MOP",
-            "Pataca de Macau"
-        ],
         "MRO": [
             "MRO",
-            "Ouguiya da Mauritânia (1973–2017)"
+            "ouguiya mauritana (1973–2017)"
         ],
         "MRU": [
             "MRU",
-            "Ouguiya da Mauritânia"
+            "ouguiya mauritana"
+        ],
+        "MUR": [
+            "MUR",
+            "rupia mauriciana"
         ],
         "MVR": [
             "MVR",
@@ -299,7 +327,7 @@
         ],
         "MWK": [
             "MWK",
-            "Kwacha do Malawi"
+            "kwacha malauiano"
         ],
         "MXN": [
             "MX$",
@@ -315,7 +343,7 @@
         ],
         "MZN": [
             "MZN",
-            "Metical de Moçambique"
+            "metical moçambicano"
         ],
         "NAD": [
             "NAD",
@@ -378,9 +406,17 @@
             "RUB",
             "rublo russo"
         ],
+        "RWF": [
+            "RWF",
+            "franco ruandês"
+        ],
         "SAR": [
             "SAR",
             "Rial saudita"
+        ],
+        "SCR": [
+            "SCR",
+            "rupia seichelense"
         ],
         "SDG": [
             "SDG",
@@ -394,17 +430,25 @@
             "SGD",
             "Dólar de Singapura"
         ],
+        "SHP": [
+            "SHP",
+            "libra santa-helenense"
+        ],
         "SOS": [
             "SOS",
-            "Xelim somali"
+            "xelim somali"
         ],
         "SRD": [
             "SRD",
             "dólar do Suriname"
         ],
+        "SSP": [
+            "SSP",
+            "libra sul-sudanesa"
+        ],
         "STN": [
             "STN",
-            "São Tomé & Príncipe Dobra (2018)"
+            "dobra de São Tomé e Príncipe"
         ],
         "SZL": [
             "SZL",
@@ -452,15 +496,15 @@
         ],
         "VEF": [
             "VEF",
-            "bolívar"
+            "bolívar (2008–2018)"
         ],
-        "VUV": [
-            "VUV",
-            "Vatu de Vanuatu"
+        "VES": [
+            "VES",
+            "bolívar"
         ],
         "XAF": [
             "FCFA",
-            "Franco CFA (BEAC)"
+            "franco CFA (BEAC)"
         ],
         "XCD": [
             "EC$",

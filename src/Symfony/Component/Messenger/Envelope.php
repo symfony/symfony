@@ -39,7 +39,7 @@ final class Envelope
     }
 
     /**
-     * @return Envelope a new Envelope instance with additional stamp
+     * @return Envelope a new stamped Envelope
      */
     public function stamp(StampInterface ...$stamps): self
     {

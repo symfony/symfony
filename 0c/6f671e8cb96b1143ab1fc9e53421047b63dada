@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-22T20:05:31Z
+
+Maybe we should wait for https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/4045 since it should fix them all at once? WDYT?
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-10-22T20:23:08Z
+
+I wouldn't, as there is no ETA for that feature request.
+Thus, I would suggest to revert the damage first, and then go with ultimate solution when it's ready.

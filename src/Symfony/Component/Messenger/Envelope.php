@@ -41,7 +41,7 @@ final class Envelope
     /**
      * @return Envelope a new Envelope instance with additional stamp
      */
-    public function with(StampInterface ...$stamps): self
+    public function stamp(StampInterface ...$stamps): self
     {
         $cloned = clone $this;
 

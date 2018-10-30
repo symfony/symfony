@@ -102,7 +102,7 @@ class Connection
             $this->setup();
         }
 
-        $this->exchange()->publish($body, null, AMQP_NOPARAM, array('headers' => $headers));
+        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, AMQP_NOPARAM, array('headers' => $headers));
     }
 
     /**

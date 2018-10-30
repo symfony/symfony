@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.20",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Albania Kaukasia",
@@ -43,7 +43,7 @@
         "Grek": "Yunani",
         "Gujr": "Gujarat",
         "Guru": "Gurmukhi",
-        "Hanb": "Hanb",
+        "Hanb": "Han dengan Bopomofo",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hano": "Hanunoo",

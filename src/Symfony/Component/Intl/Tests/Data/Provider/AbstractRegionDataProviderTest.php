@@ -270,6 +270,8 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
         'VU',
         'WF',
         'WS',
+        'XA',
+        'XB',
         'XK',
         'YE',
         'YT',

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.73",
+    "Version": "2.1.43.65",
     "Names": {
         "ace": "acehnés",
         "alt": "altái meridional",
@@ -11,13 +11,18 @@
         "bua": "buriat",
         "dum": "neerlandés medieval",
         "enm": "inglés medieval",
+        "eu": "euskera",
         "frm": "francés medieval",
+        "gan": "gan (China)",
         "gmh": "alemán de la alta edad media",
         "grc": "griego antiguo",
         "gu": "gurayatí",
         "hak": "hak",
+        "hsn": "xiang (China)",
+        "ht": "criollo haitiano",
         "kbd": "kabardiano",
         "krc": "karachay-balkar",
+        "lo": "lao",
         "lus": "lushai",
         "mga": "irlandés medieval",
         "nan": "nan",
@@ -35,6 +40,7 @@
         "tet": "tetún",
         "tn": "setchwana",
         "tyv": "tuviniano",
+        "tzm": "tamazight del Atlas Central",
         "wo": "wolof",
         "wuu": "wuu",
         "xal": "kalmyk"

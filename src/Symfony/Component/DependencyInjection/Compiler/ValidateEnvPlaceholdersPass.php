@@ -48,7 +48,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             foreach ($resolvingBag->getEnvPlaceholders() + $resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
                 $values = array();
                 if (false === $i = strpos($env, ':')) {
-                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : null;
+                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : self::$typeFixtures['string'];
                     $defaultType = null !== $default ? self::getType($default) : 'string';
                     $values[$defaultType] = $default;
                 } else {

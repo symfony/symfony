@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.88",
     "Names": {
         "ADP": [
             "ADP",
@@ -961,6 +961,10 @@
             "UYU",
             "peso uruguayo"
         ],
+        "UYW": [
+            "UYW",
+            "unidad previsional uruguayo"
+        ],
         "UZS": [
             "UZS",
             "sum"
@@ -971,6 +975,10 @@
         ],
         "VEF": [
             "VEF",
+            "bolívar venezolano (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "bolívar venezolano"
         ],
         "VND": [

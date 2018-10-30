@@ -1,0 +1,14 @@
+{
+    "Version": "2.1.44.15",
+    "Names": {
+        "Arab": "Arab",
+        "Cyrl": "Sirilik",
+        "Hani": "Han",
+        "Hant": "Tradhisional",
+        "Jpan": "Jepang",
+        "Kore": "Korea",
+        "Latn": "Latin",
+        "Zxxx": "Ora Ketulis",
+        "Zzzz": "Skrip Ora Dikenali"
+    }
+}

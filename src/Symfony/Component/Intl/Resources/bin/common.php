@@ -55,7 +55,7 @@ function run($command)
 
 function get_icu_version_from_genrb($genrb)
 {
-    exec($genrb.' --version 2>&1', $output, $status);
+    exec($genrb.' --version - 2>&1', $output, $status);
 
     if (0 !== $status) {
         bailout($genrb.' failed.');

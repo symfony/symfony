@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.39",
+    "Version": "2.1.43.65",
     "Names": {
         "AMD": [
             "AMD",
@@ -17,17 +17,45 @@
             "EUR",
             "euro"
         ],
+        "MYR": [
+            "MYR",
+            "ringgit malayo"
+        ],
         "THB": [
             "THB",
-            "bat"
+            "baht tailandes"
         ],
         "USD": [
             "USD",
             "dólar estadounidense"
         ],
+        "UZS": [
+            "UZS",
+            "som uzbeko"
+        ],
+        "VEF": [
+            "VEF",
+            "bolívar venezolano"
+        ],
+        "VES": [
+            "VES",
+            "VES"
+        ],
         "VND": [
             "VND",
             "dong"
+        ],
+        "XAF": [
+            "XAF",
+            "franco CFA BEAC"
+        ],
+        "XOF": [
+            "XOF",
+            "franco CFA BCEAO"
+        ],
+        "ZMW": [
+            "ZMW",
+            "kuacha zambiano"
         ]
     }
 }

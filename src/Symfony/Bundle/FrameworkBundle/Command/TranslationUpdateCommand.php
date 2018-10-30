@@ -189,7 +189,7 @@ EOF
                 }
 
                 if (!is_dir($transPaths[0]) && !isset($transPaths[1])) {
-                    throw new InvalidArgumentException(sprintf('<error>"%s" is neither an enabled bundle nor a directory.</error>', $transPaths[0]));
+                    throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         }

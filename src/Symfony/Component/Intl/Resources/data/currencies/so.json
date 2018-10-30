@@ -1,9 +1,177 @@
 {
-    "Version": "2.1.38.69",
+    "Version": "2.1.43.94",
     "Names": {
+        "AED": [
+            "AED",
+            "Dirhamka Isutaga Imaaraatka Carabta"
+        ],
+        "AFN": [
+            "AFN",
+            "Afgan Afgan"
+        ],
+        "ALL": [
+            "ALL",
+            "Lek Albaniya"
+        ],
+        "AMD": [
+            "AMD",
+            "Daraamka Armeniya"
+        ],
+        "ANG": [
+            "ANG",
+            "Galdar Nadarland Antilean"
+        ],
+        "AOA": [
+            "AOA",
+            "Kawansada Angola"
+        ],
+        "ARS": [
+            "ARS",
+            "Beeso Arjentina"
+        ],
+        "AUD": [
+            "A$",
+            "Doolarka Awstaraaliya"
+        ],
+        "AWG": [
+            "AWG",
+            "Foloorin Aruban"
+        ],
+        "AZN": [
+            "AZN",
+            "Manaatada Asarbeyjan"
+        ],
+        "BAM": [
+            "BAM",
+            "Konfatibal Maak Bosnia-Hersogofina"
+        ],
+        "BBD": [
+            "DBB",
+            "Doolarka Barbaadiyaanka"
+        ],
+        "BDT": [
+            "BDT",
+            "Taka Bangledesh"
+        ],
+        "BGN": [
+            "BGN",
+            "Lef Bulgariya"
+        ],
+        "BHD": [
+            "BHD",
+            "Dinaarka Baxreyn"
+        ],
+        "BIF": [
+            "BIF",
+            "Farank Burundi"
+        ],
+        "BMD": [
+            "BMD",
+            "Doolarka Barmuuda"
+        ],
+        "BND": [
+            "BND",
+            "Doollarka Burunel"
+        ],
+        "BOB": [
+            "BOB",
+            "Bolifiano Bolifiya"
+        ],
+        "BRL": [
+            "R$",
+            "Real Barasil"
+        ],
+        "BSD": [
+            "DBS",
+            "Doolarka Bahamaas"
+        ],
+        "BTN": [
+            "BTN",
+            "Ngultaram Butan"
+        ],
+        "BWP": [
+            "BWP",
+            "Buulada Botswana"
+        ],
+        "BYN": [
+            "BYN",
+            "Rubalka Belarus"
+        ],
+        "BZD": [
+            "BZD",
+            "Doolarka Beelisa"
+        ],
+        "CAD": [
+            "CA$",
+            "Doolarka Kanada"
+        ],
+        "CDF": [
+            "CDF",
+            "Farank Kongo"
+        ],
+        "CHF": [
+            "CHF",
+            "Farank Iswis"
+        ],
+        "CLP": [
+            "CLP",
+            "Beeso Jili"
+        ],
+        "CNH": [
+            "CNH",
+            "Yuanta Shiinaha (Offshore)"
+        ],
+        "CNY": [
+            "CN¥",
+            "Yuanta Shiinaha"
+        ],
+        "COP": [
+            "COP",
+            "Beeso Kolombiya"
+        ],
+        "CRC": [
+            "KKR",
+            "Kolon Kosta Rika"
+        ],
+        "CUC": [
+            "CUC",
+            "Beeso Kuuba Konfatibal"
+        ],
+        "CUP": [
+            "CUP",
+            "Beeso Kuuba"
+        ],
+        "CVE": [
+            "CVE",
+            "Eskudo Keyb Farde"
+        ],
+        "CZK": [
+            "CZK",
+            "Korunada Jeek"
+        ],
         "DJF": [
             "DJF",
             "Faran Jabbuuti"
+        ],
+        "DKK": [
+            "DKK",
+            "Koranka Danishka"
+        ],
+        "DOP": [
+            "DOP",
+            "Beeso Dominika"
+        ],
+        "DZD": [
+            "DZD",
+            "Dinaarka Aljeriya"
+        ],
+        "EGP": [
+            "EGP",
+            "Bowndka Masar"
+        ],
+        "ERN": [
+            "ERN",
+            "Nafkada Eritriya"
         ],
         "ETB": [
             "ETB",
@@ -13,21 +181,453 @@
             "€",
             "Yuuroo"
         ],
+        "FJD": [
+            "FJD",
+            "Doolarka Fiji"
+        ],
+        "FKP": [
+            "FKP",
+            "Bowndka Faalkland Island"
+        ],
+        "GBP": [
+            "£",
+            "Bowndka Biritishka"
+        ],
+        "GEL": [
+            "GEL",
+            "Laariga Joorjiya"
+        ],
+        "GHS": [
+            "GHS",
+            "Sedi Gana"
+        ],
+        "GIP": [
+            "GIP",
+            "Bowndka Gibraltar"
+        ],
+        "GMD": [
+            "GMD",
+            "Dalasi Gambiya"
+        ],
+        "GNF": [
+            "GNF",
+            "Faranka Gini"
+        ],
+        "GTQ": [
+            "GTQ",
+            "Quetsal Guatemala"
+        ],
+        "GYD": [
+            "GYD",
+            "Doolarka Guyanes"
+        ],
+        "HKD": [
+            "HK$",
+            "Doollarka Hong Kong"
+        ],
+        "HNL": [
+            "LHN",
+            "Lembira Hondura"
+        ],
+        "HRK": [
+            "HRK",
+            "Kuna Korooshiya"
+        ],
+        "HTG": [
+            "HTG",
+            "Goorde Haiti"
+        ],
+        "HUF": [
+            "HUF",
+            "Forintiska Hangari"
+        ],
+        "IDR": [
+            "IDR",
+            "Rubiah Indonesiya"
+        ],
+        "ILS": [
+            "₪",
+            "Niyuu Shekelka Israaiil"
+        ],
+        "INR": [
+            "₹",
+            "Rubiga Hindiya"
+        ],
+        "IQD": [
+            "IQD",
+            "Dinaarka Ciraaq"
+        ],
+        "IRR": [
+            "IRR",
+            "Riyaalka Iran"
+        ],
+        "ISK": [
+            "ISK",
+            "Korona Eysland"
+        ],
+        "JMD": [
+            "JMD",
+            "Doolarka Jamaaika"
+        ],
+        "JOD": [
+            "JOD",
+            "Dinaarka Joordan"
+        ],
+        "JPY": [
+            "JP¥",
+            "Yenta Jaban"
+        ],
+        "KES": [
+            "KES",
+            "Shilingka Kenya"
+        ],
+        "KGS": [
+            "KGS",
+            "Soom Kiyrgiystan"
+        ],
+        "KHR": [
+            "KHR",
+            "Riyf Cambodiya"
+        ],
+        "KMF": [
+            "KMF",
+            "Farank Komora"
+        ],
+        "KPW": [
+            "KPW",
+            "Wonka Waqooyi Kuuriya"
+        ],
+        "KRW": [
+            "₩",
+            "Wonka Koonfur Kuuriya"
+        ],
+        "KWD": [
+            "KWD",
+            "Dinaarka Kuweyt"
+        ],
+        "KYD": [
+            "KYD",
+            "Doolarka jasiiradaha Kayman"
+        ],
+        "KZT": [
+            "KZT",
+            "Tenge Kasakhstan"
+        ],
+        "LAK": [
+            "LAK",
+            "Kib Laoti"
+        ],
+        "LBP": [
+            "LBP",
+            "Bowndka Lebanon"
+        ],
+        "LKR": [
+            "LKR",
+            "Rubiga Siri lanka"
+        ],
+        "LRD": [
+            "LRD",
+            "Doollarka Liberiya"
+        ],
+        "LYD": [
+            "LYD",
+            "Dinaarka Libya"
+        ],
+        "MAD": [
+            "MAD",
+            "Dirhamka Moroko"
+        ],
+        "MDL": [
+            "MDL",
+            "Leeyuu Moldofa"
+        ],
+        "MGA": [
+            "MGA",
+            "Ariari Malagasy"
+        ],
+        "MKD": [
+            "MKD",
+            "Denaarka Masedoniya"
+        ],
+        "MMK": [
+            "MMK",
+            "Kayat Mayanmaar"
+        ],
+        "MNT": [
+            "MNT",
+            "Tugrik Mongoliya"
+        ],
+        "MOP": [
+            "MOP",
+            "Bataka Makana"
+        ],
+        "MRO": [
+            "MRO",
+            "Oogiya Mawritaniya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
+            "MRU"
+        ],
+        "MUR": [
+            "MUR",
+            "Rubiga Mowrishiya"
+        ],
+        "MVR": [
+            "MVR",
+            "Rufiya Maldifiya"
+        ],
+        "MWK": [
+            "MWK",
+            "Kawajada Malawi"
+        ],
+        "MXN": [
+            "MX$",
+            "Beeso Meksikaan"
+        ],
+        "MYR": [
+            "MYR",
+            "Ringit Malayshiya"
+        ],
+        "MZN": [
+            "MZN",
+            "Metikalka Mosambik"
+        ],
+        "NAD": [
+            "NAD",
+            "Doollarka Namibiya"
+        ],
+        "NGN": [
+            "NGN",
+            "Nairada Neyjeeriya"
+        ],
+        "NIO": [
+            "NIO",
+            "Nikaragua Kordoba"
+        ],
+        "NOK": [
+            "NOK",
+            "Koronka Norway"
+        ],
+        "NPR": [
+            "NPR",
+            "Rubiga Nebal"
+        ],
+        "NZD": [
+            "NZ$",
+            "Doolarka Niyuu Siyalaan"
+        ],
+        "OMR": [
+            "OMR",
+            "Riyaalka Comaan"
+        ],
+        "PAB": [
+            "PAB",
+            "Balboa Panama"
+        ],
+        "PEN": [
+            "PEN",
+            "Sol Beeru"
+        ],
+        "PGK": [
+            "PGK",
+            "Kinada Babua Niyuu Gini"
+        ],
+        "PHP": [
+            "PHP",
+            "Biso Filibin"
+        ],
+        "PKR": [
+            "PKR",
+            "Rubiga Bakistan"
+        ],
+        "PLN": [
+            "PLN",
+            "Solotida Boland"
+        ],
+        "PYG": [
+            "PYG",
+            "Guarani Baraguay"
+        ],
+        "QAR": [
+            "QAR",
+            "Riyaalka Qatar"
+        ],
+        "RON": [
+            "RON",
+            "Liyuu ROmaniya"
+        ],
+        "RSD": [
+            "RSD",
+            "Dinaarka Serbiya"
+        ],
+        "RUB": [
+            "RUB",
+            "Rubalka Ruush"
+        ],
+        "RWF": [
+            "RWF",
+            "Farank Ruwanda"
+        ],
         "SAR": [
             "SAR",
             "Riyaalka Sacuudiga"
         ],
+        "SBD": [
+            "SBD",
+            "Doolarka Jasiiradaha Solomon"
+        ],
+        "SCR": [
+            "SCR",
+            "Rubiga Siisalis"
+        ],
+        "SDG": [
+            "SDG",
+            "Bowndka Suudaan"
+        ],
+        "SEK": [
+            "SEK",
+            "Koronka Isweden"
+        ],
+        "SGD": [
+            "SGD",
+            "Doollarka Singabuur"
+        ],
+        "SHP": [
+            "SHP",
+            "Bowndka St Helen"
+        ],
+        "SLL": [
+            "SLL",
+            "Leonka Sira Leon"
+        ],
         "SOS": [
             "S",
-            "Shilin soomaali"
+            "Shilingka Soomaaliya"
+        ],
+        "SRD": [
+            "SRD",
+            "Doolarka Surinamees"
+        ],
+        "SSP": [
+            "SSP",
+            "Boownka Koonfurta Suudaan"
+        ],
+        "STN": [
+            "STN",
+            "Dobra Sao Tome & Birinsibal"
+        ],
+        "SYP": [
+            "SYP",
+            "Bowndka Suuriya"
+        ],
+        "SZL": [
+            "SZL",
+            "Lilangeenida iswasi"
+        ],
+        "THB": [
+            "THB",
+            "Baatka Tayland"
+        ],
+        "TJS": [
+            "TJS",
+            "Somoon Tajikistan"
+        ],
+        "TMT": [
+            "TMT",
+            "Manaat Turkmenistan"
+        ],
+        "TND": [
+            "TND",
+            "Dinaarka Tunisiya"
+        ],
+        "TOP": [
+            "TOP",
+            "Ba’anga Tonga"
+        ],
+        "TRY": [
+            "TRY",
+            "Liirada Turkiga"
+        ],
+        "TTD": [
+            "TTD",
+            "Doolarka Tirinad iyo Tobago"
+        ],
+        "TWD": [
+            "NT$",
+            "Doollarka Taywaanta Cusubta"
         ],
         "TZS": [
             "TZS",
-            "Shilin Tansaani"
+            "Shilingka Tansaaniya"
+        ],
+        "UAH": [
+            "UAH",
+            "Hirfiniyada Yukreeyn"
+        ],
+        "UGX": [
+            "UGX",
+            "Shilingka Uganda"
         ],
         "USD": [
             "US$",
-            "Doollar maraykan"
+            "USD"
+        ],
+        "UYU": [
+            "UYU",
+            "Beeso Uruguay"
+        ],
+        "UZS": [
+            "UZS",
+            "Soom Usbekistan"
+        ],
+        "VEF": [
+            "VEF",
+            "Bolifar Fenesuala (2008–2018)"
+        ],
+        "VES": [
+            "VES",
+            "Bolifar Fenezuela"
+        ],
+        "VND": [
+            "₫",
+            "Dong Fitnaam"
+        ],
+        "VUV": [
+            "VUV",
+            "Fatu Fanuatu"
+        ],
+        "WST": [
+            "WST",
+            "Tala Samao"
+        ],
+        "XAF": [
+            "FCFA",
+            "Farank CFA ee Bartamaha Afrika"
+        ],
+        "XCD": [
+            "EC$",
+            "Doolaraka Bariga Kaaribyan"
+        ],
+        "XOF": [
+            "CFA",
+            "Faranka CFA Galbeedka Afrika"
+        ],
+        "XPF": [
+            "CFPF",
+            "Farank CFP"
+        ],
+        "YER": [
+            "YER",
+            "Riyaalka Yemen"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Randka Koonfur Afrika"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Kawajada Sambiya"
         ]
     }
 }

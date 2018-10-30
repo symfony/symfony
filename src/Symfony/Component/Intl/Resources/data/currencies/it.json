@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.44.86",
     "Names": {
         "ADP": [
             "ADP",
@@ -832,7 +832,7 @@
         ],
         "STN": [
             "STN",
-            "dobra di Sao Tomé e Principe"
+            "dobra di Sao Tomé e Príncipe"
         ],
         "SUR": [
             "SUR",
@@ -952,6 +952,10 @@
         ],
         "VEF": [
             "VEF",
+            "bolívar venezuelano (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "bolívar venezuelano"
         ],
         "VND": [

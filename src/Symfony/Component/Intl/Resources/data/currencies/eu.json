@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "AED": [
             "AED",
@@ -540,7 +540,7 @@
         ],
         "STN": [
             "STN",
-            "Sao Tomeko eta Principeko dobra"
+            "Sao Tome eta Principeko dobra"
         ],
         "SYP": [
             "SYP",
@@ -608,6 +608,10 @@
         ],
         "VEF": [
             "VEF",
+            "Venezuelako bolivarra (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Venezuelako bolivarra"
         ],
         "VND": [

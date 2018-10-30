@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "AC": "Ascension-sziget",
         "AD": "Andorra",
@@ -76,7 +76,7 @@
         "FJ": "Fidzsi",
         "FK": "Falkland-szigetek",
         "FM": "Mikronézia",
-        "FO": "Feröer-szigetek",
+        "FO": "Feröer szigetek",
         "FR": "Franciaország",
         "GA": "Gabon",
         "GB": "Egyesült Királyság",
@@ -244,7 +244,7 @@
         "VE": "Venezuela",
         "VG": "Brit Virgin-szigetek",
         "VI": "Amerikai Virgin-szigetek",
-        "VN": "Vietnam",
+        "VN": "Vietnám",
         "VU": "Vanuatu",
         "WF": "Wallis és Futuna",
         "WS": "Szamoa",

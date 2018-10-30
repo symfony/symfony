@@ -303,14 +303,13 @@ class Command
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
+        $this->applicationDefinitionMerged = true;
+
         if ($mergeArgs) {
             $currentArguments = $this->definition->getArguments();
             $this->definition->setArguments($this->application->getDefinition()->getArguments());
             $this->definition->addArguments($currentArguments);
-        }
 
-        $this->applicationDefinitionMerged = true;
-        if ($mergeArgs) {
             $this->applicationDefinitionMergedWithArgs = true;
         }
     }

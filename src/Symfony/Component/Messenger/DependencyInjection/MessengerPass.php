@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -22,7 +23,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\ChainHandler;
 use Symfony\Component\Messenger\Handler\Locator\ContainerHandlerLocator;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
-use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -38,15 +38,13 @@ class MessengerPass implements CompilerPassInterface
     private $busTag;
     private $senderTag;
     private $receiverTag;
-    private $debugStopwatchId;
 
-    public function __construct(string $handlerTag = 'messenger.message_handler', string $busTag = 'messenger.bus', string $senderTag = 'messenger.sender', string $receiverTag = 'messenger.receiver', string $debugStopwatchId = 'debug.stopwatch')
+    public function __construct(string $handlerTag = 'messenger.message_handler', string $busTag = 'messenger.bus', string $senderTag = 'messenger.sender', string $receiverTag = 'messenger.receiver')
     {
         $this->handlerTag = $handlerTag;
         $this->busTag = $busTag;
         $this->senderTag = $senderTag;
         $this->receiverTag = $receiverTag;
-        $this->debugStopwatchId = $debugStopwatchId;
     }
 
     /**
@@ -306,7 +304,6 @@ class MessengerPass implements CompilerPassInterface
 
     private function registerBusMiddleware(ContainerBuilder $container, string $busId, array $middlewareCollection)
     {
-        $debug = $container->getParameter('kernel.debug') && $container->has($this->debugStopwatchId);
         $middlewareReferences = array();
         foreach ($middlewareCollection as $middlewareItem) {
             $id = $middlewareItem['id'];
@@ -319,7 +316,7 @@ class MessengerPass implements CompilerPassInterface
                 throw new RuntimeException(sprintf('Invalid middleware "%s": define such service to be able to use it.', $id));
             }
 
-            if ($isDefinitionAbstract = ($definition = $container->findDefinition($messengerMiddlewareId))->isAbstract()) {
+            if (($definition = $container->findDefinition($messengerMiddlewareId))->isAbstract()) {
                 $childDefinition = new ChildDefinition($messengerMiddlewareId);
                 $count = \count($definition->getArguments());
                 foreach (array_values($arguments ?? array()) as $key => $argument) {
@@ -333,24 +330,9 @@ class MessengerPass implements CompilerPassInterface
                 throw new RuntimeException(sprintf('Invalid middleware factory "%s": a middleware factory must be an abstract definition.', $id));
             }
 
-            if ($debug) {
-                $container->register($debugMiddlewareId = '.messenger.debug.traced.'.$messengerMiddlewareId, TraceableMiddleware::class)
-                    // Decorates with a high priority so it's applied the earliest:
-                    ->setDecoratedService($messengerMiddlewareId, null, 100)
-                    ->setArguments(array(
-                        new Reference($debugMiddlewareId.'.inner'),
-                        new Reference($this->debugStopwatchId),
-                        // In case the definition isn't abstract,
-                        // we cannot be sure the service instance is used by one bus only.
-                        // So we only inject the bus name when the original definition is abstract.
-                        $isDefinitionAbstract ? $busId : null,
-                    ))
-                ;
-            }
-
             $middlewareReferences[] = new Reference($messengerMiddlewareId);
         }
 
-        $container->getDefinition($busId)->replaceArgument(0, $middlewareReferences);
+        $container->getDefinition($busId)->replaceArgument(0, new IteratorArgument($middlewareReferences));
     }
 }

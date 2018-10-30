@@ -1542,9 +1542,13 @@ class FrameworkExtension extends Extension
             }
 
             foreach ($middleware as $middlewareItem) {
-                if (!$validationConfig['enabled'] && 'messenger.middleware.validation' === $middlewareItem['id']) {
+                if (!$validationConfig['enabled'] && \in_array($middlewareItem['id'], array('validation', 'messenger.middleware.validation'), true)) {
                     throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
                 }
+            }
+
+            if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
+                array_unshift($middleware, array('id' => 'traceable', 'arguments' => array($busId)));
             }
 
             $container->setParameter($busId.'.middleware', $middleware);

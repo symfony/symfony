@@ -54,12 +54,12 @@ class Filesystem
 
         if ($doCopy) {
             // https://bugs.php.net/bug.php?id=64634
-            if (false === $source = @fopen($originFile, 'rb')) {
+            if (false === $source = @fopen($originFile, 'r')) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading.', $originFile, $targetFile), 0, null, $originFile);
             }
 
             // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
-            if (false === $target = @fopen($targetFile, 'wb', null, stream_context_create(array('ftp' => array('overwrite' => true))))) {
+            if (false === $target = @fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))))) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing.', $originFile, $targetFile), 0, null, $originFile);
             }
 
@@ -647,7 +647,7 @@ class Filesystem
 
             // Use fopen instead of file_exists as some streams do not support stat
             // Use mode 'x+' to atomically check existence and create to avoid a TOCTOU vulnerability
-            $handle = @fopen($tmpFile, 'x+b');
+            $handle = @fopen($tmpFile, 'x+');
 
             // If unsuccessful restart the loop
             if (false === $handle) {

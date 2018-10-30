@@ -782,7 +782,7 @@ class YamlFileLoader extends FileLoader
     {
         if ($this->isLoadingInstanceof) {
             $keywords = self::$instanceofKeywords;
-        } elseif ($throw = (isset($definition['resource']) || isset($definition['namespace']))) {
+        } elseif (isset($definition['resource']) || isset($definition['namespace'])) {
             $keywords = self::$prototypeKeywords;
         } else {
             $keywords = self::$serviceKeywords;

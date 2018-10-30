@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -30,7 +31,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider getAuthenticationExceptionProvider
      */
-    public function testAuthenticationExceptionWithoutEntryPoint(\Exception $exception, \Exception $eventException = null)
+    public function testAuthenticationExceptionWithoutEntryPoint(\Exception $exception, \Exception $eventException)
     {
         $event = $this->createEvent($exception);
 
@@ -38,7 +39,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException());
+        $this->assertEquals($eventException, $event->getException());
     }
 
     /**
@@ -63,11 +64,11 @@ class ExceptionListenerTest extends TestCase
     public function getAuthenticationExceptionProvider()
     {
         return array(
-            array(new AuthenticationException()),
-            array(new \LogicException('random', 0, $e = new AuthenticationException()), $e),
-            array(new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AuthenticationException())), $e),
-            array(new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AccessDeniedException())), $e),
-            array(new AuthenticationException('random', 0, new \LogicException())),
+            array($e = new AuthenticationException(), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, array(), 0)),
+            array(new \LogicException('random', 0, $e = new AuthenticationException()), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, array(), 0)),
+            array(new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AuthenticationException())), new HttpException(Response::HTTP_UNAUTHORIZED, 'embed', $e, array(), 0)),
+            array(new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AccessDeniedException())), new HttpException(Response::HTTP_UNAUTHORIZED, 'embed', $e, array(), 0)),
+            array($e = new AuthenticationException('random', 0, new \LogicException()), new HttpException(Response::HTTP_UNAUTHORIZED, 'random', $e, array(), 0)),
         );
     }
 

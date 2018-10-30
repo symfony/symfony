@@ -30,7 +30,6 @@ matrix:
         - php: 7.2
           env: deps=low
         - php: 7.3
-          env: deps=low
 
     fast_finish: true
 

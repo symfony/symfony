@@ -75,7 +75,7 @@ class KernelTest extends TestCase
         $kernel->boot();
 
         $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
-        $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/FixturesSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
+        $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/TestsSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileNotExists($containerDir.'.legacy');
 
@@ -312,7 +312,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $this->assertEquals('HttpKernel', $kernel->getName());
+        $this->assertEquals('Fixtures', $kernel->getName());
     }
 
     /**
@@ -533,14 +533,14 @@ EOF;
 
         $containerClass = \get_class($kernel->getContainer());
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
-        unlink(__DIR__.'/Fixtures/var/cache/custom/FixturesSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
+        unlink(__DIR__.'/Fixtures/var/cache/custom/TestsSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
         $this->assertInstanceOf($containerClass, $kernel->getContainer());
         $this->assertFileExists($containerFile);
-        unlink(__DIR__.'/Fixtures/var/cache/custom/FixturesSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
+        unlink(__DIR__.'/Fixtures/var/cache/custom/TestsSymfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
         $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();

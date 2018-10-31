@@ -63,7 +63,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     if (file_exists("phpunit-$PHPUNIT_VERSION")) {
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
     }
-    if (extension_loaded('openssl') && ini_get('allow_url_fopen') && !isset($_SERVER['http_proxy']) && !isset($_SERVER['https_proxy'])) {
+    if (extension_loaded('openssl') && filter_var(ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN) && !isset($_SERVER['http_proxy']) && !isset($_SERVER['https_proxy'])) {
         $remoteZip = "https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip";
         $remoteZipStream = @fopen($remoteZip, 'rb');
         if (!$remoteZipStream) {
@@ -214,7 +214,7 @@ if ($components) {
             // STATUS_STACK_BUFFER_OVERRUN (-1073740791/0xC0000409)
             // STATUS_ACCESS_VIOLATION (-1073741819/0xC0000005)
             // STATUS_HEAP_CORRUPTION (-1073740940/0xC0000374)
-            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !ini_get('apc.enable_cli') || !in_array($procStatus, array(-1073740791, -1073741819, -1073740940)))) {
+            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN) || !in_array($procStatus, array(-1073740791, -1073741819, -1073740940)))) {
                 $exit = $procStatus;
                 echo "\033[41mKO\033[0m $component\n\n";
             } else {

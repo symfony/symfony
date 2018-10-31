@@ -34,7 +34,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->method('getManager')->willReturn($this->entityManager);
 
-        $this->middleware = new DoctrineTransactionMiddleware($managerRegistry, null);
+        $this->middleware = new DoctrineTransactionMiddleware($managerRegistry);
     }
 
     public function testMiddlewareWrapsInTransactionAndFlushes()

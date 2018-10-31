@@ -125,6 +125,28 @@ HttpKernel
 FrameworkBundle
 ---------------
 
+ * The `allow_no_handler` middleware has been removed. Use `framework.messenger.buses.[bus_id].default_middleware` instead:
+
+   Before:
+   ```yaml
+   framework:
+       messenger:
+           buses:
+               messenger.bus.events:
+                   middleware:
+                     - allow_no_handler
+   ```
+
+   After:
+   ```yaml
+   framework:
+       messenger:
+           buses:
+               messenger.bus.events:
+                   default_middleware: allow_no_handlers
+   ```
+
+ * The `messenger:consume-messages` command expects a mandatory `--bus` option value if you have more than one bus configured.
  * The `framework.router.utf8` configuration option has been added. If your app's charset
    is UTF-8 (see kernel's `getCharset()` method), it is recommended to set it to `true`:
    this will generate 404s for non-UTF-8 URLs, which are incompatible with you app anyway,
@@ -161,8 +183,66 @@ FrameworkBundle
 Messenger
 ---------
 
- * `EnvelopeItemInterface` doesn't extend `Serializable` anymore
- * The `handle` method of the `Symfony\Component\Messenger\Middleware\ValidationMiddleware` and `Symfony\Component\Messenger\Asynchronous\Middleware\SendMessageMiddleware` middlewares now requires an `Envelope` object to be given (because they implement the `EnvelopeAwareInterface`). When using these middleware with the provided `MessageBus`, you will not have to do anything. If you use the middlewares any other way, you can use `Envelope::wrap($message)` to create an envelope for your message.
+ * The `MiddlewareInterface::handle()` and `SenderInterface::send()` methods must now return an `Envelope` instance.
+ * The return value of handlers is ignored. If you used to return a value, e.g in query bus handlers, you can either:
+    - make your `Query` mutable to allow setting & getting a result:
+      ```php
+      // When dispatching:
+      $bus->dispatch($query = new Query());
+      $result = $query->getResult();
+
+      // In your handler:
+      $query->setResult($yourResult);
+      ```
+    - define a callable on your `Query` to be called in your handler:
+      ```php
+      // When dispatching:
+      $bus->dispatch(new Query([$this, 'onResult']));
+
+      // In your handler:
+      $query->executeCallback($yourResult);
+      ```
+
+ * The `EnvelopeAwareInterface` was removed and the `MiddlewareInterface::handle()` method now requires an `Envelope` object
+   as first argument. When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
+   If you use your own `MessageBusInterface` implementation, you must wrap the message in an `Envelope` before passing it to middleware.  
+   If you created your own middleware, you must change the signature to always expect an `Envelope`.
+ * The `MiddlewareInterface::handle()` second argument (`callable $next`) has changed in favor of a `StackInterface` instance.
+   When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
+   If you use your own `MessageBusInterface` implementation, you can use the `StackMiddleware` implementation.  
+   If you created your own middleware, you must change the signature to always expect an `StackInterface` instance
+   and call `$stack->next()->handle($envelope, $stack)` instead of `$next` to call the next middleware:
+   
+   Before:
+   ```php
+   public function handle($message, callable $next): Envelope
+   {
+       // do something before
+       $message = $next($message);
+       // do something after
+    
+       return $message;
+   }
+   ```
+
+   After:
+   ```php
+   public function handle(Envelope $envelope, StackInterface $stack): Envelope
+   {
+       // do something before
+       $envelope = $stack->next()->handle($envelope, $stack);
+       // do something after
+    
+       return $envelope;
+   }
+   ```
+ * `StampInterface` replaces `EnvelopeItemInterface` and doesn't extend `Serializable` anymore.
+    Built-in `ReceivedMessage`, `ValidationConfiguration` and `SerializerConfiguration` were renamed
+    respectively `ReceivedStamp`, `ValidationStamp`, `SerializerStamp` and moved to the `Stamp` namespace.
+ * `AllowNoHandlerMiddleware` has been removed in favor of a new constructor argument on `HandleMessageMiddleware`
+ * The `ConsumeMessagesCommand` class now takes an instance of `Psr\Container\ContainerInterface`
+    as first constructor argument, i.e a message bus locator. The CLI command now expects a mandatory 
+    `--bus` option value if there is more than one bus in the locator.
  * `MessageSubscriberInterface::getHandledMessages()` return value has changed. The value of an array item
    needs to be an associative array or the method name.
 

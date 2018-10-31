@@ -34,6 +34,7 @@
         </service>
 
         <service id="messenger.middleware.traceable" class="Symfony\Component\Messenger\Middleware\TraceableMiddleware" abstract="true">
+            <argument type="string" /> <!-- Bus name -->
             <argument type="service" id="debug.stopwatch" />
         </service>
 

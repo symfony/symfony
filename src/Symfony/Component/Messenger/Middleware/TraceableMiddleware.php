@@ -21,14 +21,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class TraceableMiddleware implements MiddlewareInterface
 {
-    private $stopwatch;
     private $busName;
+    private $stopwatch;
     private $eventCategory;
 
-    public function __construct(Stopwatch $stopwatch, string $busName, string $eventCategory = 'messenger.middleware')
+    public function __construct(string $busName, Stopwatch $stopwatch, string $eventCategory = 'messenger.middleware')
     {
-        $this->stopwatch = $stopwatch;
         $this->busName = $busName;
+        $this->stopwatch = $stopwatch;
         $this->eventCategory = $eventCategory;
     }
 
@@ -37,7 +37,7 @@ class TraceableMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $stack = new TraceableStack($stack, $this->stopwatch, $this->busName, $this->eventCategory);
+        $stack = new TraceableStack($stack, $this->busName, $this->stopwatch, $this->eventCategory);
 
         try {
             return $stack->next()->handle($envelope, $stack);
@@ -53,16 +53,16 @@ class TraceableMiddleware implements MiddlewareInterface
 class TraceableStack implements StackInterface
 {
     private $stack;
-    private $stopwatch;
     private $busName;
+    private $stopwatch;
     private $eventCategory;
     private $currentEvent;
 
-    public function __construct(StackInterface $stack, Stopwatch $stopwatch, string $busName, string $eventCategory)
+    public function __construct(StackInterface $stack, string $busName, Stopwatch $stopwatch, string $eventCategory)
     {
         $this->stack = $stack;
-        $this->stopwatch = $stopwatch;
         $this->busName = $busName;
+        $this->stopwatch = $stopwatch;
         $this->eventCategory = $eventCategory;
     }
 

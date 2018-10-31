@@ -56,7 +56,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
             )
         ;
 
-        $traced = new TraceableMiddleware($stopwatch, $busId);
+        $traced = new TraceableMiddleware($busId, $stopwatch);
 
         $traced->handle($envelope, new StackMiddleware(new \ArrayIterator(array(null, $middleware))));
     }
@@ -87,7 +87,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
             ->with($this->matches('"%sMiddlewareInterface%s" on "command_bus"'))
         ;
 
-        $traced = new TraceableMiddleware($stopwatch, $busId);
+        $traced = new TraceableMiddleware($busId, $stopwatch);
         $traced->handle(new Envelope(new DummyMessage('Hello')), new StackMiddleware(new \ArrayIterator(array(null, $middleware))));
     }
 }

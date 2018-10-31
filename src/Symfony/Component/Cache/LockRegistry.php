@@ -25,7 +25,6 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class LockRegistry
 {
-    private static $save;
     private static $openedFiles = array();
     private static $lockedFiles = array();
 
@@ -75,29 +74,43 @@ class LockRegistry
         return $previousFiles;
     }
 
-    public static function compute(ItemInterface $item, callable $callback, CacheInterface $pool)
+    public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool)
     {
         $key = self::$files ? crc32($item->getKey()) % \count(self::$files) : -1;
 
         if ($key < 0 || (self::$lockedFiles[$key] ?? false) || !$lock = self::open($key)) {
-            return $callback($item);
+            return $callback($item, $save);
         }
 
-        try {
-            // race to get the lock in non-blocking mode
-            if (flock($lock, LOCK_EX | LOCK_NB)) {
-                self::$lockedFiles[$key] = true;
+        while (true) {
+            try {
+                // race to get the lock in non-blocking mode
+                if (flock($lock, LOCK_EX | LOCK_NB)) {
+                    self::$lockedFiles[$key] = true;
 
-                return $callback($item);
+                    return $callback($item, $save);
+                }
+                // if we failed the race, retry locking in blocking mode to wait for the winner
+                flock($lock, LOCK_SH);
+            } finally {
+                flock($lock, LOCK_UN);
+                unset(self::$lockedFiles[$key]);
             }
-            // if we failed the race, retry locking in blocking mode to wait for the winner
-            flock($lock, LOCK_SH);
-        } finally {
-            flock($lock, LOCK_UN);
-            unset(self::$lockedFiles[$key]);
-        }
+            static $signalingException, $signalingCallback;
+            $signalingException = $signalingException ?? unserialize("O:9:\"Exception\":1:{s:16:\"\0Exception\0trace\";a:0:{}}");
+            $signalingCallback = $signalingCallback ?? function () use ($signalingException) { throw $signalingException; };
 
-        return $pool->get($item->getKey(), $callback, 0);
+            try {
+                $value = $pool->get($item->getKey(), $signalingCallback, 0);
+                $save = false;
+
+                return $value;
+            } catch (\Exception $e) {
+                if ($signalingException !== $e) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     private static function open(int $key)

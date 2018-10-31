@@ -59,7 +59,11 @@ trait CacheTrait
         }
 
         if ($recompute) {
-            $pool->save($item->set($callback($item)));
+            $save = true;
+            $item->set($callback($item, $save));
+            if ($save) {
+                $pool->save($item);
+            }
         }
 
         return $item->get();

@@ -100,11 +100,7 @@ abstract class IntlGlobals
      */
     public static function getErrorName($code)
     {
-        if (isset(self::$errorCodes[$code])) {
-            return self::$errorCodes[$code];
-        }
-
-        return '[BOGUS UErrorCode]';
+        return self::$errorCodes[$code] ?? '[BOGUS UErrorCode]';
     }
 
     /**

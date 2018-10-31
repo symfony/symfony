@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-30T16:05:34Z
+
+See also https://github.com/symfony/symfony/blob/2cd1e118478d0a57ff8c43ebdd8d6a54c40f5805/src/Symfony/Bundle/FrameworkBundle/Command/AboutCommand.php#L86-L87
+
+https://github.com/symfony/symfony/blob/2cd1e118478d0a57ff8c43ebdd8d6a54c40f5805/src/Symfony/Component/Debug/Debug.php#L48 also maybe
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-30T16:10:17Z
+
+oh wait.. i checked master :) AboutCommand would be for 3.4
+
+---------------------------------------------------------------------------
+
+by deguif at 2018-10-30T16:12:02Z
+
+Yes, will do another PR which will target 3.4 after ;)
+
+---------------------------------------------------------------------------
+
+by deguif at 2018-10-30T16:13:19Z
+
+I'm also going to check every ini_get, I just focused on `opcache` and `apc` for the moment, going to send them ASAP
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-30T16:24:15Z
+
+Cool :) i was curious if this applies to all boolean typed ini directives. I think it does :+1: https://3v4l.org/aYsiU
+
+---------------------------------------------------------------------------
+
+by deguif at 2018-10-30T16:29:02Z
+
+Ok, just added
+- `log_errors`
+- `xcache.cacher`
+- `wincache.ocenabled`
+
+Not sure about `eaccelerator.enable` as it doesn't use the macro `STD_PHP_INI_BOOLEAN`

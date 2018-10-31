@@ -168,6 +168,29 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEmpty($container->getDefinition('child.inner')->getAutowiringTypes());
     }
 
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setPublic(true)
+            ->setTags(array('bar' => array('attr' => 'baz')))
+        ;
+        $container
+            ->register('deco1')
+            ->setDecoratedService('foo', null, 50)
+        ;
+        $container
+            ->register('deco2')
+            ->setDecoratedService('foo', null, 2)
+        ;
+
+        $this->process($container);
+
+        $this->assertEmpty($container->getDefinition('deco1')->getTags());
+        $this->assertEquals(array('bar' => array('attr' => 'baz')), $container->getDefinition('deco2')->getTags());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new DecoratorServicePass();

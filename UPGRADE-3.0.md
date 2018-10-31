@@ -681,7 +681,7 @@ UPGRADE FROM 2.x to 3.0
    As a value for the option you must provide the fully-qualified class name (FQCN)
    now as well.
 
- * The `FormIntegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
+ * The `FormIntegrationTestCase` and `FormPerformanceTestCase` classes were moved from the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
 
  * The constants `ROUND_HALFEVEN`, `ROUND_HALFUP` and `ROUND_HALFDOWN` in class
    `NumberToLocalizedStringTransformer` were renamed to `ROUND_HALF_EVEN`,

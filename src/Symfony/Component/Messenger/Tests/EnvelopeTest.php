@@ -30,6 +30,16 @@ class EnvelopeTest extends TestCase
         $this->assertSame($dummy, $envelope->getMessage());
         $this->assertArrayHasKey(ReceivedStamp::class, $stamps = $envelope->all());
         $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class]);
+        $this->assertSame(DummyMessage::class, $envelope->getMessageName());
+    }
+
+    public function testCreateNamed()
+    {
+        $name = 'foobar';
+        $envelope = Envelope::createNamed($dummy = new DummyMessage('dummy'), $name);
+
+        $this->assertSame($dummy, $envelope->getMessage());
+        $this->assertSame($name, $envelope->getMessageName());
     }
 
     public function testWithReturnsNewInstance()

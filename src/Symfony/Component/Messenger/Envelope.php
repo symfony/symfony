@@ -24,6 +24,7 @@ final class Envelope
 {
     private $stamps = array();
     private $message;
+    private $messageName;
 
     /**
      * @param object $message
@@ -38,6 +39,17 @@ final class Envelope
         foreach ($stamps as $stamp) {
             $this->stamps[\get_class($stamp)] = $stamp;
         }
+    }
+
+    /**
+     * @param object $message
+     */
+    public static function createNamed($message, string $name): self
+    {
+        $envelope = new self($message);
+        $envelope->messageName = $name;
+
+        return $envelope;
     }
 
     /**
@@ -77,6 +89,6 @@ final class Envelope
 
     public function getMessageName(): string
     {
-        return \get_class($this->message);
+        return $this->messageName ?? \get_class($this->message);
     }
 }

@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-29T07:52:25Z
+
+@topbin thanks, fixed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-29T09:37:10Z
+
+> currently the "message_bus" is still forced to exists few line down low
+
+fixed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-29T09:59:43Z
+
+`MessengerPass` wont run if there's no message_bus service, its' not needed anymore IIUC (fixes #28959 i guess :))
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-29T11:02:28Z
+
+> MessengerPass wont run if there's no message_bus service
+
+fixed - and also fixed the message in ControllerTrait.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-10-29T14:38:01Z
+
+This is the approach I was absolutely hoping for. It's predicatable, but type-based. Awesome!
+
+---------------------------------------------------------------------------
+
+by skalpa at 2018-10-29T15:26:52Z
+
+Wouldn't it be worth removing the handlers' `priority` altogether ? As it is now it's pretty confusing as it only sorts handlers that subscribe to the same type.
+
+It made sense when the handler with the highest priority used to _win_, but a lot less now. IMHO,  users should not expect handlers to be executed in a predictable order. If one needs `BarHandler` to be executed after `FooHandler`, then they shouldn't both subscribe to the same message type: `FooHandler` should dispatch an additional message that `BarHandler` will subscribe to.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-29T15:54:07Z
+
+If a subscriber can declare its priority, it can also declare a more specific type to register. So that's not a downgrade in terms of possibilities. Then, within one type, it can be useful to have priorities (otherwise why would we have added them?) so I think it's OK as is.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2018-10-29T16:08:35Z
+
+Honestly, I wouldn't know why priorities were added to start with ;-). Anyway, I'm fine with that, and this behavior can always be documented.
+Btw, all your latest PRs on this component have been brilliant, thanks a lot.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-10-29T20:59:00Z
+
+> IMHO, users should not expect handlers to be executed in a predictable order. If one needs BarHandler to be executed after FooHandler, then they shouldn't both subscribe to the same message type
+
+Fully agree with @skalpa . You can also make it one handler that does the right thing internally. Also since priortiy now has a different meaning than before, I would suggest to remove it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-29T21:05:11Z
+
+For message buses, priorities can be useless, but the component should also work for query buses. In this case, priorities could be important to have. I expect people to use flat message types most of the time also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-30T14:29:15Z
+
+PR rebased, ready to merge.

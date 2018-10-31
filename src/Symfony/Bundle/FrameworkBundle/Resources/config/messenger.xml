@@ -8,13 +8,12 @@
         <defaults public="false" />
 
         <!-- Asynchronous -->
-        <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Transport\Sender\Locator\ContainerSenderLocator">
-            <argument type="service" id="messenger.sender_locator" />
-            <argument type="collection" /> <!-- Message to sender ID mapping -->
+        <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
+            <argument type="collection" /> <!-- Per message sender iterators -->
+            <argument type="collection" /> <!-- Messages to send and handle -->
         </service>
-        <service id="messenger.middleware.route_messages" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
-            <argument type="service" id="messenger.asynchronous.routing.sender_locator" />
-            <argument type="collection" /> <!-- Message to send and handle mapping -->
+        <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
+            <argument type="service" id="messenger.senders_locator" />
         </service>
 
         <!-- Message encoding/decoding -->
@@ -25,7 +24,7 @@
         </service>
 
         <!-- Middleware -->
-        <service id="messenger.middleware.call_message_handler" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
+        <service id="messenger.middleware.handle_message" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
             <argument /> <!-- Bus handler resolver -->
         </service>
 
@@ -45,10 +44,6 @@
 
         <!-- Discovery -->
         <service id="messenger.receiver_locator">
-            <tag name="container.service_locator" />
-            <argument type="collection" />
-        </service>
-        <service id="messenger.sender_locator">
             <tag name="container.service_locator" />
             <argument type="collection" />
         </service>

@@ -36,6 +36,8 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -68,7 +70,6 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\Sender\ChainSender;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -1491,7 +1492,7 @@ class FrameworkExtension extends Extension
     private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig, array $validationConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
-            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed.');
+            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
         $loader->load('messenger.xml');
@@ -1502,7 +1503,7 @@ class FrameworkExtension extends Extension
         } else {
             if ('messenger.transport.symfony_serializer' === $config['serializer']['id']) {
                 if (!$this->isConfigEnabled($container, $serializerConfig)) {
-                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".');
                 }
 
                 $container->getDefinition('messenger.transport.symfony_serializer')
@@ -1517,17 +1518,13 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (null === $config['default_bus']) {
-            if (\count($config['buses']) > 1) {
-                throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
-            }
-
+        if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
 
         $defaultMiddleware = array(
             'before' => array(array('id' => 'logging')),
-            'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
+            'after' => array(array('id' => 'send_message'), array('id' => 'handle_message')),
         );
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
@@ -1562,51 +1559,44 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$container->hasAlias('message_bus')) {
-            throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
-        }
-
         $senderAliases = array();
         foreach ($config['transports'] as $name => $transport) {
             if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
-                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".');
             }
 
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
                 ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.receiver', array('alias' => $name))
-                ->addTag('messenger.sender', array('alias' => $name))
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
         }
 
-        $messageToSenderIdMapping = array();
-        $messageToSendAndHandleMapping = array();
+        $messageToSendersMapping = array();
+        $messagesToSendAndHandle = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
+                throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
+            $senders = array_map(function ($sender) use ($senderAliases) {
+                return new Reference($senderAliases[$sender] ?? $sender);
+            }, $messageConfiguration['senders']);
 
-            if (1 < \count($messageConfiguration['senders'])) {
-                $senders = array_map(function ($sender) use ($senderAliases) {
-                    return new Reference($senderAliases[$sender] ?? $sender);
-                }, $messageConfiguration['senders']);
-                $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
-                $chainSenderDefinition->addTag('messenger.sender');
-                $chainSenderId = '.messenger.chain_sender.'.$message;
-                $container->setDefinition($chainSenderId, $chainSenderDefinition);
-                $messageToSenderIdMapping[$message] = $chainSenderId;
-            } else {
-                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
-            }
+            $sendersId = 'messenger.senders.'.$message;
+            $sendersDefinition = $container->register($sendersId, RewindableGenerator::class)
+                ->setFactory('current')
+                ->addArgument(array(new IteratorArgument($senders)));
+            $messageToSendersMapping[$message] = new Reference($sendersId);
 
-            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
+            $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 
-        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
-        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
+        $container->getDefinition('messenger.senders_locator')
+            ->replaceArgument(0, $messageToSendersMapping)
+            ->replaceArgument(1, $messagesToSendAndHandle)
+        ;
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

@@ -74,4 +74,9 @@ final class Envelope
     {
         return $this->message;
     }
+
+    public function getMessageName(): string
+    {
+        return \get_class($this->message);
+    }
 }

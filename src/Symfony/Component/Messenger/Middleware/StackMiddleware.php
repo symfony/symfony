@@ -15,6 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @experimental in 4.2
  */
 class StackMiddleware implements MiddlewareInterface, StackInterface
 {

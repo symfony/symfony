@@ -16,6 +16,8 @@ use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class StopWhenMessageCountIsExceededReceiver implements ReceiverInterface
 {

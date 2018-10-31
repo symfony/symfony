@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  * Represents a collection of message handlers.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class ChainHandler
 {

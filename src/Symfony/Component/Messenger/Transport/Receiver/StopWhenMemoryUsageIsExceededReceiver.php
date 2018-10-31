@@ -16,6 +16,8 @@ use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Simon Delicata <simon.delicata@free.fr>
+ *
+ * @experimental in 4.2
  */
 class StopWhenMemoryUsageIsExceededReceiver implements ReceiverInterface
 {

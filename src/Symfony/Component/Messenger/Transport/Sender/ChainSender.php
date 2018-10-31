@@ -15,6 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @experimental in 4.2
  */
 class ChainSender implements SenderInterface
 {

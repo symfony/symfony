@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-30T14:29:43Z
+
+Does it account for #29010 and maybe #29006 already?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-30T14:41:43Z
+
+> Does it account for #29010 and maybe #29006 already?
+
+Nope. I'm not sure those deserve more detailed entries. This is more about the outer-boundaries of the component usage & config. Unless you have more suggestions :)

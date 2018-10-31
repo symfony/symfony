@@ -185,11 +185,7 @@ class Table
      */
     public function getColumnStyle($columnIndex)
     {
-        if (isset($this->columnStyles[$columnIndex])) {
-            return $this->columnStyles[$columnIndex];
-        }
-
-        return $this->getStyle();
+        return $this->columnStyles[$columnIndex] ?? $this->getStyle();
     }
 
     /**

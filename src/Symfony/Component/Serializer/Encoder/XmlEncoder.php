@@ -382,11 +382,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $val = $this->parseXml($subnode, $context);
 
             if ('item' === $subnode->nodeName && isset($val['@key'])) {
-                if (isset($val['#'])) {
-                    $value[$val['@key']] = $val['#'];
-                } else {
-                    $value[$val['@key']] = $val;
-                }
+                $value[$val['@key']] = $val['#'] ?? $val;
             } else {
                 $value[$subnode->nodeName][] = $val;
             }

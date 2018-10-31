@@ -45,13 +45,13 @@ class ConfigDataCollectorTest extends TestCase
         // if else clause because we don't know it
         if (((\extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
                 ||
-                (\extension_loaded('apc') && ini_get('apc.enabled'))
+                (\extension_loaded('apc') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN))
                 ||
-                (\extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
+                (\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN))
                 ||
-                (\extension_loaded('xcache') && ini_get('xcache.cacher'))
+                (\extension_loaded('xcache') && filter_var(ini_get('xcache.cacher'), FILTER_VALIDATE_BOOLEAN))
                 ||
-                (\extension_loaded('wincache') && ini_get('wincache.ocenabled')))) {
+                (\extension_loaded('wincache') && filter_var(ini_get('wincache.ocenabled'), FILTER_VALIDATE_BOOLEAN)))) {
             $this->assertTrue($c->hasAccelerator());
         } else {
             $this->assertFalse($c->hasAccelerator());

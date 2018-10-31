@@ -28,7 +28,7 @@
             <argument /> <!-- Bus handler resolver -->
         </service>
 
-        <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware" abstract="true">
+        <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
             <argument type="service" id="validator" />
         </service>
 
@@ -37,7 +37,7 @@
         </service>
 
         <!-- Logging -->
-        <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware" abstract="true">
+        <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware">
             <tag name="monolog.logger" channel="messenger" />
             <argument type="service" id="logger" />
         </service>

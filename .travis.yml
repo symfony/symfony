@@ -162,7 +162,7 @@ before_install:
               tfold ext.libsodium tpecl libsodium sodium.so $INI
           fi
 
-          tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
+          tfold ext.apcu tpecl apcu-5.1.12 apcu.so $INI
           tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
           tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
           tfold ext.igbinary tpecl igbinary-2.0.6 igbinary.so $INI

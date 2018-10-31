@@ -4,6 +4,10 @@ Messenger Component
 The Messenger component helps application send and receive messages to/from other applications or via
 message queues.
 
+**This Component is experimental**. [Experimental
+features](https://symfony.com/doc/current/contributing/code/experimental.html)
+are not covered by Symfony's BC-break policy.
+
 Resources
 ---------
 

@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Handler\Locator;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class HandlerLocator extends AbstractHandlerLocator
 {

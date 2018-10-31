@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Middleware\StackMiddleware;
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Matthias Noback <matthiasnoback@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @experimental in 4.2
  */
 class MessageBus implements MessageBusInterface
 {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Messenger\Transport;
  * Creates a Messenger transport.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 interface TransportFactoryInterface
 {

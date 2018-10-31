@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Envelope;
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
  * @internal
+ *
+ * @experimental in 4.2
  */
 abstract class AbstractHandlerLocator implements HandlerLocatorInterface
 {

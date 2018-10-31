@@ -16,6 +16,8 @@ use Psr\Container\ContainerInterface;
 /**
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class ContainerHandlerLocator extends AbstractHandlerLocator
 {

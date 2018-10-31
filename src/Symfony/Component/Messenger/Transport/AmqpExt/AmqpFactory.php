@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
+/**
+ * @experimental in 4.2
+ */
 class AmqpFactory
 {
     public function createConnection(array $credentials): \AMQPConnection

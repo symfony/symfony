@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {

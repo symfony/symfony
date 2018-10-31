@@ -19,6 +19,8 @@ use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @experimental in 4.2
  */
 class SendMessageMiddleware implements MiddlewareInterface
 {

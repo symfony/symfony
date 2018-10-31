@@ -27,6 +27,8 @@ use Symfony\Component\Messenger\Worker;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class ConsumeMessagesCommand extends Command
 {

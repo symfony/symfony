@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Middleware;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @experimental in 4.2
  */
 interface StackInterface
 {

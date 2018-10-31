@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterfa
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class Serializer implements SerializerInterface
 {

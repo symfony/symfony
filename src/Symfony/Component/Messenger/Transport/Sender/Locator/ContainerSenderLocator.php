@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class ContainerSenderLocator extends AbstractSenderLocator
 {

@@ -883,6 +883,34 @@ UPGRADE FROM 2.x to 3.0
            engines: ['php']
    ```
 
+ * The assets settings under `framework.templating` were moved to `framework.assets`.
+
+   Before:
+
+   ```yml
+   framework:
+       templating:
+           assets_version: 'v123'
+           assets_version_format: '%%s?version=%%s'
+           assets_base_urls:
+               http: ['http://cdn.example.com']
+               ssl:  ['https://secure.example.com']
+           packages:
+               # ...
+   ```
+
+   After:
+
+   ```yml
+   framework:
+       assets:
+           version: 'v123'
+           version_format: '%%s?version=%%s'
+           base_urls: ['http://cdn.example.com', 'https://secure.example.com']
+           packages:
+               # ...
+   ```
+
  * The `form.csrf_provider` service is removed as it implements an adapter for
    the new token manager to the deprecated
    `Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface`

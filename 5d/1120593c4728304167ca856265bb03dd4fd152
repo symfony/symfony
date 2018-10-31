@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-11T16:07:47Z
+
+Thanks for working on this! Could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by shyim at 2018-10-11T16:44:10Z
+
+I have added a Test which fails, without the Changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-31T10:43:27Z
+
+FYI I pushed-forced an alternative implementation that more precisely focuses on fixing multiple decorations while taking care of not changing the semantics of decorating unrelated aliases.
+Ready on my side.

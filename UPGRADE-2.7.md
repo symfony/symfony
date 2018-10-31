@@ -646,6 +646,34 @@ FrameworkBundle
    }
    ```
 
+ * The assets settings under `framework.templating` were deprecated and will be removed in Symfony 3.0. Use `framework.assets` instead.
+
+   Before:
+
+   ```yml
+   framework:
+       templating:
+           assets_version: 'v123'
+           assets_version_format: '%%s?version=%%s'
+           assets_base_urls:
+               http: ['http://cdn.example.com']
+               ssl:  ['https://secure.example.com']
+           packages:
+               # ...
+   ```
+
+   After:
+
+   ```yml
+   framework:
+       assets:
+           version: 'v123'
+           version_format: '%%s?version=%%s'
+           base_urls: ['http://cdn.example.com', 'https://secure.example.com']
+           packages:
+               # ...
+   ```
+
 Security
 ---------------
 

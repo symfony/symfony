@@ -12,11 +12,11 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Sender;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
-use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SendersLocatorTest extends TestCase
 {
@@ -27,7 +27,7 @@ class SendersLocatorTest extends TestCase
             DummyMessage::class => array($sender),
         ));
 
-        $this->assertSame(array($sender), iterator_to_array($locator->getSenders(DummyMessage::class)));
-        $this->assertSame(array(), iterator_to_array($locator->getSenders(SecondMessage::class)));
+        $this->assertSame(array($sender), iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        $this->assertSame(array(), iterator_to_array($locator->getSenders(new Envelope(new SecondMessage('b')))));
     }
 }

@@ -39,6 +39,17 @@ class ReflectionCaster
         $stub->class = 'Closure'; // HHVM generates unique class names for closures
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
 
+        if (false === strpos($c->name, '{closure}')) {
+            if (isset($a[$prefix.'class'])) {
+                $stub->class = $a[$prefix.'class']->value.'::'.$c->name;
+            } elseif (isset($a[$prefix.'this'])) {
+                $stub->class = $a[$prefix.'this']->class.'::'.$c->name;
+            } else {
+                $stub->class = $c->name;
+            }
+            unset($a[$prefix.'class']);
+        }
+
         if (isset($a[$prefix.'parameters'])) {
             foreach ($a[$prefix.'parameters']->value as &$v) {
                 $param = $v;

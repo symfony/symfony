@@ -85,6 +85,34 @@ EOTXT
         );
     }
 
+    public function testFromCallableClosureCaster()
+    {
+        if (\defined('HHVM_VERSION_ID')) {
+            $this->markTestSkipped('Not for HHVM.');
+        }
+        $var = array(
+            (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
+            (new \ReflectionMethod(__CLASS__, 'tearDownAfterClass'))->getClosure(),
+        );
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+array:2 [
+  0 => Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest::testFromCallableClosureCaster {
+    this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+    file: "%sReflectionCasterTest.php"
+    line: "%d to %d"
+  }
+  1 => %sTestCase::tearDownAfterClass {
+    file: "%sTestCase.php"
+    line: "%d to %d"
+  }
+]
+EOTXT
+            , $var
+        );
+    }
+
     public function testClosureCasterExcludingVerbosity()
     {
         $var = function () {};

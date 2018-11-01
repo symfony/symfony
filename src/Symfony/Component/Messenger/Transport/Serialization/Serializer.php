@@ -28,6 +28,8 @@ use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterfa
  */
 class Serializer implements SerializerInterface
 {
+    private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
+
     private $serializer;
     private $format;
     private $context;
@@ -99,14 +101,13 @@ class Serializer implements SerializerInterface
 
     private function decodeStamps($encodedEnvelope)
     {
-        $prefix = 'X-Message-Stamp-';
         $stamps = array();
         foreach ($encodedEnvelope['headers'] as $name => $value) {
-            if (0 !== strpos($name, $prefix)) {
+            if (0 !== strpos($name, self::STAMP_HEADER_PREFIX)) {
                 continue;
             }
 
-            $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen($prefix)), $this->format, $this->context);
+            $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)), $this->format, $this->context);
         }
 
         return $stamps;
@@ -120,7 +121,7 @@ class Serializer implements SerializerInterface
 
         $headers = array();
         foreach ($stamps as $stamp) {
-            $headers['X-Message-Stamp-'.\get_class($stamp)] = $this->serializer->serialize($stamp, $this->format, $this->context);
+            $headers[self::STAMP_HEADER_PREFIX.\get_class($stamp)] = $this->serializer->serialize($stamp, $this->format, $this->context);
         }
 
         return $headers;

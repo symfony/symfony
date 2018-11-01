@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\TopicsResolver\TopicsResolverInterface;
 
 /**
  * Maps a message to a list of senders.
@@ -23,15 +23,18 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
  */
 class SendersLocator implements SendersLocatorInterface
 {
+    private $topicsResolver;
     private $senders;
     private $sendAndHandle;
 
     /**
-     * @param SenderInterface[][] $senders
-     * @param bool[]              $sendAndHandle
+     * @param TopicsResolverInterface $topicsResolver
+     * @param SenderInterface[][]     $senders
+     * @param bool[]                  $sendAndHandle
      */
-    public function __construct(array $senders, array $sendAndHandle = array())
+    public function __construct(TopicsResolverInterface $topicsResolver, array $senders, array $sendAndHandle = array())
     {
+        $this->topicsResolver = $topicsResolver;
         $this->senders = $senders;
         $this->sendAndHandle = $sendAndHandle;
     }
@@ -45,15 +48,20 @@ class SendersLocator implements SendersLocatorInterface
         $sender = null;
         $seen = array();
 
-        foreach (HandlersLocator::listTypes($envelope) as $type) {
-            foreach ($this->senders[$type] ?? array() as $sender) {
+        foreach ($this->topicsResolver->getTopics($envelope) as $topic) {
+            foreach ($this->senders[$topic] ?? array() as $sender) {
                 if (!\in_array($sender, $seen, true)) {
                     yield $seen[] = $sender;
                 }
             }
-            $handle = $handle ?: $this->sendAndHandle[$type] ?? false;
+            $handle = $handle ?: $this->sendAndHandle[$topic] ?? false;
         }
 
-        $handle = $handle || null === $sender;
+        foreach ($this->senders['*'] ?? array() as $sender) {
+            if (!\in_array($sender, $seen, true)) {
+                yield $seen[] = $sender;
+            }
+        }
+        $handle = ($handle ?: $this->sendAndHandle['*'] ?? false) || null === $sender;
     }
 }

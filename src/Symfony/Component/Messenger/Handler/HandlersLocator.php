@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Handler;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\TopicsResolver\TopicsResolverInterface;
 
 /**
  * Maps a message to a list of handlers.
@@ -22,13 +23,15 @@ use Symfony\Component\Messenger\Envelope;
  */
 class HandlersLocator implements HandlersLocatorInterface
 {
+    private $topicsResolver;
     private $handlers;
 
     /**
      * @param callable[][] $handlers
      */
-    public function __construct(array $handlers)
+    public function __construct(TopicsResolverInterface $topicsResolver, array $handlers)
     {
+        $this->topicsResolver = $topicsResolver;
         $this->handlers = $handlers;
     }
 
@@ -39,25 +42,18 @@ class HandlersLocator implements HandlersLocatorInterface
     {
         $seen = array();
 
-        foreach (self::listTypes($envelope) as $type) {
-            foreach ($this->handlers[$type] ?? array() as $handler) {
+        foreach ($this->topicsResolver->getTopics($envelope) as $topic) {
+            foreach ($this->handlers[$topic] ?? array() as $handler) {
                 if (!\in_array($handler, $seen, true)) {
                     yield $seen[] = $handler;
                 }
             }
         }
-    }
 
-    /**
-     * @internal
-     */
-    public static function listTypes(Envelope $envelope): array
-    {
-        $class = \get_class($envelope->getMessage());
-
-        return array($class => $class)
-            + class_parents($class)
-            + class_implements($class)
-            + array('*' => '*');
+        foreach ($this->handlers['*'] ?? array() as $handler) {
+            if (!\in_array($handler, $seen, true)) {
+                yield $seen[] = $handler;
+            }
+        }
     }
 }

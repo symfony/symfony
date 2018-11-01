@@ -800,7 +800,7 @@ class OptionsResolver implements Options
         $triggerDeprecation = 1 === \func_num_args() || \func_get_arg(1);
 
         // Shortcut for resolved options
-        if (array_key_exists($option, $this->resolved)) {
+        if (isset($this->resolved[$option]) || array_key_exists($option, $this->resolved)) {
             if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || $this->calling) && \is_string($this->deprecated[$option])) {
                 @trigger_error(strtr($this->deprecated[$option], array('%name%' => $option)), E_USER_DEPRECATED);
             }
@@ -809,7 +809,7 @@ class OptionsResolver implements Options
         }
 
         // Check whether the option is set at all
-        if (!array_key_exists($option, $this->defaults)) {
+        if (!isset($this->defaults[$option]) && !array_key_exists($option, $this->defaults)) {
             if (!isset($this->defined[$option])) {
                 throw new NoSuchOptionException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
             }
@@ -827,7 +827,7 @@ class OptionsResolver implements Options
             }
 
             if (!\is_array($value)) {
-                throw new InvalidOptionsException(sprintf('The nested option "%s" with value %s is expected to be of type array, but is of type "%s".', $option, $this->formatValue($value), $this->formatTypeOf($value, 'array')));
+                throw new InvalidOptionsException(sprintf('The nested option "%s" with value %s is expected to be of type array, but is of type "%s".', $option, $this->formatValue($value), $this->formatTypeOf($value)));
             }
 
             // The following section must be protected from cyclic calls.
@@ -872,7 +872,7 @@ class OptionsResolver implements Options
             $invalidTypes = array();
 
             foreach ($this->allowedTypes[$option] as $type) {
-                $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
+                $type = self::$typeAliases[$type] ?? $type;
 
                 if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
@@ -987,58 +987,33 @@ class OptionsResolver implements Options
         return $value;
     }
 
-    private function verifyTypes(string $type, $value, array &$invalidTypes): bool
+    private function verifyTypes(string $type, $value, array &$invalidTypes, int $level = 0): bool
     {
         if (\is_array($value) && '[]' === substr($type, -2)) {
-            return $this->verifyArrayType($type, $value, $invalidTypes);
+            $type = substr($type, 0, -2);
+
+            foreach ($value as $val) {
+                if (!$this->verifyTypes($type, $val, $invalidTypes, $level + 1)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        if (self::isValueValidType($type, $value)) {
+        if (('null' === $type && null === $value) || (\function_exists($func = 'is_'.$type) && $func($value)) || $value instanceof $type) {
             return true;
         }
 
         if (!$invalidTypes) {
-            $invalidTypes[$this->formatTypeOf($value, null)] = true;
+            $suffix = '';
+            while (\strlen($suffix) < $level * 2) {
+                $suffix .= '[]';
+            }
+            $invalidTypes[$this->formatTypeOf($value).$suffix] = true;
         }
 
         return false;
-    }
-
-    private function verifyArrayType(string $type, array $value, array &$invalidTypes, int $level = 0): bool
-    {
-        $type = substr($type, 0, -2);
-
-        $suffix = '[]';
-        while (\strlen($suffix) <= $level * 2) {
-            $suffix .= '[]';
-        }
-
-        if ('[]' === substr($type, -2)) {
-            $success = true;
-            foreach ($value as $item) {
-                if (!\is_array($item)) {
-                    $invalidTypes[$this->formatTypeOf($item, null).$suffix] = true;
-
-                    return false;
-                }
-
-                if (!$this->verifyArrayType($type, $item, $invalidTypes, $level + 1)) {
-                    $success = false;
-                }
-            }
-
-            return $success;
-        }
-
-        foreach ($value as $item) {
-            if (!self::isValueValidType($type, $item)) {
-                $invalidTypes[$this->formatTypeOf($item, $type).$suffix] = $value;
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -1104,40 +1079,13 @@ class OptionsResolver implements Options
     /**
      * Returns a string representation of the type of the value.
      *
-     * This method should be used if you pass the type of a value as
-     * message parameter to a constraint violation. Note that such
-     * parameters should usually not be included in messages aimed at
-     * non-technical people.
-     *
      * @param mixed $value The value to return the type of
+     *
+     * @return string The type of the value
      */
-    private function formatTypeOf($value, ?string $type): string
+    private function formatTypeOf($value): string
     {
-        $suffix = '';
-
-        if (null !== $type && '[]' === substr($type, -2)) {
-            $suffix = '[]';
-            $type = substr($type, 0, -2);
-            while ('[]' === substr($type, -2)) {
-                $type = substr($type, 0, -2);
-                $value = array_shift($value);
-                if (!\is_array($value)) {
-                    break;
-                }
-                $suffix .= '[]';
-            }
-
-            if (\is_array($value)) {
-                $subTypes = array();
-                foreach ($value as $val) {
-                    $subTypes[$this->formatTypeOf($val, null)] = true;
-                }
-
-                return implode('|', array_keys($subTypes)).$suffix;
-            }
-        }
-
-        return (\is_object($value) ? \get_class($value) : \gettype($value)).$suffix;
+        return \is_object($value) ? \get_class($value) : \gettype($value);
     }
 
     /**
@@ -1197,10 +1145,5 @@ class OptionsResolver implements Options
         }
 
         return implode(', ', $values);
-    }
-
-    private static function isValueValidType(string $type, $value): bool
-    {
-        return (\function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
     }
 }

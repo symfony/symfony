@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * Maps a message to a list of handlers.
  *
@@ -33,11 +35,11 @@ class HandlersLocator implements HandlersLocatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getHandlers(string $name): iterable
+    public function getHandlers(Envelope $envelope): iterable
     {
         $seen = array();
 
-        foreach (self::listTypes($name) as $type) {
+        foreach (self::listTypes($envelope) as $type) {
             foreach ($this->handlers[$type] ?? array() as $handler) {
                 if (!\in_array($handler, $seen, true)) {
                     yield $seen[] = $handler;
@@ -49,11 +51,9 @@ class HandlersLocator implements HandlersLocatorInterface
     /**
      * @internal
      */
-    public static function listTypes(string $class): array
+    public static function listTypes(Envelope $envelope): array
     {
-        if (!class_exists($class, false)) {
-            return array($class => $class, '*' => '*');
-        }
+        $class = \get_class($envelope->getMessage());
 
         return array($class => $class)
             + class_parents($class)

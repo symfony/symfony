@@ -40,12 +40,11 @@ class HandleMessageMiddleware implements MiddlewareInterface
     {
         $handler = null;
         $message = $envelope->getMessage();
-        $name = $envelope->getMessageName();
-        foreach ($this->handlersLocator->getHandlers($name) as $handler) {
+        foreach ($this->handlersLocator->getHandlers($envelope) as $handler) {
             $handler($message);
         }
         if (null === $handler && !$this->allowNoHandlers) {
-            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $name));
+            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));
         }
 
         return $stack->next()->handle($envelope, $stack);

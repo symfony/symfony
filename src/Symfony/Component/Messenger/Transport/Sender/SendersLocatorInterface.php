@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\Sender;
 
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Envelope;
 
 /**
  * Maps a message to a list of senders.
@@ -31,5 +31,5 @@ interface SendersLocatorInterface
      *
      * @return iterable|SenderInterface[]
      */
-    public function getSenders(string $name, ?bool &$handle = false): iterable;
+    public function getSenders(Envelope $envelope, ?bool &$handle = false): iterable;
 }

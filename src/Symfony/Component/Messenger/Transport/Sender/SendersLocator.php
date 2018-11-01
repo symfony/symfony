@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Messenger\Transport\Sender;
 
-use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * Maps a message to a list of senders.
@@ -40,13 +39,13 @@ class SendersLocator implements SendersLocatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getSenders(string $name, ?bool &$handle = false): iterable
+    public function getSenders(Envelope $envelope, ?bool &$handle = false): iterable
     {
         $handle = false;
         $sender = null;
         $seen = array();
 
-        foreach (HandlersLocator::listTypes($name) as $type) {
+        foreach (HandlersLocator::listTypes($envelope) as $type) {
             foreach ($this->senders[$type] ?? array() as $sender) {
                 if (!\in_array($sender, $seen, true)) {
                     yield $seen[] = $sender;

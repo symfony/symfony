@@ -42,7 +42,7 @@ class SendMessageMiddleware implements MiddlewareInterface
         $handle = false;
         $sender = null;
 
-        foreach ($this->sendersLocator->getSenders($envelope->getMessageName(), $handle) as $sender) {
+        foreach ($this->sendersLocator->getSenders($envelope, $handle) as $sender) {
             $envelope = $sender->send($envelope);
         }
 

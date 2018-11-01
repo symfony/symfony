@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * Maps a message to a list of handlers.
  *
@@ -25,5 +27,5 @@ interface HandlersLocatorInterface
      *
      * @return iterable|callable[]
      */
-    public function getHandlers(string $name): iterable;
+    public function getHandlers(Envelope $envelope): iterable;
 }

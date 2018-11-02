@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by gonzalovilaseca at 2018-11-02T11:03:52Z
+
+Great catch, is it worth adding a test to avoid this happening in the future?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-02T11:11:47Z
+
+How can we write a test that would catch this if we add more properties in the future?
+`$this->assertEquals($resource, unserialize(serialize($resource))` wouldn't catch it, unless we add random values in each properties... - which runs in circle since this would require knowing the properties (and thus fail the prevention we're looking for)...
+Merging now, PR welcome with extra tests if one wants to resolve this (I don't have the solution :) )

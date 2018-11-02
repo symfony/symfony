@@ -286,7 +286,7 @@ class TraceableEventDispatcherTest extends TestCase
 
 class EventSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array('foo' => 'call');
     }

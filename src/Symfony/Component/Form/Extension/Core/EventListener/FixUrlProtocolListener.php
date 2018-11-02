@@ -41,7 +41,7 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(FormEvents::SUBMIT => 'onSubmit');
     }

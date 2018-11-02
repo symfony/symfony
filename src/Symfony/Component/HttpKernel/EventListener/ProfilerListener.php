@@ -117,7 +117,7 @@ class ProfilerListener implements EventSubscriberInterface
         $this->parents = new \SplObjectStorage();
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             KernelEvents::RESPONSE => array('onKernelResponse', -100),

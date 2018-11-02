@@ -34,7 +34,7 @@ class DataCollectorListener implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             // High priority in order to be called as soon as possible

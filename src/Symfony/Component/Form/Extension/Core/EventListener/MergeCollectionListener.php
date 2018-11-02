@@ -34,7 +34,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         $this->allowDelete = $allowDelete;
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             FormEvents::SUBMIT => 'onSubmit',

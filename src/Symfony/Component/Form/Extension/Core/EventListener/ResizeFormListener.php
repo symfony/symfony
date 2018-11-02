@@ -47,7 +47,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->deleteEmpty = $deleteEmpty;
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             FormEvents::PRE_SET_DATA => 'preSetData',

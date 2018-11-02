@@ -42,5 +42,5 @@ interface EventSubscriberInterface
      *
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents();
+    public function getSubscribedEvents() : array;
 }

@@ -50,7 +50,7 @@ class AddLinkHeaderListener implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(KernelEvents::RESPONSE => 'onKernelResponse');
     }

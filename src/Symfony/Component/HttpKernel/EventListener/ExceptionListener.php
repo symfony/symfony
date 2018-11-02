@@ -110,7 +110,7 @@ class ExceptionListener implements EventSubscriberInterface
         $this->isTerminating = false;
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             KernelEvents::EXCEPTION => array(

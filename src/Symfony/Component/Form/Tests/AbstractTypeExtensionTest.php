@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpHierarchyChecksInspection */
 
 /*
  * This file is part of the Symfony package.

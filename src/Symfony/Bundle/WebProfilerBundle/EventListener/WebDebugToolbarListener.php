@@ -134,7 +134,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             KernelEvents::RESPONSE => array('onKernelResponse', -128),

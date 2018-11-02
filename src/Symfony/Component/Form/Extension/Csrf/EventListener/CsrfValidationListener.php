@@ -34,7 +34,7 @@ class CsrfValidationListener implements EventSubscriberInterface
     private $translationDomain;
     private $serverParams;
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             FormEvents::PRE_SUBMIT => 'preSubmit',

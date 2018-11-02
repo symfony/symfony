@@ -65,7 +65,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->logger->debug('Command "{command}" exited with code "{code}"', array('command' => $inputString, 'code' => $exitCode));
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             ConsoleEvents::ERROR => array('onConsoleError', -128),

@@ -143,7 +143,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         $events = array(KernelEvents::REQUEST => array('configure', 2048));
 

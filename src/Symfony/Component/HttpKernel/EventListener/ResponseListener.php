@@ -47,7 +47,7 @@ class ResponseListener implements EventSubscriberInterface
         $response->prepare($event->getRequest());
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             KernelEvents::RESPONSE => 'onKernelResponse',

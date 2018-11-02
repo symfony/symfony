@@ -56,7 +56,7 @@ class TranslatorListener implements EventSubscriberInterface
         $this->setLocale($parentRequest);
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             // must be registered after the Locale listener

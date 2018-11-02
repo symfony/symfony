@@ -36,7 +36,7 @@ class SaveSessionListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             // low priority but higher than StreamedResponseListener

@@ -168,7 +168,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 {
     public static $subscribedEvents = array();
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return self::$subscribedEvents;
     }
@@ -178,7 +178,7 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 {
     public static $subscribedServices = array();
 
-    public static function getSubscribedServices()
+    public function getSubscribedServices() : array
     {
         return self::$subscribedServices;
     }

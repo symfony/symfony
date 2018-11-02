@@ -90,7 +90,7 @@ class FragmentListener implements EventSubscriberInterface
         throw new AccessDeniedHttpException();
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 48)),

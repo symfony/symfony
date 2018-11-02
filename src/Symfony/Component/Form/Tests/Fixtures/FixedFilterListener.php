@@ -55,7 +55,7 @@ class FixedFilterListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents() : array
     {
         return array(
             FormEvents::PRE_SUBMIT => 'preSubmit',

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -112,11 +111,11 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('bool' === $prefix) {
-            return (bool) self::phpize($env);
+            return (bool) (filter_var($env, FILTER_VALIDATE_BOOLEAN) ?: filter_var($env, FILTER_VALIDATE_INT) ?: filter_var($env, FILTER_VALIDATE_FLOAT));
         }
 
         if ('int' === $prefix) {
-            if (!is_numeric($env = self::phpize($env))) {
+            if (false === $env = filter_var($env, FILTER_VALIDATE_INT) ?: filter_var($env, FILTER_VALIDATE_FLOAT)) {
                 throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to int.', $name));
             }
 
@@ -124,7 +123,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('float' === $prefix) {
-            if (!is_numeric($env = self::phpize($env))) {
+            if (false === $env = filter_var($env, FILTER_VALIDATE_FLOAT)) {
                 throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to float.', $name));
             }
 
@@ -176,14 +175,5 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
-    }
-
-    private static function phpize($value)
-    {
-        if (!class_exists(XmlUtils::class)) {
-            throw new LogicException('The Symfony Config component is required to cast env vars to "bool", "int" or "float".');
-        }
-
-        return XmlUtils::phpize($value);
     }
 }

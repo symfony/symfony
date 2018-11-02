@@ -218,7 +218,7 @@ class PhpDumper extends Dumper
 
         if ($this->addGetService) {
             $code = preg_replace(
-                "/(\n\n    public function __construct.+?\\{\n)/s",
+                "/(\r?\n\r?\n    public function __construct.+?\\{\r?\n)/s",
                 "\n    private \$getService;$1        \$this->getService = \\Closure::fromCallable(array(\$this, 'getService'));\n",
                 $code,
                 1

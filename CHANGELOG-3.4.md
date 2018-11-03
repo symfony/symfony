@@ -7,6 +7,26 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.18 (2018-11-03)
+
+ * bug #28820 [DependencyInjection] Fix tags on multiple decorated service (Soner Sayakci)
+ * bug #29020 Fix ini_get() for boolean values (deguif)
+ * feature #28893 [TwigBundle] Fix usage of TwigBundle without FrameworkBundle (tgalopin)
+ * bug #28861 [DependencyInjection] Skip empty proxy code (olvlvl)
+ * bug #28801 Convert InsufficientAuthenticationException to HttpException with 401 status code (vincentchalamon)
+ * bug #28840 add missing double-quotes to extra_fields output message (danielkay)
+ * bug #28712 [Form] reverse transform RFC 3339 formatted dates (xabbuh)
+ * bug #28813 Fix for race condition in console output stream write (rudolfratusinski)
+ * bug #27772 [Console] Fixes multiselect choice question defaults in non-interactive mode (veewee)
+ * bug #28835 [FrameworkBundle] Setting missing default paths under BC layer (yceruto)
+ * bug #28760 [DI] fix dumping inline services again (nicolas-grekas)
+ * bug #28689 [Process] fix locking of pipe files on Windows (nicolas-grekas)
+ * bug #28704 [Form] fix multi-digit seconds fraction handling (xabbuh)
+ * bug #28793 [SecurityBundle] do not override custom access decision configs (xabbuh)
+ * bug #28783 [FrameworkBundle] add missing cache prefix seed attribute to XSD (xabbuh)
+ * bug #28072 [Security] Do not deauthenticate user when the first refreshed user has changed (gpekz)
+ * bug #28735 [FWBundle] Automatically enable PropertyInfo when using Flex (dunglas)
+
 * 3.4.17 (2018-10-03)
 
  * bug #28604 [Finder] fixed root directory access for ftp/sftp wrapper (DerDu)

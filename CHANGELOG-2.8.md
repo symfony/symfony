@@ -7,6 +7,19 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.47 (2018-11-03)
+
+ * bug #29020 Fix ini_get() for boolean values (deguif)
+ * bug #28861 [DependencyInjection] Skip empty proxy code (olvlvl)
+ * bug #28801 Convert InsufficientAuthenticationException to HttpException with 401 status code (vincentchalamon)
+ * bug #28840 add missing double-quotes to extra_fields output message (danielkay)
+ * bug #28712 [Form] reverse transform RFC 3339 formatted dates (xabbuh)
+ * bug #28813 Fix for race condition in console output stream write (rudolfratusinski)
+ * bug #27772 [Console] Fixes multiselect choice question defaults in non-interactive mode (veewee)
+ * bug #28689 [Process] fix locking of pipe files on Windows (nicolas-grekas)
+ * bug #28704 [Form] fix multi-digit seconds fraction handling (xabbuh)
+ * bug #28648 [PHPUnitBridge] Fix ClockMock microtime() format (acasademont)
+
 * 2.8.46 (2018-09-30)
 
  * bug #28376 [TwigBundle] Fixed caching of templates in src/Resources/<BundleName>/views on cache warmup (yceruto)

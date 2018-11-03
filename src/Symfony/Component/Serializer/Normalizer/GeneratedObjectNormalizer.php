@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Serializer\Dumper\NormalizerDumper;
@@ -29,6 +29,7 @@ class GeneratedObjectNormalizer implements NormalizerInterface, NormalizerAwareI
     private $normalizerDumper;
     private $cacheDir;
     private $debug;
+    protected $defaultContext;
 
     /**
      * @var NormalizerInterface[]
@@ -40,21 +41,12 @@ class GeneratedObjectNormalizer implements NormalizerInterface, NormalizerAwareI
      */
     private $configCacheFactory;
 
-    /**
-     * @var int
-     */
-    protected $circularReferenceLimit = 1;
-
-    /**
-     * @var callable|null
-     */
-    protected $circularReferenceHandler;
-
-    public function __construct(NormalizerDumper $normalizerDumper, string $cacheDir, bool $debug)
+    public function __construct(NormalizerDumper $normalizerDumper, string $cacheDir, bool $debug, array $defaultContext = array())
     {
         $this->normalizerDumper = $normalizerDumper;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
+        $this->defaultContext = $defaultContext;
     }
 
     /**
@@ -62,7 +54,7 @@ class GeneratedObjectNormalizer implements NormalizerInterface, NormalizerAwareI
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $class = get_class($object);
+        $class = \get_class($object);
         if (isset($this->normalizers[$class])) {
             return $this->normalizers[$class]->normalize($object, $format, $context);
         }
@@ -82,12 +74,8 @@ class GeneratedObjectNormalizer implements NormalizerInterface, NormalizerAwareI
 
         require_once $cache->getPath();
 
-        $this->normalizers[$class] = $normalizer = new $normalizerClass();
+        $this->normalizers[$class] = $normalizer = new $normalizerClass($this->defaultContext);
         $normalizer->setNormalizer($this->normalizer);
-        $normalizer->setCircularReferenceLimit($this->circularReferenceLimit);
-        if (null !== $this->circularReferenceHandler) {
-            $normalizer->setCircularReferenceHandler($this->circularReferenceHandler);
-        }
 
         return $normalizer->normalize($object, $format, $context);
     }

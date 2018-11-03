@@ -12,15 +12,15 @@
 namespace Symfony\Component\Serializer\Tests\Dumper;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Dumper\NormalizerDumper;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Normalizer\ObjectNormalizerTest;
-use Symfony\Component\Serializer\Dumper\NormalizerDumper;
 
 class NormalizerDumperTest extends ObjectNormalizerTest
 {
-    protected function getNormalizerFor(string $class): NormalizerInterface
+    protected function getNormalizerFor(string $class, array $defaultContext = array()): NormalizerInterface
     {
         $normalizerName = 'Test'.md5($class).'Normalizer';
 
@@ -31,7 +31,7 @@ class NormalizerDumperTest extends ObjectNormalizerTest
             eval('?>'.$dumper->dump($class, array('class' => $normalizerName)));
         }
 
-        $normalizer = new $normalizerName();
+        $normalizer = new $normalizerName($defaultContext);
         $normalizer->setNormalizer($this->serializer);
 
         return $normalizer;

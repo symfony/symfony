@@ -61,11 +61,11 @@ class ObjectNormalizerTest extends TestCase
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    protected function getNormalizerFor(string $class): NormalizerInterface
+    protected function getNormalizerFor(string $class, array $defaultContext = array()): NormalizerInterface
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
         $normalizer->setSerializer($this->serializer);
 
         return $normalizer;
@@ -607,13 +607,12 @@ class ObjectNormalizerTest extends TestCase
 
     private function doTestUnableToNormalizeCircularReference(bool $legacy = false)
     {
-        $legacy ? $this->normalizer->setCircularReferenceLimit(2) : $this->createNormalizer(array(ObjectNormalizer::CIRCULAR_REFERENCE_LIMIT => 2));
+        $legacy ? $this->normalizer->setCircularReferenceLimit(2) : $this->normalizer = $this->getNormalizerFor(CircularReferenceDummy::class, array(ObjectNormalizer::CIRCULAR_REFERENCE_LIMIT => 2));
         $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
 
         $obj = new CircularReferenceDummy();
 
-        $normalizer->normalize($obj);
+        $this->normalizer->normalize($obj);
     }
 
     public function testSiblingReference()
@@ -665,9 +664,8 @@ class ObjectNormalizerTest extends TestCase
 
     private function createNormalizerWithCircularReferenceHandler(callable $handler, bool $legacy)
     {
-        $legacy ? $this->normalizer->setCircularReferenceHandler($handler) : $this->createNormalizer(array(ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => $handler));
+        $legacy ? $this->normalizer->setCircularReferenceHandler($handler) : $this->normalizer = $this->getNormalizerFor(CircularReferenceDummy::class, array(ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => $handler));
         $this->serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($this->serializer);
     }
 
     public function testDenormalizeNonExistingAttribute()

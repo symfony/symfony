@@ -46,7 +46,7 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList(call_user_func($this->callback), $value);
+        return $this->choiceList = new ArrayChoiceList(\call_user_func($this->callback), $value);
     }
 
     /**

@@ -15,6 +15,10 @@
             <argument type="service" id="cache.app" />
         </service>
 
+        <service id="cache.app.taggable" class="Symfony\Component\Cache\Adapter\TagAwareAdapter">
+            <argument type="service" id="cache.app" />
+        </service>
+
         <service id="cache.system" parent="cache.adapter.system" public="true">
             <tag name="cache.pool" />
         </service>
@@ -70,6 +74,7 @@
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
             <argument>%kernel.cache_dir%/pools</argument>
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -88,6 +93,7 @@
             <argument /> <!-- Redis connection service -->
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -99,6 +105,20 @@
             <argument /> <!-- Memcached connection service -->
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
+        <service id="cache.adapter.pdo" class="Symfony\Component\Cache\Adapter\PdoAdapter" abstract="true">
+            <tag name="cache.pool" provider="cache.default_pdo_provider" clearer="cache.default_clearer" reset="reset" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- PDO connection service -->
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <argument type="collection" /> <!-- table options -->
+            <argument type="service" id="cache.default_marshaller" on-invalid="ignore" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -113,6 +133,10 @@
             </call>
         </service>
 
+        <service id="cache.default_marshaller" class="Symfony\Component\Cache\Marshaller\DefaultMarshaller">
+            <argument>null</argument> <!-- use igbinary_serialize() when available -->
+        </service>
+
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
             <argument type="collection" />
         </service>
@@ -124,5 +148,7 @@
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" />
         <service id="Psr\SimpleCache\CacheInterface" alias="cache.app.simple" />
         <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="cache.app" />
+        <service id="Symfony\Contracts\Cache\CacheInterface" alias="cache.app" />
+        <service id="Symfony\Contracts\Cache\TagAwareCacheInterface" alias="cache.app.taggable" />
     </services>
 </container>

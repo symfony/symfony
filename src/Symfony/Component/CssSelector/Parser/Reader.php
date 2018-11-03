@@ -30,7 +30,7 @@ class Reader
     public function __construct(string $source)
     {
         $this->source = $source;
-        $this->length = strlen($source);
+        $this->length = \strlen($source);
     }
 
     public function isEOF(): bool

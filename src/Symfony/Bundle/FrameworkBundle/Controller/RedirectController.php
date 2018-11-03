@@ -54,16 +54,17 @@ class RedirectController
      *
      * @throws HttpException In case the route name is empty
      */
-    public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false, bool $keepRequestMethod = false): Response
+    public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false, bool $keepRequestMethod = false, bool $keepQueryParams = false): Response
     {
         if ('' == $route) {
             throw new HttpException($permanent ? 410 : 404);
         }
 
         $attributes = array();
-        if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
+        if (false === $ignoreAttributes || \is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
-            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['keepRequestMethod']);
+            $attributes = $keepQueryParams ? array_merge($request->query->all(), $attributes) : $attributes;
+            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['keepRequestMethod'], $attributes['keepQueryParams']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
             }

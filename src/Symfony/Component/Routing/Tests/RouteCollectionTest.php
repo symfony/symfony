@@ -12,9 +12,9 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class RouteCollectionTest extends TestCase
 {
@@ -316,5 +316,18 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals($apiFoo, $collection->get('api_api_foo'));
         $this->assertNull($collection->get('foo'));
         $this->assertNull($collection->get('bar'));
+    }
+
+    public function testAddNamePrefixCanonicalRouteName()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo', array('_canonical_route' => 'foo')));
+        $collection->add('bar', new Route('/bar', array('_canonical_route' => 'bar')));
+        $collection->add('api_foo', new Route('/api/foo', array('_canonical_route' => 'api_foo')));
+        $collection->addNamePrefix('api_');
+
+        $this->assertEquals('api_foo', $collection->get('api_foo')->getDefault('_canonical_route'));
+        $this->assertEquals('api_bar', $collection->get('api_bar')->getDefault('_canonical_route'));
+        $this->assertEquals('api_api_foo', $collection->get('api_api_foo')->getDefault('_canonical_route'));
     }
 }

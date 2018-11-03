@@ -8,7 +8,7 @@
 
 {% block body %}
 <div class="header">
-    <h1>{{ file }} <small>line {{ line }}</small></h1>
+    <h1>{{ file }}{% if 0 < line %} <small>line {{ line }}</small>{% endif %}</h1>
     <a class="doc" href="https://symfony.com/doc/{{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}/reference/configuration/framework.html#ide" rel="help">Open in your IDE?</a>
 </div>
 <div class="source">

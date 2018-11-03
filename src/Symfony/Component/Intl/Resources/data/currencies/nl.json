@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.45.14",
     "Names": {
         "ADP": [
             "ADP",
@@ -271,7 +271,7 @@
         ],
         "CNY": [
             "CN¥",
-            "Chinese Yuan"
+            "Chinese yuan"
         ],
         "COP": [
             "COP",
@@ -683,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaanse ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaanse ouguiya"
         ],
         "MTL": [
@@ -915,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "Santomese dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Santomese dobra"
         ],
         "SUR": [
@@ -1035,6 +1043,10 @@
         ],
         "VEF": [
             "VEF",
+            "Venezolaanse bolivar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Venezolaanse bolivar"
         ],
         "VND": [

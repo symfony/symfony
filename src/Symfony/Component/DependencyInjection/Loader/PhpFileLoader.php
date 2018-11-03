@@ -33,7 +33,7 @@ class PhpFileLoader extends FileLoader
         $loader = $this;
 
         $path = $this->locator->locate($resource);
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
         $this->container->fileExists($path);
 
         // the closure forbids access to the private scope in the included file
@@ -43,7 +43,7 @@ class PhpFileLoader extends FileLoader
 
         $callback = $load($path);
 
-        if ($callback instanceof \Closure) {
+        if (\is_object($callback) && \is_callable($callback)) {
             $callback(new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource), $this->container, $this);
         }
     }
@@ -53,7 +53,7 @@ class PhpFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        if (!is_string($resource)) {
+        if (!\is_string($resource)) {
             return false;
         }
 

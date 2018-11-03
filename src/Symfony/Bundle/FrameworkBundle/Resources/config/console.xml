@@ -38,6 +38,11 @@
             <tag name="console.command" command="cache:pool:prune" />
         </service>
 
+        <service id="console.command.cache_pool_delete" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand">
+            <argument type="service" id="cache.global_clearer" />
+            <tag name="console.command" command="cache:pool:delete" />
+        </service>
+
         <service id="console.command.cache_warmup" class="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
             <argument type="service" id="cache_warmer" />
             <tag name="console.command" command="cache:warmup" />
@@ -62,6 +67,21 @@
         <service id="console.command.event_dispatcher_debug" class="Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand">
             <argument type="service" id="event_dispatcher" />
             <tag name="console.command" command="debug:event-dispatcher" />
+        </service>
+
+        <service id="console.command.messenger_consume_messages" class="Symfony\Component\Messenger\Command\ConsumeMessagesCommand">
+            <argument /> <!-- Message bus locator -->
+            <argument type="service" id="messenger.receiver_locator" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument type="collection" /> <!-- Receiver names -->
+            <argument type="collection" /> <!-- Message bus names -->
+
+            <tag name="console.command" command="messenger:consume-messages" />
+        </service>
+
+        <service id="console.command.messenger_debug" class="Symfony\Component\Messenger\Command\DebugCommand">
+            <argument type="collection" /> <!-- Message to handlers mapping -->
+            <tag name="console.command" command="debug:messenger" />
         </service>
 
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">

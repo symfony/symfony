@@ -9,6 +9,6 @@ security:
                     user_can_switch: { password: test, roles: [ROLE_USER, ROLE_ALLOWED_TO_SWITCH] }
     firewalls:
         main:
+            stateless: true
             switch_user:
                 parameter: X-Switch-User
-                stateless: true

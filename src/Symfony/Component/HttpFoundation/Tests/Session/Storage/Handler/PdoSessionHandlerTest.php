@@ -33,7 +33,7 @@ class PdoSessionHandlerTest extends TestCase
 
     protected function getPersistentSqliteDsn()
     {
-        $this->dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_sessions');
+        $this->dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_sessions');
 
         return 'sqlite:'.$this->dbFile;
     }
@@ -389,8 +389,8 @@ class MockPdo extends \PDO
 
     public function prepare($statement, $driverOptions = array())
     {
-        return is_callable($this->prepareResult)
-            ? call_user_func($this->prepareResult, $statement, $driverOptions)
+        return \is_callable($this->prepareResult)
+            ? \call_user_func($this->prepareResult, $statement, $driverOptions)
             : $this->prepareResult;
     }
 

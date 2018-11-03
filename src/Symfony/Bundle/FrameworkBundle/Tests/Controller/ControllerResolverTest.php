@@ -92,6 +92,10 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->getContainer());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Auto-injection of the container for "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController" is deprecated since Symfony 4.2. Configure it as a service instead.
+     */
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
         class_exists(AbstractControllerTest::class);
@@ -110,6 +114,10 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->setContainer($container));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Auto-injection of the container for "Symfony\Bundle\FrameworkBundle\Tests\Controller\DummyController" is deprecated since Symfony 4.2. Configure it as a service instead.
+     */
     public function testAbstractControllerServiceWithFcqnIdGetsContainerWhenNotSet()
     {
         class_exists(AbstractControllerTest::class);

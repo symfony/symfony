@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added information about orphaned events
+ * made the toolbar auto-update with info from ajax reponses when they set the 
+   `Symfony-Debug-Toolbar-Replace header` to `1`
 
 4.0.0
 -----

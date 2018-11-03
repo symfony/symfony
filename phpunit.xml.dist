@@ -19,6 +19,7 @@
         <env name="LDAP_PORT" value="3389" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
+        <env name="ZOOKEEPER_HOST" value="localhost" />
     </php>
 
     <testsuites>
@@ -26,6 +27,7 @@
             <directory>./src/Symfony/Bridge/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/*/Tests/</directory>
+            <directory>./src/Symfony/Contract/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -44,6 +46,7 @@
                 <directory>./src/Symfony/Bridge/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/*/Tests</directory>
+                <directory>./src/Symfony/Contract/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
@@ -52,6 +55,7 @@
                 <directory>./src/Symfony/Bundle/*/vendor</directory>
                 <directory>./src/Symfony/Component/*/vendor</directory>
                 <directory>./src/Symfony/Component/*/*/vendor</directory>
+                <directory>./src/Symfony/Contract/*/vendor</directory>
             </exclude>
         </whitelist>
     </filter>
@@ -65,6 +69,7 @@
                             <element><string>Cache\IntegrationTests</string></element>
                             <element><string>Doctrine\Common\Cache</string></element>
                             <element><string>Symfony\Component\Cache</string></element>
+                            <element><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
                             <element><string>Symfony\Component\Cache\Traits</string></element>
                             <element><string>Symfony\Component\Console</string></element>
                             <element><string>Symfony\Component\HttpFoundation</string></element>

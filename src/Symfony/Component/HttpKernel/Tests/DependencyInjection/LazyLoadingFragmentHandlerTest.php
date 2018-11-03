@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler;
 
 class LazyLoadingFragmentHandlerTest extends TestCase
 {

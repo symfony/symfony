@@ -10,7 +10,7 @@
     "arguments": [
         {
             "type": "service",
-            "id": "definition2"
+            "id": ".definition_2"
         },
         "%parameter%",
         {
@@ -33,7 +33,7 @@
             "foo",
             {
                 "type": "service",
-                "id": "definition2"
+                "id": ".definition_2"
             },
             {
                 "class": "inline_service",
@@ -56,7 +56,7 @@
             },
             {
                 "type": "service",
-                "id": "definition_2"
+                "id": ".definition_2"
             }
         ]
     ],

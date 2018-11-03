@@ -95,7 +95,7 @@ class ChildDefinition extends Definition
      */
     public function replaceArgument($index, $value)
     {
-        if (is_int($index)) {
+        if (\is_int($index)) {
             $this->arguments['index_'.$index] = $value;
         } elseif (0 === strpos($index, '$')) {
             $this->arguments[$index] = $value;
@@ -120,13 +120,5 @@ class ChildDefinition extends Definition
     public function setInstanceofConditionals(array $instanceof)
     {
         throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
-    }
-
-    /**
-     * @internal
-     */
-    public function setBindings(array $bindings)
-    {
-        throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
     }
 }

@@ -1,12 +1,23 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated `KernelInterface::getRootDir()` and the `kernel.root_dir` parameter
+ * deprecated `KernelInterface::getName()` and the `kernel.name` parameter
+ * deprecated the first and second constructor argument of `ConfigDataCollector` 
+ * deprecated `ConfigDataCollector::getApplicationName()` 
+ * deprecated `ConfigDataCollector::getApplicationVersion()`
+
 4.1.0
 -----
 
  * added orphaned events support to `EventDataCollector`
- * `ExceptionListener` now logs and collects exceptions at priority `2048` (previously logged at `-128` and collected at `0`)
+ * `ExceptionListener` now logs exceptions at priority `0` (previously logged at `-128`)
  * Deprecated `service:action` syntax with a single colon to reference controllers. Use `service::method` instead.
+ * Added the ability to profile individual argument value resolvers via the
+   `Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver`
 
 4.0.0
 -----

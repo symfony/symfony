@@ -18,8 +18,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\CompiledRoute;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class ObjectsProvider
@@ -96,6 +96,14 @@ class ObjectsProvider
         return array('builder_1' => $builder1);
     }
 
+    public static function getContainerDefinitionsWithExistingClasses()
+    {
+        return array(
+            'existing_class_def_1' => new Definition(ClassWithDocComment::class),
+            'existing_class_def_2' => new Definition(ClassWithoutDocComment::class),
+        );
+    }
+
     public static function getContainerDefinitions()
     {
         $definition1 = new Definition('Full\\Qualified\\Class1');
@@ -107,20 +115,20 @@ class ObjectsProvider
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
-                ->addArgument(new Reference('definition2'))
+                ->addArgument(new Reference('.definition_2'))
                 ->addArgument('%parameter%')
                 ->addArgument(new Definition('inline_service', array('arg1', 'arg2')))
                 ->addArgument(array(
                     'foo',
-                    new Reference('definition2'),
+                    new Reference('.definition_2'),
                     new Definition('inline_service'),
                 ))
                 ->addArgument(new IteratorArgument(array(
                     new Reference('definition_1'),
-                    new Reference('definition_2'),
+                    new Reference('.definition_2'),
                 )))
                 ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
-            'definition_2' => $definition2
+            '.definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')
@@ -138,7 +146,7 @@ class ObjectsProvider
     {
         return array(
             'alias_1' => new Alias('service_1', true),
-            'alias_2' => new Alias('service_2', false),
+            '.alias_2' => new Alias('.service_2', false),
         );
     }
 
@@ -195,4 +203,15 @@ class RouteStub extends Route
     {
         return new CompiledRoute('', '#PATH_REGEX#', array(), array(), '#HOST_REGEX#');
     }
+}
+
+class ClassWithoutDocComment
+{
+}
+
+/**
+ * This is a class with a doc comment.
+ */
+class ClassWithDocComment
+{
 }

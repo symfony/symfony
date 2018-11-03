@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
-use Symfony\Component\Form\FormError;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormTest_AuthorWithoutRefSetter
 {
@@ -40,7 +40,7 @@ class FormTest_AuthorWithoutRefSetter
     // to update it
     public function getReferenceCopy()
     {
-        return is_object($this->referenceCopy) ? clone $this->referenceCopy : $this->referenceCopy;
+        return \is_object($this->referenceCopy) ? clone $this->referenceCopy : $this->referenceCopy;
     }
 
     public function setReferenceCopy($reference)

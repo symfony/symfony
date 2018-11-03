@@ -13,8 +13,8 @@ namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class ArrayInputTest extends TestCase
@@ -47,14 +47,14 @@ class ArrayInputTest extends TestCase
     {
         $input = new ArrayInput(array('name' => 'Fabien', '--foo' => 'bar'));
         $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
-        $this->assertFalse($input->getParameterOption('--bar'), '->getParameterOption() returns the default if an option is not present in the passed parameters');
+        $this->assertEquals('default', $input->getParameterOption('--bar', 'default'), '->getParameterOption() returns the default value if an option is not present in the passed parameters');
 
         $input = new ArrayInput(array('Fabien', '--foo' => 'bar'));
         $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
 
         $input = new ArrayInput(array('--foo', '--', '--bar' => 'woop'));
         $this->assertEquals('woop', $input->getParameterOption('--bar'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
-        $this->assertFalse($input->getParameterOption('--bar', false, true), '->getParameterOption() returns false if an option is present in the passed parameters after an end of options signal');
+        $this->assertEquals('default', $input->getParameterOption('--bar', 'default', true), '->getParameterOption() returns the default value if an option is present in the passed parameters after an end of options signal');
     }
 
     public function testParseArguments()

@@ -29,7 +29,7 @@ class GetResponseEvent extends KernelEvent
     /**
      * Returns the response object.
      *
-     * @return Response
+     * @return Response|null
      */
     public function getResponse()
     {

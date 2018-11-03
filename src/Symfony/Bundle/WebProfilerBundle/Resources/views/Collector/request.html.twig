@@ -131,6 +131,33 @@
                     {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
+                <h3>Uploaded files</h3>
+
+                {% if collector.requestfiles is empty %}
+                    <div class="empty">
+                        <p>No files were uploaded</p>
+                    </div>
+                {% else %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">File Name</th>
+                                <th scope="col">MIME Type</th>
+                                <th scope="col text-right">Size (bytes)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for file in collector.requestfiles %}
+                            <tr>
+                                <td>{{ file.name }}</td>
+                                <td>{{ file.mimetype }}</td>
+                                <td class="text-right">{{ file.size|number_format }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
                 <h3>Request Attributes</h3>
 
                 {% if collector.requestattributes.all is empty %}
@@ -159,17 +186,6 @@
                         <p>No content</p>
                     </div>
                 {% endif %}
-
-                <h3>Server Parameters</h3>
-                <h4>Defined in .env</h4>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.dotenvvars }, with_context = false) }}
-
-                <h4>Defined as regular env variables</h4>
-                {% set requestserver = [] %}
-                {% for key, value in collector.requestserver if key not in collector.dotenvvars.keys %}
-                    {% set requestserver = requestserver|merge({(key): value}) %}
-                {% endfor %}
-                {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}
             </div>
         </div>
 
@@ -248,6 +264,22 @@
                 {% else %}
                     {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.flashes }, with_context = false) }}
                 {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Server Parameters</h3>
+            <div class="tab-content">
+                <h3>Server Parameters</h3>
+                <h4>Defined in .env</h4>
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.dotenvvars }, with_context = false) }}
+
+                <h4>Defined as regular env variables</h4>
+                {% set requestserver = [] %}
+                {% for key, value in collector.requestserver if key not in collector.dotenvvars.keys %}
+                    {% set requestserver = requestserver|merge({(key): value}) %}
+                {% endfor %}
+                {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}
             </div>
         </div>
 

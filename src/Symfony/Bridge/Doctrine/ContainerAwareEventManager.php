@@ -54,7 +54,7 @@ class ContainerAwareEventManager extends EventManager
             $initialized = isset($this->initialized[$eventName]);
 
             foreach ($this->listeners[$eventName] as $hash => $listener) {
-                if (!$initialized && is_string($listener)) {
+                if (!$initialized && \is_string($listener)) {
                     $this->listeners[$eventName][$hash] = $listener = $this->container->get($listener);
                 }
 
@@ -98,7 +98,7 @@ class ContainerAwareEventManager extends EventManager
      */
     public function addEventListener($events, $listener)
     {
-        if (is_string($listener)) {
+        if (\is_string($listener)) {
             if ($this->initialized) {
                 throw new \RuntimeException('Adding lazy-loading listeners after construction is not supported.');
             }
@@ -124,7 +124,7 @@ class ContainerAwareEventManager extends EventManager
      */
     public function removeEventListener($events, $listener)
     {
-        if (is_string($listener)) {
+        if (\is_string($listener)) {
             $hash = '_service_'.$listener;
         } else {
             // Picks the hash code related to that listener

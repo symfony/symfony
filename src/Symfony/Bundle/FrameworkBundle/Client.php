@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\Client as BaseClient;
-use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\BrowserKit\History;
-use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpKernel\Client as BaseClient;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -161,17 +161,17 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
-        $kernel = str_replace("'", "\\'", serialize($this->kernel));
-        $request = str_replace("'", "\\'", serialize($request));
+        $kernel = var_export(serialize($this->kernel), true);
+        $request = var_export(serialize($request), true);
         $errorReporting = error_reporting();
 
         $requires = '';
         foreach (get_declared_classes() as $class) {
             if (0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
-                $file = dirname(dirname($r->getFileName())).'/autoload.php';
+                $file = \dirname(\dirname($r->getFileName())).'/autoload.php';
                 if (file_exists($file)) {
-                    $requires .= "require_once '".str_replace("'", "\\'", $file)."';\n";
+                    $requires .= 'require_once '.var_export($file, true).";\n";
                 }
             }
         }
@@ -180,7 +180,7 @@ class Client extends BaseClient
             throw new \RuntimeException('Composer autoloader not found.');
         }
 
-        $requires .= "require_once '".str_replace("'", "\\'", (new \ReflectionObject($this->kernel))->getFileName())."';\n";
+        $requires .= 'require_once '.var_export((new \ReflectionObject($this->kernel))->getFileName(), true).";\n";
 
         $profilerCode = '';
         if ($this->profiler) {
@@ -194,11 +194,11 @@ error_reporting($errorReporting);
 
 $requires
 
-\$kernel = unserialize('$kernel');
+\$kernel = unserialize($kernel);
 \$kernel->boot();
 $profilerCode
 
-\$request = unserialize('$request');
+\$request = unserialize($request);
 EOF;
 
         return $code.$this->getHandleScript();

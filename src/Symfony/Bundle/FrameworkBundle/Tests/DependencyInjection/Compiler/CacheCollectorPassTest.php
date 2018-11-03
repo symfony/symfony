@@ -21,6 +21,9 @@ use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @group legacy
+ */
 class CacheCollectorPassTest extends TestCase
 {
     public function testProcess()

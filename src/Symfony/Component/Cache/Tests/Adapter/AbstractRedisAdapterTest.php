@@ -30,7 +30,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
 
     public static function setupBeforeClass()
     {
-        if (!extension_loaded('redis')) {
+        if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }
         if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {

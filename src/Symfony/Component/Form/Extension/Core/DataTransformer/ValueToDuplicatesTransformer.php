@@ -54,7 +54,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      */
     public function reverseTransform($array)
     {
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -64,24 +64,20 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         foreach ($this->keys as $key) {
             if (isset($array[$key]) && '' !== $array[$key] && false !== $array[$key] && array() !== $array[$key]) {
                 if ($array[$key] !== $result) {
-                    throw new TransformationFailedException(
-                        'All values in the array should be the same'
-                    );
+                    throw new TransformationFailedException('All values in the array should be the same');
                 }
             } else {
                 $emptyKeys[] = $key;
             }
         }
 
-        if (count($emptyKeys) > 0) {
-            if (count($emptyKeys) == count($this->keys)) {
+        if (\count($emptyKeys) > 0) {
+            if (\count($emptyKeys) == \count($this->keys)) {
                 // All keys empty
                 return;
             }
 
-            throw new TransformationFailedException(
-                 sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)
-            ));
+            throw new TransformationFailedException(sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)));
         }
 
         return $result;

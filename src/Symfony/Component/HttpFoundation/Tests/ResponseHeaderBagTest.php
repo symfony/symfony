@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @group time-sensitive
@@ -110,13 +110,13 @@ class ResponseHeaderBagTest extends TestCase
     public function testToStringIncludesCookieHeaders()
     {
         $bag = new ResponseHeaderBag(array());
-        $bag->setCookie(new Cookie('foo', 'bar'));
+        $bag->setCookie(Cookie::create('foo', 'bar'));
 
-        $this->assertSetCookieHeader('foo=bar; path=/; httponly', $bag);
+        $this->assertSetCookieHeader('foo=bar; path=/; httponly; samesite=lax', $bag);
 
         $bag->clearCookie('foo');
 
-        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; max-age=-31536001; path=/; httponly', $bag);
+        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; httponly', $bag);
     }
 
     public function testClearCookieSecureNotHttpOnly()
@@ -125,7 +125,7 @@ class ResponseHeaderBagTest extends TestCase
 
         $bag->clearCookie('foo', '/', null, true, false);
 
-        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; max-age=-31536001; path=/; secure', $bag);
+        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure', $bag);
     }
 
     public function testReplace()
@@ -154,24 +154,24 @@ class ResponseHeaderBagTest extends TestCase
     public function testCookiesWithSameNames()
     {
         $bag = new ResponseHeaderBag();
-        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/foo', 'foo.bar'));
-        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/bar', 'foo.bar'));
-        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/bar', 'bar.foo'));
-        $bag->setCookie(new Cookie('foo', 'bar'));
+        $bag->setCookie(Cookie::create('foo', 'bar', 0, '/path/foo', 'foo.bar'));
+        $bag->setCookie(Cookie::create('foo', 'bar', 0, '/path/bar', 'foo.bar'));
+        $bag->setCookie(Cookie::create('foo', 'bar', 0, '/path/bar', 'bar.foo'));
+        $bag->setCookie(Cookie::create('foo', 'bar'));
 
         $this->assertCount(4, $bag->getCookies());
-        $this->assertEquals('foo=bar; path=/path/foo; domain=foo.bar; httponly', $bag->get('set-cookie'));
+        $this->assertEquals('foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax', $bag->get('set-cookie'));
         $this->assertEquals(array(
-            'foo=bar; path=/path/foo; domain=foo.bar; httponly',
-            'foo=bar; path=/path/bar; domain=foo.bar; httponly',
-            'foo=bar; path=/path/bar; domain=bar.foo; httponly',
-            'foo=bar; path=/; httponly',
+            'foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax',
+            'foo=bar; path=/path/bar; domain=foo.bar; httponly; samesite=lax',
+            'foo=bar; path=/path/bar; domain=bar.foo; httponly; samesite=lax',
+            'foo=bar; path=/; httponly; samesite=lax',
         ), $bag->get('set-cookie', null, false));
 
-        $this->assertSetCookieHeader('foo=bar; path=/path/foo; domain=foo.bar; httponly', $bag);
-        $this->assertSetCookieHeader('foo=bar; path=/path/bar; domain=foo.bar; httponly', $bag);
-        $this->assertSetCookieHeader('foo=bar; path=/path/bar; domain=bar.foo; httponly', $bag);
-        $this->assertSetCookieHeader('foo=bar; path=/; httponly', $bag);
+        $this->assertSetCookieHeader('foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax', $bag);
+        $this->assertSetCookieHeader('foo=bar; path=/path/bar; domain=foo.bar; httponly; samesite=lax', $bag);
+        $this->assertSetCookieHeader('foo=bar; path=/path/bar; domain=bar.foo; httponly; samesite=lax', $bag);
+        $this->assertSetCookieHeader('foo=bar; path=/; httponly; samesite=lax', $bag);
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
 
@@ -186,8 +186,8 @@ class ResponseHeaderBagTest extends TestCase
         $bag = new ResponseHeaderBag();
         $this->assertFalse($bag->has('set-cookie'));
 
-        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/foo', 'foo.bar'));
-        $bag->setCookie(new Cookie('bar', 'foo', 0, '/path/bar', 'foo.bar'));
+        $bag->setCookie(Cookie::create('foo', 'bar', 0, '/path/foo', 'foo.bar'));
+        $bag->setCookie(Cookie::create('bar', 'foo', 0, '/path/bar', 'foo.bar'));
         $this->assertTrue($bag->has('set-cookie'));
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
@@ -209,8 +209,8 @@ class ResponseHeaderBagTest extends TestCase
     public function testRemoveCookieWithNullRemove()
     {
         $bag = new ResponseHeaderBag();
-        $bag->setCookie(new Cookie('foo', 'bar', 0));
-        $bag->setCookie(new Cookie('bar', 'foo', 0));
+        $bag->setCookie(Cookie::create('foo', 'bar'));
+        $bag->setCookie(Cookie::create('bar', 'foo'));
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $this->assertArrayHasKey('/', $cookies['']);
@@ -228,12 +228,12 @@ class ResponseHeaderBagTest extends TestCase
     {
         $bag = new ResponseHeaderBag();
         $bag->set('set-cookie', 'foo=bar');
-        $this->assertEquals(array(new Cookie('foo', 'bar', 0, '/', null, false, false, true)), $bag->getCookies());
+        $this->assertEquals(array(Cookie::create('foo', 'bar', 0, '/', null, false, false, true, null)), $bag->getCookies());
 
         $bag->set('set-cookie', 'foo2=bar2', false);
         $this->assertEquals(array(
-            new Cookie('foo', 'bar', 0, '/', null, false, false, true),
-            new Cookie('foo2', 'bar2', 0, '/', null, false, false, true),
+            Cookie::create('foo', 'bar', 0, '/', null, false, false, true, null),
+            Cookie::create('foo2', 'bar2', 0, '/', null, false, false, true, null),
         ), $bag->getCookies());
 
         $bag->remove('set-cookie');
@@ -250,26 +250,6 @@ class ResponseHeaderBagTest extends TestCase
         $bag->getCookies('invalid_argument');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMakeDispositionInvalidDisposition()
-    {
-        $headers = new ResponseHeaderBag();
-
-        $headers->makeDisposition('invalid', 'foo.html');
-    }
-
-    /**
-     * @dataProvider provideMakeDisposition
-     */
-    public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)
-    {
-        $headers = new ResponseHeaderBag();
-
-        $this->assertEquals($expected, $headers->makeDisposition($disposition, $filename, $filenameFallback));
-    }
-
     public function testToStringDoesntMessUpHeaders()
     {
         $headers = new ResponseHeaderBag();
@@ -282,41 +262,6 @@ class ResponseHeaderBagTest extends TestCase
         $allHeaders = $headers->allPreserveCase();
         $this->assertEquals(array('http://www.symfony.com'), $allHeaders['Location']);
         $this->assertEquals(array('text/html'), $allHeaders['Content-type']);
-    }
-
-    public function provideMakeDisposition()
-    {
-        return array(
-            array('attachment', 'foo.html', 'foo.html', 'attachment; filename="foo.html"'),
-            array('attachment', 'foo.html', '', 'attachment; filename="foo.html"'),
-            array('attachment', 'foo bar.html', '', 'attachment; filename="foo bar.html"'),
-            array('attachment', 'foo "bar".html', '', 'attachment; filename="foo \\"bar\\".html"'),
-            array('attachment', 'foo%20bar.html', 'foo bar.html', 'attachment; filename="foo bar.html"; filename*=utf-8\'\'foo%2520bar.html'),
-            array('attachment', 'föö.html', 'foo.html', 'attachment; filename="foo.html"; filename*=utf-8\'\'f%C3%B6%C3%B6.html'),
-        );
-    }
-
-    /**
-     * @dataProvider provideMakeDispositionFail
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMakeDispositionFail($disposition, $filename)
-    {
-        $headers = new ResponseHeaderBag();
-
-        $headers->makeDisposition($disposition, $filename);
-    }
-
-    public function provideMakeDispositionFail()
-    {
-        return array(
-            array('attachment', 'foo%20bar.html'),
-            array('attachment', 'foo/bar.html'),
-            array('attachment', '/foo.html'),
-            array('attachment', 'foo\bar.html'),
-            array('attachment', '\foo.html'),
-            array('attachment', 'föö.html'),
-        );
     }
 
     public function testDateHeaderAddedOnCreation()

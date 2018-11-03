@@ -24,14 +24,14 @@ class StateMachineValidator implements DefinitionValidatorInterface
         $transitionFromNames = array();
         foreach ($definition->getTransitions() as $transition) {
             // Make sure that each transition has exactly one TO
-            if (1 !== count($transition->getTos())) {
-                throw new InvalidDefinitionException(sprintf('A transition in StateMachine can only have one output. But the transition "%s" in StateMachine "%s" has %d outputs.', $transition->getName(), $name, count($transition->getTos())));
+            if (1 !== \count($transition->getTos())) {
+                throw new InvalidDefinitionException(sprintf('A transition in StateMachine can only have one output. But the transition "%s" in StateMachine "%s" has %d outputs.', $transition->getName(), $name, \count($transition->getTos())));
             }
 
             // Make sure that each transition has exactly one FROM
             $froms = $transition->getFroms();
-            if (1 !== count($froms)) {
-                throw new InvalidDefinitionException(sprintf('A transition in StateMachine can only have one input. But the transition "%s" in StateMachine "%s" has %d inputs.', $transition->getName(), $name, count($froms)));
+            if (1 !== \count($froms)) {
+                throw new InvalidDefinitionException(sprintf('A transition in StateMachine can only have one input. But the transition "%s" in StateMachine "%s" has %d inputs.', $transition->getName(), $name, \count($froms)));
             }
 
             // Enforcing uniqueness of the names of transitions starting at each node

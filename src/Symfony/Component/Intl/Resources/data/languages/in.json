@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.20",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhaz",
@@ -28,6 +28,7 @@
         "arn": "Mapuche",
         "arp": "Arapaho",
         "arq": "Arab Aljazair",
+        "ars": "Arab Najdi",
         "arw": "Arawak",
         "ary": "Arab Maroko",
         "arz": "Arab Mesir",
@@ -325,7 +326,6 @@
         "ms": "Melayu",
         "mt": "Malta",
         "mua": "Mundang",
-        "mul": "Beberapa Bahasa",
         "mus": "Bahasa Muskogee",
         "mwl": "Miranda",
         "mwr": "Marwari",
@@ -505,7 +505,6 @@
         "uga": "Ugarit",
         "uk": "Ukraina",
         "umb": "Umbundu",
-        "und": "Bahasa Tidak Dikenal",
         "ur": "Urdu",
         "uz": "Uzbek",
         "vai": "Vai",
@@ -542,7 +541,6 @@
         "zh_Hant": "Tionghoa (Aksara Tradisional)",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Tidak ada konten linguistik",
         "zza": "Zaza"
     }
 }

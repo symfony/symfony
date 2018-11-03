@@ -17,9 +17,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 class CompoundFormTest extends AbstractFormTest
 {
@@ -595,7 +595,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequest($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
         $values = array(
@@ -643,7 +643,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
 
@@ -691,7 +691,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
 
@@ -728,7 +728,7 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
         file_put_contents($path, 'zaza');
 
@@ -877,6 +877,48 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertCount(1, $nestedErrorsAsArray);
         $this->assertSame($nestedError, $nestedErrorsAsArray[0]);
+    }
+
+    public function testClearErrors()
+    {
+        $this->form->addError(new FormError('Error 1'));
+        $this->form->addError(new FormError('Error 2'));
+
+        $this->assertCount(2, $this->form->getErrors());
+
+        $this->form->clearErrors();
+
+        $this->assertCount(0, $this->form->getErrors());
+    }
+
+    public function testClearErrorsShallow()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError(new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->form->clearErrors(false);
+
+        $this->assertCount(0, $this->form->getErrors(false));
+        $this->assertCount(1, $this->form->getErrors(true));
+    }
+
+    public function testClearErrorsDeep()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->form->clearErrors(true);
+
+        $this->assertCount(0, $this->form->getErrors(false));
+        $this->assertCount(0, $this->form->getErrors(true));
     }
 
     // Basic cases are covered in SimpleFormTest

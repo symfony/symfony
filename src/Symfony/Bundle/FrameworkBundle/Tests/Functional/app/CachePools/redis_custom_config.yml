@@ -26,3 +26,17 @@ framework:
             cache.pool2:
                 public: true
                 clearer: ~
+            cache.pool3:
+                clearer: ~
+            cache.pool4:
+                tags: true
+                public: true
+            cache.pool5:
+                tags: cache.pool2
+                public: true
+            cache.pool6:
+                tags: cache.pool4
+                public: true
+            cache.pool7:
+                adapter: cache.pool4
+                public: true

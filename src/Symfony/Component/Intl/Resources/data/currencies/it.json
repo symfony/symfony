@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.44.86",
     "Names": {
         "ADP": [
             "ADP",
@@ -604,6 +604,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya della Mauritania (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya della Mauritania"
         ],
         "MTL": [
@@ -824,7 +828,11 @@
         ],
         "STD": [
             "STD",
-            "dobra di Sao Tomé e Principe"
+            "dobra di Sao Tomé e Principe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
+            "dobra di Sao Tomé e Príncipe"
         ],
         "SUR": [
             "SUR",
@@ -944,6 +952,10 @@
         ],
         "VEF": [
             "VEF",
+            "bolívar venezuelano (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "bolívar venezuelano"
         ],
         "VND": [

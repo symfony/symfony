@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.67",
+    "Version": "2.1.44.91",
     "Names": {
         "ADP": [
             "ADP",
@@ -359,7 +359,7 @@
         ],
         "ESA": [
             "ESA",
-            "Espanjan peseta (A–tili)"
+            "Espanjan peseta (A-tili)"
         ],
         "ESB": [
             "ESB",
@@ -683,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanian ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanian ouguiya"
         ],
         "MTL": [
@@ -915,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomén ja Príncipen dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomén ja Príncipen dobra"
         ],
         "SUR": [
@@ -1031,11 +1039,15 @@
         ],
         "VEB": [
             "VEB",
-            "Venezuelan bolivar (1871–2008)"
+            "Venezuelan bolívar (1871–2008)"
         ],
         "VEF": [
             "VEF",
-            "Venezuelan bolivar"
+            "Venezuelan bolívar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
+            "Venezuelan suvereeni bolívar"
         ],
         "VND": [
             "VND",

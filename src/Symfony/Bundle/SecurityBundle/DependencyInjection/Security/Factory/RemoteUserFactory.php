@@ -38,6 +38,7 @@ class RemoteUserFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.remote_user'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, $config['user']);
+        $listener->addMethodCall('setSessionAuthenticationStrategy', array(new Reference('security.authentication.session_strategy.'.$id)));
 
         return array($providerId, $listenerId, $defaultEntryPoint);
     }

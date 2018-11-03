@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -30,7 +31,6 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContextListenerTest extends TestCase
 {
@@ -258,6 +258,15 @@ class ContextListenerTest extends TestCase
         $this->handleEventWithPreviousSession($tokenStorage, array(new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)));
 
         $this->assertNull($tokenStorage->getToken());
+    }
+
+    public function testIfTokenIsNotDeauthenticated()
+    {
+        $tokenStorage = new TokenStorage();
+        $badRefreshedUser = new User('foobar', 'baz');
+        $goodRefreshedUser = new User('foobar', 'bar');
+        $this->handleEventWithPreviousSession($tokenStorage, array(new SupportingUserProvider($badRefreshedUser), new SupportingUserProvider($goodRefreshedUser)), $goodRefreshedUser, true);
+        $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
 
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()

@@ -33,7 +33,7 @@ class LexerTest extends TestCase
      */
     public function testTokenize($tokens, $expression)
     {
-        $tokens[] = new Token('end of expression', null, strlen($expression) + 1);
+        $tokens[] = new Token('end of expression', null, \strlen($expression) + 1);
         $this->assertEquals(new TokenStream($tokens, $expression), $this->lexer->tokenize($expression));
     }
 

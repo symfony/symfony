@@ -35,6 +35,7 @@ class YamlEncoderTest extends TestCase
         $encoder = new YamlEncoder();
 
         $this->assertTrue($encoder->supportsEncoding('yaml'));
+        $this->assertTrue($encoder->supportsEncoding('yml'));
         $this->assertFalse($encoder->supportsEncoding('json'));
     }
 
@@ -51,6 +52,7 @@ class YamlEncoderTest extends TestCase
         $encoder = new YamlEncoder();
 
         $this->assertTrue($encoder->supportsDecoding('yaml'));
+        $this->assertTrue($encoder->supportsDecoding('yml'));
         $this->assertFalse($encoder->supportsDecoding('json'));
     }
 

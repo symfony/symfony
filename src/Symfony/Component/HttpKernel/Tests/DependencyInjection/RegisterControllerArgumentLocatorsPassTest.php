@@ -13,13 +13,14 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
@@ -148,7 +149,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame(ServiceLocator::class, $locator->getClass());
         $this->assertFalse($locator->isPublic());
 
-        $expected = array('bar' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, RegisterTestController::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+        $expected = array('bar' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'bar')));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
@@ -168,7 +169,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
-        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class)));
+        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
@@ -187,7 +188,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
-        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
@@ -308,23 +309,72 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
     public function provideBindings()
     {
-        return array(array(ControllerDummy::class), array('$bar'));
+        return array(
+            array(ControllerDummy::class.'$bar'),
+            array(ControllerDummy::class),
+            array('$bar'),
+        );
     }
 
-    public function testDoNotBindScalarValueToControllerArgument()
+    /**
+     * @dataProvider provideBindScalarValueToControllerArgument
+     */
+    public function testBindScalarValueToControllerArgument($bindingKey)
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
 
         $container->register('foo', ArgumentWithoutTypeController::class)
-            ->setBindings(array('$someArg' => '%foo%'))
+            ->setBindings(array($bindingKey => '%foo%'))
             ->addTag('controller.service_arguments');
+
+        $container->setParameter('foo', 'foo_val');
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertEmpty($locator);
+
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+
+        // assert the locator has a someArg key
+        $arguments = $locator->getArgument(0);
+        $this->assertArrayHasKey('someArg', $arguments);
+        $this->assertInstanceOf(ServiceClosureArgument::class, $arguments['someArg']);
+        // get the Reference that someArg points to
+        $reference = $arguments['someArg']->getValues()[0];
+        // make sure this service *does* exist and returns the correct value
+        $this->assertTrue($container->has((string) $reference));
+        $this->assertSame('foo_val', $container->get((string) $reference));
+    }
+
+    public function provideBindScalarValueToControllerArgument()
+    {
+        yield array('$someArg');
+        yield array('string $someArg');
+    }
+
+    public function testBindingsOnChildDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('parent', ArgumentWithoutTypeController::class);
+
+        $container->setDefinition('child', (new ChildDefinition('parent'))
+            ->setBindings(array('$someArg' => new Reference('parent')))
+            ->addTag('controller.service_arguments')
+        );
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertInstanceOf(ServiceClosureArgument::class, $locator['child::fooAction']);
+
+        $locator = $container->getDefinition((string) $locator['child::fooAction']->getValues()[0])->getArgument(0);
+        $this->assertInstanceOf(ServiceClosureArgument::class, $locator['someArg']);
+        $this->assertEquals(new Reference('parent'), $locator['someArg']->getValues()[0]);
     }
 }
 
@@ -383,7 +433,7 @@ class NonExistentClassOptionalController
 
 class ArgumentWithoutTypeController
 {
-    public function fooAction($someArg)
+    public function fooAction(string $someArg)
     {
     }
 }

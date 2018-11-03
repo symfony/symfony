@@ -55,7 +55,16 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 class {$context['class']} implements NormalizerInterface, NormalizerAwareInterface
 {
+    protected \$defaultContext = array(
+        ObjectNormalizer::CIRCULAR_REFERENCE_LIMIT => 1,
+    );
+
     use CircularReferenceTrait, NormalizerAwareTrait;
+
+    public function __construct(array \$defaultContext)
+    {
+        \$this->defaultContext = array_merge(\$this->defaultContext, \$defaultContext);
+    }
 
 {$this->generateNormalizeMethod($reflectionClass)}
 
@@ -104,9 +113,10 @@ EOL;
         }
 
         if ($maxDepthCode) {
+            $maxDepthKey = ObjectNormalizer::ENABLE_MAX_DEPTH;
             $code .= <<<EOL
 
-        if (isset(\$context[ObjectNormalizer::ENABLE_MAX_DEPTH])) {{$maxDepthCode}
+        if (\$context[$maxDepthKey] ?? \$this->defaultContext[$maxDepthKey]) {{$maxDepthCode}
         }
 
 EOL;
@@ -115,6 +125,7 @@ EOL;
         foreach ($attributesMetadata as $attributeMetadata) {
             $code .= <<<EOL
 
+        \$attributes = \$context['attributes'] ?? $this->defaultContext['attributes'] ?? null
         if ((null === \$groups
 EOL;
 
@@ -123,7 +134,7 @@ EOL;
             }
             $code .= ')';
 
-            $code .= " && (!isset(\$context['attributes']) || isset(\$context['attributes']['{$attributeMetadata->name}']) || (is_array(\$context['attributes']) && in_array('{$attributeMetadata->name}', \$context['attributes'], true)))";
+            $code .= " && (isset(\$attributes['{$attributeMetadata->name}']) || (is_array(\$attributes) && in_array('{$attributeMetadata->name}', \$attributes, true)))";
 
             if (null !== $maxDepth = $attributeMetadata->getMaxDepth()) {
                 $key = sprintf(ObjectNormalizer::DEPTH_KEY_PATTERN, $reflectionClass->name, $attributeMetadata->name);

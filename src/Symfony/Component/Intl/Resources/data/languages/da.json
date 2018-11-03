@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.43.65",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -25,6 +25,7 @@
         "arc": "aramæisk",
         "arn": "mapudungun",
         "arp": "arapaho",
+        "ars": "Najd-arabisk",
         "arw": "arawak",
         "as": "assamesisk",
         "asa": "asu",
@@ -154,7 +155,7 @@
         "frr": "nordfrisisk",
         "frs": "østfrisisk",
         "fur": "friulian",
-        "fy": "frisisk",
+        "fy": "vestfrisisk",
         "ga": "irsk",
         "gaa": "ga",
         "gag": "gagauzisk",
@@ -319,7 +320,6 @@
         "ms": "malajisk",
         "mt": "maltesisk",
         "mua": "mundang",
-        "mul": "flere sprog",
         "mus": "creek",
         "mwl": "mirandesisk",
         "mwr": "marwari",
@@ -492,7 +492,6 @@
         "uga": "ugaristisk",
         "uk": "ukrainsk",
         "umb": "umbundu",
-        "und": "ukendt sprog",
         "ur": "urdu",
         "uz": "usbekisk",
         "vai": "vai",
@@ -529,7 +528,6 @@
         "zh_Hant": "traditionelt kinesisk",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "intet sprogligt indhold",
         "zza": "zaza"
     }
 }

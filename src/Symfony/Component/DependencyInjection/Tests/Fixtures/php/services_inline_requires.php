@@ -19,11 +19,6 @@ class ProjectServiceContainer extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
-
     public function __construct()
     {
         $dir = __DIR__;
@@ -47,12 +42,6 @@ class ProjectServiceContainer extends Container
             include_once $this->targetDirs[1].'/includes/HotPath/T1.php';
             include_once $this->targetDirs[1].'/includes/HotPath/C1.php';
         };
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
     }
 
     public function compile()
@@ -101,8 +90,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getC2Service()
     {
-        include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
         include_once $this->targetDirs[1].'/includes/HotPath/C2.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
 
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3());
     }

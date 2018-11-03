@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.88",
     "Names": {
         "AC": "Motu ʻAsenisini",
         "AD": "ʻAnitola",
@@ -72,7 +72,6 @@
         "ER": "ʻElitulia",
         "ES": "Sipeini",
         "ET": "ʻĪtiōpia",
-        "EZ": "ʻEulope fekauʻaki-paʻanga",
         "FI": "Finilani",
         "FJ": "Fisi",
         "FK": "ʻOtumotu Fokulani",
@@ -149,7 +148,7 @@
         "MH": "ʻOtumotu Māsolo",
         "MK": "Masetōnia",
         "ML": "Māli",
-        "MM": "Pema",
+        "MM": "Mianimā (Pema)",
         "MN": "Mongokōlia",
         "MO": "Makau SAR Siaina",
         "MP": "ʻOtumotu Maliana tokelau",
@@ -237,7 +236,6 @@
         "UA": "ʻŪkalaʻine",
         "UG": "ʻIukanitā",
         "UM": "ʻOtumotu siʻi ʻo ʻAmelika",
-        "UN": "ʻŪ fonua fakatahataha",
         "US": "Puleʻanga fakatahataha ʻAmelika",
         "UY": "ʻUlukuai",
         "UZ": "ʻUsipekitani",

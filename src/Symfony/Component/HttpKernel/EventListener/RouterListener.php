@@ -12,24 +12,25 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
@@ -129,12 +130,6 @@ class RouterListener implements EventSubscriberInterface
             unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
-            if ($this->debug && $e instanceof NoConfigurationException) {
-                $event->setResponse($this->createWelcomeResponse());
-
-                return;
-            }
-
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
 
             if ($referer = $request->headers->get('referer')) {
@@ -149,18 +144,30 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        if (!$this->debug || !($e = $event->getException()) instanceof NotFoundHttpException) {
+            return;
+        }
+
+        if ($e->getPrevious() instanceof NoConfigurationException) {
+            $event->setResponse($this->createWelcomeResponse());
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
             KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
+            KernelEvents::EXCEPTION => array('onKernelException', -64),
         );
     }
 
     private function createWelcomeResponse()
     {
         $version = Kernel::VERSION;
-        $baseDir = realpath($this->projectDir).DIRECTORY_SEPARATOR;
+        $baseDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;
         $docVersion = substr(Kernel::VERSION, 0, 3);
 
         ob_start();

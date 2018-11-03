@@ -45,9 +45,20 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function get($key, $default = null)
     {
-        foreach ($this->getMultiple(array($key), $default) as $v) {
-            return $v;
+        if (!\is_string($key) || !isset($this->expiries[$key])) {
+            CacheItem::validateKey($key);
         }
+        if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > microtime(true) || !$this->delete($key))) {
+            $this->values[$key] = null;
+
+            return $default;
+        }
+        if (!$this->storeSerialized) {
+            return $this->values[$key];
+        }
+        $value = $this->unfreeze($key, $isHit);
+
+        return $isHit ? $value : $default;
     }
 
     /**
@@ -57,14 +68,16 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
-            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
+        } elseif (!\is_array($keys)) {
+            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
         foreach ($keys as $key) {
-            CacheItem::validateKey($key);
+            if (!\is_string($key) || !isset($this->expiries[$key])) {
+                CacheItem::validateKey($key);
+            }
         }
 
-        return $this->generateItems($keys, time(), function ($k, $v, $hit) use ($default) { return $hit ? $v : $default; });
+        return $this->generateItems($keys, microtime(true), function ($k, $v, $hit) use ($default) { return $hit ? $v : $default; });
     }
 
     /**
@@ -72,8 +85,8 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function deleteMultiple($keys)
     {
-        if (!is_array($keys) && !$keys instanceof \Traversable) {
-            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
+        if (!\is_array($keys) && !$keys instanceof \Traversable) {
+            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
         foreach ($keys as $key) {
             $this->delete($key);
@@ -87,7 +100,9 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function set($key, $value, $ttl = null)
     {
-        CacheItem::validateKey($key);
+        if (!\is_string($key)) {
+            CacheItem::validateKey($key);
+        }
 
         return $this->setMultiple(array($key => $value), $ttl);
     }
@@ -97,33 +112,26 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function setMultiple($values, $ttl = null)
     {
-        if (!is_array($values) && !$values instanceof \Traversable) {
-            throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', is_object($values) ? get_class($values) : gettype($values)));
+        if (!\is_array($values) && !$values instanceof \Traversable) {
+            throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
         $valuesArray = array();
 
         foreach ($values as $key => $value) {
-            is_int($key) || CacheItem::validateKey($key);
+            if (!\is_int($key) && !(\is_string($key) && isset($this->expiries[$key]))) {
+                CacheItem::validateKey($key);
+            }
             $valuesArray[$key] = $value;
         }
         if (false === $ttl = $this->normalizeTtl($ttl)) {
             return $this->deleteMultiple(array_keys($valuesArray));
         }
-        if ($this->storeSerialized) {
-            foreach ($valuesArray as $key => $value) {
-                try {
-                    $valuesArray[$key] = serialize($value);
-                } catch (\Exception $e) {
-                    $type = is_object($value) ? get_class($value) : gettype($value);
-                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
-
-                    return false;
-                }
-            }
-        }
-        $expiry = 0 < $ttl ? time() + $ttl : PHP_INT_MAX;
+        $expiry = 0 < $ttl ? microtime(true) + $ttl : PHP_INT_MAX;
 
         foreach ($valuesArray as $key => $value) {
+            if ($this->storeSerialized && null === $value = $this->freeze($value)) {
+                return false;
+            }
             $this->values[$key] = $value;
             $this->expiries[$key] = $expiry;
         }
@@ -139,10 +147,10 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         if ($ttl instanceof \DateInterval) {
             $ttl = (int) \DateTime::createFromFormat('U', 0)->add($ttl)->format('U');
         }
-        if (is_int($ttl)) {
+        if (\is_int($ttl)) {
             return 0 < $ttl ? $ttl : false;
         }
 
-        throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', is_object($ttl) ? get_class($ttl) : gettype($ttl)));
+        throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', \is_object($ttl) ? \get_class($ttl) : \gettype($ttl)));
     }
 }

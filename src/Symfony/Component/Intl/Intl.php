@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Intl;
 
-use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
+use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
+use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
@@ -186,14 +187,14 @@ final class Intl
     /**
      * Returns the version of the installed ICU library.
      *
-     * @return null|string The ICU version or NULL if it could not be determined
+     * @return string|null The ICU version or NULL if it could not be determined
      */
     public static function getIcuVersion()
     {
         if (false === self::$icuVersion) {
             if (!self::isExtensionLoaded()) {
                 self::$icuVersion = self::getIcuStubVersion();
-            } elseif (defined('INTL_ICU_VERSION')) {
+            } elseif (\defined('INTL_ICU_VERSION')) {
                 self::$icuVersion = INTL_ICU_VERSION;
             } else {
                 try {
@@ -234,7 +235,7 @@ final class Intl
      */
     public static function getIcuStubVersion()
     {
-        return '60.2';
+        return '63.1';
     }
 
     /**
@@ -259,6 +260,11 @@ final class Intl
                 new JsonBundleReader(),
                 self::BUFFER_SIZE
             ));
+            $localeDataProvider = new LocaleDataProvider(
+                self::getDataDirectory().'/'.self::LOCALE_DIR,
+                self::$entryReader
+            );
+            self::$entryReader->setLocaleAliases($localeDataProvider->getAliases());
         }
 
         return self::$entryReader;

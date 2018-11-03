@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Validator\Constraints\GroupSequence;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -592,8 +592,29 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($form, new Form());
 
         $this->buildViolation('Extra!')
-            ->setParameter('{{ extra_fields }}', 'foo')
+            ->setParameter('{{ extra_fields }}', '"foo"')
             ->setInvalidValue(array('foo' => 'bar'))
+            ->setCode(Form::NO_SUCH_FIELD_ERROR)
+            ->assertRaised();
+    }
+
+    public function testViolationFormatIfMultipleExtraFields()
+    {
+        $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->submit(array('foo' => 'bar', 'baz' => 'qux', 'quux' => 'quuz'));
+
+        $this->expectNoValidate();
+
+        $this->validator->validate($form, new Form());
+
+        $this->buildViolation('Extra!')
+            ->setParameter('{{ extra_fields }}', '"foo", "baz", "quux"')
+            ->setInvalidValue(array('foo' => 'bar', 'baz' => 'qux', 'quux' => 'quuz'))
             ->setCode(Form::NO_SUCH_FIELD_ERROR)
             ->assertRaised();
     }

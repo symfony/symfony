@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Core\Tests\Role;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class RoleHierarchyTest extends TestCase
 {

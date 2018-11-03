@@ -12,6 +12,9 @@
 namespace Symfony\Component\Yaml\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,7 +54,7 @@ class LintCommand extends Command
     {
         $this
             ->setDescription('Lints a file and outputs encountered errors')
-            ->addArgument('filename', null, 'A file or a directory or STDIN')
+            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addOption('parse-tags', null, InputOption::VALUE_NONE, 'Parse custom tags')
             ->setHelp(<<<EOF
@@ -79,26 +82,28 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $filename = $input->getArgument('filename');
+        $filenames = (array) $input->getArgument('filename');
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
         $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
 
-        if (!$filename) {
+        if (0 === \count($filenames)) {
             if (!$stdin = $this->getStdin()) {
-                throw new \RuntimeException('Please provide a filename or pipe file content to STDIN.');
+                throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
             return $this->display($io, array($this->validate($stdin, $flags)));
         }
 
-        if (!$this->isReadable($filename)) {
-            throw new \RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));
-        }
-
         $filesInfo = array();
-        foreach ($this->getFiles($filename) as $file) {
-            $filesInfo[] = $this->validate(file_get_contents($file), $flags, $file);
+        foreach ($filenames as $filename) {
+            if (!$this->isReadable($filename)) {
+                throw new RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));
+            }
+
+            foreach ($this->getFiles($filename) as $file) {
+                $filesInfo[] = $this->validate(file_get_contents($file), $flags, $file);
+            }
         }
 
         return $this->display($io, $filesInfo);
@@ -133,13 +138,13 @@ EOF
             case 'json':
                 return $this->displayJson($io, $files);
             default:
-                throw new \InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
+                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
         }
     }
 
     private function displayTxt(SymfonyStyle $io, array $filesInfo)
     {
-        $countFiles = count($filesInfo);
+        $countFiles = \count($filesInfo);
         $erroredFiles = 0;
 
         foreach ($filesInfo as $info) {
@@ -186,7 +191,7 @@ EOF
         }
 
         foreach ($this->getDirectoryIterator($fileOrDirectory) as $file) {
-            if (!in_array($file->getExtension(), array('yml', 'yaml'))) {
+            if (!\in_array($file->getExtension(), array('yml', 'yaml'))) {
                 continue;
             }
 
@@ -227,7 +232,7 @@ EOF
         };
 
         if (null !== $this->directoryIteratorProvider) {
-            return call_user_func($this->directoryIteratorProvider, $directory, $default);
+            return \call_user_func($this->directoryIteratorProvider, $directory, $default);
         }
 
         return $default($directory);
@@ -240,7 +245,7 @@ EOF
         };
 
         if (null !== $this->isReadableProvider) {
-            return call_user_func($this->isReadableProvider, $fileOrDirectory, $default);
+            return \call_user_func($this->isReadableProvider, $fileOrDirectory, $default);
         }
 
         return $default($fileOrDirectory);

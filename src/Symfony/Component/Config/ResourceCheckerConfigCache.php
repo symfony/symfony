@@ -72,7 +72,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             $this->resourceCheckers = iterator_to_array($this->resourceCheckers);
         }
 
-        if (!count($this->resourceCheckers)) {
+        if (!\count($this->resourceCheckers)) {
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
@@ -137,7 +137,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             }
         }
 
-        if (\function_exists('opcache_invalidate') && ini_get('opcache.enable')) {
+        if (\function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
             @opcache_invalidate($this->file, true);
         }
     }
@@ -168,13 +168,13 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
 
         try {
             $meta = unserialize(file_get_contents($file));
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
-        }
-        restore_error_handler();
-        ini_set('unserialize_callback_func', $prevUnserializeHandler);
-        if (null !== $e && $e !== $signalingException) {
-            throw $e;
+        } catch (\Throwable $e) {
+            if ($e !== $signalingException) {
+                throw $e;
+            }
+        } finally {
+            restore_error_handler();
+            ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
         return $meta;

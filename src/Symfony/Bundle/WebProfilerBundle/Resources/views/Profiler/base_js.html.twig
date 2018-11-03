@@ -83,6 +83,10 @@
             if (ret = allHeaders.match(/^x-debug-token-link:\s+(.*)$/im)) {
                 stackElement.profilerUrl = ret[1];
             }
+            if (ret = allHeaders.match(/^Symfony-Debug-Toolbar-Replace:\s+(.*)$/im)) {
+                stackElement.toolbarReplaceFinished = false;
+                stackElement.toolbarReplace = '1' === ret[1];
+            }
         };
 
         var successStreak = 4;
@@ -122,10 +126,19 @@
                 return;
             }
 
+            var nbOfAjaxRequest = tbody.rows.length;
+            if (nbOfAjaxRequest >= 100) {
+                tbody.deleteRow(0);
+            }
+
             var request = requestStack[index];
             pendingRequests++;
             var row = document.createElement('tr');
             request.DOMNode = row;
+
+            var profilerCell = document.createElement('td');
+            profilerCell.textContent = 'n/a';
+            row.appendChild(profilerCell);
 
             var methodCell = document.createElement('td');
             methodCell.textContent = request.method;
@@ -159,29 +172,47 @@
             durationCell.textContent = 'n/a';
             row.appendChild(durationCell);
 
-            var profilerCell = document.createElement('td');
-            profilerCell.textContent = 'n/a';
-            row.appendChild(profilerCell);
+            request.liveDurationHandle = setInterval(function() {
+                durationCell.textContent = (new Date() - request.start) + 'ms';
+            }, 100);
 
             row.className = 'sf-ajax-request sf-ajax-request-loading';
-            tbody.insertBefore(row, tbody.firstChild);
+            tbody.insertBefore(row, null);
+
+            var toolbarInfo = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+            toolbarInfo.scrollTop = toolbarInfo.scrollHeight;
 
             renderAjaxRequests();
         };
 
         var finishAjaxRequest = function(index) {
             var request = requestStack[index];
+            clearInterval(request.liveDurationHandle);
+
             if (!request.DOMNode) {
                 return;
             }
+
+            if (request.toolbarReplace && !request.toolbarReplaceFinished && request.profile) {
+                /* Flag as complete because finishAjaxRequest can be called multiple times. */
+                request.toolbarReplaceFinished = true;
+                /* Search up through the DOM to find the toolbar's container ID. */
+                for (var elem = request.DOMNode; elem && elem !== document; elem = elem.parentNode) {
+                    if (elem.id.match(/^sfwdt/)) {
+                        Sfjs.loadToolbar(elem.id.replace(/^sfwdt/, ''), request.profile);
+                        break;
+                    }
+                }
+            }
+
             pendingRequests--;
             var row = request.DOMNode;
             /* Unpack the children from the row */
-            var methodCell = row.children[0];
-            var statusCodeCell = row.children[2];
+            var profilerCell = row.children[0];
+            var methodCell = row.children[1];
+            var statusCodeCell = row.children[3];
             var statusCodeElem = statusCodeCell.children[0];
-            var durationCell = row.children[4];
-            var profilerCell = row.children[5];
+            var durationCell = row.children[5];
 
             if (request.error) {
                 row.className = 'sf-ajax-request sf-ajax-request-error';
@@ -212,7 +243,7 @@
             if (request.profilerUrl) {
                 profilerCell.textContent = '';
                 var profilerLink = document.createElement('a');
-                profilerLink.setAttribute('href', request.profilerUrl);
+                profilerLink.setAttribute('href', request.statusCode < 400 ? request.profilerUrl : request.profilerUrl + '?panel=exception');
                 profilerLink.textContent = request.profile;
                 profilerCell.appendChild(profilerLink);
             }
@@ -274,6 +305,8 @@
                             stackElement.statusCode = r.status;
                             stackElement.profile = r.headers.get('x-debug-token');
                             stackElement.profilerUrl = r.headers.get('x-debug-token-link');
+                            stackElement.toolbarReplaceFinished = false;
+                            stackElement.toolbarReplace = '1' === r.headers.get('Symfony-Debug-Toolbar-Replace');
                             finishAjaxRequest(idx);
                         }, function (e){
                             stackElement.error = true;
@@ -361,12 +394,15 @@
                             el.innerHTML = xhr.responseText;
                             el.setAttribute('data-sfurl', url);
                             removeClass(el, 'loading');
+                            var pending = pendingRequests;
                             for (var i = 0; i < requestStack.length; i++) {
                                 startAjaxRequest(i);
                                 if (requestStack[i].duration) {
                                     finishAjaxRequest(i);
                                 }
                             }
+                            /* Revert the pending state in case there was a start called without a finish above. */
+                            pendingRequests = pending;
                             (onSuccess || noop)(xhr, el);
                         },
                         function(xhr) { (onError || noop)(xhr, el); },
@@ -374,6 +410,125 @@
                         options
                     );
                 }
+
+                return this;
+            },
+
+            loadToolbar: function(token, newToken) {
+                newToken = (newToken || token);
+                this.load(
+                    'sfwdt' + token,
+                    '{{ path("_wdt", { "token": "xxxxxx" }) }}'.replace(/xxxxxx/, newToken),
+                    function(xhr, el) {
+
+                        /* Evaluate in global scope scripts embedded inside the toolbar */
+                        var i, scripts = [].slice.call(el.querySelectorAll('script'));
+                        for (i = 0; i < scripts.length; ++i) {
+                            eval.call({}, scripts[i].firstChild.nodeValue);
+                        }
+
+                        el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
+
+                        if (el.style.display == 'none') {
+                            return;
+                        }
+
+                        if (getPreference('toolbar/displayState') == 'none') {
+                            document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'none';
+                            document.getElementById('sfToolbarClearer-' + newToken).style.display = 'none';
+                            document.getElementById('sfMiniToolbar-' + newToken).style.display = 'block';
+                        } else {
+                            document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'block';
+                            document.getElementById('sfToolbarClearer-' + newToken).style.display = 'block';
+                            document.getElementById('sfMiniToolbar-' + newToken).style.display = 'none';
+                        }
+
+                        /* Handle toolbar-info position */
+                        var toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
+                        for (i = 0; i < toolbarBlocks.length; ++i) {
+                            toolbarBlocks[i].onmouseover = function () {
+                                var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
+                                var pageWidth = document.body.clientWidth;
+                                var elementWidth = toolbarInfo.offsetWidth;
+                                var leftValue = (elementWidth + this.offsetLeft) - pageWidth;
+                                var rightValue = (elementWidth + (pageWidth - this.offsetLeft)) - pageWidth;
+
+                                /* Reset right and left value, useful on window resize */
+                                toolbarInfo.style.right = '';
+                                toolbarInfo.style.left = '';
+
+                                if (elementWidth > pageWidth) {
+                                    toolbarInfo.style.left = 0;
+                                }
+                                else if (leftValue > 0 && rightValue > 0) {
+                                    toolbarInfo.style.right = (rightValue * -1) + 'px';
+                                } else if (leftValue < 0) {
+                                    toolbarInfo.style.left = 0;
+                                } else {
+                                    toolbarInfo.style.right = '0px';
+                                }
+                            };
+                        }
+                        addEventListener(document.getElementById('sfToolbarHideButton-' + newToken), 'click', function (event) {
+                            event.preventDefault();
+
+                            var p = this.parentNode;
+                            p.style.display = 'none';
+                            (p.previousElementSibling || p.previousSibling).style.display = 'none';
+                            document.getElementById('sfMiniToolbar-' + newToken).style.display = 'block';
+                            setPreference('toolbar/displayState', 'none');
+                        });
+                        addEventListener(document.getElementById('sfToolbarMiniToggler-' + newToken), 'click', function (event) {
+                            event.preventDefault();
+
+                            var elem = this.parentNode;
+                            if (elem.style.display == 'none') {
+                                document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'none';
+                                document.getElementById('sfToolbarClearer-' + newToken).style.display = 'none';
+                                elem.style.display = 'block';
+                            } else {
+                                document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'block';
+                                document.getElementById('sfToolbarClearer-' + newToken).style.display = 'block';
+                                elem.style.display = 'none'
+                            }
+
+                            setPreference('toolbar/displayState', 'block');
+                        });
+                        renderAjaxRequests();
+                        addEventListener(document.querySelector('.sf-toolbar-block-ajax'), 'mouseenter', function (event) {
+                            var elem = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+                            elem.scrollTop = elem.scrollHeight;
+                        });
+                        addEventListener(document.querySelector('.sf-toolbar-block-ajax > .sf-toolbar-icon'), 'click', function (event) {
+                            event.preventDefault();
+
+                            toggleClass(this.parentNode, 'hover');
+                        });
+
+                        var dumpInfo = document.querySelector('.sf-toolbar-block-dump .sf-toolbar-info');
+                        if (null !== dumpInfo) {
+                            addEventListener(dumpInfo, 'sfbeforedumpcollapse', function () {
+                                dumpInfo.style.minHeight = dumpInfo.getBoundingClientRect().height+'px';
+                            });
+                            addEventListener(dumpInfo, 'mouseleave', function () {
+                                dumpInfo.style.minHeight = '';
+                            });
+                        }
+                    },
+                    function(xhr) {
+                        if (xhr.status !== 0) {
+                            var sfwdt = document.getElementById('sfwdt' + token);
+                            sfwdt.innerHTML = '\
+                                <div class="sf-toolbarreset">\
+                                    <div class="sf-toolbar-icon"><svg width="26" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 26 28" enable-background="new 0 0 26 28" xml:space="preserve"><path fill="#FFFFFF" d="M13 0C5.8 0 0 5.8 0 13c0 7.2 5.8 13 13 13c7.2 0 13-5.8 13-13C26 5.8 20.2 0 13 0z M20 7.5 c-0.6 0-1-0.3-1-0.9c0-0.2 0-0.4 0.2-0.6c0.1-0.3 0.2-0.3 0.2-0.4c0-0.3-0.5-0.4-0.7-0.4c-2 0.1-2.5 2.7-2.9 4.8l-0.2 1.1 c1.1 0.2 1.9 0 2.4-0.3c0.6-0.4-0.2-0.8-0.1-1.3C18 9.2 18.4 9 18.7 8.9c0.5 0 0.8 0.5 0.8 1c0 0.8-1.1 2-3.3 1.9 c-0.3 0-0.5 0-0.7-0.1L15 14.1c-0.4 1.7-0.9 4.1-2.6 6.2c-1.5 1.8-3.1 2.1-3.8 2.1c-1.3 0-2.1-0.6-2.2-1.6c0-0.9 0.8-1.4 1.3-1.4 c0.7 0 1.2 0.5 1.2 1.1c0 0.5-0.2 0.6-0.4 0.7c-0.1 0.1-0.3 0.2-0.3 0.4c0 0.1 0.1 0.3 0.4 0.3c0.5 0 0.9-0.3 1.2-0.5 c1.3-1 1.7-2.9 2.4-6.2l0.1-0.8c0.2-1.1 0.5-2.3 0.8-3.5c-0.9-0.7-1.4-1.5-2.6-1.8c-0.8-0.2-1.3 0-1.7 0.4C8.4 10 8.6 10.7 9 11.1 l0.7 0.7c0.8 0.9 1.3 1.7 1.1 2.7c-0.3 1.6-2.1 2.8-4.3 2.1c-1.9-0.6-2.2-1.9-2-2.7c0.2-0.6 0.7-0.8 1.2-0.6 c0.5 0.2 0.7 0.8 0.6 1.3c0 0.1 0 0.1-0.1 0.3C6 15 5.9 15.2 5.9 15.3c-0.1 0.4 0.4 0.7 0.8 0.8c0.8 0.3 1.7-0.2 1.9-0.9 c0.2-0.6-0.2-1.1-0.4-1.2l-0.8-0.9c-0.4-0.4-1.2-1.5-0.8-2.8c0.2-0.5 0.5-1 0.9-1.4c1-0.7 2-0.8 3-0.6c1.3 0.4 1.9 1.2 2.8 1.9 c0.5-1.3 1.1-2.6 2-3.8c0.9-1 2-1.7 3.3-1.8C20 4.8 21 5.4 21 6.3C21 6.7 20.8 7.5 20 7.5z"/></svg></div>\
+                                    An error occurred while loading the web debug toolbar. <a href="{{ path("_profiler_home") }}' + newToken + '>Open the web profiler.</a>\
+                                </div>\
+                            ';
+                            sfwdt.setAttribute('class', 'sf-toolbar sf-error-toolbar');
+                        }
+                    },
+                    { maxTries: 5 }
+                );
 
                 return this;
             },
@@ -401,13 +556,14 @@
                     var tabNavigation = document.createElement('ul');
                     tabNavigation.className = 'tab-navigation';
 
+                    var selectedTabId = 'tab-' + i + '-0'; /* select the first tab by default */
                     for (var j = 0; j < tabs.length; j++) {
                         var tabId = 'tab-' + i + '-' + j;
                         var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
 
                         var tabNavigationItem = document.createElement('li');
                         tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        if (j == 0) { addClass(tabNavigationItem, 'active'); }
+                        if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
                         if (hasClass(tabs[j], 'disabled')) { addClass(tabNavigationItem, 'disabled'); }
                         tabNavigationItem.innerHTML = tabTitle;
                         tabNavigation.appendChild(tabNavigationItem);
@@ -417,6 +573,7 @@
                     }
 
                     tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
+                    addClass(document.querySelector('[data-tab-id="' + selectedTabId + '"]'), 'active');
                 }
 
                 /* display the active tab and add the 'click' event listeners */
@@ -525,6 +682,105 @@
 
                     toggles[i].setAttribute('data-processed', 'true');
                 }
+            },
+
+            createFilters: function() {
+                document.querySelectorAll('[data-filters] [data-filter]').forEach(function (filter) {
+                    var filters = filter.closest('[data-filters]'),
+                        type = 'choice',
+                        name = filter.dataset.filter,
+                        ucName = name.charAt(0).toUpperCase()+name.slice(1),
+                        list = document.createElement('ul'),
+                        values = filters.dataset['filter'+ucName] || filters.querySelectorAll('[data-filter-'+name+']'),
+                        labels = {},
+                        defaults = null,
+                        indexed = {},
+                        processed = {};
+                    if (typeof values === 'string') {
+                        type = 'level';
+                        labels = values.split(',');
+                        values = values.toLowerCase().split(',');
+                        defaults = values.length - 1;
+                    }
+                    addClass(list, 'filter-list');
+                    addClass(list, 'filter-list-'+type);
+                    values.forEach(function (value, i) {
+                        if (value instanceof HTMLElement) {
+                            value = value.dataset['filter'+ucName];
+                        }
+                        if (value in processed) {
+                            return;
+                        }
+                        var option = document.createElement('li'),
+                            label = i in labels ? labels[i] : value,
+                            active = false,
+                            matches;
+                        if ('' === label) {
+                            option.innerHTML = '<em>(none)</em>';
+                        } else {
+                            option.innerText = label;
+                        }
+                        option.dataset.filter = value;
+                        option.setAttribute('title', 1 === (matches = filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').length) ? 'Matches 1 row' : 'Matches '+matches+' rows');
+                        indexed[value] = i;
+                        list.appendChild(option);
+                        addEventListener(option, 'click', function () {
+                            if ('choice' === type) {
+                                filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
+                                    if (option.dataset.filter === row.dataset['filter'+ucName]) {
+                                        toggleClass(row, 'filter-hidden-'+name);
+                                    }
+                                });
+                                toggleClass(option, 'active');
+                            } else if ('level' === type) {
+                                if (i === this.parentNode.querySelectorAll('.active').length - 1) {
+                                    return;
+                                }
+                                this.parentNode.querySelectorAll('li').forEach(function (currentOption, j) {
+                                    if (j <= i) {
+                                        addClass(currentOption, 'active');
+                                        if (i === j) {
+                                            addClass(currentOption, 'last-active');
+                                        } else {
+                                            removeClass(currentOption, 'last-active');
+                                        }
+                                    } else {
+                                        removeClass(currentOption, 'active');
+                                        removeClass(currentOption, 'last-active');
+                                    }
+                                });
+                                filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
+                                    if (i < indexed[row.dataset['filter'+ucName]]) {
+                                        addClass(row, 'filter-hidden-'+name);
+                                    } else {
+                                        removeClass(row, 'filter-hidden-'+name);
+                                    }
+                                });
+                            }
+                        });
+                        if ('choice' === type) {
+                            active = null === defaults || 0 <= defaults.indexOf(value);
+                        } else if ('level' === type) {
+                            active = i <= defaults;
+                            if (active && i === defaults) {
+                                addClass(option, 'last-active');
+                            }
+                        }
+                        if (active) {
+                            addClass(option, 'active');
+                        } else {
+                            filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').forEach(function (row) {
+                                toggleClass(row, 'filter-hidden-'+name);
+                            });
+                        }
+                        processed[value] = true;
+                    });
+
+                    if (1 < list.childNodes.length) {
+                        filter.appendChild(list);
+                        filter.dataset.filtered = '';
+                    }
+                });
             }
         };
     })();

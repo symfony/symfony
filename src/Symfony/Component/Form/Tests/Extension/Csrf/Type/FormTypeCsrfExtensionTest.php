@@ -12,11 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
@@ -42,8 +44,8 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     protected function setUp()
     {
-        $this->tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
+        $this->tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
+        $this->translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
 
         parent::setUp();
     }
@@ -363,9 +365,10 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testsTranslateCustomErrorMessage()
     {
+        $csrfToken = new CsrfToken('TOKEN_ID', 'token');
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
-            ->with(new CsrfToken('TOKEN_ID', 'token'))
+            ->with($csrfToken)
             ->will($this->returnValue(false));
 
         $this->translator->expects($this->once())
@@ -388,10 +391,10 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
 
         $errors = $form->getErrors();
-        $expected = new FormError('[trans]Foobar[/trans]');
+        $expected = new FormError('[trans]Foobar[/trans]', null, array(), null, $csrfToken);
         $expected->setOrigin($form);
 
-        $this->assertGreaterThan(0, count($errors));
+        $this->assertGreaterThan(0, \count($errors));
         $this->assertEquals($expected, $errors[0]);
     }
 }

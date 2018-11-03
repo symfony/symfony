@@ -32,6 +32,8 @@
 
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate" public="true">
             <argument type="tagged" tag="kernel.cache_warmer" />
+            <argument>%kernel.debug%</argument>
+            <argument>%kernel.cache_dir%/%kernel.container_class%Deprecations.log</argument>
         </service>
 
         <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer" public="true">

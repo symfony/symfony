@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Security\Guard\Authenticator;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 /**
  * A base class to make form login authentication easier!
@@ -26,8 +24,6 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  */
 abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
 {
-    use TargetPathTrait;
-
     /**
      * Return the URL to the login page.
      *
@@ -42,7 +38,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        if ($request->getSession() instanceof SessionInterface) {
+        if ($request->hasSession()) {
             $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
         }
 

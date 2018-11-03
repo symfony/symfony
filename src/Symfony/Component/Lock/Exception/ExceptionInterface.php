@@ -16,6 +16,6 @@ namespace Symfony\Component\Lock\Exception;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

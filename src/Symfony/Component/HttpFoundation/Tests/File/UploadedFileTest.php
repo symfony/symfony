@@ -12,6 +12,14 @@
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
+use Symfony\Component\HttpFoundation\File\Exception\ExtensionFileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FormSizeFileException;
+use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoTmpDirFileException;
+use Symfony\Component\HttpFoundation\File\Exception\PartialFileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileTest extends TestCase
@@ -45,7 +53,7 @@ class UploadedFileTest extends TestCase
 
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
 
-        if (extension_loaded('fileinfo')) {
+        if (\extension_loaded('fileinfo')) {
             $this->assertEquals('image/gif', $file->getMimeType());
         }
     }
@@ -135,6 +143,54 @@ class UploadedFileTest extends TestCase
         );
 
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
+    }
+
+    public function failedUploadedFile()
+    {
+        foreach (array(UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_EXTENSION, -1) as $error) {
+            yield array(new UploadedFile(
+                __DIR__.'/Fixtures/test.gif',
+                'original.gif',
+                'image/gif',
+                $error
+            ));
+        }
+    }
+
+    /**
+     * @dataProvider failedUploadedFile
+     */
+    public function testMoveFailed(UploadedFile $file)
+    {
+        switch ($file->getError()) {
+            case UPLOAD_ERR_INI_SIZE:
+                $exceptionClass = IniSizeFileException::class;
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                $exceptionClass = FormSizeFileException::class;
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $exceptionClass = PartialFileException::class;
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $exceptionClass = NoFileException::class;
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                $exceptionClass = CannotWriteFileException::class;
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                $exceptionClass = NoTmpDirFileException::class;
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                $exceptionClass = ExtensionFileException::class;
+                break;
+            default:
+                $exceptionClass = FileException::class;
+        }
+
+        $this->expectException($exceptionClass);
+
+        $file->move(__DIR__.'/Fixtures/directory');
     }
 
     public function testMoveLocalFileIsAllowedInTestMode()

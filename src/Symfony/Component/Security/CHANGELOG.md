@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* added the `is_granted()` function in security expressions
+* deprecated the `has_role()` function in security expressions, use `is_granted()` instead
+* Passing custom class names to the
+  `Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver` to define
+  custom anonymous and remember me token classes is deprecated. To
+  use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
+  or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+* allow passing null as $filter in LdapUserProvider to get the default filter
+* accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated
+* Deprecated `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`,
+  `SimplePreAuthenticatorInterface`, `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`,
+  `SimpleFormAuthenticationListener` and `SimplePreAuthenticationListener`. Use Guard instead.
+
 4.1.0
 -----
 
@@ -9,6 +25,7 @@ CHANGELOG
  * Using the AdvancedUserInterface is now deprecated. To use the existing
    functionality, create a custom user-checker based on the
    `Symfony\Component\Security\Core\User\UserChecker`.
+ * `AuthenticationUtils::getLastUsername()` now always returns a string.
 
 4.0.0
 -----
@@ -29,7 +46,7 @@ CHANGELOG
 
  * Added `getUser`, `getToken` and `isGranted` methods to `Security`.
  * added a `setToken()` method to the `SwitchUserEvent` class to allow to replace the created token while switching users
-   when custom token generation is required by application. 
+   when custom token generation is required by application.
  * Using voters that do not implement the `VoterInterface`is now deprecated in
    the `AccessDecisionManager` and this functionality will be removed in 4.0.
  * Using the `ContextListener` without setting the `logoutOnUserChange`
@@ -39,6 +56,8 @@ CHANGELOG
  * deprecated HTTP digest authentication
  * Added a new password encoder for the Argon2i hashing algorithm
  * deprecated `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * deprecated to return `null` from `getCredentials()` in classes that extend
+   `AbstractGuardAuthenticator`. Return `false` from `supports()` instead.
 
 3.3.0
 -----

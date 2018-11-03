@@ -12,6 +12,8 @@
 namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\LogicException;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
+use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -23,13 +25,13 @@ final class Definition
     private $places = array();
     private $transitions = array();
     private $initialPlace;
+    private $metadataStore;
 
     /**
      * @param string[]     $places
      * @param Transition[] $transitions
-     * @param string|null  $initialPlace
      */
-    public function __construct(array $places, array $transitions, string $initialPlace = null)
+    public function __construct(array $places, array $transitions, string $initialPlace = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -40,6 +42,8 @@ final class Definition
         }
 
         $this->setInitialPlace($initialPlace);
+
+        $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
     }
 
     /**
@@ -66,6 +70,11 @@ final class Definition
         return $this->transitions;
     }
 
+    public function getMetadataStore(): MetadataStoreInterface
+    {
+        return $this->metadataStore;
+    }
+
     private function setInitialPlace(string $place = null)
     {
         if (null === $place) {
@@ -81,7 +90,7 @@ final class Definition
 
     private function addPlace(string $place)
     {
-        if (!count($this->places)) {
+        if (!\count($this->places)) {
             $this->initialPlace = $place;
         }
 

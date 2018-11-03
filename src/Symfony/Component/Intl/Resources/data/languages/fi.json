@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.67",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "afar",
         "ab": "abhaasi",
@@ -30,6 +30,7 @@
         "aro": "araona",
         "arp": "arapaho",
         "arq": "algerianarabia",
+        "ars": "arabia – najd",
         "arw": "arawak",
         "ary": "marokonarabia",
         "arz": "egyptinarabia",
@@ -366,7 +367,6 @@
         "ms": "malaiji",
         "mt": "malta",
         "mua": "mundang",
-        "mul": "useita kieliä",
         "mus": "creek",
         "mwl": "mirandeesi",
         "mwr": "marwari",
@@ -569,7 +569,6 @@
         "uga": "ugarit",
         "uk": "ukraina",
         "umb": "mbundu",
-        "und": "tuntematon kieli",
         "ur": "urdu",
         "uz": "uzbekki",
         "vai": "vai",
@@ -614,7 +613,6 @@
         "zh_Hant": "perinteinen kiina",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "ei kielellistä sisältöä",
         "zza": "zaza"
     }
 }

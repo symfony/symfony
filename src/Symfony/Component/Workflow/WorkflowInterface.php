@@ -13,6 +13,7 @@ namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
+use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -37,10 +38,15 @@ interface WorkflowInterface
      * @param string $transitionName A transition
      *
      * @return bool true if the transition is enabled
-     *
-     * @throws LogicException
      */
     public function can($subject, $transitionName);
+
+    /**
+     * Builds a TransitionBlockerList to know why a transition is blocked.
+     *
+     * @param object $subject A subject
+     */
+    public function buildTransitionBlockerList($subject, string $transitionName): TransitionBlockerList;
 
     /**
      * Fire a transition.
@@ -51,7 +57,6 @@ interface WorkflowInterface
      * @return Marking The new Marking
      *
      * @throws LogicException If the transition is not applicable
-     * @throws LogicException If the transition does not exist
      */
     public function apply($subject, $transitionName);
 
@@ -78,4 +83,6 @@ interface WorkflowInterface
      * @return MarkingStoreInterface
      */
     public function getMarkingStore();
+
+    public function getMetadataStore(): MetadataStoreInterface;
 }

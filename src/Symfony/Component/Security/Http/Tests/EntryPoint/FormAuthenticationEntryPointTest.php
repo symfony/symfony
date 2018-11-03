@@ -13,8 +13,8 @@ namespace Symfony\Component\Security\Http\Tests\EntryPoint;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint;
 
 class FormAuthenticationEntryPointTest extends TestCase
 {

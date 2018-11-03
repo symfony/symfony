@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* Deprecated omitting the `$environment` argument of the `ServerRunCommand` and
+ `ServerStartCommand` constructors
+ * Added ability to display the current hostname address if available when binding to 0.0.0.0
+
 3.4.0
 -----
 

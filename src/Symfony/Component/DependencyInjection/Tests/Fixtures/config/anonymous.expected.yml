@@ -8,7 +8,7 @@ services:
         class: Bar\FooClass
         public: true
         arguments: [!tagged listener]
-    2_stdClass~%s:
+    .2_stdClass~%s:
         class: stdClass
         public: false
         tags:

@@ -86,7 +86,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertContains('Password encoding succeeded', $output);
 
         $encoder = new Argon2iPasswordEncoder();
-        preg_match('#  Encoded password\s+(\$argon2id\$[\w\d,=\$+\/]+={0,2})\s+#', $output, $matches);
+        preg_match('#  Encoded password\s+(\$argon2id?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
         $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
     }
@@ -231,7 +231,7 @@ EOTXT
 
     protected function setUp()
     {
-        putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
+        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode'));
         $kernel->boot();
 
@@ -249,7 +249,7 @@ EOTXT
 
     private function setupArgon2i()
     {
-        putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
+        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode', 'root_config' => 'argon2i.yml'));
         $kernel->boot();
 

@@ -13,8 +13,8 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
-use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 use Symfony\Component\Config\Tests\Fixtures\BadParent;
+use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
 class ClassExistenceResourceTest extends TestCase
 {

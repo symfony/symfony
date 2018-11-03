@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added a new `UnexpectedValueException` that can be thrown by constraint validators, these exceptions are caught by
+   the validator and are converted into constraint violations
+ * added `DivisibleBy` constraint
+ * decoupled from `symfony/translation` by using `Symfony\Contracts\Translation\TranslatorInterface`
+ * deprecated `ValidatorBuilderInterface`
+ * made `ValidatorBuilder` final
+ * marked `format` the default option in `DateTime` constraint
+ * deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`.
+ * deprecated using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl`
+ * deprecated using the `Email` constraint without `egulias/email-validator`
+ * deprecated using the `Expression` constraint without `symfony/expression-language`
+
 4.1.0
 -----
 

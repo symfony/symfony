@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * FormHelper provides helpers to help display forms.
@@ -170,6 +170,18 @@ class FormHelper extends Helper
     }
 
     /**
+     * Renders the help of the given view.
+     *
+     * @param FormView $view The parent view
+     *
+     * @return string The HTML markup
+     */
+    public function help(FormView $view): string
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'help');
+    }
+
+    /**
      * Renders the errors of the given view.
      *
      * @return string The HTML markup
@@ -212,18 +224,14 @@ class FormHelper extends Helper
      * Use this helper for CSRF protection without the overhead of creating a
      * form.
      *
-     * <code>
-     * echo $view['form']->csrfToken('rm_user_'.$user->getId());
-     * </code>
+     *     echo $view['form']->csrfToken('rm_user_'.$user->getId());
      *
      * Check the token in your action using the same CSRF token id.
      *
-     * <code>
-     * // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
-     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
-     *     throw new \RuntimeException('CSRF attack detected.');
-     * }
-     * </code>
+     *     // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
+     *     if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *         throw new \RuntimeException('CSRF attack detected.');
+     *     }
      *
      * @param string $tokenId The CSRF token id of the protected action
      *
@@ -239,5 +247,21 @@ class FormHelper extends Helper
     public function humanize($text)
     {
         return $this->renderer->humanize($text);
+    }
+
+    /**
+     * @internal
+     */
+    public function formEncodeCurrency($text, $widget = '')
+    {
+        if ('UTF-8' === $charset = $this->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
+        }
+
+        return str_replace('{{ widget }}', $widget, $text);
     }
 }

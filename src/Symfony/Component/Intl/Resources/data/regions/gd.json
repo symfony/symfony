@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.44.91",
     "Names": {
         "AC": "Eilean na Deasgabhalach",
         "AD": "Andorra",
@@ -72,7 +72,6 @@
         "ER": "Eartra",
         "ES": "An Spàinnt",
         "ET": "An Itiop",
-        "EZ": "Raon an Eòro",
         "FI": "An Fhionnlann",
         "FJ": "Fìdi",
         "FK": "Na h-Eileanan Fàclannach",
@@ -186,7 +185,7 @@
         "PM": "Saint Pierre agus Miquelon",
         "PN": "Eileanan Pheit a’ Chàirn",
         "PR": "Porto Rìceo",
-        "PS": "Na Ranntairean Palastaineach",
+        "PS": "Ùghdarras nam Palastaineach",
         "PT": "A’ Phortagail",
         "PW": "Palabh",
         "PY": "Paraguaidh",
@@ -237,7 +236,6 @@
         "UA": "An Ucràin",
         "UG": "Uganda",
         "UM": "Meanbh-Eileanan Iomallach nan SA",
-        "UN": "Na Dùthchannan Aonaichte",
         "US": "Na Stàitean Aonaichte",
         "UY": "Uruguaidh",
         "UZ": "Usbagastàn",

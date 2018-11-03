@@ -27,7 +27,7 @@ class FileLinkFormatterTest extends TestCase
 
     public function testWhenFileLinkFormatAndNoRequest()
     {
-        $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
 
         $sut = new FileLinkFormatter('debug://open?url=file://%f&line=%l', new RequestStack());
 
@@ -36,8 +36,7 @@ class FileLinkFormatterTest extends TestCase
 
     public function testWhenFileLinkFormatAndRequest()
     {
-        $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
-        $baseDir = __DIR__;
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
         $requestStack = new RequestStack();
         $request = new Request();
         $requestStack->push($request);
@@ -49,19 +48,19 @@ class FileLinkFormatterTest extends TestCase
 
     public function testWhenNoFileLinkFormatAndRequest()
     {
-        $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
         $requestStack = new RequestStack();
         $request = new Request();
         $requestStack->push($request);
 
         $request->server->set('SERVER_NAME', 'www.example.org');
         $request->server->set('SERVER_PORT', 80);
-        $request->server->set('SCRIPT_NAME', '/app.php');
-        $request->server->set('SCRIPT_FILENAME', '/web/app.php');
-        $request->server->set('REQUEST_URI', '/app.php/example');
+        $request->server->set('SCRIPT_NAME', '/index.php');
+        $request->server->set('SCRIPT_FILENAME', '/public/index.php');
+        $request->server->set('REQUEST_URI', '/index.php/example');
 
         $sut = new FileLinkFormatter(null, $requestStack, __DIR__, '/_profiler/open?file=%f&line=%l#line%l');
 
-        $this->assertSame('http://www.example.org/app.php/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
+        $this->assertSame('http://www.example.org/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
     }
 }

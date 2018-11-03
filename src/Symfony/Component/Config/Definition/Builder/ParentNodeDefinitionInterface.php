@@ -16,16 +16,31 @@ namespace Symfony\Component\Config\Definition\Builder;
  *
  * @author Victor Berchet <victor@suumit.com>
  *
- * @method NodeDefinition[] getChildNodeDefinitions() should be implemented since 4.1
+ * @method NodeDefinition[] getChildNodeDefinitions() Gets the child node definitions - not implementing it is deprecated since Symfony 4.2
  */
-interface ParentNodeDefinitionInterface
+interface ParentNodeDefinitionInterface extends BuilderAwareInterface
 {
     /**
+     * Returns a builder to add children nodes.
+     *
      * @return NodeBuilder
      */
     public function children();
 
+    /**
+     * Appends a node definition.
+     *
+     * Usage:
+     *
+     *     $node = $parentNode
+     *         ->children()
+     *             ->scalarNode('foo')->end()
+     *             ->scalarNode('baz')->end()
+     *             ->append($this->getBarNodeDefinition())
+     *         ->end()
+     *     ;
+     *
+     * @return $this
+     */
     public function append(NodeDefinition $node);
-
-    public function setBuilder(NodeBuilder $builder);
 }

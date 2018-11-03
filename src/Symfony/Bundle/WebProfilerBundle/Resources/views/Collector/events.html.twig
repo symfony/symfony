@@ -61,7 +61,20 @@
                             </p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(collector.orphanedEvents) }}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in collector.orphanedEvents %}
+                                    <tr>
+                                        <td class="font-normal">{{ event }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     {% endif %}
                 </div>
             </div>

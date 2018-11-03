@@ -51,8 +51,8 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('identity_translator');
         $container->setAlias('translator', 'identity_translator');
 
-        $definitionsBefore = count($container->getDefinitions());
-        $aliasesBefore = count($container->getAliases());
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
@@ -68,8 +68,8 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('monolog.logger');
         $container->setAlias('logger', 'monolog.logger');
 
-        $definitionsBefore = count($container->getDefinitions());
-        $aliasesBefore = count($container->getAliases());
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);

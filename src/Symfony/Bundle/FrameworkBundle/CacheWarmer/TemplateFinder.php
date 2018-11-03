@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
  * Finds all the templates.
@@ -97,11 +97,10 @@ class TemplateFinder implements TemplateFinderInterface
     private function findTemplatesInBundle(BundleInterface $bundle)
     {
         $name = $bundle->getName();
-        $templates = array_merge(
+        $templates = array_unique(array_merge(
             $this->findTemplatesInFolder($bundle->getPath().'/Resources/views'),
             $this->findTemplatesInFolder($this->rootDir.'/'.$name.'/views')
-        );
-        $templates = array_unique($templates);
+        ));
 
         foreach ($templates as $i => $template) {
             $templates[$i] = $template->set('bundle', $name);

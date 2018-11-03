@@ -237,6 +237,8 @@ class CookieJarTest extends TestCase
         $this->assertEquals($cookie1, $cookieJar->get('foo', '/test', 'example.com'));
         $this->assertEquals($cookie2, $cookieJar->get('foo1', '/', 'example.com'));
         $this->assertEquals($cookie2, $cookieJar->get('foo1', '/bar', 'example.com'));
+
+        $this->assertEquals($cookie2, $cookieJar->get('foo1', '/bar'));
     }
 
     public function testCookieWithWildcardDomain()

@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Bridge\Twig\TokenParser\StopwatchTokenParser;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Twig\Extension\AbstractExtension;
 
 /**

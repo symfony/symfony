@@ -53,7 +53,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
         }
 
-        if (!is_array($attributes)) {
+        if (!\is_array($attributes)) {
             $attributes = array($attributes);
         }
 

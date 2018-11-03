@@ -31,7 +31,7 @@ class RegistryTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Symfony\Component\Workflow\Registry::add is deprecated since Symfony 4.1. Use addWorkflow() instead.
+     * @expectedDeprecation The "Symfony\Component\Workflow\Registry::add()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.
      */
     public function testAddIsDeprecated()
     {
@@ -79,6 +79,33 @@ class RegistryTest extends TestCase
         $w1 = $this->registry->get(new \stdClass());
         $this->assertInstanceOf(Workflow::class, $w1);
         $this->assertSame('workflow1', $w1->getName());
+    }
+
+    public function testAllWithOneMatchWithSuccess()
+    {
+        $workflows = $this->registry->all(new Subject1());
+        $this->assertInternalType('array', $workflows);
+        $this->assertCount(1, $workflows);
+        $this->assertInstanceOf(Workflow::class, $workflows[0]);
+        $this->assertSame('workflow1', $workflows[0]->getName());
+    }
+
+    public function testAllWithMultipleMatchWithSuccess()
+    {
+        $workflows = $this->registry->all(new Subject2());
+        $this->assertInternalType('array', $workflows);
+        $this->assertCount(2, $workflows);
+        $this->assertInstanceOf(Workflow::class, $workflows[0]);
+        $this->assertInstanceOf(Workflow::class, $workflows[1]);
+        $this->assertSame('workflow2', $workflows[0]->getName());
+        $this->assertSame('workflow3', $workflows[1]->getName());
+    }
+
+    public function testAllWithNoMatch()
+    {
+        $workflows = $this->registry->all(new \stdClass());
+        $this->assertInternalType('array', $workflows);
+        $this->assertCount(0, $workflows);
     }
 
     /**

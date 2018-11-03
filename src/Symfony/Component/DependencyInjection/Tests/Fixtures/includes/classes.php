@@ -2,7 +2,7 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 function sc_configure($instance)
 {
@@ -85,17 +85,17 @@ class DummyProxyDumper implements ProxyDumper
 {
     public function isProxyCandidate(Definition $definition)
     {
-        return false;
+        return $definition->isLazy();
     }
 
     public function getProxyFactoryCode(Definition $definition, $id, $factoryCall = null)
     {
-        return '';
+        return "        // lazy factory for {$definition->getClass()}\n\n";
     }
 
     public function getProxyCode(Definition $definition)
     {
-        return '';
+        return "// proxy code for {$definition->getClass()}\n";
     }
 }
 

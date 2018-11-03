@@ -124,7 +124,7 @@
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="synthetic" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
@@ -141,11 +141,12 @@
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" use="required" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
   </xsd:complexType>
@@ -160,13 +161,14 @@
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="exclude" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="namespace" type="xsd:string" use="required" />
     <xsd:attribute name="resource" type="xsd:string" use="required" />
     <xsd:attribute name="exclude" type="xsd:string" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
@@ -246,6 +248,7 @@
       <xsd:enumeration value="collection" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
+      <xsd:enumeration value="binary" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -257,6 +260,7 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
+      <xsd:enumeration value="service_locator" />
       <xsd:enumeration value="tagged" />
     </xsd:restriction>
   </xsd:simpleType>

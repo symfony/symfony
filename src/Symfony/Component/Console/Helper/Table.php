@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\WrappableOutputFormatterInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Provides helpers to display a table.
@@ -21,9 +24,20 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  * @author Саша Стаменковић <umpirsky@gmail.com>
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  * @author Max Grigorian <maxakawizard@gmail.com>
+ * @author Dany Maillard <danymaillard93b@gmail.com>
  */
 class Table
 {
+    private const SEPARATOR_TOP = 0;
+    private const SEPARATOR_TOP_BOTTOM = 1;
+    private const SEPARATOR_MID = 2;
+    private const SEPARATOR_BOTTOM = 3;
+    private const BORDER_OUTSIDE = 0;
+    private const BORDER_INSIDE = 1;
+
+    private $headerTitle;
+    private $footerTitle;
+
     /**
      * Table headers.
      */
@@ -67,8 +81,11 @@ class Table
      * @var array
      */
     private $columnWidths = array();
+    private $columnMaxWidths = array();
 
     private static $styles;
+
+    private $rendered = false;
 
     public function __construct(OutputInterface $output)
     {
@@ -168,11 +185,7 @@ class Table
      */
     public function getColumnStyle($columnIndex)
     {
-        if (isset($this->columnStyles[$columnIndex])) {
-            return $this->columnStyles[$columnIndex];
-        }
-
-        return $this->getStyle();
+        return $this->columnStyles[$columnIndex] ?? $this->getStyle();
     }
 
     /**
@@ -207,10 +220,29 @@ class Table
         return $this;
     }
 
+    /**
+     * Sets the maximum width of a column.
+     *
+     * Any cell within this column which contents exceeds the specified width will be wrapped into multiple lines, while
+     * formatted strings are preserved.
+     *
+     * @return $this
+     */
+    public function setColumnMaxWidth(int $columnIndex, int $width): self
+    {
+        if (!$this->output->getFormatter() instanceof WrappableOutputFormatterInterface) {
+            throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, \get_class($this->output->getFormatter())));
+        }
+
+        $this->columnMaxWidths[$columnIndex] = $width;
+
+        return $this;
+    }
+
     public function setHeaders(array $headers)
     {
         $headers = array_values($headers);
-        if (!empty($headers) && !is_array($headers[0])) {
+        if (!empty($headers) && !\is_array($headers[0])) {
             $headers = array($headers);
         }
 
@@ -243,11 +275,30 @@ class Table
             return $this;
         }
 
-        if (!is_array($row)) {
+        if (!\is_array($row)) {
             throw new InvalidArgumentException('A row must be an array or a TableSeparator instance.');
         }
 
         $this->rows[] = array_values($row);
+
+        return $this;
+    }
+
+    /**
+     * Adds a row to the table, and re-renders the table.
+     */
+    public function appendRow($row): self
+    {
+        if (!$this->output instanceof ConsoleSectionOutput) {
+            throw new RuntimeException(sprintf('Output should be an instance of "%s" when calling "%s".', ConsoleSectionOutput::class, __METHOD__));
+        }
+
+        if ($this->rendered) {
+            $this->output->clear($this->calculateRowCount());
+        }
+
+        $this->addRow($row);
+        $this->render();
 
         return $this;
     }
@@ -259,19 +310,32 @@ class Table
         return $this;
     }
 
+    public function setHeaderTitle(?string $title): self
+    {
+        $this->headerTitle = $title;
+
+        return $this;
+    }
+
+    public function setFooterTitle(?string $title): self
+    {
+        $this->footerTitle = $title;
+
+        return $this;
+    }
+
     /**
      * Renders table to output.
      *
      * Example:
-     * <code>
-     * +---------------+-----------------------+------------------+
-     * | ISBN          | Title                 | Author           |
-     * +---------------+-----------------------+------------------+
-     * | 99921-58-10-7 | Divine Comedy         | Dante Alighieri  |
-     * | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
-     * | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
-     * +---------------+-----------------------+------------------+
-     * </code>
+     *
+     *     +---------------+-----------------------+------------------+
+     *     | ISBN          | Title                 | Author           |
+     *     +---------------+-----------------------+------------------+
+     *     | 99921-58-10-7 | Divine Comedy         | Dante Alighieri  |
+     *     | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
+     *     | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
+     *     +---------------+-----------------------+------------------+
      */
     public function render()
     {
@@ -300,37 +364,72 @@ class Table
             }
 
             if ($isHeader || $isFirstRow) {
-                $this->renderRowSeparator();
                 if ($isFirstRow) {
+                    $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
                     $isFirstRow = false;
+                } else {
+                    $this->renderRowSeparator(self::SEPARATOR_TOP, $this->headerTitle, $this->style->getHeaderTitleFormat());
                 }
             }
 
             $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
         }
-        $this->renderRowSeparator();
+        $this->renderRowSeparator(self::SEPARATOR_BOTTOM, $this->footerTitle, $this->style->getFooterTitleFormat());
 
         $this->cleanup();
+        $this->rendered = true;
     }
 
     /**
      * Renders horizontal header separator.
      *
-     * Example: <code>+-----+-----------+-------+</code>
+     * Example:
+     *
+     *     +-----+-----------+-------+
      */
-    private function renderRowSeparator()
+    private function renderRowSeparator(int $type = self::SEPARATOR_MID, string $title = null, string $titleFormat = null)
     {
         if (0 === $count = $this->numberOfColumns) {
             return;
         }
 
-        if (!$this->style->getHorizontalBorderChar() && !$this->style->getCrossingChar()) {
+        $borders = $this->style->getBorderChars();
+        if (!$borders[0] && !$borders[2] && !$this->style->getCrossingChar()) {
             return;
         }
 
-        $markup = $this->style->getCrossingChar();
+        $crossings = $this->style->getCrossingChars();
+        if (self::SEPARATOR_MID === $type) {
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[2], $crossings[8], $crossings[0], $crossings[4]);
+        } elseif (self::SEPARATOR_TOP === $type) {
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[0], $crossings[1], $crossings[2], $crossings[3]);
+        } elseif (self::SEPARATOR_TOP_BOTTOM === $type) {
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[0], $crossings[9], $crossings[10], $crossings[11]);
+        } else {
+            list($horizontal, $leftChar, $midChar, $rightChar) = array($borders[0], $crossings[7], $crossings[6], $crossings[5]);
+        }
+
+        $markup = $leftChar;
         for ($column = 0; $column < $count; ++$column) {
-            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->effectiveColumnWidths[$column]).$this->style->getCrossingChar();
+            $markup .= str_repeat($horizontal, $this->effectiveColumnWidths[$column]);
+            $markup .= $column === $count - 1 ? $rightChar : $midChar;
+        }
+
+        if (null !== $title) {
+            $titleLength = Helper::strlenWithoutDecoration($formatter = $this->output->getFormatter(), $formattedTitle = sprintf($titleFormat, $title));
+            $markupLength = Helper::strlen($markup);
+            if ($titleLength > $limit = $markupLength - 4) {
+                $titleLength = $limit;
+                $formatLength = Helper::strlenWithoutDecoration($formatter, sprintf($titleFormat, ''));
+                $formattedTitle = sprintf($titleFormat, Helper::substr($title, 0, $limit - $formatLength - 3).'...');
+            }
+
+            $titleStart = ($markupLength - $titleLength) / 2;
+            if (false === mb_detect_encoding($markup, null, true)) {
+                $markup = substr_replace($markup, $formattedTitle, $titleStart, $titleLength);
+            } else {
+                $markup = mb_substr($markup, 0, $titleStart).$formattedTitle.mb_substr($markup, $titleStart + $titleLength);
+            }
         }
 
         $this->output->writeln(sprintf($this->style->getBorderFormat(), $markup));
@@ -339,22 +438,28 @@ class Table
     /**
      * Renders vertical column separator.
      */
-    private function renderColumnSeparator()
+    private function renderColumnSeparator($type = self::BORDER_OUTSIDE)
     {
-        return sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar());
+        $borders = $this->style->getBorderChars();
+
+        return sprintf($this->style->getBorderFormat(), self::BORDER_OUTSIDE === $type ? $borders[1] : $borders[3]);
     }
 
     /**
      * Renders table row.
      *
-     * Example: <code>| 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |</code>
+     * Example:
+     *
+     *     | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
      */
     private function renderRow(array $row, string $cellFormat)
     {
-        $rowContent = $this->renderColumnSeparator();
-        foreach ($this->getRowColumns($row) as $column) {
+        $rowContent = $this->renderColumnSeparator(self::BORDER_OUTSIDE);
+        $columns = $this->getRowColumns($row);
+        $last = \count($columns) - 1;
+        foreach ($columns as $i => $column) {
             $rowContent .= $this->renderCell($row, $column, $cellFormat);
-            $rowContent .= $this->renderColumnSeparator();
+            $rowContent .= $this->renderColumnSeparator($last === $i ? self::BORDER_OUTSIDE : self::BORDER_INSIDE);
         }
         $this->output->writeln($rowContent);
     }
@@ -375,13 +480,13 @@ class Table
 
         // str_pad won't work properly with multi-byte strings, we need to fix the padding
         if (false !== $encoding = mb_detect_encoding($cell, null, true)) {
-            $width += strlen($cell) - mb_strwidth($cell, $encoding);
+            $width += \strlen($cell) - mb_strwidth($cell, $encoding);
         }
 
         $style = $this->getColumnStyle($column);
 
         if ($cell instanceof TableSeparator) {
-            return sprintf($style->getBorderFormat(), str_repeat($style->getHorizontalBorderChar(), $width));
+            return sprintf($style->getBorderFormat(), str_repeat($style->getBorderChars()[2], $width));
         }
 
         $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
@@ -409,12 +514,17 @@ class Table
 
     private function buildTableRows($rows)
     {
+        /** @var WrappableOutputFormatterInterface $formatter */
+        $formatter = $this->output->getFormatter();
         $unmergedRows = array();
-        for ($rowKey = 0; $rowKey < count($rows); ++$rowKey) {
+        for ($rowKey = 0; $rowKey < \count($rows); ++$rowKey) {
             $rows = $this->fillNextRows($rows, $rowKey);
 
             // Remove any new line breaks and replace it with a new line
             foreach ($rows[$rowKey] as $column => $cell) {
+                if (isset($this->columnMaxWidths[$column]) && Helper::strlenWithoutDecoration($formatter, $cell) > $this->columnMaxWidths[$column]) {
+                    $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column]);
+                }
                 if (!strstr($cell, "\n")) {
                     continue;
                 }
@@ -445,6 +555,19 @@ class Table
         });
     }
 
+    private function calculateRowCount(): int
+    {
+        $numberOfRows = \count(iterator_to_array($this->buildTableRows(array_merge($this->headers, array(new TableSeparator()), $this->rows))));
+
+        if ($this->headers) {
+            ++$numberOfRows; // Add row for header separator
+        }
+
+        ++$numberOfRows; // Add row for footer separator
+
+        return $numberOfRows;
+    }
+
     /**
      * fill rows that contains rowspan > 1.
      *
@@ -454,15 +577,15 @@ class Table
     {
         $unmergedRows = array();
         foreach ($rows[$line] as $column => $cell) {
-            if (null !== $cell && !$cell instanceof TableCell && !is_scalar($cell) && !(is_object($cell) && method_exists($cell, '__toString'))) {
-                throw new InvalidArgumentException(sprintf('A cell must be a TableCell, a scalar or an object implementing __toString, %s given.', gettype($cell)));
+            if (null !== $cell && !$cell instanceof TableCell && !is_scalar($cell) && !(\is_object($cell) && method_exists($cell, '__toString'))) {
+                throw new InvalidArgumentException(sprintf('A cell must be a TableCell, a scalar or an object implementing __toString, %s given.', \gettype($cell)));
             }
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;
                 $lines = array($cell);
                 if (strstr($cell, "\n")) {
                     $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
-                    $nbLines = count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
+                    $nbLines = \count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
 
                     $rows[$line][$column] = new TableCell($lines[0], array('colspan' => $cell->getColspan()));
                     unset($lines[0]);
@@ -482,7 +605,7 @@ class Table
 
         foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
             // we need to know if $unmergedRow will be merged or inserted into $rows
-            if (isset($rows[$unmergedRowKey]) && is_array($rows[$unmergedRowKey]) && ($this->getNumberOfColumns($rows[$unmergedRowKey]) + $this->getNumberOfColumns($unmergedRows[$unmergedRowKey]) <= $this->numberOfColumns)) {
+            if (isset($rows[$unmergedRowKey]) && \is_array($rows[$unmergedRowKey]) && ($this->getNumberOfColumns($rows[$unmergedRowKey]) + $this->getNumberOfColumns($unmergedRows[$unmergedRowKey]) <= $this->numberOfColumns)) {
                 foreach ($unmergedRow as $cellKey => $cell) {
                     // insert cell into row at cellKey position
                     array_splice($rows[$unmergedRowKey], $cellKey, 0, array($cell));
@@ -538,7 +661,7 @@ class Table
      */
     private function getNumberOfColumns(array $row): int
     {
-        $columns = count($row);
+        $columns = \count($row);
         foreach ($row as $column) {
             $columns += $column instanceof TableCell ? ($column->getColspan() - 1) : 0;
         }
@@ -590,13 +713,13 @@ class Table
                 $lengths[] = $this->getCellWidth($row, $column);
             }
 
-            $this->effectiveColumnWidths[$column] = max($lengths) + strlen($this->style->getCellRowContentFormat()) - 2;
+            $this->effectiveColumnWidths[$column] = max($lengths) + Helper::strlen($this->style->getCellRowContentFormat()) - 2;
         }
     }
 
     private function getColumnSeparatorWidth(): int
     {
-        return strlen(sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar()));
+        return Helper::strlen(sprintf($this->style->getBorderFormat(), $this->style->getBorderChars()[3]));
     }
 
     private function getCellWidth(array $row, int $column): int
@@ -609,8 +732,9 @@ class Table
         }
 
         $columnWidth = isset($this->columnWidths[$column]) ? $this->columnWidths[$column] : 0;
+        $cellWidth = max($cellWidth, $columnWidth);
 
-        return max($cellWidth, $columnWidth);
+        return isset($this->columnMaxWidths[$column]) ? min($this->columnMaxWidths[$column], $cellWidth) : $cellWidth;
     }
 
     /**
@@ -626,31 +750,37 @@ class Table
     {
         $borderless = new TableStyle();
         $borderless
-            ->setHorizontalBorderChar('=')
-            ->setVerticalBorderChar(' ')
-            ->setCrossingChar(' ')
+            ->setHorizontalBorderChars('=')
+            ->setVerticalBorderChars(' ')
+            ->setDefaultCrossingChar(' ')
         ;
 
         $compact = new TableStyle();
         $compact
-            ->setHorizontalBorderChar('')
-            ->setVerticalBorderChar(' ')
-            ->setCrossingChar('')
+            ->setHorizontalBorderChars('')
+            ->setVerticalBorderChars(' ')
+            ->setDefaultCrossingChar('')
             ->setCellRowContentFormat('%s')
         ;
 
         $styleGuide = new TableStyle();
         $styleGuide
-            ->setHorizontalBorderChar('-')
-            ->setVerticalBorderChar(' ')
-            ->setCrossingChar(' ')
+            ->setHorizontalBorderChars('-')
+            ->setVerticalBorderChars(' ')
+            ->setDefaultCrossingChar(' ')
             ->setCellHeaderFormat('%s')
         ;
 
         $box = (new TableStyle())
-            ->setHorizontalBorderChar('─')
-            ->setVerticalBorderChar('│')
-            ->setCrossingChar('┼')
+            ->setHorizontalBorderChars('─')
+            ->setVerticalBorderChars('│')
+            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
+        ;
+
+        $boxDouble = (new TableStyle())
+            ->setHorizontalBorderChars('═', '─')
+            ->setVerticalBorderChars('║', '│')
+            ->setCrossingChars('┼', '╔', '╤', '╗', '╢', '╝', '╧', '╚', '╟', '╠', '╪', '╣')
         ;
 
         return array(
@@ -659,6 +789,7 @@ class Table
             'compact' => $compact,
             'symfony-style-guide' => $styleGuide,
             'box' => $box,
+            'box-double' => $boxDouble,
         );
     }
 

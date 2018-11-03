@@ -18,3 +18,9 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
 } else {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CoverageListenerForV7', 'Symfony\Bridge\PhpUnit\CoverageListener');
 }
+
+if (false) {
+    class CoverageListener
+    {
+    }
+}

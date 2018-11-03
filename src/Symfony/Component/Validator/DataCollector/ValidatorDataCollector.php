@@ -59,7 +59,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         $collected = $this->validator->getCollectedData();
         $this->data['calls'] = $this->cloneVar($collected);
         $this->data['violations_count'] = array_reduce($collected, function ($previous, $item) {
-            return $previous + count($item['violations']);
+            return $previous + \count($item['violations']);
         }, 0);
     }
 
@@ -103,7 +103,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
             FormInterface::class => function (FormInterface $f, array $a) {
                 return array(
                     Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(\get_class($f->getConfig()->getType()->getInnerType())),
                     Caster::PREFIX_VIRTUAL.'data' => $f->getData(),
                 );
             },

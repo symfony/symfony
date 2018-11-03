@@ -15,8 +15,9 @@ use Egulias\EmailValidator\Validation\EmailValidation;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -48,13 +49,13 @@ class EmailValidator extends ConstraintValidator
      */
     public function __construct($defaultMode = Email::VALIDATION_MODE_LOOSE)
     {
-        if (is_bool($defaultMode)) {
+        if (\is_bool($defaultMode)) {
             @trigger_error(sprintf('Calling `new %s(%s)` is deprecated since Symfony 4.1, use `new %s("%s")` instead.', self::class, $defaultMode ? 'true' : 'false', self::class, $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE), E_USER_DEPRECATED);
 
             $defaultMode = $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE;
         }
 
-        if (!in_array($defaultMode, Email::$validationModes, true)) {
+        if (!\in_array($defaultMode, Email::$validationModes, true)) {
             throw new \InvalidArgumentException('The "defaultMode" parameter value is not valid.');
         }
 
@@ -74,8 +75,8 @@ class EmailValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+            throw new UnexpectedValueException($value, 'string');
         }
 
         $value = (string) $value;
@@ -94,13 +95,13 @@ class EmailValidator extends ConstraintValidator
             $constraint->mode = $this->defaultMode;
         }
 
-        if (!in_array($constraint->mode, Email::$validationModes, true)) {
-            throw new \InvalidArgumentException(sprintf('The %s::$mode parameter value is not valid.', get_class($constraint)));
+        if (!\in_array($constraint->mode, Email::$validationModes, true)) {
+            throw new \InvalidArgumentException(sprintf('The %s::$mode parameter value is not valid.', \get_class($constraint)));
         }
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {
             if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
-                throw new RuntimeException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
+                throw new LogicException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
             }
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();

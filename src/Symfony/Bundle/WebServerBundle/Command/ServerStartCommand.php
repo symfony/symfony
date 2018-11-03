@@ -17,8 +17,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -36,6 +36,10 @@ class ServerStartCommand extends Command
 
     public function __construct(string $documentRoot = null, string $environment = null)
     {
+        if (!$environment) {
+            @trigger_error(sprintf('Omitting the $environment argument of the "%s" constructor is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;
 
@@ -90,7 +94,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if (!extension_loaded('pcntl')) {
+        if (!\extension_loaded('pcntl')) {
             $io->error(array(
                 'This command needs the pcntl extension to run.',
                 'You can either install it or use the "server:run" command instead.',
@@ -112,6 +116,7 @@ EOF
             $documentRoot = $this->documentRoot;
         }
 
+        // @deprecated since Symfony 4.2
         if (!$env = $this->environment) {
             if ($input->hasOption('env') && !$env = $input->getOption('env')) {
                 $io->error('The environment must be either passed as second argument of the constructor or through the "--env" input option.');
@@ -135,7 +140,7 @@ EOF
         try {
             $server = new WebServer();
             if ($server->isRunning($input->getOption('pidfile'))) {
-                $io->error(sprintf('The web server is already running (listening on http://%s).', $server->getAddress($input->getOption('pidfile'))));
+                $io->error(sprintf('The web server has already been started. It is currently listening on http://%s. Please stop the web server before you try to start it again.', $server->getAddress($input->getOption('pidfile'))));
 
                 return 1;
             }
@@ -143,7 +148,14 @@ EOF
             $config = new WebServerConfig($documentRoot, $env, $input->getArgument('addressport'), $input->getOption('router'));
 
             if (WebServer::STARTED === $server->start($config, $input->getOption('pidfile'))) {
-                $io->success(sprintf('Server listening on http://%s', $config->getAddress()));
+                $message = sprintf('Server listening on http://%s', $config->getAddress());
+                if ('' !== $displayAddress = $config->getDisplayAddress()) {
+                    $message = sprintf('Server listening on all interfaces, port %s -- see http://%s', $config->getPort(), $displayAddress);
+                }
+                $io->success($message);
+                if (ini_get('xdebug.profiler_enable_trigger')) {
+                    $io->comment('Xdebug profiler trigger enabled.');
+                }
             }
         } catch (\Exception $e) {
             $io->error($e->getMessage());

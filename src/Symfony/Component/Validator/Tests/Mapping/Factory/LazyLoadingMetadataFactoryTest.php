@@ -149,6 +149,21 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertEquals($metadata, $factory->getMetadataFor(self::PARENT_CLASS));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
+     */
+    public function testNonClassNameStringValues()
+    {
+        $testedValue = 'error@example.com';
+        $loader = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
+        $factory = new LazyLoadingMetadataFactory($loader, $cache);
+        $cache
+            ->expects($this->never())
+            ->method('read');
+        $factory->getMetadataFor($testedValue);
+    }
+
     public function testMetadataCacheWithRuntimeConstraint()
     {
         $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();

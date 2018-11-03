@@ -37,7 +37,7 @@ class ElementNode extends AbstractNode
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getNamespace()
     {
@@ -45,7 +45,7 @@ class ElementNode extends AbstractNode
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getElement()
     {

@@ -66,6 +66,10 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['max-depth'])) {
                     $attributeMetadata->setMaxDepth((int) $attribute['max-depth']);
                 }
+
+                if (isset($attribute['serialized-name'])) {
+                    $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
+                }
             }
 
             if (isset($xml->{'discriminator-map'})) {

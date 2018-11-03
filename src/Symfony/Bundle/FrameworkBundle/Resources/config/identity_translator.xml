@@ -6,11 +6,13 @@
     <services>
         <defaults public="false" />
 
-        <service id="translator" class="Symfony\Component\Translation\IdentityTranslator" public="true">
-            <argument type="service" id="translator.selector" />
-        </service>
+        <service id="translator" class="Symfony\Component\Translation\IdentityTranslator" public="true" />
         <service id="Symfony\Component\Translation\TranslatorInterface" alias="translator" />
+        <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="translator" />
 
-        <service id="translator.selector" class="Symfony\Component\Translation\MessageSelector" />
+        <service id="identity_translator" class="Symfony\Component\Translation\IdentityTranslator" />
+        <service id="translator.selector" class="Symfony\Component\Translation\MessageSelector">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.2, use "identity_translator" instead.</deprecated>
+        </service>
     </services>
 </container>

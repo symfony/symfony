@@ -40,7 +40,7 @@ abstract class AbstractQuery implements QueryInterface
         $resolver->setAllowedValues('scope', array(static::SCOPE_BASE, static::SCOPE_ONE, static::SCOPE_SUB));
 
         $resolver->setNormalizer('filter', function (Options $options, $value) {
-            return is_array($value) ? $value : array($value);
+            return \is_array($value) ? $value : array($value);
         });
 
         $this->connection = $connection;

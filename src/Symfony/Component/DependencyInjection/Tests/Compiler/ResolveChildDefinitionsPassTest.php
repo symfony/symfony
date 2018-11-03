@@ -259,23 +259,23 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $configurator = $container->getDefinition('sibling')->getConfigurator();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($configurator));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($configurator));
         $this->assertSame('parentClass', $configurator->getClass());
 
         $factory = $container->getDefinition('sibling')->getFactory();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($factory[0]));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($factory[0]));
         $this->assertSame('parentClass', $factory[0]->getClass());
 
         $argument = $container->getDefinition('sibling')->getArgument(0);
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($argument));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($argument));
         $this->assertSame('parentClass', $argument->getClass());
 
         $properties = $container->getDefinition('sibling')->getProperties();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($properties['prop']));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($properties['prop']));
         $this->assertSame('parentClass', $properties['prop']->getClass());
 
         $methodCalls = $container->getDefinition('sibling')->getMethodCalls();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($methodCalls[0][1][0]));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($methodCalls[0][1][0]));
         $this->assertSame('parentClass', $methodCalls[0][1][0]->getClass());
     }
 
@@ -355,6 +355,27 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertSame(array(2, 1, 'foo' => 3), $def->getArguments());
     }
 
+    public function testBindings()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'stdClass')
+            ->setBindings(array('a' => '1', 'b' => '2'))
+        ;
+
+        $child = $container->setDefinition('child', new ChildDefinition('parent'))
+            ->setBindings(array('b' => 'B', 'c' => 'C'))
+        ;
+
+        $this->process($container);
+
+        $bindings = array();
+        foreach ($container->getDefinition('child')->getBindings() as $k => $v) {
+            $bindings[$k] = $v->getValues()[0];
+        }
+        $this->assertEquals(array('b' => 'B', 'c' => 'C', 'a' => '1'), $bindings);
+    }
+
     public function testSetAutoconfiguredOnServiceIsParent()
     {
         $container = new ContainerBuilder();
@@ -374,5 +395,22 @@ class ResolveChildDefinitionsPassTest extends TestCase
     {
         $pass = new ResolveChildDefinitionsPass();
         $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @expectedExceptionMessageRegExp /^Circular reference detected for service "c", path: "c -> b -> a -> c"./
+     */
+    public function testProcessDetectsChildDefinitionIndirectCircularReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a');
+
+        $container->setDefinition('b', new ChildDefinition('a'));
+        $container->setDefinition('c', new ChildDefinition('b'));
+        $container->setDefinition('a', new ChildDefinition('c'));
+
+        $this->process($container);
     }
 }

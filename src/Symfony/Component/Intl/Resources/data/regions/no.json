@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.2",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -72,7 +72,6 @@
         "ER": "Eritrea",
         "ES": "Spania",
         "ET": "Etiopia",
-        "EZ": "eurosonen",
         "FI": "Finland",
         "FJ": "Fiji",
         "FK": "Falklandsøyene",
@@ -184,7 +183,7 @@
         "PK": "Pakistan",
         "PL": "Polen",
         "PM": "Saint-Pierre-et-Miquelon",
-        "PN": "Pitcairn",
+        "PN": "Pitcairnøyene",
         "PR": "Puerto Rico",
         "PS": "Det palestinske området",
         "PT": "Portugal",
@@ -237,7 +236,6 @@
         "UA": "Ukraina",
         "UG": "Uganda",
         "UM": "USAs ytre øyer",
-        "UN": "FN",
         "US": "USA",
         "UY": "Uruguay",
         "UZ": "Usbekistan",

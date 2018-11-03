@@ -110,8 +110,8 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with an optional variable as the first segment with requirements',
                 array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
-                '', '#^/(?P<bar>(foo|bar))?$#sD', array('bar'), array(
-                    array('variable', '/', '(foo|bar)', 'bar'),
+                '', '#^/(?P<bar>(?:foo|bar))?$#sD', array('bar'), array(
+                    array('variable', '/', '(?:foo|bar)', 'bar'),
                 ),
             ),
 
@@ -146,10 +146,10 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
-                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#sD', array('w', 'x', 'y', 'z', '_format'), array(
+                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(?:y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#sD', array('w', 'x', 'y', 'z', '_format'), array(
                     array('variable', '.', '[^/]++', '_format'),
                     array('variable', '', '[^/\.]++', 'z'),
-                    array('variable', '', '(y|Y)', 'y'),
+                    array('variable', '', '(?:y|Y)', 'y'),
                     array('variable', '', '[^/\.]+', 'x'),
                     array('variable', '/', '[^/\.]+', 'w'),
                 ),
@@ -379,6 +379,26 @@ class RouteCompilerTest extends TestCase
     {
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
         $route->compile();
+    }
+
+    /**
+     * @dataProvider provideRemoveCapturingGroup
+     */
+    public function testRemoveCapturingGroup($regex, $requirement)
+    {
+        $route = new Route('/{foo}', array(), array('foo' => $requirement));
+
+        $this->assertSame($regex, $route->compile()->getRegex());
+    }
+
+    public function provideRemoveCapturingGroup()
+    {
+        yield array('#^/(?P<foo>a(?:b|c)(?:d|e)f)$#sD', 'a(b|c)(d|e)f');
+        yield array('#^/(?P<foo>a\(b\)c)$#sD', 'a\(b\)c');
+        yield array('#^/(?P<foo>(?:b))$#sD', '(?:b)');
+        yield array('#^/(?P<foo>(?(b)b))$#sD', '(?(b)b)');
+        yield array('#^/(?P<foo>(*F))$#sD', '(*F)');
+        yield array('#^/(?P<foo>(?:(?:foo)))$#sD', '((foo))');
     }
 }
 

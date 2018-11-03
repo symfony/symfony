@@ -191,7 +191,7 @@ class FormTest extends TestCase
             $values,
             array_map(
                 function ($field) {
-                    $class = get_class($field);
+                    $class = \get_class($field);
 
                     return array(substr($class, strrpos($class, '\\') + 1), $field->getValue());
                 },
@@ -948,12 +948,12 @@ class FormTest extends TestCase
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
-              <html>
-                  <form>
-                      <textarea name="example"></textarea>
-                  </form>
-              </html>
-          ');
+            <html>
+                <form>
+                    <textarea name="example"></textarea>
+                </form>
+            </html>'
+        );
 
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');

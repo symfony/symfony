@@ -25,6 +25,14 @@ class RouteTest extends TestCase
     }
 
     /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testTryingToSetLocalesDirectly()
+    {
+        $route = new Route(array('locales' => array('nl' => 'bar')));
+    }
+
+    /**
      * @dataProvider getValidParameters
      */
     public function testRouteParameters($parameter, $value, $getter)
@@ -45,6 +53,7 @@ class RouteTest extends TestCase
             array('methods', array('GET', 'POST'), 'getMethods'),
             array('host', '{locale}.example.com', 'getHost'),
             array('condition', 'context.getMethod() == "GET"', 'getCondition'),
+            array('value', array('nl' => '/hier', 'en' => '/here'), 'getLocalizedPaths'),
         );
     }
 }

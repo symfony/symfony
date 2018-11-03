@@ -12,14 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Ldap\LdapInterface;
-use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
+use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -43,6 +43,23 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection->setAccessible(true);
 
         $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', '', 'key'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage The presented password must not be empty.
+     */
+    public function testNullPasswordShouldThrowAnException()
+    {
+        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapInterface')->getMock();
+        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+
+        $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
+        $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
+        $reflection->setAccessible(true);
+
+        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', null, 'key'));
     }
 
     /**

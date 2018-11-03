@@ -38,7 +38,7 @@ interface FormConfigInterface
     /**
      * Returns the property path that the form should be mapped to.
      *
-     * @return null|PropertyPathInterface The property path
+     * @return PropertyPathInterface|null The property path
      */
     public function getPropertyPath();
 
@@ -99,7 +99,7 @@ interface FormConfigInterface
     /**
      * Returns the data mapper of the form.
      *
-     * @return DataMapperInterface The data mapper
+     * @return DataMapperInterface|null The data mapper
      */
     public function getDataMapper();
 
@@ -167,7 +167,7 @@ interface FormConfigInterface
     /**
      * Returns the class of the form data or null if the data is scalar or an array.
      *
-     * @return null|string The data class or null
+     * @return string|null The data class or null
      */
     public function getDataClass();
 

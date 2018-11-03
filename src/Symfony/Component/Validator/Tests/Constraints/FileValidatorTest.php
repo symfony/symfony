@@ -31,7 +31,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     {
         parent::setUp();
 
-        $this->path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'FileValidatorTest';
+        $this->path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
         fwrite($this->file, ' ', 1);
     }
@@ -40,7 +40,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     {
         parent::tearDown();
 
-        if (is_resource($this->file)) {
+        if (\is_resource($this->file)) {
             fclose($this->file);
         }
 
@@ -67,7 +67,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
     public function testExpectsStringCompatibleTypeOrFile()
     {
@@ -177,6 +177,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ size }}', $sizeAsString)
             ->setParameter('{{ suffix }}', $suffix)
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::TOO_LARGE_ERROR)
             ->assertRaised();
     }
@@ -279,6 +280,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ size }}', $sizeAsString)
             ->setParameter('{{ suffix }}', $suffix)
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::TOO_LARGE_ERROR)
             ->assertRaised();
     }
@@ -357,6 +359,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ type }}', '"application/pdf"')
             ->setParameter('{{ types }}', '"image/png", "image/jpg"')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
     }
@@ -387,6 +390,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ type }}', '"application/pdf"')
             ->setParameter('{{ types }}', '"image/*", "image/jpg"')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
     }
@@ -403,6 +407,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::EMPTY_ERROR)
             ->assertRaised();
     }
@@ -451,11 +456,17 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
                 '{{ suffix }}' => 'bytes',
             ), '1');
 
+            // access FileValidator::factorizeSizes() private method to format max file size
+            $reflection = new \ReflectionClass(\get_class(new FileValidator()));
+            $method = $reflection->getMethod('factorizeSizes');
+            $method->setAccessible(true);
+            list($sizeAsString, $limit, $suffix) = $method->invokeArgs(new FileValidator(), array(0, UploadedFile::getMaxFilesize(), false));
+
             // it correctly parses the maxSize option and not only uses simple string comparison
             // 1000M should be bigger than the ini value
             $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
-                '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
-                '{{ suffix }}' => 'MiB',
+                '{{ limit }}' => $limit,
+                '{{ suffix }}' => $suffix,
             ), '1000M');
 
             // it correctly parses the maxSize option and not only uses simple string comparison

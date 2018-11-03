@@ -49,6 +49,7 @@ class PassConfig
         );
 
         $this->optimizationPasses = array(array(
+            new ValidateEnvPlaceholdersPass(),
             new ResolveChildDefinitionsPass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),
@@ -80,12 +81,9 @@ class PassConfig
             new RemovePrivateAliasesPass(),
             new ReplaceAliasByActualDefinitionPass(),
             new RemoveAbstractDefinitionsPass(),
-            new RepeatedPass(array(
-                new AnalyzeServiceReferencesPass(),
-                new InlineServiceDefinitionsPass(),
-                new AnalyzeServiceReferencesPass(),
-                new RemoveUnusedDefinitionsPass(),
-            )),
+            new RemoveUnusedDefinitionsPass(),
+            new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
+            new AnalyzeServiceReferencesPass(),
             new DefinitionErrorExceptionPass(),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
@@ -257,13 +255,13 @@ class PassConfig
      */
     private function sortPasses(array $passes)
     {
-        if (0 === count($passes)) {
+        if (0 === \count($passes)) {
             return array();
         }
 
         krsort($passes);
 
         // Flatten the array
-        return call_user_func_array('array_merge', $passes);
+        return array_merge(...$passes);
     }
 }

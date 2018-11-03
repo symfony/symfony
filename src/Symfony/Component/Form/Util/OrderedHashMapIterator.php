@@ -73,7 +73,7 @@ class OrderedHashMapIterator implements \Iterator
         $this->elements = &$elements;
         $this->orderedKeys = &$orderedKeys;
         $this->managedCursors = &$managedCursors;
-        $this->cursorId = count($managedCursors);
+        $this->cursorId = \count($managedCursors);
 
         $this->managedCursors[$this->cursorId] = &$this->cursor;
     }

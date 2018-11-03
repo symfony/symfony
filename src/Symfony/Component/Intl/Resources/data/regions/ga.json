@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.91",
     "Names": {
         "AC": "Oileán na Deascabhála",
         "AD": "Andóra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Oileán na Nollag",
         "CY": "an Chipir",
-        "CZ": "An tSeicia",
+        "CZ": "an tSeicia",
         "DE": "an Ghearmáin",
         "DG": "Diego Garcia",
         "DJ": "Djibouti",
@@ -72,7 +72,6 @@
         "ER": "an Eiritré",
         "ES": "an Spáinn",
         "ET": "an Aetóip",
-        "EZ": "Limistéar an euro",
         "FI": "an Fhionlainn",
         "FJ": "Fidsí",
         "FK": "Oileáin Fháclainne",
@@ -237,7 +236,6 @@
         "UA": "an Úcráin",
         "UG": "Uganda",
         "UM": "Oileáin Imeallacha S.A.M.",
-        "UN": "na Náisiúin Aontaiteh",
         "US": "Stáit Aontaithe Mheiriceá",
         "UY": "Uragua",
         "UZ": "an Úisbéiceastáin",

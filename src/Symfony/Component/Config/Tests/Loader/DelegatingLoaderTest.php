@@ -12,8 +12,8 @@
 namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Loader\LoaderResolver;
 
 class DelegatingLoaderTest extends TestCase
 {
@@ -57,7 +57,7 @@ class DelegatingLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Exception\FileLoaderLoadException
+     * @expectedException \Symfony\Component\Config\Exception\LoaderLoadException
      */
     public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
     {

@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouterDataCollector;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouterDataCollector;
 
 /**
  * RouterDataCollector.
@@ -24,7 +24,7 @@ class RouterDataCollector extends BaseRouterDataCollector
 {
     public function guessRoute(Request $request, $controller)
     {
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             $controller = $controller[0];
         }
 

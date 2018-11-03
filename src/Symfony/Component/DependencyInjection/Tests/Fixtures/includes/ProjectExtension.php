@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 class ProjectExtension implements ExtensionInterface
@@ -12,7 +11,7 @@ class ProjectExtension implements ExtensionInterface
         $configs = array_filter($configs);
 
         if ($configs) {
-            $config = call_user_func_array('array_merge', $configs);
+            $config = array_merge(...$configs);
         } else {
             $config = array();
         }

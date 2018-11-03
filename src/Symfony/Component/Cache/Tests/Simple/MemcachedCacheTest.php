@@ -45,6 +45,15 @@ class MemcachedCacheTest extends CacheTestCase
         return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
+    public function testCreatePersistentConnectionShouldNotDupServerList()
+    {
+        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('persistent_id' => 'persistent'));
+        $this->assertCount(1, $instance->getServerList());
+
+        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('persistent_id' => 'persistent'));
+        $this->assertCount(1, $instance->getServerList());
+    }
+
     public function testOptions()
     {
         $client = MemcachedCache::createConnection(array(), array(

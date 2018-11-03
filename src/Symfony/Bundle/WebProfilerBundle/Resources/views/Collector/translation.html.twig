@@ -68,20 +68,7 @@
 
 {% block panelContent %}
 
-    <h2>Translation Locales</h2>
-
-    <div class="metrics">
-        <div class="metric">
-            <span class="value">{{ collector.locale|default('-') }}</span>
-            <span class="label">Locale</span>
-        </div>
-        <div class="metric">
-            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
-            <span class="label">Fallback locales</span>
-        </div>
-    </div>
-
-    <h2>Translation Metrics</h2>
+    <h2>Translation</h2>
 
     <div class="metrics">
         <div class="metric">
@@ -98,9 +85,20 @@
             <span class="value">{{ collector.countMissings }}</span>
             <span class="label">Missing messages</span>
         </div>
+
+        <div class="metric-divider"></div>
+
+        <div class="metric">
+            <span class="value">{{ collector.locale|default('-') }}</span>
+            <span class="label">Locale</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
+            <span class="label">Fallback locale{{ collector.fallbackLocales|length != 1 ? 's' }}</span>
+        </div>
     </div>
 
-    <h2>Translation Messages</h2>
+    <h2>Messages</h2>
 
     {% block messages %}
 
@@ -117,7 +115,7 @@
     {% endfor %}
 
     <div class="sf-tabs">
-        <div class="tab">
+        <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
             <h3 class="tab-title">Defined <span class="badge">{{ collector.countDefines }}</span></h3>
 
             <div class="tab-content">
@@ -158,7 +156,7 @@
             </div>
         </div>
 
-        <div class="tab">
+        <div class="tab {{ collector.countMissings > 0 ? 'active' }}">
             <h3 class="tab-title">Missing <span class="badge {{ collector.countMissings ? 'status-error' }}">{{ collector.countMissings }}</span></h3>
 
             <div class="tab-content">

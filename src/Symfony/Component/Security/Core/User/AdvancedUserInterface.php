@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AccountExpiredException;
-use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
 
 /**
  * Adds extra features to a user class related to account status flags.
@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\Exception\DisabledException;
  *
  * @see UserInterface
  * @see AccountStatusException
- * @deprecated since version 4.1
+ * @deprecated since Symfony 4.1
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

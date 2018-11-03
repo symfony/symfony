@@ -35,6 +35,7 @@
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument>%kernel.cache_dir%/%kernel.container_class%</argument>
+            <argument type="service" id="request_stack" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">

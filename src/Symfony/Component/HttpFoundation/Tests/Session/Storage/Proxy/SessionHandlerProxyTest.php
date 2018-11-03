@@ -121,4 +121,37 @@ class SessionHandlerProxyTest extends TestCase
 
         $this->proxy->gc(86400);
     }
+
+    /**
+     * @requires PHPUnit 5.1
+     */
+    public function testValidateId()
+    {
+        $mock = $this->getMockBuilder(array('SessionHandlerInterface', 'SessionUpdateTimestampHandlerInterface'))->getMock();
+        $mock->expects($this->once())
+            ->method('validateId');
+
+        $proxy = new SessionHandlerProxy($mock);
+        $proxy->validateId('id');
+
+        $this->assertTrue($this->proxy->validateId('id'));
+    }
+
+    /**
+     * @requires PHPUnit 5.1
+     */
+    public function testUpdateTimestamp()
+    {
+        $mock = $this->getMockBuilder(array('SessionHandlerInterface', 'SessionUpdateTimestampHandlerInterface'))->getMock();
+        $mock->expects($this->once())
+            ->method('updateTimestamp');
+
+        $proxy = new SessionHandlerProxy($mock);
+        $proxy->updateTimestamp('id', 'data');
+
+        $this->mock->expects($this->once())
+            ->method('write');
+
+        $this->proxy->updateTimestamp('id', 'data');
+    }
 }

@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Validator\Violation;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Util\PropertyPath;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ConstraintViolationBuilderInterface}.
@@ -43,8 +44,14 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
      */
     private $cause;
 
-    public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, $root, $propertyPath, $invalidValue, TranslatorInterface $translator, $translationDomain = null)
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, $root, $propertyPath, $invalidValue, $translator, $translationDomain = null)
     {
+        if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 8 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+        }
         $this->violations = $violations;
         $this->message = $message;
         $this->parameters = $parameters;
@@ -145,6 +152,12 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             $translatedMessage = $this->translator->trans(
                 $this->message,
                 $this->parameters,
+                $this->translationDomain
+            );
+        } elseif ($this->translator instanceof TranslatorInterface) {
+            $translatedMessage = $this->translator->trans(
+                $this->message,
+                array('%count%' => $this->plural) + $this->parameters,
                 $this->translationDomain
             );
         } else {

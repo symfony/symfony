@@ -18,14 +18,20 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since Symfony 4.2, use Guard instead.
  */
 class SimpleFormFactory extends FormLoginFactory
 {
-    public function __construct()
+    public function __construct(bool $triggerDeprecation = true)
     {
         parent::__construct();
 
         $this->addOption('authenticator', null);
+
+        if ($triggerDeprecation) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use Guard instead.', __CLASS__), E_USER_DEPRECATED);
+        }
     }
 
     public function getKey()
@@ -55,6 +61,7 @@ class SimpleFormFactory extends FormLoginFactory
             ->replaceArgument(0, new Reference($config['authenticator']))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, $id)
+            ->replaceArgument(3, new Reference('security.user_checker.'.$id))
         ;
 
         return $provider;

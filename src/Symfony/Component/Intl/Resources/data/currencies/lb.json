@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.44.91",
     "Names": {
         "ADP": [
             "ADP",
@@ -611,6 +611,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauretaneschen Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauretaneschen Ouguiya"
         ],
         "MTL": [
@@ -839,6 +843,10 @@
         ],
         "STD": [
             "STD",
+            "São-toméeschen Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São-toméeschen Dobra"
         ],
         "SUR": [
@@ -955,6 +963,10 @@
         ],
         "VEF": [
             "VEF",
+            "Venezolanesche Bolívar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Venezolanesche Bolívar"
         ],
         "VND": [

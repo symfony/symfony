@@ -76,7 +76,7 @@
     </div>
     <div id="comment">
         <p>
-            You're seeing this message because you have debug mode enabled and you haven't configured any URLs.
+            You're seeing this page because debug mode is enabled and you haven't configured any homepage URL.
         </p>
     </div>
 </div>

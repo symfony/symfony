@@ -13,8 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 
@@ -41,7 +41,7 @@ class TemplatingPass implements CompilerPassInterface
                 }
             }
 
-            if (count($helpers) > 0) {
+            if (\count($helpers) > 0) {
                 $definition = $container->getDefinition('templating.engine.php');
                 $definition->addMethodCall('setHelpers', array($helpers));
 

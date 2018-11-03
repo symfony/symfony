@@ -36,7 +36,7 @@ class PhpMatcherDumperTest extends TestCase
         parent::setUp();
 
         $this->matcherClass = uniqid('ProjectUrlMatcher');
-        $this->dumpPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
+        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
     }
 
     protected function tearDown()
@@ -44,24 +44,6 @@ class PhpMatcherDumperTest extends TestCase
         parent::tearDown();
 
         @unlink($this->dumpPath);
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
-    {
-        $collection = new RouteCollection();
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array(),
-            array(),
-            '',
-            array('https')
-        ));
-        $dumper = new PhpMatcherDumper($collection);
-        $dumper->dump();
     }
 
     public function testRedirectPreservesUrlEncoding()
@@ -508,6 +490,18 @@ class PhpMatcherDumperTest extends TestCase
         include $this->dumpPath;
 
         return $this->matcherClass;
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Symfony\Component\Routing\Route cannot contain objects
+     */
+    public function testGenerateDumperMatcherWithObject()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('_', new Route('/', array(new \stdClass())));
+        $dumper = new PhpMatcherDumper($routeCollection);
+        $dumper->dump();
     }
 }
 

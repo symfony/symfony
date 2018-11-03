@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
@@ -68,6 +68,27 @@ class SessionTest extends TestCase
         $this->session->setId('0123456789abcdef');
         $this->session->start();
         $this->assertEquals('0123456789abcdef', $this->session->getId());
+    }
+
+    public function testSetIdAfterStart()
+    {
+        $this->session->start();
+        $id = $this->session->getId();
+
+        $e = null;
+        try {
+            $this->session->setId($id);
+        } catch (\Exception $e) {
+        }
+
+        $this->assertNull($e);
+
+        try {
+            $this->session->setId('different');
+        } catch (\Exception $e) {
+        }
+
+        $this->assertInstanceOf('\LogicException', $e);
     }
 
     public function testSetName()
@@ -206,7 +227,7 @@ class SessionTest extends TestCase
             ++$i;
         }
 
-        $this->assertEquals(count($attributes), $i);
+        $this->assertEquals(\count($attributes), $i);
     }
 
     public function testGetCount()

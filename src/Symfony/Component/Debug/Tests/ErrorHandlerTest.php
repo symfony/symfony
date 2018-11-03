@@ -65,6 +65,30 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    public function testErrorGetLast()
+    {
+        $handler = ErrorHandler::register();
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $handler->setDefaultLogger($logger);
+        $handler->screamAt(E_ALL);
+
+        try {
+            @trigger_error('Hello', E_USER_WARNING);
+            $expected = array(
+                'type' => E_USER_WARNING,
+                'message' => 'Hello',
+                'file' => __FILE__,
+                'line' => __LINE__ - 5,
+            );
+            $this->assertSame($expected, error_get_last());
+        } catch (\Exception $e) {
+            restore_error_handler();
+            restore_exception_handler();
+
+            throw $e;
+        }
+    }
+
     public function testNotice()
     {
         ErrorHandler::register();
@@ -456,12 +480,25 @@ class ErrorHandlerTest extends TestCase
 
         $handler = new ErrorHandler();
         $handler->setExceptionHandler(function () use (&$args) {
-            $args = func_get_args();
+            $args = \func_get_args();
         });
 
         $handler->handleException($exception);
 
         $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $args[0]);
         $this->assertStringStartsWith("Attempted to load class \"Foo\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCustomExceptionHandler()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler(function ($e) use ($handler) {
+            $handler->handleException($e);
+        });
+
+        $handler->handleException(new \Exception());
     }
 }

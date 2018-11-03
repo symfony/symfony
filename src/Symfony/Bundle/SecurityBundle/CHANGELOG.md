@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * Using the `security.authentication.trust_resolver.anonymous_class` and 
+   `security.authentication.trust_resolver.rememberme_class` parameters to define
+   the token classes is deprecated. To use custom tokens extend the existing
+   `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`.
+   or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+ * Added `Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass`
+ * Added `json_login_ldap` authentication provider to use LDAP authentication with a REST API.
+ * Made remember-me cookies inherit their default config from `framework.session.cookie_*`
+   and added an "auto" mode to their "secure" config option to make them secure on HTTPS automatically.
+ * Deprecated the `simple_form` and `simple_preauth` authentication listeners, use Guard instead.
+ * Deprecated the `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes, use Guard instead.
+ * Added `port` in access_control
+ * Added individual voter decisions to the profiler
+ 
 4.1.0
 -----
 

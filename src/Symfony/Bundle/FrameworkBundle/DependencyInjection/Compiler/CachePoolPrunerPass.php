@@ -11,51 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
-use Symfony\Component\Cache\PruneableInterface;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass as BaseCachePoolPrunerPass;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" instead.', CachePoolPrunerPass::class, BaseCachePoolPrunerPass::class), E_USER_DEPRECATED);
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
+ *
+ * @deprecated since Symfony 4.2, use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass instead.
  */
-class CachePoolPrunerPass implements CompilerPassInterface
+class CachePoolPrunerPass extends BaseCachePoolPrunerPass
 {
-    private $cacheCommandServiceId;
-    private $cachePoolTag;
-
-    public function __construct(string $cacheCommandServiceId = CachePoolPruneCommand::class, string $cachePoolTag = 'cache.pool')
-    {
-        $this->cacheCommandServiceId = $cacheCommandServiceId;
-        $this->cachePoolTag = $cachePoolTag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition($this->cacheCommandServiceId)) {
-            return;
-        }
-
-        $services = array();
-
-        foreach ($container->findTaggedServiceIds($this->cachePoolTag) as $id => $tags) {
-            $class = $container->getParameterBag()->resolveValue($container->getDefinition($id)->getClass());
-
-            if (!$reflection = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
-            }
-
-            if ($reflection->implementsInterface(PruneableInterface::class)) {
-                $services[$id] = new Reference($id);
-            }
-        }
-
-        $container->getDefinition($this->cacheCommandServiceId)->replaceArgument(0, new IteratorArgument($services));
-    }
 }

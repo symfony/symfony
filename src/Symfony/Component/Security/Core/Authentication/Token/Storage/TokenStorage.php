@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token\Storage;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * TokenStorage contains a TokenInterface.
@@ -21,7 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class TokenStorage implements TokenStorageInterface
+class TokenStorage implements TokenStorageInterface, ResetInterface
 {
     private $token;
 
@@ -39,5 +40,10 @@ class TokenStorage implements TokenStorageInterface
     public function setToken(TokenInterface $token = null)
     {
         $this->token = $token;
+    }
+
+    public function reset()
+    {
+        $this->setToken(null);
     }
 }

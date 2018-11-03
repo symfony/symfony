@@ -10,6 +10,9 @@
         <service id="twig.command.debug" class="Symfony\Bridge\Twig\Command\DebugCommand">
             <argument type="service" id="twig" />
             <argument>%kernel.project_dir%</argument>
+            <argument>%kernel.bundles_metadata%</argument>
+            <argument>%twig.default_path%</argument>
+            <argument>%kernel.root_dir%</argument>
             <tag name="console.command" command="debug:twig" />
         </service>
 

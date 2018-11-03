@@ -26,7 +26,7 @@ class ContainerBagTest extends TestCase
     /** @var ContainerBag */
     private $containerBag;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->parameterBag = new ParameterBag(array('foo' => 'value'));
         $this->containerBag = new ContainerBag(new Container($this->parameterBag));

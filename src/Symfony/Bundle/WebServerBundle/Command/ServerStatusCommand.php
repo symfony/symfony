@@ -13,10 +13,11 @@ namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -39,7 +40,7 @@ class ServerStatusCommand extends Command
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'The value to display (one of port, host, or address)'),
             ))
-            ->setDescription('Outputs the status of the local web server for the given address')
+            ->setDescription('Outputs the status of the local web server')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> shows the details of the given local web
 server, such as the address and port where it is listening to:
@@ -74,7 +75,7 @@ EOF
                 } elseif ('port' === $filter) {
                     $output->write($port);
                 } else {
-                    throw new \InvalidArgumentException(sprintf('"%s" is not a valid filter.', $filter));
+                    throw new InvalidArgumentException(sprintf('"%s" is not a valid filter.', $filter));
                 }
             } else {
                 return 1;

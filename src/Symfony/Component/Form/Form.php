@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\RuntimeException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
+use Symfony\Component\Form\Exception\RuntimeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
@@ -58,7 +58,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Form implements \IteratorAggregate, FormInterface
+class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
     /**
      * The form's configuration.
@@ -322,7 +322,7 @@ class Form implements \IteratorAggregate, FormInterface
             return $this;
         }
 
-        if (is_object($modelData) && !$this->config->getByReference()) {
+        if (\is_object($modelData) && !$this->config->getByReference()) {
             $modelData = clone $modelData;
         }
 
@@ -354,17 +354,11 @@ class Form implements \IteratorAggregate, FormInterface
             $dataClass = $this->config->getDataClass();
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                $actualType = is_object($viewData)
-                    ? 'an instance of class '.get_class($viewData)
-                    : 'a(n) '.gettype($viewData);
+                $actualType = \is_object($viewData)
+                    ? 'an instance of class '.\get_class($viewData)
+                    : 'a(n) '.\gettype($viewData);
 
-                throw new LogicException(
-                    'The form\'s view data is expected to be an instance of class '.
-                    $dataClass.', but is '.$actualType.'. You can avoid this error '.
-                    'by setting the "data_class" option to null or by adding a view '.
-                    'transformer that transforms '.$actualType.' to an instance of '.
-                    $dataClass.'.'
-                );
+                throw new LogicException('The form\'s view data is expected to be an instance of class '.$dataClass.', but is '.$actualType.'. You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms '.$actualType.' to an instance of '.$dataClass.'.');
             }
         }
 
@@ -376,7 +370,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // It is not necessary to invoke this method if the form doesn't have children,
         // even if the form is compound.
-        if (count($this->children) > 0) {
+        if (\count($this->children) > 0) {
             // Update child forms from the data
             $iterator = new InheritDataAwareIterator($this->children);
             $iterator = new \RecursiveIteratorIterator($iterator);
@@ -561,7 +555,7 @@ class Form implements \IteratorAggregate, FormInterface
                     $submittedData = array();
                 }
 
-                if (!is_array($submittedData)) {
+                if (!\is_array($submittedData)) {
                     throw new TransformationFailedException('Compound forms expect an array or NULL on submission.');
                 }
 
@@ -618,7 +612,7 @@ class Form implements \IteratorAggregate, FormInterface
                 // Merge form data from children into existing view data
                 // It is not necessary to invoke this method if the form has no children,
                 // even if it is compound.
-                if (count($this->children) > 0) {
+                if (\count($this->children) > 0) {
                     // Use InheritDataAwareIterator to process children of
                     // descendants that inherit this form's data.
                     // These descendants will not be submitted normally (see the check
@@ -723,7 +717,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         return FormUtil::isEmpty($this->modelData) ||
             // arrays, countables
-            ((is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === count($this->modelData)) ||
+            ((\is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === \count($this->modelData)) ||
             // traversables that are not countable
             ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
@@ -741,7 +735,7 @@ class Form implements \IteratorAggregate, FormInterface
             return true;
         }
 
-        return 0 === count($this->getErrors(true));
+        return 0 === \count($this->getErrors(true));
     }
 
     /**
@@ -778,7 +772,7 @@ class Form implements \IteratorAggregate, FormInterface
 
                 $iterator = $child->getErrors(true, $flatten);
 
-                if (0 === count($iterator)) {
+                if (0 === \count($iterator)) {
                     continue;
                 }
 
@@ -793,6 +787,27 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return new FormErrorIterator($this, $errors);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function clearErrors(bool $deep = false): self
+    {
+        $this->errors = array();
+
+        if ($deep) {
+            // Clear errors from children
+            foreach ($this as $child) {
+                if ($child instanceof ClearableErrorsInterface) {
+                    $child->clearErrors(true);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -840,11 +855,11 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (!$child instanceof FormInterface) {
-            if (!is_string($child) && !is_int($child)) {
+            if (!\is_string($child) && !\is_int($child)) {
                 throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormInterface');
             }
 
-            if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
+            if (null !== $type && !\is_string($type) && !$type instanceof FormTypeInterface) {
                 throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
             }
 
@@ -861,11 +876,7 @@ class Form implements \IteratorAggregate, FormInterface
                 $child = $this->config->getFormFactory()->createNamed($child, $type, null, $options);
             }
         } elseif ($child->getConfig()->getAutoInitialize()) {
-            throw new RuntimeException(sprintf(
-                'Automatic initialization is only supported on root forms. You '.
-                'should set the "auto_initialize" option to false on the field "%s".',
-                $child->getName()
-            ));
+            throw new RuntimeException(sprintf('Automatic initialization is only supported on root forms. You should set the "auto_initialize" option to false on the field "%s".', $child->getName()));
         }
 
         $this->children[$child->getName()] = $child;
@@ -992,7 +1003,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function count()
     {
-        return count($this->children);
+        return \count($this->children);
     }
 
     /**
@@ -1039,11 +1050,7 @@ class Form implements \IteratorAggregate, FormInterface
                 $value = $transformer->transform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(
-                'Unable to transform value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
+            throw new TransformationFailedException('Unable to transform value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return $value;
@@ -1063,15 +1070,11 @@ class Form implements \IteratorAggregate, FormInterface
         try {
             $transformers = $this->config->getModelTransformers();
 
-            for ($i = count($transformers) - 1; $i >= 0; --$i) {
+            for ($i = \count($transformers) - 1; $i >= 0; --$i) {
                 $value = $transformers[$i]->reverseTransform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(
-                'Unable to reverse value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
+            throw new TransformationFailedException('Unable to reverse value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return $value;
@@ -1102,11 +1105,7 @@ class Form implements \IteratorAggregate, FormInterface
                 $value = $transformer->transform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(
-                'Unable to transform value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
+            throw new TransformationFailedException('Unable to transform value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return $value;
@@ -1130,15 +1129,11 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         try {
-            for ($i = count($transformers) - 1; $i >= 0; --$i) {
+            for ($i = \count($transformers) - 1; $i >= 0; --$i) {
                 $value = $transformers[$i]->reverseTransform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(
-                'Unable to reverse value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
+            throw new TransformationFailedException('Unable to reverse value for property path "'.$this->getPropertyPath().'": '.$exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return $value;

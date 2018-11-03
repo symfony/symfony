@@ -63,7 +63,7 @@ abstract class AbstractHandlerTest extends TestCase
             $this->assertEquals(0, $reader->getRemainingLength());
             $this->assertTrue($reader->isEOF());
         } else {
-            $this->assertEquals(strlen($remainingContent), $reader->getRemainingLength());
+            $this->assertEquals(\strlen($remainingContent), $reader->getRemainingLength());
             $this->assertEquals(0, $reader->getOffset($remainingContent));
         }
     }

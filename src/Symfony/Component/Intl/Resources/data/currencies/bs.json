@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.88",
     "Names": {
         "ADP": [
             "ADP",
@@ -647,6 +647,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanijska ugvija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanijska ugvija"
         ],
         "MTL": [
@@ -875,6 +879,10 @@
         ],
         "STD": [
             "STD",
+            "Dobra Sao Toma i Principa (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobra Sao Toma i Principa"
         ],
         "SUR": [
@@ -995,7 +1003,11 @@
         ],
         "VEF": [
             "VEF",
-            "Venecuelanski bolivar"
+            "venecuelanski bolivar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
+            "venecuelanski bolivar"
         ],
         "VND": [
             "₫",

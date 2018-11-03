@@ -22,10 +22,14 @@ final class BoundArgument implements ArgumentInterface
     private $identifier;
     private $used;
 
-    public function __construct($value)
+    public function __construct($value, bool $trackUsage = true)
     {
         $this->value = $value;
-        $this->identifier = ++self::$sequence;
+        if ($trackUsage) {
+            $this->identifier = ++self::$sequence;
+        } else {
+            $this->used = true;
+        }
     }
 
     /**

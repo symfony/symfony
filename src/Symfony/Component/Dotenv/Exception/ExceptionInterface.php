@@ -16,6 +16,6 @@ namespace Symfony\Component\Dotenv\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

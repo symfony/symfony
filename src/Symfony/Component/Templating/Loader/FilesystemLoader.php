@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
@@ -102,7 +102,7 @@ class FilesystemLoader extends Loader
     protected static function isAbsolutePath($file)
     {
         if ('/' == $file[0] || '\\' == $file[0]
-            || (strlen($file) > 3 && ctype_alpha($file[0])
+            || (\strlen($file) > 3 && ctype_alpha($file[0])
                 && ':' == $file[1]
                 && ('\\' == $file[2] || '/' == $file[2])
             )

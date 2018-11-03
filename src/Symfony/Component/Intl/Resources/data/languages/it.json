@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.44.86",
     "Names": {
         "aa": "afar",
         "ab": "abcaso",
@@ -30,6 +30,7 @@
         "aro": "araona",
         "arp": "arapaho",
         "arq": "arabo algerino",
+        "ars": "arabo najd",
         "arw": "aruaco",
         "ary": "arabo marocchino",
         "arz": "arabo egiziano",
@@ -296,7 +297,7 @@
         "kut": "kutenai",
         "kv": "komi",
         "kw": "cornico",
-        "ky": "chirghiso",
+        "ky": "kirghiso",
         "la": "latino",
         "lad": "giudeo-spagnolo",
         "lag": "langi",
@@ -362,7 +363,6 @@
         "ms": "malese",
         "mt": "maltese",
         "mua": "mundang",
-        "mul": "multilingua",
         "mus": "creek",
         "mwl": "mirandese",
         "mwr": "marwari",
@@ -408,7 +408,7 @@
         "oc": "occitano",
         "oj": "ojibwa",
         "om": "oromo",
-        "or": "oriya",
+        "or": "odia",
         "os": "ossetico",
         "osa": "osage",
         "ota": "turco ottomano",
@@ -564,7 +564,6 @@
         "uga": "ugaritico",
         "uk": "ucraino",
         "umb": "mbundu",
-        "und": "lingua imprecisata",
         "ur": "urdu",
         "uz": "uzbeco",
         "vai": "vai",
@@ -608,7 +607,6 @@
         "zh_Hant": "cinese tradizionale",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "nessun contenuto linguistico",
         "zza": "zaza"
     }
 }

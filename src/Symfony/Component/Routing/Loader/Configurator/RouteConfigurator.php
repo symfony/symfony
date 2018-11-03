@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -24,11 +23,12 @@ class RouteConfigurator
 
     private $parentConfigurator;
 
-    public function __construct(RouteCollection $collection, Route $route, string $name = '', CollectionConfigurator $parentConfigurator = null)
+    public function __construct(RouteCollection $collection, $route, string $name = '', CollectionConfigurator $parentConfigurator = null, array $prefixes = null)
     {
         $this->collection = $collection;
         $this->route = $route;
         $this->name = $name;
         $this->parentConfigurator = $parentConfigurator; // for GC control
+        $this->prefixes = $prefixes;
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates whether a value is a valid locale code.
@@ -36,8 +37,8 @@ class LocaleValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+            throw new UnexpectedValueException($value, 'string');
         }
 
         $inputValue = (string) $value;
@@ -48,7 +49,7 @@ class LocaleValidator extends ConstraintValidator
         $localeBundle = Intl::getLocaleBundle();
         $locales = $localeBundle->getLocaleNames();
 
-        if (!isset($locales[$value]) && !in_array($value, $localeBundle->getAliases(), true)) {
+        if (!isset($locales[$value]) && !\in_array($value, $localeBundle->getAliases(), true)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($inputValue))
                 ->setCode(Locale::NO_SUCH_LOCALE_ERROR)

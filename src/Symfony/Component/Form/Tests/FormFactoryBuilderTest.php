@@ -41,7 +41,7 @@ class FormFactoryBuilderTest extends TestCase
         $extensions = $registry->getExtensions();
 
         $this->assertCount(1, $extensions);
-        $this->assertTrue($extensions[0]->hasType(get_class($this->type)));
+        $this->assertTrue($extensions[0]->hasType(\get_class($this->type)));
         $this->assertNull($extensions[0]->getTypeGuesser());
     }
 

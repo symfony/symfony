@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Constraints\Bic;
+use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
@@ -34,6 +34,14 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('', new Bic());
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
+     */
+    public function testExpectsStringCompatibleType()
+    {
+        $this->validator->validate(new \stdClass(), new Bic());
     }
 
     /**
@@ -92,6 +100,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             array('DEUT12HH', Bic::INVALID_COUNTRY_CODE_ERROR),
             array('DSBAC6BXSHA', Bic::INVALID_COUNTRY_CODE_ERROR),
             array('DSBA5NBXSHA', Bic::INVALID_COUNTRY_CODE_ERROR),
+            array('DSBAAABXSHA', Bic::INVALID_COUNTRY_CODE_ERROR),
 
             // branch code error
             array('THISSVAL1D]', Bic::INVALID_CHARACTERS_ERROR),

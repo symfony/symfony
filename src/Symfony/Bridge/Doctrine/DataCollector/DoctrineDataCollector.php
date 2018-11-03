@@ -14,9 +14,9 @@ namespace Symfony\Bridge\Doctrine\DataCollector;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Types\Type;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * DoctrineDataCollector.
@@ -134,14 +134,14 @@ class DoctrineDataCollector extends DataCollector
         if (null === $query['params']) {
             $query['params'] = array();
         }
-        if (!is_array($query['params'])) {
+        if (!\is_array($query['params'])) {
             $query['params'] = array($query['params']);
         }
         foreach ($query['params'] as $j => $param) {
             if (isset($query['types'][$j])) {
                 // Transform the param according to the type
                 $type = $query['types'][$j];
-                if (is_string($type)) {
+                if (\is_string($type)) {
                     $type = Type::getType($type);
                 }
                 if ($type instanceof Type) {
@@ -168,15 +168,15 @@ class DoctrineDataCollector extends DataCollector
      */
     private function sanitizeParam($var): array
     {
-        if (is_object($var)) {
-            $className = get_class($var);
+        if (\is_object($var)) {
+            $className = \get_class($var);
 
             return method_exists($var, '__toString') ?
                 array(sprintf('/* Object(%s): */"%s"', $className, $var->__toString()), false) :
                 array(sprintf('/* Object(%s) */', $className), false);
         }
 
-        if (is_array($var)) {
+        if (\is_array($var)) {
             $a = array();
             $original = true;
             foreach ($var as $k => $v) {
@@ -188,7 +188,7 @@ class DoctrineDataCollector extends DataCollector
             return array($a, $original);
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return array(sprintf('/* Resource(%s) */', get_resource_type($var)), false);
         }
 

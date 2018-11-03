@@ -222,6 +222,10 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Desteklenmeyen kart tipi veya geçersiz kart numarası.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Hata</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

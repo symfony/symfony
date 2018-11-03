@@ -20,8 +20,8 @@ use Symfony\Component\Console\EventListener\ErrorListener;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\Input;
-use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ErrorListenerTest extends TestCase
@@ -34,7 +34,7 @@ class ErrorListenerTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Error thrown while running command "{command}". Message: "{message}"', array('error' => $error, 'command' => 'test:run --foo=baz buzz', 'message' => 'An error occurred'))
+            ->with('Error thrown while running command "{command}". Message: "{message}"', array('exception' => $error, 'command' => 'test:run --foo=baz buzz', 'message' => 'An error occurred'))
         ;
 
         $listener = new ErrorListener($logger);
@@ -49,7 +49,7 @@ class ErrorListenerTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('An error occurred while using the console. Message: "{message}"', array('error' => $error, 'message' => 'An error occurred'))
+            ->with('An error occurred while using the console. Message: "{message}"', array('exception' => $error, 'message' => 'An error occurred'))
         ;
 
         $listener = new ErrorListener($logger);

@@ -28,21 +28,36 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     const KEY_SEPARATOR_KEY = 'csv_key_separator';
     const HEADERS_KEY = 'csv_headers';
     const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
+    const AS_COLLECTION_KEY = 'as_collection';
 
-    private $delimiter;
-    private $enclosure;
-    private $escapeChar;
-    private $keySeparator;
-    private $escapeFormulas;
     private $formulasStartCharacters = array('=', '-', '+', '@');
+    private $defaultContext = array(
+        self::DELIMITER_KEY => ',',
+        self::ENCLOSURE_KEY => '"',
+        self::ESCAPE_CHAR_KEY => '\\',
+        self::ESCAPE_FORMULAS_KEY => false,
+        self::HEADERS_KEY => array(),
+        self::KEY_SEPARATOR_KEY => '.',
+    );
 
-    public function __construct(string $delimiter = ',', string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
+    /**
+     * @param array $defaultContext
+     */
+    public function __construct($defaultContext = array(), string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
     {
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->escapeChar = $escapeChar;
-        $this->keySeparator = $keySeparator;
-        $this->escapeFormulas = $escapeFormulas;
+        if (!\is_array($defaultContext)) {
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+
+            $defaultContext = array(
+                self::DELIMITER_KEY => (string) $defaultContext,
+                self::ENCLOSURE_KEY => $enclosure,
+                self::ESCAPE_CHAR_KEY => $escapeChar,
+                self::KEY_SEPARATOR_KEY => $keySeparator,
+                self::ESCAPE_FORMULAS_KEY => $escapeFormulas,
+            );
+        }
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -52,7 +67,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     {
         $handle = fopen('php://temp,', 'w+');
 
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             $data = array(array($data));
         } elseif (empty($data)) {
             $data = array(array());
@@ -60,7 +75,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             // Sequential arrays of arrays are considered as collections
             $i = 0;
             foreach ($data as $key => $value) {
-                if ($i !== $key || !is_array($value)) {
+                if ($i !== $key || !\is_array($value)) {
                     $data = array($data);
                     break;
                 }
@@ -119,7 +134,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
 
         while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
-            $nbCols = count($cols);
+            $nbCols = \count($cols);
 
             if (null === $headers) {
                 $nbHeaders = $nbCols;
@@ -127,7 +142,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 foreach ($cols as $col) {
                     $header = explode($keySeparator, $col);
                     $headers[] = $header;
-                    $headerCount[] = count($header);
+                    $headerCount[] = \count($header);
                 }
 
                 continue;
@@ -157,12 +172,16 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         fclose($handle);
 
-        if ($context['as_collection'] ?? false) {
+        if ($context[self::AS_COLLECTION_KEY] ?? false) {
             return $result;
         }
 
         if (empty($result) || isset($result[1])) {
             return $result;
+        }
+
+        if (!isset($context['as_collection'])) {
+            @trigger_error('Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.', E_USER_DEPRECATED);
         }
 
         // If there is only one data line in the document, return it (the line), the result is not considered as a collection
@@ -183,7 +202,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     private function flatten(array $array, array &$result, string $keySeparator, string $parentKey = '', bool $escapeFormulas = false)
     {
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
             } else {
                 if ($escapeFormulas && \in_array(substr($value, 0, 1), $this->formulasStartCharacters, true)) {
@@ -195,17 +214,17 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
     }
 
-    private function getCsvOptions(array $context)
+    private function getCsvOptions(array $context): array
     {
-        $delimiter = isset($context[self::DELIMITER_KEY]) ? $context[self::DELIMITER_KEY] : $this->delimiter;
-        $enclosure = isset($context[self::ENCLOSURE_KEY]) ? $context[self::ENCLOSURE_KEY] : $this->enclosure;
-        $escapeChar = isset($context[self::ESCAPE_CHAR_KEY]) ? $context[self::ESCAPE_CHAR_KEY] : $this->escapeChar;
-        $keySeparator = isset($context[self::KEY_SEPARATOR_KEY]) ? $context[self::KEY_SEPARATOR_KEY] : $this->keySeparator;
-        $headers = isset($context[self::HEADERS_KEY]) ? $context[self::HEADERS_KEY] : array();
-        $escapeFormulas = isset($context[self::ESCAPE_FORMULAS_KEY]) ? $context[self::ESCAPE_FORMULAS_KEY] : $this->escapeFormulas;
+        $delimiter = $context[self::DELIMITER_KEY] ?? $this->defaultContext[self::DELIMITER_KEY];
+        $enclosure = $context[self::ENCLOSURE_KEY] ?? $this->defaultContext[self::ENCLOSURE_KEY];
+        $escapeChar = $context[self::ESCAPE_CHAR_KEY] ?? $this->defaultContext[self::ESCAPE_CHAR_KEY];
+        $keySeparator = $context[self::KEY_SEPARATOR_KEY] ?? $this->defaultContext[self::KEY_SEPARATOR_KEY];
+        $headers = $context[self::HEADERS_KEY] ?? $this->defaultContext[self::HEADERS_KEY];
+        $escapeFormulas = $context[self::ESCAPE_FORMULAS_KEY] ?? $this->defaultContext[self::ESCAPE_FORMULAS_KEY];
 
-        if (!is_array($headers)) {
-            throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, gettype($headers)));
+        if (!\is_array($headers)) {
+            throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, \gettype($headers)));
         }
 
         return array($delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas);
@@ -229,11 +248,11 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 }
 
                 if (null === $previousHeader) {
-                    $n = count($headers);
+                    $n = \count($headers);
                 } else {
                     $n = $flippedHeaders[$previousHeader] + 1;
 
-                    for ($j = count($headers); $j > $n; --$j) {
+                    for ($j = \count($headers); $j > $n; --$j) {
                         ++$flippedHeaders[$headers[$j] = $headers[$j - 1]];
                     }
                 }

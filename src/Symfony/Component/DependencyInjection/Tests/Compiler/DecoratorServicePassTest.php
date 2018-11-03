@@ -13,8 +13,8 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DecoratorServicePassTest extends TestCase
 {
@@ -142,6 +142,29 @@ class DecoratorServicePassTest extends TestCase
 
         $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
         $this->assertEquals(array('bar' => array('attr' => 'baz'), 'foobar' => array('attr' => 'bar')), $container->getDefinition('baz')->getTags());
+    }
+
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setPublic(true)
+            ->setTags(array('bar' => array('attr' => 'baz')))
+        ;
+        $container
+            ->register('deco1')
+            ->setDecoratedService('foo', null, 50)
+        ;
+        $container
+            ->register('deco2')
+            ->setDecoratedService('foo', null, 2)
+        ;
+
+        $this->process($container);
+
+        $this->assertEmpty($container->getDefinition('deco1')->getTags());
+        $this->assertEquals(array('bar' => array('attr' => 'baz')), $container->getDefinition('deco2')->getTags());
     }
 
     protected function process(ContainerBuilder $container)

@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
-use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -213,7 +215,7 @@ class HttpCacheTest extends HttpCacheTestCase
             if ($request->cookies->has('authenticated')) {
                 $response->headers->set('Cache-Control', 'private, no-store');
                 $response->setETag('"private tag"');
-                if (in_array('"private tag"', $etags)) {
+                if (\in_array('"private tag"', $etags)) {
                     $response->setStatusCode(304);
                 } else {
                     $response->setStatusCode(200);
@@ -223,7 +225,7 @@ class HttpCacheTest extends HttpCacheTestCase
             } else {
                 $response->headers->set('Cache-Control', 'public');
                 $response->setETag('"public tag"');
-                if (in_array('"public tag"', $etags)) {
+                if (\in_array('"public tag"', $etags)) {
                     $response->setStatusCode(304);
                 } else {
                     $response->setStatusCode(200);
@@ -564,7 +566,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testDegradationWhenCacheLocked()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Skips on windows to avoid permissions issues.');
         }
 
@@ -992,7 +994,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertEquals('', $this->response->getContent());
-        $this->assertEquals(strlen('Hello World'), $this->response->headers->get('Content-Length'));
+        $this->assertEquals(\strlen('Hello World'), $this->response->headers->get('Content-Length'));
     }
 
     public function testSendsNoContentWhenFresh()
@@ -1336,62 +1338,67 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponse();
         $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $this->assertEquals('127.0.0.1', $this->kernel->getBackendRequest()->server->get('REMOTE_ADDR'));
+        $this->kernel->assert(function ($backendRequest) {
+            $this->assertSame('127.0.0.1', $backendRequest->server->get('REMOTE_ADDR'));
+        });
     }
 
     /**
      * @dataProvider getTrustedProxyData
      */
-    public function testHttpCacheIsSetAsATrustedProxy(array $existing, array $expected)
+    public function testHttpCacheIsSetAsATrustedProxy(array $existing)
     {
         Request::setTrustedProxies($existing, Request::HEADER_X_FORWARDED_ALL);
 
         $this->setNextResponse();
         $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));
+        $this->assertSame($existing, Request::getTrustedProxies());
 
-        $this->assertEquals($expected, Request::getTrustedProxies());
+        $existing = array_unique(array_merge($existing, array('127.0.0.1')));
+        $this->kernel->assert(function ($backendRequest) use ($existing) {
+            $this->assertSame($existing, Request::getTrustedProxies());
+            $this->assertsame('10.0.0.1', $backendRequest->getClientIp());
+        });
+
+        Request::setTrustedProxies(array(), -1);
     }
 
     public function getTrustedProxyData()
     {
         return array(
-            array(array(), array('127.0.0.1')),
-            array(array('10.0.0.2'), array('10.0.0.2', '127.0.0.1')),
-            array(array('10.0.0.2', '127.0.0.1'), array('10.0.0.2', '127.0.0.1')),
+            array(array()),
+            array(array('10.0.0.2')),
+            array(array('10.0.0.2', '127.0.0.1')),
         );
     }
 
     /**
-     * @dataProvider getXForwardedForData
+     * @dataProvider getForwardedData
      */
-    public function testXForwarderForHeaderForForwardedRequests($xForwardedFor, $expected)
+    public function testForwarderHeaderForForwardedRequests($forwarded, $expected)
     {
         $this->setNextResponse();
         $server = array('REMOTE_ADDR' => '10.0.0.1');
-        if (false !== $xForwardedFor) {
-            $server['HTTP_X_FORWARDED_FOR'] = $xForwardedFor;
+        if (null !== $forwarded) {
+            Request::setTrustedProxies($server, -1);
+            $server['HTTP_FORWARDED'] = $forwarded;
         }
         $this->request('GET', '/', $server);
 
-        $this->assertEquals($expected, $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+        $this->kernel->assert(function ($backendRequest) use ($expected) {
+            $this->assertSame($expected, $backendRequest->headers->get('Forwarded'));
+        });
+
+        Request::setTrustedProxies(array(), -1);
     }
 
-    public function getXForwardedForData()
+    public function getForwardedData()
     {
         return array(
-            array(false, '10.0.0.1'),
-            array('10.0.0.2', '10.0.0.2, 10.0.0.1'),
-            array('10.0.0.2, 10.0.0.3', '10.0.0.2, 10.0.0.3, 10.0.0.1'),
+            array(null, 'for="10.0.0.1";host="localhost";proto=http'),
+            array('for=10.0.0.2', 'for="10.0.0.2";host="localhost";proto=http, for="10.0.0.1"'),
+            array('for=10.0.0.2, for=10.0.0.3', 'for="10.0.0.2";host="localhost";proto=http, for="10.0.0.3", for="10.0.0.1"'),
         );
-    }
-
-    public function testXForwarderForHeaderForPassRequests()
-    {
-        $this->setNextResponse();
-        $server = array('REMOTE_ADDR' => '10.0.0.1');
-        $this->request('POST', '/', $server);
-
-        $this->assertEquals('10.0.0.1', $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
     }
 
     public function testEsiCacheRemoveValidationHeadersIfEmbeddedResponses()
@@ -1464,6 +1471,42 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertSame('get', $this->response->getContent());
+    }
+
+    public function testUsesOriginalRequestForSurrogate()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $store = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\StoreInterface')->getMock();
+
+        $kernel
+            ->expects($this->exactly(2))
+            ->method('handle')
+            ->willReturnCallback(function (Request $request) {
+                $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
+
+                return new Response();
+            });
+
+        $cache = new HttpCache($kernel,
+            $store,
+            new Esi()
+        );
+
+        $request = Request::create('/');
+        $request->server->set('REMOTE_ADDR', '10.0.0.1');
+
+        // Main request
+        $cache->handle($request, HttpKernelInterface::MASTER_REQUEST);
+
+        // Main request was now modified by HttpCache
+        // The surrogate will ask for the request using $this->cache->getRequest()
+        // which MUST return the original request so the surrogate
+        // can actually behave like a reverse proxy like e.g. Varnish would.
+        $this->assertSame('10.0.0.1', $cache->getRequest()->getClientIp());
+        $this->assertSame('10.0.0.1', $cache->getRequest()->server->get('REMOTE_ADDR'));
+
+        // Surrogate request
+        $cache->handle($request, HttpKernelInterface::SUB_REQUEST);
     }
 }
 

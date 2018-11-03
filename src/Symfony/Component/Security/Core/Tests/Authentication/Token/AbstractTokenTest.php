@@ -229,7 +229,7 @@ class AbstractTokenTest extends TestCase
      *
      * @dataProvider getUserChangesAdvancedUser
      */
-    public function testSetUserSetsAuthenticatedToFalseWhenUserChangesdvancedUser($firstUser, $secondUser)
+    public function testSetUserSetsAuthenticatedToFalseWhenUserChangesAdvancedUser($firstUser, $secondUser)
     {
         $token = $this->getToken();
         $token->setAuthenticated(true);

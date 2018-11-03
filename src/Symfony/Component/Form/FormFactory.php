@@ -51,7 +51,7 @@ class FormFactory implements FormFactoryInterface
      */
     public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
-        if (!is_string($type)) {
+        if (!\is_string($type)) {
             throw new UnexpectedTypeException($type, 'string');
         }
 
@@ -67,7 +67,7 @@ class FormFactory implements FormFactoryInterface
             $options['data'] = $data;
         }
 
-        if (!is_string($type)) {
+        if (!\is_string($type)) {
             throw new UnexpectedTypeException($type, 'string');
         }
 

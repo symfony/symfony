@@ -1,10 +1,6 @@
 imports:
     - { resource: ../config/default.yml }
 
-services:
-    _defaults: { public: true }
-    test.property_info: '@property_info'
-
 framework:
     serializer: { enabled: true }
     property_info: { enabled: true }

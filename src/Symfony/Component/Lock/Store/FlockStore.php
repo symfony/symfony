@@ -34,7 +34,7 @@ class FlockStore implements StoreInterface
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
      *
-     * @throws LockStorageException If the lock directory could not be created or is not writable
+     * @throws LockStorageException If the lock directory doesn’t exist or is not writable
      */
     public function __construct(string $lockPath = null)
     {
@@ -78,21 +78,19 @@ class FlockStore implements StoreInterface
         );
 
         // Silence error reporting
-        set_error_handler(function () {
-        });
-        if (!$handle = fopen($fileName, 'r')) {
+        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+        if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
             if ($handle = fopen($fileName, 'x')) {
-                chmod($fileName, 0444);
-            } elseif (!$handle = fopen($fileName, 'r')) {
+                chmod($fileName, 0666);
+            } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
                 usleep(100); // Give some time for chmod() to complete
-                $handle = fopen($fileName, 'r');
+                $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
             }
         }
         restore_error_handler();
 
         if (!$handle) {
-            $error = error_get_last();
-            throw new LockStorageException($error['message'], 0, null);
+            throw new LockStorageException($error, 0, null);
         }
 
         // On Windows, even if PHP doc says the contrary, LOCK_NB works, see

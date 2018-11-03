@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Fig\Link\Link;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
@@ -528,6 +529,21 @@ abstract class ControllerTraitTest extends TestCase
 
         $this->assertEquals($doctrine, $controller->getDoctrine());
     }
+
+    public function testAddLink()
+    {
+        $request = new Request();
+        $link1 = new Link('mercure', 'https://demo.mercure.rocks');
+        $link2 = new Link('self', 'https://example.com/foo');
+
+        $controller = $this->createController();
+        $controller->addLink($request, $link1);
+        $controller->addLink($request, $link2);
+
+        $links = $request->attributes->get('_links')->getLinks();
+        $this->assertContains($link1, $links);
+        $this->assertContains($link2, $links);
+    }
 }
 
 trait TestControllerTrait
@@ -552,5 +568,6 @@ trait TestControllerTrait
         createForm as public;
         createFormBuilder as public;
         getDoctrine as public;
+        addLink as public;
     }
 }

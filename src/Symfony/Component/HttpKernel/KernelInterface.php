@@ -11,23 +11,25 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * The Kernel is the heart of the Symfony system.
  *
- * It manages an environment made of bundles.
+ * It manages an environment made of application kernel and bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method string getProjectDir() Gets the project dir (path of the project's composer file) - not defining it is deprecated since Symfony 4.2
  */
 interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     /**
      * Returns an array of bundles to register.
      *
-     * @return BundleInterface[] An array of bundle instances
+     * @return iterable|BundleInterface[] An iterable of bundle instances
      */
     public function registerBundles();
 
@@ -67,7 +69,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function getBundle($name);
 
     /**
-     * Returns the file path for a given resource.
+     * Returns the file path for a given bundle resource.
      *
      * A Resource can be a file or a directory.
      *
@@ -100,6 +102,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Gets the name of the kernel.
      *
      * @return string The kernel name
+     *
+     * @deprecated since Symfony 4.2
      */
     public function getName();
 
@@ -121,13 +125,15 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Gets the application root dir (path of the project's Kernel class).
      *
      * @return string The Kernel root dir
+     *
+     * @deprecated since Symfony 4.2
      */
     public function getRootDir();
 
     /**
      * Gets the current container.
      *
-     * @return ContainerInterface A ContainerInterface instance
+     * @return ContainerInterface|null A ContainerInterface instance or null when the Kernel is shutdown
      */
     public function getContainer();
 

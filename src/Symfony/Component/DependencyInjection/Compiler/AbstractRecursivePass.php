@@ -14,8 +14,11 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -27,6 +30,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
      */
     protected $container;
     protected $currentId;
+
+    private $processExpressions = false;
+    private $expressionLanguage;
+    private $inExpression = false;
 
     /**
      * {@inheritdoc}
@@ -40,6 +47,21 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         } finally {
             $this->container = null;
         }
+    }
+
+    protected function enableExpressionProcessing()
+    {
+        $this->processExpressions = true;
+    }
+
+    protected function inExpression(bool $reset = true): bool
+    {
+        $inExpression = $this->inExpression;
+        if ($reset) {
+            $this->inExpression = false;
+        }
+
+        return $inExpression;
     }
 
     /**
@@ -63,6 +85,8 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             }
         } elseif ($value instanceof ArgumentInterface) {
             $value->setValues($this->processValue($value->getValues()));
+        } elseif ($value instanceof Expression && $this->processExpressions) {
+            $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
         } elseif ($value instanceof Definition) {
             $value->setArguments($this->processValue($value->getArguments()));
             $value->setProperties($this->processValue($value->getProperties()));
@@ -90,8 +114,8 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
      */
     protected function getConstructor(Definition $definition, $required)
     {
-        if (is_string($factory = $definition->getFactory())) {
-            if (!function_exists($factory)) {
+        if (\is_string($factory = $definition->getFactory())) {
+            if (!\function_exists($factory)) {
                 throw new RuntimeException(sprintf('Invalid service "%s": function "%s" does not exist.', $this->currentId, $factory));
             }
             $r = new \ReflectionFunction($factory);
@@ -118,8 +142,12 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
         $class = $definition->getClass();
 
-        if (!$r = $this->container->getReflectionClass($class)) {
-            throw new RuntimeException(sprintf('Invalid service "%s": class "%s" does not exist.', $this->currentId, $class));
+        try {
+            if (!$r = $this->container->getReflectionClass($class)) {
+                throw new RuntimeException(sprintf('Invalid service "%s": class "%s" does not exist.', $this->currentId, $class));
+            }
+        } catch (\ReflectionException $e) {
+            throw new RuntimeException(sprintf('Invalid service "%s": %s.', $this->currentId, lcfirst(rtrim($e->getMessage(), '.'))));
         }
         if (!$r = $r->getConstructor()) {
             if ($required) {
@@ -164,5 +192,32 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         }
 
         return $r;
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists(ExpressionLanguage::class)) {
+                throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+
+            $providers = $this->container->getExpressionLanguageProviders();
+            $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
+                if ('""' === substr_replace($arg, '', 1, -1)) {
+                    $id = stripcslashes(substr($arg, 1, -1));
+                    $this->inExpression = true;
+                    $arg = $this->processValue(new Reference($id));
+                    $this->inExpression = false;
+                    if (!$arg instanceof Reference) {
+                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, %s returned for service("%s").', \get_class($this), \is_object($arg) ? \get_class($arg) : \gettype($arg), $id));
+                    }
+                    $arg = sprintf('"%s"', $arg);
+                }
+
+                return sprintf('$this->get(%s)', $arg);
+            });
+        }
+
+        return $this->expressionLanguage;
     }
 }

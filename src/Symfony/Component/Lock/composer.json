@@ -20,7 +20,8 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
-        "predis/predis": "~1.0"
+        "predis/predis": "~1.0",
+        "doctrine/dbal": "~2.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Lock\\": "" },
@@ -31,7 +32,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

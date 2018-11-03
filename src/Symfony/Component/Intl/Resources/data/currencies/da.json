@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.43.65",
     "Names": {
         "ADP": [
             "ADP",
@@ -603,6 +603,10 @@
         ],
         "MRO": [
             "MRO",
+            "mauritansk ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mauritansk ouguiya"
         ],
         "MTL": [
@@ -695,7 +699,7 @@
         ],
         "PEN": [
             "PEN",
-            "peruviansk sol"
+            "peruansk sol"
         ],
         "PES": [
             "PES",
@@ -823,6 +827,10 @@
         ],
         "STD": [
             "STD",
+            "dobra fra Sao Tome og Principe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra fra Sao Tome og Principe"
         ],
         "SUR": [
@@ -939,6 +947,10 @@
         ],
         "VEF": [
             "VEF",
+            "venezuelansk bolivar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "venezuelansk bolivar"
         ],
         "VND": [

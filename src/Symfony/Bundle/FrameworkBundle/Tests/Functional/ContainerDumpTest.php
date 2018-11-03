@@ -20,13 +20,13 @@ class ContainerDumpTest extends WebTestCase
     {
         $client = $this->createClient(array('test_case' => 'ContainerDump', 'root_config' => 'config.yml'));
 
-        $this->assertTrue($client->getContainer()->has('serializer'));
+        $this->assertTrue(static::$container->has('serializer'));
     }
 
     public function testContainerCompilation()
     {
         $client = $this->createClient(array('test_case' => 'ContainerDump', 'root_config' => 'config.yml', 'debug' => false));
 
-        $this->assertTrue($client->getContainer()->has('serializer'));
+        $this->assertTrue(static::$container->has('serializer'));
     }
 }

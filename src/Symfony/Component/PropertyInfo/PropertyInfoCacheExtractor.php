@@ -20,7 +20,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @final
  */
-class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
+class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
 {
     private $propertyInfoExtractor;
     private $cacheItemPool;
@@ -81,6 +81,14 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    {
+        return $this->extract('isInitializable', array($class, $property, $context));
+    }
+
+    /**
      * Retrieves the cached data if applicable or delegates to the decorated extractor.
      *
      * @return mixed
@@ -91,7 +99,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
             $serializedArguments = serialize($arguments);
         } catch (\Exception $exception) {
             // If arguments are not serializable, skip the cache
-            return call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
+            return $this->propertyInfoExtractor->{$method}(...$arguments);
         }
 
         // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
@@ -107,7 +115,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
             return $this->arrayCache[$key] = $item->get();
         }
 
-        $value = call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
+        $value = $this->propertyInfoExtractor->{$method}(...$arguments);
         $item->set($value);
         $this->cacheItemPool->save($item);
 

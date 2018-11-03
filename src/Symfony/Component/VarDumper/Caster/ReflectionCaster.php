@@ -33,10 +33,21 @@ class ReflectionCaster
 
     public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested, $filter = 0)
     {
-        $prefix = Caster::PREFIX_VIRTUAL;
         $c = new \ReflectionFunction($c);
 
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
+
+        $stub->class .= self::getSignature($a);
+
+        $prefix = Caster::PREFIX_DYNAMIC;
+        unset($a['name'], $a[$prefix.'this'], $a[$prefix.'parameter'], $a[Caster::PREFIX_VIRTUAL.'extra']);
+        $prefix = Caster::PREFIX_VIRTUAL;
+
+        if ($filter & Caster::EXCLUDE_VERBOSE) {
+            $stub->cut += ($c->getFileName() ? 2 : 0) + \count($a);
+
+            return array();
+        }
 
         if (isset($a[$prefix.'parameters'])) {
             foreach ($a[$prefix.'parameters']->value as &$v) {
@@ -51,13 +62,10 @@ class ReflectionCaster
             }
         }
 
-        if (!($filter & Caster::EXCLUDE_VERBOSE) && $f = $c->getFileName()) {
+        if ($f = $c->getFileName()) {
             $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());
             $a[$prefix.'line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
-
-        $prefix = Caster::PREFIX_DYNAMIC;
-        unset($a['name'], $a[$prefix.'this'], $a[$prefix.'parameter'], $a[Caster::PREFIX_VIRTUAL.'extra']);
 
         return $a;
     }
@@ -198,7 +206,7 @@ class ReflectionCaster
 
         if ($v = $c->getStaticVariables()) {
             foreach ($v as $k => &$v) {
-                if (is_object($v)) {
+                if (\is_object($v)) {
                     $a[$prefix.'use']['$'.$k] = new CutStub($v);
                 } else {
                     $a[$prefix.'use']['$'.$k] = &$v;
@@ -292,6 +300,52 @@ class ReflectionCaster
         ));
 
         return $a;
+    }
+
+    public static function getSignature(array $a)
+    {
+        $prefix = Caster::PREFIX_VIRTUAL;
+        $signature = '';
+
+        if (isset($a[$prefix.'parameters'])) {
+            foreach ($a[$prefix.'parameters']->value as $k => $param) {
+                $signature .= ', ';
+                if ($type = $param->getType()) {
+                    if (!$param->isOptional() && $param->allowsNull()) {
+                        $signature .= '?';
+                    }
+                    $signature .= substr(strrchr('\\'.$type->getName(), '\\'), 1).' ';
+                }
+                $signature .= $k;
+
+                if (!$param->isDefaultValueAvailable()) {
+                    continue;
+                }
+                $v = $param->getDefaultValue();
+                $signature .= ' = ';
+
+                if ($param->isDefaultValueConstant()) {
+                    $signature .= substr(strrchr('\\'.$param->getDefaultValueConstantName(), '\\'), 1);
+                } elseif (null === $v) {
+                    $signature .= 'null';
+                } elseif (\is_array($v)) {
+                    $signature .= $v ? '[…'.\count($v).']' : '[]';
+                } elseif (\is_string($v)) {
+                    $signature .= 10 > \strlen($v) && false === strpos($v, '\\') ? "'{$v}'" : "'…".\strlen($v)."'";
+                } elseif (\is_bool($v)) {
+                    $signature .= $v ? 'true' : 'false';
+                } else {
+                    $signature .= $v;
+                }
+            }
+        }
+        $signature = (empty($a[$prefix.'returnsReference']) ? '' : '&').'('.substr($signature, 2).')';
+
+        if (isset($a[$prefix.'returnType'])) {
+            $signature .= ': '.substr(strrchr('\\'.$a[$prefix.'returnType'], '\\'), 1);
+        }
+
+        return $signature;
     }
 
     private static function addExtra(&$a, \Reflector $c)

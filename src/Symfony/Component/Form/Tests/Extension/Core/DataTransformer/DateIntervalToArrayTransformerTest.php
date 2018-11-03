@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToArrayTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToArrayTransformer;
 
 /**
  * @author Steffen Roßkamp <steffen.rosskamp@gimmickmedia.de>
@@ -81,6 +81,21 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $input = new \DateInterval('P1Y2M3WT4H5M6S');
         $output = array(
             'weeks' => '3',
+            'minutes' => '5',
+            'seconds' => '6',
+        );
+        $input = $transformer->transform($input);
+        ksort($input);
+        ksort($output);
+        $this->assertSame($output, $input);
+    }
+
+    public function testTransformWithZeroWeek()
+    {
+        $transformer = new DateIntervalToArrayTransformer(array('weeks', 'minutes', 'seconds'));
+        $input = new \DateInterval('P1Y2M0WT4H5M6S');
+        $output = array(
+            'weeks' => '0',
             'minutes' => '5',
             'seconds' => '6',
         );

@@ -89,6 +89,7 @@ class JsonLoginFactory extends AbstractFactory
         $listener->replaceArgument(4, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)) : null);
         $listener->replaceArgument(5, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $id, $config)) : null);
         $listener->replaceArgument(6, array_intersect_key($config, $this->options));
+        $listener->addMethodCall('setSessionAuthenticationStrategy', array(new Reference('security.authentication.session_strategy.'.$id)));
 
         $listenerId .= '.'.$id;
         $container->setDefinition($listenerId, $listener);

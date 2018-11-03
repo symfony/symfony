@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\TwigBundle\Controller;
 
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * PreviewErrorController can be used to test error pages.

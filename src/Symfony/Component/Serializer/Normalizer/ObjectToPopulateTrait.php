@@ -28,7 +28,7 @@ trait ObjectToPopulateTrait
     {
         $key = $key ?: 'object_to_populate';
 
-        if (isset($context[$key]) && is_object($context[$key]) && $context[$key] instanceof $class) {
+        if (isset($context[$key]) && \is_object($context[$key]) && $context[$key] instanceof $class) {
             return $context[$key];
         }
 

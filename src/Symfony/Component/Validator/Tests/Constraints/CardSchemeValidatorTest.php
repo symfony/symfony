@@ -59,7 +59,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($number, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', is_string($number) ? '"'.$number.'"' : $number)
+            ->setParameter('{{ value }}', \is_string($number) ? '"'.$number.'"' : $number)
             ->setCode($code)
             ->assertRaised();
     }

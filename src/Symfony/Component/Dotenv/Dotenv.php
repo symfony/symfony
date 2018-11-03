@@ -21,6 +21,7 @@ use Symfony\Component\Process\Process;
  * Manages .env files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Dotenv
 {
@@ -39,33 +40,66 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param string    $path  A file to load
-     * @param ...string $paths A list of additional files to load
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function load(string $path, string ...$paths): void
+    public function load(string $path, string ...$extraPaths): void
     {
-        array_unshift($paths, $path);
+        $this->doLoad(false, false, \func_get_args());
+    }
 
-        foreach ($paths as $path) {
-            if (!is_readable($path) || is_dir($path)) {
-                throw new PathException($path);
+    /**
+     * Loads one or several .env and the corresponding .env.$env, .env.local and .env.$env.local files if they exist.
+     *
+     * .env.local is always ignored in test env because tests should produce the same results for everyone.
+     *
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
+     *
+     * @throws FormatException when a file has a syntax error
+     * @throws PathException   when a file does not exist or is not readable
+     *
+     * @see https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
+     */
+    public function loadForEnv(string $env, string $path, string ...$extraPaths): void
+    {
+        $paths = \func_get_args();
+        for ($i = 1; $i < \func_num_args(); ++$i) {
+            $path = $paths[$i];
+            $pathList = array($path, "$path.$env");
+            if ('test' !== $env) {
+                $pathList[] = "$path.local";
             }
+            $pathList[] = "$path.$env.local";
 
-            $this->populate($this->parse(file_get_contents($path), $path));
+            $this->doLoad(false, true, $pathList);
         }
+    }
+
+    /**
+     * Loads one or several .env files and enables override existing vars.
+     *
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
+     *
+     * @throws FormatException when a file has a syntax error
+     * @throws PathException   when a file does not exist or is not readable
+     */
+    public function overload(string $path, string ...$extraPaths): void
+    {
+        $this->doLoad(true, false, \func_get_args());
     }
 
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
-     * Note that existing environment variables are not overridden.
-     *
-     * @param array $values An array of env variables
+     * @param array $values               An array of env variables
+     * @param bool  $overrideExistingVars true when existing environment variables must be overridden
      */
-    public function populate(array $values): void
+    public function populate(array $values, bool $overrideExistingVars = false): void
     {
         $loadedVars = array_flip(explode(',', getenv('SYMFONY_DOTENV_VARS')));
         unset($loadedVars['']);
@@ -73,7 +107,7 @@ final class Dotenv
         foreach ($values as $name => $value) {
             $notHttpName = 0 !== strpos($name, 'HTTP_');
             // don't check existence with getenv() because of thread safety issues
-            if (!isset($loadedVars[$name]) && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName))) {
+            if (!isset($loadedVars[$name]) && (!$overrideExistingVars && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName)))) {
                 continue;
             }
 
@@ -110,7 +144,7 @@ final class Dotenv
         $this->data = str_replace(array("\r\n", "\r"), "\n", $data);
         $this->lineno = 1;
         $this->cursor = 0;
-        $this->end = strlen($this->data);
+        $this->end = \strlen($this->data);
         $this->state = self::STATE_VARNAME;
         $this->values = array();
         $name = '';
@@ -232,7 +266,7 @@ final class Dotenv
             } else {
                 $value = '';
                 $prevChr = $this->data[$this->cursor - 1];
-                while ($this->cursor < $this->end && !in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
+                while ($this->cursor < $this->end && !\in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
                     if ('\\' === $this->data[$this->cursor] && isset($this->data[$this->cursor + 1]) && ('"' === $this->data[$this->cursor + 1] || "'" === $this->data[$this->cursor + 1])) {
                         ++$this->cursor;
                     }
@@ -322,7 +356,7 @@ final class Dotenv
                 return substr($matches[0], 1);
             }
 
-            if ('\\' === DIRECTORY_SEPARATOR) {
+            if ('\\' === \DIRECTORY_SEPARATOR) {
                 throw new \LogicException('Resolving commands is not supported on Windows.');
             }
 
@@ -330,7 +364,7 @@ final class Dotenv
                 throw new \LogicException('Resolving commands requires the Symfony Process component.');
             }
 
-            $process = new Process('echo '.$matches[0]);
+            $process = \method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
             $process->inheritEnvironmentVariables(true);
             $process->setEnv($this->values);
             try {
@@ -391,12 +425,23 @@ final class Dotenv
 
     private function moveCursor($text)
     {
-        $this->cursor += strlen($text);
+        $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");
     }
 
     private function createFormatException($message)
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
+    }
+
+    private function doLoad(bool $overrideExistingVars, bool $ignoreMissingExtraPaths, array $paths): void
+    {
+        foreach ($paths as $i => $path) {
+            if (is_readable($path) && !is_dir($path)) {
+                $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+            } elseif (!$ignoreMissingExtraPaths || 0 === $i) {
+                throw new PathException($path);
+            }
+        }
     }
 }

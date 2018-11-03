@@ -314,6 +314,14 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Érvénytelen nemzetközi bankazonosító kód (BIC/SWIFT).</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Hiba</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Érvénytelen egyedi azonosító (UUID).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

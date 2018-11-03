@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Predis\Response\ErrorInterface;
+use Symfony\Component\Cache\Traits\RedisClusterProxy;
+use Symfony\Component\Cache\Traits\RedisProxy;
 
 /**
  * Redis based session storage handler based on the Redis class
@@ -32,15 +34,22 @@ class RedisSessionHandler extends AbstractSessionHandler
      * List of available options:
      *  * prefix: The prefix to use for the keys in order to avoid collision on the Redis server.
      *
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redis
-     * @param array                                           $options An associative array of options
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|RedisProxy $redis
+     * @param array                                                      $options An associative array of options
      *
      * @throws \InvalidArgumentException When unsupported client or options are passed
      */
     public function __construct($redis, array $options = array())
     {
-        if (!$redis instanceof \Redis && !$redis instanceof \RedisArray && !$redis instanceof \Predis\Client && !$redis instanceof RedisProxy) {
-            throw new \InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redis) ? get_class($redis) : gettype($redis)));
+        if (
+            !$redis instanceof \Redis &&
+            !$redis instanceof \RedisArray &&
+            !$redis instanceof \RedisCluster &&
+            !$redis instanceof \Predis\Client &&
+            !$redis instanceof RedisProxy &&
+            !$redis instanceof RedisClusterProxy
+        ) {
+            throw new \InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($redis) ? \get_class($redis) : \gettype($redis)));
         }
 
         if ($diff = array_diff(array_keys($options), array('prefix'))) {
@@ -100,6 +109,6 @@ class RedisSessionHandler extends AbstractSessionHandler
      */
     public function updateTimestamp($sessionId, $data)
     {
-        return $this->redis->expire($this->prefix.$sessionId, (int) ini_get('session.gc_maxlifetime'));
+        return (bool) $this->redis->expire($this->prefix.$sessionId, (int) ini_get('session.gc_maxlifetime'));
     }
 }

@@ -15,8 +15,8 @@ use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 /**
  * @DiscriminatorMap(typeProperty="type", mapping={
- *    "first"="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild",
- *    "second"="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild"
+ *    "one"="Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne",
+ *    "two"="Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo"
  * })
  *
  * @author Samuel Roze <samuel.roze@gmail.com>

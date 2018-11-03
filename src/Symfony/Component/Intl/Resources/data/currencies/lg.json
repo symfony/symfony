@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -123,6 +123,10 @@
         ],
         "MRO": [
             "MRO",
+            "Wugwiya ey’eMawritenya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Wugwiya ey’eMawritenya"
         ],
         "MUR": [
@@ -179,6 +183,10 @@
         ],
         "STD": [
             "STD",
+            "Dobura ey’eSantome ne Purincipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobura ey’eSantome ne Purincipe"
         ],
         "SZL": [

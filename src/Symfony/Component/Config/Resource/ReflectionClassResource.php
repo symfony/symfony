@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Config\Resource;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface as LegacyServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -81,7 +82,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             $file = $class->getFileName();
             if (false !== $file && file_exists($file)) {
                 foreach ($this->excludedVendors as $vendor) {
-                    if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                    if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                         $file = false;
                         break;
                     }
@@ -148,12 +149,19 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             yield print_r($defaults, true);
         }
 
-        if ($class->isSubclassOf(EventSubscriberInterface::class)) {
+        if ($class->isAbstract() || $class->isInterface() || $class->isTrait()) {
+            return;
+        }
+
+        if (interface_exists(EventSubscriberInterface::class, false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
             yield EventSubscriberInterface::class;
             yield print_r(\call_user_func(array($class->name, 'getSubscribedEvents')), true);
         }
 
-        if ($class->isSubclassOf(ServiceSubscriberInterface::class)) {
+        if (interface_exists(LegacyServiceSubscriberInterface::class, false) && $class->isSubclassOf(LegacyServiceSubscriberInterface::class)) {
+            yield LegacyServiceSubscriberInterface::class;
+            yield print_r(\call_user_func(array($class->name, 'getSubscribedServices')), true);
+        } elseif (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
             yield print_r(\call_user_func(array($class->name, 'getSubscribedServices')), true);
         }

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
 
 /**
@@ -39,6 +40,7 @@ abstract class Client
     protected $insulated = false;
     protected $redirect;
     protected $followRedirects = true;
+    protected $followMetaRefresh = false;
 
     private $maxRedirects = -1;
     private $redirectCount = 0;
@@ -68,6 +70,14 @@ abstract class Client
     }
 
     /**
+     * Sets whether to automatically follow meta refresh redirects or not.
+     */
+    public function followMetaRefresh(bool $followMetaRefresh = true)
+    {
+        $this->followMetaRefresh = $followMetaRefresh;
+    }
+
+    /**
      * Returns whether client automatically follows redirects or not.
      *
      * @return bool
@@ -78,7 +88,7 @@ abstract class Client
     }
 
     /**
-     * Sets the maximum number of requests that crawler can follow.
+     * Sets the maximum number of redirects that crawler can follow.
      *
      * @param int $maxRedirects
      */
@@ -89,7 +99,7 @@ abstract class Client
     }
 
     /**
-     * Returns the maximum number of requests that crawler can follow.
+     * Returns the maximum number of redirects that crawler can follow.
      *
      * @return int
      */
@@ -108,7 +118,7 @@ abstract class Client
     public function insulate($insulated = true)
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
-            throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
+            throw new \LogicException('Unable to isolate requests as the Symfony Process Component is not installed.');
         }
 
         $this->insulated = (bool) $insulated;
@@ -150,14 +160,15 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
-    public function switchToXHR()
+    public function xmlHttpRequest(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true): Crawler
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
-    }
 
-    public function removeXHR()
-    {
-        unset($this->server['HTTP_X_REQUESTED_WITH']);
+        try {
+            return $this->request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
+        } finally {
+            unset($this->server['HTTP_X_REQUESTED_WITH']);
+        }
     }
 
     /**
@@ -183,20 +194,30 @@ abstract class Client
     /**
      * Returns the current Crawler instance.
      *
-     * @return Crawler|null A Crawler instance
+     * @return Crawler A Crawler instance
      */
     public function getCrawler()
     {
+        if (null === $this->crawler) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
         return $this->crawler;
     }
 
     /**
      * Returns the current BrowserKit Response instance.
      *
-     * @return Response|null A BrowserKit Response instance
+     * @return Response A BrowserKit Response instance
      */
     public function getInternalResponse()
     {
+        if (null === $this->internalResponse) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
         return $this->internalResponse;
     }
 
@@ -206,22 +227,32 @@ abstract class Client
      * The origin response is the response instance that is returned
      * by the code that handles requests.
      *
-     * @return object|null A response instance
+     * @return object A response instance
      *
      * @see doRequest()
      */
     public function getResponse()
     {
+        if (null === $this->response) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
         return $this->response;
     }
 
     /**
      * Returns the current BrowserKit Request instance.
      *
-     * @return Request|null A BrowserKit Request instance
+     * @return Request A BrowserKit Request instance
      */
     public function getInternalRequest()
     {
+        if (null === $this->internalRequest) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
         return $this->internalRequest;
     }
 
@@ -231,12 +262,17 @@ abstract class Client
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
-     * @return object|null A Request instance
+     * @return object A Request instance
      *
      * @see doRequest()
      */
     public function getRequest()
     {
+        if (null === $this->request) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
         return $this->request;
     }
 
@@ -255,18 +291,59 @@ abstract class Client
     }
 
     /**
+     * Clicks the first link (or clickable image) that contains the given text.
+     *
+     * @param string $linkText The text of the link or the alt attribute of the clickable image
+     */
+    public function clickLink(string $linkText): Crawler
+    {
+        if (null === $this->crawler) {
+            throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
+        return $this->click($this->crawler->selectLink($linkText)->link());
+    }
+
+    /**
      * Submits a form.
      *
-     * @param Form  $form   A Form instance
-     * @param array $values An array of form field values
+     * @param Form  $form             A Form instance
+     * @param array $values           An array of form field values
+     * @param array $serverParameters An array of server parameters
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = array())
+    public function submit(Form $form, array $values = array()/*, array $serverParameters = array()*/)
     {
-        $form->setValues($values);
+        if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        }
 
-        return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles());
+        $form->setValues($values);
+        $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
+
+        return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $serverParameters);
+    }
+
+    /**
+     * Finds the first form that contains a button with the given content and
+     * uses it to submit the given form field values.
+     *
+     * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
+     * @param array  $fieldValues      Use this syntax: array('my_form[name]' => '...', 'my_form[email]' => '...')
+     * @param string $method           The HTTP method used to submit the form
+     * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
+     */
+    public function submitForm(string $button, array $fieldValues = array(), string $method = 'POST', array $serverParameters = array()): Crawler
+    {
+        if (null === $this->crawler) {
+            throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        }
+
+        $buttonNode = $this->crawler->selectButton($button);
+        $form = $buttonNode->form($fieldValues, $method);
+
+        return $this->submit($form, array(), $serverParameters);
     }
 
     /**
@@ -340,7 +417,16 @@ abstract class Client
             return $this->crawler = $this->followRedirect();
         }
 
-        return $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
+        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
+
+        // Check for meta refresh redirect
+        if ($this->followMetaRefresh && null !== $redirect = $this->getMetaRefreshUrl()) {
+            $this->redirect = $redirect;
+            $this->redirects[serialize($this->history->current())] = true;
+            $this->crawler = $this->followRedirect();
+        }
+
+        return $this->crawler;
     }
 
     /**
@@ -365,7 +451,7 @@ abstract class Client
             unlink($deprecationsFile);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
-                    trigger_error($deprecation[1], E_USER_DEPRECATED);
+                    @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 }
@@ -507,7 +593,7 @@ abstract class Client
 
         $request = $this->internalRequest;
 
-        if (in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
+        if (\in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
             $method = 'GET';
             $files = array();
             $content = null;
@@ -534,6 +620,21 @@ abstract class Client
         $this->isMainRequest = true;
 
         return $response;
+    }
+
+    /**
+     * @see https://dev.w3.org/html5/spec-preview/the-meta-element.html#attr-meta-http-equiv-refresh
+     */
+    private function getMetaRefreshUrl(): ?string
+    {
+        $metaRefresh = $this->getCrawler()->filter('head meta[http-equiv="refresh"]');
+        foreach ($metaRefresh->extract(array('content')) as $content) {
+            if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/i', $content, $m)) {
+                return str_replace("\t\r\n", '', rtrim($m[1]));
+            }
+        }
+
+        return null;
     }
 
     /**

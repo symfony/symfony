@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -29,11 +29,11 @@ class CountValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_array($value) && !$value instanceof \Countable) {
-            throw new UnexpectedTypeException($value, 'array or \Countable');
+        if (!\is_array($value) && !$value instanceof \Countable) {
+            throw new UnexpectedValueException($value, 'array|\Countable');
         }
 
-        $count = count($value);
+        $count = \count($value);
 
         if (null !== $constraint->max && $count > $constraint->max) {
             $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)

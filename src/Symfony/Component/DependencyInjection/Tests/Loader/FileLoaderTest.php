@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
-use Psr\Container\ContainerInterface as PsrContainerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,10 +26,10 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterface;
 
@@ -134,6 +134,25 @@ class FileLoaderTest extends TestCase
             ),
             array_keys($container->getAliases())
         );
+    }
+
+    public function testRegisterClassesWithExcludeAsArray()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('sub_dir', 'Sub');
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*', array(
+                'Prototype/%sub_dir%',
+                'Prototype/OtherDir/AnotherSub/DeeperBaz.php',
+            )
+        );
+        $this->assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Baz::class));
+        $this->assertFalse($container->has(Bar::class));
+        $this->assertFalse($container->has(DeeperBaz::class));
     }
 
     public function testNestedRegisterClasses()

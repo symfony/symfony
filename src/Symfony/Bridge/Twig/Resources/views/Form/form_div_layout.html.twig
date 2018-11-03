@@ -10,6 +10,10 @@
 
 {%- block form_widget_simple -%}
     {%- set type = type|default('text') -%}
+    {%- if type == 'range' or type == 'color' -%}
+        {# Attribute "required" is not supported #}
+        {%- set required = false -%}
+    {%- endif -%}
     <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
 {%- endblock form_widget_simple -%}
 
@@ -136,7 +140,7 @@
     {%- else -%}
         <div {{ block('widget_container_attributes') }}>
             {{- form_errors(form) -}}
-            <table class="{{ table_class|default('') }}">
+            <table class="{{ table_class|default('') }}" role="presentation">
                 <thead>
                     <tr>
                         {%- if with_years %}<th>{{ form_label(form.years) }}</th>{% endif -%}
@@ -177,7 +181,7 @@
 {%- endblock integer_widget -%}
 
 {%- block money_widget -%}
-    {{ money_pattern|replace({ '{{ widget }}': block('form_widget_simple') })|raw }}
+    {{ money_pattern|form_encode_currency(block('form_widget_simple')) }}
 {%- endblock money_widget -%}
 
 {%- block url_widget -%}
@@ -283,6 +287,22 @@
 
 {%- block button_label -%}{%- endblock -%}
 
+{# Help #}
+
+{% block form_help -%}
+    {%- if help is not empty -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
+
+        <p id="{{ id }}_help" {% for attrname, attrvalue in help_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if translation_domain is same as(false) -%}
+                {{- help -}}
+            {%- else -%}
+                {{- help|trans({}, translation_domain) -}}
+            {%- endif -%}
+        </p>
+    {%- endif -%}
+{%- endblock form_help %}
+
 {# Rows #}
 
 {%- block repeated_row -%}
@@ -294,10 +314,15 @@
 {%- endblock repeated_row -%}
 
 {%- block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <div>
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
-        {{- form_widget(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
     </div>
 {%- endblock form_row -%}
 
@@ -327,7 +352,7 @@
     {%- else -%}
         {% set form_method = "POST" %}
     {%- endif -%}
-    <form name="{{ name }}" method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
@@ -375,7 +400,7 @@
 {# Support #}
 
 {%- block form_rows -%}
-    {% for child in form %}
+    {% for child in form if not child.rendered %}
         {{- form_row(child) -}}
     {% endfor %}
 {%- endblock form_rows -%}

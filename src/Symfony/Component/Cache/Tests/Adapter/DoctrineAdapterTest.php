@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 
 /**
  * @group time-sensitive

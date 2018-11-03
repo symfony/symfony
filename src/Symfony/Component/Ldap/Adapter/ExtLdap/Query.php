@@ -89,7 +89,12 @@ class Query extends AbstractQuery
         }
 
         if (false === $this->search) {
-            throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".', $this->dn, $this->query, implode(',', $this->options['filter'])));
+            $ldapError = '';
+            if ($errno = ldap_errno($con)) {
+                $ldapError = sprintf(' LDAP error was [%d] %s', $errno, ldap_error($con));
+            }
+
+            throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
         }
 
         return new Collection($this->connection, $this);

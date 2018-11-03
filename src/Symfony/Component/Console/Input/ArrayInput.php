@@ -56,7 +56,7 @@ class ArrayInput extends Input
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
-            if (!is_int($k)) {
+            if (!\is_int($k)) {
                 $v = $k;
             }
 
@@ -64,7 +64,7 @@ class ArrayInput extends Input
                 return false;
             }
 
-            if (in_array($v, $values)) {
+            if (\in_array($v, $values)) {
                 return true;
             }
         }
@@ -80,15 +80,15 @@ class ArrayInput extends Input
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
-            if ($onlyParams && ('--' === $k || (is_int($k) && '--' === $v))) {
-                return false;
+            if ($onlyParams && ('--' === $k || (\is_int($k) && '--' === $v))) {
+                return $default;
             }
 
-            if (is_int($k)) {
-                if (in_array($v, $values)) {
+            if (\is_int($k)) {
+                if (\in_array($v, $values)) {
                     return true;
                 }
-            } elseif (in_array($k, $values)) {
+            } elseif (\in_array($k, $values)) {
                 return $v;
             }
         }
@@ -106,7 +106,7 @@ class ArrayInput extends Input
         $params = array();
         foreach ($this->parameters as $param => $val) {
             if ($param && '-' === $param[0]) {
-                if (is_array($val)) {
+                if (\is_array($val)) {
                     foreach ($val as $v) {
                         $params[] = $param.('' != $v ? '='.$this->escapeToken($v) : '');
                     }
@@ -114,7 +114,7 @@ class ArrayInput extends Input
                     $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
                 }
             } else {
-                $params[] = is_array($val) ? implode(' ', array_map(array($this, 'escapeToken'), $val)) : $this->escapeToken($val);
+                $params[] = \is_array($val) ? implode(' ', array_map(array($this, 'escapeToken'), $val)) : $this->escapeToken($val);
             }
         }
 

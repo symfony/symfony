@@ -4,13 +4,13 @@
 
 {% if colors is not defined %}
     {% set colors = {
-        'default':                '#999',
-        'section':                '#444',
+        'default':                '#777',
+        'section':                '#999',
         'event_listener':         '#00B8F5',
-        'event_listener_loading': '#00B8F5',
         'template':               '#66CC00',
         'doctrine':               '#FF6633',
-        'propel':                 '#FF6633',
+        'messenger.middleware':   '#BDB81E',
+        'controller.argument_value_resolver': '#8c5de6',
     } %}
 {% endif %}
 
@@ -128,7 +128,7 @@
         </h3>
     {% endif %}
 
-    {{ helper.display_timeline('timeline_' ~ token, collector.events, colors) }}
+    {{ helper.display_timeline('timeline_' ~ token, colors) }}
 
     {% if profile.children|length %}
         <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
@@ -142,7 +142,7 @@
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 
-            {{ helper.display_timeline('timeline_' ~ child.token, events, colors) }}
+            {{ helper.display_timeline('timeline_' ~ child.token, colors) }}
         {% endfor %}
     {% endif %}
 
@@ -222,6 +222,11 @@
                 return query('#collector-content h2').clientWidth;
             }
 
+            function getCssVarValue(varName)
+            {
+                return getComputedStyle(document.querySelector('body')).getPropertyValue(varName);
+            }
+
             /**
              * Draw one canvas.
              *
@@ -274,7 +279,11 @@
                 ctx.lineWidth = 0;
 
                 // For each event, draw a line.
-                ctx.strokeStyle = "#CCC";
+                ctx.strokeStyle = getCssVarValue('--table-border');
+
+                // set the background color of the canvas
+                ctx.fillStyle = getCssVarValue('--table-background');
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 drawableEvents.forEach(function(event) {
                     event.periods.forEach(function(period) {
@@ -381,31 +390,31 @@
                 // For each event, draw the label.
                 mainEvents.forEach(function(event) {
 
-                    ctx.fillStyle = "#444";
+                    ctx.fillStyle = getCssVarValue('--color-text');
                     ctx.font = "12px sans-serif";
                     text = event.name;
                     ms = "  " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
-                        ctx.fillStyle = "#777";
+                        ctx.fillStyle = getCssVarValue('--color-muted');
                         xc = x + event.endtime * ratio - 1;
                         ctx.fillText(ms, xc, h);
 
                         xc -= ctx.measureText(ms).width;
                         ctx.font = "12px sans-serif";
-                        ctx.fillStyle = "#222";
+                        ctx.fillStyle = getCssVarValue('--color-text');
                         ctx.fillText(text, xc, h);
                     } else {
                         ctx.textAlign = "start";
                         ctx.font = "13px sans-serif";
-                        ctx.fillStyle = "#222";
+                        ctx.fillStyle = getCssVarValue('--color-text');
                         xc = x + event.starttime * ratio + 1;
                         ctx.fillText(text, xc, h);
 
                         xc += ctx.measureText(text).width;
                         ctx.font = "11px sans-serif";
-                        ctx.fillStyle = "#777";
+                        ctx.fillStyle = getCssVarValue('--color-muted');
                         ctx.fillText(ms, xc, h);
                     }
 
@@ -463,12 +472,12 @@
         var requests_data = {
             "max": {{ "%F"|format(collector.events.__section__.endtime) }},
             "requests": [
-{{ helper.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
+{{ helper.dump_request_data(token, collector.events, collector.events.__section__.origin) }}
 
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ helper.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{{ helper.dump_request_data(child.token, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]
@@ -506,7 +515,7 @@
     //]]>{% endautoescape %}</script>
 {% endblock %}
 
-{% macro dump_request_data(token, profile, events, origin) %}
+{% macro dump_request_data(token, events, origin) %}
 {% autoescape 'js' %}
 {% from _self import dump_events %}
                 {
@@ -542,7 +551,7 @@
 {% endautoescape %}
 {% endmacro %}
 
-{% macro display_timeline(id, events, colors) %}
+{% macro display_timeline(id, colors) %}
     <div class="sf-profiler-timeline">
         <div class="legends">
             {% for category, color in colors %}

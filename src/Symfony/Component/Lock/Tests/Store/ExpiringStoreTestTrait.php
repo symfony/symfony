@@ -48,7 +48,7 @@ trait ExpiringStoreTestTrait
         $store->putOffExpiration($key, $clockDelay / 1000000);
         $this->assertTrue($store->exists($key));
 
-        usleep(2 * $clockDelay);
+        usleep(3 * $clockDelay);
         $this->assertFalse($store->exists($key));
     }
 

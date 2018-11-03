@@ -23,6 +23,8 @@ trait FilesystemTrait
 {
     use FilesystemCommonTrait;
 
+    private $marshaller;
+
     /**
      * @return bool
      */
@@ -68,7 +70,7 @@ trait FilesystemTrait
                 $value = stream_get_contents($h);
                 fclose($h);
                 if ($i === $id) {
-                    $values[$id] = parent::unserialize($value);
+                    $values[$id] = $this->marshaller->unmarshall($value);
                 }
             }
         }
@@ -91,17 +93,19 @@ trait FilesystemTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        $ok = true;
         $expiresAt = $lifetime ? (time() + $lifetime) : 0;
+        $values = $this->marshaller->marshall($values, $failed);
 
         foreach ($values as $id => $value) {
-            $ok = $this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".serialize($value), $expiresAt) && $ok;
+            if (!$this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".$value, $expiresAt)) {
+                $failed[] = $id;
+            }
         }
 
-        if (!$ok && !is_writable($this->directory)) {
+        if ($failed && !is_writable($this->directory)) {
             throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
         }
 
-        return $ok;
+        return $failed;
     }
 }

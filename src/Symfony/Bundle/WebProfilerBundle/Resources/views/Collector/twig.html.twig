@@ -75,20 +75,32 @@
 
         <h2>Rendered Templates</h2>
 
-        <table>
+        <table id="twig-table">
             <thead>
-                <tr>
-                    <th scope="col">Template Name</th>
-                    <th scope="col">Render Count</th>
-                </tr>
+            <tr>
+                <th scope="col">Template Name &amp; Path</th>
+                <th class="num-col" scope="col">Render Count</th>
+            </tr>
             </thead>
             <tbody>
             {% for template, count in collector.templates %}
                 <tr>
                     {%- set file = collector.templatePaths[template]|default(false) -%}
                     {%- set link = file ? file|file_link(1) : false -%}
-                    <td>{% if link %}<a href="{{ link }}" title="{{ file }}">{{ template }}</a>{% else %}{{ template }}{% endif %}</td>
-                    <td class="font-normal">{{ count }}</td>
+                    <td>
+                        <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                            <div>
+                                <a class="text-muted" href="{{ link }}" title="{{ file }}">
+                                    {{ file|file_relative|default(file) }}
+                                </a>
+                            </div>
+                        {% else %}
+                            {{ template }}
+                        {% endif %}
+                    </td>
+                    <td class="font-normal num-col">{{ count }}</td>
                 </tr>
             {% endfor %}
             </tbody>

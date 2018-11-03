@@ -1,0 +1,60 @@
+build: false
+clone_depth: 2
+clone_folder: c:\projects\symfony
+
+cache:
+    - composer.phar
+    - .phpunit -> phpunit
+
+init:
+    - SET PATH=c:\php;%PATH%
+    - SET COMPOSER_NO_INTERACTION=1
+    - SET SYMFONY_DEPRECATIONS_HELPER=strict
+    - SET "SYMFONY_REQUIRE=>=4.2"
+    - SET ANSICON=121x90 (121x90)
+    - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
+
+install:
+    - mkdir c:\php && cd c:\php
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.1.3-Win32-VC14-x86.zip
+    - 7z x php-7.1.3-Win32-VC14-x86.zip -y >nul
+    - cd ext
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.8-7.1-ts-vc14-x86.zip
+    - 7z x php_apcu-5.1.8-7.1-ts-vc14-x86.zip -y >nul
+    - cd ..
+    - copy /Y php.ini-development php.ini-min
+    - echo memory_limit=-1 >> php.ini-min
+    - echo serialize_precision=14 >> php.ini-min
+    - echo max_execution_time=1200 >> php.ini-min
+    - echo date.timezone="America/Los_Angeles" >> php.ini-min
+    - echo extension_dir=ext >> php.ini-min
+    - copy /Y php.ini-min php.ini-max
+    - echo zend_extension=php_opcache.dll >> php.ini-max
+    - echo opcache.enable_cli=1 >> php.ini-max
+    - echo extension=php_openssl.dll >> php.ini-max
+    - echo extension=php_apcu.dll >> php.ini-max
+    - echo apc.enable_cli=1 >> php.ini-max
+    - echo extension=php_intl.dll >> php.ini-max
+    - echo extension=php_mbstring.dll >> php.ini-max
+    - echo extension=php_fileinfo.dll >> php.ini-max
+    - echo extension=php_pdo_sqlite.dll >> php.ini-max
+    - echo extension=php_curl.dll >> php.ini-max
+    - copy /Y php.ini-max php.ini
+    - cd c:\projects\symfony
+    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/1.7.1/composer.phar)
+    - php composer.phar self-update
+    - copy /Y .composer\* %APPDATA%\Composer\
+    - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
+    - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit src\Symfony\Contracts
+    - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
+    - php composer.phar update --no-progress --no-suggest --ansi
+    - php phpunit install
+
+test_script:
+    - SET X=0
+    - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
+    - copy /Y c:\php\php.ini-min c:\php\php.ini
+    - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
+    - copy /Y c:\php\php.ini-max c:\php\php.ini
+    - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
+    - exit %X%

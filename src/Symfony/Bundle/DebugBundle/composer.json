@@ -20,14 +20,15 @@
         "ext-xml": "*",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/twig-bridge": "~3.4|~4.0",
-        "symfony/var-dumper": "~3.4|~4.0"
+        "symfony/var-dumper": "^4.1.1"
     },
     "require-dev": {
-        "symfony/config": "~3.4|~4.0",
+        "symfony/config": "~4.2",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/web-profiler-bundle": "~3.4|~4.0"
     },
     "conflict": {
+        "symfony/config": "<4.2",
         "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
@@ -43,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.2-dev"
         }
     }
 }

@@ -21,8 +21,8 @@ class FooTypeBazExtension extends AbstractTypeExtension
         $builder->setAttribute('baz', 'x');
     }
 
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return __NAMESPACE__.'\FooType';
+        return array(__NAMESPACE__.'\FooType');
     }
 }

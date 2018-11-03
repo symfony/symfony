@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <!-- Asynchronous -->
+        <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
+            <argument type="collection" /> <!-- Per message sender iterators -->
+            <argument type="collection" /> <!-- Messages to send and handle -->
+        </service>
+        <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
+            <argument type="service" id="messenger.senders_locator" />
+        </service>
+
+        <!-- Message encoding/decoding -->
+        <service id="messenger.transport.symfony_serializer" class="Symfony\Component\Messenger\Transport\Serialization\Serializer">
+            <argument type="service" id="serializer" />
+            <argument /> <!-- Format -->
+            <argument type="collection" /> <!-- Context -->
+        </service>
+
+        <!-- Middleware -->
+        <service id="messenger.middleware.handle_message" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
+            <argument /> <!-- Bus handler resolver -->
+        </service>
+
+        <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
+            <argument type="service" id="validator" />
+        </service>
+
+        <service id="messenger.middleware.traceable" class="Symfony\Component\Messenger\Middleware\TraceableMiddleware" abstract="true">
+            <argument type="service" id="debug.stopwatch" />
+        </service>
+
+        <!-- Logging -->
+        <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware">
+            <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="logger" />
+        </service>
+
+        <!-- Discovery -->
+        <service id="messenger.receiver_locator">
+            <tag name="container.service_locator" />
+            <argument type="collection" />
+        </service>
+
+        <!-- transports -->
+        <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\TransportFactory">
+            <argument type="tagged" tag="messenger.transport_factory" />
+        </service>
+
+        <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
+            <tag name="messenger.transport_factory" />
+            <argument type="service" id="messenger.transport.serializer" />
+            <argument>%kernel.debug%</argument>
+        </service>
+    </services>
+</container>

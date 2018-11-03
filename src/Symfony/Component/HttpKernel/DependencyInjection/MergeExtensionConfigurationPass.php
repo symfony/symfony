@@ -31,7 +31,7 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
     public function process(ContainerBuilder $container)
     {
         foreach ($this->extensions as $extension) {
-            if (!count($container->getExtensionConfig($extension))) {
+            if (!\count($container->getExtensionConfig($extension))) {
                 $container->loadFromExtension($extension, array());
             }
         }

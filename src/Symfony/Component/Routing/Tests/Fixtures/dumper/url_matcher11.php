@@ -1,7 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -10,127 +9,54 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher
 {
+    use PhpMatcherTrait;
+
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-    }
-
-    public function match($pathinfo)
-    {
-        $allow = array();
-        if ($ret = $this->doMatch($pathinfo, $allow)) {
-            return $ret;
-        }
-        if ('/' !== $pathinfo && in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
-            $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
-            if ($ret = $this->doMatch($pathinfo)) {
-                return $this->redirect($pathinfo, $ret['_route']) + $ret;
-            }
-        }
-
-        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
-    }
-
-    private function doMatch(string $rawPathinfo, array &$allow = array()): ?array
-    {
-        $allow = array();
-        $pathinfo = rawurldecode($rawPathinfo);
-        $context = $this->context;
-        $requestMethod = $canonicalMethod = $context->getMethod();
-
-        if ('HEAD' === $requestMethod) {
-            $canonicalMethod = 'GET';
-        }
-
-        $matchedPathinfo = $pathinfo;
-        $regexList = array(
+        $this->regexpList = array(
             0 => '{^(?'
                     .'|/(en|fr)/(?'
                         .'|admin/post/(?'
                             .'|(*:33)'
                             .'|new(*:43)'
-                            .'|(\\d+)(?'
-                                .'|(*:58)'
-                                .'|/(?'
-                                    .'|edit(*:73)'
-                                    .'|delete(*:86)'
-                                .')'
-                            .')'
+                            .'|(\\d+)(*:55)'
+                            .'|(\\d+)/edit(*:72)'
+                            .'|(\\d+)/delete(*:91)'
                         .')'
                         .'|blog/(?'
-                            .'|(*:104)'
-                            .'|rss\\.xml(*:120)'
+                            .'|(*:107)'
+                            .'|rss\\.xml(*:123)'
                             .'|p(?'
-                                .'|age/([^/]++)(*:144)'
-                                .'|osts/([^/]++)(*:165)'
+                                .'|age/([^/]++)(*:147)'
+                                .'|osts/([^/]++)(*:168)'
                             .')'
-                            .'|comments/(\\d+)/new(*:192)'
-                            .'|search(*:206)'
+                            .'|comments/(\\d+)/new(*:195)'
+                            .'|search(*:209)'
                         .')'
                         .'|log(?'
-                            .'|in(*:223)'
-                            .'|out(*:234)'
+                            .'|in(*:226)'
+                            .'|out(*:237)'
                         .')'
                     .')'
-                    .'|/(en|fr)?(*:253)'
+                    .'|/(en|fr)?(*:256)'
                 .')$}sD',
         );
-
-        foreach ($regexList as $offset => $regex) {
-            while (preg_match($regex, $matchedPathinfo, $matches)) {
-                switch ($m = (int) $matches['MARK']) {
-                    default:
-                        $routes = array(
-                            33 => array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null),
-                            43 => array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null),
-                            58 => array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            73 => array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            86 => array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            104 => array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null),
-                            120 => array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null),
-                            144 => array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null),
-                            165 => array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null),
-                            192 => array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            206 => array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null),
-                            223 => array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null),
-                            234 => array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null),
-                            253 => array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null),
-                        );
-
-                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
-
-                        foreach ($vars as $i => $v) {
-                            if (isset($matches[1 + $i])) {
-                                $ret[$v] = $matches[1 + $i];
-                            }
-                        }
-
-                        $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
-                        if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                            if ($hasRequiredScheme) {
-                                $allow += $requiredMethods;
-                            }
-                            break;
-                        }
-                        if (!$hasRequiredScheme) {
-                            if ('GET' !== $canonicalMethod) {
-                                break;
-                            }
-
-                            return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
-                        }
-
-                        return $ret;
-                }
-
-                if (253 === $m) {
-                    break;
-                }
-                $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));
-                $offset += strlen($m);
-            }
-        }
-
-        return null;
+        $this->dynamicRoutes = array(
+            33 => array(array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null, null)),
+            43 => array(array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null, null)),
+            55 => array(array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
+            72 => array(array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
+            91 => array(array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
+            107 => array(array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null, null)),
+            123 => array(array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null, null)),
+            147 => array(array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null, null)),
+            168 => array(array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null, null)),
+            195 => array(array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
+            209 => array(array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null, null)),
+            226 => array(array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null, null)),
+            237 => array(array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null, null)),
+            256 => array(array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null, null)),
+        );
     }
 }

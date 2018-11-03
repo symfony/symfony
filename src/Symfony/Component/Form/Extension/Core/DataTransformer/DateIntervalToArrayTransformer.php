@@ -88,8 +88,8 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         foreach (self::$availableFields as $field => $char) {
             $result[$field] = $dateInterval->format('%'.($this->pad ? strtoupper($char) : $char));
         }
-        if (in_array('weeks', $this->fields, true)) {
-            $result['weeks'] = 0;
+        if (\in_array('weeks', $this->fields, true)) {
+            $result['weeks'] = '0';
             if (isset($result['days']) && (int) $result['days'] >= 7) {
                 $result['weeks'] = (string) floor($result['days'] / 7);
                 $result['days'] = (string) ($result['days'] % 7);
@@ -116,7 +116,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         if (null === $value) {
             return;
         }
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new UnexpectedTypeException($value, 'array');
         }
         if ('' === implode('', $value)) {
@@ -128,10 +128,10 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                 $emptyFields[] = $field;
             }
         }
-        if (count($emptyFields) > 0) {
+        if (\count($emptyFields) > 0) {
             throw new TransformationFailedException(sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)));
         }
-        if (isset($value['invert']) && !is_bool($value['invert'])) {
+        if (isset($value['invert']) && !\is_bool($value['invert'])) {
             throw new TransformationFailedException('The value of "invert" must be boolean');
         }
         foreach (self::$availableFields as $field => $char) {

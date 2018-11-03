@@ -55,7 +55,7 @@ class Entry
      *
      * @param $name string The name of the attribute
      *
-     * @return null|array
+     * @return array|null
      */
     public function getAttribute($name)
     {

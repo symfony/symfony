@@ -12,10 +12,10 @@
 namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Yaml\Command\LintCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Yaml\Command\LintCommand;
 
 /**
  * Tests the YamlLintCommand.
@@ -32,6 +32,18 @@ class LintCommandTest extends TestCase
         $filename = $this->createFile('foo: bar');
 
         $ret = $tester->execute(array('filename' => $filename), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertRegExp('/^\/\/ OK in /', trim($tester->getDisplay()));
+    }
+
+    public function testLintCorrectFiles()
+    {
+        $tester = $this->createCommandTester();
+        $filename1 = $this->createFile('foo: bar');
+        $filename2 = $this->createFile('bar: baz');
+
+        $ret = $tester->execute(array('filename' => array($filename1, $filename2)), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertRegExp('/^\/\/ OK in /', trim($tester->getDisplay()));

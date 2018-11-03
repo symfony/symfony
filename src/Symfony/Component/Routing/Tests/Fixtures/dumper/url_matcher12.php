@@ -1,7 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -10,24 +9,12 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 {
+    use PhpMatcherTrait;
+
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-    }
-
-    public function match($rawPathinfo)
-    {
-        $allow = array();
-        $pathinfo = rawurldecode($rawPathinfo);
-        $context = $this->context;
-        $requestMethod = $canonicalMethod = $context->getMethod();
-
-        if ('HEAD' === $requestMethod) {
-            $canonicalMethod = 'GET';
-        }
-
-        $matchedPathinfo = $pathinfo;
-        $regexList = array(
+        $this->regexpList = array(
             0 => '{^(?'
                     .'|/abc([^/]++)/(?'
                         .'|1(?'
@@ -47,44 +34,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     .')'
                 .')$}sD',
         );
-
-        foreach ($regexList as $offset => $regex) {
-            while (preg_match($regex, $matchedPathinfo, $matches)) {
-                switch ($m = (int) $matches['MARK']) {
-                    default:
-                        $routes = array(
-                            27 => array(array('_route' => 'r1'), array('foo'), null, null),
-                            38 => array(array('_route' => 'r10'), array('foo'), null, null),
-                            46 => array(array('_route' => 'r100'), array('foo'), null, null),
-                            59 => array(array('_route' => 'r2'), array('foo'), null, null),
-                            70 => array(array('_route' => 'r20'), array('foo'), null, null),
-                            78 => array(array('_route' => 'r200'), array('foo'), null, null),
-                        );
-
-                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
-
-                        foreach ($vars as $i => $v) {
-                            if (isset($matches[1 + $i])) {
-                                $ret[$v] = $matches[1 + $i];
-                            }
-                        }
-
-                        if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                            $allow += $requiredMethods;
-                            break;
-                        }
-
-                        return $ret;
-                }
-
-                if (78 === $m) {
-                    break;
-                }
-                $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));
-                $offset += strlen($m);
-            }
-        }
-
-        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+        $this->dynamicRoutes = array(
+            27 => array(array(array('_route' => 'r1'), array('foo'), null, null, null)),
+            38 => array(array(array('_route' => 'r10'), array('foo'), null, null, null)),
+            46 => array(array(array('_route' => 'r100'), array('foo'), null, null, null)),
+            59 => array(array(array('_route' => 'r2'), array('foo'), null, null, null)),
+            70 => array(array(array('_route' => 'r20'), array('foo'), null, null, null)),
+            78 => array(array(array('_route' => 'r200'), array('foo'), null, null, null)),
+        );
     }
 }

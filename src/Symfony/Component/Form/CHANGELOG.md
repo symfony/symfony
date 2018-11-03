@@ -1,10 +1,56 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * The `getExtendedType()` method of the `FormTypeExtensionInterface` is deprecated and will be removed in 5.0. Type
+   extensions must implement the static `getExtendedTypes()` method instead and return an iterable of extended types.
+
+   Before:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public function getExtendedType()
+       {
+           return FormType::class;
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public static function getExtendedTypes(): iterable
+       {
+           return array(FormType::class);
+       }
+
+       // ...
+   }
+   ```
+ * deprecated the `$scale` argument of the `IntegerToLocalizedStringTransformer`
+ * added `Symfony\Component\Form\ClearableErrorsInterface`
+ * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered
+ * added a cause when a CSRF error has occurred
+ * deprecated the `scale` option of the `IntegerType`
+ * removed restriction on allowed HTTP methods
+ * deprecated the `regions` option of the `TimezoneType`
+
 4.1.0
 -----
 
+ * added `input=datetime_immutable` to `DateType`, `TimeType`, `DateTimeType`
+ * added `rounding_mode` option to `MoneyType`
+ * added `choice_translation_locale` option to `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * deprecated the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
  * added `input=datetime_immutable` to DateType, TimeType, DateTimeType
+ * added `rounding_mode` option to MoneyType
 
 4.0.0
 -----

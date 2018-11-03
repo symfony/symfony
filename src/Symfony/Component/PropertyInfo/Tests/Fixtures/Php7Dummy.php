@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Php7Dummy
+class Php7Dummy extends \stdClass
 {
     public function getFoo(): array
     {
@@ -25,6 +25,14 @@ class Php7Dummy
     }
 
     public function addBaz(string $baz)
+    {
+    }
+
+    public function getBuz(): self
+    {
+    }
+
+    public function getBiz(): parent
     {
     }
 }

@@ -15,6 +15,8 @@ namespace Symfony\Component\Translation;
  * Returns the plural rules for a given locale.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.2, use IdentityTranslator instead
  */
 class PluralizationRules
 {
@@ -28,21 +30,25 @@ class PluralizationRules
      *
      * @return int The plural position
      */
-    public static function get($number, $locale)
+    public static function get($number, $locale/*, bool $triggerDeprecation = true*/)
     {
+        if (3 > \func_num_args() || \func_get_arg(2)) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian
             $locale = 'xbr';
         }
 
-        if (strlen($locale) > 3) {
-            $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
+        if (\strlen($locale) > 3) {
+            $locale = substr($locale, 0, -\strlen(strrchr($locale, '_')));
         }
 
         if (isset(self::$rules[$locale])) {
-            $return = call_user_func(self::$rules[$locale], $number);
+            $return = \call_user_func(self::$rules[$locale], $number);
 
-            if (!is_int($return) || $return < 0) {
+            if (!\is_int($return) || $return < 0) {
                 return 0;
             }
 
@@ -107,6 +113,7 @@ class PluralizationRules
             case 'nl':
             case 'nn':
             case 'no':
+            case 'oc':
             case 'om':
             case 'or':
             case 'pa':
@@ -143,6 +150,7 @@ class PluralizationRules
             case 'bs':
             case 'hr':
             case 'ru':
+            case 'sh':
             case 'sr':
             case 'uk':
                 return ((1 == $number % 10) && (11 != $number % 100)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
@@ -194,13 +202,15 @@ class PluralizationRules
      */
     public static function set(callable $rule, $locale)
     {
+        @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian
             $locale = 'xbr';
         }
 
-        if (strlen($locale) > 3) {
-            $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
+        if (\strlen($locale) > 3) {
+            $locale = substr($locale, 0, -\strlen(strrchr($locale, '_')));
         }
 
         self::$rules[$locale] = $rule;

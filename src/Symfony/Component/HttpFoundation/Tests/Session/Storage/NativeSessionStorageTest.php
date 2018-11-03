@@ -36,7 +36,7 @@ class NativeSessionStorageTest extends TestCase
     protected function setUp()
     {
         $this->iniSet('session.save_handler', 'files');
-        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
+        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath);
         }
@@ -171,6 +171,10 @@ class NativeSessionStorageTest extends TestCase
             'cookie_httponly' => false,
         );
 
+        if (\PHP_VERSION_ID >= 70300) {
+            $options['cookie_samesite'] = 'lax';
+        }
+
         $this->getStorage($options);
         $temp = session_get_cookie_params();
         $gco = array();
@@ -180,6 +184,23 @@ class NativeSessionStorageTest extends TestCase
         }
 
         $this->assertEquals($options, $gco);
+    }
+
+    public function testSessionOptions()
+    {
+        if (\defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM is not handled in this test case.');
+        }
+
+        $options = array(
+            'url_rewriter.tags' => 'a=href',
+            'cache_expire' => '200',
+        );
+
+        $this->getStorage($options);
+
+        $this->assertSame('a=href', ini_get('url_rewriter.tags'));
+        $this->assertSame('200', ini_get('session.cache_expire'));
     }
 
     /**

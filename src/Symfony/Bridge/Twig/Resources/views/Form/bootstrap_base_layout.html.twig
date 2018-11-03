@@ -13,11 +13,11 @@
     {% if prepend or append %}
         <div class="input-group{{ group_class|default('') }}">
             {% if prepend %}
-                <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
             {% endif %}
             {{- block('form_widget_simple') -}}
             {% if append %}
-                <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
             {% endif %}
         </div>
     {% else %}
@@ -40,6 +40,16 @@
         <div {{ block('widget_container_attributes') }}>
             {{- form_errors(form.date) -}}
             {{- form_errors(form.time) -}}
+
+            <div class="sr-only">
+                {%- if form.date.year is defined %}{{ form_label(form.date.year) }}{% endif -%}
+                {%- if form.date.month is defined %}{{ form_label(form.date.month) }}{% endif -%}
+                {%- if form.date.day is defined %}{{ form_label(form.date.day) }}{% endif -%}
+                {%- if form.time.hour is defined %}{{ form_label(form.time.hour) }}{% endif -%}
+                {%- if form.time.minute is defined %}{{ form_label(form.time.minute) }}{% endif -%}
+                {%- if form.time.second is defined %}{{ form_label(form.time.second) }}{% endif -%}
+            </div>
+
             {{- form_widget(form.date, { datetime: true } ) -}}
             {{- form_widget(form.time, { datetime: true } ) -}}
         </div>
@@ -54,6 +64,14 @@
         {%- if datetime is not defined or not datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif %}
+        {%- if label is not same as(false) -%}
+            <div class="sr-only">
+                {{ form_label(form.year) }}
+                {{ form_label(form.month) }}
+                {{ form_label(form.day) }}
+            </div>
+        {%- endif -%}
+
             {{- date_pattern|replace({
                 '{{ year }}': form_widget(form.year),
                 '{{ month }}': form_widget(form.month),
@@ -73,7 +91,10 @@
         {%- if datetime is not defined or false == datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif -%}
-        {{- form_widget(form.hour) }}{% if with_minutes %}:{{ form_widget(form.minute) }}{% endif %}{% if with_seconds %}:{{ form_widget(form.second) }}{% endif %}
+        {%- if label is not same as(false) -%}<div class="sr-only">{{ form_label(form.hour) }}</div>{%- endif -%}
+        {{- form_widget(form.hour) -}}
+        {%- if with_minutes -%}:{%- if label is not same as(false) -%}<div class="sr-only">{{ form_label(form.minute) }}</div>{%- endif -%}{{ form_widget(form.minute) }}{%- endif -%}
+        {%- if with_seconds -%}:{%- if label is not same as(false) -%}<div class="sr-only">{{ form_label(form.second) }}</div>{%- endif -%}{{ form_widget(form.second) }}{%- endif -%}
         {%- if datetime is not defined or false == datetime -%}
             </div>
         {%- endif -%}
@@ -88,7 +109,7 @@
         <div {{ block('widget_container_attributes') }}>
             {{- form_errors(form) -}}
             <div class="table-responsive">
-                <table class="table {{ table_class|default('table-bordered table-condensed table-striped') }}">
+                <table class="table {{ table_class|default('table-bordered table-condensed table-striped') }}" role="presentation">
                     <thead>
                     <tr>
                         {%- if with_years %}<th>{{ form_label(form.years) }}</th>{% endif -%}

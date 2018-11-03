@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures\Container;
 
-class NoConstructorContainer
+use Symfony\Component\DependencyInjection\Container;
+
+class NoConstructorContainer extends Container
 {
 }

@@ -31,7 +31,7 @@ class MemcachedStore implements StoreInterface
 
     public static function isSupported()
     {
-        return extension_loaded('memcached');
+        return \extension_loaded('memcached');
     }
 
     /**
@@ -57,7 +57,7 @@ class MemcachedStore implements StoreInterface
      */
     public function save(Key $key)
     {
-        $token = $this->getToken($key);
+        $token = $this->getUniqueToken($key);
         $key->reduceLifetime($this->initialTtl);
         if (!$this->memcached->add((string) $key, $token, (int) ceil($this->initialTtl))) {
             // the lock is already acquired. It could be us. Let's try to put off.
@@ -71,7 +71,7 @@ class MemcachedStore implements StoreInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
+        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
 
     /**
@@ -80,13 +80,13 @@ class MemcachedStore implements StoreInterface
     public function putOffExpiration(Key $key, $ttl)
     {
         if ($ttl < 1) {
-            throw new InvalidArgumentException(sprintf('%s() expects a TTL greater or equals to 1. Got %s.', __METHOD__, $ttl));
+            throw new InvalidArgumentException(sprintf('%s() expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
         }
 
         // Interface defines a float value but Store required an integer.
         $ttl = (int) ceil($ttl);
 
-        $token = $this->getToken($key);
+        $token = $this->getUniqueToken($key);
 
         list($value, $cas) = $this->getValueAndCas($key);
 
@@ -120,7 +120,7 @@ class MemcachedStore implements StoreInterface
      */
     public function delete(Key $key)
     {
-        $token = $this->getToken($key);
+        $token = $this->getUniqueToken($key);
 
         list($value, $cas) = $this->getValueAndCas($key);
 
@@ -144,13 +144,10 @@ class MemcachedStore implements StoreInterface
      */
     public function exists(Key $key)
     {
-        return $this->memcached->get((string) $key) === $this->getToken($key);
+        return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
     }
 
-    /**
-     * Retrieve an unique token for the given key.
-     */
-    private function getToken(Key $key): string
+    private function getUniqueToken(Key $key): string
     {
         if (!$key->hasState(__CLASS__)) {
             $token = base64_encode(random_bytes(32));

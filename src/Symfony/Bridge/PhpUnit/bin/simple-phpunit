@@ -15,19 +15,54 @@
 
 error_reporting(-1);
 
+$getEnvVar = function ($name, $default = false) {
+    if (false !== $value = getenv($name)) {
+        return $value;
+    }
+
+    static $phpunitConfig = null;
+    if (null === $phpunitConfig) {
+        $phpunitConfigFilename = null;
+        if (file_exists('phpunit.xml')) {
+            $phpunitConfigFilename = 'phpunit.xml';
+        } elseif (file_exists('phpunit.xml.dist')) {
+            $phpunitConfigFilename = 'phpunit.xml.dist';
+        }
+        if ($phpunitConfigFilename) {
+            $phpunitConfig = new DomDocument();
+            $phpunitConfig->load($phpunitConfigFilename);
+        } else {
+            $phpunitConfig = false;
+        }
+    }
+    if (false !== $phpunitConfig) {
+        $var = new DOMXpath($phpunitConfig);
+        foreach ($var->query('//php/env[@name="'.$name.'"]') as $var) {
+            return $var->getAttribute('value');
+        }
+    }
+
+    return $default;
+};
+
 if (PHP_VERSION_ID >= 70200) {
     // PHPUnit 6 is required for PHP 7.2+
-    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '6.5';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '6.5');
 } elseif (PHP_VERSION_ID >= 50600) {
     // PHPUnit 4 does not support PHP 7
-    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.7';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '5.7');
 } else {
     // PHPUnit 5.1 requires PHP 5.6+
     $PHPUNIT_VERSION = '4.8';
 }
 
+if ('composer.json' !== $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json') {
+    putenv('COMPOSER=composer.json');
+    $_SERVER['COMPOSER'] = $_ENV['COMPOSER'] = 'composer.json';
+}
+
 $root = __DIR__;
-while (!file_exists($root.'/composer.json') || file_exists($root.'/DeprecationErrorHandler.php')) {
+while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {
     if ($root === dirname($root)) {
         break;
     }
@@ -35,20 +70,19 @@ while (!file_exists($root.'/composer.json') || file_exists($root.'/DeprecationEr
 }
 
 $oldPwd = getcwd();
-$PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: ($root.'/vendor/bin/.phpunit');
+$PHPUNIT_DIR = $getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit');
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = escapeshellarg($PHP);
 if ('phpdbg' === PHP_SAPI) {
     $PHP .= ' -qrr';
 }
 
-$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
+$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
 
-if (false === $SYMFONY_PHPUNIT_REMOVE = getenv('SYMFONY_PHPUNIT_REMOVE')) {
-    $SYMFONY_PHPUNIT_REMOVE = 'phpspec/prophecy symfony/yaml';
-}
+
+$SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy symfony/yaml');
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
@@ -65,9 +99,11 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
             throw new \RuntimeException("Could not find $remoteZip");
         }
         stream_copy_to_stream($remoteZipStream, fopen("$PHPUNIT_VERSION.zip", 'wb'));
+    } elseif ('\\' === DIRECTORY_SEPARATOR) {
+        passthru("certutil -urlcache -split -f \"https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip\" $PHPUNIT_VERSION.zip");
     } else {
         @unlink("$PHPUNIT_VERSION.zip");
-        passthru("wget https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");
+        passthru("wget -q https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");
     }
     if (!class_exists('ZipArchive')) {
         throw new \Exception('simple-phpunit requires the "zip" PHP extension to be installed and enabled in order to uncompress the downloaded PHPUnit packages.');
@@ -94,7 +130,8 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
-    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-suggest --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
+    // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
+    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($exit) {
         exit($exit);
@@ -137,7 +174,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file
     $argv[1] = 'src/Symfony';
 }
 if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.dist')) {
-    // Find Symfony components in plain php for Windows portability
+    // Find Symfony components in plain PHP for Windows portability
 
     $finder = new RecursiveDirectoryIterator($argv[1], FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
     $finder = new RecursiveIteratorIterator($finder);
@@ -183,15 +220,6 @@ if ($components) {
         }
     }
 
-    // Fixes for colors support on appveyor
-    // See https://github.com/appveyor/ci/issues/373
-    $colorFixes = array(
-        array("S\033[0m\033[0m\033[36m\033[1mS", "E\033[0m\033[0m\033[31m\033[1mE", "I\033[0m\033[0m\033[33m\033[1mI", "F\033[0m\033[0m\033[41m\033[37mF"),
-        array("SS", "EE", "II", "FF"),
-    );
-    $colorFixes[0] = array_merge($colorFixes[0], $colorFixes[0]);
-    $colorFixes[1] = array_merge($colorFixes[1], $colorFixes[1]);
-
     while ($runningProcs) {
         usleep(300000);
         $terminatedProcs = array();
@@ -207,20 +235,7 @@ if ($components) {
         foreach ($terminatedProcs as $component => $procStatus) {
             foreach (array('out', 'err') as $file) {
                 $file = "$component/phpunit.std$file";
-
-                if ('\\' === DIRECTORY_SEPARATOR) {
-                    $h = fopen($file, 'rb');
-                    while (false !== $line = fgets($h)) {
-                        echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
-                            '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
-                            "$1m\033[$2$3$4$4",
-                            $line
-                        ));
-                    }
-                    fclose($h);
-                } else {
-                    readfile($file);
-                }
+                readfile($file);
                 unlink($file);
             }
 

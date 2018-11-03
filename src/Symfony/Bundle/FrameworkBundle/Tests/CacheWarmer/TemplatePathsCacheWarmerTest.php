@@ -50,7 +50,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
 
         $this->templateLocator = new TemplateLocator($this->fileLocator);
 
-        $this->tmpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('cache_template_paths_', true);
+        $this->tmpDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('cache_template_paths_', true);
 
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->tmpDir);
@@ -74,7 +74,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
             ->expects($this->once())
             ->method('locate')
             ->with($template->getPath())
-            ->will($this->returnValue(dirname($this->tmpDir).'/path/to/template.html.twig'));
+            ->will($this->returnValue(\dirname($this->tmpDir).'/path/to/template.html.twig'));
 
         $warmer = new TemplatePathsCacheWarmer($this->templateFinder, $this->templateLocator);
         $warmer->warmUp($this->tmpDir);

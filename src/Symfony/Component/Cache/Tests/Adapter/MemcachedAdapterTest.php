@@ -89,6 +89,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
         $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
+        $this->assertSame(1, $client->getOption(\Memcached::OPT_TCP_NODELAY));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
     }
 
@@ -190,5 +191,47 @@ class MemcachedAdapterTest extends AdapterTestCase
             array(\Memcached::OPT_RETRY_TIMEOUT => 8),
             array(\Memcached::OPT_SOCKET_RECV_SIZE => 1, \Memcached::OPT_SOCKET_SEND_SIZE => 2, \Memcached::OPT_RETRY_TIMEOUT => 8),
         );
+    }
+
+    public function testMultiServerDsn()
+    {
+        $dsn = 'memcached:?host[localhost]&host[localhost:12345]&host[/some/memcached.sock:]=3';
+        $client = MemcachedAdapter::createConnection($dsn);
+
+        $expected = array(
+            0 => array(
+                'host' => 'localhost',
+                'port' => 11211,
+                'type' => 'TCP',
+            ),
+            1 => array(
+                'host' => 'localhost',
+                'port' => 12345,
+                'type' => 'TCP',
+            ),
+            2 => array(
+                'host' => '/some/memcached.sock',
+                'port' => 0,
+                'type' => 'SOCKET',
+            ),
+        );
+        $this->assertSame($expected, $client->getServerList());
+
+        $dsn = 'memcached://localhost?host[foo.bar]=3';
+        $client = MemcachedAdapter::createConnection($dsn);
+
+        $expected = array(
+            0 => array(
+                'host' => 'localhost',
+                'port' => 11211,
+                'type' => 'TCP',
+            ),
+            1 => array(
+                'host' => 'foo.bar',
+                'port' => 11211,
+                'type' => 'TCP',
+            ),
+        );
+        $this->assertSame($expected, $client->getServerList());
     }
 }

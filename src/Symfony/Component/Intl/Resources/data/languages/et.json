@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "afari",
         "ab": "abhaasi",
@@ -361,7 +361,6 @@
         "ms": "malai",
         "mt": "malta",
         "mua": "mundangi",
-        "mul": "mitu keelt",
         "mus": "maskogi",
         "mwl": "miranda",
         "mwr": "marvari",
@@ -562,7 +561,6 @@
         "uga": "ugariti",
         "uk": "ukraina",
         "umb": "umbundu",
-        "und": "määramata keel",
         "ur": "urdu",
         "uz": "usbeki",
         "vai": "vai",
@@ -607,7 +605,6 @@
         "zh_Hant": "traditsiooniline hiina",
         "zu": "suulu",
         "zun": "sunji",
-        "zxx": "mittekeeleline",
         "zza": "zaza"
     }
 }

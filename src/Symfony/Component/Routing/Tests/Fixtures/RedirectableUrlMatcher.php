@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures;
 
-use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

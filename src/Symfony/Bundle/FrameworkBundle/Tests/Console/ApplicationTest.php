@@ -101,6 +101,10 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand" class is deprecated since Symfony 4.2, use "Symfony\Component\Console\Command\Command" with dependency injection instead.
+     */
     public function testBundleCommandsHaveRightContainer()
     {
         $command = $this->getMockForAbstractClass('Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand', array('foo'), '', true, true, true, array('setContainer'));
@@ -163,6 +167,62 @@ class ApplicationTest extends TestCase
         $this->assertContains('Some commands could not be registered:', $output);
         $this->assertContains('throwing', $output);
         $this->assertContains('fine', $output);
+    }
+
+    public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class);
+
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->method('getBundles')
+            ->willReturn(array($this->createBundleMock(
+                array((new Command(null))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
+            )));
+        $kernel
+            ->method('getContainer')
+            ->willReturn($container);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'fine'));
+        $output = $tester->getDisplay();
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertContains('Some commands could not be registered:', $output);
+        $this->assertContains('Command "fine" is not defined.', $output);
+    }
+
+    public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class);
+        $container->register(ThrowingCommand::class, ThrowingCommand::class);
+        $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class));
+
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->method('getBundles')
+            ->willReturn(array($this->createBundleMock(
+                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
+            )));
+        $kernel
+            ->method('getContainer')
+            ->willReturn($container);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'list'));
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $display = explode('Lists commands', $tester->getDisplay());
+
+        $this->assertContains(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
     }
 
     private function getKernel(array $bundles, $useDispatcher = false)

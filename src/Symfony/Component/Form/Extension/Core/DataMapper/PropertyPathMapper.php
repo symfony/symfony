@@ -37,7 +37,7 @@ class PropertyPathMapper implements DataMapperInterface
     {
         $empty = null === $data || array() === $data;
 
-        if (!$empty && !is_array($data) && !is_object($data)) {
+        if (!$empty && !\is_array($data) && !\is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
@@ -62,7 +62,7 @@ class PropertyPathMapper implements DataMapperInterface
             return;
         }
 
-        if (!is_array($data) && !is_object($data)) {
+        if (!\is_array($data) && !\is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
@@ -81,7 +81,7 @@ class PropertyPathMapper implements DataMapperInterface
 
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
-                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {
+                if (!\is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {
                     $this->propertyAccessor->setValue($data, $propertyPath, $form->getData());
                 }
             }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.8",
+    "Version": "2.1.44.50",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -119,6 +119,7 @@
         "enm": "srednjeengleski",
         "eo": "esperanto",
         "es": "španski",
+        "es_ES": "španski (Evropa)",
         "et": "estonski",
         "eu": "baskijski",
         "ewo": "evondo",
@@ -298,7 +299,6 @@
         "ms": "malajski",
         "mt": "malteški",
         "mua": "mundang",
-        "mul": "Više jezika",
         "mus": "kriški",
         "mwl": "mirandski",
         "mwr": "marvari",
@@ -467,7 +467,6 @@
         "uga": "ugaritski",
         "uk": "ukrajinski",
         "umb": "umbundu",
-        "und": "nepoznat jezik",
         "ur": "urdu",
         "uz": "uzbečki",
         "vai": "vai",
@@ -503,7 +502,6 @@
         "zh_Hant": "tradicionalni kineski",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "bez lingvističkog sadržaja",
         "zza": "zaza"
     }
 }

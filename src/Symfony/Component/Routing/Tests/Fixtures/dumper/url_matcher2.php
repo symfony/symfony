@@ -1,7 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -10,259 +9,107 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher
 {
+    use PhpMatcherTrait;
+
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-    }
-
-    public function match($pathinfo)
-    {
-        $allow = array();
-        if ($ret = $this->doMatch($pathinfo, $allow)) {
-            return $ret;
-        }
-        if ('/' !== $pathinfo && in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
-            $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
-            if ($ret = $this->doMatch($pathinfo)) {
-                return $this->redirect($pathinfo, $ret['_route']) + $ret;
-            }
-        }
-
-        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
-    }
-
-    private function doMatch(string $rawPathinfo, array &$allow = array()): ?array
-    {
-        $allow = array();
-        $pathinfo = rawurldecode($rawPathinfo);
-        $context = $this->context;
-        $requestMethod = $canonicalMethod = $context->getMethod();
-        $host = strtolower($context->getHost());
-
-        if ('HEAD' === $requestMethod) {
-            $canonicalMethod = 'GET';
-        }
-
-        switch ($pathinfo) {
-            default:
-                $routes = array(
-                    '/test/baz' => array(array('_route' => 'baz'), null, null, null),
-                    '/test/baz.html' => array(array('_route' => 'baz2'), null, null, null),
-                    '/test/baz3/' => array(array('_route' => 'baz3'), null, null, null),
-                    '/foofoo' => array(array('_route' => 'foofoo', 'def' => 'test'), null, null, null),
-                    '/spa ce' => array(array('_route' => 'space'), null, null, null),
-                    '/multi/new' => array(array('_route' => 'overridden2'), null, null, null),
-                    '/multi/hey/' => array(array('_route' => 'hey'), null, null, null),
-                    '/ababa' => array(array('_route' => 'ababa'), null, null, null),
-                    '/route1' => array(array('_route' => 'route1'), 'a.example.com', null, null),
-                    '/c2/route2' => array(array('_route' => 'route2'), 'a.example.com', null, null),
-                    '/route4' => array(array('_route' => 'route4'), 'a.example.com', null, null),
-                    '/c2/route3' => array(array('_route' => 'route3'), 'b.example.com', null, null),
-                    '/route5' => array(array('_route' => 'route5'), 'c.example.com', null, null),
-                    '/route6' => array(array('_route' => 'route6'), null, null, null),
-                    '/route11' => array(array('_route' => 'route11'), '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null),
-                    '/route12' => array(array('_route' => 'route12', 'var1' => 'val'), '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null),
-                    '/route17' => array(array('_route' => 'route17'), null, null, null),
-                    '/secure' => array(array('_route' => 'secure'), null, null, array('https' => 0)),
-                    '/nonsecure' => array(array('_route' => 'nonsecure'), null, null, array('http' => 0)),
-                );
-
-                if (!isset($routes[$pathinfo])) {
-                    break;
-                }
-                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$pathinfo];
-
-                if ($requiredHost) {
-                    if ('#' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
-                        break;
-                    }
-                    if ('#' === $requiredHost[0] && $hostMatches) {
-                        $hostMatches['_route'] = $ret['_route'];
-                        $ret = $this->mergeDefaults($hostMatches, $ret);
-                    }
-                }
-
-                $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
-                if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                    if ($hasRequiredScheme) {
-                        $allow += $requiredMethods;
-                    }
-                    break;
-                }
-                if (!$hasRequiredScheme) {
-                    if ('GET' !== $canonicalMethod) {
-                        break;
-                    }
-
-                    return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
-                }
-
-                return $ret;
-        }
-
-        $matchedPathinfo = $host.$pathinfo;
-        $regexList = array(
+        $this->matchHost = true;
+        $this->staticRoutes = array(
+            '/test/baz' => array(array(array('_route' => 'baz'), null, null, null, null)),
+            '/test/baz.html' => array(array(array('_route' => 'baz2'), null, null, null, null)),
+            '/test/baz3/' => array(array(array('_route' => 'baz3'), null, null, null, null)),
+            '/foofoo' => array(array(array('_route' => 'foofoo', 'def' => 'test'), null, null, null, null)),
+            '/spa ce' => array(array(array('_route' => 'space'), null, null, null, null)),
+            '/multi/new' => array(array(array('_route' => 'overridden2'), null, null, null, null)),
+            '/multi/hey/' => array(array(array('_route' => 'hey'), null, null, null, null)),
+            '/ababa' => array(array(array('_route' => 'ababa'), null, null, null, null)),
+            '/route1' => array(array(array('_route' => 'route1'), 'a.example.com', null, null, null)),
+            '/c2/route2' => array(array(array('_route' => 'route2'), 'a.example.com', null, null, null)),
+            '/route4' => array(array(array('_route' => 'route4'), 'a.example.com', null, null, null)),
+            '/c2/route3' => array(array(array('_route' => 'route3'), 'b.example.com', null, null, null)),
+            '/route5' => array(array(array('_route' => 'route5'), 'c.example.com', null, null, null)),
+            '/route6' => array(array(array('_route' => 'route6'), null, null, null, null)),
+            '/route11' => array(array(array('_route' => 'route11'), '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null, null)),
+            '/route12' => array(array(array('_route' => 'route12', 'var1' => 'val'), '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null, null)),
+            '/route17' => array(array(array('_route' => 'route17'), null, null, null, null)),
+            '/secure' => array(array(array('_route' => 'secure'), null, null, array('https' => 0), null)),
+            '/nonsecure' => array(array(array('_route' => 'nonsecure'), null, null, array('http' => 0), null)),
+        );
+        $this->regexpList = array(
             0 => '{^(?'
-                .'|[^/]*+(?'
-                    .'|/foo/(baz|symfony)(*:34)'
+                .'|(?:(?:[^./]*+\\.)++)(?'
+                    .'|/foo/(baz|symfony)(*:47)'
                     .'|/bar(?'
-                        .'|/([^/]++)(*:57)'
-                        .'|head/([^/]++)(*:77)'
+                        .'|/([^/]++)(*:70)'
+                        .'|head/([^/]++)(*:90)'
                     .')'
                     .'|/test/([^/]++)/(?'
-                        .'|(*:103)'
+                        .'|(*:116)'
                     .')'
-                    .'|/([\']+)(*:119)'
+                    .'|/([\']+)(*:132)'
                     .'|/a/(?'
                         .'|b\'b/([^/]++)(?'
-                            .'|(*:148)'
-                            .'|(*:156)'
+                            .'|(*:161)'
+                            .'|(*:169)'
                         .')'
-                        .'|(.*)(*:169)'
+                        .'|(.*)(*:182)'
                         .'|b\'b/([^/]++)(?'
-                            .'|(*:192)'
-                            .'|(*:200)'
+                            .'|(*:205)'
+                            .'|(*:213)'
                         .')'
                     .')'
-                    .'|/multi/hello(?:/([^/]++))?(*:236)'
+                    .'|/multi/hello(?:/([^/]++))?(*:249)'
                     .'|/([^/]++)/b/([^/]++)(?'
-                        .'|(*:267)'
-                        .'|(*:275)'
+                        .'|(*:280)'
+                        .'|(*:288)'
                     .')'
-                    .'|/aba/([^/]++)(*:297)'
-                .')|(?i:([^\\.]++)\\.example\\.com)(?'
+                    .'|/aba/([^/]++)(*:310)'
+                .')|(?i:([^\\.]++)\\.example\\.com)\\.(?'
                     .'|/route1(?'
-                        .'|3/([^/]++)(*:357)'
-                        .'|4/([^/]++)(*:375)'
+                        .'|3/([^/]++)(*:372)'
+                        .'|4/([^/]++)(*:390)'
                     .')'
-                .')|(?i:c\\.example\\.com)(?'
-                    .'|/route15/([^/]++)(*:425)'
-                .')|[^/]*+(?'
-                    .'|/route16/([^/]++)(*:460)'
+                .')|(?i:c\\.example\\.com)\\.(?'
+                    .'|/route15/([^/]++)(*:442)'
+                .')|(?:(?:[^./]*+\\.)++)(?'
+                    .'|/route16/([^/]++)(*:490)'
                     .'|/a/(?'
-                        .'|a\\.\\.\\.(*:481)'
+                        .'|a\\.\\.\\.(*:511)'
                         .'|b/(?'
-                            .'|([^/]++)(*:502)'
-                            .'|c/([^/]++)(*:520)'
+                            .'|([^/]++)(*:532)'
+                            .'|c/([^/]++)(*:550)'
                         .')'
                     .')'
                 .')'
                 .')$}sD',
         );
-
-        foreach ($regexList as $offset => $regex) {
-            while (preg_match($regex, $matchedPathinfo, $matches)) {
-                switch ($m = (int) $matches['MARK']) {
-                    case 103:
-                        $matches = array('foo' => $matches[1] ?? null);
-
-                        // baz4
-                        return $this->mergeDefaults(array('_route' => 'baz4') + $matches, array());
-
-                        // baz5
-                        $ret = $this->mergeDefaults(array('_route' => 'baz5') + $matches, array());
-                        if (!isset(($a = array('POST' => 0))[$requestMethod])) {
-                            $allow += $a;
-                            goto not_baz5;
-                        }
-
-                        return $ret;
-                        not_baz5:
-
-                        // baz.baz6
-                        $ret = $this->mergeDefaults(array('_route' => 'baz.baz6') + $matches, array());
-                        if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
-                            $allow += $a;
-                            goto not_bazbaz6;
-                        }
-
-                        return $ret;
-                        not_bazbaz6:
-
-                        break;
-                    case 148:
-                        $matches = array('foo' => $matches[1] ?? null);
-
-                        // foo1
-                        $ret = $this->mergeDefaults(array('_route' => 'foo1') + $matches, array());
-                        if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
-                            $allow += $a;
-                            goto not_foo1;
-                        }
-
-                        return $ret;
-                        not_foo1:
-
-                        break;
-                    case 192:
-                        $matches = array('foo1' => $matches[1] ?? null);
-
-                        // foo2
-                        return $this->mergeDefaults(array('_route' => 'foo2') + $matches, array());
-
-                        break;
-                    case 267:
-                        $matches = array('_locale' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
-
-                        // foo3
-                        return $this->mergeDefaults(array('_route' => 'foo3') + $matches, array());
-
-                        break;
-                    default:
-                        $routes = array(
-                            34 => array(array('_route' => 'foo', 'def' => 'test'), array('bar'), null, null),
-                            57 => array(array('_route' => 'bar'), array('foo'), array('GET' => 0, 'HEAD' => 1), null),
-                            77 => array(array('_route' => 'barhead'), array('foo'), array('GET' => 0), null),
-                            119 => array(array('_route' => 'quoter'), array('quoter'), null, null),
-                            156 => array(array('_route' => 'bar1'), array('bar'), null, null),
-                            169 => array(array('_route' => 'overridden'), array('var'), null, null),
-                            200 => array(array('_route' => 'bar2'), array('bar1'), null, null),
-                            236 => array(array('_route' => 'helloWorld', 'who' => 'World!'), array('who'), null, null),
-                            275 => array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null),
-                            297 => array(array('_route' => 'foo4'), array('foo'), null, null),
-                            357 => array(array('_route' => 'route13'), array('var1', 'name'), null, null),
-                            375 => array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null),
-                            425 => array(array('_route' => 'route15'), array('name'), null, null),
-                            460 => array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null),
-                            481 => array(array('_route' => 'a'), array(), null, null),
-                            502 => array(array('_route' => 'b'), array('var'), null, null),
-                            520 => array(array('_route' => 'c'), array('var'), null, null),
-                        );
-
-                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
-
-                        foreach ($vars as $i => $v) {
-                            if (isset($matches[1 + $i])) {
-                                $ret[$v] = $matches[1 + $i];
-                            }
-                        }
-
-                        $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
-                        if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                            if ($hasRequiredScheme) {
-                                $allow += $requiredMethods;
-                            }
-                            break;
-                        }
-                        if (!$hasRequiredScheme) {
-                            if ('GET' !== $canonicalMethod) {
-                                break;
-                            }
-
-                            return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
-                        }
-
-                        return $ret;
-                }
-
-                if (520 === $m) {
-                    break;
-                }
-                $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));
-                $offset += strlen($m);
-            }
-        }
-
-        return null;
+        $this->dynamicRoutes = array(
+            47 => array(array(array('_route' => 'foo', 'def' => 'test'), array('bar'), null, null, null)),
+            70 => array(array(array('_route' => 'bar'), array('foo'), array('GET' => 0, 'HEAD' => 1), null, null)),
+            90 => array(array(array('_route' => 'barhead'), array('foo'), array('GET' => 0), null, null)),
+            116 => array(
+                array(array('_route' => 'baz4'), array('foo'), null, null, null),
+                array(array('_route' => 'baz5'), array('foo'), array('POST' => 0), null, null),
+                array(array('_route' => 'baz.baz6'), array('foo'), array('PUT' => 0), null, null),
+            ),
+            132 => array(array(array('_route' => 'quoter'), array('quoter'), null, null, null)),
+            161 => array(array(array('_route' => 'foo1'), array('foo'), array('PUT' => 0), null, null)),
+            169 => array(array(array('_route' => 'bar1'), array('bar'), null, null, null)),
+            182 => array(array(array('_route' => 'overridden'), array('var'), null, null, null)),
+            205 => array(array(array('_route' => 'foo2'), array('foo1'), null, null, null)),
+            213 => array(array(array('_route' => 'bar2'), array('bar1'), null, null, null)),
+            249 => array(array(array('_route' => 'helloWorld', 'who' => 'World!'), array('who'), null, null, null)),
+            280 => array(array(array('_route' => 'foo3'), array('_locale', 'foo'), null, null, null)),
+            288 => array(array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null, null)),
+            310 => array(array(array('_route' => 'foo4'), array('foo'), null, null, null)),
+            372 => array(array(array('_route' => 'route13'), array('var1', 'name'), null, null, null)),
+            390 => array(array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null, null)),
+            442 => array(array(array('_route' => 'route15'), array('name'), null, null, null)),
+            490 => array(array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null, null)),
+            511 => array(array(array('_route' => 'a'), array(), null, null, null)),
+            532 => array(array(array('_route' => 'b'), array('var'), null, null, null)),
+            550 => array(array(array('_route' => 'c'), array('var'), null, null, null)),
+        );
     }
 }

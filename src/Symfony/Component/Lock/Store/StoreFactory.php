@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 
@@ -22,19 +23,29 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached $connection
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper $connection
      *
-     * @return RedisStore|MemcachedStore
+     * @return RedisStore|MemcachedStore|ZookeeperStore
      */
     public static function createStore($connection)
     {
-        if ($connection instanceof \Redis || $connection instanceof \RedisArray || $connection instanceof \RedisCluster || $connection instanceof \Predis\Client || $connection instanceof RedisProxy) {
+        if (
+            $connection instanceof \Redis ||
+            $connection instanceof \RedisArray ||
+            $connection instanceof \RedisCluster ||
+            $connection instanceof \Predis\Client ||
+            $connection instanceof RedisProxy ||
+            $connection instanceof RedisClusterProxy
+        ) {
             return new RedisStore($connection);
         }
         if ($connection instanceof \Memcached) {
             return new MemcachedStore($connection);
         }
+        if ($connection instanceof \Zookeeper) {
+            return new ZookeeperStore($connection);
+        }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', get_class($connection)));
+        throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
     }
 }

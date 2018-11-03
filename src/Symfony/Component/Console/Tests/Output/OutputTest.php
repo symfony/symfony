@@ -12,8 +12,8 @@
 namespace Symfony\Component\Console\Tests\Output;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Output\Output;
 
 class OutputTest extends TestCase
 {
@@ -79,6 +79,19 @@ class OutputTest extends TestCase
         $output = new TestOutput();
         $output->writeln(array('foo', 'bar'));
         $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
+    }
+
+    public function testWriteAnIterableOfMessages()
+    {
+        $output = new TestOutput();
+        $output->writeln($this->generateMessages());
+        $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an iterable of messages to output');
+    }
+
+    private function generateMessages(): iterable
+    {
+        yield 'foo';
+        yield 'bar';
     }
 
     /**

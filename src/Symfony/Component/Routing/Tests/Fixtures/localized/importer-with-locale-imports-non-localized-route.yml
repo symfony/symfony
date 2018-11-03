@@ -1,0 +1,6 @@
+---
+i_need:
+    resource: ./imported-with-locale-but-not-localized.yml
+    prefix:
+        nl: /nl
+        en: /en

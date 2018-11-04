@@ -234,15 +234,20 @@
     {%- endif -%}
 
     {%- if icon is not empty -%}
-        {%- if icon is iterable and icon.name is defined and icon.align is defined and icon.align == "right" -%}
-            <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }} <i class="{{ icon.name }}"></i></button>
-        {%- else -%}
-            <button type="{{ type|default('button') }}" {{ block('button_attributes') }}><i class="{{ icon.name is defined ? icon.name : icon }}"></i> {{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
-        {%- endif -%}
-    {% else %}
+        {{ block('icon_widget') }}
+    {%- else -%}
         <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
     {%- endif -%}
 {%- endblock button_widget -%}
+
+{%- block icon_widget -%}
+    {%- set icon_space = icon.space|default(1) -%}
+    {%- if icon is iterable and icon.name is defined and icon.align is defined and icon.align == "right" -%}
+        <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}{% for i in range(1, icon_space) if icon_space > 0 %}{{-"&nbsp;"-}}{% endfor %}<i class="{{ icon.name }}"></i></button>
+    {%- else -%}
+        <button type="{{ type|default('button') }}" {{ block('button_attributes') }}><i class="{{ icon.name is defined ? icon.name : icon }}"></i>{% for i in range(1, icon_space) if icon_space > 0 %}{{-"&nbsp;"-}}{% endfor %}{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+    {%- endif -%}
+{%- endblock icon_widget -%}
 
 {%- block submit_widget -%}
     {%- set type = type|default('submit') -%}

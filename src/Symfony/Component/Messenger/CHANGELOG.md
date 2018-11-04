@@ -4,7 +4,6 @@ CHANGELOG
 4.2.0
 -----
 
- * The component is not experimental anymore
  * All the changes below are BC BREAKS
  * Senders and handlers subscribing to parent interfaces now receive *all* matching messages, wildcard included
  * `MessageBusInterface::dispatch()`, `MiddlewareInterface::handle()` and `SenderInterface::send()` return `Envelope`

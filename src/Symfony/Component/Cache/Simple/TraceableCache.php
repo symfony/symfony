@@ -145,7 +145,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
             }
         };
 
-        return $f();
+        yield from $f();
     }
 
     /**

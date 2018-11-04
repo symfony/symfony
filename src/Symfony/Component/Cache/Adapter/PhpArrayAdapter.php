@@ -257,9 +257,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
         }
 
         if ($fallbackKeys) {
-            foreach ($this->pool->getItems($fallbackKeys) as $key => $item) {
-                yield $key => $item;
-            }
+            yield from $this->pool->getItems($fallbackKeys);
         }
     }
 

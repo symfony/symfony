@@ -251,9 +251,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         }
 
         if ($fallbackKeys) {
-            foreach ($this->pool->getMultiple($fallbackKeys, $default) as $key => $item) {
-                yield $key => $item;
-            }
+            yield from $this->pool->getMultiple($fallbackKeys, $default);
         }
     }
 }

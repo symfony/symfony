@@ -115,9 +115,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
             throw new \LogicException(sprintf('%s object holds non-iterable type "%s".', self::class, \gettype($value)));
         }
 
-        foreach ($value as $k => $v) {
-            yield $k => $v;
-        }
+        yield from $value;
     }
 
     public function __get($key)

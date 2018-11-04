@@ -127,7 +127,7 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
             }
         };
 
-        return $f();
+        yield from $f();
     }
 
     /**

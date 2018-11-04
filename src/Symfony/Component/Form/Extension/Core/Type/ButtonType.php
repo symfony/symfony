@@ -42,7 +42,9 @@ class ButtonType extends BaseType implements ButtonTypeInterface
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (\is_array($options['icon'])) {
+        parent::buildForm($builder, $options);
+
+        if (isset($options['icon']) && \is_array($options['icon'])) {
             if (!isset($options['icon']['name'])) {
                 throw new InvalidOptionsException('The "icon" option must contain the key name.');
             }

@@ -27,6 +27,7 @@ require_once __DIR__.'/Resources/functions/dump.php';
 class VarDumper
 {
     private static $handler;
+    private static $afterDumpHandlerOnce;
 
     public static function dump($var)
     {
@@ -47,13 +48,28 @@ class VarDumper
             };
         }
 
-        return (self::$handler)($var);
+        $output = (self::$handler)($var);
+
+        if (null !== self::$afterDumpHandlerOnce) {
+            (self::$afterDumpHandlerOnce)($var);
+            self::$afterDumpHandlerOnce = null;
+        }
+
+        return $output;
     }
 
     public static function setHandler(callable $callable = null)
     {
         $prevHandler = self::$handler;
         self::$handler = $callable;
+
+        return $prevHandler;
+    }
+
+    public static function setAfterDumpHandlerOnce(callable $callable = null)
+    {
+        $prevHandler = self::$afterDumpHandlerOnce;
+        self::$afterDumpHandlerOnce = $callable;
 
         return $prevHandler;
     }

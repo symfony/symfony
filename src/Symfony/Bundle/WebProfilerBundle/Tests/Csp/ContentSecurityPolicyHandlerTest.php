@@ -45,6 +45,25 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider provideRequestAndResponsesForOnKernelResponseEvaluation
+     */
+    public function testOnKernelResponseEvaluation($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp): void
+    {
+        $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
+
+        $cspHandler->setEvaluationEnabled(true);
+        $this->assertSame($expectedNonce, $cspHandler->updateResponseHeaders($request, $response));
+
+        $this->assertFalse($cspHandler->isEvaluationEnabled(), 'evaluationEnabled has to be disabled again');
+        $this->assertFalse($response->headers->has('X-SymfonyProfiler-Script-Nonce'));
+        $this->assertFalse($response->headers->has('X-SymfonyProfiler-Style-Nonce'));
+
+        foreach ($expectedCsp as $header => $value) {
+            $this->assertSame($value, $response->headers->get($header));
+        }
+    }
+
     public function provideRequestAndResponses()
     {
         $nonce = bin2hex(random_bytes(16));
@@ -174,6 +193,75 @@ class ContentSecurityPolicyHandlerTest extends TestCase
                 $this->createRequest(),
                 $this->createResponse(['Content-Security-Policy' => 'script-src \'self\'; style-src \'self\'', 'X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'; style-src \'self\'']),
                 ['Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'self\' \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'; style-src \'self\' \'unsafe-inline\' \'nonce-'.$nonce.'\''],
+            ],
+        ];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function provideRequestAndResponsesForOnKernelResponseEvaluation(): array
+    {
+        $nonce = bin2hex(random_bytes(16));
+
+        return [
+            // Cases where nothing needs to be done because evaluation is already enabled
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(),
+                ['Content-Security-Policy' => null, 'Content-Security-Policy-Report-Only' => null, 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\'']),
+                ['Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\' \'unsafe-eval\'', 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'self\'; script-src \'unsafe-inline\' \'unsafe-eval\'; style-src \'unsafe-inline\'']),
+                ['Content-Security-Policy' => 'default-src \'self\'; script-src \'unsafe-inline\' \'unsafe-eval\'; style-src \'unsafe-inline\'', 'X-Content-Security-Policy' => null],
+            ],
+            // Cases where evaluation needs to be enabled
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\'']),
+                ['Content-Security-Policy' => 'default-src \'self\' \'unsafe-inline\'; script-src \'unsafe-eval\'', 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'']),
+                ['Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\'', 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'unsafe-inline\'; script-src \'self\' \'unsafe-inline\'']),
+                ['Content-Security-Policy' => 'default-src \'unsafe-inline\'; script-src \'self\' \'unsafe-inline\' \'unsafe-eval\'', 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'unsafe-inline\'; script-src \'self\' \'unsafe-inline\'']),
+                ['Content-Security-Policy' => 'default-src \'unsafe-inline\'; script-src \'self\' \'unsafe-inline\' \'unsafe-eval\'', 'X-Content-Security-Policy' => null],
+            ],
+            [
+                $nonce,
+                ['csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce],
+                $this->createRequest(),
+                $this->createResponse(['Content-Security-Policy' => 'default-src \'none\'; script-src \'self\' \'unsafe-inline\'; style-src \'unsafe-inline\'']),
+                ['Content-Security-Policy' => 'default-src \'none\'; script-src \'self\' \'unsafe-inline\' \'unsafe-eval\'; style-src \'unsafe-inline\'', 'X-Content-Security-Policy' => null],
             ],
         ];
     }

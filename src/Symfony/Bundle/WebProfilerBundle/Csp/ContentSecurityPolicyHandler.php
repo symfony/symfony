@@ -25,6 +25,7 @@ class ContentSecurityPolicyHandler
 {
     private $nonceGenerator;
     private $cspDisabled = false;
+    private $evaluationEnabled = false;
 
     public function __construct(NonceGenerator $nonceGenerator)
     {
@@ -92,8 +93,23 @@ class ContentSecurityPolicyHandler
         $nonces = $this->getNonces($request, $response);
         $this->cleanHeaders($response);
         $this->updateCspHeaders($response, $nonces);
+        $this->setEvaluationEnabled(false);
 
         return $nonces;
+    }
+
+    public function isEvaluationEnabled(): bool
+    {
+        return $this->evaluationEnabled;
+    }
+
+    /**
+     * Allows/disallows the evaluation of code via functions like eval().
+     * If enabled 'unsafe-eval' will be set in the Content-Security-Policy.
+     */
+    public function setEvaluationEnabled(bool $enabled): void
+    {
+        $this->evaluationEnabled = $enabled;
     }
 
     private function cleanHeaders(Response $response)
@@ -141,6 +157,11 @@ class ContentSecurityPolicyHandler
                     $headers[$header][$type][] = '\'unsafe-inline\'';
                 }
                 $headers[$header][$type][] = sprintf('\'nonce-%s\'', $nonces[$tokenName]);
+            }
+
+            if ($this->evaluationEnabled && !$this->authorizesEval($directives, 'script-src')) {
+                $ruleIsSet = true;
+                $headers[$header]['script-src'][] = '\'unsafe-eval\'';
             }
         }
 
@@ -206,6 +227,27 @@ class ContentSecurityPolicyHandler
         }
 
         return \in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
+    }
+
+    /**
+     * Detects if the 'unsafe-eval' is prevented for a directive within the directive set.
+     *
+     * @param array  $directivesSet The directive set
+     * @param string $type          The name of the directive to check
+     *
+     * @return bool
+     */
+    private function authorizesEval(array $directivesSet, $type)
+    {
+        if (isset($directivesSet[$type])) {
+            $directives = $directivesSet[$type];
+        } elseif (isset($directivesSet['default-src'])) {
+            $directives = $directivesSet['default-src'];
+        } else {
+            return false;
+        }
+
+        return \in_array('\'unsafe-eval\'', $directives, true);
     }
 
     private function hasHashOrNonce(array $directives): bool

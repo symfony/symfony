@@ -46,12 +46,40 @@ class FunctionsTest extends TestCase
         $this->assertEquals([$var1, $var2, $var3], $return);
     }
 
-    protected function setupVarDumper()
+    public function testAfterDumpHandler()
+    {
+        $handlerCalled = false;
+        $this->setupVarDumper(function () use (&$handlerCalled) {
+            $handlerCalled = true;
+        });
+
+        $var1 = 'a';
+
+        ob_start();
+        $return = dump($var1);
+        $out = ob_get_clean();
+
+        $this->assertTrue($handlerCalled);
+        $this->assertEquals($var1, $return);
+
+        // Test if the afterDumpHandlerOnce is only being used once
+        $handlerCalled = false;
+
+        ob_start();
+        $return = dump($var1);
+        $out = ob_get_clean();
+
+        $this->assertFalse($handlerCalled, 'The afterDumpHandlerOnce must only be used once');
+        $this->assertEquals($var1, $return);
+    }
+
+    protected function setupVarDumper(callable $afterDumpHandlerOnce = null)
     {
         $cloner = new VarCloner();
         $dumper = new CliDumper('php://output');
         VarDumper::setHandler(function ($var) use ($cloner, $dumper) {
             $dumper->dump($cloner->cloneVar($var));
         });
+        VarDumper::setAfterDumpHandlerOnce($afterDumpHandlerOnce);
     }
 }

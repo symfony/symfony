@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\VarDumper\VarDumper;
 use Twig\Environment;
 
 /**
@@ -111,6 +112,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->injectToolbar($response, $request, $nonces);
     }
 
+    public function onKernelRequest(): void
+    {
+        // Because as of now the dumper embeds scripts they are evaluated in base_js.html.twig
+        VarDumper::setAfterDumpHandlerOnce(function () {
+            $this->cspHandler->setEvaluationEnabled(true);
+        });
+    }
+
     /**
      * Injects the web debug toolbar into the given Response.
      */
@@ -139,6 +148,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::RESPONSE => ['onKernelResponse', -128],
+            KernelEvents::REQUEST => ['onKernelRequest'],
         ];
     }
 }

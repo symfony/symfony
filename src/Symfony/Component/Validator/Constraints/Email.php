@@ -95,8 +95,8 @@ class Email extends Constraint
         parent::__construct($options);
 
         if ((self::VALIDATION_MODE_STRICT === $this->mode || true === $this->strict) && !class_exists(StrictEmailValidator::class)) {
-            // throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint.', __CLASS__));
-            @trigger_error(sprintf('Using the "%s" constraint without the "egulias/email-validator" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+            // throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode.', __CLASS__));
+            @trigger_error(sprintf('Using the "%s" constraint in strict mode without the "egulias/email-validator" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
         }
     }
 }

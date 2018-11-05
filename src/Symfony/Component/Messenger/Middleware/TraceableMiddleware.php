@@ -90,7 +90,7 @@ class TraceableStack implements StackInterface
         return $nextMiddleware;
     }
 
-    public function stop()
+    public function stop(): void
     {
         if (null !== $this->currentEvent && $this->stopwatch->isStarted($this->currentEvent)) {
             $this->stopwatch->stop($this->currentEvent);

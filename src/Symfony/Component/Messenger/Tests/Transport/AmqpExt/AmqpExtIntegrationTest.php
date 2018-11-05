@@ -56,7 +56,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         $receivedMessages = 0;
         $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages, $first, $second) {
-            $this->assertEquals(0 == $receivedMessages ? $first : $second, $envelope);
+            $this->assertEquals(0 === $receivedMessages ? $first : $second, $envelope);
 
             if (2 === ++$receivedMessages) {
                 $receiver->stop();

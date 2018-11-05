@@ -28,6 +28,6 @@ class SendersLocatorTest extends TestCase
         ));
 
         $this->assertSame(array($sender), iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
-        $this->assertSame(array(), iterator_to_array($locator->getSenders(new Envelope(new SecondMessage('b')))));
+        $this->assertSame(array(), iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 }

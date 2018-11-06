@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-10-31T09:40:38Z
+
+This shouldn't be needed, `ini_get` already returns a normalized value for boolean configs : `""` for false and `"1"` for true (and `false` if the setting doesn't exists).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-31T10:24:19Z
+
+maybe it only happens due ini_set()? https://3v4l.org/flvAL
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-31T10:30:09Z
+
+ini_set() and ENV-defined ini settings, see https://github.com/composer/composer/pull/7760#issuecomment-434630838
+
+---------------------------------------------------------------------------
+
+by deguif at 2018-10-31T10:56:22Z
+
+To add more details, the issue is encountered when using environment variables to configure some PHP ini directives.
+
+```
+#php.ini
+[opcache]
+opcache.enable_cli = ${PHP_INI_OPCACHE_ENABLE_CLI}
+```
+
+`PHP_INI_APC_ENABLE_CLI=true php -r "var_dump(ini_get('apc.enable_cli')); new APCUIterator();"` will enable apcu and outputs:
+```
+string(4) "true"
+```
+
+`PHP_INI_APC_ENABLE_CLI=false php -r "var_dump(ini_get('apc.enable_cli')) ; new APCUIterator();"`
+will disable apcu and outputs:
+ ```
+string(5) "false"
+
+Fatal error: APCuIterator::__construct(): APC must be enabled to use APCuIterator in Command line code on line 1
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-31T18:16:55Z
+
+I'm not sure we want to do this dance for all calls to `ini_get`. Most of those settings should not be set via env vars anyway (or is there another case where we need this?).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-01T09:51:54Z
+
+Let's do it IMHO: that prevents us from wondering about which settings are legit changing via env vars. There is no easy reasoning so we will be wrong at some point in the future. There are only a few calls in the code base also...

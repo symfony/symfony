@@ -380,12 +380,27 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         if ($controller instanceof \Closure) {
             $r = new \ReflectionFunction($controller);
 
-            return array(
+            $controller = array(
                 'class' => $r->getName(),
                 'method' => null,
                 'file' => $r->getFileName(),
                 'line' => $r->getStartLine(),
             );
+
+            if (false !== strpos($r->name, '{closure}')) {
+                return $controller;
+            }
+            $controller['method'] = $r->name;
+
+            if ($class = $r->getClosureScopeClass()) {
+                $controller['class'] = $class;
+            } elseif ($class = $r->getClosureThis()) {
+                $controller['class'] = \get_class($class);
+            } else {
+                return $r->name;
+            }
+
+            return $controller;
         }
 
         if (\is_object($controller)) {

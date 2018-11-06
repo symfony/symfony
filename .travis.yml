@@ -162,7 +162,7 @@ before_install:
           fi
 
           tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-          tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
+          tfold ext.mongodb tpecl mongodb-1.5.2 mongodb.so $INI
           tfold ext.amqp tpecl amqp-1.9.3 amqp.so $INI
           tfold ext.igbinary tpecl igbinary-2.0.6 igbinary.so $INI
           tfold ext.zookeeper tpecl zookeeper-0.5.0 zookeeper.so $INI
@@ -227,7 +227,7 @@ install:
               break
           fi
           phpenv global $PHP
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.2; composer require --dev --no-update mongodb/mongodb)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then

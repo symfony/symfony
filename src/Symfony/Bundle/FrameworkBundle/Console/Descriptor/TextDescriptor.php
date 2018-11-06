@@ -57,12 +57,7 @@ class TextDescriptor extends Descriptor
 
             if ($showControllers) {
                 $controller = $route->getDefault('_controller');
-                if ($controller instanceof \Closure) {
-                    $controller = 'Closure';
-                } elseif (\is_object($controller)) {
-                    $controller = \get_class($controller);
-                }
-                $row[] = $controller;
+                $row[] = $this->formatCallable($controller);
             }
 
             $tableRows[] = $row;
@@ -464,7 +459,18 @@ class TextDescriptor extends Descriptor
         }
 
         if ($callable instanceof \Closure) {
-            return '\Closure()';
+            $r = new \ReflectionFunction($callable);
+            if (false !== strpos($r->name, '{closure}')) {
+                return 'Closure()';
+            }
+            if ($class = $r->getClosureScopeClass()) {
+                return sprintf('%s::%s()', $class, $r->name);
+            }
+            if ($class = $r->getClosureThis()) {
+                return sprintf('%s::%s()', \get_class($class), $r->name);
+            }
+
+            return $r->name.'()';
         }
 
         if (method_exists($callable, '__invoke')) {

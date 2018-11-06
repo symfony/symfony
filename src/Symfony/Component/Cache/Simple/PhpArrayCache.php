@@ -48,7 +48,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
     public static function create($file, CacheInterface $fallbackPool)
     {
         // Shared memory is available in PHP 7.0+ with OPCache enabled
-        if (ini_get('opcache.enable')) {
+        if (filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
             return new static($file, $fallbackPool);
         }
 

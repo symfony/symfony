@@ -40,7 +40,7 @@ trait PhpFilesTrait
     {
         self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
 
-        return \function_exists('opcache_invalidate') && ini_get('opcache.enable') && ('cli' !== \PHP_SAPI || ini_get('opcache.enable_cli'));
+        return \function_exists('opcache_invalidate') && ('cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN)) && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**

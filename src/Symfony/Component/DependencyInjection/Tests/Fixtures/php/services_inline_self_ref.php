@@ -54,14 +54,14 @@ class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
      */
     protected function getFooService()
     {
-        $b = new \App\Bar();
-        $a = new \App\Baz($b);
+        $a = new \App\Bar();
 
-        $this->services['App\Foo'] = $instance = new \App\Foo($a);
+        $b = new \App\Baz($a);
+        $b->bar = $a;
 
-        $b->foo = $instance;
+        $this->services['App\Foo'] = $instance = new \App\Foo($b);
 
-        $a->bar = $b;
+        $a->foo = $instance;
 
         return $instance;
     }

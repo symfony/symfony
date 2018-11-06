@@ -1362,6 +1362,8 @@ class ContainerBuilderTest extends TestCase
 
         $foo6 = $container->get('foo6');
         $this->assertEquals((object) array('bar6' => (object) array()), $foo6);
+
+        $this->assertInstanceOf(\stdClass::class, $container->get('root'));
     }
 
     public function provideAlmostCircular()

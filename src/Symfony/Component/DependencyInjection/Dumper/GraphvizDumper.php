@@ -132,6 +132,14 @@ class GraphvizDumper extends Dumper
                 $edges[] = array('name' => $name, 'required' => $required, 'to' => $argument, 'lazy' => $lazyEdge);
             } elseif ($argument instanceof ArgumentInterface) {
                 $edges = array_merge($edges, $this->findEdges($id, $argument->getValues(), $required, $name, true));
+            } elseif ($argument instanceof Definition) {
+                $edges = array_merge($edges,
+                    $this->findEdges($id, $argument->getArguments(), $required, ''),
+                    $this->findEdges($id, $argument->getProperties(), false, '')
+                );
+                foreach ($argument->getMethodCalls() as $call) {
+                    $edges = array_merge($edges, $this->findEdges($id, $call[1], false, $call[0].'()'));
+                }
             } elseif (\is_array($argument)) {
                 $edges = array_merge($edges, $this->findEdges($id, $argument, $required, $name, $lazy));
             }

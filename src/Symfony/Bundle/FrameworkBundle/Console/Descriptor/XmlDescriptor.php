@@ -518,6 +518,20 @@ class XmlDescriptor extends Descriptor
         if ($callable instanceof \Closure) {
             $callableXML->setAttribute('type', 'closure');
 
+            $r = new \ReflectionFunction($callable);
+            if (false !== strpos($r->name, '{closure}')) {
+                return $dom;
+            }
+            $callableXML->setAttribute('name', $r->name);
+
+            $class = ($class = $r->getClosureThis()) ? \get_class($class) : null;
+            if ($scopeClass = $r->getClosureScopeClass() ?: $class) {
+                $callableXML->setAttribute('class', $class);
+                if (!$class) {
+                    $callableXML->setAttribute('static', 'true');
+                }
+            }
+
             return $dom;
         }
 

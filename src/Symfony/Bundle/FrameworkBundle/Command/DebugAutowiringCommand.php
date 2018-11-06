@@ -86,7 +86,6 @@ EOF
         if ($search) {
             $io->text(sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
         }
-        $tableRows = array();
         $hasAlias = array();
         $all = $input->getOption('all');
         $previousId = '-';

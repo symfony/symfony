@@ -42,7 +42,6 @@ class MessageBusTest extends TestCase
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
-        $responseFromDepthMiddleware = 1234;
 
         $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $firstMiddleware->expects($this->once())

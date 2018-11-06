@@ -99,7 +99,7 @@ class Serializer implements SerializerInterface
         );
     }
 
-    private function decodeStamps($encodedEnvelope)
+    private function decodeStamps(array $encodedEnvelope): array
     {
         $stamps = array();
         foreach ($encodedEnvelope['headers'] as $name => $value) {
@@ -113,7 +113,7 @@ class Serializer implements SerializerInterface
         return $stamps;
     }
 
-    private function encodeStamps(Envelope $envelope)
+    private function encodeStamps(Envelope $envelope): array
     {
         if (!$stamps = $envelope->all()) {
             return array();

@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -33,8 +32,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class MessengerPass implements CompilerPassInterface
 {
-    use PriorityTaggedServiceTrait;
-
     private $handlerTag;
     private $busTag;
     private $receiverTag;
@@ -282,7 +279,7 @@ class MessengerPass implements CompilerPassInterface
                 throw new RuntimeException(sprintf('Invalid middleware: service "%s" not found.', $id));
             }
 
-            if (($definition = $container->findDefinition($messengerMiddlewareId))->isAbstract()) {
+            if ($container->findDefinition($messengerMiddlewareId)->isAbstract()) {
                 $childDefinition = new ChildDefinition($messengerMiddlewareId);
                 $childDefinition->setArguments($arguments);
                 $container->setDefinition($messengerMiddlewareId = $busId.'.middleware.'.$id, $childDefinition);

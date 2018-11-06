@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-05T10:58:33Z
+
+I think we should update the `UPGRADE-5.0.md` file and the deprecation messages in the PHP code (in the constraint and the validator) too.
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-11-05T11:02:58Z
+
+> I think we should update the `UPGRADE-5.0.md` file and the deprecation messages in the PHP code (in the constraint and the validator) too.
+
+Good point. I'll do that somewhere later today :+1:
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-11-05T19:38:34Z
+
+`UPGRADE-5.0.md` and `Email` constraint updated. Email constraint validator was already correct.

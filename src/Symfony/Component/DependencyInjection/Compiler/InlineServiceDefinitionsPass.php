@@ -157,7 +157,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      */
     private function isInlineableDefinition($id, Definition $definition)
     {
-        if ($definition->getErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
+        if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
             return false;
         }
 

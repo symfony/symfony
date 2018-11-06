@@ -876,13 +876,17 @@ class Definition
     /**
      * Add an error that occurred when building this Definition.
      *
-     * @param string $error
+     * @param string|\Closure|self $error
      *
      * @return $this
      */
     public function addError($error)
     {
-        $this->errors[] = $error;
+        if ($error instanceof self) {
+            $this->errors = array_merge($this->errors, $error->errors);
+        } else {
+            $this->errors[] = $error;
+        }
 
         return $this;
     }
@@ -894,6 +898,19 @@ class Definition
      */
     public function getErrors()
     {
+        foreach ($this->errors as $i => $error) {
+            if ($error instanceof \Closure) {
+                $this->errors[$i] = (string) $error();
+            } elseif (!\is_string($error)) {
+                $this->errors[$i] = (string) $error;
+            }
+        }
+
         return $this->errors;
+    }
+
+    public function hasErrors(): bool
+    {
+        return (bool) $this->errors;
     }
 }

@@ -492,7 +492,7 @@ EOF;
 
     private function isTrivialInstance(Definition $definition): bool
     {
-        if ($definition->getErrors()) {
+        if ($definition->hasErrors()) {
             return true;
         }
         if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
@@ -1465,7 +1465,7 @@ EOF;
                             continue;
                         }
                         $definition = $this->container->findDefinition($id = (string) $v);
-                        $load = !($e = $definition->getErrors()) ? $this->asFiles && !$this->isHotPath($definition) : reset($e);
+                        $load = !($definition->hasErrors() && $e = $definition->getErrors()) ? $this->asFiles && !$this->isHotPath($definition) : reset($e);
                         $serviceMap .= sprintf("\n            %s => array(%s, %s, %s, %s),",
                             $this->export($k),
                             $this->export($definition->isShared() ? ($definition->isPublic() ? 'services' : 'privates') : false),
@@ -1483,7 +1483,7 @@ EOF;
                 list($this->definitionVariables, $this->referenceVariables) = $scope;
             }
         } elseif ($value instanceof Definition) {
-            if ($e = $value->getErrors()) {
+            if ($value->hasErrors() && $e = $value->getErrors()) {
                 $this->addThrow = true;
 
                 return sprintf('$this->throw(%s)', $this->export(reset($e)));
@@ -1592,7 +1592,7 @@ EOF;
                     return $code;
                 }
             } elseif ($this->isTrivialInstance($definition)) {
-                if ($e = $definition->getErrors()) {
+                if ($definition->hasErrors() && $e = $definition->getErrors()) {
                     $this->addThrow = true;
 
                     return sprintf('$this->throw(%s)', $this->export(reset($e)));

@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-11-04T06:26:35Z
+
+Isn’t this the same like #29050 ?
+
+---------------------------------------------------------------------------
+
+by KatharinaSt at 2018-11-05T11:15:20Z
+
+@OskarStark
+Possibly yes.
+
+I made the change to UPGRADE-3.0.md first and added the change to UPGRADE-2.7.md later.
+
+As this is one of my first contributions using a fork I still have to find out how this whole merging and branching workflow works exactly.

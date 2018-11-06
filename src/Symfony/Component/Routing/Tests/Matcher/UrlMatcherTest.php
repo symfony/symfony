@@ -455,6 +455,9 @@ class UrlMatcherTest extends TestCase
     {
         $coll = new RouteCollection();
         $route = new Route('/foo/{bar}');
+        $route->setCondition('request.getBaseUrl() == "/bar"');
+        $coll->add('bar', $route);
+        $route = new Route('/foo/{bar}');
         $route->setCondition('request.getBaseUrl() == "/sub/front.php" and request.getPathInfo() == "/foo/bar"');
         $coll->add('foo', $route);
         $matcher = $this->getUrlMatcher($coll, new RequestContext('/sub/front.php'));

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-05T12:55:32Z
+
+Shouldn't this be added to the bundle instead? The bridge doesn't force using the TranslationExtension - the bundle does. WDYT?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-05T12:57:44Z
+
+My reasoning would be that the extension was usable without installing any other package before and would now also break other potential consumers of it that do not use the bundle.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-05T13:00:29Z
+
+> My reasoning would be that the extension was usable without installing any other package
+
+symfony/translation was required, isn't it? and this one links to symfony/contracts in 4.2
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-05T13:06:09Z
+
+we used `strtr()` as a fallback: https://github.com/symfony/symfony/blob/4.1/src/Symfony/Bridge/Twig/Extension/TranslationExtension.php#L94
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-05T13:06:43Z
+
+yes, twig bridge suggests: `"symfony/translation": "For using the TranslationExtension"`.
+
+IIUC the issues is we *dont* have `symfony/translation` and it fallbacks to the contract implementation.. but that's still a soft-dependency :thinking:
+
+edit: @xabbuh was faster :)

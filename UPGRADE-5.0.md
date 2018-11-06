@@ -276,7 +276,7 @@ Validator
  * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final
  * Removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
  * The `symfony/intl` component is now required for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints
- * The `egulias/email-validator` component is now required for using the `Email` constraint
+ * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
 
 Workflow

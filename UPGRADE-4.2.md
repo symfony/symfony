@@ -360,7 +360,7 @@ Validator
  * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final
  * Deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
  * Using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl` is deprecated
- * Using the `Email` constraint without `egulias/email-validator` is deprecated
+ * Using the `Email` constraint in strict mode without `egulias/email-validator` is deprecated
  * Using the `Expression` constraint without `symfony/expression-language` is deprecated
 
 WebServerBundle

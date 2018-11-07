@@ -282,9 +282,3 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
-
-WebServerBundle
----------------
-
-* Omitting the `$environment` argument of  the `ServerRunCommand` and
-  `ServerStartCommand` constructors now throws a `\TypeError`.

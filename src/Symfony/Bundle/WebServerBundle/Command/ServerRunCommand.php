@@ -36,10 +36,6 @@ class ServerRunCommand extends Command
 
     public function __construct(string $documentRoot = null, string $environment = null)
     {
-        if (!$environment) {
-            @trigger_error(sprintf('Omitting the $environment argument of the "%s" constructor is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
-        }
-
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;
 
@@ -103,7 +99,6 @@ EOF
             $documentRoot = $this->documentRoot;
         }
 
-        // @deprecated since Symfony 4.2
         if (!$env = $this->environment) {
             if ($input->hasOption('env') && !$env = $input->getOption('env')) {
                 $io->error('The environment must be either passed as second argument of the constructor or through the "--env" input option.');

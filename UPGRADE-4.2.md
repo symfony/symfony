@@ -359,9 +359,3 @@ Validator
  * Using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl` is deprecated
  * Using the `Email` constraint in strict mode without `egulias/email-validator` is deprecated
  * Using the `Expression` constraint without `symfony/expression-language` is deprecated
-
-WebServerBundle
----------------
-
-* Omitting the `$environment` argument of the `ServerRunCommand` and 
-  `ServerStartCommand` constructors is deprecated.

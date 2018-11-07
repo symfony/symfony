@@ -48,34 +48,41 @@ final class Dotenv
      */
     public function load(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(false, false, \func_get_args());
+        $this->doLoad(false, \func_get_args());
     }
 
     /**
-     * Loads one or several .env and the corresponding .env.$env, .env.local and .env.$env.local files if they exist.
+     * Loads a .env file and the corresponding .env.local, .env.$env and .env.$env.local files if they exist.
      *
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      *
-     * @param string    $path       A file to load
-     * @param ...string $extraPaths A list of additional files to load
+     * @param string $path       A file to load
+     * @param string $varName    The name of the env vars that defines the app env
+     * @param string $defaultEnv The app env to use when none is defined
+     * @param array  $testEnvs   A list of app envs for which .env.local should be ignored
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
-     *
-     * @see https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
      */
-    public function loadForEnv(string $env, string $path, string ...$extraPaths): void
+    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = array('test')): void
     {
-        $paths = \func_get_args();
-        for ($i = 1; $i < \func_num_args(); ++$i) {
-            $path = $paths[$i];
-            $pathList = array($path, "$path.$env");
-            if ('test' !== $env) {
-                $pathList[] = "$path.local";
-            }
-            $pathList[] = "$path.$env.local";
+        $this->load($path);
 
-            $this->doLoad(false, true, $pathList);
+        if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
+            $this->populate(array($varName => $env = $defaultEnv));
+        }
+
+        if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {
+            $this->load($p);
+            $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? $env;
+        }
+
+        if (file_exists($p = "$path.$env")) {
+            $this->load($p);
+        }
+
+        if (file_exists($p = "$path.$env.local")) {
+            $this->load($p);
         }
     }
 
@@ -90,7 +97,7 @@ final class Dotenv
      */
     public function overload(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(true, false, \func_get_args());
+        $this->doLoad(true, \func_get_args());
     }
 
     /**
@@ -434,14 +441,14 @@ final class Dotenv
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }
 
-    private function doLoad(bool $overrideExistingVars, bool $ignoreMissingExtraPaths, array $paths): void
+    private function doLoad(bool $overrideExistingVars, array $paths): void
     {
-        foreach ($paths as $i => $path) {
-            if (is_readable($path) && !is_dir($path)) {
-                $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
-            } elseif (!$ignoreMissingExtraPaths || 0 === $i) {
+        foreach ($paths as $path) {
+            if (!is_readable($path) || is_dir($path)) {
                 throw new PathException($path);
             }
+
+            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
         }
     }
 }

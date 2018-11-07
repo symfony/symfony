@@ -172,9 +172,6 @@ FrameworkBundle
    ```
  * The `ContainerAwareCommand` class has been deprecated, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` console option and its "-e" shortcut have been deprecated,
-   set the "APP_ENV" environment variable instead.
- * The `--no-debug` console option has been deprecated,
    set the "APP_DEBUG" environment variable to "0" instead.
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been deprecated, use the `trans()` one instead with a `%count%` parameter.
  * Deprecated support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.

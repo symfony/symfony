@@ -164,10 +164,6 @@ FrameworkBundle
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `ContainerAwareCommand` class has been removed, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` console option and its "-e" shortcut have been removed,
-   set the "APP_ENV" environment variable instead.
- * The `--no-debug` console option has been removed, 
-   set the "APP_DEBUG" environment variable to "0" instead.
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.

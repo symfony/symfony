@@ -14,7 +14,20 @@ Cache
 Config
 ------
 
- * Deprecated constructing a `TreeBuilder` without passing root node information.
+ * Deprecated constructing a `TreeBuilder` without passing root node information:
+
+   Before:
+   ```php
+   $treeBuilder = new TreeBuilder();
+   $rootNode = $treeBuilder->root('my_config');
+   ```
+
+   After:
+   ```php
+   $treeBuilder = new TreeBuilder('my_config');
+   $rootNode = $treeBuilder->getRootNode();
+   ```
+
  * Deprecated `FileLoaderLoadException`, use `LoaderLoadException` instead.
 
 Console
@@ -106,25 +119,15 @@ Form
 
  * The `regions` option of the `TimezoneType` is deprecated.
 
-HttpFoundation
---------------
-
- * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
-   will respectively change from "false" to "null" and from "null" to "lax" in Symfony
-   5.0, you should define their values explicitly or use "Cookie::create()" instead.
-
-HttpKernel
-----------
-
- * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been deprecated
- * The `KernelInterface::getName()` and the `kernel.name` parameter have been deprecated
- * Deprecated the first and second constructor argument of `ConfigDataCollector` 
- * Deprecated `ConfigDataCollector::getApplicationName()` 
- * Deprecated `ConfigDataCollector::getApplicationVersion()`
-
 FrameworkBundle
 ---------------
 
+ * The following middleware service ids were renamed:
+    - `messenger.middleware.call_message_handler` becomes `messenger.middleware.handle_message`
+    - `messenger.middleware.route_messages` becomes `messenger.middleware.send_message`
+
+   If you set `framework.messenger.buses.[bus_id].default_middleware` to `false`,
+   replace any of these names in the `framework.messenger.buses.[bus_id].middleware` list.
  * The `allow_no_handler` middleware has been removed. Use `framework.messenger.buses.[bus_id].default_middleware` instead:
 
    Before:
@@ -179,6 +182,22 @@ FrameworkBundle
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been deprecated, use the `trans()` one instead with a `%count%` parameter.
  * Deprecated support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been deprecated.
+
+HttpFoundation
+--------------
+
+ * The default value of the `$secure` and `$samesite` arguments of Cookie's constructor
+   will respectively change from `false` to `null` and from `null` to `lax` in Symfony
+   5.0, you should define their values explicitly or use `Cookie::create()` instead.
+
+HttpKernel
+----------
+
+ * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been deprecated
+ * The `KernelInterface::getName()` and the `kernel.name` parameter have been deprecated
+ * Deprecated the first and second constructor argument of `ConfigDataCollector` 
+ * Deprecated `ConfigDataCollector::getApplicationName()` 
+ * Deprecated `ConfigDataCollector::getApplicationVersion()`
 
 Messenger
 ---------

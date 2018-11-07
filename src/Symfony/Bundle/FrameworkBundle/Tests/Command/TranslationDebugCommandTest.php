@@ -90,7 +90,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
-        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
+        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $tester->execute(['locale' => 'en']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
@@ -145,7 +145,7 @@ class TranslationDebugCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null)
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $viewsPaths = [])
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -207,7 +207,7 @@ class TranslationDebugCommandTest extends TestCase
             ->method('getContainer')
             ->will($this->returnValue($container));
 
-        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates');
+        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $viewsPaths);
 
         $application = new Application($kernel);
         $application->add($command);

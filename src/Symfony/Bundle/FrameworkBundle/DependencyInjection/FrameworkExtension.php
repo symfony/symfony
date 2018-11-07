@@ -1023,20 +1023,21 @@ class FrameworkExtension extends Extension
 
         // Discover translation directories
         $dirs = [];
+        $transPaths = [];
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
-            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
@@ -1053,11 +1054,13 @@ class FrameworkExtension extends Extension
 
         foreach ($config['paths'] as $dir) {
             if ($container->fileExists($dir)) {
-                $dirs[] = $dir;
+                $dirs[] = $transPaths[] = $dir;
             } else {
                 throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
             }
         }
+        $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
+        $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
 
         if ($container->fileExists($defaultDir)) {
             $dirs[] = $defaultDir;

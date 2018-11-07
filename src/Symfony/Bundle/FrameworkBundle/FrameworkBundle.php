@@ -105,7 +105,9 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_AFTER_REMOVING, -255);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class, PassConfig::TYPE_BEFORE_REMOVING);
-        $this->addCompilerPassIfExists($container, TranslatorPass::class);
+        // must be registered as late as possible to get access to all Twig paths registered in
+        // twig.template_iterator definition
+        $this->addCompilerPassIfExists($container, TranslatorPass::class, PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new LoggingTranslatorPass());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);

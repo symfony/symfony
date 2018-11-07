@@ -164,10 +164,6 @@ FrameworkBundle
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `ContainerAwareCommand` class has been removed, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` and `--no-debug` console options have been removed, define the `APP_ENV` and
-   `APP_DEBUG` environment variables instead.
-   If you want to keep using `--env` and `--no-debug`, you can take inspiration from
-   https://github.com/symfony/recipes/blob/master/symfony/console/3.3/bin/console
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
@@ -286,9 +282,3 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
-
-WebServerBundle
----------------
-
-* Omitting the `$environment` argument of  the `ServerRunCommand` and
-  `ServerStartCommand` constructors now throws a `\TypeError`.

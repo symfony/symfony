@@ -62,19 +62,6 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        if ($input->hasParameterOption(array('-e', '--env'), true)) {
-            $notice = 'The "--env" option and its "-e" shortcut are deprecated since Symfony 4.2, set the "APP_ENV" environment variable instead.';
-            $io = (new SymfonyStyle($input, $output))->getErrorStyle();
-            $io->warning($notice);
-            @trigger_error($notice, E_USER_DEPRECATED);
-        }
-
-        if ($input->hasParameterOption('--no-debug', true)) {
-            $notice = 'The "--no-debug" option is deprecated since Symfony 4.2, set the "APP_DEBUG" environment variable to "0" instead.';
-            ($io ?? (new SymfonyStyle($input, $output))->getErrorStyle())->warning($notice);
-            @trigger_error($notice, E_USER_DEPRECATED);
-        }
-
         $this->kernel->boot();
 
         $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));

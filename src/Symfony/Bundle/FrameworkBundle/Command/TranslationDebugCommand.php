@@ -165,7 +165,7 @@ EOF
                 if (is_dir($dir = sprintf('%s/Resources/%s/translations', $rootDir, $bundle->getName()))) {
                     $transPaths[] = $dir;
                     $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $dir, $bundle->getName());
-                    @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : sprintf('configure and use "framework.translator.default_path" instead.', $bundle->getName())), E_USER_DEPRECATED);
+                    @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
                 }
                 $viewsPaths = array($bundle->getPath().'/Resources/views');
                 if ($this->defaultViewsPath) {
@@ -174,7 +174,7 @@ EOF
                 if (is_dir($dir = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName()))) {
                     $viewsPaths[] = $dir;
                     $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $dir);
-                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : sprintf('configure and use "twig.default_path" instead.', $bundle->getName())), E_USER_DEPRECATED);
+                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
                 }
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
@@ -212,7 +212,7 @@ EOF
                 if (is_dir($deprecatedPath = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName()))) {
                     $viewsPaths[] = $deprecatedPath;
                     $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $deprecatedPath);
-                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : sprintf('configure and use "twig.default_path" instead.', $bundle->getName())), E_USER_DEPRECATED);
+                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
                 }
             }
         }

@@ -704,7 +704,7 @@ class Request
     {
         $session = $this->session;
         if (!$session instanceof SessionInterface && null !== $session) {
-            $this->setSession($session = $session());
+            $this->setSession($session = session());
         }
 
         if (null === $session) {

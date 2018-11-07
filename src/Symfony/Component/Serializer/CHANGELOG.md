@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added the list of constraint violations' parameters in `ConstraintViolationListNormalizer`
+
 4.2.0
 -----
 

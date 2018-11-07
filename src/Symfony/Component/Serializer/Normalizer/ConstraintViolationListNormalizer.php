@@ -49,6 +49,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             $violationEntry = [
                 'propertyPath' => $propertyPath,
                 'title' => $violation->getMessage(),
+                'parameters' => $violation->getParameters(),
             ];
             if (null !== $code = $violation->getCode()) {
                 $violationEntry['type'] = sprintf('urn:uuid:%s', $code);

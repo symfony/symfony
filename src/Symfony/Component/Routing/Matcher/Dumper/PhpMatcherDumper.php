@@ -400,7 +400,7 @@ EOF;
 
         if ($condition = $route->getCondition()) {
             $condition = $this->getExpressionLanguage()->compile($condition, array('context', 'request'));
-            $condition = $conditions[$condition] ?? $conditions[$condition] = ((false !== strpos($condition, '$request')) - 1) * \count($conditions);
+            $condition = $conditions[$condition] ?? $conditions[$condition] = (false !== strpos($condition, '$request') ? 1 : -1) * \count($conditions);
         } else {
             $condition = 'null';
         }

@@ -373,7 +373,7 @@ class DotenvTest extends TestCase
 
     public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar()
     {
-        putenv('SYMFONY_DOTENV_VARS=FOO,BAR,BAZ');
+        putenv('SYMFONY_DOTENV_VARS='.$_SERVER['SYMFONY_DOTENV_VARS'] = 'FOO,BAR,BAZ');
 
         putenv('FOO=foo');
         putenv('BAR=bar');

@@ -433,8 +433,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
                     unset($data[$key]);
-                } elseif (null !== $param = $context[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key] ?? $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key] ?? null) {
-                    $params[] = $param;
+                } elseif (array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? array())) {
+                    $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
+                } elseif (array_key_exists($key, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? array())) {
+                    $params[] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {

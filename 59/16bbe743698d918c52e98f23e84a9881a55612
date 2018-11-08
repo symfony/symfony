@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-07T19:40:33Z
+
+@neFAST Can you take a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by neFAST at 2018-11-07T20:09:35Z
+
+@xabbuh fixed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-08T07:15:38Z
+
+@neFAST Thanks for your fast reaction. Nice contribution. 👍 IMO this is a bugfix so I have updated the description accordingly. Don't worry about the target branch. We can rebase your changes on the right branch while merging.

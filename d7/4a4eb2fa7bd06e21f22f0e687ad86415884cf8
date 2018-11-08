@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-08T09:04:29Z
+
+see also `AboutCommand::getDotenvVars()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-08T09:06:52Z
+
+the commands don't care about thread safety: they never run in an IIS thread.

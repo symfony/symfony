@@ -602,15 +602,44 @@ class FrameworkExtension extends Extension
                 @trigger_error(sprintf('The "type" option of the "framework.workflows.%s" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.', $name), E_USER_DEPRECATED);
             }
             $type = $workflow['type'];
+            $workflowId = sprintf('%s.%s', $type, $name);
 
+            // Create transitions
             $transitions = array();
+            $guardsConfiguration = array();
+            // Global transition counter per workflow
+            $transitionCounter = 0;
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
-                    $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitionDefinition->setPublic(false);
+                    $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
+                    $container->setDefinition($transitionId, $transitionDefinition);
+                    $transitions[] = new Reference($transitionId);
+                    if (isset($transition['guard'])) {
+                        $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
+                        $configuration->addArgument(new Reference($transitionId));
+                        $configuration->addArgument($transition['guard']);
+                        $configuration->setPublic(false);
+                        $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                        $guardsConfiguration[$eventName][] = $configuration;
+                    }
                 } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitionDefinition->setPublic(false);
+                            $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
+                            $container->setDefinition($transitionId, $transitionDefinition);
+                            $transitions[] = new Reference($transitionId);
+                            if (isset($transition['guard'])) {
+                                $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
+                                $configuration->addArgument(new Reference($transitionId));
+                                $configuration->addArgument($transition['guard']);
+                                $configuration->setPublic(false);
+                                $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                                $guardsConfiguration[$eventName][] = $configuration;
+                            }
                         }
                     }
                 }
@@ -641,7 +670,6 @@ class FrameworkExtension extends Extension
             }
 
             // Create Workflow
-            $workflowId = sprintf('%s.%s', $type, $name);
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
             if (isset($markingStoreDefinition)) {
@@ -677,16 +705,7 @@ class FrameworkExtension extends Extension
             }
 
             // Add Guard Listener
-            $guard = new Definition(Workflow\EventListener\GuardListener::class);
-            $guard->setPrivate(true);
-            $configuration = array();
-            foreach ($workflow['transitions'] as $config) {
-                $transitionName = $config['name'];
-
-                if (!isset($config['guard'])) {
-                    continue;
-                }
-
+            if ($guardsConfiguration) {
                 if (!class_exists(ExpressionLanguage::class)) {
                     throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
                 }
@@ -695,13 +714,11 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security".');
                 }
 
-                $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
-                $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
-                $configuration[$eventName] = $config['guard'];
-            }
-            if ($configuration) {
+                $guard = new Definition(Workflow\EventListener\GuardListener::class);
+                $guard->setPrivate(true);
+
                 $guard->setArguments(array(
-                    $configuration,
+                    $guardsConfiguration,
                     new Reference('workflow.security.expression_language'),
                     new Reference('security.token_storage'),
                     new Reference('security.authorization_checker'),
@@ -709,6 +726,9 @@ class FrameworkExtension extends Extension
                     new Reference('security.role_hierarchy'),
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ));
+                foreach ($guardsConfiguration as $eventName => $config) {
+                    $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
+                }
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);

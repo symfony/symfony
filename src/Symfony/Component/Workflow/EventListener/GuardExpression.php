@@ -19,19 +19,22 @@ class GuardExpression
 
     private $expression;
 
-    public function getTransition(): Transition
+    /**
+     * @param string $expression
+     */
+    public function __construct(Transition $transition, $expression)
+    {
+        $this->transition = $transition;
+        $this->expression = $expression;
+    }
+
+    public function getTransition()
     {
         return $this->transition;
     }
 
-    public function getExpression(): string
+    public function getExpression()
     {
         return $this->expression;
-    }
-
-    public function __construct(Transition $transition, string $expression)
-    {
-        $this->transition = $transition;
-        $this->expression = $expression;
     }
 }

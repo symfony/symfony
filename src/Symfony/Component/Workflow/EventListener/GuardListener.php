@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Exception\InvalidTokenConfigurationException;
-use Symfony\Component\Workflow\TransitionBlocker;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -63,16 +62,15 @@ class GuardListener
         }
     }
 
-    private function validateGuardExpression(GuardEvent $event, string $expression)
+    private function validateGuardExpression(GuardEvent $event, $expression)
     {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
-            $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);
-            $event->addTransitionBlocker($blocker);
+            $event->setBlocked(true);
         }
     }
 
     // code should be sync with Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter
-    private function getVariables(GuardEvent $event): array
+    private function getVariables(GuardEvent $event)
     {
         $token = $this->tokenStorage->getToken();
 

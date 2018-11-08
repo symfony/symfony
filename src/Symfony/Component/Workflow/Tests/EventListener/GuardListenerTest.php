@@ -21,16 +21,16 @@ class GuardListenerTest extends TestCase
     private $authenticationChecker;
     private $validator;
     private $listener;
-    private $transition;
+    private $configuration;
 
     protected function setUp()
     {
-        $configuration = array(
+        $this->configuration = array(
             'test_is_granted' => 'is_granted("something")',
             'test_is_valid' => 'is_valid(subject)',
             'test_expression' => array(
-                new GuardExpression($this->getTransition(true), '!is_valid(subject)'),
-                new GuardExpression($this->getTransition(true), 'is_valid(subject)'),
+                new GuardExpression(new Transition('name', 'from', 'to'), '!is_valid(subject)'),
+                new GuardExpression(new Transition('name', 'from', 'to'), 'is_valid(subject)'),
             ),
         );
         $expressionLanguage = new ExpressionLanguage();
@@ -41,7 +41,7 @@ class GuardListenerTest extends TestCase
         $this->authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
         $trustResolver = $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock();
         $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
-        $this->listener = new GuardListener($configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, null, $this->validator);
+        $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, null, $this->validator);
     }
 
     protected function tearDown()
@@ -104,8 +104,8 @@ class GuardListenerTest extends TestCase
 
     public function testWithGuardExpressionWithNotSupportedTransition()
     {
-        $event = $this->createEvent(true);
-        $this->configureValidator(false, false);
+        $event = $this->createEvent();
+        $this->configureValidator(false);
         $this->listener->onTransition($event, 'test_expression');
 
         $this->assertFalse($event->isBlocked());
@@ -113,7 +113,7 @@ class GuardListenerTest extends TestCase
 
     public function testWithGuardExpressionWithSupportedTransition()
     {
-        $event = $this->createEvent();
+        $event = $this->createEvent($this->configuration['test_expression'][1]->getTransition());
         $this->configureValidator(true, true);
         $this->listener->onTransition($event, 'test_expression');
 
@@ -122,18 +122,18 @@ class GuardListenerTest extends TestCase
 
     public function testGuardExpressionBlocks()
     {
-        $event = $this->createEvent();
+        $event = $this->createEvent($this->configuration['test_expression'][1]->getTransition());
         $this->configureValidator(true, false);
         $this->listener->onTransition($event, 'test_expression');
 
         $this->assertTrue($event->isBlocked());
     }
 
-    private function createEvent($newTransition = false)
+    private function createEvent(Transition $transition = null)
     {
         $subject = new \stdClass();
         $subject->marking = new Marking();
-        $transition = $this->getTransition($newTransition);
+        $transition = $transition ?: new Transition('name', 'from', 'to');
 
         return new GuardEvent($subject, $subject->marking, $transition);
     }
@@ -172,14 +172,5 @@ class GuardListenerTest extends TestCase
             ->method('validate')
             ->willReturn($valid ? array() : array('a violation'))
         ;
-    }
-
-    private function getTransition($new = false)
-    {
-        if ($new || !$this->transition) {
-            $this->transition = new Transition('name', 'from', 'to');
-        }
-
-        return $this->transition;
     }
 }

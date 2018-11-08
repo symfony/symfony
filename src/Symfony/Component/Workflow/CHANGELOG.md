@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Trigger `entered` event for subject entering in the Workflow for the first time
+
 4.1.0
 -----
 

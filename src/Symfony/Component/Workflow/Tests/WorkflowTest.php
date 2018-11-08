@@ -373,6 +373,8 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $eventNameExpected = array(
+            'workflow.entered',
+            'workflow.workflow_name.entered',
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.t1',

@@ -614,7 +614,8 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addTag('workflow.definition', [
                 'name' => $name,
                 'type' => $type,
-                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
+                'marking_store' => $workflow['marking_store']['type'] ?? null,
+                'single_state' => 'method' === ($workflow['marking_store']['type'] ?? null) && ($workflow['marking_store']['arguments'][0] ?? false),
             ]);
 
             // Create MarkingStore

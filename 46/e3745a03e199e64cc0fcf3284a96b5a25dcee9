@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T11:50:18Z
+
+Just wondering, for Symfony Docs, if this is merged ... should we change anything? In the stand-alone component and/or when using it as part of a Symfony full-stack app? Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-07T11:54:42Z
+
+@javiereguiluz I don't think the doc needs any update. This is fixing a bug for a specific case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-07T11:55:05Z
+
+@javiereguiluz I don't think so, this is a bug fix.

@@ -48,7 +48,6 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase

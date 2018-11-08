@@ -35,6 +35,7 @@ CHANGELOG
  * The `ContainerHandlerLocator`, `AbstractHandlerLocator`, `SenderLocator` and `AbstractSenderLocator` classes have been removed
  * `Envelope::all()` takes a new optional `$stampFqcn` argument and returns the stamps for the specified FQCN, or all stamps by their class name
  * `Envelope::get()` has been renamed `Envelope::last()`
+ * Add option `force-consumption` to force the consumption of messages even if an exception is thrown by a message handler
 
 4.1.0
 -----

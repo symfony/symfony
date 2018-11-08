@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\Transport\Receiver\ForceConsumptionReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\StopWhenMemoryUsageIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\StopWhenMessageCountIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\StopWhenTimeLimitIsReachedReceiver;
@@ -66,6 +67,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched', $defaultBusName),
+                new InputOption('force-consumption', 'f', InputOption::VALUE_REQUIRED, 'Force the consumption of messages even if an exception is thrown by a message handler', false),
             ))
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -84,6 +86,10 @@ Use the --memory-limit option to stop the worker if it exceeds a given memory us
 Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached:
 
     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
+
+Use the --force-consumption option to force the consumption of messages:
+
+    <info>php %command.full_name% <receiver-name> --force-consumption</info>
 EOF
             )
         ;
@@ -153,6 +159,10 @@ EOF
 
         if ($timeLimit = $input->getOption('time-limit')) {
             $receiver = new StopWhenTimeLimitIsReachedReceiver($receiver, $timeLimit, $this->logger);
+        }
+
+        if ($input->getOption('force-consumption')) {
+            $receiver = new ForceConsumptionReceiver($receiver, $this->logger);
         }
 
         $worker = new Worker($receiver, $bus);

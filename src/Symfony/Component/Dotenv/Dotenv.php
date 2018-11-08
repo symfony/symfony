@@ -67,8 +67,8 @@ final class Dotenv
      */
     public function populate(array $values): void
     {
-        $loadedVars = array_flip(explode(',', getenv('SYMFONY_DOTENV_VARS')));
-        unset($loadedVars['']);
+        $updateLoadedVars = false;
+        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? '')));
 
         foreach ($values as $name => $value) {
             $notHttpName = 0 !== strpos($name, 'HTTP_');
@@ -83,14 +83,15 @@ final class Dotenv
                 $_SERVER[$name] = $value;
             }
 
-            $loadedVars[$name] = true;
+            if (!isset($loadedVars[$name])) {
+                $loadedVars[$name] = $updateLoadedVars = true;
+            }
         }
 
-        if ($loadedVars) {
+        if ($updateLoadedVars) {
+            unset($loadedVars['']);
             $loadedVars = implode(',', array_keys($loadedVars));
-            putenv("SYMFONY_DOTENV_VARS=$loadedVars");
-            $_ENV['SYMFONY_DOTENV_VARS'] = $loadedVars;
-            $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars;
+            putenv('SYMFONY_DOTENV_VARS='.$_ENV['SYMFONY_DOTENV_VARS'] = $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars);
         }
     }
 

@@ -149,6 +149,11 @@
     {{- parent() -}}
 {%- endblock button_widget %}
 
+{% block submit_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-primary'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock submit_widget %}
+
 {% block checkbox_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {%- if 'checkbox-custom' in parent_label_class -%}

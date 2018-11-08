@@ -111,7 +111,7 @@ EOF
 
         // check format
         $supportedFormats = $this->writer->getFormats();
-        if (!\in_array($input->getOption('output-format'), $supportedFormats)) {
+        if (!\in_array($input->getOption('output-format'), $supportedFormats, true)) {
             $errorIo->error(array('Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.'));
 
             return 1;
@@ -165,7 +165,7 @@ EOF
                 if (is_dir($dir = sprintf('%s/Resources/%s/views', $rootDir, $foundBundle->getName()))) {
                     $viewsPaths[] = $dir;
                     $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $foundBundle->getName(), $dir);
-                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : sprintf('configure and use "twig.default_path" instead.', $foundBundle->getName())), E_USER_DEPRECATED);
+                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
                 }
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
@@ -261,7 +261,7 @@ EOF
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
-            if ('xlf' == $input->getOption('output-format')) {
+            if ('xlf' === $input->getOption('output-format')) {
                 $errorIo->comment('Xliff output version is <info>1.2</info>');
             }
 

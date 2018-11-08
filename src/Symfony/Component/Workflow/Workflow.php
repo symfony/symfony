@@ -92,11 +92,7 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            try {
-                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
-            } catch (NotEnabledTransitionException $e) {
-                $transitionBlockerList = $e->getTransitionBlockerList();
-            }
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
             if ($transitionBlockerList->isEmpty()) {
                 return true;
@@ -120,13 +116,18 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            try {
-                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
+            if ($transitionBlockerList->isEmpty()) {
                 return $transitionBlockerList;
-            } catch (NotEnabledTransitionException $e) {
-                // a transition with the same name is defined for other places too
-                $transitionBlockerList = $e->getTransitionBlockerList();
+            }
+
+            // We prefer to return transitions blocker by something else than
+            // marking. Because it means the marking was OK. Transitions are
+            // deterministic: it's not possible to have many transitions enabled
+            // at the same time that match the same marking with the same name
+            if (!$transitionBlockerList->has(TransitionBlocker::BLOCKED_BY_MARKING)) {
+                return $transitionBlockerList;
             }
         }
 
@@ -153,15 +154,11 @@ class Workflow implements WorkflowInterface
                 continue;
             }
 
-            try {
-                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
-            } catch (NotEnabledTransitionException $e) {
-                $transitionBlockerList = $e->getTransitionBlockerList();
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+            if (!$transitionBlockerList->isEmpty()) {
+                continue;
             }
-
-            if ($transitionBlockerList->isEmpty()) {
-                $approvedTransitionQueue[] = $transition;
-            }
+            $approvedTransitionQueue[] = $transition;
         }
 
         foreach ($approvedTransitionQueue as $transition) {
@@ -202,12 +199,7 @@ class Workflow implements WorkflowInterface
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {
-            try {
-                $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
-            } catch (NotEnabledTransitionException $e) {
-                $transitionBlockerList = $e->getTransitionBlockerList();
-            }
-
+            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
             if ($transitionBlockerList->isEmpty()) {
                 $enabledTransitions[] = $transition;
             }
@@ -252,7 +244,9 @@ class Workflow implements WorkflowInterface
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
-                throw new NotEnabledTransitionException($subject, $transition->getName(), $this, new TransitionBlockerList(array(TransitionBlocker::createBlockedByMarking($marking))));
+                return new TransitionBlockerList(array(
+                    TransitionBlocker::createBlockedByMarking($marking),
+                ));
             }
         }
 

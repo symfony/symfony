@@ -87,7 +87,8 @@ class StateMachineTest extends TestCase
         // that are not enabled by the marking are evaluated.
         // see https://github.com/symfony/symfony/issues/28432
 
-        // Test if when you are in place "a" applying transition "t1" then returned blocker list contains guard blocker instead blockedByMarking
+        // Test if when you are in place "a"trying transition "t1" then returned
+        // blocker list contains guard blocker instead blockedByMarking
         $subject->marking = 'a';
         $transitionBlockerList = $net->buildTransitionBlockerList($subject, 't1');
         $this->assertCount(1, $transitionBlockerList);
@@ -96,7 +97,8 @@ class StateMachineTest extends TestCase
         $this->assertSame('Transition blocker of place a', $blockers[0]->getMessage());
         $this->assertSame('blocker', $blockers[0]->getCode());
 
-        // Test if when you are in place "d" applying transition "t1" then returned blocker list contains guard blocker instead blockedByMarking
+        // Test if when you are in place "d" trying transition "t1" then
+        // returned blocker list contains guard blocker instead blockedByMarking
         $subject->marking = 'd';
         $transitionBlockerList = $net->buildTransitionBlockerList($subject, 't1');
         $this->assertCount(1, $transitionBlockerList);

@@ -50,8 +50,21 @@ class GuardListener
             return;
         }
 
-        $expression = $this->configuration[$eventName];
+        $eventConfiguration = (array) $this->configuration[$eventName];
+        foreach ($eventConfiguration as $guard) {
+            if ($guard instanceof GuardExpression) {
+                if ($guard->getTransition() !== $event->getTransition()) {
+                    continue;
+                }
+                $this->validateGuardExpression($event, $guard->getExpression());
+            } else {
+                $this->validateGuardExpression($event, $guard);
+            }
+        }
+    }
 
+    private function validateGuardExpression(GuardEvent $event, string $expression)
+    {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);
             $event->addTransitionBlocker($blocker);

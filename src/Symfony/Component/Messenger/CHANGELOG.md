@@ -33,6 +33,8 @@ CHANGELOG
  * `ActivationMiddlewareDecorator` has been renamed `ActivationMiddleware`
  * `AllowNoHandlerMiddleware` has been removed in favor of a new constructor argument on `HandleMessageMiddleware`
  * The `ContainerHandlerLocator`, `AbstractHandlerLocator`, `SenderLocator` and `AbstractSenderLocator` classes have been removed
+ * `Envelope::all()` takes a new optional `$stampFqcn` argument and returns the stamps for the specified FQCN, or all stamps by their class name
+ * `Envelope::get()` has been renamed `Envelope::last()`
 
 4.1.0
 -----

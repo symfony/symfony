@@ -56,7 +56,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
-            'stamps' => array($stamp),
+            'stamps' => array(array($stamp)),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,

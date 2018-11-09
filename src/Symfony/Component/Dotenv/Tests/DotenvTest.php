@@ -186,7 +186,7 @@ class DotenvTest extends TestCase
         $this->assertSame('BAZ', $bar);
     }
 
-    public function testLoadForEnv()
+    public function testLoadEnv()
     {
         unset($_ENV['FOO']);
         unset($_ENV['BAR']);
@@ -197,50 +197,46 @@ class DotenvTest extends TestCase
 
         @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
 
-        $path1 = tempnam($tmpdir, 'sf-');
-        $path2 = tempnam($tmpdir, 'sf-');
-
-        file_put_contents($path1, 'FOO=BAR');
-        file_put_contents($path2, 'BAR=BAZ');
+        $path = tempnam($tmpdir, 'sf-');
 
         // .env
 
-        (new DotEnv())->loadForEnv('dev', $path1, $path2);
-
+        file_put_contents($path, 'FOO=BAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('BAZ', getenv('BAR'));
-
-        // .env.dev
-
-        file_put_contents("$path1.dev", 'FOO=devBAR');
-        (new DotEnv())->loadForEnv('dev', $path1, $path2);
-        $this->assertSame('devBAR', getenv('FOO'));
+        $this->assertSame('dev', getenv('TEST_APP_ENV'));
 
         // .env.local
 
-        file_put_contents("$path1.local", 'FOO=localBAR');
-        (new DotEnv())->loadForEnv('dev', $path1, $path2);
+        file_put_contents("$path.local", 'FOO=localBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('localBAR', getenv('FOO'));
 
         // special case for test
 
-        file_put_contents("$path1.local", 'FOO=testBAR');
-        (new DotEnv())->loadForEnv('test', $path1, $path2);
+        $_SERVER['TEST_APP_ENV'] = 'test';
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
+
+        // .env.dev
+
+        unset($_SERVER['TEST_APP_ENV']);
+        file_put_contents("$path.dev", 'FOO=devBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devBAR', getenv('FOO'));
 
         // .env.dev.local
 
-        file_put_contents("$path1.dev.local", 'FOO=devlocalBAR');
-        (new DotEnv())->loadForEnv('dev', $path1, $path2);
+        file_put_contents("$path.dev.local", 'FOO=devlocalBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devlocalBAR', getenv('FOO'));
 
         putenv('FOO');
         putenv('BAR');
-        unlink($path1);
-        unlink("$path1.dev");
-        unlink("$path1.local");
-        unlink("$path1.dev.local");
-        unlink($path2);
+        unlink($path);
+        unlink("$path.dev");
+        unlink("$path.local");
+        unlink("$path.dev.local");
         rmdir($tmpdir);
     }
 

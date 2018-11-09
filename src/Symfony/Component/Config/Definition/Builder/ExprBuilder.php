@@ -149,7 +149,7 @@ class ExprBuilder
     }
 
     /**
-     * Sets a closure marking the value as invalid at validation time.
+     * Sets a closure marking the value as invalid at processing time.
      *
      * if you want to add the value of the node in your message just use a %s placeholder.
      *
@@ -167,7 +167,7 @@ class ExprBuilder
     }
 
     /**
-     * Sets a closure unsetting this key of the array at validation time.
+     * Sets a closure unsetting this key of the array at processing time.
      *
      * @return $this
      *

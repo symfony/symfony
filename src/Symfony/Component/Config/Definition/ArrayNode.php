@@ -288,7 +288,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $normalized = array();
         foreach ($value as $name => $val) {
             if (isset($this->children[$name])) {
-                $normalized[$name] = $this->children[$name]->normalize($val);
+                try {
+                    $normalized[$name] = $this->children[$name]->normalize($val);
+                } catch (UnsetKeyException $e) {
+                }
                 unset($value[$name]);
             } elseif (!$this->removeExtraKeys) {
                 $normalized[$name] = $val;

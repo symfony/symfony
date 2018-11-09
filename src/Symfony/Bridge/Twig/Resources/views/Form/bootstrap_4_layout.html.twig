@@ -24,14 +24,6 @@
     {%- endif -%}
 {%- endblock money_widget %}
 
-{% block datetime_widget -%}
-    {%- if widget != 'single_text' and not valid -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
-        {% set valid = true %}
-    {%- endif -%}
-    {{- parent() -}}
-{%- endblock datetime_widget %}
-
 {% block date_widget -%}
     {%- if widget != 'single_text' and not valid -%}
         {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}

@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-07T17:40:59Z
+
+> Note that loadForEnv() used to give higher preference to .env.$env vs .env.local.
+The new behavior is aligned with the order used by create-react-app.
+
+But not aligned with `bkeepers/dotenv`. See https://github.com/symfony/symfony-docs/pull/10626#discussion_r230746767
+Not sure which one really is the most convenient one.
+
+> vars defined in .env files override real env vars (similar to what Rails' dotenv does: you don't want your tests to randomly fail because of some real env vars).
+
+I'm used to occasionally start phpunit with `APP_DEBUG=1 bin/phpunit --filter=[...]` to debug some tests (`APP_DEBUG=0` is used by default in my tests suites). This will prevent it, right?
+What about CI using real env vars?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-07T18:08:43Z
+
+> But not aligned with bkeepers/dotenv.
+
+Sure. create-react-app has the behavior that best matches Symfony, so why should we care more about bkeepers?
+
+> APP_DEBUG=1 bin/phpunit --filter=[...] This will prevent it, right? What about CI using real env vars?
+
+Nope it won't, useless you defined `APP_DEBUG` yourself in .env (we don't do that by default).
+Same for other real env vars: if they're not defined in .env(.*) they'll be used.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-07T18:23:14Z
+
+> create-react-app has the behavior that best matches Symfony
+
+Based on which facts? 🤔
+
+> unless you defined APP_DEBUG yourself in .env (we don't do that by default).
+
+Indeed. We provided the value in https://github.com/symfony/recipes/blob/5b3ce909504b9366405820c49bc9f0e13ac4be54/symfony/phpunit-bridge/4.1/phpunit.xml.dist#L14, but that's not relevant with planned changes.
+Still, if my test suite is meant to be ran by default with `APP_DEBUG=0`, it'll need to be set in `.env.test`, so wouldn't be overridable anymore.
+
+> Same for other real env vars: if they're not defined in .env(.*) they'll be used.
+
+So, what do you preconize for CI appart from either removing `.env(.*)` files or not using env vars at all and requiring generating a `.env.test[.local]` on each build?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-07T18:32:35Z
+
+> Based on which facts? thinking
+
+You're asking because you think we should keep the current behavior?
+
+My arguments for the new one are:
+- matching the behavior of create-react-app looks more important than matching the one of a rails app (how often will ppl use both rails+symfony vs symfony+create-react-app?)
+- as explained in the description, having this order allows defining the env in .env.local - *before* .env.$env(.local). It wouldn't be that easy without.
+
+> if my test suite is meant to be ran by default with APP_DEBUG=0, it'll need to be set in .env.test
+
+yes, this is described in https://metaskills.net/2013/10/03/using-dotenv-in-rails/
+> Now, one last thing. We need to make sure that our tests do not use any real, development or local environment settings. This is where @ecbypi overload feature comes in handy.
+
+the reason is that tests run in a special set of configuration and the very purpose of .env.test is to commit that configuration. If you don't want to follow what the devs set there, you have to do extra work. OR if your test setup needs to be flexible, you can omit defining those vars in .env files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-07T19:04:39Z
+
+BTW, about the test env: if, for some FOO env var, one would like to give control to the real env while that var is defined in `.env`, the way to do it would be to add `FOO=$FOO` in .env.test (or .env.test.local)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-11-07T20:00:09Z
+
+> The new behavior is aligned with the order used by create-react-app. It also allows overriding the env in .env.local, which should be convenient for DX.
+
+👍 on my side. Many people will use Create React App and Symfony together in the same project, Rails + Symfony will definitely be less popular.
+
+> vars defined in .env files override real env vars (similar to what Rails' dotenv does: you don't want your tests to randomly fail because of some real env vars).
+
+Are you sure about that? According to their docs, it's not the case by default, but you can use `overload` (as in our DotEnv) to have this behavior: https://github.com/bkeepers/dotenv#why-is-it-not-overriding-existing-env-variables
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-07T22:17:17Z
+
+OK, overloading for test removed. Ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-08T11:02:03Z
+
+> --env would be ignored if APP_ENV env var is set
+
+Right now, `--env` is considered more specific, so it wins over the env var.
+I don't see why we should change that part.

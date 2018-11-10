@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-11-10T03:03:18Z
+
+Should be for master as it's not a trivial change as proved by the comments (and not a bug fix either).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-10T06:22:48Z
+
+the remaining changes are equivalent at least :) in this case avoiding the foreach in lower branches is nice? I.e. if one patches it we need to switch back to foreach upstream as well =/
+
+---------------------------------------------------------------------------
+
+by kalessil at 2018-11-10T07:25:19Z
+
+@fabpot, targeting master sounds good to me.
+
+---------------------------------------------------------------------------
+
+by kalessil at 2018-11-10T07:30:19Z
+
+@ro0NL, the syntax is not supported by PHP prior to 7.0, so only 4.1 and master can be targeted. Later merging can require re-introducing foreach, theoretically.

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-09T13:28:04Z
+
+Two more ideas:
+- add before/after for bin/console in UPGRADE files
+- bump symfony/console to 4.2 (in require-dev and conflict) so that we're sure to get console 4.2 when fwb 4.2 is installed (will make the recipe much simpler)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-11-09T16:29:53Z
+
+@nicolas-grekas updated, thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-10T09:56:33Z
+
+I'm merging quickly so that the recipes work with 4.2 (they're broken for now.)
+It will allow us to play with the new experience more easily to ensure 4.2 will be smooth.
+If you have more comments here, please do post them and I'll ensure they're resolved asap.

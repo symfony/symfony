@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -33,7 +34,12 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
-        $middleware->handle($envelope, $this->getStackMock(false));
+        $envelope = $middleware->handle($envelope, $this->getStackMock(false));
+
+        /* @var SentStamp $stamp */
+        $this->assertInstanceOf(SentStamp::class, $stamp = $envelope->last(SentStamp::class), 'it adds a sent stamp');
+        $this->assertNull($stamp->getSenderAlias());
+        $this->assertStringMatchesFormat('Mock_SenderInterface_%s', $stamp->getSenderClass());
     }
 
     public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
@@ -128,6 +134,8 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $sender->expects($this->never())->method('send');
 
-        $middleware->handle($envelope, $this->getStackMock());
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
     }
 }

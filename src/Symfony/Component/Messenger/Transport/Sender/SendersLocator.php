@@ -46,9 +46,9 @@ class SendersLocator implements SendersLocatorInterface
         $seen = array();
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
-            foreach ($this->senders[$type] ?? array() as $sender) {
+            foreach ($this->senders[$type] ?? array() as $alias => $sender) {
                 if (!\in_array($sender, $seen, true)) {
-                    yield $seen[] = $sender;
+                    yield $alias => $seen[] = $sender;
                 }
             }
             $handle = $handle ?: $this->sendAndHandle[$type] ?? false;

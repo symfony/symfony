@@ -1578,9 +1578,10 @@ class FrameworkExtension extends Extension
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
-            $senders = array_map(function ($sender) use ($senderAliases) {
-                return new Reference($senderAliases[$sender] ?? $sender);
-            }, $messageConfiguration['senders']);
+            $senders = array();
+            foreach ($messageConfiguration['senders'] as $sender) {
+                $senders[$sender] = new Reference($senderAliases[$sender] ?? $sender);
+            }
 
             $sendersId = 'messenger.senders.'.$message;
             $container->register($sendersId, RewindableGenerator::class)

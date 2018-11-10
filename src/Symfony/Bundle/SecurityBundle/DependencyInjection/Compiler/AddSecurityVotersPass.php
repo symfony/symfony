@@ -57,7 +57,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
 
             if ($debug) {
                 // Decorate original voters with TraceableVoter
-                $debugVoterServiceId = '.debug.security.voter.'.$voterServiceId;
+                $debugVoterServiceId = 'debug.security.voter.'.$voterServiceId;
                 $container
                     ->register($debugVoterServiceId, TraceableVoter::class)
                     ->setDecoratedService($voterServiceId)

@@ -281,9 +281,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         }
 
         if ($fallbackKeys) {
-            foreach ($this->pool->getItems($fallbackKeys) as $key => $item) {
-                yield $key => $item;
-            }
+            yield from $this->pool->getItems($fallbackKeys);
         }
     }
 

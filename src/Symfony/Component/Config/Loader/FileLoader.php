@@ -122,9 +122,7 @@ abstract class FileLoader extends Loader
         }
         $resource = new GlobResource($prefix, $pattern, $recursive, $forExclusion, $excluded);
 
-        foreach ($resource as $path => $info) {
-            yield $path => $info;
-        }
+        yield from $resource;
     }
 
     private function doImport($resource, $type = null, bool $ignoreErrors = false, $sourceResource = null)

@@ -181,7 +181,7 @@ FrameworkBundle
 
    After:
    ```php
-   Application::bootstrapEnv($_SERVER['argv'];
+   Application::bootstrapEnv($_SERVER['argv']);
    $kernel = new Kernel($_SERVER['APP_ENV'], $_SERVER['APP_DEBUG']);
    $application = new Application($kernel);
    $application->run();

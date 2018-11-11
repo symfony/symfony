@@ -90,4 +90,17 @@ class UrlTypeTest extends TextTypeTest
 
         $this->assertSame(array('domain.com', 'www.domain.com'), $form->getData());
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = 'http://empty')
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // listener normalizes data on submit
+        $this->assertSame($expectedData, $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
 }

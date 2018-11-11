@@ -56,8 +56,8 @@
                 <array>
                     <element key="time-sensitive">
                         <array>
-                            <element><string>Symfony\Component\Console</string></element>
-                            <element><string>Symfony\Component\HttpFoundation</string></element>
+                            <element key="0"><string>Symfony\Component\Console</string></element>
+                            <element key="1"><string>Symfony\Component\HttpFoundation</string></element>
                         </array>
                     </element>
                 </array>

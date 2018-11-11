@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-11T09:26:41Z
+
+I'd prefer to "unhide" them instead, can you do that, please?
+We hide services only when their name is garbage (eg when generating them using hashes)
+
+---------------------------------------------------------------------------
+
+by fmata at 2018-11-11T10:47:24Z
+
+Indeed, it makes more sense. Done.

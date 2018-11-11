@@ -231,11 +231,18 @@ class DotenvTest extends TestCase
         (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devlocalBAR', getenv('FOO'));
 
+        // .env.dist
+
+        unlink($path);
+        file_put_contents("$path.dist", 'BAR=distBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('distBAR', getenv('BAR'));
+
         putenv('FOO');
         putenv('BAR');
-        unlink($path);
-        unlink("$path.dev");
+        unlink("$path.dist");
         unlink("$path.local");
+        unlink("$path.dev");
         unlink("$path.dev.local");
         rmdir($tmpdir);
     }

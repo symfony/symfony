@@ -49,4 +49,9 @@ class LanguageTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, '');
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
+    {
+        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
 }

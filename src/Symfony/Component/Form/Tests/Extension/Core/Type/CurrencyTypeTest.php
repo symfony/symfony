@@ -49,4 +49,9 @@ class CurrencyTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, '');
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'EUR', $expectedData = 'EUR')
+    {
+        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
 }

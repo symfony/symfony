@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * A base class to make form login authentication easier!
@@ -25,8 +24,6 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  */
 abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
 {
-    use TargetPathTrait;
-
     /**
      * Return the URL to the login page.
      *

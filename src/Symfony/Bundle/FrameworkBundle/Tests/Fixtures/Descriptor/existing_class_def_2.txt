@@ -1,0 +1,15 @@
+---------------- -------------------------------------------------------------------------------- 
+ [32m Option         [39m [32m Value                                                                          [39m 
+ ---------------- -------------------------------------------------------------------------------- 
+  Service ID       -                                                                               
+  Class            Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\ClassWithoutDocComment  
+  Tags             -                                                                               
+  Public           no                                                                              
+  Synthetic        no                                                                              
+  Lazy             no                                                                              
+  Shared           yes                                                                             
+  Abstract         no                                                                              
+  Autowired        no                                                                              
+  Autoconfigured   no                                                                              
+ ---------------- --------------------------------------------------------------------------------
+

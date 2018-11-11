@@ -291,7 +291,9 @@
 
 {% block form_help -%}
     {%- if help is not empty -%}
-        <p id="{{ id }}_help" class="help-text">
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
+
+        <p id="{{ id }}_help" {% for attrname, attrvalue in help_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {%- if translation_domain is same as(false) -%}
                 {{- help -}}
             {%- else -%}

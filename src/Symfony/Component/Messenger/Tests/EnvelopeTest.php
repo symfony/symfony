@@ -12,10 +12,9 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
-use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 /**
@@ -25,58 +24,41 @@ class EnvelopeTest extends TestCase
 {
     public function testConstruct()
     {
-        $envelope = new Envelope($dummy = new DummyMessage('dummy'), array(
-            $receivedConfig = new ReceivedMessage(),
-        ));
+        $receivedStamp = new ReceivedStamp();
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'), $receivedStamp);
 
         $this->assertSame($dummy, $envelope->getMessage());
-        $this->assertArrayHasKey(ReceivedMessage::class, $configs = $envelope->all());
-        $this->assertSame($receivedConfig, $configs[ReceivedMessage::class]);
-    }
-
-    public function testWrap()
-    {
-        $first = Envelope::wrap($dummy = new DummyMessage('dummy'));
-
-        $this->assertInstanceOf(Envelope::class, $first);
-        $this->assertSame($dummy, $first->getMessage());
-
-        $envelope = Envelope::wrap($first);
-        $this->assertSame($first, $envelope);
+        $this->assertArrayHasKey(ReceivedStamp::class, $stamps = $envelope->all());
+        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class]);
     }
 
     public function testWithReturnsNewInstance()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'));
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'));
 
-        $this->assertNotSame($envelope, $envelope->with(new ReceivedMessage()));
+        $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp()));
     }
 
     public function testGet()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'))
-            ->with($config = new ReceivedMessage())
-        ;
+        $receivedStamp = new ReceivedStamp();
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'), $receivedStamp);
 
-        $this->assertSame($config, $envelope->get(ReceivedMessage::class));
-        $this->assertNull($envelope->get(ValidationConfiguration::class));
+        $this->assertSame($receivedStamp, $envelope->get(ReceivedStamp::class));
+        $this->assertNull($envelope->get(ValidationStamp::class));
     }
 
     public function testAll()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'))
-            ->with($receivedConfig = new ReceivedMessage())
-            ->with($validationConfig = new ValidationConfiguration(array('foo')))
+        $envelope = (new Envelope($dummy = new DummyMessage('dummy')))
+            ->with($receivedStamp = new ReceivedStamp())
+            ->with($validationStamp = new ValidationStamp(array('foo')))
         ;
 
-        $configs = $envelope->all();
-        $this->assertArrayHasKey(ReceivedMessage::class, $configs);
-        $this->assertSame($receivedConfig, $configs[ReceivedMessage::class]);
-        $this->assertArrayHasKey(ValidationConfiguration::class, $configs);
-        $this->assertSame($validationConfig, $configs[ValidationConfiguration::class]);
+        $stamps = $envelope->all();
+        $this->assertArrayHasKey(ReceivedStamp::class, $stamps);
+        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class]);
+        $this->assertArrayHasKey(ValidationStamp::class, $stamps);
+        $this->assertSame($validationStamp, $stamps[ValidationStamp::class]);
     }
-}
-
-class FooConfigurationConsumer implements EnvelopeAwareInterface
-{
 }

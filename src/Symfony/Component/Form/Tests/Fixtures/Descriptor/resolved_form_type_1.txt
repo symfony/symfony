@@ -15,8 +15,9 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   expanded                                         data                                             
   group_by                                         disabled                                         
   multiple                                         help                                             
-  placeholder                                      inherit_data                                     
-  preferred_choices                                label                                            
+  placeholder                                      help_attr                                        
+  preferred_choices                                inherit_data                                     
+                                                   label                                            
                                                    label_attr                                       
                                                    label_format                                     
                                                    mapped                                           

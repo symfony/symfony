@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.39",
+    "Version": "2.1.43.65",
     "Names": {
         "ace": "achenés",
         "ady": "adigeo",
@@ -14,9 +14,11 @@
         "gu": "gujarati",
         "ht": "haitiano",
         "kbd": "cabardiano",
+        "krc": "karachái-bálkaro",
         "lo": "laosiano",
         "luo": "luo",
         "nr": "ndebele del sur",
+        "nso": "sesotho del norte",
         "prg": "prusiano antiguo",
         "rm": "retorrománico",
         "shu": "árabe (Chad)",
@@ -26,10 +28,12 @@
         "sw_CD": "swahili (Congo)",
         "syr": "siríaco",
         "tet": "tetun",
+        "tyv": "tuvano",
         "tzm": "tamazight del Marruecos Central",
         "vai": "vai",
         "wal": "walamo",
         "wuu": "wu",
+        "xal": "calmuco",
         "zun": "zuni"
     }
 }

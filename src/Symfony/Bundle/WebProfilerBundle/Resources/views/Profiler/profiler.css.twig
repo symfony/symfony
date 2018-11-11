@@ -1,3 +1,5 @@
+{# This file is partially duplicated in TwigBundle/Resources/views/exceotion.css.twig.
+   If you make any change in this file, verify the same change is needed in the other file. #}
 {# Normalization
    (normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css)
    ========================================================================= #}
@@ -7,7 +9,7 @@
     --font-sans-serif: 'Helvetica, Arial, sans-serif';
     --page-background: #f9f9f9;
     --color-text: #222;
-    --color-muted: #777;
+    --color-muted: #999;
     /* when updating any of these colors, do the same in toolbar.css.twig */
     --color-success: #4f805d;
     --color-warning: #a46a1f;
@@ -28,7 +30,6 @@
     --table-header: #e0e0e0;
     --shadow: 0px 0px 1px rgba(128, 128, 128, .2);
     --border: 1px solid #e0e0e0;
-    --color-muted: #999;
     --base-0: #fff;
     --base-1: #f5f5f5;
     --base-2: #e0e0e0;
@@ -585,9 +586,18 @@ tr.status-warning td {
     font-size: 21px;
     margin: 0;
     text-decoration: none;
+    vertical-align: middle;
 }
 #summary h2 a:hover {
     text-decoration: underline;
+}
+#summary h2 a.referer {
+    margin-left: .5em;
+    font-size: 75%;
+    color: rgba(255, 255, 255, 0.5);
+}
+#summary h2 a.referer:before {
+    content: '\1F503\00a0';
 }
 
 #summary .status-success { background: var(--color-success); }
@@ -914,6 +924,42 @@ tr.status-warning td {
     display: block;
 }
 
+{# Filters
+   ========================================================================= #}
+[data-filters] { position: relative; }
+[data-filtered] { cursor: pointer; }
+[data-filtered]:after { content: '\00a0\25BE'; }
+[data-filtered]:hover .filter-list li { display: inline-flex; }
+[class*="filter-hidden-"] { display: none; }
+.filter-list { position: absolute; border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; }
+.filter-list :after { content: ''; }
+.filter-list li {
+    background: var(--tab-disabled-background);
+    border-bottom: var(--border);
+    color: var(--tab-disabled-color);
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 5px 10px;
+    text-align: left;
+    font-weight: normal;
+}
+.filter-list li.active {
+    background: var(--tab-background);
+    color: var(--tab-color);
+}
+.filter-list li.last-active {
+    background: var(--tab-active-background);
+    color: var(--tab-active-color);
+}
+
+.filter-list-level li { cursor: s-resize; }
+.filter-list-level li.active { cursor: n-resize; }
+.filter-list-level li.last-active { cursor: default; }
+.filter-list-level li.last-active:before { content: '\2714\00a0'; }
+.filter-list-choice li:before { content: '\2714\00a0'; color: var(--tab-background); }
+.filter-list-choice li.active:before { color: unset; }
+
 {# Twig panel
    ========================================================================= #}
 #twig-dump pre {
@@ -955,13 +1001,6 @@ table.logs .metadata {
     display: block;
     font-size: 12px;
 }
-table.logs tr td:last-child { width: 100%; }
-
-.log-levels { width: 100%; margin: 0; padding: 0; display: flex; align-items: center; list-style: none; }
-.log-levels li { width: 100%; padding: 3px; margin: 0; cursor: pointer; text-align: center; border: 2px dashed #e0e0e0; border-radius: 5px; color: #888; }
-.log-levels li + li { margin-left: 10px; }
-.log-levels li.active { background: #eee; color: #666; border-style: solid; border-width: 1px; padding: 4px; border-color: #aaa; }
-.log-levels li.last-active { cursor: not-allowed; }
 
 {# Doctrine panel
    ========================================================================= #}
@@ -986,6 +1025,31 @@ table.logs tr td:last-child { width: 100%; }
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
     hyphens: auto;
+}
+
+{# Security panel
+   ========================================================================= #}
+#collector-content .decision-log .voter_result td {
+    border-top-width: 1px;
+    border-bottom-width: 0;
+    padding-bottom: 0;
+}
+
+#collector-content .decision-log .voter_details td {
+    border-top-width: 0;
+    border-bottom-width: 1px;
+    padding-bottom: 0;
+}
+
+#collector-content .decision-log .voter_details table {
+    border: 0;
+    margin: 0;
+    box-shadow: unset;
+}
+
+#collector-content .decision-log .voter_details table td {
+    border: 0;
+    padding: 0 0 8px 0;
 }
 
 {# Validator panel

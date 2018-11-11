@@ -7,6 +7,7 @@ CHANGELOG
  * deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`,
    an instance of `EntityManagerInterface` should be injected instead
  * added support for `simple_array` type
+ * the `DoctrineTransactionMiddlewareFactory` class has been removed
 
 4.1.0
 -----

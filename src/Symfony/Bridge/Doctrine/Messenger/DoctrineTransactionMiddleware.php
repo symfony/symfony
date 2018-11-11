@@ -13,25 +13,32 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
  * Wraps all handlers in a single doctrine transaction.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
     private $managerRegistry;
     private $entityManagerName;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?string $entityManagerName)
+    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->entityManagerName = $entityManagerName;
     }
 
-    public function handle($message, callable $next)
+    /**
+     * {@inheritdoc}
+     */
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
 
@@ -41,15 +48,15 @@ class DoctrineTransactionMiddleware implements MiddlewareInterface
 
         $entityManager->getConnection()->beginTransaction();
         try {
-            $result = $next($message);
+            $envelope = $stack->next()->handle($envelope, $stack);
             $entityManager->flush();
             $entityManager->getConnection()->commit();
+
+            return $envelope;
         } catch (\Throwable $exception) {
             $entityManager->getConnection()->rollBack();
 
             throw $exception;
         }
-
-        return $result;
     }
 }

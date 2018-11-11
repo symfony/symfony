@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * using the default context is the new recommended way to configure normalizers and encoders
  * added a `skip_null_values` context option to not serialize properties with a `null` values
  * `AbstractNormalizer::handleCircularReference` is now final and receives
    two optional extra arguments: the format and the context
@@ -24,6 +25,15 @@ CHANGELOG
    and `ObjectNormalizer` constructor
  * added `MetadataAwareNameConverter` to configure the serialized name of properties through metadata
  * `YamlEncoder` now handles the `.yml` extension too
+ * `AbstractNormalizer::$circularReferenceLimit`, `AbstractNormalizer::$circularReferenceHandler`,
+   `AbstractNormalizer::$callbacks`, `AbstractNormalizer::$ignoredAttributes`,
+   `AbstractNormalizer::$camelizedAttributes`, `AbstractNormalizer::setCircularReferenceLimit()`,
+   `AbstractNormalizer::setCircularReferenceHandler()`, `AbstractNormalizer::setCallbacks()` and
+   `AbstractNormalizer::setIgnoredAttributes()` are deprecated, use the default context instead.
+ * `AbstractObjectNormalizer::$maxDepthHandler` and `AbstractObjectNormalizer::setMaxDepthHandler()`
+   are deprecated, use the default context instead.
+ * passing configuration options directly to the constructor of `CsvEncoder`, `JsonDecode` and
+   `XmlEncoder` is deprecated since Symfony 4.2, use the default context instead.
 
 4.1.0
 -----

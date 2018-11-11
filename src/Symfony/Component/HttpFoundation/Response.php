@@ -336,8 +336,9 @@ class Response
 
         // headers
         foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
+            $replace = 0 === strcasecmp($name, 'Content-Type');
             foreach ($values as $value) {
-                header($name.': '.$value, false, $this->statusCode);
+                header($name.': '.$value, $replace, $this->statusCode);
             }
         }
 
@@ -939,7 +940,7 @@ class Response
     public function setCache(array $options)
     {
         if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public', 'immutable'))) {
-            throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_values($diff))));
+            throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
         }
 
         if (isset($options['etag'])) {

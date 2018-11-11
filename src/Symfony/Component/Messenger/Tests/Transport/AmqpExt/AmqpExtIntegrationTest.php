@@ -51,12 +51,12 @@ class AmqpExtIntegrationTest extends TestCase
         $sender = new AmqpSender($connection, $serializer);
         $receiver = new AmqpReceiver($connection, $serializer);
 
-        $sender->send($first = Envelope::wrap(new DummyMessage('First')));
-        $sender->send($second = Envelope::wrap(new DummyMessage('Second')));
+        $sender->send($first = new Envelope(new DummyMessage('First')));
+        $sender->send($second = new Envelope(new DummyMessage('Second')));
 
         $receivedMessages = 0;
         $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages, $first, $second) {
-            $this->assertEquals(0 == $receivedMessages ? $first : $second, $envelope);
+            $this->assertEquals(0 === $receivedMessages ? $first : $second, $envelope);
 
             if (2 === ++$receivedMessages) {
                 $receiver->stop();
@@ -75,7 +75,7 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->queue()->purge();
 
         $sender = new AmqpSender($connection, $serializer);
-        $sender->send(Envelope::wrap(new DummyMessage('Hello')));
+        $sender->send(new Envelope(new DummyMessage('Hello')));
 
         $amqpReadTimeout = 30;
         $dsn = getenv('MESSENGER_AMQP_DSN').'?read_timeout='.$amqpReadTimeout;
@@ -101,8 +101,8 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
         $this->assertSame($expectedOutput.<<<'TXT'
 Get envelope with message: Symfony\Component\Messenger\Tests\Fixtures\DummyMessage
-with items: [
-    "Symfony\\Component\\Messenger\\Asynchronous\\Transport\\ReceivedMessage"
+with stamps: [
+    "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp"
 ]
 Done.
 

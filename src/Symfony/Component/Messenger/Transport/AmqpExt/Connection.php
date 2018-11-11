@@ -17,6 +17,10 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  * An AMQP connection.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @final
+ *
+ * @experimental in 4.2
  */
 class Connection
 {
@@ -100,7 +104,7 @@ class Connection
             $this->setup();
         }
 
-        $this->exchange()->publish($body, null, AMQP_NOPARAM, array('headers' => $headers));
+        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, AMQP_NOPARAM, array('headers' => $headers));
     }
 
     /**

@@ -37,7 +37,7 @@ class TimezoneType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choice_loader' => function (Options $options) {
-                $regions = $options['regions'];
+                $regions = $options->offsetGet('regions', false);
 
                 return new CallbackChoiceLoader(function () use ($regions) {
                     return self::getTimezones($regions);
@@ -51,6 +51,7 @@ class TimezoneType extends AbstractType
         $resolver->setAllowedValues('input', array('string', 'datetimezone'));
 
         $resolver->setAllowedTypes('regions', 'int');
+        $resolver->setDeprecated('regions', 'The option "%name%" is deprecated since Symfony 4.2.');
     }
 
     /**

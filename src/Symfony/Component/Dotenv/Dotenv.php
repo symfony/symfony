@@ -21,6 +21,7 @@ use Symfony\Component\Process\Process;
  * Manages .env files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Dotenv
 {
@@ -39,29 +40,64 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param string    $path  A file to load
-     * @param ...string $paths A list of additional files to load
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function load(string $path, string ...$paths): void
+    public function load(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(false, $path, $paths);
+        $this->doLoad(false, \func_get_args());
+    }
+
+    /**
+     * Loads a .env file and the corresponding .env.local, .env.$env and .env.$env.local files if they exist.
+     *
+     * .env.local is always ignored in test env because tests should produce the same results for everyone.
+     *
+     * @param string $path       A file to load
+     * @param string $varName    The name of the env vars that defines the app env
+     * @param string $defaultEnv The app env to use when none is defined
+     * @param array  $testEnvs   A list of app envs for which .env.local should be ignored
+     *
+     * @throws FormatException when a file has a syntax error
+     * @throws PathException   when a file does not exist or is not readable
+     */
+    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = array('test')): void
+    {
+        $this->load($path);
+
+        if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
+            $this->populate(array($varName => $env = $defaultEnv));
+        }
+
+        if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {
+            $this->load($p);
+            $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? $env;
+        }
+
+        if (file_exists($p = "$path.$env")) {
+            $this->load($p);
+        }
+
+        if (file_exists($p = "$path.$env.local")) {
+            $this->load($p);
+        }
     }
 
     /**
      * Loads one or several .env files and enables override existing vars.
      *
-     * @param string    $path  A file to load
-     * @param ...string $paths A list of additional files to load
+     * @param string    $path       A file to load
+     * @param ...string $extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function overload(string $path, string ...$paths): void
+    public function overload(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(true, $path, $paths);
+        $this->doLoad(true, \func_get_args());
     }
 
     /**
@@ -72,8 +108,8 @@ final class Dotenv
      */
     public function populate(array $values, bool $overrideExistingVars = false): void
     {
-        $loadedVars = array_flip(explode(',', getenv('SYMFONY_DOTENV_VARS')));
-        unset($loadedVars['']);
+        $updateLoadedVars = false;
+        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
 
         foreach ($values as $name => $value) {
             $notHttpName = 0 !== strpos($name, 'HTTP_');
@@ -88,14 +124,15 @@ final class Dotenv
                 $_SERVER[$name] = $value;
             }
 
-            $loadedVars[$name] = true;
+            if (!isset($loadedVars[$name])) {
+                $loadedVars[$name] = $updateLoadedVars = true;
+            }
         }
 
-        if ($loadedVars) {
+        if ($updateLoadedVars) {
+            unset($loadedVars['']);
             $loadedVars = implode(',', array_keys($loadedVars));
-            putenv("SYMFONY_DOTENV_VARS=$loadedVars");
-            $_ENV['SYMFONY_DOTENV_VARS'] = $loadedVars;
-            $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars;
+            putenv('SYMFONY_DOTENV_VARS='.$_ENV['SYMFONY_DOTENV_VARS'] = $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars);
         }
     }
 
@@ -405,10 +442,8 @@ final class Dotenv
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }
 
-    private function doLoad(bool $overrideExistingVars, string $path, array $paths): void
+    private function doLoad(bool $overrideExistingVars, array $paths): void
     {
-        array_unshift($paths, $path);
-
         foreach ($paths as $path) {
             if (!is_readable($path) || is_dir($path)) {
                 throw new PathException($path);

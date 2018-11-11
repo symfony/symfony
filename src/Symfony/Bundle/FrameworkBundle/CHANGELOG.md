@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * Added a `AbstractController::addLink()` method to add Link headers to the current response
  * Allowed configuring taggable cache pools via a new `framework.cache.pools.tags` option (bool|service-id)
  * Allowed configuring PDO-based cache pools via a new `cache.adapter.pdo` abstract service
  * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead
@@ -14,15 +15,17 @@ CHANGELOG
  * Removed the `framework.messenger.encoder` and `framework.messenger.decoder` options. Use the `framework.messenger.serializer.id` option to replace the Messenger serializer. 
  * Deprecated the `ContainerAwareCommand` class in favor of `Symfony\Component\Console\Command\Command`
  * Made `debug:container` and `debug:autowiring` ignore backslashes in service ids
- * Deprecated the `--env` console option and its "-e" shortcut, set
-   the "APP_ENV" environment variable instead.
- * Deprecated the `--no-debug` console option, set the "APP_DEBUG" 
-   environment variable to "0" instead.
+ * Deprecated the `--env` console option and its "-e" shortcut, set the "APP_ENV" environment variable
+   or use `Application::bootstrapEnv()` instead.
+ * Deprecated the `--no-debug` console option, set the "APP_DEBUG" environment variable to "0"
+   or use `Application::bootstrapEnv()` instead.
  * Deprecated the `Templating\Helper\TranslatorHelper::transChoice()` method, use the `trans()` one instead with a `%count%` parameter
  * Deprecated `CacheCollectorPass`. Use `Symfony\Component\Cache\DependencyInjection\CacheCollectorPass` instead.
  * Deprecated `CachePoolClearerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass` instead.
  * Deprecated `CachePoolPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPass` instead.
  * Deprecated `CachePoolPrunerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass` instead.
+ * Deprecated support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
+ * Deprecated support for the legacy directory structure in `translation:update` and `debug:translation` commands.
 
 4.1.0
 -----

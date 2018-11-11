@@ -285,7 +285,7 @@ class Configuration implements ConfigurationInterface
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                             ->validate()
-                                                ->ifTrue(function ($v) { return !class_exists($v) && !interface_exists($v); })
+                                                ->ifTrue(function ($v) { return !class_exists($v) && !interface_exists($v, false); })
                                                 ->thenInvalid('The supported class or interface "%s" does not exist.')
                                             ->end()
                                         ->end()
@@ -699,7 +699,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('en'))
                         ->end()
                         ->booleanNode('logging')->defaultValue(false)->end()
-                        ->scalarNode('formatter')->defaultValue(class_exists(\MessageFormatter::class) ? 'translator.formatter.default' : 'translator.formatter.symfony')->end()
+                        ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->scalarNode('default_path')
                             ->info('The default path used to load translations')
                             ->defaultValue('%kernel.project_dir%/translations')
@@ -1077,23 +1077,24 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
-                        ->scalarNode('default_bus')->defaultValue(null)->end()
+                        ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
                             ->defaultValue(array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())))
                             ->useAttributeAsKey('name')
-                            ->prototype('array')
+                            ->arrayPrototype()
                                 ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->booleanNode('default_middleware')->defaultTrue()->end()
+                                    ->enumNode('default_middleware')
+                                        ->values(array(true, false, 'allow_no_handlers'))
+                                        ->defaultTrue()
+                                    ->end()
                                     ->arrayNode('middleware')
                                         ->beforeNormalization()
-                                            ->ifString()
-                                            ->then(function (string $middleware) {
-                                                return array($middleware);
-                                            })
+                                            ->ifTrue(function ($v) { return \is_string($v) || (\is_array($v) && !\is_int(key($v))); })
+                                            ->then(function ($v) { return array($v); })
                                         ->end()
                                         ->defaultValue(array())
-                                        ->prototype('array')
+                                        ->arrayPrototype()
                                             ->beforeNormalization()
                                                 ->always()
                                                 ->then(function ($middleware): array {
@@ -1103,8 +1104,8 @@ class Configuration implements ConfigurationInterface
                                                     if (isset($middleware['id'])) {
                                                         return $middleware;
                                                     }
-                                                    if (\count($middleware) > 1) {
-                                                        throw new \InvalidArgumentException(sprintf('There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "%s".', json_encode($middleware)));
+                                                    if (1 < \count($middleware)) {
+                                                        throw new \InvalidArgumentException(sprintf('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, %s given.', json_encode($middleware)));
                                                     }
 
                                                     return array(

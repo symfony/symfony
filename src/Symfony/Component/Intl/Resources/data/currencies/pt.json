@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "ADP": [
             "ADP",
@@ -7,7 +7,7 @@
         ],
         "AED": [
             "AED",
-            "Dirrã dos Emirados Árabes Unidos"
+            "Dirham dos Emirados Árabes Unidos"
         ],
         "AFA": [
             "AFA",
@@ -107,7 +107,7 @@
         ],
         "BDT": [
             "BDT",
-            "Taka bengalesa"
+            "Taka bengali"
         ],
         "BEC": [
             "BEC",
@@ -155,7 +155,7 @@
         ],
         "BOB": [
             "BOB",
-            "Boliviano"
+            "Boliviano da Bolívia"
         ],
         "BOL": [
             "BOL",
@@ -263,7 +263,7 @@
         ],
         "CNH": [
             "CNH",
-            "Yuan (offshore)"
+            "Renminbi chinês (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -271,7 +271,7 @@
         ],
         "CNY": [
             "CN¥",
-            "Yuan chinês"
+            "Renminbi chinês"
         ],
         "COP": [
             "COP",
@@ -495,7 +495,7 @@
         ],
         "ILS": [
             "₪",
-            "Sheqel novo israelita"
+            "Novo shekel israelense"
         ],
         "INR": [
             "₹",
@@ -587,7 +587,7 @@
         ],
         "LKR": [
             "LKR",
-            "Rupia ceilandesa"
+            "Rupia do Sri Lanka"
         ],
         "LRD": [
             "LRD",
@@ -671,7 +671,7 @@
         ],
         "MMK": [
             "MMK",
-            "Kyat mianmarense"
+            "Quiat de Myanmar"
         ],
         "MNT": [
             "MNT",
@@ -679,7 +679,7 @@
         ],
         "MOP": [
             "MOP",
-            "Pataca macaense"
+            "Pataca de Macau"
         ],
         "MRO": [
             "MRO",
@@ -703,7 +703,7 @@
         ],
         "MVR": [
             "MVR",
-            "Rupia maldiva"
+            "Rupia maldivana"
         ],
         "MWK": [
             "MWK",
@@ -783,7 +783,7 @@
         ],
         "PEN": [
             "PEN",
-            "Sol peruano"
+            "Novo sol peruano"
         ],
         "PES": [
             "PES",
@@ -803,7 +803,7 @@
         ],
         "PLN": [
             "PLN",
-            "Zloti polonês"
+            "Zloty polonês"
         ],
         "PLZ": [
             "PLZ",
@@ -899,7 +899,7 @@
         ],
         "SOS": [
             "SOS",
-            "Xelim somaliano"
+            "Xelim somali"
         ],
         "SRD": [
             "SRD",
@@ -1039,6 +1039,10 @@
         ],
         "VEF": [
             "VEF",
+            "Bolívar venezuelano (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Bolívar venezuelano"
         ],
         "VND": [
@@ -1051,7 +1055,7 @@
         ],
         "VUV": [
             "VUV",
-            "Vatu vanuatuense"
+            "Vatu de Vanuatu"
         ],
         "WST": [
             "WST",

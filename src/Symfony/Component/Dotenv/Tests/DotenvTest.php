@@ -186,6 +186,60 @@ class DotenvTest extends TestCase
         $this->assertSame('BAZ', $bar);
     }
 
+    public function testLoadEnv()
+    {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_SERVER['FOO']);
+        unset($_SERVER['BAR']);
+        putenv('FOO');
+        putenv('BAR');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path = tempnam($tmpdir, 'sf-');
+
+        // .env
+
+        file_put_contents($path, 'FOO=BAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('BAR', getenv('FOO'));
+        $this->assertSame('dev', getenv('TEST_APP_ENV'));
+
+        // .env.local
+
+        file_put_contents("$path.local", 'FOO=localBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('localBAR', getenv('FOO'));
+
+        // special case for test
+
+        $_SERVER['TEST_APP_ENV'] = 'test';
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('BAR', getenv('FOO'));
+
+        // .env.dev
+
+        unset($_SERVER['TEST_APP_ENV']);
+        file_put_contents("$path.dev", 'FOO=devBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devBAR', getenv('FOO'));
+
+        // .env.dev.local
+
+        file_put_contents("$path.dev.local", 'FOO=devlocalBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devlocalBAR', getenv('FOO'));
+
+        putenv('FOO');
+        putenv('BAR');
+        unlink($path);
+        unlink("$path.dev");
+        unlink("$path.local");
+        unlink("$path.dev.local");
+        rmdir($tmpdir);
+    }
+
     public function testOverload()
     {
         unset($_ENV['FOO']);
@@ -315,7 +369,7 @@ class DotenvTest extends TestCase
 
     public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar()
     {
-        putenv('SYMFONY_DOTENV_VARS=FOO,BAR,BAZ');
+        putenv('SYMFONY_DOTENV_VARS='.$_SERVER['SYMFONY_DOTENV_VARS'] = 'FOO,BAR,BAZ');
 
         putenv('FOO=foo');
         putenv('BAR=bar');

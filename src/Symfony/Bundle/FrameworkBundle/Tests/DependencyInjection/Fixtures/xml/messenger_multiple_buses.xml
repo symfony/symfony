@@ -16,12 +16,10 @@
                         <framework:bar>baz</framework:bar>
                     </framework:argument>
                 </framework:middleware>
-                <framework:middleware id="allow_no_handler" />
             </framework:bus>
             <framework:bus name="messenger.bus.queries" default-middleware="false">
-                <framework:middleware id="route_messages" />
-                <framework:middleware id="allow_no_handler" />
-                <framework:middleware id="call_message_handler" />
+                <framework:middleware id="send_message" />
+                <framework:middleware id="handle_message" />
             </framework:bus>
         </framework:messenger>
     </framework:config>

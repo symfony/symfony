@@ -290,7 +290,6 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a = new \Bar();
-
         $a->pub = 'pub';
         $a->setBaz(($this->services['baz'] ?? $this->getBazService()));
 

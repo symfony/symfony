@@ -19,26 +19,14 @@
     {% endif %}
 
     {% set icon %}
-        {% if collector.applicationname %}
-            <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
-            <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
-        {% elseif collector.symfonyState is defined %}
-            <span class="sf-toolbar-label">
-                {{ include('@WebProfiler/Icon/symfony.svg') }}
-            </span>
-            <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
-        {% endif %}
+        <span class="sf-toolbar-label">
+            {{ include('@WebProfiler/Icon/symfony.svg') }}
+        </span>
+        <span class="sf-toolbar-value">{{ collector.symfonyState is defined ? collector.symfonyversion : 'n/a' }}</span>
     {% endset %}
 
     {% set text %}
         <div class="sf-toolbar-info-group">
-            {% if collector.applicationname %}
-                <div class="sf-toolbar-info-piece">
-                    <b>{{ collector.applicationname }}</b>
-                    <span>{{ collector.applicationversion }}</span>
-                </div>
-            {% endif %}
-
             <div class="sf-toolbar-info-piece">
                 <b>Profiler token</b>
                 <span>
@@ -49,13 +37,6 @@
                     {% endif %}
                 </span>
             </div>
-
-            {% if 'n/a' is not same as(collector.appname) %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Kernel name</b>
-                    <span>{{ collector.appname }}</span>
-                </div>
-            {% endif %}
 
             {% if 'n/a' is not same as(collector.env) %}
                 <div class="sf-toolbar-info-piece">
@@ -99,15 +80,9 @@
                 <div class="sf-toolbar-info-piece">
                     <b>Resources</b>
                     <span>
-                        {% if 'Silex' == collector.applicationname %}
-                            <a href="https://silex.symfony.com/documentation" rel="help">
-                                Read Silex Docs
-                            </a>
-                        {% else %}
-                            <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
-                                Read Symfony {{ collector.symfonyversion }} Docs
-                            </a>
-                        {% endif %}
+                        <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
+                            Read Symfony {{ collector.symfonyversion }} Docs
+                        </a>
                     </span>
                 </div>
                 <div class="sf-toolbar-info-piece">
@@ -133,81 +108,53 @@
 {% endblock %}
 
 {% block panel %}
-    {% if collector.applicationname %}
-        {# this application is not the Symfony framework #}
-        <h2>Project Configuration</h2>
+    <h2>Symfony Configuration</h2>
 
-        <div class="metrics">
-            <div class="metric">
-                <span class="value">{{ collector.applicationname }}</span>
-                <span class="label">Application name</span>
-            </div>
-
-            <div class="metric">
-                <span class="value">{{ collector.applicationversion }}</span>
-                <span class="label">Application version</span>
-            </div>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.symfonyversion }}</span>
+            <span class="label">Symfony version</span>
         </div>
 
-        <p>
-            Based on <a class="text-bold" href="https://symfony.com">Symfony {{ collector.symfonyversion }}</a>
-        </p>
-    {% else %}
-        <h2>Symfony Configuration</h2>
-
-        <div class="metrics">
+        {% if 'n/a' != collector.env %}
             <div class="metric">
-                <span class="value">{{ collector.symfonyversion }}</span>
-                <span class="label">Symfony version</span>
+                <span class="value">{{ collector.env }}</span>
+                <span class="label">Environment</span>
             </div>
+        {% endif %}
 
-            {% if 'n/a' != collector.appname %}
-                <div class="metric">
-                    <span class="value">{{ collector.appname }}</span>
-                    <span class="label">Application name</span>
-                </div>
-            {% endif %}
+        {% if 'n/a' != collector.debug %}
+            <div class="metric">
+                <span class="value">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
+                <span class="label">Debug</span>
+            </div>
+        {% endif %}
+    </div>
 
-            {% if 'n/a' != collector.env %}
-                <div class="metric">
-                    <span class="value">{{ collector.env }}</span>
-                    <span class="label">Environment</span>
-                </div>
-            {% endif %}
-
-            {% if 'n/a' != collector.debug %}
-                <div class="metric">
-                    <span class="value">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
-                    <span class="label">Debug</span>
-                </div>
-            {% endif %}
-        </div>
-
-        {% set symfony_status = { dev: 'Unstable Version', stable: 'Stable Version', eom: 'Maintenance Ended', eol: 'Version Expired' } %}
-        {% set symfony_status_class = { dev: 'warning', stable: 'success', eom: 'warning', eol: 'error' } %}
-        <table>
-            <thead class="small">
-                <tr>
-                    <th>Symfony Status</th>
-                    <th>Bugs {{ collector.symfonystate in ['eom', 'eol'] ? 'were' : 'are' }} fixed until</th>
-                    <th>Security issues {{ collector.symfonystate == 'eol' ? 'were' : 'are' }} fixed until</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="font-normal">
-                        <span class="label status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
-                    </td>
-                    <td class="font-normal">{{ collector.symfonyeom }}</td>
-                    <td class="font-normal">{{ collector.symfonyeol }}</td>
-                    <td class="font-normal">
-                        <a href="https://symfony.com/roadmap?version={{ collector.symfonyminorversion }}#checker">View roadmap</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
+    {% set symfony_status = { dev: 'Unstable Version', stable: 'Stable Version', eom: 'Maintenance Ended', eol: 'Version Expired' } %}
+    {% set symfony_status_class = { dev: 'warning', stable: 'success', eom: 'warning', eol: 'error' } %}
+    <table>
+        <thead class="small">
+            <tr>
+                <th>Symfony Status</th>
+                <th>Bugs {{ collector.symfonystate in ['eom', 'eol'] ? 'were' : 'are' }} fixed until</th>
+                <th>Security issues {{ collector.symfonystate == 'eol' ? 'were' : 'are' }} fixed until</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="font-normal">
+                    <span class="label status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
+                </td>
+                <td class="font-normal">{{ collector.symfonyeom }}</td>
+                <td class="font-normal">{{ collector.symfonyeol }}</td>
+                <td class="font-normal">
+                    <a href="https://symfony.com/roadmap?version={{ collector.symfonyminorversion }}#checker">View roadmap</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <h2>PHP Configuration</h2>
 

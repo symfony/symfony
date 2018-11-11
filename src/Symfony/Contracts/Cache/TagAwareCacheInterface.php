@@ -22,8 +22,6 @@ interface TagAwareCacheInterface extends CacheInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @param callable(ItemInterface):mixed $callback Should return the computed value for the given key/item
      */
     public function get(string $key, callable $callback, float $beta = null);
 

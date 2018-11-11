@@ -4,7 +4,6 @@ CHANGELOG
 4.2.0
 -----
 
- * added `getAcceptableFormats()` for reading acceptable formats based on Accept header
  * the default value of the "$secure" and "$samesite" arguments of Cookie's constructor
    will respectively change from "false" to "null" and from "null" to "lax" in Symfony
    5.0, you should define their values explicitly or use "Cookie::create()" instead.

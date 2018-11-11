@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
@@ -136,12 +137,33 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
         // collect voters and access decision manager information
         if ($this->accessDecisionManager instanceof TraceableAccessDecisionManager) {
-            $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
 
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
+                if ($voter instanceof TraceableVoter) {
+                    $voter = $voter->getDecoratedVoter();
+                }
+
                 $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(\get_class($voter)) : \get_class($voter);
             }
+
+            // collect voter details
+            $decisionLog = $this->accessDecisionManager->getDecisionLog();
+            foreach ($decisionLog as $key => $log) {
+                $decisionLog[$key]['voter_details'] = array();
+                foreach ($log['voterDetails'] as $voterDetail) {
+                    $voterClass = \get_class($voterDetail['voter']);
+                    $classData = $this->hasVarDumper ? new ClassStub($voterClass) : $voterClass;
+                    $decisionLog[$key]['voter_details'][] = array(
+                        'class' => $classData,
+                        'attributes' => $voterDetail['attributes'], // Only displayed for unanimous strategy
+                        'vote' => $voterDetail['vote'],
+                    );
+                }
+                unset($decisionLog[$key]['voterDetails']);
+            }
+
+            $this->data['access_decision_log'] = $decisionLog;
         } else {
             $this->data['access_decision_log'] = array();
             $this->data['voter_strategy'] = 'unknown';

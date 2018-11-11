@@ -50,7 +50,6 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
@@ -544,9 +543,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger_transports');
         $this->assertTrue($container->hasDefinition('messenger.transport.default'));
         $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
-        $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.sender'));
         $this->assertEquals(array(array('alias' => 'default')), $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
-        $this->assertEquals(array(array('alias' => 'default')), $container->getDefinition('messenger.transport.default')->getTag('messenger.sender'));
 
         $this->assertTrue($container->hasDefinition('messenger.transport.customised'));
         $transportFactory = $container->getDefinition('messenger.transport.customised')->getFactory();
@@ -563,28 +560,21 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessengerRouting()
     {
         $container = $this->createContainerFromFile('messenger_routing');
-        $senderLocatorDefinition = $container->getDefinition('messenger.asynchronous.routing.sender_locator');
-        $sendMessageMiddlewareDefinition = $container->getDefinition('messenger.middleware.route_messages');
+        $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
 
-        $messageToSenderIdsMapping = array(
-            DummyMessage::class => '.messenger.chain_sender.'.DummyMessage::class,
-            SecondMessage::class => '.messenger.chain_sender.'.SecondMessage::class,
-            '*' => 'amqp',
-        );
         $messageToSendAndHandleMapping = array(
             DummyMessage::class => false,
             SecondMessage::class => true,
             '*' => false,
         );
 
-        $this->assertSame($messageToSenderIdsMapping, $senderLocatorDefinition->getArgument(1));
-        $this->assertSame($messageToSendAndHandleMapping, $sendMessageMiddlewareDefinition->getArgument(1));
-        $this->assertEquals(array(new Reference('messenger.transport.amqp'), new Reference('audit')), $container->getDefinition('.messenger.chain_sender.'.DummyMessage::class)->getArgument(0));
+        $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(1));
+        $this->assertEquals(array(new Reference('messenger.transport.amqp'), new Reference('audit')), $container->getDefinition('messenger.senders.'.DummyMessage::class)->getArgument(0)[0]->getValues());
     }
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".
+     * @expectedExceptionMessage The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".
      */
     public function testMessengerTransportConfigurationWithoutSerializer()
     {
@@ -593,7 +583,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".
+     * @expectedExceptionMessage The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".
      */
     public function testMessengerAMQPTransportConfigurationWithoutSerializer()
     {
@@ -619,24 +609,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array(), $container->getDefinition('messenger.bus.commands')->getArgument(0));
         $this->assertEquals(array(
             array('id' => 'logging'),
-            array('id' => 'route_messages'),
-            array('id' => 'call_message_handler'),
+            array('id' => 'send_message'),
+            array('id' => 'handle_message'),
         ), $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.events')->getArgument(0));
         $this->assertEquals(array(
             array('id' => 'logging'),
             array('id' => 'with_factory', 'arguments' => array('foo', true, array('bar' => 'baz'))),
-            array('id' => 'allow_no_handler', 'arguments' => array()),
-            array('id' => 'route_messages'),
-            array('id' => 'call_message_handler'),
+            array('id' => 'send_message'),
+            array('id' => 'handle_message'),
         ), $container->getParameter('messenger.bus.events.middleware'));
         $this->assertTrue($container->has('messenger.bus.queries'));
         $this->assertSame(array(), $container->getDefinition('messenger.bus.queries')->getArgument(0));
         $this->assertEquals(array(
-            array('id' => 'route_messages', 'arguments' => array()),
-            array('id' => 'allow_no_handler', 'arguments' => array()),
-            array('id' => 'call_message_handler', 'arguments' => array()),
+            array('id' => 'send_message', 'arguments' => array()),
+            array('id' => 'handle_message', 'arguments' => array()),
         ), $container->getParameter('messenger.bus.queries.middleware'));
 
         $this->assertTrue($container->hasAlias('message_bus'));
@@ -645,7 +633,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage There is an error at path "framework.messenger" in one of the buses middleware definitions: expected a single entry for a middleware item config, with factory id as key and arguments as value. Got "{"foo":["qux"],"bar":["baz"]}"
+     * @expectedExceptionMessage Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.
      */
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
@@ -691,6 +679,20 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(array('fr'), $calls[1][1][0]);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Translations directory "%s/Resources/translations" is deprecated since Symfony 4.2, use "%s/translations" instead.
+     */
+    public function testLegacyTranslationsDirectory()
+    {
+        $container = $this->createContainerFromFile('full', array('kernel.root_dir' => __DIR__.'/Fixtures'));
+        $options = $container->getDefinition('translator.default')->getArgument(4);
+        $files = array_map('realpath', $options['resource_files']['en']);
+
+        $dir = str_replace('/', \DIRECTORY_SEPARATOR, __DIR__.'/Fixtures/Resources/translations/test_default.en.xlf');
+        $this->assertContains($dir, $files, '->registerTranslatorConfiguration() finds translation resources in legacy directory');
     }
 
     public function testTranslatorMultipleFallbacks()

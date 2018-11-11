@@ -19,6 +19,8 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt\Exception;
  * be rejected. Otherwise, it will be re-queued.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 interface RejectMessageExceptionInterface extends \Throwable
 {

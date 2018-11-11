@@ -24,11 +24,22 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     const FORMAT_KEY = 'dateinterval_format';
 
-    private $format;
+    private $defaultContext = array(
+        self::FORMAT_KEY => 'P%yY%mM%dDT%hH%iM%sS',
+    );
 
-    public function __construct(string $format = 'P%yY%mM%dDT%hH%iM%sS')
+    /**
+     * @param array $defaultContext
+     */
+    public function __construct($defaultContext = array())
     {
-        $this->format = $format;
+        if (!\is_array($defaultContext)) {
+            @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), E_USER_DEPRECATED);
+
+            $defaultContext = array(self::FORMAT_KEY => (string) $defaultContext);
+        }
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -42,9 +53,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
         }
 
-        $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
-
-        return $object->format($dateIntervalFormat);
+        return $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
     }
 
     /**
@@ -79,7 +88,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
             throw new UnexpectedValueException('Expected a valid ISO 8601 interval string.');
         }
 
-        $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $dateIntervalFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
 
         $valuePattern = '/^'.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $dateIntervalFormat).'$/';
         if (!preg_match($valuePattern, $data)) {

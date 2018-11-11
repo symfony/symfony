@@ -25,7 +25,6 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
-use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -37,6 +36,8 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -69,7 +70,6 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\ChainSender;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -101,6 +101,7 @@ use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -161,7 +162,7 @@ class FrameworkExtension extends Extension
         // translator will be used and everything will still work as expected.
         if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
             if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
-                throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
+                throw new LogicException('Translation support cannot be enabled as the Translation component is not installed. Try running "composer require symfony/translation".');
             }
 
             if (class_exists(Translator::class)) {
@@ -218,7 +219,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists('Symfony\Component\Form\Form')) {
-                throw new LogicException('Form support cannot be enabled as the Form component is not installed.');
+                throw new LogicException('Form support cannot be enabled as the Form component is not installed. Try running "composer require symfony/form".');
             }
 
             $this->formConfigEnabled = true;
@@ -238,7 +239,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
             if (!class_exists('Symfony\Component\Asset\Package')) {
-                throw new LogicException('Asset support cannot be enabled as the Asset component is not installed.');
+                throw new LogicException('Asset support cannot be enabled as the Asset component is not installed. Try running "composer require symfony/asset".');
             }
 
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -246,7 +247,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['templating'])) {
             if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
-                throw new LogicException('Templating support cannot be enabled as the Templating component is not installed.');
+                throw new LogicException('Templating support cannot be enabled as the Templating component is not installed. Try running "composer require symfony/templating".');
             }
 
             $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
@@ -274,7 +275,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists('Symfony\Component\Serializer\Serializer')) {
-                throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed.');
+                throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
 
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
@@ -290,7 +291,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
             if (!class_exists(HttpHeaderSerializer::class)) {
-                throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed.');
+                throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed. Try running "composer require symfony/weblink".');
             }
 
             $loader->load('web_link.xml');
@@ -497,7 +498,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!class_exists(Workflow\Workflow::class)) {
-            throw new LogicException('Workflow support cannot be enabled as the Workflow component is not installed.');
+            throw new LogicException('Workflow support cannot be enabled as the Workflow component is not installed. Try running "composer require symfony/workflow".');
         }
 
         $loader->load('workflow.xml');
@@ -629,11 +630,11 @@ class FrameworkExtension extends Extension
                 }
 
                 if (!class_exists(ExpressionLanguage::class)) {
-                    throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed.');
+                    throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
                 }
 
                 if (!class_exists(Security::class)) {
-                    throw new LogicException('Cannot guard workflows as the Security component is not installed.');
+                    throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security".');
                 }
 
                 $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
@@ -796,10 +797,8 @@ class FrameworkExtension extends Extension
         if ($config['formats']) {
             $loader->load('request.xml');
 
-            $container
-                ->getDefinition('request.add_request_formats_listener')
-                ->replaceArgument(0, $config['formats'])
-            ;
+            $listener = $container->getDefinition('request.add_request_formats_listener');
+            $listener->replaceArgument(0, $config['formats']);
         }
     }
 
@@ -1009,6 +1008,8 @@ class FrameworkExtension extends Extension
                 $dirs[] = $dir;
             }
             if ($container->fileExists($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
+                @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
+
                 $dirs[] = $dir;
             }
         }
@@ -1025,6 +1026,10 @@ class FrameworkExtension extends Extension
             $dirs[] = $defaultDir;
         }
         if ($container->fileExists($dir = $rootDir.'/Resources/translations')) {
+            if ($dir !== $defaultDir) {
+                @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
+            }
+
             $dirs[] = $dir;
         }
 
@@ -1066,7 +1071,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!class_exists('Symfony\Component\Validator\Validation')) {
-            throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
+            throw new LogicException('Validation support cannot be enabled as the Validator component is not installed. Try running "composer require symfony/validator".');
         }
 
         if (!isset($config['email_validation_mode'])) {
@@ -1307,7 +1312,7 @@ class FrameworkExtension extends Extension
 
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
-                 array(new Reference('annotation_reader'))
+                array(new Reference('annotation_reader'))
             );
             $annotationLoader->setPublic(false);
 
@@ -1485,7 +1490,7 @@ class FrameworkExtension extends Extension
     private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig, array $validationConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
-            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed.');
+            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
         $loader->load('messenger.xml');
@@ -1496,7 +1501,7 @@ class FrameworkExtension extends Extension
         } else {
             if ('messenger.transport.symfony_serializer' === $config['serializer']['id']) {
                 if (!$this->isConfigEnabled($container, $serializerConfig)) {
-                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".');
                 }
 
                 $container->getDefinition('messenger.transport.symfony_serializer')
@@ -1511,25 +1516,34 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (null === $config['default_bus']) {
-            if (\count($config['buses']) > 1) {
-                throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
-            }
-
+        if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
 
         $defaultMiddleware = array(
             'before' => array(array('id' => 'logging')),
-            'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
+            'after' => array(array('id' => 'send_message'), array('id' => 'handle_message')),
         );
         foreach ($config['buses'] as $busId => $bus) {
-            $middleware = $bus['default_middleware'] ? array_merge($defaultMiddleware['before'], $bus['middleware'], $defaultMiddleware['after']) : $bus['middleware'];
+            $middleware = $bus['middleware'];
+
+            if ($bus['default_middleware']) {
+                if ('allow_no_handlers' === $bus['default_middleware']) {
+                    $defaultMiddleware['after'][1]['arguments'] = array(true);
+                } else {
+                    unset($defaultMiddleware['after'][1]['arguments']);
+                }
+                $middleware = array_merge($defaultMiddleware['before'], $middleware, $defaultMiddleware['after']);
+            }
 
             foreach ($middleware as $middlewareItem) {
-                if (!$validationConfig['enabled'] && 'messenger.middleware.validation' === $middlewareItem['id']) {
+                if (!$validationConfig['enabled'] && \in_array($middlewareItem['id'], array('validation', 'messenger.middleware.validation'), true)) {
                     throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
                 }
+            }
+
+            if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
+                array_unshift($middleware, array('id' => 'traceable', 'arguments' => array($busId)));
             }
 
             $container->setParameter($busId.'.middleware', $middleware);
@@ -1543,51 +1557,44 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$container->hasAlias('message_bus')) {
-            throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
-        }
-
         $senderAliases = array();
         foreach ($config['transports'] as $name => $transport) {
             if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
-                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".');
             }
 
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
                 ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.receiver', array('alias' => $name))
-                ->addTag('messenger.sender', array('alias' => $name))
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
         }
 
-        $messageToSenderIdMapping = array();
-        $messageToSendAndHandleMapping = array();
+        $messageToSendersMapping = array();
+        $messagesToSendAndHandle = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
+                throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
+            $senders = array_map(function ($sender) use ($senderAliases) {
+                return new Reference($senderAliases[$sender] ?? $sender);
+            }, $messageConfiguration['senders']);
 
-            if (1 < \count($messageConfiguration['senders'])) {
-                $senders = array_map(function ($sender) use ($senderAliases) {
-                    return new Reference($senderAliases[$sender] ?? $sender);
-                }, $messageConfiguration['senders']);
-                $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
-                $chainSenderDefinition->addTag('messenger.sender');
-                $chainSenderId = '.messenger.chain_sender.'.$message;
-                $container->setDefinition($chainSenderId, $chainSenderDefinition);
-                $messageToSenderIdMapping[$message] = $chainSenderId;
-            } else {
-                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
-            }
+            $sendersId = 'messenger.senders.'.$message;
+            $sendersDefinition = $container->register($sendersId, RewindableGenerator::class)
+                ->setFactory('current')
+                ->addArgument(array(new IteratorArgument($senders)));
+            $messageToSendersMapping[$message] = new Reference($sendersId);
 
-            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
+            $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 
-        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
-        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
+        $container->getDefinition('messenger.senders_locator')
+            ->replaceArgument(0, $messageToSendersMapping)
+            ->replaceArgument(1, $messagesToSendAndHandle)
+        ;
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
@@ -1625,8 +1632,10 @@ class FrameworkExtension extends Extension
                 $pool['adapter'] = '.'.$pool['adapter'].'.inner';
             }
             $definition = new ChildDefinition($pool['adapter']);
-            $container->registerAliasForArgument($name, CacheInterface::class);
-            $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            if (!\in_array($name, array('cache.app', 'cache.system'), true)) {
+                $container->registerAliasForArgument($name, CacheInterface::class);
+                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            }
 
             if ($pool['tags']) {
                 if ($config['pools'][$pool['tags']]['tags'] ?? false) {

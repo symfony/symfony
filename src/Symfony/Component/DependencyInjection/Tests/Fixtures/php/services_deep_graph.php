@@ -74,8 +74,8 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
         if (isset($this->services['foo'])) {
             return $this->services['foo'];
         }
-
         $b = new \stdClass();
+
         $c = new \stdClass();
         $c->p3 = new \stdClass();
 

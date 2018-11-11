@@ -69,7 +69,7 @@
         "symfony/form": "<4.2",
         "symfony/messenger": "<4.2",
         "symfony/property-info": "<3.4",
-        "symfony/serializer": "<4.1",
+        "symfony/serializer": "<4.2",
         "symfony/stopwatch": "<3.4",
         "symfony/translation": "<4.2",
         "symfony/twig-bridge": "<4.1.1",

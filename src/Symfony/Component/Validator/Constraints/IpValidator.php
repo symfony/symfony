@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates whether a value is a valid IP address.
@@ -37,7 +38,7 @@ class IpValidator extends ConstraintValidator
         }
 
         if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new UnexpectedValueException($value, 'string');
         }
 
         $value = (string) $value;

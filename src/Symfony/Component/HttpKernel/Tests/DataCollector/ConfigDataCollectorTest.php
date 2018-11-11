@@ -30,7 +30,6 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame('test', $c->getEnv());
         $this->assertTrue($c->isDebug());
         $this->assertSame('config', $c->getName());
-        $this->assertSame('testkernel', $c->getAppName());
         $this->assertRegExp('~^'.preg_quote($c->getPhpVersion(), '~').'~', PHP_VERSION);
         $this->assertRegExp('~'.preg_quote((string) $c->getPhpVersionExtra(), '~').'$~', PHP_VERSION);
         $this->assertSame(PHP_INT_SIZE * 8, $c->getPhpArchitecture());
@@ -39,18 +38,29 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
-        $this->assertSame(\extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
-        $this->assertSame(\extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
+        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
+        $this->assertSame(\extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "$name" argument in method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::__construct()" is deprecated since Symfony 4.2.
+     * @expectedDeprecation The "$version" argument in method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::__construct()" is deprecated since Symfony 4.2.
+     * @expectedDeprecation The method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::getApplicationName()" is deprecated since Symfony 4.2.
+     * @expectedDeprecation The method "Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector::getApplicationVersion()" is deprecated since Symfony 4.2.
+     */
+    public function testLegacy()
+    {
+        $c = new ConfigDataCollector('name', null);
+        $c->collect(new Request(), new Response());
+
+        $this->assertSame('name', $c->getApplicationName());
+        $this->assertNull($c->getApplicationVersion());
     }
 }
 
 class KernelForTest extends Kernel
 {
-    public function getName()
-    {
-        return 'testkernel';
-    }
-
     public function registerBundles()
     {
     }

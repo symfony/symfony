@@ -50,9 +50,9 @@ class CachePoolPass implements CompilerPassInterface
         if ($container->hasParameter('cache.prefix.seed')) {
             $seed = '.'.$container->getParameterBag()->resolveValue($container->getParameter('cache.prefix.seed'));
         } else {
-            $seed = '_'.$container->getParameter('kernel.root_dir');
+            $seed = '_'.$container->getParameter('kernel.project_dir');
         }
-        $seed .= '.'.$container->getParameter('kernel.name').'.'.$container->getParameter('kernel.environment');
+        $seed .= '.'.$container->getParameter('kernel.container_class');
 
         $pools = array();
         $clearers = array();

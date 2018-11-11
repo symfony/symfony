@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -171,7 +172,7 @@ class ExceptionListener
     private function startAuthentication(Request $request, AuthenticationException $authException): Response
     {
         if (null === $this->authenticationEntryPoint) {
-            throw $authException;
+            throw new HttpException(Response::HTTP_UNAUTHORIZED, $authException->getMessage(), $authException, array(), $authException->getCode());
         }
 
         if (null !== $this->logger) {

@@ -344,6 +344,20 @@ class JsonDescriptor extends Descriptor
         if ($callable instanceof \Closure) {
             $data['type'] = 'closure';
 
+            $r = new \ReflectionFunction($callable);
+            if (false !== strpos($r->name, '{closure}')) {
+                return $data;
+            }
+            $data['name'] = $r->name;
+
+            $class = ($class = $r->getClosureThis()) ? \get_class($class) : null;
+            if ($scopeClass = $r->getClosureScopeClass() ?: $class) {
+                $data['class'] = $scopeClass;
+                if (!$class) {
+                    $data['static'] = true;
+                }
+            }
+
             return $data;
         }
 

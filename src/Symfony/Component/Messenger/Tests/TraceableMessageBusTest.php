@@ -14,27 +14,26 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeItem;
+use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
 
 class TraceableMessageBusTest extends TestCase
 {
-    public function testItTracesResult()
+    public function testItTracesDispatch()
     {
         $message = new DummyMessage('Hello');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn($result = array('foo' => 'bar'));
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn(new Envelope($message));
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
-        $this->assertSame($result, $traceableBus->dispatch($message));
+        $traceableBus->dispatch($message);
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
-            'result' => $result,
-            'envelopeItems' => null,
+            'stamps' => array(),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
@@ -43,21 +42,21 @@ class TraceableMessageBusTest extends TestCase
         ), $tracedMessages[0], true);
     }
 
-    public function testItTracesResultWithEnvelope()
+    public function testItTracesDispatchWithEnvelope()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hello'))->with($envelopeItem = new AnEnvelopeItem());
+        $message = new DummyMessage('Hello');
+        $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($result = array('foo' => 'bar'));
+        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($envelope);
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
-        $this->assertSame($result, $traceableBus->dispatch($envelope));
+        $traceableBus->dispatch($envelope);
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
-            'result' => $result,
-            'envelopeItems' => array($envelopeItem),
+            'stamps' => array($stamp),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
@@ -86,7 +85,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertArraySubset(array(
             'message' => $message,
             'exception' => $exception,
-            'envelopeItems' => null,
+            'stamps' => array(),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,

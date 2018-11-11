@@ -21,13 +21,27 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
  */
 class JsonEncode implements EncoderInterface
 {
-    private $options;
-    private $propertyAccessor;
+    const OPTIONS = 'json_encode_options';
 
-    public function __construct(int $bitmask = 0)
+    private $propertyAccessor;
+    private $defaultContext = array(
+        self::OPTIONS => 0,
+        JsonEncoder::JSON_PROPERTY_PATH => null
+    );
+
+    /**
+     * @param array $defaultContext
+     */
+    public function __construct($defaultContext = array())
     {
-        $this->options = $bitmask;
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        if (!\is_array($defaultContext)) {
+            @trigger_error(sprintf('Passing an integer as first parameter of the "%s()" method is deprecated since Symfony 4.2, use the "json_encode_options" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->defaultContext[self::OPTIONS] = (int) $defaultContext;
+        } else {
+            $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+        }
     }
 
     /**
@@ -37,8 +51,10 @@ class JsonEncode implements EncoderInterface
      */
     public function encode($data, $format, array $context = array())
     {
-        $context = $this->resolveContext($context);
+        $jsonEncodeOptions = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
+        $encodedJson = json_encode($data, $jsonEncodeOptions);
 
+        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($jsonEncodeOptions & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
         if ($propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH]) {
             $data = $this->wrapEncodableData($propertyPath, $data);
         }
@@ -58,32 +74,5 @@ class JsonEncode implements EncoderInterface
     public function supportsEncoding($format)
     {
         return JsonEncoder::FORMAT === $format;
-    }
-
-    /**
-     * Merge default json encode options with context.
-     *
-     * @return array
-     */
-    private function resolveContext(array $context = array())
-    {
-        return array_merge(array('json_encode_options' => $this->options, JsonEncoder::JSON_PROPERTY_PATH => null), $context);
-    }
-
-    /**
-     * Wrap data before encoding.
-     *
-     * @param string $propertyPath
-     * @param mixed  $data
-     *
-     * @return array
-     */
-    private function wrapEncodableData($propertyPath, $data)
-    {
-        $wrappedData = array();
-
-        $this->propertyAccessor->setValue($wrappedData, $propertyPath, $data);
-
-        return $wrappedData;
     }
 }

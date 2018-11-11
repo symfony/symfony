@@ -265,7 +265,6 @@ class Exporter
     private static function exportRegistry(Registry $value, string $indent, string $subIndent): string
     {
         $code = '';
-        $reflectors = array();
         $serializables = array();
         $seen = array();
         $prototypesAccess = 0;

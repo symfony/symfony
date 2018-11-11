@@ -38,8 +38,13 @@ class PropertyNormalizerTest extends TestCase
 
     protected function setUp()
     {
+        $this->createNormalizer();
+    }
+
+    private function createNormalizer(array $defaultContext = array())
+    {
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
-        $this->normalizer = new PropertyNormalizer();
+        $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -121,7 +126,20 @@ class PropertyNormalizerTest extends TestCase
      */
     public function testCallbacks($callbacks, $value, $result, $message)
     {
-        $this->normalizer->setCallbacks($callbacks);
+        $this->doTestCallbacks($callbacks, $value, $result, $message);
+    }
+
+    /**
+     * @dataProvider provideCallbacks
+     */
+    public function testLegacyCallbacks($callbacks, $value, $result, $message)
+    {
+        $this->doTestCallbacks($callbacks, $value, $result, $message, true);
+    }
+
+    private function doTestCallbacks($callbacks, $value, $result, $message, bool $legacy = false)
+    {
+        $legacy ? $this->normalizer->setCallbacks($callbacks) : $this->createNormalizer(array(PropertyNormalizer::CALLBACKS => $callbacks));
 
         $obj = new PropertyConstructorDummy('', $value);
 
@@ -137,7 +155,24 @@ class PropertyNormalizerTest extends TestCase
      */
     public function testUncallableCallbacks()
     {
-        $this->normalizer->setCallbacks(array('bar' => null));
+        $this->doTestUncallableCallbacks();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLegacyUncallableCallbacks()
+    {
+        $this->doTestUncallableCallbacks(true);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    private function doTestUncallableCallbacks(bool $legacy = false)
+    {
+        $callbacks = array('bar' => null);
+        $legacy ? $this->normalizer->setCallbacks($callbacks) : $this->createNormalizer(array(PropertyNormalizer::CALLBACKS => $callbacks));
 
         $obj = new PropertyConstructorDummy('baz', 'quux');
 
@@ -146,7 +181,18 @@ class PropertyNormalizerTest extends TestCase
 
     public function testIgnoredAttributes()
     {
-        $this->normalizer->setIgnoredAttributes(array('foo', 'bar', 'camelCase'));
+        $this->doTestIgnoredAttributes();
+    }
+
+    public function testLegacyIgnoredAttributes()
+    {
+        $this->doTestIgnoredAttributes(true);
+    }
+
+    private function doTestIgnoredAttributes(bool $legacy = false)
+    {
+        $ignoredAttributes = array('foo', 'bar', 'camelCase');
+        $legacy ? $this->normalizer->setIgnoredAttributes($ignoredAttributes) : $this->createNormalizer(array(PropertyNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes));
 
         $obj = new PropertyDummy();
         $obj->foo = 'foo';
@@ -324,9 +370,22 @@ class PropertyNormalizerTest extends TestCase
      */
     public function testUnableToNormalizeCircularReference()
     {
-        $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
-        $this->normalizer->setCircularReferenceLimit(2);
+        $this->doTestUnableToNormalizeCircularReference();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
+     */
+    public function testLegacyUnableToNormalizeCircularReference()
+    {
+        $this->doTestUnableToNormalizeCircularReference(true);
+    }
+
+    private function doTestUnableToNormalizeCircularReference(bool $legacy = false)
+    {
+        $legacy ? $this->normalizer->setCircularReferenceLimit(2) : $this->createNormalizer(array(PropertyNormalizer::CIRCULAR_REFERENCE_LIMIT => 2));
+        $this->serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($this->serializer);
 
         $obj = new PropertyCircularReferenceDummy();
 
@@ -350,11 +409,23 @@ class PropertyNormalizerTest extends TestCase
 
     public function testCircularReferenceHandler()
     {
-        $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
-        $this->normalizer->setCircularReferenceHandler(function ($obj) {
+        $this->doTestCircularReferenceHandler();
+    }
+
+    public function testLegacyCircularReferenceHandler()
+    {
+        $this->doTestCircularReferenceHandler(true);
+    }
+
+    private function doTestCircularReferenceHandler(bool $legacy = false)
+    {
+        $handler = function ($obj) {
             return \get_class($obj);
-        });
+        };
+        $legacy ? $this->normalizer->setCircularReferenceHandler($handler) : $this->createNormalizer(array(PropertyNormalizer::CIRCULAR_REFERENCE_HANDLER => $handler));
+
+        $this->serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($this->serializer);
 
         $obj = new PropertyCircularReferenceDummy();
 

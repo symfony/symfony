@@ -6,7 +6,8 @@
     <div id="summary">
         {% block summary %}
             {% if profile is defined %}
-                {% set status_code = ('request' in profile.collectors|keys) ? profile.getcollector('request').statuscode|default(0) : 0 %}
+                {% set request_collector = profile.collectors.request|default(false) %}
+                {% set status_code = request_collector ? request_collector.statuscode|default(0) : 0 %}
                 {% set css_class = status_code > 399 ? 'status-error' : status_code > 299 ? 'status-warning' : 'status-success' %}
 
                 <div class="status {{ css_class }}">
@@ -16,10 +17,13 @@
                                 <a href="{{ profile.url }}">{{ profile.url }}</a>
                             {% else %}
                                 {{ profile.url }}
+                                {% set referer = request_collector ? request_collector.requestheaders.get('referer') : null %}
+                                {% if referer %}
+                                    <a href="{{ referer }}" class="referer">Return to referer URL</a>
+                                {% endif %}
                             {% endif %}
                         </h2>
 
-                        {% set request_collector = profile.collectors.request|default(false) %}
                         {% if request_collector and request_collector.redirect -%}
                             {%- set redirect = request_collector.redirect -%}
                             {%- set controller = redirect.controller -%}

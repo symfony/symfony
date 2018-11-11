@@ -346,7 +346,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         try {
             if (isset($this->classReflectors[$class])) {
                 $classReflector = $this->classReflectors[$class];
-            } elseif ($this->trackResources) {
+            } elseif (class_exists(ClassExistenceResource::class)) {
                 $resource = new ClassExistenceResource($class, false);
                 $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
             } else {
@@ -1124,7 +1124,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
             }
         } else {
-            $r = new \ReflectionClass($class = $parameterBag->resolveValue($definition->getClass()));
+            $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
 

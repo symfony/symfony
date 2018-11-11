@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -25,7 +25,7 @@
         "arc": "aramæisk",
         "arn": "mapudungun",
         "arp": "arapaho",
-        "ars": "najd-arabisk",
+        "ars": "Najd-arabisk",
         "arw": "arawak",
         "as": "assamesisk",
         "asa": "asu",
@@ -155,7 +155,7 @@
         "frr": "nordfrisisk",
         "frs": "østfrisisk",
         "fur": "friulian",
-        "fy": "frisisk",
+        "fy": "vestfrisisk",
         "ga": "irsk",
         "gaa": "ga",
         "gag": "gagauzisk",

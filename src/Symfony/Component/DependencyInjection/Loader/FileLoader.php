@@ -109,7 +109,7 @@ abstract class FileLoader extends BaseFileLoader
         $excludePrefix = null;
         $excludePatterns = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePatterns));
         foreach ($excludePatterns as $excludePattern) {
-            foreach ($this->glob($excludePattern, true, $resource) as $path => $info) {
+            foreach ($this->glob($excludePattern, true, $resource, false, true) as $path => $info) {
                 if (null === $excludePrefix) {
                     $excludePrefix = $resource->getPrefix();
                 }
@@ -123,7 +123,7 @@ abstract class FileLoader extends BaseFileLoader
         $classes = array();
         $extRegexp = '/\\.php$/';
         $prefixLen = null;
-        foreach ($this->glob($pattern, true, $resource) as $path => $info) {
+        foreach ($this->glob($pattern, true, $resource, false, false, $excludePaths) as $path => $info) {
             if (null === $prefixLen) {
                 $prefixLen = \strlen($resource->getPrefix());
 

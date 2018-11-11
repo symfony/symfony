@@ -15,6 +15,7 @@
             "empty_data",
             "error_bubbling",
             "help",
+            "help_attr",
             "inherit_data",
             "label",
             "label_attr",

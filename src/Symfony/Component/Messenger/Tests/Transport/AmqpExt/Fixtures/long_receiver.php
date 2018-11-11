@@ -12,6 +12,7 @@ if (!file_exists($autoload)) {
 
 require_once $autoload;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
@@ -29,13 +30,15 @@ $connection = Connection::fromDsn(getenv('DSN'));
 $receiver = new AmqpReceiver($connection, $serializer);
 
 $worker = new Worker($receiver, new class() implements MessageBusInterface {
-    public function dispatch($envelope)
+    public function dispatch($envelope): Envelope
     {
-        echo 'Get envelope with message: '.get_class($envelope->getMessage())."\n";
-        echo sprintf("with items: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));
+        echo 'Get envelope with message: '.\get_class($envelope->getMessage())."\n";
+        echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));
 
         sleep(30);
         echo "Done.\n";
+
+        return $envelope;
     }
 });
 

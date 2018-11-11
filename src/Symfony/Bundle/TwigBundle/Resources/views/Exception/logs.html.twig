@@ -1,9 +1,9 @@
 {% set channel_is_defined = (logs|first).channel is defined %}
-<table class="logs" data-log-levels="Emergency,Alert,Critical,Error,Warning,Notice,Info,Debug" data-default-log-level="Info">
+<table class="logs" data-filter-level="Emergency,Alert,Critical,Error,Warning,Notice,Info,Debug" data-filters>
     <thead>
         <tr>
-            <th>Level</th>
-            {% if channel_is_defined %}<th>Channel</th>{% endif %}
+            <th data-filter="level">Level</th>
+            {% if channel_is_defined %}<th data-filter="channel">Channel</th>{% endif %}
             <th class="full-width">Message</th>
         </tr>
     </thead>
@@ -18,7 +18,7 @@
             {% set severity = log.context.exception.severity|default(false) %}
             {% set status = severity is constant('E_DEPRECATED') or severity is constant('E_USER_DEPRECATED') ? 'warning' : 'normal' %}
         {% endif %}
-        <tr class="status-{{ status }}" data-log-level="{{ log.priorityName|lower }}">
+        <tr class="status-{{ status }}" data-filter-level="{{ log.priorityName|lower }}"{% if channel_is_defined %} data-filter-channel="{{ log.channel }}"{% endif %}>
             <td class="text-small" nowrap>
                 <span class="colored text-bold">{{ log.priorityName }}</span>
                 <span class="text-muted newline">{{ log.timestamp|date('H:i:s') }}</span>

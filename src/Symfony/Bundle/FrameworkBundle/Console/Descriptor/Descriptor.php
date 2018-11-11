@@ -289,24 +289,25 @@ abstract class Descriptor implements DescriptorInterface
 
     /**
      * Gets class description from a docblock.
-     *
-     * @param string $class
-     *
-     * @return string
      */
-    protected function getClassDescription($class)
+    public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
+        $resolvedClass = null;
+
         if (!interface_exists(DocBlockFactoryInterface::class)) {
             return '';
         }
 
         try {
-            $reflectionProperty = new \ReflectionClass($class);
+            $r = new \ReflectionClass($class);
+            $resolvedClass = $r->name;
 
-            return DocBlockFactory::createInstance()
-                ->create($reflectionProperty->getDocComment())
-                ->getSummary();
-        } catch (\ReflectionException $e) {
+            if ($docComment = $r->getDocComment()) {
+                return DocBlockFactory::createInstance()
+                    ->create($docComment)
+                    ->getSummary();
+            }
+        } catch (\ReflectionException | \InvalidArgumentException $e) {
         }
 
         return '';

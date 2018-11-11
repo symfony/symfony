@@ -16,6 +16,7 @@ CHANGELOG
  * Deprecated the `simple_form` and `simple_preauth` authentication listeners, use Guard instead.
  * Deprecated the `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes, use Guard instead.
  * Added `port` in access_control
+ * Added individual voter decisions to the profiler
  
 4.1.0
 -----

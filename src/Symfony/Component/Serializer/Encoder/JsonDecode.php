@@ -22,21 +22,44 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 class JsonDecode implements DecoderInterface
 {
     protected $serializer;
-
-    private $associative;
-    private $recursionDepth;
     private $propertyAccessor;
+
+    /**
+     * True to return the result as an associative array, false for a nested stdClass hierarchy.
+     */
+    const ASSOCIATIVE = 'json_decode_associative';
+
+    const OPTIONS = 'json_decode_options';
+
+    /**
+     * Specifies the recursion depth.
+     */
+    const RECURSION_DEPTH = 'json_decode_recursion_depth';
+
+    private $defaultContext = array(
+        self::ASSOCIATIVE => false,
+        self::OPTIONS => 0,
+        self::RECURSION_DEPTH => 512,
+        JsonEncoder::JSON_PROPERTY_PATH => null,
+    );
 
     /**
      * Constructs a new JsonDecode instance.
      *
-     * @param bool $associative True to return the result associative array, false for a nested stdClass hierarchy
-     * @param int  $depth       Specifies the recursion depth
+     * @param array $defaultContext
      */
-    public function __construct(bool $associative = false, int $depth = 512)
+    public function __construct($defaultContext = array(), int $depth = 512)
     {
-        $this->associative = $associative;
-        $this->recursionDepth = $depth;
+        if (!\is_array($defaultContext)) {
+            @trigger_error(sprintf('Using constructor parameters that are not a default context is deprecated since Symfony 4.2, use the "%s" and "%s" keys of the context instead.', self::ASSOCIATIVE, self::RECURSION_DEPTH), E_USER_DEPRECATED);
+
+            $defaultContext = array(
+                self::ASSOCIATIVE => (bool) $defaultContext,
+                self::RECURSION_DEPTH => $depth,
+            );
+        }
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -50,7 +73,7 @@ class JsonDecode implements DecoderInterface
      * The $context array is a simple key=>value array, with the following supported keys:
      *
      * json_decode_associative: boolean
-     *      If true, returns the object as associative array.
+     *      If true, returns the object as an associative array.
      *      If false, returns the object as nested stdClass
      *      If not specified, this method will use the default set in JsonDecode::__construct
      *
@@ -59,7 +82,7 @@ class JsonDecode implements DecoderInterface
      *      If not specified, this method will use the default set in JsonDecode::__construct
      *
      * json_decode_options: integer
-     *      Specifies additional options as per documentation for json_decode.
+     *      Specifies additional options as per documentation for json_decode
      *
      * JSON_PROPERTY_PATH: string
      *      Specifies property path and allow to unwrap data
@@ -72,11 +95,9 @@ class JsonDecode implements DecoderInterface
      */
     public function decode($data, $format, array $context = array())
     {
-        $context = $this->resolveContext($context);
-
-        $associative = $context['json_decode_associative'];
-        $recursionDepth = $context['json_decode_recursion_depth'];
-        $options = $context['json_decode_options'];
+        $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
+        $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
+        $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
 
         $decodedData = json_decode($data, $associative, $recursionDepth, $options);
 
@@ -101,22 +122,5 @@ class JsonDecode implements DecoderInterface
     public function supportsDecoding($format)
     {
         return JsonEncoder::FORMAT === $format;
-    }
-
-    /**
-     * Merges the default options of the Json Decoder with the passed context.
-     *
-     * @return array
-     */
-    private function resolveContext(array $context)
-    {
-        $defaultOptions = array(
-            'json_decode_associative' => $this->associative,
-            'json_decode_recursion_depth' => $this->recursionDepth,
-            'json_decode_options' => 0,
-            JsonEncoder::JSON_PROPERTY_PATH => null,
-        );
-
-        return array_merge($defaultOptions, $context);
     }
 }

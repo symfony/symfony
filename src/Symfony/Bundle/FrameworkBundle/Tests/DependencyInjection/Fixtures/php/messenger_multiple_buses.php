@@ -8,15 +8,13 @@ $container->loadFromExtension('framework', array(
             'messenger.bus.events' => array(
                 'middleware' => array(
                     array('with_factory' => array('foo', true, array('bar' => 'baz'))),
-                    'allow_no_handler',
                 ),
             ),
             'messenger.bus.queries' => array(
                 'default_middleware' => false,
                 'middleware' => array(
-                    'route_messages',
-                    'allow_no_handler',
-                    'call_message_handler',
+                    'send_message',
+                    'handle_message',
                 ),
             ),
         ),

@@ -11,41 +11,36 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
-class LoggingMiddlewareTest extends TestCase
+class LoggingMiddlewareTest extends MiddlewareTestCase
 {
     public function testDebugLogAndNextMiddleware()
     {
         $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger
             ->expects($this->exactly(2))
             ->method('debug')
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($message)
-            ->willReturn('Hello')
-        ;
 
-        $result = (new LoggingMiddleware($logger))->handle($message, $next);
-
-        $this->assertSame('Hello', $result);
+        (new LoggingMiddleware($logger))->handle($envelope, $this->getStackMock());
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Thrown from next middleware.
      */
     public function testWarningLogOnException()
     {
         $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -56,14 +51,8 @@ class LoggingMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('warning')
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($message)
-            ->willThrowException(new \Exception())
-        ;
+        $stack = $this->getThrowingStackMock();
 
-        (new LoggingMiddleware($logger))->handle($message, $next);
+        (new LoggingMiddleware($logger))->handle($envelope, $stack);
     }
 }

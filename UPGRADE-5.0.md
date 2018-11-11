@@ -121,6 +121,8 @@ Form
    {% endfor %}
    ```
 
+ * The `regions` option was removed from the `TimezoneType`.
+
 FrameworkBundle
 ---------------
 
@@ -162,11 +164,32 @@ FrameworkBundle
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `ContainerAwareCommand` class has been removed, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` console option and its "-e" shortcut have been removed,
-   set the "APP_ENV" environment variable instead.
- * The `--no-debug` console option has been removed, 
-   set the "APP_DEBUG" environment variable to "0" instead.
+ * The `--env` and `--no-debug` console options have been removed, define the `APP_ENV` and
+   `APP_DEBUG` environment variables instead.
+   If you want to keep using `--env` and `--no-debug`, update your `bin/console` file to make it call
+   `Application::bootstrapEnv()`.
+
+   Before:
+   ```php
+   $input = new ArgvInput();
+   $env = $input->getParameterOption(['--env', '-e'], $_SERVER['APP_ENV'] ?? 'dev', true);
+   $debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env)) && !$input->hasParameterOption('--no-debug', true);
+   $kernel = new Kernel($env, $debug);
+   $application = new Application($kernel);
+   $application->run($input);
+   ```
+
+   After:
+   ```php
+   Application::bootstrapEnv($_SERVER['argv']);
+   $kernel = new Kernel($_SERVER['APP_ENV'], $_SERVER['APP_DEBUG']);
+   $application = new Application($kernel);
+   $application->run();
+   ```
+
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
+ * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
+ * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
 
 HttpFoundation
 --------------
@@ -176,6 +199,15 @@ HttpFoundation
  * The `getSession()` method of the `Request` class throws an exception when session is null.
  * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
    changed respectively from "false" to "null" and from "null" to "lax".
+
+HttpKernel
+----------
+
+ * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
+ * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
+ * Removed the first and second constructor argument of `ConfigDataCollector`
+ * Removed `ConfigDataCollector::getApplicationName()` 
+ * Removed `ConfigDataCollector::getApplicationVersion()`
 
 Monolog
 -------
@@ -250,6 +282,7 @@ TwigBundle
 
  * The default value (`false`) of the `twig.strict_variables` configuration option has been changed to `%kernel.debug%`.
  * The `transchoice` tag and filter have been removed, use the `trans` ones instead with a `%count%` parameter.
+ * Removed support for legacy templates directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`, use `templates/` and `templates/bundles/<BundleName>/` instead.
 
 Validator
 --------
@@ -262,7 +295,7 @@ Validator
  * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final
  * Removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
  * The `symfony/intl` component is now required for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints
- * The `egulias/email-validator` component is now required for using the `Email` constraint
+ * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
 
 Workflow
@@ -277,4 +310,4 @@ WebServerBundle
 ---------------
 
 * Omitting the `$environment` argument of  the `ServerRunCommand` and
-  `ServerStartCommand` constructors now throws a `\TypeError.
+  `ServerStartCommand` constructors now throws a `\TypeError`.

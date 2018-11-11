@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Messenger;
 
-use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class Worker
 {
@@ -44,7 +46,7 @@ class Worker
                 return;
             }
 
-            $this->bus->dispatch($envelope->with(new ReceivedMessage()));
+            $this->bus->dispatch($envelope->with(new ReceivedStamp()));
         });
     }
 }

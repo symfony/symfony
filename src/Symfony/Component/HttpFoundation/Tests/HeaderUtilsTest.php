@@ -82,4 +82,53 @@ class HeaderUtilsTest extends TestCase
         $this->assertEquals('foo "bar"', HeaderUtils::unquote('"foo \"\b\a\r\""'));
         $this->assertEquals('foo \\ bar', HeaderUtils::unquote('"foo \\\\ bar"'));
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testMakeDispositionInvalidDisposition()
+    {
+        HeaderUtils::makeDisposition('invalid', 'foo.html');
+    }
+
+    /**
+     * @dataProvider provideMakeDisposition
+     */
+    public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)
+    {
+        $this->assertEquals($expected, HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback));
+    }
+
+    public function provideMakeDisposition()
+    {
+        return array(
+            array('attachment', 'foo.html', 'foo.html', 'attachment; filename=foo.html'),
+            array('attachment', 'foo.html', '', 'attachment; filename=foo.html'),
+            array('attachment', 'foo bar.html', '', 'attachment; filename="foo bar.html"'),
+            array('attachment', 'foo "bar".html', '', 'attachment; filename="foo \\"bar\\".html"'),
+            array('attachment', 'foo%20bar.html', 'foo bar.html', 'attachment; filename="foo bar.html"; filename*=utf-8\'\'foo%2520bar.html'),
+            array('attachment', 'föö.html', 'foo.html', 'attachment; filename=foo.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html'),
+        );
+    }
+
+    /**
+     * @dataProvider provideMakeDispositionFail
+     * @expectedException \InvalidArgumentException
+     */
+    public function testMakeDispositionFail($disposition, $filename)
+    {
+        HeaderUtils::makeDisposition($disposition, $filename);
+    }
+
+    public function provideMakeDispositionFail()
+    {
+        return array(
+            array('attachment', 'foo%20bar.html'),
+            array('attachment', 'foo/bar.html'),
+            array('attachment', '/foo.html'),
+            array('attachment', 'foo\bar.html'),
+            array('attachment', '\foo.html'),
+            array('attachment', 'föö.html'),
+        );
+    }
 }

@@ -261,7 +261,7 @@ EOF
     public function filterToServiceTypes($serviceId)
     {
         // filter out things that could not be valid class names
-        if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $serviceId)) {
+        if (!preg_match('/(?(DEFINE)(?<V>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))^(?&V)(?:\\\\(?&V))*+(?: \$(?&V))?$/', $serviceId)) {
             return false;
         }
 
@@ -270,13 +270,6 @@ EOF
             return true;
         }
 
-        try {
-            new \ReflectionClass($serviceId);
-
-            return true;
-        } catch (\ReflectionException $e) {
-            // the service id is not a valid class/interface
-            return false;
-        }
+        return class_exists($serviceId) || interface_exists($serviceId, false);
     }
 }

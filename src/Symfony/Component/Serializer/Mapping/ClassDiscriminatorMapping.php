@@ -32,11 +32,7 @@ class ClassDiscriminatorMapping
 
     public function getClassForType(string $type): ?string
     {
-        if (isset($this->typesMapping[$type])) {
-            return $this->typesMapping[$type];
-        }
-
-        return null;
+        return $this->typesMapping[$type] ?? null;
     }
 
     /**

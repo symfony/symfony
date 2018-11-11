@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates a PAN using the LUHN Algorithm.
@@ -50,7 +51,7 @@ class LuhnValidator extends ConstraintValidator
         // Work with strings only, because long numbers are represented as floats
         // internally and don't work with strlen()
         if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new UnexpectedValueException($value, 'string');
         }
 
         $value = (string) $value;

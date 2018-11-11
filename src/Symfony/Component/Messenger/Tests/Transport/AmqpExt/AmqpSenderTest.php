@@ -25,7 +25,7 @@ class AmqpSenderTest extends TestCase
 {
     public function testItSendsTheEncodedMessage()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Oy'));
+        $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = array('body' => '...', 'headers' => array('type' => DummyMessage::class));
 
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();

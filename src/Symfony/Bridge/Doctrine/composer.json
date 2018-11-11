@@ -29,6 +29,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/form": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/messenger": "~4.2",
         "symfony/property-access": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/proxy-manager-bridge": "~3.4|~4.0",

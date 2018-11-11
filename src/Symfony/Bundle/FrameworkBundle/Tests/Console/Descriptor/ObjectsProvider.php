@@ -96,6 +96,14 @@ class ObjectsProvider
         return array('builder_1' => $builder1);
     }
 
+    public static function getContainerDefinitionsWithExistingClasses()
+    {
+        return array(
+            'existing_class_def_1' => new Definition(ClassWithDocComment::class),
+            'existing_class_def_2' => new Definition(ClassWithoutDocComment::class),
+        );
+    }
+
     public static function getContainerDefinitions()
     {
         $definition1 = new Definition('Full\\Qualified\\Class1');
@@ -195,4 +203,15 @@ class RouteStub extends Route
     {
         return new CompiledRoute('', '#PATH_REGEX#', array(), array(), '#HOST_REGEX#');
     }
+}
+
+class ClassWithoutDocComment
+{
+}
+
+/**
+ * This is a class with a doc comment.
+ */
+class ClassWithDocComment
+{
 }

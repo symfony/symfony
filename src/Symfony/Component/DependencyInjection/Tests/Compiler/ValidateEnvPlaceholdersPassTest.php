@@ -48,6 +48,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = array(
             'float_node' => '%env(FLOATISH)%',
+            'string_node' => '%env(UNDEFINED)%',
         ));
 
         $this->doProcess($container);
@@ -313,6 +314,14 @@ class EnvConfiguration implements ConfigurationInterface
                 ->arrayNode('simple_array_node')->end()
                 ->enumNode('enum_node')->values(array('a', 'b'))->end()
                 ->variableNode('variable_node')->end()
+                ->scalarNode('string_node')
+                    ->validate()
+                        ->ifTrue(function ($value) {
+                            return !\is_string($value);
+                        })
+                        ->thenInvalid('%s is not a string')
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

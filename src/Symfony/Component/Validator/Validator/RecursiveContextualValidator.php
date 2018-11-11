@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
@@ -798,7 +799,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
             $validator = $this->validatorFactory->getInstance($constraint);
             $validator->initialize($context);
-            $validator->validate($value, $constraint);
+
+            try {
+                $validator->validate($value, $constraint);
+            } catch (UnexpectedValueException $e) {
+                $context->buildViolation('This value should be of type {{ type }}.')
+                    ->setParameter('{{ type }}', $e->getExpectedType())
+                    ->addViolation();
+            }
         }
     }
 }

@@ -30,13 +30,15 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 {
     protected $propertyAccessor;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null)
+    private $discriminatorCache = array();
+
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = array())
     {
         if (!\class_exists(PropertyAccess::class)) {
             throw new LogicException('The ObjectNormalizer class requires the "PropertyAccess" component. Install "symfony/property-access" to use it.');
         }
 
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver);
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -110,15 +112,16 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
     {
-        if (null !== $this->classDiscriminatorResolver) {
-            $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
-
-            if (null !== $mapping && $attribute == $mapping->getTypeProperty()) {
-                return $this->classDiscriminatorResolver->getTypeForMappedObject($object);
+        $cacheKey = \get_class($object);
+        if (!array_key_exists($cacheKey, $this->discriminatorCache)) {
+            $this->discriminatorCache[$cacheKey] = null;
+            if (null !== $this->classDiscriminatorResolver) {
+                $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
+                $this->discriminatorCache[$cacheKey] = null === $mapping ? null : $mapping->getTypeProperty();
             }
         }
 
-        return $this->propertyAccessor->getValue($object, $attribute);
+        return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
     }
 
     /**

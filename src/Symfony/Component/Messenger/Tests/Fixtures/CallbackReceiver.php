@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Fixtures;
 
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class CallbackReceiver implements ReceiverInterface
 {

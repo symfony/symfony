@@ -39,13 +39,7 @@ class ReflectionCaster
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
 
         if (false === strpos($c->name, '{closure}')) {
-            if (isset($a[$prefix.'class'])) {
-                $stub->class = $a[$prefix.'class']->value.'::'.$c->name;
-            } elseif (isset($a[$prefix.'this'])) {
-                $stub->class = $a[$prefix.'this']->class.'::'.$c->name;
-            } else {
-                $stub->class = $c->name;
-            }
+            $stub->class = isset($a[$prefix.'class']) ? $a[$prefix.'class']->value.'::'.$c->name : $c->name;
             unset($a[$prefix.'class']);
         }
         unset($a[$prefix.'extra']);

@@ -359,10 +359,9 @@ class MarkdownDescriptor extends Descriptor
             }
             $string .= "\n".sprintf('- Name: `%s`', $r->name);
 
-            $class = ($class = $r->getClosureThis()) ? \get_class($class) : null;
-            if ($scopeClass = $r->getClosureScopeClass() ?: $class) {
-                $string .= "\n".sprintf('- Class: `%s`', $class);
-                if (!$class) {
+            if ($class = $r->getClosureScopeClass()) {
+                $string .= "\n".sprintf('- Class: `%s`', $class->name);
+                if (!$r->getClosureThis()) {
                     $string .= "\n- Static: yes";
                 }
             }

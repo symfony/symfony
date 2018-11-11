@@ -170,6 +170,11 @@ class FormTypeTest extends BaseTypeTest
         ));
     }
 
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = array())
+    {
+        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
     public function testSubmitWithEmptyDataCreatesObjectIfClassAvailable()
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, array(

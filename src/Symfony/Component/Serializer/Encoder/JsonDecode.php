@@ -98,6 +98,7 @@ class JsonDecode implements DecoderInterface
         $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
         $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
         $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
+        $propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH] ?? $this->defaultContext[JsonEncoder::JSON_PROPERTY_PATH];
 
         $decodedData = json_decode($data, $associative, $recursionDepth, $options);
 
@@ -105,7 +106,7 @@ class JsonDecode implements DecoderInterface
             throw new NotEncodableValueException(json_last_error_msg());
         }
 
-        if ($propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH]) {
+        if ($propertyPath) {
             if ($this->propertyAccessor->isReadable($decodedData, $propertyPath)) {
                 $decodedData = $this->propertyAccessor->getValue($decodedData, $propertyPath);
             } else {

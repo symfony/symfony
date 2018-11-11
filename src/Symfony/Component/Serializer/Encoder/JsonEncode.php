@@ -26,7 +26,7 @@ class JsonEncode implements EncoderInterface
     private $propertyAccessor;
     private $defaultContext = array(
         self::OPTIONS => 0,
-        JsonEncoder::JSON_PROPERTY_PATH => null
+        JsonEncoder::JSON_PROPERTY_PATH => null,
     );
 
     /**
@@ -52,20 +52,35 @@ class JsonEncode implements EncoderInterface
     public function encode($data, $format, array $context = array())
     {
         $jsonEncodeOptions = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
-        $encodedJson = json_encode($data, $jsonEncodeOptions);
+        $propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH] ?? $this->defaultContext[JsonEncoder::JSON_PROPERTY_PATH];
 
-        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($jsonEncodeOptions & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-        if ($propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH]) {
+        if ($propertyPath) {
             $data = $this->wrapEncodableData($propertyPath, $data);
         }
 
-        $encodedJson = json_encode($data, $context['json_encode_options']);
+        $encodedJson = json_encode($data, $jsonEncodeOptions);
 
-        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($context['json_encode_options'] & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
+        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($jsonEncodeOptions & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
             throw new NotEncodableValueException(json_last_error_msg());
         }
 
         return $encodedJson;
+    }
+
+    /**
+     * Wrap data before encoding.
+     *
+     * @param string $propertyPath
+     * @param mixed  $data
+     *
+     * @return array
+     */
+    private function wrapEncodableData($propertyPath, $data)
+    {
+        $wrappedData = array();
+        $this->propertyAccessor->setValue($wrappedData, $propertyPath, $data);
+
+        return $wrappedData;
     }
 
     /**

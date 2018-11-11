@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-11T12:29:08Z
+
+The Travis failure seems unrelated, and from the output, it looks like someone used `set -x` in a bash script… weird.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-11T13:50:06Z
+
+I confirm about the failure: it's related but not an issue with the patch itself. Good to merge.

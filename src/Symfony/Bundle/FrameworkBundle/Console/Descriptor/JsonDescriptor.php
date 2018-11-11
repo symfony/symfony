@@ -374,10 +374,9 @@ class JsonDescriptor extends Descriptor
             }
             $data['name'] = $r->name;
 
-            $class = ($class = $r->getClosureThis()) ? \get_class($class) : null;
-            if ($scopeClass = $r->getClosureScopeClass() ?: $class) {
-                $data['class'] = $scopeClass;
-                if (!$class) {
+            if ($class = $r->getClosureScopeClass()) {
+                $data['class'] = $class->name;
+                if (!$r->getClosureThis()) {
                     $data['static'] = true;
                 }
             }

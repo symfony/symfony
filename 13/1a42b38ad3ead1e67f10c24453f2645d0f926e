@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-11T10:25:03Z
+
+:thinking: looks like there are more issues to fix:
+
+```
+phpunit.xml.dist:10: element phpunit: Schemas validity error : Element 'phpunit', attribute 'failOnRisky': The attribute 'failOnRisky' is not allowed.
+phpunit.xml.dist:10: element phpunit: Schemas validity error : Element 'phpunit', attribute 'failOnWarning': The attribute 'failOnWarning' is not allowed.
+phpunit.xml.dist fails to validate
+```
+
+That one is probably an issue with the XSD url being outdate, because I can see these attributes here: https://github.com/sebastianbergmann/phpunit/blob/master/phpunit.xsd
+
+I think 5.2 should probably be used here: https://github.com/sebastianbergmann/phpunit/commit/7e06a82806be004cbfd30a02d92162e9ed4abc7c
+
+It validates if I use http://schema.phpunit.de/5.2/phpunit.xsd . Composer seems to say lower versions should be allowed though:
+https://github.com/symfony/symfony/blob/46e3745a03e199e64cc0fcf3284a96b5a25dcee9/composer.json#L98
+
+What is the right call here? I think I should change the url.
+
+I also checked the other phpunit config files in the project, they all validate against that version of the XSD:
+```
+wget http://schema.phpunit.de/5.2/phpunit.xsd && find src -name phpunit.xml.dist| xargs xmllint --schema phpunit.xsd  1>/dev/null
+src/Symfony/Component/Routing/phpunit.xml.dist validates
+src/Symfony/Component/OptionsResolver/phpunit.xml.dist validates
+src/Symfony/Component/ClassLoader/phpunit.xml.dist validates
+src/Symfony/Component/Config/phpunit.xml.dist validates
+src/Symfony/Component/PropertyAccess/phpunit.xml.dist validates
+src/Symfony/Component/Filesystem/phpunit.xml.dist validates
+src/Symfony/Component/Stopwatch/phpunit.xml.dist validates
+src/Symfony/Component/DependencyInjection/phpunit.xml.dist validates
+src/Symfony/Component/Intl/phpunit.xml.dist validates
+src/Symfony/Component/PropertyInfo/phpunit.xml.dist validates
+src/Symfony/Component/HttpKernel/phpunit.xml.dist validates
+src/Symfony/Component/Form/phpunit.xml.dist validates
+src/Symfony/Component/ExpressionLanguage/phpunit.xml.dist validates
+src/Symfony/Component/VarDumper/phpunit.xml.dist validates
+src/Symfony/Component/Console/phpunit.xml.dist validates
+src/Symfony/Component/Asset/phpunit.xml.dist validates
+src/Symfony/Component/Finder/phpunit.xml.dist validates
+src/Symfony/Component/Locale/phpunit.xml.dist validates
+src/Symfony/Component/Process/phpunit.xml.dist validates
+src/Symfony/Component/CssSelector/phpunit.xml.dist validates
+src/Symfony/Component/Ldap/phpunit.xml.dist validates
+src/Symfony/Component/Validator/phpunit.xml.dist validates
+src/Symfony/Component/DomCrawler/phpunit.xml.dist validates
+src/Symfony/Component/Translation/phpunit.xml.dist validates
+src/Symfony/Component/Security/Guard/phpunit.xml.dist validates
+src/Symfony/Component/Security/phpunit.xml.dist validates
+src/Symfony/Component/Security/Csrf/phpunit.xml.dist validates
+src/Symfony/Component/Security/Http/phpunit.xml.dist validates
+src/Symfony/Component/Security/Core/phpunit.xml.dist validates
+src/Symfony/Component/Debug/phpunit.xml.dist validates
+src/Symfony/Component/Debug/vendor/symfony/http-foundation/phpunit.xml.dist validates
+src/Symfony/Component/Debug/vendor/symfony/event-dispatcher/phpunit.xml.dist validates
+src/Symfony/Component/Debug/vendor/symfony/http-kernel/phpunit.xml.dist validates
+src/Symfony/Component/Serializer/phpunit.xml.dist validates
+src/Symfony/Component/Yaml/phpunit.xml.dist validates
+src/Symfony/Component/Templating/phpunit.xml.dist validates
+src/Symfony/Component/HttpFoundation/phpunit.xml.dist validates
+src/Symfony/Component/EventDispatcher/phpunit.xml.dist validates
+src/Symfony/Component/BrowserKit/phpunit.xml.dist validates
+src/Symfony/Bridge/PhpUnit/phpunit.xml.dist validates
+src/Symfony/Bridge/Doctrine/phpunit.xml.dist validates
+src/Symfony/Bridge/Twig/phpunit.xml.dist validates
+src/Symfony/Bridge/Monolog/phpunit.xml.dist validates
+src/Symfony/Bridge/ProxyManager/phpunit.xml.dist validates
+src/Symfony/Bundle/FrameworkBundle/phpunit.xml.dist validates
+src/Symfony/Bundle/WebProfilerBundle/phpunit.xml.dist validates
+src/Symfony/Bundle/DebugBundle/phpunit.xml.dist validates
+src/Symfony/Bundle/TwigBundle/phpunit.xml.dist validates
+src/Symfony/Bundle/SecurityBundle/phpunit.xml.dist validates
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-11T11:07:30Z
+
+Let's change the URL yes. Since lowest versions of phpunit don't care about it, there is no issue doing so.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-11T11:08:26Z
+
+I will make a separate PR for this, since there are a lot more files to change.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-11T11:17:59Z
+
+See #29175

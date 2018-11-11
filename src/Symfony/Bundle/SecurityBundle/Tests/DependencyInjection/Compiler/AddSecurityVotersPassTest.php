@@ -95,13 +95,13 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
 
-        $def1 = $container->getDefinition('.debug.security.voter.voter1');
+        $def1 = $container->getDefinition('debug.security.voter.voter1');
         $this->assertEquals(array('voter1', null, 0), $def1->getDecoratedService(), 'voter1: wrong return from getDecoratedService');
-        $this->assertEquals(new Reference('.debug.security.voter.voter1.inner'), $def1->getArgument(0), 'voter1: wrong decorator argument');
+        $this->assertEquals(new Reference('debug.security.voter.voter1.inner'), $def1->getArgument(0), 'voter1: wrong decorator argument');
 
-        $def2 = $container->getDefinition('.debug.security.voter.voter2');
+        $def2 = $container->getDefinition('debug.security.voter.voter2');
         $this->assertEquals(array('voter2', null, 0), $def2->getDecoratedService(), 'voter2: wrong return from getDecoratedService');
-        $this->assertEquals(new Reference('.debug.security.voter.voter2.inner'), $def2->getArgument(0), 'voter2: wrong decorator argument');
+        $this->assertEquals(new Reference('debug.security.voter.voter2.inner'), $def2->getArgument(0), 'voter2: wrong decorator argument');
 
         $voters = $container->findTaggedServiceIds('security.voter');
         $this->assertCount(2, $voters, 'Incorrect count of voters');

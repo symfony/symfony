@@ -712,7 +712,8 @@ pre.sf-dump .sf-dump-search-hidden {
     display: none;
 }
 pre.sf-dump .sf-dump-search-wrapper {
-    float: right;
+    position: fixed;
+    right: 15px;
     font-size: 0;
     white-space: nowrap;
     max-width: 100%;

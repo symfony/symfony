@@ -615,4 +615,20 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(
+            array('date' => array('year' => '', 'month' => '', 'day' => ''), 'time' => array('hour' => '', 'minute' => '')),
+            $form->getViewData()
+        );
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
 }

@@ -684,19 +684,20 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleChoiceWithEmptyData()
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
-            'choices' => array('test'),
+            // empty data must match string choice value
+            'choices' => array($emptyData),
             'choices_as_values' => true,
-            'empty_data' => 'test',
+            'empty_data' => $emptyData,
         ));
 
         $form->submit(null);
 
-        $this->assertSame('test', $form->getData());
+        $this->assertSame($emptyData, $form->getData());
     }
 
     public function testSubmitSingleChoiceWithEmptyDataAndInitialData()

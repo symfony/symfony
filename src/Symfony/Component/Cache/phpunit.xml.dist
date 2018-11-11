@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.2/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
@@ -36,11 +36,11 @@
                 <array>
                     <element key="time-sensitive">
                         <array>
-                            <element><string>Cache\IntegrationTests</string></element>
-                            <element><string>Doctrine\Common\Cache</string></element>
-                            <element><string>Symfony\Component\Cache</string></element>
-                            <element><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
-                            <element><string>Symfony\Component\Cache\Traits</string></element>
+                            <element key="0"><string>Cache\IntegrationTests</string></element>
+                            <element key="1"><string>Doctrine\Common\Cache</string></element>
+                            <element key="2"><string>Symfony\Component\Cache</string></element>
+                            <element key="3"><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
+                            <element key="4"><string>Symfony\Component\Cache\Traits</string></element>
                         </array>
                     </element>
                 </array>

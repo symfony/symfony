@@ -524,10 +524,9 @@ class XmlDescriptor extends Descriptor
             }
             $callableXML->setAttribute('name', $r->name);
 
-            $class = ($class = $r->getClosureThis()) ? \get_class($class) : null;
-            if ($scopeClass = $r->getClosureScopeClass() ?: $class) {
-                $callableXML->setAttribute('class', $class);
-                if (!$class) {
+            if ($class = $r->getClosureScopeClass()) {
+                $callableXML->setAttribute('class', $class->name);
+                if (!$r->getClosureThis()) {
                     $callableXML->setAttribute('static', 'true');
                 }
             }

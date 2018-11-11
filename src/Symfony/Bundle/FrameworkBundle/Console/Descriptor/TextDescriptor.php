@@ -453,10 +453,7 @@ class TextDescriptor extends Descriptor
                 return 'Closure()';
             }
             if ($class = $r->getClosureScopeClass()) {
-                return sprintf('%s::%s()', $class, $r->name);
-            }
-            if ($class = $r->getClosureThis()) {
-                return sprintf('%s::%s()', \get_class($class), $r->name);
+                return sprintf('%s::%s()', $class->name, $r->name);
             }
 
             return $r->name.'()';

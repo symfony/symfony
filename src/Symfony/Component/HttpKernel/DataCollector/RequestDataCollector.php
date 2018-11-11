@@ -415,9 +415,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $controller['method'] = $r->name;
 
             if ($class = $r->getClosureScopeClass()) {
-                $controller['class'] = $class;
-            } elseif ($class = $r->getClosureThis()) {
-                $controller['class'] = \get_class($class);
+                $controller['class'] = $class->name;
             } else {
                 return $r->name;
             }

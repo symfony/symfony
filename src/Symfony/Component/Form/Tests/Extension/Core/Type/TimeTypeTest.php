@@ -790,4 +790,17 @@ class TimeTypeTest extends BaseTypeTest
 
         parent::testSubmitNull($expected, $norm, $view);
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer write back empty strings in the view data
+        $this->assertSame(array('hour' => '', 'minute' => ''), $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
 }

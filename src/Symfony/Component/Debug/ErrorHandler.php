@@ -417,8 +417,8 @@ class ErrorHandler
             self::$toStringException = null;
         } elseif (!$throw && !($type & $level)) {
             if (!isset(self::$silencedErrorCache[$id = $file.':'.$line])) {
-                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3), $type, $file, $line, false) : array();
-                $errorAsException = new SilencedErrorContext($type, $file, $line, $lightTrace);
+                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5), $type, $file, $line, false) : array();
+                $errorAsException = new SilencedErrorContext($type, $file, $line, isset($lightTrace[1]) ? array($lightTrace[0]) : $lightTrace);
             } elseif (isset(self::$silencedErrorCache[$id][$message])) {
                 $lightTrace = null;
                 $errorAsException = self::$silencedErrorCache[$id][$message];
@@ -441,7 +441,6 @@ class ErrorHandler
         } else {
             $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
 
-            // Clean the trace by removing function arguments and the first frames added by the error handler itself.
             if ($throw || $this->tracedErrors & $type) {
                 $backtrace = $errorAsException->getTrace();
                 $lightTrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
@@ -669,6 +668,9 @@ class ErrorHandler
         );
     }
 
+    /**
+     * Cleans the trace by removing function arguments and the frames added by the error handler and DebugClassLoader.
+     */
     private function cleanTrace($backtrace, $type, $file, $line, $throw)
     {
         $lightTrace = $backtrace;
@@ -677,6 +679,13 @@ class ErrorHandler
             if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
                 $lightTrace = \array_slice($lightTrace, 1 + $i);
                 break;
+            }
+        }
+        if (class_exists(DebugClassLoader::class, false)) {
+            for ($i = \count($lightTrace) - 2; 0 < $i; --$i) {
+                if (DebugClassLoader::class === ($lightTrace[$i]['class'] ?? null)) {
+                    array_splice($lightTrace, --$i, 2);
+                }
             }
         }
         if (!($throw || $this->scopedErrors & $type)) {

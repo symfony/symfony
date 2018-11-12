@@ -283,63 +283,6 @@ class ApplicationTest extends TestCase
 
         return $bundle;
     }
-
-    public function testBootstrapEnv()
-    {
-        $argv = array('--no-debug', '--env=testBootstrapEnv', 'foo=bar');
-        Application::bootstrapEnv($argv);
-
-        $this->assertSame($_SERVER['APP_DEBUG'], '0');
-        $this->assertSame($_ENV['APP_DEBUG'], '0');
-        $this->assertSame('0', getenv('APP_DEBUG'));
-        $this->assertSame('testBootstrapEnv', $_SERVER['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', $_ENV['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', getenv('APP_ENV'));
-        $this->assertSame(array('foo=bar'), $argv);
-
-        unset($_SERVER['APP_ENV']);
-        unset($_ENV['APP_ENV']);
-        putenv('APP_ENV');
-        unset($_SERVER['APP_DEBUG']);
-        unset($_ENV['APP_DEBUG']);
-        putenv('APP_DEBUG');
-
-        $argv = array('--env', 'testBootstrapEnv', 'foo=bar');
-        Application::bootstrapEnv($argv);
-
-        $this->assertSame('testBootstrapEnv', $_SERVER['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', $_ENV['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', getenv('APP_ENV'));
-        $this->assertSame(array('foo=bar'), $argv);
-
-        unset($_SERVER['APP_ENV']);
-        unset($_ENV['APP_ENV']);
-        putenv('APP_ENV');
-
-        $argv = array('-e', 'testBootstrapEnv', 'foo=bar');
-        Application::bootstrapEnv($argv);
-
-        $this->assertSame('testBootstrapEnv', $_SERVER['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', $_ENV['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', getenv('APP_ENV'));
-        $this->assertSame(array('foo=bar'), $argv);
-
-        unset($_SERVER['APP_ENV']);
-        unset($_ENV['APP_ENV']);
-        putenv('APP_ENV');
-
-        $argv = array('-e=testBootstrapEnv', 'foo=bar');
-        Application::bootstrapEnv($argv);
-
-        $this->assertSame('testBootstrapEnv', $_SERVER['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', $_ENV['APP_ENV']);
-        $this->assertSame('testBootstrapEnv', getenv('APP_ENV'));
-        $this->assertSame(array('foo=bar'), $argv);
-
-        unset($_SERVER['APP_ENV']);
-        unset($_ENV['APP_ENV']);
-        putenv('APP_ENV');
-    }
 }
 
 class ThrowingCommand extends Command

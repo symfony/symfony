@@ -166,27 +166,8 @@ FrameworkBundle
    with dependency injection instead.
  * The `--env` and `--no-debug` console options have been removed, define the `APP_ENV` and
    `APP_DEBUG` environment variables instead.
-   If you want to keep using `--env` and `--no-debug`, update your `bin/console` file to make it call
-   `Application::bootstrapEnv()`.
-
-   Before:
-   ```php
-   $input = new ArgvInput();
-   $env = $input->getParameterOption(['--env', '-e'], $_SERVER['APP_ENV'] ?? 'dev', true);
-   $debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env)) && !$input->hasParameterOption('--no-debug', true);
-   $kernel = new Kernel($env, $debug);
-   $application = new Application($kernel);
-   $application->run($input);
-   ```
-
-   After:
-   ```php
-   Application::bootstrapEnv($_SERVER['argv']);
-   $kernel = new Kernel($_SERVER['APP_ENV'], $_SERVER['APP_DEBUG']);
-   $application = new Application($kernel);
-   $application->run();
-   ```
-
+   If you want to keep using `--env` and `--no-debug`, you can take inspiration from
+   https://github.com/symfony/recipes/blob/master/symfony/console/3.3/bin/console
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.

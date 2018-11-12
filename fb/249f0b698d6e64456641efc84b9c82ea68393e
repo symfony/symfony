@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-10T09:43:43Z
+
+> This fixes the current behavior where we replace any previous stamp with the same type, which is unexpected to me as it silently looses data and more importantly blocks interesting use cases we're going to need in the near future.
+
+Nothing prevents anyone from getting and mutating/cloning a stamp with new data. So that's not blocking actually, but this suggestion is nice for DX.
+
+Stamps were thought as an advanced feature for flexibility but them as collections is even more specific.
+DX is always nice, but does it really make sense to keep & serialize every stamps when most of them makes no sense as collections?
+
+Couldn't stamps be mergeable by essence and a `StampInterface::merge(StampInterface $newStamp): StampInterface` used by `Envelope::with` (would either return the new stamp or a new instance with merged data, depending of the nature of the stamp)?
+
+In case of a stamp making sense as a collection, there is no way to clear the collection (appart from re-creating an envelope). Do we care?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-10T09:53:03Z
+
+>  does it really make sense to keep & serialize every stamps when most of them makes no sense as collections?
+
+It does a lot to me. The comparison with HTTP headers (or with DI tags btw) is sound and meaningful.
+
+> StampInterface::merge(StampInterface $newStamp): StampInterface
+
+that's an interesting idea. I would do it with a separate interface that would be added to stamps that provide this method (as you said, not all of them would need that behavior). Is it worth doing when the current PR is so simple?
+
+> no way to clear the collection (appart from re-creating an envelope).
+
+that's legit to me, like a real-life envelope: you cannot remove a stamp. And that's on purpose: this is information about the life of the message that shouldn't be deleted - unless you put the message in a new envelope. That's a metaphor but it makes sense to me. BTW, this hints me I'd prefer the current PR vs the mergeable interface: we really don't want to lose stamps silently IMHO (when replacing)
+
+---------------------------------------------------------------------------
+
+by skalpa at 2018-11-11T15:52:04Z
+
+This breaks the ability to "update" existing stamps by replacing them with a new instance. Ie:
+```php
+$bus->dispatch(new Envelope($msg, new SerializationStamp(array('foo' => 'bar'))));
+// Later in a middleware
+$context = array('bar' => 'baz');
+if ($envelope->get(SerializationStamp::class)) {
+    $context = array_replace($envelope->get(SerializationStamp::class)->getContext(), $context);
+}
+$envelope = $envelope->with(new SerializationStamp($context));
+```
+
+Also, imho, this has a lot of potential for WTF. Before the behaviour was, at least, clear: a new stamp of the same type replaces an old one. Now, stamps are added to the envelope but they may or may not be taken into account depending on whether the code that consumes them retrieves all of them or just the last one.
+
+So, I'd push this a little further to make it more predictable:
+- `Envelope::get()` should return an array
+- `Envelope::getLast()` should be removed
+- When several stamps of the same type are present, the explicitly defined behaviour should be that consumers should attempt to take all of them into account (by attempting to _merge_ them if that makes sense).
+- Instead of adding some kind of `MergeableStampInterface::merge()`, I'd keep the individual stamps in the envelope and provide a way to merge collections at a later stage, when the stamps need to be consumed. For instance, in the case of the `SerializationStamp`, add a `public static function fromCollection(SerializationStamp ...$stamps): self`
+
+If we compare stamps to HTTP headers, this would be in line with the HTTP behaviour that considers that duplicate headers should get merged:
+
+> Multiple message-header fields with the same field-name MAY be present in a message if and only if the entire field-value for that header field is defined as a comma-separated list [i.e., #(values)]. It MUST be possible to combine the multiple header fields into one "field-name: field-value" pair, without changing the semantics of the message, by appending each subsequent field-value to the first, each separated by a comma.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-11T19:24:26Z
+
+@skalpa thanks for the feedback. I read your comment and I'm really sorry but I don't agree with any of your proposals. I see an envelope and its stamps as the history of the processing of a message. The current behavior of erasing the previous message is critically reducing the usefulness of the Envelope wrapper. About mutability of the stamp, this PR doesn't change anything: getLast allows doing exactly the same as the previous get() (the reason being that it does exactly the same thing: return the last stamp). About the previous stamps, we shouldn't facilitate mutating nor merging them: history shouldn't be rewritten. Looking at #29166 then #29167 this already proves that this behavior is useful - and simple to use. LGTM as is. Thanks again.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2018-11-11T19:44:46Z
+
+@nicolas-grekas I understood this, but I still have to respectfully disagree.
+
+By only seeing the envelope as "the history of the processing of a message", you are ignoring what stamps are used for in most cases at the moment: to pass information from the outside world to the components involved in the processing of the message (ie: `SerializationStamp` and `ValidationStamp`, or in other words 100% of the stamps currently provided for user consumption by the component).
+
+While I understand what you're trying to do and consider it positive, if from now on stamps should only be considered as a "the history of the processing of the message", then another, distinct, mean to pass configuration to middleware/senders on a message basis should be found.
+
+I would also appreciate if you could tell me how I am supposed to fix the middleware I described above and that this PR is going to break once it gets merged, as I'm unable to find a solution by myself.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-11T19:57:45Z
+
+I don't get the issue with the middleware example: just replace `get()` by `getLast()` and done. You shouldn't care that the previous stamp is still there: that's history nobody will care about in this case.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2018-11-11T20:30:42Z
+
+That's right, sorry I missed that. I'll be able to work around it, so I'll stop bothering you ;-)
+Thanks for taking the time to answer me.
+👍

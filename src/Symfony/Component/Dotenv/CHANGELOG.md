@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `Dotenv::overload()` and `$overrideExistingVars` as optional parameter of `Dotenv::populate()`
+ * added `Dotenv::loadEnv()` to load a .env file and its corresponding .env.local, .env.$env and .env.$env.local files if they exist
 
 3.3.0
 -----

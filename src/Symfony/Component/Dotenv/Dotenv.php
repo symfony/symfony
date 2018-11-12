@@ -55,6 +55,7 @@ final class Dotenv
      * Loads a .env file and the corresponding .env.local, .env.$env and .env.$env.local files if they exist.
      *
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
+     * .env.dist is loaded when it exists and .env is not found.
      *
      * @param string $path       A file to load
      * @param string $varName    The name of the env vars that defines the app env
@@ -66,7 +67,11 @@ final class Dotenv
      */
     public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = array('test')): void
     {
-        $this->load($path);
+        if (file_exists($path) || !file_exists($p = "$path.dist")) {
+            $this->load($path);
+        } else {
+            $this->load($p);
+        }
 
         if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
             $this->populate(array($varName => $env = $defaultEnv));

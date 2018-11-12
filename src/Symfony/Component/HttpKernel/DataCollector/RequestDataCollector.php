@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,15 +59,20 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         $requestFiles = array();
-        foreach ($request->files->all() as $files) {
-            foreach ($files as $fileName => $fileData) {
-                $requestFiles[] = array(
-                    'name' => $fileData->getClientOriginalName(),
-                    'mimetype' => $fileData->getMimeType(),
-                    'size' => $fileData->getSize(),
-                );
+        $extractFiles = function (array $files) use (&$extractFiles, &$requestFiles) {
+            foreach ($files as $file) {
+                if ($file instanceof UploadedFile) {
+                    $requestFiles[] = array(
+                        'name' => $file->getClientOriginalName(),
+                        'mimetype' => $file->getMimeType(),
+                        'size' => $file->getSize(),
+                    );
+                } elseif (\is_array($file)) {
+                    $extractFiles($file);
+                }
             }
-        }
+        };
+        $extractFiles($request->files->all());
 
         $sessionMetadata = array();
         $sessionAttributes = array();

@@ -36,7 +36,7 @@ final class Envelope
         $this->message = $message;
 
         foreach ($stamps as $stamp) {
-            $this->stamps[\get_class($stamp)] = $stamp;
+            $this->stamps[\get_class($stamp)][] = $stamp;
         }
     }
 
@@ -48,22 +48,26 @@ final class Envelope
         $cloned = clone $this;
 
         foreach ($stamps as $stamp) {
-            $cloned->stamps[\get_class($stamp)] = $stamp;
+            $cloned->stamps[\get_class($stamp)][] = $stamp;
         }
 
         return $cloned;
     }
 
-    public function get(string $stampFqcn): ?StampInterface
+    public function last(string $stampFqcn): ?StampInterface
     {
-        return $this->stamps[$stampFqcn] ?? null;
+        return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
     }
 
     /**
-     * @return StampInterface[] indexed by fqcn
+     * @return StampInterface[]|StampInterface[][] The stamps for the specified FQCN, or all stamps by their class name
      */
-    public function all(): array
+    public function all(string $stampFqcn = null): array
     {
+        if (null !== $stampFqcn) {
+            return $this->stamps[$stampFqcn] ?? array();
+        }
+
         return $this->stamps;
     }
 

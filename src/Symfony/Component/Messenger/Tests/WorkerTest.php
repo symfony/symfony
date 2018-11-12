@@ -42,10 +42,11 @@ class WorkerTest extends TestCase
 
     public function testWorkerDoesNotWrapMessagesAlreadyWrappedWithReceivedMessage()
     {
-        $envelope = (new Envelope(new DummyMessage('API')))->with(new ReceivedStamp());
+        $envelope = new Envelope(new DummyMessage('API'));
         $receiver = new CallbackReceiver(function ($handler) use ($envelope) {
             $handler($envelope);
         });
+        $envelope = $envelope->with(new ReceivedStamp());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
         $bus->expects($this->at(0))->method('dispatch')->with($envelope)->willReturn($envelope);

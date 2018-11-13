@@ -82,6 +82,10 @@ final class Dotenv
             $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? $env;
         }
 
+        if ('local' === $env) {
+            return;
+        }
+
         if (file_exists($p = "$path.$env")) {
             $this->load($p);
         }

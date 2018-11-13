@@ -30,7 +30,7 @@ class DeprecationErrorHandler
      * - use "/some-regexp/" to stop the test suite whenever a deprecation
      *   message matches the given regular expression;
      * - use a number to define the upper bound of allowed deprecations,
-     *   making the test suite fail whenever more notices are trigerred.
+     *   making the test suite fail whenever more notices are triggered.
      *
      * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
      */

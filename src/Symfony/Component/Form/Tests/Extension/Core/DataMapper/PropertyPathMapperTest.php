@@ -357,4 +357,44 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData(array($form), $car);
     }
+
+    /**
+     * @dataProvider provideDate
+     */
+    public function testMapFormsToDataDoesNotChangeEqualDateTimeInstance($date)
+    {
+        $article = array();
+        $publishedAt = $date;
+        $article['publishedAt'] = clone $publishedAt;
+        $propertyPath = $this->getPropertyPath('[publishedAt]');
+
+        $this->propertyAccessor->expects($this->once())
+            ->method('getValue')
+            ->willReturn($article['publishedAt'])
+        ;
+        $this->propertyAccessor->expects($this->never())
+            ->method('setValue')
+        ;
+
+        $config = new FormConfigBuilder('publishedAt', \get_class($publishedAt), $this->dispatcher);
+        $config->setByReference(false);
+        $config->setPropertyPath($propertyPath);
+        $config->setData($publishedAt);
+        $form = $this->getForm($config);
+
+        $this->mapper->mapFormsToData(array($form), $article);
+    }
+
+    public function provideDate()
+    {
+        $data = array(
+            '\DateTime' => array(new \DateTime()),
+        );
+
+        if (class_exists('DateTimeImmutable')) {
+            $data['\DateTimeImmutable'] = array(new \DateTimeImmutable());
+        }
+
+        return $data;
+    }
 }

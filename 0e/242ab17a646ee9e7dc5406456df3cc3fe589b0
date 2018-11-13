@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-13T07:56:54Z
+
+I'm proposing to revert this method because it fits nowhere: we cannot use it in the console recipe because the method is in fwb. Logic fits only inlined in bin/console as in https://github.com/symfony/recipes/pull/491
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-11-13T09:24:11Z
+
+> we cannot use it in the console recipe because the method is in fwb.
+
+We are instantiating the FWB `Application` there, not sure to get the issue.
+OK for me anyways
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-13T09:28:57Z
+
+The issue is that even if the code is in fwb, it is the console recipe that is going to reference it, because that's where bin/console is.

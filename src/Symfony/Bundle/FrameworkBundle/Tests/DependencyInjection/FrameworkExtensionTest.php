@@ -321,14 +321,84 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertCount(5, $transitions);
 
-        $this->assertSame('request_review', $transitions[0]->getArgument(0));
-        $this->assertSame('journalist_approval', $transitions[1]->getArgument(0));
-        $this->assertSame('spellchecker_approval', $transitions[2]->getArgument(0));
-        $this->assertSame('publish', $transitions[3]->getArgument(0));
-        $this->assertSame('publish', $transitions[4]->getArgument(0));
+        $this->assertSame('workflow.article.transition.0', (string) $transitions[0]);
+        $this->assertSame(array(
+            'request_review',
+            array(
+                'draft',
+            ),
+            array(
+                'wait_for_journalist', 'wait_for_spellchecker',
+            ),
+        ), $container->getDefinition($transitions[0])->getArguments());
 
-        $this->assertSame(array('approved_by_journalist', 'approved_by_spellchecker'), $transitions[3]->getArgument(1));
-        $this->assertSame(array('draft'), $transitions[4]->getArgument(1));
+        $this->assertSame('workflow.article.transition.1', (string) $transitions[1]);
+        $this->assertSame(array(
+            'journalist_approval',
+            array(
+                'wait_for_journalist',
+            ),
+            array(
+                'approved_by_journalist',
+            ),
+        ), $container->getDefinition($transitions[1])->getArguments());
+
+        $this->assertSame('workflow.article.transition.2', (string) $transitions[2]);
+        $this->assertSame(array(
+            'spellchecker_approval',
+            array(
+                'wait_for_spellchecker',
+            ),
+            array(
+                'approved_by_spellchecker',
+            ),
+        ), $container->getDefinition($transitions[2])->getArguments());
+
+        $this->assertSame('workflow.article.transition.3', (string) $transitions[3]);
+        $this->assertSame(array(
+            'publish',
+            array(
+                'approved_by_journalist',
+                'approved_by_spellchecker',
+            ),
+            array(
+                'published',
+            ),
+        ), $container->getDefinition($transitions[3])->getArguments());
+
+        $this->assertSame('workflow.article.transition.4', (string) $transitions[4]);
+        $this->assertSame(array(
+            'publish',
+            array(
+                'draft',
+            ),
+            array(
+                'published',
+            ),
+        ), $container->getDefinition($transitions[4])->getArguments());
+    }
+
+    public function testGuardExpressions()
+    {
+        $container = $this->createContainerFromFile('workflow_with_guard_expression');
+
+        $this->assertTrue($container->hasDefinition('workflow.article.listener.guard'), 'Workflow guard listener is registered as a service');
+        $this->assertTrue($container->hasParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter exists');
+        $this->assertTrue(true === $container->getParameter('workflow.has_guard_listeners'), 'Workflow guard listeners parameter is enabled');
+        $guardDefinition = $container->getDefinition('workflow.article.listener.guard');
+        $this->assertSame(array(
+            array(
+                'event' => 'workflow.article.guard.publish',
+                'method' => 'onTransition',
+            ),
+        ), $guardDefinition->getTag('kernel.event_listener'));
+        $guardsConfiguration = $guardDefinition->getArgument(0);
+        $this->assertTrue(1 === \count($guardsConfiguration), 'Workflow guard configuration contains one element per transition name');
+        $transitionGuardExpressions = $guardsConfiguration['workflow.article.guard.publish'];
+        $this->assertSame('workflow.article.transition.3', (string) $transitionGuardExpressions[0]->getArgument(0));
+        $this->assertSame('!!true', $transitionGuardExpressions[0]->getArgument(1));
+        $this->assertSame('workflow.article.transition.4', (string) $transitionGuardExpressions[1]->getArgument(0));
+        $this->assertSame('!!false', $transitionGuardExpressions[1]->getArgument(1));
     }
 
     public function testWorkflowServicesCanBeEnabled()

@@ -313,6 +313,7 @@
             <xsd:element name="from" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="to" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="metadata" type="metadata" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="guard" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>

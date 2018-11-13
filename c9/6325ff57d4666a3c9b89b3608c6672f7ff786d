@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-11-12T19:40:26Z
+
+Should this be considered a BC break? I mean we currently don’t have a type hint here, so the behavior is changed.
+I am 👍🏻 for this change but to have a smooth upgrade path without surprises, an Upgrade note should be added.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-12T19:47:38Z
+
+3.4 throws already, that's a bug :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-11-12T19:50:04Z
+
+In this case... 👍🏻😉

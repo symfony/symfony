@@ -38,8 +38,8 @@
     {%- else -%}
         {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
         <div {{ block('widget_container_attributes') }}>
-            {{- form_errors(form.date) -}}
-            {{- form_errors(form.time) -}}
+            {{- form_errors(form.date, _context|merge({'render_errors': true})) -}}
+            {{- form_errors(form.time, _context|merge({'render_errors': true})) -}}
 
             <div class="sr-only">
                 {%- if form.date.year is defined %}{{ form_label(form.date.year) }}{% endif -%}
@@ -105,7 +105,7 @@
     {%- else -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
         <div {{ block('widget_container_attributes') }}>
-            {{- form_errors(form) -}}
+            {{- form_errors(form, _context|merge({'render_errors': true})) -}}
             <div class="table-responsive">
                 <table class="table {{ table_class|default('table-bordered table-condensed table-striped') }}" role="presentation">
                     <thead>

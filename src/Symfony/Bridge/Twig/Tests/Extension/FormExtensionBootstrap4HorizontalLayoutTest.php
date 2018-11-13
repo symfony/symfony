@@ -72,7 +72,9 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
+        return (string) $this->renderer->searchAndRenderBlock($view, 'errors', array(
+            'render_errors' => true,
+        ));
     }
 
     protected function renderWidget(FormView $view, array $vars = array())

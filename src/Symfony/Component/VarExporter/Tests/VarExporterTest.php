@@ -184,6 +184,11 @@ class VarExporterTest extends TestCase
         yield array('final-array-iterator', new FinalArrayIterator());
 
         yield array('final-stdclass', new FinalStdClass());
+
+        $value = new MyWakeup();
+        $value->bis = new \ReflectionClass($value);
+
+         yield array('wakeup-refl', $value);
     }
 }
 

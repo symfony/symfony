@@ -119,11 +119,10 @@ class Exporter
             $proto = (array) $proto;
 
             foreach ($arrayValue as $name => $v) {
+                $i = 0;
                 $n = (string) $name;
                 if ('' === $n || "\0" !== $n[0]) {
                     $c = 'stdClass';
-                    $properties[$c][$n] = $v;
-                    unset($sleep[$n]);
                 } elseif ('*' === $n[1]) {
                     $n = substr($n, 3);
                     $c = $reflector->getProperty($n)->class;
@@ -132,26 +131,26 @@ class Exporter
                     } elseif ('Exception' === $c) {
                         $c = 'ErrorException';
                     }
-                    $properties[$c][$n] = $v;
-                    unset($sleep[$n]);
                 } else {
                     $i = strpos($n, "\0", 2);
                     $c = substr($n, 1, $i - 1);
                     $n = substr($n, 1 + $i);
-                    if (null === $sleep) {
-                        $properties[$c][$n] = $v;
-                    } elseif (isset($sleep[$n]) && $c === $class) {
-                        $properties[$c][$n] = $v;
-                        unset($sleep[$n]);
-                    }
                 }
-                if (\array_key_exists($name, $proto) && $proto[$name] === $v) {
-                    unset($properties[$c][$n]);
+                if (null !== $sleep) {
+                    if (!isset($sleep[$n]) || ($i && $c !== $class)) {
+                        continue;
+                    }
+                    $sleep[$n] = false;
+                }
+                if (!\array_key_exists($name, $proto) || $proto[$name] !== $v) {
+                    $properties[$c][$n] = $v;
                 }
             }
             if ($sleep) {
                 foreach ($sleep as $n => $v) {
-                    trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), E_USER_NOTICE);
+                    if (false !== $v) {
+                        trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), E_USER_NOTICE);
+                    }
                 }
             }
 

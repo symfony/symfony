@@ -119,7 +119,15 @@ class Workflow implements WorkflowInterface
             $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
             if ($transitionBlockerList->isEmpty()) {
-                continue;
+                return $transitionBlockerList;
+            }
+
+            // We prefer to return transitions blocker by something else than
+            // marking. Because it means the marking was OK. Transitions are
+            // deterministic: it's not possible to have many transitions enabled
+            // at the same time that match the same marking with the same name
+            if (!$transitionBlockerList->has(TransitionBlocker::BLOCKED_BY_MARKING)) {
+                return $transitionBlockerList;
             }
         }
 

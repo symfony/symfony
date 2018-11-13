@@ -15,10 +15,8 @@ CHANGELOG
  * Removed the `framework.messenger.encoder` and `framework.messenger.decoder` options. Use the `framework.messenger.serializer.id` option to replace the Messenger serializer. 
  * Deprecated the `ContainerAwareCommand` class in favor of `Symfony\Component\Console\Command\Command`
  * Made `debug:container` and `debug:autowiring` ignore backslashes in service ids
- * Deprecated the `--env` console option and its "-e" shortcut, set the "APP_ENV" environment variable
-   or use `Application::bootstrapEnv()` instead.
- * Deprecated the `--no-debug` console option, set the "APP_DEBUG" environment variable to "0"
-   or use `Application::bootstrapEnv()` instead.
+ * Deprecated `--env` and `--no-debug` console options, define the `APP_ENV` and `APP_DEBUG` environment variables or
+   parse input arguments as done in https://github.com/symfony/recipes/blob/master/symfony/console/3.3/bin/console instead
  * Deprecated the `Templating\Helper\TranslatorHelper::transChoice()` method, use the `trans()` one instead with a `%count%` parameter
  * Deprecated `CacheCollectorPass`. Use `Symfony\Component\Cache\DependencyInjection\CacheCollectorPass` instead.
  * Deprecated `CachePoolClearerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass` instead.

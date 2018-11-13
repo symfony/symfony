@@ -207,35 +207,6 @@ class Application extends BaseApplication
         }
     }
 
-    /**
-     * Defines the "APP_ENV" and "APP_DEBUG" environment variables by consuming --env and --no-debug from the command line arguments.
-     */
-    public static function bootstrapEnv(array &$argv)
-    {
-        for ($i = 0; $i < \count($argv) && '--' !== $v = $argv[$i]; ++$i) {
-            if ('--no-debug' === $v) {
-                putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
-                $argvUnset[$i] = true;
-                break;
-            }
-        }
-
-        for ($i = 0; $i < \count($argv) && '--' !== $v = $argv[$i]; ++$i) {
-            if (!$v || '-' !== $v[0] || !preg_match('/^-(?:-env(?:=|$)|e=?)(.*)$/D', $v, $v)) {
-                continue;
-            }
-            if (!empty($v[1]) || !empty($argv[1 + $i])) {
-                putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = empty($v[1]) ? $argv[1 + $i] : $v[1]);
-                $argvUnset[$i] = $argvUnset[$i + empty($v[1])] = true;
-            }
-            break;
-        }
-
-        if (!empty($argvUnset)) {
-            $argv = array_values(array_diff_key($argv, $argvUnset));
-        }
-    }
-
     private function renderRegistrationErrors(InputInterface $input, OutputInterface $output)
     {
         if ($output instanceof ConsoleOutputInterface) {

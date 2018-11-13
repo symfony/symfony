@@ -16,6 +16,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
@@ -28,13 +29,25 @@ class ExpressionVoter implements VoterInterface
 {
     private $expressionLanguage;
     private $trustResolver;
+    private $authChecker;
     private $roleHierarchy;
 
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null)
+    /**
+     * @param AuthorizationCheckerInterface $authChecker
+     */
+    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, $authChecker = null, RoleHierarchyInterface $roleHierarchy = null)
     {
+        if ($authChecker instanceof RoleHierarchyInterface) {
+            $roleHierarchy = $authChecker;
+            $authChecker = null;
+        } elseif (null !== $authChecker && !$authChecker instanceof AuthorizationCheckerInterface) {
+            throw new \InvalidArgumentException(sprintf('Argument 3 passed to %s() must be an instance of Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface or null, %s given.', __METHOD__, \is_object($authChecker) ? \get_class($authChecker) : \gettype($authChecker)));
+        }
+
         $this->expressionLanguage = $expressionLanguage;
         $this->trustResolver = $trustResolver;
         $this->roleHierarchy = $roleHierarchy;
+        $this->authChecker = $authChecker;
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -105,6 +118,10 @@ class ExpressionVoter implements VoterInterface
         // to be handled by this voter
         if ($object instanceof Request) {
             $variables['request'] = $object;
+        }
+
+        if (null !== $this->authChecker) {
+            $variables['auth_checker'] = $this->authChecker;
         }
 
         return $variables;

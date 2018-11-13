@@ -49,8 +49,16 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }),
 
             new ExpressionFunction('has_role', function ($role) {
+                if (isset($variables['auth_checker'])) {
+                    return sprintf('$token && $auth_checker->isGranted(%s)', $role);
+                }
+
                 return sprintf('in_array(%s, $roles)', $role);
             }, function (array $variables, $role) {
+                if (isset($variables['auth_checker'])) {
+                    return $variables['token'] && $variables['auth_checker']->isGranted($role);
+                }
+
                 return \in_array($role, $variables['roles']);
             }),
         );

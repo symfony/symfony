@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.9",
         "ext-xml": "*",
-        "symfony/security": "^2.8.45|^3.4.15",
+        "symfony/security": "^2.8.48|^3.4.19",
         "symfony/security-acl": "~2.7|~3.0.0",
         "symfony/http-kernel": "~2.7|~3.0.0",
         "symfony/polyfill-php70": "~1.0"

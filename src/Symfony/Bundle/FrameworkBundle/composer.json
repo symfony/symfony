@@ -66,6 +66,7 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/asset": "<3.4",
         "symfony/console": "<3.4",
+        "symfony/dotenv": "<4.2",
         "symfony/form": "<4.2",
         "symfony/messenger": "<4.2",
         "symfony/property-info": "<3.4",

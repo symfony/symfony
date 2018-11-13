@@ -1583,7 +1583,7 @@ class FrameworkExtension extends Extension
             }, $messageConfiguration['senders']);
 
             $sendersId = 'messenger.senders.'.$message;
-            $sendersDefinition = $container->register($sendersId, RewindableGenerator::class)
+            $container->register($sendersId, RewindableGenerator::class)
                 ->setFactory('current')
                 ->addArgument(array(new IteratorArgument($senders)));
             $messageToSendersMapping[$message] = new Reference($sendersId);

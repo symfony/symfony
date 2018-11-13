@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Stamp;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 
 /**
- * Marker config for a received message.
+ * Marker stamp for a received message.
  *
  * This is mainly used by the `SendMessageMiddleware` middleware to identify
  * a message should not be sent if it was just received.

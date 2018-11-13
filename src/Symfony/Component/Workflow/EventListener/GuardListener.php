@@ -32,7 +32,7 @@ class GuardListener
     private $roleHierarchy;
     private $validator;
 
-    public function __construct($configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
+    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
@@ -49,7 +49,22 @@ class GuardListener
             return;
         }
 
-        if (!$this->expressionLanguage->evaluate($this->configuration[$eventName], $this->getVariables($event))) {
+        $eventConfiguration = (array) $this->configuration[$eventName];
+        foreach ($eventConfiguration as $guard) {
+            if ($guard instanceof GuardExpression) {
+                if ($guard->getTransition() !== $event->getTransition()) {
+                    continue;
+                }
+                $this->validateGuardExpression($event, $guard->getExpression());
+            } else {
+                $this->validateGuardExpression($event, $guard);
+            }
+        }
+    }
+
+    private function validateGuardExpression(GuardEvent $event, $expression)
+    {
+        if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $event->setBlocked(true);
         }
     }

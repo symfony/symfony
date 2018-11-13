@@ -39,7 +39,7 @@ class EnvelopeTest extends TestCase
         $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp()));
     }
 
-    public function testGetLast()
+    public function testLast()
     {
         $receivedStamp = new ReceivedStamp();
         $envelope = new Envelope($dummy = new DummyMessage('dummy'), $receivedStamp);

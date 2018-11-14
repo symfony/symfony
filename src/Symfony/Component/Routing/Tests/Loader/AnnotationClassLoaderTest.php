@@ -92,6 +92,8 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $routes = $this->loader->load(InvokableController::class);
         $this->assertCount(1, $routes);
         $this->assertEquals('/here', $routes->get('lol')->getPath());
+        $this->assertEquals(array('GET', 'POST'), $routes->get('lol')->getMethods());
+        $this->assertEquals(array('https'), $routes->get('lol')->getSchemes());
     }
 
     public function testInvokableLocalizedControllerLoading()

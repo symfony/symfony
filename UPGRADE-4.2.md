@@ -175,10 +175,6 @@ FrameworkBundle
    ```
  * The `ContainerAwareCommand` class has been deprecated, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` and `--no-debug` console options have been deprecated, define the `APP_ENV` and
-   `APP_DEBUG` environment variables instead.
-   If you want to keep using `--env` and `--no-debug`, you can take inspiration from
-   https://github.com/symfony/recipes/blob/master/symfony/console/3.3/bin/console
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been deprecated, use the `trans()` one instead with a `%count%` parameter.
  * Deprecated support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been deprecated.
@@ -381,9 +377,3 @@ Validator
  * Using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl` is deprecated
  * Using the `Email` constraint in strict mode without `egulias/email-validator` is deprecated
  * Using the `Expression` constraint without `symfony/expression-language` is deprecated
-
-WebServerBundle
----------------
-
-* Omitting the `$environment` argument of the `ServerRunCommand` and 
-  `ServerStartCommand` constructors is deprecated.

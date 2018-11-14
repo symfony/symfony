@@ -97,6 +97,9 @@ class VarExporterTest extends TestCase
         $marshalledValue = include $fixtureFile;
 
         if (!$isStaticValue) {
+            if ($value instanceof MyWakeup) {
+                $value->bis = null;
+            }
             $this->assertDumpEquals($value, $marshalledValue);
         } else {
             $this->assertSame($value, $marshalledValue);
@@ -184,6 +187,11 @@ class VarExporterTest extends TestCase
         yield array('final-array-iterator', new FinalArrayIterator());
 
         yield array('final-stdclass', new FinalStdClass());
+
+        $value = new MyWakeup();
+        $value->bis = new \ReflectionClass($value);
+
+        yield array('wakeup-refl', $value);
     }
 }
 

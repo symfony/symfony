@@ -65,7 +65,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return;
         }
         foreach ($container->getExtensionConfig('framework') as $config) {
-            if (isset($config['session'])) {
+            if (isset($config['session']) && \is_array($config['session'])) {
                 $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
                 $rememberMeSameSiteDefault = array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
             }

@@ -50,7 +50,7 @@ class MessengerDataCollectorTest extends TestCase
 
         $collector->lateCollect();
 
-        $messages = iterator_to_array($collector->getMessages());
+        $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
         $file = __FILE__;
@@ -95,7 +95,7 @@ DUMP;
 
         $collector->lateCollect();
 
-        $messages = iterator_to_array($collector->getMessages());
+        $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
         $file = __FILE__;
@@ -145,7 +145,7 @@ DUMP
 
         $collector->lateCollect();
 
-        $messages = iterator_to_array($collector->getMessages());
+        $messages = $collector->getMessages();
         $this->assertCount(5, $messages);
 
         $this->assertSame('#1', $messages[0]['message']['value']['message']);

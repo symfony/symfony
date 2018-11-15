@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T13:20:42Z
+
+4.2?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-14T13:53:33Z
+
+@nicolas-grekas see the last paragraph.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T14:03:24Z
+
+Works either for 4.2 or 4.1 to me. 4.2 feels more natural since it's almost a "new feature". Also because projects that are on 4.1 either already moved to deprecation-less - or can skip 4.1 altogether. Makes sense?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-14T15:37:28Z
+
+@nicolas-grekas if 4.1 keeps that deprecation, community bundles wanting to support both the 3.4 LTS and 4.1 (current stable) still have to pay the cost.
+
+And no, shared bundles have not all moved to be deprecation-free in their released versions, as there is no easy way for that.

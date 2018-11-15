@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-11-12T19:33:09Z
+
+To give more context, https://github.com/symfony/symfony/pull/29179/files#diff-1c1084613d7579bc9e39092ac95364f9R1020 is the test revealing the inconsistency prior to fix compound cases in this PR.

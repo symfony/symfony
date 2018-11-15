@@ -71,6 +71,11 @@
             <argument type="service" id="form.choice_list_factory"/>
         </service>
 
+        <service id="form.type_extension.form.transformation_failure_handling" class="Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <argument type="service" id="translator" on-invalid="ignore" />
+        </service>
+
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
             <argument type="service" id="form.type_extension.form.request_handler" />

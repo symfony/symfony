@@ -31,16 +31,18 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  *   (1) the "model" format required by the form's object
  *   (2) the "normalized" format for internal processing
- *   (3) the "view" format used for display
+ *   (3) the "view" format used for display simple fields
+ *       or map children model data for compound fields
  *
  * A date field, for example, may store a date as "Y-m-d" string (1) in the
  * object. To facilitate processing in the field, this value is normalized
  * to a DateTime object (2). In the HTML representation of your form, a
- * localized string (3) is presented to and modified by the user.
+ * localized string (3) may be presented to and modified by the user, or it could be an array of values
+ * to be mapped to choices fields.
  *
  * In most cases, format (1) and format (2) will be the same. For example,
  * a checkbox field uses a Boolean value for both internal processing and
- * storage in the object. In these cases you simply need to set a value
+ * storage in the object. In these cases you simply need to set a view
  * transformer to convert between formats (2) and (3). You can do this by
  * calling addViewTransformer().
  *
@@ -48,7 +50,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
  * use a DateTime object for processing. To convert the data from string/integer
- * to DateTime you can set a normalization transformer by calling
+ * to DateTime you can set a model transformer by calling
  * addModelTransformer(). The normalized data is then converted to the displayed
  * data as described before.
  *
@@ -217,7 +219,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null === $this->getName() || '' === $this->getName()) {
-            return;
+            return null;
         }
 
         $parent = $this->parent;
@@ -340,8 +342,8 @@ class Form implements \IteratorAggregate, FormInterface
             $modelData = $event->getData();
         }
 
-        // Treat data as strings unless a value transformer exists
-        if (!$this->config->getViewTransformers() && !$this->config->getModelTransformers() && is_scalar($modelData)) {
+        // Treat data as strings unless a transformer exists
+        if (is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
             $modelData = (string) $modelData;
         }
 
@@ -1014,7 +1016,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Normalizes the value if a normalization transformer is set.
+     * Normalizes the value if a model transformer is set.
      *
      * @param mixed $value The value to transform
      *
@@ -1036,7 +1038,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Reverse transforms a value if a normalization transformer is set.
+     * Reverse transforms a value if a model transformer is set.
      *
      * @param string $value The value to reverse transform
      *
@@ -1060,7 +1062,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Transforms the value if a value transformer is set.
+     * Transforms the value if a view transformer is set.
      *
      * @param mixed $value The value to transform
      *
@@ -1091,7 +1093,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Reverse transforms a value if a value transformer is set.
+     * Reverse transforms a value if a view transformer is set.
      *
      * @param string $value The value to reverse transform
      *

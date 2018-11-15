@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
@@ -341,6 +342,59 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->has(UserProviderInterface::class));
+    }
+
+    /**
+     * @dataProvider sessionConfigurationProvider
+     */
+    public function testRememberMeCookieInheritFrameworkSessionCookie($config, $samesite, $secure)
+    {
+        $container = $this->getRawContainer();
+
+        $container->registerExtension(new FrameworkExtension());
+        $container->setParameter('kernel.bundles_metadata', array());
+        $container->setParameter('kernel.project_dir', __DIR__);
+        $container->setParameter('kernel.root_dir', __DIR__);
+        $container->setParameter('kernel.cache_dir', __DIR__);
+
+        $container->loadFromExtension('security', array(
+            'firewalls' => array(
+                'default' => array(
+                    'form_login' => null,
+                    'remember_me' => array('secret' => 'baz'),
+                ),
+            ),
+        ));
+        $container->loadFromExtension('framework', array(
+            'session' => $config,
+        ));
+
+        $container->compile();
+
+        $definition = $container->getDefinition('security.authentication.rememberme.services.simplehash.default');
+
+        $this->assertEquals($samesite, $definition->getArgument(3)['samesite']);
+        $this->assertEquals($secure, $definition->getArgument(3)['secure']);
+    }
+
+    public function sessionConfigurationProvider()
+    {
+        return array(
+            array(
+                false,
+                null,
+                false,
+            ),
+            array(
+                array(
+                    'cookie_secure' => true,
+                    'cookie_samesite' => 'lax',
+                    'save_path' => null,
+                ),
+                'lax',
+                true,
+            ),
+        );
     }
 
     protected function getRawContainer()

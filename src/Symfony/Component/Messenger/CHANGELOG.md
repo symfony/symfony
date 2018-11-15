@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+ * Added `HandledStamp` & `SentStamp` stamps
  * All the changes below are BC BREAKS
  * Senders and handlers subscribing to parent interfaces now receive *all* matching messages, wildcard included
  * `MessageBusInterface::dispatch()`, `MiddlewareInterface::handle()` and `SenderInterface::send()` return `Envelope`

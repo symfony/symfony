@@ -40,9 +40,9 @@ class HandlersLocator implements HandlersLocatorInterface
         $seen = array();
 
         foreach (self::listTypes($envelope) as $type) {
-            foreach ($this->handlers[$type] ?? array() as $handler) {
+            foreach ($this->handlers[$type] ?? array() as $alias => $handler) {
                 if (!\in_array($handler, $seen, true)) {
-                    yield $seen[] = $handler;
+                    yield $alias => $seen[] = $handler;
                 }
             }
         }

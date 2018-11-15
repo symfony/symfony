@@ -90,6 +90,9 @@ class DateTimeType extends AbstractType
                 ));
             }
         } else {
+            // when the form is compound the entries of the array are ignored in favor of children data
+            // so we need to handle the cascade setting here
+            $emptyData = $builder->getEmptyData() ?: array();
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(
                 'years',
@@ -103,6 +106,10 @@ class DateTimeType extends AbstractType
                 'invalid_message',
                 'invalid_message_parameters',
             )));
+
+            if (isset($emptyData['date'])) {
+                $dateOptions['empty_data'] = $emptyData['date'];
+            }
 
             $timeOptions = array_intersect_key($options, array_flip(array(
                 'hours',
@@ -118,6 +125,10 @@ class DateTimeType extends AbstractType
                 'invalid_message',
                 'invalid_message_parameters',
             )));
+
+            if (isset($emptyData['time'])) {
+                $timeOptions['empty_data'] = $emptyData['time'];
+            }
 
             if (false === $options['label']) {
                 $dateOptions['label'] = false;
@@ -224,6 +235,9 @@ class DateTimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'empty_data' => function (Options $options) {
+                return $options['compound'] ? array() : '';
+            },
         ));
 
         // Don't add some defaults in order to preserve the defaults

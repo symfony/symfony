@@ -983,25 +983,36 @@ class DateTypeTest extends BaseTypeTest
         ));
         $form->submit(null);
 
-        // view transformer write back empty strings in the view data
+        // view transformer writes back empty strings in the view data
         $this->assertSame(array('year' => '', 'month' => '', 'day' => ''), $form->getViewData());
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testSingleTextSubmitNullUsesDefaultEmptyData()
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
     {
-        $emptyData = '2018-11-11';
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
-            'widget' => 'single_text',
+            'widget' => $widget,
             'empty_data' => $emptyData,
         ));
         $form->submit(null);
 
-        $date = new \DateTime($emptyData);
-
         $this->assertSame($emptyData, $form->getViewData());
-        $this->assertEquals($date, $form->getNormData());
-        $this->assertEquals($date, $form->getData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateTime::createFromFormat('Y-m-d H:i:s', '2018-11-11 00:00:00');
+
+        return array(
+            'Simple field' => array('single_text', '2018-11-11', $expectedData),
+            'Compound text fields' => array('text', array('year' => '2018', 'month' => '11', 'day' => '11'), $expectedData),
+            'Compound choice fields' => array('choice', array('year' => '2018', 'month' => '11', 'day' => '11'), $expectedData),
+        );
     }
 }

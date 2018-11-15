@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-14T16:09:13Z
+
+Does anyone know how to get the tests green without having to setup a kernel?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T16:43:24Z
+
+(tests are red)
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-14T16:49:26Z
+
+> (tests are red)
+
+I know, but I don't know (yet) how to get green test suite. I'm still looking at the differences between 7.1 and 7.2 deps=low to find how to get green tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T17:47:51Z
+
+```sh
+cd src/Symfony/Bundle/SecurityBundle
+composer up --prefer-lowest --prefer-stable
+../../../../phpunit
+```
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2018-11-14T20:10:15Z
+
+AppVeyor build failure seems unrelated.

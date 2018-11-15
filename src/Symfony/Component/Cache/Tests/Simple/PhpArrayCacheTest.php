@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class PhpArrayCacheTest extends CacheTestCase
 {
@@ -125,37 +126,5 @@ class PhpArrayCacheTest extends CacheTestCase
         $values = eval(substr(file_get_contents(self::$file), 6));
 
         $this->assertSame($expected, $values, 'Warm up should create a PHP file that OPCache can load in memory');
-    }
-}
-
-class PhpArrayCacheWrapper extends PhpArrayCache
-{
-    protected $data = [];
-
-    public function set($key, $value, $ttl = null)
-    {
-        (\Closure::bind(function () use ($key, $value) {
-            $this->data[$key] = $value;
-            $this->warmUp($this->data);
-            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
-        }, $this, PhpArrayCache::class))();
-
-        return true;
-    }
-
-    public function setMultiple($values, $ttl = null)
-    {
-        if (!\is_array($values) && !$values instanceof \Traversable) {
-            return parent::setMultiple($values, $ttl);
-        }
-        (\Closure::bind(function () use ($values) {
-            foreach ($values as $key => $value) {
-                $this->data[$key] = $value;
-            }
-            $this->warmUp($this->data);
-            list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
-        }, $this, PhpArrayCache::class))();
-
-        return true;
     }
 }

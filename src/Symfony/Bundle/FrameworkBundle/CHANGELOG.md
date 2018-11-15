@@ -8,6 +8,7 @@ CHANGELOG
    be mandatory in 5.0.
  * Added `ControllerTrait::isFormValid()`
  * Added an `help_html` form option to display the `help` text as HTML
+ * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead
 
  * [BC Break] When using Messenger, the default transport changed from
    using Symfony's serializer service to use `PhpSerializer`, which uses

@@ -13,6 +13,8 @@ Cache
 -----
 
  * Removed `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
+ * Removed all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead.
+ * Removed `SimpleCacheAdapter`, use `Psr16Adapter instead.
 
 Config
 ------
@@ -163,6 +165,7 @@ FrameworkBundle
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
+ * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
 
 HttpFoundation
 --------------

@@ -8,6 +8,13 @@ BrowserKit
  * Deprecated `Response::buildHeader()`
  * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
 
+Cache
+-----
+
+ * The `psr/simple-cache` dependency has been removed - run `composer require psr/simple-cache` if you need it.
+ * Deprecated all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead.
+ * Deprecated `SimpleCacheAdapter`, use `Psr16Adapter instead.
+
 Config
 ------
 
@@ -18,6 +25,7 @@ FrameworkBundle
 
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
+ * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
 
 HttpFoundation
 --------------

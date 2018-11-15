@@ -11,28 +11,28 @@
 
 namespace Symfony\Component\Cache\Simple;
 
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', PhpArrayCache::class, PhpArrayAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
 
 /**
- * Caches items at warm up time using a PHP array that is stored in shared memory by OPCache since PHP 7.0.
- * Warmed up items are read-only and run-time discovered items are cached using a fallback adapter.
- *
- * @author Titouan Galopin <galopintitouan@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+ * @deprecated since Symfony 4.3, use PhpArrayAdapter and type-hint for CacheInterface instead.
  */
-class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInterface
+class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, ResettableInterface
 {
     use PhpArrayTrait;
 
     /**
-     * @param string         $file         The PHP file were values are cached
-     * @param CacheInterface $fallbackPool A pool to fallback on when an item is not hit
+     * @param string              $file         The PHP file were values are cached
+     * @param Psr16CacheInterface $fallbackPool A pool to fallback on when an item is not hit
      */
-    public function __construct(string $file, CacheInterface $fallbackPool)
+    public function __construct(string $file, Psr16CacheInterface $fallbackPool)
     {
         $this->file = $file;
         $this->pool = $fallbackPool;
@@ -43,9 +43,9 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      *
      * @param string $file The PHP file were values are cached
      *
-     * @return CacheInterface
+     * @return Psr16CacheInterface
      */
-    public static function create($file, CacheInterface $fallbackPool)
+    public static function create($file, Psr16CacheInterface $fallbackPool)
     {
         // Shared memory is available in PHP 7.0+ with OPCache enabled
         if (filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {

@@ -11,10 +11,17 @@
 
 namespace Symfony\Component\Cache\Simple;
 
+use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PdoTrait;
+use Symfony\Contracts\Cache\CacheInterface;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', PdoCache::class, PdoAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
+
+/**
+ * @deprecated since Symfony 4.3, use PdoAdapter and type-hint for CacheInterface instead.
+ */
 class PdoCache extends AbstractCache implements PruneableInterface
 {
     use PdoTrait;

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-14T14:16:59Z
+
+i think we should target master for this, as a new feature. IMHO a deprecation is not really worth it, so :+1: for throwing.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-14T17:23:25Z
+
+Well, the code of the validator already expects the right class due to property being used. So these are about providing a good error message in case you mess your project configuration, but it probably already does not work (with a crappier error message) in case of such mess.
+So :+1: for adding the exception directly.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-14T17:46:39Z
+
+@stof unless someone completely mimics the exepcted api with its own constraint class :}

@@ -35,8 +35,11 @@ class TransformationFailureExtension extends AbstractTypeExtension
         }
     }
 
-    public function getExtendedType()
+    /**
+     * {@inheritdoc}
+     */
+    public static function getExtendedTypes(): iterable
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        return array(FormType::class);
     }
 }

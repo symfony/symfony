@@ -21,7 +21,7 @@
     "require-dev": {
         "psr/log": "~1.0",
         "symfony/console": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4.19|~4.0.14|^4.1.8",
+        "symfony/dependency-injection": "~3.4.19|^4.1.8",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
         "symfony/property-access": "~3.4|~4.0",

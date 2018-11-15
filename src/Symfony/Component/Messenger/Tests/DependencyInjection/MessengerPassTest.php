@@ -196,6 +196,22 @@ class MessengerPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid service "NonExistentHandlerClass": class "NonExistentHandlerClass" does not exist.
+     */
+    public function testThrowsExceptionIfTheHandlerClassDoesNotExist()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
+        $container
+            ->register('NonExistentHandlerClass', 'NonExistentHandlerClass')
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerMappingWithNonExistentMethod": method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerMappingWithNonExistentMethod::dummyMethod()" does not exist.
      */
     public function testThrowsExceptionIfTheHandlerMethodDoesNotExist()

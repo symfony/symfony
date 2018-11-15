@@ -15,6 +15,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\LogicException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
@@ -29,6 +30,10 @@ class BicValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Bic) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Bic');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }

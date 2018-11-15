@@ -30,7 +30,7 @@ EventDispatcher
 FrameworkBundle
 ---------------
 
- * Removed support for `bundle:controller:action` and `service:action` syntaxes to reference controllers. Use `serviceOrFqcn::method`
+ * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
    instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
 
    Before:
@@ -40,11 +40,6 @@ FrameworkBundle
        path: /
        defaults:
            _controller: FrameworkBundle:Redirect:redirect
-
-   service_controller:
-       path: /
-       defaults:
-           _controller: app.my_controller:myAction
    ```
 
    After:
@@ -54,11 +49,6 @@ FrameworkBundle
        path: /
        defaults:
            _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
-
-   service_controller:
-       path: /
-       defaults:
-           _controller: app.my_controller::myAction
    ```
 
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.

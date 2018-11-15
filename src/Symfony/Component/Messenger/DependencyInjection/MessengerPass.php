@@ -79,7 +79,12 @@ class MessengerPass implements CompilerPassInterface
                     throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: %s).', $serviceId, $tag['bus'], $this->handlerTag, implode(', ', $busIds)));
                 }
 
-                $r = $container->getReflectionClass($container->getDefinition($serviceId)->getClass());
+                $className = $container->getDefinition($serviceId)->getClass();
+                $r = $container->getReflectionClass($className);
+
+                if (null === $r) {
+                    throw new RuntimeException(sprintf('Invalid service "%s": class "%s" does not exist.', $serviceId, $className));
+                }
 
                 if (isset($tag['handles'])) {
                     $handles = isset($tag['method']) ? array($tag['handles'] => $tag['method']) : array($tag['handles']);

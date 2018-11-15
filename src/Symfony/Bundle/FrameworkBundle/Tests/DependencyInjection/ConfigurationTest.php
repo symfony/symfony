@@ -235,7 +235,7 @@ class ConfigurationTest extends TestCase
                 'cookie_samesite' => null,
                 'gc_probability' => 1,
                 'save_path' => '%kernel.cache_dir%/sessions',
-                'metadata_update_threshold' => '0',
+                'metadata_update_threshold' => 0,
             ),
             'request' => array(
                 'enabled' => false,

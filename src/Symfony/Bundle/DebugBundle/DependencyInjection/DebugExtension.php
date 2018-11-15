@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * DebugExtension.
@@ -67,6 +68,14 @@ class DebugExtension extends Extension
             ;
             $container->getDefinition('var_dumper.command.server_dump')
                 ->setClass(ServerDumpPlaceholderCommand::class)
+            ;
+        }
+
+        if (method_exists(CliDumper::class, 'setDisplayOptions')) {
+            $container->getDefinition('var_dumper.cli_dumper')
+                ->addMethodCall('setDisplayOptions', array(array(
+                    'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
+                )))
             ;
         }
     }

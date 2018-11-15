@@ -18,8 +18,6 @@ namespace Symfony\Component\Translation\Formatter;
  */
 interface IntlFormatterInterface
 {
-    const DOMAIN_SUFFIX = '+intl-icu';
-
     /**
      * Formats a localized message using rules defined by ICU MessageFormat.
      *

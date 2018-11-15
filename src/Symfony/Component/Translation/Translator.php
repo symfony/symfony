@@ -203,20 +203,17 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
         $id = (string) $id;
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
-        $intlDomain = $this->hasIntlFormatter ? $domain.IntlFormatterInterface::DOMAIN_SUFFIX : null;
-        while (true) {
-            if (null !== $intlDomain && $catalogue->defines($id, $intlDomain)) {
-                return $this->formatter->formatIntl($catalogue->get($id, $intlDomain), $locale, $parameters);
-            }
-            if ($catalogue->defines($id, $domain)) {
-                break;
-            }
+        while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
                 $locale = $catalogue->getLocale();
             } else {
                 break;
             }
+        }
+
+        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, $parameters);
         }
 
         return $this->formatter->format($catalogue->get($id, $domain), $locale, $parameters);
@@ -249,6 +246,10 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
             } else {
                 break;
             }
+        }
+
+        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, array('%count%' => $number) + $parameters);
         }
 
         return $this->formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by karser at 2018-10-31T15:05:35Z
+
+@nicolas-grekas This bug exists in 4.1 and master, is this PR going to be merged in there as well?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-06T16:01:17Z
+
+@karser yes: we regularly merge lower branches into upper ones.

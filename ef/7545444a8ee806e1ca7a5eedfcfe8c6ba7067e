@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T16:10:34Z
+
+Now with tests. PR ready.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-14T16:14:45Z
+
+@nicolas-grekas wouldn't `transChoice` now also go look in the Intl-ICU domain, but without switching to the Intl formatter ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T16:18:28Z
+
+It could, but that'd mean make a new feature accessible via a deprecated API. I'd prefer not allowing it. OK for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T16:20:20Z
+
+OH, GOT IT.
+Yes. I wouldn't care :)
+New format with deprecated transChoice => not supported :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-14T16:25:38Z
+
+GRR. OK, fixed. Good catch @stof :)

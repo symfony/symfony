@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-15T02:24:54Z
+
+Even if we don't add a query bus https://github.com/symfony/symfony/pull/29167#issuecomment-438891775, adding tracking for handled/sent should not hurt to add to the core and allows people to add any custom logic on top of it.

@@ -113,7 +113,7 @@ EOF;
             ?? $this->context->getParameter('_locale')
             ?: $this->defaultLocale;
 
-        if (null !== $locale) {
+        if (null !== $locale && null !== $name) {
             do {
                 if ((self::$declaredRoutes[$name.'.'.$locale][1]['_canonical_route'] ?? null) === $name) {
                     unset($parameters['_locale']);

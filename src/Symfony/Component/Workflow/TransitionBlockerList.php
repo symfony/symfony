@@ -37,6 +37,17 @@ final class TransitionBlockerList implements \IteratorAggregate, \Countable
         $this->blockers[] = $blocker;
     }
 
+    public function has(string $code): bool
+    {
+        foreach ($this->blockers as $blocker) {
+            if ($code === $blocker->getCode()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function clear(): void
     {
         $this->blockers = array();

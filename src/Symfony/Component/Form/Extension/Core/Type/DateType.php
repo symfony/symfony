@@ -76,7 +76,21 @@ class DateType extends AbstractType
 
             $yearOptions = $monthOptions = $dayOptions = array(
                 'error_bubbling' => true,
+                'empty_data' => '',
             );
+            // when the form is compound the entries of the array are ignored in favor of children data
+            // so we need to handle the cascade setting here
+            $emptyData = $builder->getEmptyData() ?: array();
+
+            if (isset($emptyData['year'])) {
+                $yearOptions['empty_data'] = $emptyData['year'];
+            }
+            if (isset($emptyData['month'])) {
+                $monthOptions['empty_data'] = $emptyData['month'];
+            }
+            if (isset($emptyData['day'])) {
+                $dayOptions['empty_data'] = $emptyData['day'];
+            }
 
             if (isset($options['invalid_message'])) {
                 $dayOptions['invalid_message'] = $options['invalid_message'];
@@ -265,6 +279,9 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'empty_data' => function (Options $options) {
+                return $options['compound'] ? array() : '';
+            },
             'choice_translation_domain' => false,
         ));
 

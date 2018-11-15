@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
- * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
+ * A request handler using PHP super globals $_GET, $_POST and $_SERVER.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -213,7 +213,7 @@ class NativeRequestHandler implements RequestHandlerInterface
 
         if (self::$fileKeys === $keys) {
             if (UPLOAD_ERR_NO_FILE === $data['error']) {
-                return;
+                return null;
             }
 
             return $data;

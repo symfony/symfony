@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-15T21:42:40Z
+
+@j4nr6n the example you used is not affected by this change. This is about the deprecations coming from the DebugClassLoader which is not triggered in your example.

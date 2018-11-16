@@ -492,7 +492,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->integerNode('metadata_update_threshold')
-                            ->defaultValue('0')
+                            ->defaultValue(0)
                             ->info('seconds to wait between 2 session metadata updates')
                         ->end()
                     ->end()

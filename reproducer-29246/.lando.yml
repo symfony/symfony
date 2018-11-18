@@ -1,0 +1,34 @@
+name: sf
+recipe: lemp
+
+config:
+  php: 7.2
+  webroot: public
+  database: mariadb
+
+tooling:
+  php:
+    service: appserver
+    description: Run PHP commands
+    cmd:
+      - php
+  composer:
+    service: appserver
+    description: Run Composer commands
+    cmd:
+      - composer
+  bash:
+    service: appserver
+    description: Run bash commands
+    cmd:
+      - bash
+      - -xc
+  sf:
+    service: appserver
+    description: Run Symfony commands
+    cmd:
+      - bin/console
+
+events:
+  post-start:
+    appserver: "composer install --working-dir=$LANDO_MOUNT"

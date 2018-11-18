@@ -29,7 +29,10 @@
         "psr/http-factory-implementation": "To use the PSR-17 factory"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" }
+        "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "extra": {
         "branch-alias": {

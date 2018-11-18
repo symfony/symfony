@@ -53,7 +53,8 @@ class ObjectsProvider
                 array('opt1' => 'val1', 'opt2' => 'val2'),
                 'localhost',
                 array('http', 'https'),
-                array('put', 'post')
+                array('put', 'post'),
+                "context.getMethod() in ['GET', 'HEAD', 'POST']"
             ),
         );
     }

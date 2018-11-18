@@ -32,13 +32,15 @@ class EntityUserProvider implements UserProviderInterface
     private $classOrAlias;
     private $class;
     private $property;
+    private $repository;
 
-    public function __construct(ManagerRegistry $registry, $classOrAlias, $property = null, $managerName = null)
+    public function __construct(ManagerRegistry $registry, $classOrAlias, $property = null, $managerName = null, $repository = null)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;
         $this->classOrAlias = $classOrAlias;
         $this->property = $property;
+        $this->repository = $repository;
     }
 
     /**
@@ -47,6 +49,7 @@ class EntityUserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         $repository = $this->getRepository();
+
         if (null !== $this->property) {
             $user = $repository->findOneBy(array($this->property => $username));
         } else {
@@ -75,6 +78,7 @@ class EntityUserProvider implements UserProviderInterface
         }
 
         $repository = $this->getRepository();
+
         if ($repository instanceof UserProviderInterface) {
             $refreshedUser = $repository->refreshUser($user);
         } else {
@@ -114,7 +118,7 @@ class EntityUserProvider implements UserProviderInterface
 
     private function getRepository()
     {
-        return $this->getObjectManager()->getRepository($this->classOrAlias);
+        return (null !== $this->repository) ? $this->repository : $this->getObjectManager()->getRepository($this->classOrAlias);
     }
 
     private function getClass()

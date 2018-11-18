@@ -8,6 +8,7 @@ CHANGELOG
  * added cause of UniqueEntity constraint violation
  * deprecated `DbalSessionHandler` and `DbalSessionHandlerSchema` in favor of
    `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler`
+ * added custom entity repositories in `EntityUserProvider`
 
 3.1.0
 -----

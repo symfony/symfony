@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\User
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * EntityFactory creates services for Doctrine user provider.
@@ -40,6 +41,7 @@ class EntityFactory implements UserProviderFactoryInterface
             ->addArgument($config['class'])
             ->addArgument($config['property'])
             ->addArgument($config['manager_name'])
+            ->addArgument(new Reference($config['repository']))
         ;
     }
 
@@ -55,6 +57,7 @@ class EntityFactory implements UserProviderFactoryInterface
                 ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('property')->defaultNull()->end()
                 ->scalarNode('manager_name')->defaultNull()->end()
+                ->scalarNode('repository')->defaultNull()->end()
             ->end()
         ;
     }

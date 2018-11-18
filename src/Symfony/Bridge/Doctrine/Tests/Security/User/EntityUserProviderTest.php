@@ -182,6 +182,74 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByUsername('name');
     }
 
+    public function testLoadUserByUserNameWithCustomEntityRepository()
+    {
+        $user = new User(1, 1, 'user1');
+
+        $customRepository = $this->getMockBuilder('Symfony\Bridge\Doctrine\Tests\Fixtures\CustomUserRepository')
+            ->getMock();
+
+        $customRepository
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with('user1')
+            ->willReturn($user);
+
+        $repository = $this->getMockBuilder('Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository
+            ->expects($this->never())
+            ->method('loadUserByUsername');
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em
+            ->expects($this->never())
+            ->method('getRepository');
+
+        $provider = new EntityUserProvider(
+            $this->getManager($em),
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User',
+            null,
+            null,
+            $customRepository
+        );
+        $this->assertSame($user, $provider->loadUserByUsername('user1'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadUserByUserNameWithCustomEntityRepositoryShoudDeclineInvalidInterface()
+    {
+        $customRepository = new \Symfony\Bridge\Doctrine\Tests\Fixtures\CustomNotValidUserRepository();
+
+        $repository = $this->getMockBuilder('Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository
+            ->expects($this->never())
+            ->method('loadUserByUsername');
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em
+            ->expects($this->never())
+            ->method('getRepository');
+
+        $provider = new EntityUserProvider(
+            $this->getManager($em),
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User',
+            null,
+            null,
+            $customRepository
+        );
+        $provider->loadUserByUsername('user1');
+    }
+
     private function getManager($em, $name = null)
     {
         $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();

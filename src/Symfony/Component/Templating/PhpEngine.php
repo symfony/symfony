@@ -366,7 +366,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $context The context name
      *
-     * @return callable $escaper A PHP callable
+     * @return callable A PHP callable
      *
      * @throws \InvalidArgumentException
      */

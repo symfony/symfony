@@ -191,7 +191,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
             $srcId = $edge->getSourceNode()->getId();
             $this->connectedIds[$srcId] = true;
-            if ($edge->isWeak()) {
+            if ($edge->isWeak() || (($v = $edge->getSourceNode()->getValue()) instanceof Definition && $v->isLazy() && $this->graph->getNode($id)->getOutEdges())) {
                 return false;
             }
             $srcIds[$srcId] = true;

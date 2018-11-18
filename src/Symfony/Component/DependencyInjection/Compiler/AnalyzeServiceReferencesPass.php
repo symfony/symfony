@@ -112,7 +112,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                     $targetId,
                     $targetDefinition,
                     $value,
-                    $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                    $this->lazy || ($this->hasProxyDumper && $targetDefinition && $targetDefinition->isLazy()),
                     true
                );
             }

@@ -45,7 +45,7 @@ abstract class FileDumper implements DumperInterface
     /**
      * Sets backup flag.
      *
-     * @param bool
+     * @param bool $backup
      *
      * @deprecated since Symfony 4.1
      */

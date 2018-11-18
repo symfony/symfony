@@ -1250,7 +1250,7 @@ EOF;
     /*{$this->docStar}
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string \$name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *

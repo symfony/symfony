@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-16T07:39:13Z
+
+The extension now throws when `enabled="false` is present for a single workflow.
+
+Status: Needs Review

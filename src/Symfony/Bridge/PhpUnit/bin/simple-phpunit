@@ -23,7 +23,7 @@ if (PHP_VERSION_ID >= 70200) {
     $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.7.26';
 } else {
     // PHPUnit 5.1 requires PHP 5.6+
-    $PHPUNIT_VERSION = '4.8';
+    $PHPUNIT_VERSION = '4.8.36';
 }
 
 if ('composer.json' !== $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json') {

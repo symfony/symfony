@@ -79,8 +79,8 @@ trait TesterTrait
     /**
      * Sets the user inputs.
      *
-     * @param $inputs array An array of strings representing each input
-     *              passed to the command input stream
+     * @param array $inputs An array of strings representing each input
+     *                      passed to the command input stream
      *
      * @return self
      */

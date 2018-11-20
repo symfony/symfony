@@ -38,7 +38,7 @@ class Entry
     /**
      * Returns whether an attribute exists.
      *
-     * @param $name string The name of the attribute
+     * @param string $name The name of the attribute
      *
      * @return bool
      */
@@ -53,7 +53,7 @@ class Entry
      * As LDAP can return multiple values for a single attribute,
      * this value is returned as an array.
      *
-     * @param $name string The name of the attribute
+     * @param string $name The name of the attribute
      *
      * @return array|null
      */

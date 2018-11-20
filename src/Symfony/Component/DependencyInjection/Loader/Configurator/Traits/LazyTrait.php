@@ -16,7 +16,7 @@ trait LazyTrait
     /**
      * Sets the lazy flag of this service.
      *
-     * @param bool $lazy
+     * @param bool|string $lazy A FQCN to derivate the lazy proxy from or `true` to make it extend from the definition's class
      *
      * @return $this
      */

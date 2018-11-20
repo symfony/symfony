@@ -19,8 +19,8 @@ namespace Symfony\Component\VarDumper\Caster;
 class ClassStub extends ConstStub
 {
     /**
-     * @param string   A PHP identifier, e.g. a class, method, interface, etc. name
-     * @param callable The callable targeted by the identifier when it is ambiguous or not a real PHP identifier
+     * @param string   $identifier A PHP identifier, e.g. a class, method, interface, etc. name
+     * @param callable $callable   The callable targeted by the identifier when it is ambiguous or not a real PHP identifier
      */
     public function __construct($identifier, $callable = null)
     {

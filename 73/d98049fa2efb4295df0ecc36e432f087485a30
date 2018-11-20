@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-18T11:00:08Z
+
+Does it mean some form of BC break happend along the way? Im curious as only as of 4.2 things became problematic.. before it worked like a charm. Did i rely on something unsupported actually?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T11:10:02Z
+
+3.4 is equally affected (that's where this PR applies.) No BC break here, just a core issue with dumping complex service graphs that have varying side effects depending on the state of the fixes. With this PR, the dumped container should always be correct (ie no infinite loop) BUT it doesn't dump setters in the most optimized order when circular loops are involved. This doesn't play well with Doctrine's Configuration objects which expect to be fully defined before being injected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T15:12:13Z
+
+I found a workaround: disabling inlining of services with outgoing edges in lazy services is enough to fix the Doctrine use case - ie have a Configuration instance fully ready before injecting it.
+In theory, the issue could come back again if the entity manager service is not declared lazy anymore. In practice, this was required with Symfony 2 - and I don't expect such complex graph + expectations to be common.
+
+Should be good enough, PR ready.
+
+For reference, the fully fixed behavior would involve dumping all services using the call stack (ie following references recursively when dumping - where the current logic stops at them) - for history and reference, #29252 contains a reproducer so that if fixing this is needed in the future, we can start from it.

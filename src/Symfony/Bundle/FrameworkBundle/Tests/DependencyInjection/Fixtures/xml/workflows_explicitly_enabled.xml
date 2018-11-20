@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:workflow enabled="true" name="foo" type="workflow" initial-place="bar">
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:place>bar</framework:place>
+            <framework:place>baz</framework:place>
+            <framework:transition name="bar_baz">
+                <framework:from>bar</framework:from>
+                <framework:to>baz</framework:to>
+            </framework:transition>
+        </framework:workflow>
+    </framework:config>
+</container>

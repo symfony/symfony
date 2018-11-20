@@ -409,6 +409,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
     }
 
+    public function testExplicitlyEnabledWorkflows()
+    {
+        $container = $this->createContainerFromFile('workflows_explicitly_enabled');
+
+        $this->assertTrue($container->hasDefinition('workflow.foo.definition'));
+    }
+
+    public function testExplicitlyEnabledWorkflowNamedWorkflows()
+    {
+        $container = $this->createContainerFromFile('workflows_explicitly_enabled_named_workflows');
+
+        $this->assertTrue($container->hasDefinition('workflow.workflows.definition'));
+    }
+
     public function testEnabledPhpErrorsConfig()
     {
         $container = $this->createContainerFromFile('php_errors_enabled');

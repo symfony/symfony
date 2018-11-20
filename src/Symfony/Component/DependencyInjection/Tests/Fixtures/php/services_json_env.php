@@ -105,7 +105,7 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *

@@ -4,6 +4,8 @@ CHANGELOG
 4.2.0
 -----
 
+ * Added `HandleTrait` leveraging a message bus instance to return a single 
+   synchronous message handling result
  * Added `HandledStamp` & `SentStamp` stamps
  * All the changes below are BC BREAKS
  * Senders and handlers subscribing to parent interfaces now receive *all* matching messages, wildcard included

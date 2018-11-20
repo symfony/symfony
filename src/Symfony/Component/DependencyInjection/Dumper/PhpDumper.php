@@ -170,15 +170,19 @@ class PhpDumper extends Dumper
             }
         }
 
-        (new AnalyzeServiceReferencesPass(false))->process($this->container);
+        (new AnalyzeServiceReferencesPass(false, !$this->getProxyDumper() instanceof NullDumper))->process($this->container);
         $this->circularReferences = array();
         $this->singleUsePrivateIds = array();
-        $checkedNodes = array();
-        foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
-            $currentPath = array($id => $id);
-            $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
-            if ($this->isSingleUsePrivateNode($node)) {
-                $this->singleUsePrivateIds[$id] = $id;
+        foreach (array(true, false) as $byConstructor) {
+            foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
+                if (!$node->getValue() instanceof Definition) {
+                    continue;
+                }
+                $currentPath = array($id => $id);
+                $this->analyzeCircularReferences($node->getOutEdges(), $currentPath, $id, $byConstructor);
+                if ($this->isSingleUsePrivateNode($node)) {
+                    $this->singleUsePrivateIds[$id] = $id;
+                }
             }
         }
         $this->container->getCompiler()->getServiceReferenceGraph()->clear();
@@ -333,27 +337,31 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function analyzeCircularReferences(array $edges, &$checkedNodes, &$currentPath)
+    private function analyzeCircularReferences(array $edges, &$currentPath, $sourceId, $byConstructor)
     {
         foreach ($edges as $edge) {
+            if ($byConstructor && !$edge->isReferencedByConstructor()) {
+                continue;
+            }
             $node = $edge->getDestNode();
             $id = $node->getId();
 
-            if ($node->getValue() && ($edge->isLazy() || $edge->isWeak())) {
+            if (!$node->getValue() instanceof Definition || $sourceId === $id || $edge->isLazy() || $edge->isWeak()) {
                 // no-op
             } elseif (isset($currentPath[$id])) {
                 $currentId = $id;
                 foreach (array_reverse($currentPath) as $parentId) {
-                    $this->circularReferences[$parentId][$currentId] = $currentId;
+                    if (!isset($this->circularReferences[$parentId][$currentId])) {
+                        $this->circularReferences[$parentId][$currentId] = $byConstructor;
+                    }
                     if ($parentId === $id) {
                         break;
                     }
                     $currentId = $parentId;
                 }
-            } elseif (!isset($checkedNodes[$id])) {
-                $checkedNodes[$id] = true;
+            } else {
                 $currentPath[$id] = $id;
-                $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
+                $this->analyzeCircularReferences($node->getOutEdges(), $currentPath, $id, $byConstructor);
                 unset($currentPath[$id]);
             }
         }
@@ -695,8 +703,14 @@ EOF;
 
     private function addInlineReference(string $id, Definition $definition, string $targetId, bool $forConstructor): string
     {
+        list($callCount, $behavior) = $this->serviceCalls[$targetId];
+
+        while ($this->container->hasAlias($targetId)) {
+            $targetId = (string) $this->container->getAlias($targetId);
+        }
+
         if ($id === $targetId) {
-            return $this->addInlineService($id, $definition, $definition, $forConstructor);
+            return $this->addInlineService($id, $definition, $definition);
         }
 
         if ('service_container' === $targetId || isset($this->referenceVariables[$targetId])) {
@@ -705,9 +719,7 @@ EOF;
 
         $hasSelfRef = isset($this->circularReferences[$id][$targetId]);
         $forConstructor = $forConstructor && !isset($this->definitionVariables[$definition]);
-        list($callCount, $behavior) = $this->serviceCalls[$targetId];
-
-        $code = $hasSelfRef && !$forConstructor ? $this->addInlineService($id, $definition, $definition, $forConstructor) : '';
+        $code = $hasSelfRef && $this->circularReferences[$id][$targetId] && !$forConstructor ? $this->addInlineService($id, $definition, $definition) : '';
 
         if (isset($this->referenceVariables[$targetId]) || (2 > $callCount && (!$hasSelfRef || !$forConstructor))) {
             return $code;
@@ -1250,7 +1262,7 @@ EOF;
     /*{$this->docStar}
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string \$name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -1736,7 +1748,7 @@ EOF;
 
     private function isSingleUsePrivateNode(ServiceReferenceGraphNode $node): bool
     {
-        if (!$node->getValue() || $node->getValue()->isPublic()) {
+        if ($node->getValue()->isPublic()) {
             return false;
         }
         $ids = array();

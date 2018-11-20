@@ -11,7 +11,7 @@
  */
 
 // Please update when phpunit needs to be reinstalled with fresh deps:
-// Cache-Id-Version: 2017-11-22 09:30 UTC
+// Cache-Id-Version: 2018-11-20 15:30 UTC
 
 error_reporting(-1);
 
@@ -89,29 +89,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
 
     @mkdir($PHPUNIT_DIR, 0777, true);
     chdir($PHPUNIT_DIR);
-    if (file_exists("phpunit-$PHPUNIT_VERSION")) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
-    }
-    if (extension_loaded('openssl') && filter_var(ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN) && !isset($_SERVER['http_proxy']) && !isset($_SERVER['https_proxy'])) {
-        $remoteZip = "https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip";
-        $remoteZipStream = @fopen($remoteZip, 'rb');
-        if (!$remoteZipStream) {
-            throw new \RuntimeException("Could not find $remoteZip");
-        }
-        stream_copy_to_stream($remoteZipStream, fopen("$PHPUNIT_VERSION.zip", 'wb'));
-    } elseif ('\\' === DIRECTORY_SEPARATOR) {
-        passthru("certutil -urlcache -split -f \"https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip\" $PHPUNIT_VERSION.zip");
-    } else {
-        @unlink("$PHPUNIT_VERSION.zip");
-        passthru("wget -q https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");
-    }
-    if (!class_exists('ZipArchive')) {
-        throw new \Exception('simple-phpunit requires the "zip" PHP extension to be installed and enabled in order to uncompress the downloaded PHPUnit packages.');
-    }
-    $zip = new ZipArchive();
-    $zip->open("$PHPUNIT_VERSION.zip");
-    $zip->extractTo(getcwd());
-    $zip->close();
+    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");
     chdir("phpunit-$PHPUNIT_VERSION");
     if ($SYMFONY_PHPUNIT_REMOVE) {
         passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);

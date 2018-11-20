@@ -184,7 +184,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      *
      * @internal since Symfony 4.2
      *
-     * @return array $locales The fallback locales
+     * @return array The fallback locales
      */
     public function getFallbackLocales()
     {

@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-15T02:19:29Z
+
+While the implementation looks clean and simple, I'm not confident that a query bus should be added at all. The problem that @nicolas-grekas already mentioned in https://github.com/symfony/symfony/pull/28909#issuecomment-430889273 still applies. This does not allow to use type declarations for the return value. And there are better alternatives already.
+
+Also I would argue that queries should not be using the command bus pattern at all. Use the repository pattern for this. This is also why SimpleBus does not include a query bus.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-15T02:29:37Z
+
+This PR replaces #28716 I assume
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-15T09:10:23Z
+
+@nicolas-grekas 's comment still applies, yes....about autocompletion. While I would usually agree with you, here the return type wouldn't even be of any help in most cases, because the result is often simply sent to the template or a serializer.
+
+> This does not allow to use type declarations for the return value
+
+Return type is enforced by the handler. Which we ensure is registered, and single. So a mismatch in config/code may still happen, but at some point users are responsible of their config and the issue would be easily spotted.
+
+> Also I would argue that queries should not be using the command bus pattern at all. Use the repository pattern for this.
+
+The query bus isn't a replacement of the repository pattern but is actually complementary to it.
+It also allows:
+- cross-cutting concerns through middleware (logging, cache, storing metrics, query validation, security, ...)
+- centralizing application use-cases in one place, in a consistent way between reads & writes. It's awesome for discoverability, really helpful for anyone new in the team to understand the application.
+
+Query handlers are also the place where data is aggregated into DTOs matching the use-case.
+All of this favor best practices & designing sustainable, understandable, enjoyable apps.
+
+If one really needs the return type, this is perfectly legit to implement in their action or any caller:
+
+```php
+private function query(MyQuery $query): MyQueryResult
+{
+    return $this->queryBus->query($query);
+}
+```
+
+And if we want to enforce return type to prevent any misconfig issue, we could add an optional fqcn argument to assert the result is what we expect.
+
+> What about shipping a trait instead of an interface + class? We would then encourage ppl to declare return types when using it. The method added to the trait would be private.
+
+This is not needed to me regarding above explanations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-15T10:32:25Z
+
+What is not needed is the interface and the class ;)
+Let's save us creating an abstraction (the interface) we can avoid, especially when it's not that SOLID.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-15T12:53:55Z
+
+Trait it is...
+
+(Agree for the interface, but I would have provided the base class anyway. Expect to see this happen in  userland.)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-15T13:57:26Z
+
+I agree the interface is not needed. But the query bus as a class is much cleaner than as a trait. Traits are for code reuse in single-inheritance languages. A class like a controller that requires a query bus, depends on it and it does not behave like one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-16T08:15:03Z
+
+What about renaming this CommandBusTrait?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-16T09:38:04Z
+
+>  a message bus instance to return a single synchronous message handling result
+
+That does not a apply to a event- and/or command-bus. Only a query bus,
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-16T10:03:21Z
+
+In #28716, @pamil uses the term command bus for his need. What's a command bus vs a query bus?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-16T10:16:31Z
+
+Or maybe something more neutral like `OneHandlerTrait`?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-16T10:46:11Z
+
+I think there 2 concepts to grasp;
+- enforce a single handler
+- enforce a result value
+
+The first does not enforce the latter, however both apply to a query bus at least.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-16T10:58:50Z
+
+@ro0NL : We do not enforce a result value. We enforce there is a handler. Which applies to both **synchronous** command & query buses. Using this trait for a command bus would be fine. Either you choose to use a return value or not, then, is up to you.
+
+Note: the `CommandBusTrait` name suggestion is more about the generic term referring to the command pattern. Not command/query bus. Would `SyncCommandBusTrait` be any better?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-16T11:06:11Z
+
+> We do not enforce a result value
+
+True, my bad.
+
+>  suggestion is more about the generic term referring to the command pattern. Not command/query bus
+
+i find that confusing :)
+
+I think something more generic could apply yes, e.g. i have something called `MessageDispatchingTrait`: https://github.com/msgphp/msgphp/blob/master/src/Domain/Message/MessageDispatchingTrait.php#L12
+
+It could provide multiple APIs, e.g. `dispatch()` + `dispatchOne()`
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-11-18T13:02:49Z
+
+The name `QueryBusTrait` seems reasonable to me as the query bus is typically what describes a bus returning a result, so it sounds good.
+
+If we really want to get rid of the "query bus" notion, then we should focus on the expected behaviour: returning results: `DispatchAndGetResultTrait`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T13:11:48Z
+
+Naming things :)
+My best proposal would be using just `HandleTrait` + `handle()`:
+- use `dispatch()` to get an envelop back and have things potentially async
+- use `handle()` from the trait to get synchronous behavior and a result back

@@ -93,7 +93,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the current store.
      *
-     * @return StoreInterface $store A StoreInterface instance
+     * @return StoreInterface A StoreInterface instance
      */
     public function getStore()
     {

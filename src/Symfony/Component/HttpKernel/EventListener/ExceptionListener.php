@@ -112,7 +112,7 @@ class ExceptionListener implements EventSubscriberInterface
      * @param \Exception $exception The thrown exception
      * @param Request    $request   The original request
      *
-     * @return Request $request The cloned request
+     * @return Request The cloned request
      */
     protected function duplicateRequest(\Exception $exception, Request $request)
     {

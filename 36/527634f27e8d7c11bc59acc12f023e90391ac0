@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-11-20T12:59:30Z
+
+shouldn't `\is_array` come first ? As of PHP 7.2, this is highly optimized (as this is a special opcode)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-20T14:32:48Z
+
+actually it looks like putting is_array last is the fastest as of 7.2 :thinking:
+
+https://3v4l.org/pvFaP
+
+i get the same results more or less locally on 5.6, 7.1 & 7.2. That is; puttting is_array last being the fastest

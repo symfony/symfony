@@ -279,6 +279,7 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
             $container->removeDefinition('console.command.messenger_debug');
+            $container->removeDefinition('console.command.messenger_setup_transports');
         }
 
         $this->registerValidationConfiguration($config['validation'], $container, $loader);

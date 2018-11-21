@@ -89,6 +89,13 @@
             <tag name="monolog.logger" channel="messenger" />
         </service>
 
+        <service id="console.command.messenger_setup_transports" class="Symfony\Component\Messenger\Command\SetupTransportsCommand">
+            <argument type="service" id="messenger.receiver_locator" />
+            <argument type="collection" /> <!-- Receiver names -->
+
+            <tag name="console.command" command="messenger:setup-transports" />
+        </service>
+
         <service id="console.command.messenger_debug" class="Symfony\Component\Messenger\Command\DebugCommand">
             <argument type="collection" /> <!-- Message to handlers mapping -->
             <tag name="console.command" command="debug:messenger" />

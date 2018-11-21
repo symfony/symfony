@@ -51,6 +51,8 @@ CHANGELOG
    and queues by default. Previously, this was done when in "debug" mode
    only. Pass the `auto_setup` connection option to control this.
 
+ * Added a `SetupTransportsCommand` command to setup the transports
+
 4.2.0
 -----
 

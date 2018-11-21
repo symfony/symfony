@@ -236,11 +236,11 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
+        $receiverNames = [];
+        foreach ($receiverMapping as $name => $reference) {
+            $receiverNames[(string) $reference] = $name;
+        }
         if ($container->hasDefinition('console.command.messenger_consume_messages')) {
-            $receiverNames = [];
-            foreach ($receiverMapping as $name => $reference) {
-                $receiverNames[(string) $reference] = $name;
-            }
             $buses = [];
             foreach ($busIds as $busId) {
                 $buses[$busId] = new Reference($busId);
@@ -249,6 +249,11 @@ class MessengerPass implements CompilerPassInterface
             $container->getDefinition('console.command.messenger_consume_messages')
                 ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
                 ->replaceArgument(3, array_values($receiverNames));
+        }
+
+        if ($container->hasDefinition('console.command.messenger_setup_transports')) {
+            $container->getDefinition('console.command.messenger_setup_transports')
+                ->replaceArgument(1, array_values($receiverNames));
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);

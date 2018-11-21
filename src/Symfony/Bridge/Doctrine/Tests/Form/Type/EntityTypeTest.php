@@ -1509,4 +1509,9 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(), $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
+    {
+        $this->markTestIncomplete('Added in symfony/form 2.8.');
+    }
 }

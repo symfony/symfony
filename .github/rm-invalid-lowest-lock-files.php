@@ -79,7 +79,7 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
             continue 2;
         }
 
-        if (isset($composerJsons[$name][2]['repositories']) && !isset($lockedJson[$key]['repositories'])) {
+        if (isset($composerJsons[$name][2]['repositories']) && !isset($lockedJson['repositories'])) {
             // the locked package has been patched locally but the lock references a commit,
             // which means the referencing package itself is not modified
             continue;
@@ -104,8 +104,7 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
     }
 }
 
-if (!$referencedCommits || (isset($_SERVER['TRAVIS_PULL_REQUEST']) && 'false' !== $_SERVER['TRAVIS_PULL_REQUEST'])) {
-    // cached commits cannot be stale for PRs
+if (!$referencedCommits) {
     return;
 }
 

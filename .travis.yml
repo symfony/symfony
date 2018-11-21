@@ -1,10 +1,9 @@
 language: php
 
 dist: trusty
-sudo: false
 
 git:
-    depth: 1
+    depth: 2
 
 addons:
     apt_packages:
@@ -159,7 +158,7 @@ before_install:
               echo extension = $ext_cache >> $INI
           elif [[ $PHP = 7.* ]]; then
               tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-              tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
+              tfold ext.mongodb tpecl mongodb-1.5.2 mongodb.so $INI
           fi
       done
 
@@ -218,10 +217,14 @@ install:
           fi
           phpenv global ${PHP/hhvm*/hhvm}
           if [[ $PHP = 7.* ]]; then
-              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.0; composer require --dev --no-update mongodb/mongodb)
+              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.2; composer require --dev --no-update mongodb/mongodb)
           fi
           tfold 'composer update' $COMPOSER_UP
-          tfold 'phpunit install' ./phpunit install
+          if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then
+              tfold 'phpunit install' 'composer global remove symfony/flex && ./phpunit install && composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master'
+          else
+              tfold 'phpunit install' ./phpunit install
+          fi
           if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then

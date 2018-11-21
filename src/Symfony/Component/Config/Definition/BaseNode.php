@@ -332,7 +332,7 @@ abstract class BaseNode implements NodeInterface
 
         // run custom normalization closures
         foreach ($this->normalizationClosures as $closure) {
-            $value = $closure($value);
+            $value = $closure($value, $value !== self::resolvePlaceholderValue($value));
         }
 
         // resolve placeholder value

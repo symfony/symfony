@@ -265,6 +265,21 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame('1', $container->getParameter('boolish'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
+     * @expectedExceptionMessage A dynamic value is not compatible with a "Symfony\Component\Config\Definition\PrototypedArrayNode" node type at path "env_extension.nodes".
+     */
+    public function testNormalizedPlaceholderArray()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension(new ConfigurationWithArrayNodeRequiringOneElement()));
+        $container->loadFromExtension('env_extension', array(
+            'nodes' => '%env(SOME)%',
+        ));
+
+        $this->doProcess($container);
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -340,10 +355,16 @@ class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInte
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('env_extension')
+        $treeBuilder = new TreeBuilder('env_extension');
+        $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('nodes')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($v, bool $isEnv) {
+                            return $isEnv ? $v : array($v);
+                        })
+                    ->end()
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->scalarPrototype()->end()

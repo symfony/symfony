@@ -83,14 +83,6 @@ class UrlTypeTest extends TextTypeTest
         ));
     }
 
-    public function testSubmitWithNonStringDataDoesNotBreakTheFixUrlProtocolListener()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE);
-        $form->submit(array('domain.com', 'www.domain.com'));
-
-        $this->assertSame(array('domain.com', 'www.domain.com'), $form->getData());
-    }
-
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = 'http://empty')
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(

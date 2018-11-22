@@ -18,7 +18,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     public function match($rawPathinfo)
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo);
+        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
         $host = strtolower($context->getHost());
@@ -35,7 +35,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         .'|(*:56)'
                     .')'
                 .')'
-                .')$}sD',
+                .')(?:/?)$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -45,9 +45,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         $matches = array('foo' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
 
                         // r1
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                            break;
+                        }
                         return $this->mergeDefaults(array('_route' => 'r1') + $matches, array());
 
                         // r2
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                            break;
+                        }
                         return $this->mergeDefaults(array('_route' => 'r2') + $matches, array());
 
                         break;

@@ -18,7 +18,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     public function match($rawPathinfo)
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo);
+        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -45,7 +45,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             .')'
                         .')'
                     .')'
-                .')$}sD',
+                .')(?:/?)$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -53,15 +53,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            27 => array(array('_route' => 'r1'), array('foo'), null, null),
-                            38 => array(array('_route' => 'r10'), array('foo'), null, null),
-                            46 => array(array('_route' => 'r100'), array('foo'), null, null),
-                            59 => array(array('_route' => 'r2'), array('foo'), null, null),
-                            70 => array(array('_route' => 'r20'), array('foo'), null, null),
-                            78 => array(array('_route' => 'r200'), array('foo'), null, null),
+                            27 => array(array('_route' => 'r1'), array('foo'), null, null, false),
+                            38 => array(array('_route' => 'r10'), array('foo'), null, null, false),
+                            46 => array(array('_route' => 'r100'), array('foo'), null, null, false),
+                            59 => array(array('_route' => 'r2'), array('foo'), null, null, false),
+                            70 => array(array('_route' => 'r20'), array('foo'), null, null, false),
+                            78 => array(array('_route' => 'r200'), array('foo'), null, null, false),
                         );
 
-                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
+                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
+
+                        if ('/' !== $pathinfo && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                            break;
+                        }
 
                         foreach ($vars as $i => $v) {
                             if (isset($matches[1 + $i])) {

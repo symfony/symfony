@@ -118,16 +118,37 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        $supportsTrailingSlash = '/' !== $pathinfo && '' !== $pathinfo && $this instanceof RedirectableUrlMatcherInterface;
+
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();
+            $staticPrefix = $compiledRoute->getStaticPrefix();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($pathinfo, $compiledRoute->getStaticPrefix())) {
+            if ('' === $staticPrefix || 0 === strpos($pathinfo, $staticPrefix)) {
+                // no-op
+            } elseif (!$supportsTrailingSlash) {
+                continue;
+            } elseif ('/' === substr($staticPrefix, -1) && substr($staticPrefix, 0, -1) === $pathinfo) {
+                return;
+            } else {
+                continue;
+            }
+            $regex = $compiledRoute->getRegex();
+
+            if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
+                $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
+                $hasTrailingSlash = true;
+            } else {
+                $hasTrailingSlash = false;
+            }
+
+            if (!preg_match($regex, $pathinfo, $matches)) {
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
-                continue;
+            if ($hasTrailingSlash && '/' !== substr($pathinfo, -1)) {
+                return;
             }
 
             $hostMatches = array();

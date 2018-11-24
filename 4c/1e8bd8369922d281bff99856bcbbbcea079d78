@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-22T18:09:42Z
+
+:+1: for the new approach.
+
+Im not sure about "FILES parameters", that's not a real HTTP verb. In HTTP context we're dealing "multipart form-data" (part of the POST params).
+
+I suggest to keep the current title. At most it could be moved as `h4` under POST parameters
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-11-22T18:19:06Z
+
+@ro0NL I thought "FILES Parameters" is more according to `$_FILES` var as well as "POST Parameters" and `$_POST` | "GET Parameters" and `$_GET`. But I see your point.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-22T18:24:54Z
+
+Right, but im not sure we should use PHP terminology. It's also `Server Parameters` not `SERVER` :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-11-22T18:35:12Z
+
+@ro0NL comments addressed, thanks!

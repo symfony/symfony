@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-20T15:44:22Z
+
+But we don't enable strict types, so this change is not necessary!
+
+---------------------------------------------------------------------------
+
+by PavelPrischepa at 2018-11-21T05:21:08Z
+
+@nicolas-grekas ok, but what about PdoStore::putOffExpiration() fix?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-22T20:09:13Z
+
+I don't get them. Can't we reference the same parameter twice? Can you give a few more hints please?
+
+---------------------------------------------------------------------------
+
+by PavelPrischepa at 2018-11-23T03:53:25Z
+
+Yes, according to http://php.net/pdo.prepare
+> You must include a unique parameter marker for each value you wish to pass in to the statement when you call PDOStatement::execute(). You cannot use a named parameter marker of the same name more than once in a prepared statement, unless emulation mode is on.

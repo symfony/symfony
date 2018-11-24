@@ -66,6 +66,20 @@ class DotenvTest extends TestCase
         $_ENV['REMOTE'] = 'remote';
 
         $tests = array(
+            // backslashes
+            array('FOO=foo\\\\bar', array('FOO' => 'foo\\bar')),
+            array("FOO='foo\\\\bar'", array('FOO' => 'foo\\\\bar')),
+            array('FOO="foo\\\\bar"', array('FOO' => 'foo\\bar')),
+
+            // escaped backslash in front of variable
+            array("BAR=bar\nFOO=foo\\\\\$BAR", array('BAR' => 'bar', 'FOO' => 'foo\\bar')),
+            array("BAR=bar\nFOO='foo\\\\\$BAR'", array('BAR' => 'bar', 'FOO' => 'foo\\\\$BAR')),
+            array("BAR=bar\nFOO=\"foo\\\\\$BAR\"", array('BAR' => 'bar', 'FOO' => 'foo\\bar')),
+
+            array('FOO=foo\\\\\\$BAR', array('FOO' => 'foo\\$BAR')),
+            array('FOO=\'foo\\\\\\$BAR\'', array('FOO' => 'foo\\\\\\$BAR')),
+            array('FOO="foo\\\\\\$BAR"', array('FOO' => 'foo\\$BAR')),
+
             // spaces
             array('FOO=bar', array('FOO' => 'bar')),
             array(' FOO=bar ', array('FOO' => 'bar')),

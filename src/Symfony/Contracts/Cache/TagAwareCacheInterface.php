@@ -21,11 +21,6 @@ use Psr\Cache\InvalidArgumentException;
 interface TagAwareCacheInterface extends CacheInterface
 {
     /**
-     * {@inheritdoc}
-     */
-    public function get(string $key, callable $callback, float $beta = null);
-
-    /**
      * Invalidates cached items using tags.
      *
      * When implemented on a PSR-6 pool, invalidation should not apply

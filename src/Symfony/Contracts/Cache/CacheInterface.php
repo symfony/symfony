@@ -29,19 +29,20 @@ interface CacheInterface
      * requested key, that could be used e.g. for expiration control. It could also
      * be an ItemInterface instance when its additional features are needed.
      *
-     * @param string                     $key      The key of the item to retrieve from the cache
-     * @param callable|CallbackInterface $callback Should return the computed value for the given key/item
-     * @param float|null                 $beta     A float that, as it grows, controls the likeliness of triggering
-     *                                             early expiration. 0 disables it, INF forces immediate expiration.
-     *                                             The default (or providing null) is implementation dependent but should
-     *                                             typically be 1.0, which should provide optimal stampede protection.
-     *                                             See https://en.wikipedia.org/wiki/Cache_stampede#Probabilistic_early_expiration
+     * @param string                     $key       The key of the item to retrieve from the cache
+     * @param callable|CallbackInterface $callback  Should return the computed value for the given key/item
+     * @param float|null                 $beta      A float that, as it grows, controls the likeliness of triggering
+     *                                              early expiration. 0 disables it, INF forces immediate expiration.
+     *                                              The default (or providing null) is implementation dependent but should
+     *                                              typically be 1.0, which should provide optimal stampede protection.
+     *                                              See https://en.wikipedia.org/wiki/Cache_stampede#Probabilistic_early_expiration
+     * @param array                      &$metadata The metadata of the cached item {@see ItemInterface::getMetadata()}
      *
      * @return mixed The value corresponding to the provided key
      *
      * @throws InvalidArgumentException When $key is not valid or when $beta is negative
      */
-    public function get(string $key, callable $callback, float $beta = null);
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null);
 
     /**
      * Removes an item from the pool.

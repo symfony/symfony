@@ -82,7 +82,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (null === $this->values) {
             $this->initialize();
@@ -90,10 +90,10 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         if (!isset($this->keys[$key])) {
             get_from_pool:
             if ($this->pool instanceof CacheInterface) {
-                return $this->pool->get($key, $callback, $beta);
+                return $this->pool->get($key, $callback, $beta, $metadata);
             }
 
-            return $this->doGet($this->pool, $key, $callback, $beta);
+            return $this->doGet($this->pool, $key, $callback, $beta, $metadata);
         }
         $value = $this->values[$this->keys[$key]];
 

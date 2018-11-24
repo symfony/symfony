@@ -164,11 +164,13 @@ class PdoStore implements StoreInterface
 
         $key->reduceLifetime($ttl);
 
-        $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + $ttl, $this->tokenCol = :token WHERE $this->idCol = :id AND ($this->tokenCol = :token OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
+        $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + $ttl, $this->tokenCol = :token1 WHERE $this->idCol = :id AND ($this->tokenCol = :token2 OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
         $stmt = $this->getConnection()->prepare($sql);
 
+        $uniqueToken = $this->getUniqueToken($key);
         $stmt->bindValue(':id', $this->getHashedKey($key));
-        $stmt->bindValue(':token', $this->getUniqueToken($key));
+        $stmt->bindValue(':token1', $uniqueToken);
+        $stmt->bindValue(':token2', $uniqueToken);
         $stmt->execute();
 
         // If this method is called twice in the same second, the row wouldn't be updated. We have to call exists to know if we are the owner
@@ -214,7 +216,7 @@ class PdoStore implements StoreInterface
      */
     private function getHashedKey(Key $key): string
     {
-        return hash('sha256', $key);
+        return hash('sha256', (string) $key);
     }
 
     private function getUniqueToken(Key $key): string

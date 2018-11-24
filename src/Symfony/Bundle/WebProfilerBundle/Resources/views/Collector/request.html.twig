@@ -131,31 +131,14 @@
                     {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
-                <h3>Uploaded files</h3>
+                <h4>Uploaded Files</h4>
 
                 {% if collector.requestfiles is empty %}
                     <div class="empty">
                         <p>No files were uploaded</p>
                     </div>
                 {% else %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">File Name</th>
-                                <th scope="col">MIME Type</th>
-                                <th scope="col" class="text-right">Size (bytes)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for file in collector.requestfiles %}
-                            <tr>
-                                <td>{{ file.name }}</td>
-                                <td>{{ file.mimetype }}</td>
-                                <td class="text-right">{{ file.size|number_format }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestfiles, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
                 <h3>Request Attributes</h3>

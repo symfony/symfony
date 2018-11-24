@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,22 +57,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $content = false;
         }
 
-        $requestFiles = array();
-        $extractFiles = function (array $files) use (&$extractFiles, &$requestFiles) {
-            foreach ($files as $file) {
-                if ($file instanceof UploadedFile) {
-                    $requestFiles[] = array(
-                        'name' => $file->getClientOriginalName(),
-                        'mimetype' => $file->getMimeType(),
-                        'size' => $file->getSize(),
-                    );
-                } elseif (\is_array($file)) {
-                    $extractFiles($file);
-                }
-            }
-        };
-        $extractFiles($request->files->all());
-
         $sessionMetadata = array();
         $sessionAttributes = array();
         $session = null;
@@ -112,7 +95,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'status_code' => $statusCode,
             'request_query' => $request->query->all(),
             'request_request' => $request->request->all(),
-            'request_files' => $requestFiles,
+            'request_files' => $request->files->all(),
             'request_headers' => $request->headers->all(),
             'request_server' => $request->server->all(),
             'request_cookies' => $request->cookies->all(),
@@ -216,7 +199,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function getRequestFiles()
     {
-        return $this->data['request_files']->getValue(true);
+        return new ParameterBag($this->data['request_files']->getValue());
     }
 
     public function getRequestHeaders()

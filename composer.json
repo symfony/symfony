@@ -101,6 +101,7 @@
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/reflection": "~1.0",
         "doctrine/doctrine-bundle": "~1.4",
+        "masterminds/html5": "^2.6",
         "monolog/monolog": "~1.11",
         "nyholm/psr7": "^1.0",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
@@ -112,6 +113,7 @@
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
+        "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.3.0",
         "phpunit/phpunit": "<5.4.3"

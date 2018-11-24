@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
+use Masterminds\HTML5;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
@@ -55,14 +56,28 @@ class Crawler implements \Countable, \IteratorAggregate
     private $isHtml = true;
 
     /**
-     * @param mixed  $node     A Node to use as the base for the crawling
-     * @param string $uri      The current URI
-     * @param string $baseHref The base href value
+     * @var HTML5|null
      */
-    public function __construct($node = null, string $uri = null, string $baseHref = null)
+    private $html5Parser;
+
+    /**
+     * @param mixed     $node           A Node to use as the base for the crawling
+     * @param string    $uri            The current URI
+     * @param string    $baseHref       The base href value
+     * @param bool|null $useHtml5Parser Whether the Crawler should use the HTML5 parser or the native DOM parser
+     */
+    public function __construct($node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = null)
     {
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
+
+        if ($useHtml5Parser && !class_exists(HTML5::class)) {
+            throw new \LogicException('Using the DomCrawler HTML5 parser requires the html5-php library. Try running "composer require masterminds/html5".');
+        }
+
+        if ($useHtml5Parser ?? class_exists(HTML5::class)) {
+            $this->html5Parser = new HTML5(['disable_html_ns' => true]);
+        }
 
         $this->add($node);
     }
@@ -183,29 +198,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
-        $internalErrors = libxml_use_internal_errors(true);
-        $disableEntities = libxml_disable_entity_loader(true);
-
-        $dom = new \DOMDocument('1.0', $charset);
-        $dom->validateOnParse = true;
-
-        set_error_handler(function () { throw new \Exception(); });
-
-        try {
-            // Convert charset to HTML-entities to work around bugs in DOMDocument::loadHTML()
-            $content = mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
-        } catch (\Exception $e) {
-        }
-
-        restore_error_handler();
-
-        if ('' !== trim($content)) {
-            @$dom->loadHTML($content);
-        }
-
-        libxml_use_internal_errors($internalErrors);
-        libxml_disable_entity_loader($disableEntities);
-
+        $dom = null !== $this->html5Parser ? $this->parseHtml5($content, $charset) : $this->parseXhtml($content, $charset);
         $this->addDocument($dom);
 
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(['href']);
@@ -606,6 +599,15 @@ class Crawler implements \Countable, \IteratorAggregate
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        if (null !== $this->html5Parser) {
+            $html = '';
+            foreach ($this->getNode(0)->childNodes as $child) {
+                $html .= $this->html5Parser->saveHTML($child);
+            }
+
+            return $html;
         }
 
         $html = '';
@@ -1110,6 +1112,53 @@ class Crawler implements \Countable, \IteratorAggregate
         } while ($node = $node->$siblingDir);
 
         return $nodes;
+    }
+
+    private function parseHtml5(string $htmlContent, string $charset = 'UTF-8'): \DOMDocument
+    {
+        return $this->html5Parser->parse($this->convertToHtmlEntities($htmlContent, $charset), [], $charset);
+    }
+
+    private function parseXhtml(string $htmlContent, string $charset = 'UTF-8'): \DOMDocument
+    {
+        $htmlContent = $this->convertToHtmlEntities($htmlContent, $charset);
+
+        $internalErrors = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
+
+        $dom = new \DOMDocument('1.0', $charset);
+        $dom->validateOnParse = true;
+
+        if ('' !== trim($htmlContent)) {
+            @$dom->loadHTML($htmlContent);
+        }
+
+        libxml_use_internal_errors($internalErrors);
+        libxml_disable_entity_loader($disableEntities);
+
+        return $dom;
+    }
+
+    /**
+     * Convert charset to HTML-entities to ensure valid parsing.
+     */
+    private function convertToHtmlEntities(string $htmlContent, string $charset = 'UTF-8'): string
+    {
+        set_error_handler(function () { throw new \Exception(); });
+
+        try {
+            return mb_convert_encoding($htmlContent, 'HTML-ENTITIES', $charset);
+        } catch (\Exception $e) {
+            try {
+                $htmlContent = iconv($charset, 'UTF-8', $htmlContent);
+                $htmlContent = mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8');
+            } catch (\Exception $e) {
+            }
+
+            return $htmlContent;
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**

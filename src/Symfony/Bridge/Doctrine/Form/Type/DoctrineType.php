@@ -212,7 +212,7 @@ abstract class DoctrineType extends AbstractType
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
             if (\is_callable($queryBuilder)) {
-                $queryBuilder = \call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+                $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
             }
 
             return $queryBuilder;

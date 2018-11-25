@@ -147,7 +147,7 @@ class DebugClassLoader
                     require $file;
                 }
             } else {
-                \call_user_func($this->classLoader, $class);
+                ($this->classLoader)($class);
                 $file = false;
             }
         } finally {

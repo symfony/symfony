@@ -1227,7 +1227,7 @@ class Process implements \IteratorAggregate
         if ($this->outputDisabled) {
             return function ($type, $data) use ($callback) {
                 if (null !== $callback) {
-                    \call_user_func($callback, $type, $data);
+                    $callback($type, $data);
                 }
             };
         }
@@ -1242,7 +1242,7 @@ class Process implements \IteratorAggregate
             }
 
             if (null !== $callback) {
-                \call_user_func($callback, $type, $data);
+                $callback($type, $data);
             }
         };
     }

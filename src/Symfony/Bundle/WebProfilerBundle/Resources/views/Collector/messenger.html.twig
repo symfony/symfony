@@ -33,10 +33,11 @@
 <span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
     <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
     <strong>Messages</strong>
-
-    <span class="count">
-        <span>{{ collector.messages|length }}</span>
-    </span>
+    {% if collector.exceptionsCount > 0 %}
+        <span class="count">
+            <span>{{ collector.exceptionsCount }}</span>
+        </span>
+    {% endif %}
 </span>
 {% endblock %}
 

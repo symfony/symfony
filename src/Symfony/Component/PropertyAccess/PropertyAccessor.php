@@ -508,14 +508,14 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getReadAccessInfo($class, $property)
     {
-        $key = false !== strpbrk($key = $class.'..'.$property, '{}()/@:') ? rawurlencode($key) : $key;
+        $key = str_replace('\\', '.', $class).'..'.$property;
 
         if (isset($this->readPropertyCache[$key])) {
             return $this->readPropertyCache[$key];
         }
 
         if ($this->cacheItemPool) {
-            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_READ.str_replace('\\', '.', $key));
+            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_READ.rawurlencode($key));
             if ($item->isHit()) {
                 return $this->readPropertyCache[$key] = $item->get();
             }
@@ -687,14 +687,14 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getWriteAccessInfo($class, $property, $value)
     {
-        $key = false !== strpbrk($key = $class.'..'.$property, '{}()/@:') ? rawurlencode($key) : $key;
+        $key = str_replace('\\', '.', $class).'..'.$property;
 
         if (isset($this->writePropertyCache[$key])) {
             return $this->writePropertyCache[$key];
         }
 
         if ($this->cacheItemPool) {
-            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_WRITE.str_replace('\\', '.', $key));
+            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_WRITE.rawurlencode($key));
             if ($item->isHit()) {
                 return $this->writePropertyCache[$key] = $item->get();
             }
@@ -868,8 +868,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         if ($this->cacheItemPool) {
-            $key = false !== strpbrk($propertyPath, '{}()/@:') ? rawurlencode($propertyPath) : $propertyPath;
-            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_PROPERTY_PATH.str_replace('\\', '.', $key));
+            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_PROPERTY_PATH.rawurlencode($propertyPath));
             if ($item->isHit()) {
                 return $this->propertyPathCache[$propertyPath] = $item->get();
             }

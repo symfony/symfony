@@ -60,8 +60,8 @@ class DebugProcessor implements DebugLoggerInterface
      */
     public function getLogs(/* Request $request = null */)
     {
-        if (1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) && isset($this->records[$hash = spl_object_hash($request)])) {
-            return $this->records[$hash];
+        if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
+            return $this->records[spl_object_hash($request)] ?? array();
         }
 
         if (0 === \count($this->records)) {
@@ -76,8 +76,8 @@ class DebugProcessor implements DebugLoggerInterface
      */
     public function countErrors(/* Request $request = null */)
     {
-        if (1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) && isset($this->errorCount[$hash = spl_object_hash($request)])) {
-            return $this->errorCount[$hash];
+        if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
+            return $this->errorCount[spl_object_hash($request)] ?? 0;
         }
 
         return array_sum($this->errorCount);

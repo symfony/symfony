@@ -592,7 +592,8 @@ class Command
         $key = $short ? 'short' : 'long';
 
         if (!isset($this->synopsis[$key])) {
-            $this->synopsis[$key] = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis($short)));
+            $partialSynopsis = $this->definition->getPartialSynopsis(array('command'), array(), $short);
+            $this->synopsis[$key] = trim(sprintf('%s %s', $this->name, $partialSynopsis));
         }
 
         return $this->synopsis[$key];

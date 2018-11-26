@@ -192,6 +192,23 @@ class CommandTest extends TestCase
         $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
+    public function testGetSypnosisWithApplication()
+    {
+        $appDef = $this->getMockBuilder('Symfony\Component\Console\Input\InputDefinition')->getMock();
+        $appDef->method('getArguments')->willReturn(array(new InputArgument('command'), new InputArgument('appbar')));
+        $appDef->method('getOptions')->willReturn(array(new InputOption('appfoo')));
+        $helperSet = $this->getMockBuilder('Symfony\Component\Console\Helper\HelperSet')->getMock();
+        $application = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
+        $application->method('getDefinition')->willReturn($appDef);
+        $application->method('getHelperSet')->willReturn($helperSet);
+        $command = new \TestCommand();
+        $command->setApplication($application);
+        $command->mergeApplicationDefinition();
+        $command->addOption('foo');
+        $command->addArgument('bar');
+        $this->assertEquals('namespace:name [--appfoo] [--foo] [--] [<appbar>] [<bar>]', $command->getSynopsis());
+    }
+
     public function testAddGetUsages()
     {
         $command = new \TestCommand();

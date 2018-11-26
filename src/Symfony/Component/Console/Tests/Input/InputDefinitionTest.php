@@ -387,6 +387,27 @@ class InputDefinitionTest extends TestCase
         $this->assertEquals('[options] [--] [<cat>]', $definition->getSynopsis(true), '->getSynopsis(true) groups options in [options]');
     }
 
+    public function getGetPartialSynopsisData()
+    {
+        return array(
+            array(array(), array(), '[--foobar] [--] [<foo>] [<bar>]'),
+            array(array('foo'), array(), '[--foobar] [--] [<bar>]'),
+            array(array('bar'), array('foobar'), '[<foo>]'),
+            array(array('foo', 'bar'), array('foobar'), ''),
+        );
+    }
+
+    /**
+     * @dataProvider getGetPartialSynopsisData
+     */
+    public function testGetPartialSynopsis($exceptArguments, $exceptOptions, $expectedSynopsis)
+    {
+        $definition = new InputDefinition(
+            array(new InputArgument('foo'), new InputArgument('bar'), new InputOption('foobar'))
+        );
+        $this->assertEquals($expectedSynopsis, $definition->getPartialSynopsis($exceptArguments, $exceptOptions));
+    }
+
     protected function initializeArguments()
     {
         $this->foo = new InputArgument('foo');

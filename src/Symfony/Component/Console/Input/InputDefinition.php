@@ -349,13 +349,15 @@ class InputDefinition
     }
 
     /**
-     * Gets the synopsis.
+     * Gets the synopsis without displaying given arguments and options.
      *
-     * @param bool $short Whether to return the short version (with options folded) or not
+     * @param array $exceptArguments arguments that won't be displayed
+     * @param array $exceptOptions   options that won't be displayed
+     * @param bool  $short           Whether to return the short version (with options folded) or not
      *
      * @return string The synopsis
      */
-    public function getSynopsis($short = false)
+    public function getPartialSynopsis(array $exceptArguments, array $exceptOptions = array(), $short = false)
     {
         $elements = array();
 
@@ -363,12 +365,17 @@ class InputDefinition
             $elements[] = '[options]';
         } elseif (!$short) {
             foreach ($this->getOptions() as $option) {
+                $name = $option->getName();
+                if (\in_array($name, $exceptOptions)) {
+                    continue;
+                }
+
                 $value = '';
                 if ($option->acceptValue()) {
                     $value = sprintf(
                         ' %s%s%s',
                         $option->isValueOptional() ? '[' : '',
-                        strtoupper($option->getName()),
+                        strtoupper($name),
                         $option->isValueOptional() ? ']' : ''
                     );
                 }
@@ -383,7 +390,12 @@ class InputDefinition
         }
 
         foreach ($this->getArguments() as $argument) {
-            $element = '<'.$argument->getName().'>';
+            $name = $argument->getName();
+            if (\in_array($name, $exceptArguments)) {
+                continue;
+            }
+
+            $element = '<'.$name.'>';
             if (!$argument->isRequired()) {
                 $element = '['.$element.']';
             } elseif ($argument->isArray()) {
@@ -398,5 +410,17 @@ class InputDefinition
         }
 
         return implode(' ', $elements);
+    }
+
+    /**
+     * Gets the synopsis.
+     *
+     * @param bool $short Whether to return the short version (with options folded) or not
+     *
+     * @return string The synopsis
+     */
+    public function getSynopsis($short = false)
+    {
+        return $this->getPartialSynopsis(array(), array(), $short);
     }
 }

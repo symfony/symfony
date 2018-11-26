@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by sergeyklay at 2018-11-25T11:26:42Z
+
+@nicolas-grekas Should I submit this PR to the 2.8 branch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T11:28:12Z
+
+As you want: we can also do the change while merging.
+
+---------------------------------------------------------------------------
+
+by sergeyklay at 2018-11-25T11:34:59Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by sergeyklay at 2018-11-25T12:47:13Z
+
+@nicolas-grekas I'm a bit confused and unclear on what the next steps. The tests was failed after changing the base branch from 4.1 to 2.8 and seems this is unrelated with this PR. Could you please elaborate on that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T12:52:44Z
+
+You changed the branch on github after pushing, that's why. You can commit --amen and push force again to retrigger.

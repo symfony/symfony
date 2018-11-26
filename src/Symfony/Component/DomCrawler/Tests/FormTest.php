@@ -394,6 +394,10 @@ class FormTest extends TestCase
 
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" disabled="disabled" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(array('bar' => 'bar'), $form->getValues(), '->getValues() does not include disabled fields');
+
+        $form = $this->createForm('<form><template><input type="text" name="foo" value="foo" /></template><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $this->assertEquals(array('bar' => 'bar'), $form->getValues(), '->getValues() does not include template fields');
+        $this->assertFalse($form->has('foo'));
     }
 
     public function testSetValues()
@@ -444,6 +448,10 @@ class FormTest extends TestCase
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');
         $this->assertEquals(array(), $form->getFiles(), '->getFiles() does not include disabled file fields');
+
+        $form = $this->createForm('<form method="post"><template><input type="file" name="foo"/></template><input type="text" name="bar" value="bar"/><input type="submit"/></form>');
+        $this->assertEquals(array(), $form->getFiles(), '->getFiles() does not include template file fields');
+        $this->assertFalse($form->has('foo'));
     }
 
     public function testGetPhpFiles()
@@ -857,7 +865,7 @@ class FormTest extends TestCase
     protected function createForm($form, $method = null, $currentUri = null)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML('<html>'.$form.'</html>');
+        @$dom->loadHTML('<html>'.$form.'</html>');
 
         $xPath = new \DOMXPath($dom);
         $nodes = $xPath->query('//input | //button');

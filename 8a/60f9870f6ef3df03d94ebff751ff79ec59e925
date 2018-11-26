@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by MathieuMindid at 2018-02-21T14:01:09Z
+
+Thanks for the fix.
+As mentioned in #26257 the problems also exist in last version (3.x and 4.x)
+
+---------------------------------------------------------------------------
+
+by brizzz at 2018-02-22T17:21:21Z
+
+Yes, this fix (if its correct) should be merged to all maintained versions. I have edited description to clarify.
+
+---------------------------------------------------------------------------
+
+by brizzz at 2018-11-25T11:11:25Z
+
+this is great news!

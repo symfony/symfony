@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-25T07:34:52Z
+
+I confirm the profiler deduplicates events. Ill try to take another stab at it in master to fully close #24275

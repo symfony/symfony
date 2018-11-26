@@ -91,10 +91,10 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (!$this->pool instanceof CacheInterface) {
-            return $this->doGet($this, $key, $callback, $beta);
+            return $this->doGet($this, $key, $callback, $beta, $metadata);
         }
 
         return $this->pool->get($this->getId($key), function ($innerItem) use ($key, $callback) {
@@ -103,7 +103,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             ($this->setInnerItem)($innerItem, (array) $item);
 
             return $value;
-        }, $beta);
+        }, $beta, $metadata);
     }
 
     /**

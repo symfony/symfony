@@ -87,7 +87,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         $lastItem = null;
         $i = 0;
@@ -98,9 +98,9 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $beta = INF === $beta ? INF : 0;
             }
             if ($adapter instanceof CacheInterface) {
-                $value = $adapter->get($key, $callback, $beta);
+                $value = $adapter->get($key, $callback, $beta, $metadata);
             } else {
-                $value = $this->doGet($adapter, $key, $callback, $beta);
+                $value = $this->doGet($adapter, $key, $callback, $beta, $metadata);
             }
             if (null !== $item) {
                 ($this->syncItem)($lastItem = $lastItem ?? $item, $item);

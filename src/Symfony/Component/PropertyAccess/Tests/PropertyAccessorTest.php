@@ -586,9 +586,13 @@ class PropertyAccessorTest extends TestCase
     {
         $obj = new \stdClass();
         $obj->{'@foo'} = 'bar';
+        $obj->{'a/b'} = '1';
+        $obj->{'a%2Fb'} = '2';
 
         $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
         $this->assertSame('bar', $propertyAccessor->getValue($obj, '@foo'));
+        $this->assertSame('1', $propertyAccessor->getValue($obj, 'a/b'));
+        $this->assertSame('2', $propertyAccessor->getValue($obj, 'a%2Fb'));
     }
 
     /**

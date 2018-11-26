@@ -153,7 +153,7 @@ class DoctrineDataCollectorTest extends TestCase
 
         if (version_compare(Version::VERSION, '2.6', '>=')) {
             $tests[] = array('this is not a date', array('date'), 'this is not a date', false);
-            $tests[] = array(new \stdClass(), array('date'), 'Object(stdClass)', false);
+            $tests[] = array(new \stdClass(), array('date'), '/* Object(stdClass) */', false);
         }
 
         return $tests;

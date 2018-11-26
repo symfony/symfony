@@ -7,6 +7,21 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.48 (2018-11-26)
+
+ * bug #28917 [DoctrineBridge] catch errors while converting to db values in data collector (alekitto)
+ * bug #27314 [DoctrineBridge] fix case sensitivity issue in RememberMe\DoctrineTokenProvider (PF4Public)
+ * bug #29308 [Translation] Use XLIFF source rather than resname when there's no target (thewilkybarkid)
+ * bug #26244 [BrowserKit] fixed BC Break for HTTP_HOST header (brizzz)
+ * bug #28147 [DomCrawler] exclude fields inside "template" tags (Gorjunov)
+ * bug #29271 [HttpFoundation] Fix trailing space for mime-type with parameters (Sascha Dens)
+ * bug #29223 [Validator] Added the missing constraints instance checks (thomasbisignani)
+ * bug #29182 [Form] Fixed empty data for compound date types (HeahDude)
+ * bug #29185 [Form] Fixed keeping hash of equal \DateTimeInterface on submit (HeahDude)
+ * bug #28731 [Form] invalidate forms on transformation failures (xabbuh)
+ * bug #29152 [Config] Unset key during normalization (ro0NL)
+ * bug #29057 [HttpFoundation] replace any preexisting Content-Type headers (nicolas-grekas)
+
 * 2.8.47 (2018-11-03)
 
  * bug #29020 Fix ini_get() for boolean values (deguif)

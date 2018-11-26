@@ -53,7 +53,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): ?array
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo);
+        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -61,27 +61,31 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $canonicalMethod = 'GET';
         }
 
-        switch ($pathinfo) {
+        switch ($trimmedPathinfo = '/' !== $pathinfo && '/' === $pathinfo[-1] ? substr($pathinfo, 0, -1) : $pathinfo) {
             default:
                 $routes = array(
-                    '/a/11' => array(array('_route' => 'a_first'), null, null, null),
-                    '/a/22' => array(array('_route' => 'a_second'), null, null, null),
-                    '/a/333' => array(array('_route' => 'a_third'), null, null, null),
-                    '/a/44/' => array(array('_route' => 'a_fourth'), null, null, null),
-                    '/a/55/' => array(array('_route' => 'a_fifth'), null, null, null),
-                    '/a/66/' => array(array('_route' => 'a_sixth'), null, null, null),
-                    '/nested/group/a/' => array(array('_route' => 'nested_a'), null, null, null),
-                    '/nested/group/b/' => array(array('_route' => 'nested_b'), null, null, null),
-                    '/nested/group/c/' => array(array('_route' => 'nested_c'), null, null, null),
-                    '/slashed/group/' => array(array('_route' => 'slashed_a'), null, null, null),
-                    '/slashed/group/b/' => array(array('_route' => 'slashed_b'), null, null, null),
-                    '/slashed/group/c/' => array(array('_route' => 'slashed_c'), null, null, null),
+                    '/a/11' => array(array('_route' => 'a_first'), null, null, null, false),
+                    '/a/22' => array(array('_route' => 'a_second'), null, null, null, false),
+                    '/a/333' => array(array('_route' => 'a_third'), null, null, null, false),
+                    '/a/44' => array(array('_route' => 'a_fourth'), null, null, null, true),
+                    '/a/55' => array(array('_route' => 'a_fifth'), null, null, null, true),
+                    '/a/66' => array(array('_route' => 'a_sixth'), null, null, null, true),
+                    '/nested/group/a' => array(array('_route' => 'nested_a'), null, null, null, true),
+                    '/nested/group/b' => array(array('_route' => 'nested_b'), null, null, null, true),
+                    '/nested/group/c' => array(array('_route' => 'nested_c'), null, null, null, true),
+                    '/slashed/group' => array(array('_route' => 'slashed_a'), null, null, null, true),
+                    '/slashed/group/b' => array(array('_route' => 'slashed_b'), null, null, null, true),
+                    '/slashed/group/c' => array(array('_route' => 'slashed_c'), null, null, null, true),
                 );
 
-                if (!isset($routes[$pathinfo])) {
+                if (!isset($routes[$trimmedPathinfo])) {
                     break;
                 }
-                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$pathinfo];
+                list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
+
+                if ('/' !== $pathinfo && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                    return null;
+                }
 
                 $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
                 if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
@@ -103,7 +107,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             0 => '{^(?'
                     .'|/([^/]++)(*:16)'
                     .'|/nested/([^/]++)(*:39)'
-                .')$}sD',
+                .')(?:/?)$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -111,11 +115,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            16 => array(array('_route' => 'a_wildcard'), array('param'), null, null),
-                            39 => array(array('_route' => 'nested_wildcard'), array('param'), null, null),
+                            16 => array(array('_route' => 'a_wildcard'), array('param'), null, null, false),
+                            39 => array(array('_route' => 'nested_wildcard'), array('param'), null, null, false),
                         );
 
-                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
+                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
+
+                        if ('/' !== $pathinfo && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                            return null;
+                        }
 
                         foreach ($vars as $i => $v) {
                             if (isset($matches[1 + $i])) {

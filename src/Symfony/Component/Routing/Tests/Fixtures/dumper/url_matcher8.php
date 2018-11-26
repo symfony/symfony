@@ -18,7 +18,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     public function match($rawPathinfo)
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo);
+        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -30,13 +30,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $regexList = array(
             0 => '{^(?'
                     .'|/(a)(*:11)'
-                .')$}sD',
+                .')(?:/?)$}sD',
             11 => '{^(?'
                     .'|/(.)(*:22)'
-                .')$}sDu',
+                .')(?:/?)$}sDu',
             22 => '{^(?'
                     .'|/(.)(*:33)'
-                .')$}sD',
+                .')(?:/?)$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -44,12 +44,16 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            11 => array(array('_route' => 'a'), array('a'), null, null),
-                            22 => array(array('_route' => 'b'), array('a'), null, null),
-                            33 => array(array('_route' => 'c'), array('a'), null, null),
+                            11 => array(array('_route' => 'a'), array('a'), null, null, false),
+                            22 => array(array('_route' => 'b'), array('a'), null, null, false),
+                            33 => array(array('_route' => 'c'), array('a'), null, null, false),
                         );
 
-                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
+                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
+
+                        if ('/' !== $pathinfo && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                            break;
+                        }
 
                         foreach ($vars as $i => $v) {
                             if (isset($matches[1 + $i])) {

@@ -29,6 +29,7 @@ class PhpMatcherDumper extends MatcherDumper
 {
     private $expressionLanguage;
     private $signalingException;
+    private $supportsRedirections;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
@@ -56,7 +57,7 @@ class PhpMatcherDumper extends MatcherDumper
 
         // trailing slash support is only enabled if we know how to redirect the user
         $interfaces = class_implements($options['base_class']);
-        $supportsRedirections = isset($interfaces[RedirectableUrlMatcherInterface::class]);
+        $this->supportsRedirections = isset($interfaces[RedirectableUrlMatcherInterface::class]);
 
         return <<<EOF
 <?php
@@ -76,7 +77,7 @@ class {$options['class']} extends {$options['base_class']}
         \$this->context = \$context;
     }
 
-{$this->generateMatchMethod($supportsRedirections)}
+{$this->generateMatchMethod()}
 }
 
 EOF;
@@ -90,7 +91,7 @@ EOF;
     /**
      * Generates the code for the match method implementing UrlMatcherInterface.
      */
-    private function generateMatchMethod(bool $supportsRedirections): string
+    private function generateMatchMethod(): string
     {
         // Group hosts by same-suffix, re-order when possible
         $matchHost = false;
@@ -111,7 +112,7 @@ EOF;
         $code = <<<EOF
     {
         \$allow = \$allowSchemes = array();
-        \$pathinfo = rawurldecode(\$rawPathinfo);
+        \$pathinfo = rawurldecode(\$rawPathinfo) ?: '/';
         \$context = \$this->context;
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
 {$fetchHost}
@@ -123,7 +124,7 @@ $code
 
 EOF;
 
-        if ($supportsRedirections) {
+        if ($this->supportsRedirections) {
             return <<<'EOF'
     public function match($pathinfo)
     {
@@ -213,9 +214,18 @@ EOF
             $compiledRoute = $route->compile();
             $hostRegex = $compiledRoute->getHostRegex();
             $regex = $compiledRoute->getRegex();
+            if ($hasTrailingSlash = '/' !== $route->getPath()) {
+                $pos = strrpos($regex, '$');
+                $hasTrailingSlash = '/' === $regex[$pos - 1];
+                $regex = substr_replace($regex, '/?$', $pos - $hasTrailingSlash, 1 + $hasTrailingSlash);
+            }
+
             if (!$compiledRoute->getPathVariables()) {
                 $host = !$compiledRoute->getHostVariables() ? $route->getHost() : '';
                 $url = $route->getPath();
+                if ($hasTrailingSlash) {
+                    $url = substr($url, 0, -1);
+                }
                 foreach ($dynamicRegex as list($hostRx, $rx)) {
                     if (preg_match($rx, $url) && (!$host || !$hostRx || preg_match($hostRx, $host))) {
                         $dynamicRegex[] = array($hostRegex, $regex);
@@ -224,7 +234,7 @@ EOF
                     }
                 }
 
-                $staticRoutes[$url][$name] = $route;
+                $staticRoutes[$url][$name] = array($route, $hasTrailingSlash);
             } else {
                 $dynamicRegex[] = array($hostRegex, $regex);
                 $dynamicRoutes->add($name, $route);
@@ -251,7 +261,7 @@ EOF
 
         foreach ($staticRoutes as $url => $routes) {
             if (1 === \count($routes)) {
-                foreach ($routes as $name => $route) {
+                foreach ($routes as $name => list($route, $hasTrailingSlash)) {
                 }
 
                 if (!$route->getCondition()) {
@@ -261,20 +271,21 @@ EOF
                         unset($defaults['_canonical_route']);
                     }
                     $default .= sprintf(
-                        "%s => array(%s, %s, %s, %s),\n",
+                        "%s => array(%s, %s, %s, %s, %s),\n",
                         self::export($url),
                         self::export(array('_route' => $name) + $defaults),
                         self::export(!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null),
                         self::export(array_flip($route->getMethods()) ?: null),
-                        self::export(array_flip($route->getSchemes()) ?: null)
+                        self::export(array_flip($route->getSchemes()) ?: null),
+                        self::export($hasTrailingSlash)
                     );
                     continue;
                 }
             }
 
             $code .= sprintf("        case %s:\n", self::export($url));
-            foreach ($routes as $name => $route) {
-                $code .= $this->compileRoute($route, $name, true);
+            foreach ($routes as $name => list($route, $hasTrailingSlash)) {
+                $code .= $this->compileRoute($route, $name, true, $hasTrailingSlash);
             }
             $code .= "            break;\n";
         }
@@ -285,15 +296,15 @@ EOF
             \$routes = array(
 {$this->indent($default, 4)}            );
 
-            if (!isset(\$routes[\$pathinfo])) {
+            if (!isset(\$routes[\$trimmedPathinfo])) {
                 break;
             }
-            list(\$ret, \$requiredHost, \$requiredMethods, \$requiredSchemes) = \$routes[\$pathinfo];
+            list(\$ret, \$requiredHost, \$requiredMethods, \$requiredSchemes, \$hasTrailingSlash) = \$routes[\$trimmedPathinfo];
 {$this->compileSwitchDefault(false, $matchHost)}
 EOF;
         }
 
-        return sprintf("        switch (\$pathinfo) {\n%s        }\n\n", $this->indent($code));
+        return sprintf("        switch (\$trimmedPathinfo = '/' !== \$pathinfo && '/' === \$pathinfo[-1] ? substr(\$pathinfo, 0, -1) : \$pathinfo) {\n%s        }\n\n", $this->indent($code));
     }
 
     /**
@@ -394,7 +405,11 @@ EOF;
 
                     $state->vars = array();
                     $regex = preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]);
-                    $tree->addRoute($regex, array($name, $regex, $state->vars, $route));
+                    if ($hasTrailingSlash = '/' !== $regex && '/' === $regex[-1]) {
+                        $regex = substr($regex, 0, -1);
+                    }
+
+                    $tree->addRoute($regex, array($name, $regex, $state->vars, $route, $hasTrailingSlash));
                 }
 
                 $code .= $this->compileStaticPrefixCollection($tree, $state);
@@ -403,7 +418,7 @@ EOF;
                 $code .= "\n                .')'";
                 $state->regex .= ')';
             }
-            $rx = ")$}{$modifiers}";
+            $rx = ")(?:/?)$}{$modifiers}";
             $code .= "\n                .'{$rx}',";
             $state->regex .= $rx;
             $state->markTail = 0;
@@ -423,7 +438,7 @@ EOF;
             \$routes = array(
 {$this->indent($state->default, 4)}            );
 
-            list(\$ret, \$vars, \$requiredMethods, \$requiredSchemes) = \$routes[\$m];
+            list(\$ret, \$vars, \$requiredMethods, \$requiredSchemes, \$hasTrailingSlash) = \$routes[\$m];
 {$this->compileSwitchDefault(true, $matchHost)}
 EOF;
         }
@@ -478,11 +493,11 @@ EOF;
                 continue;
             }
 
-            list($name, $regex, $vars, $route) = $route;
+            list($name, $regex, $vars, $route, $hasTrailingSlash) = $route;
             $compiledRoute = $route->compile();
 
             if ($compiledRoute->getRegex() === $prevRegex) {
-                $state->switch = substr_replace($state->switch, $this->compileRoute($route, $name, false)."\n", -19, 0);
+                $state->switch = substr_replace($state->switch, $this->compileRoute($route, $name, false, $hasTrailingSlash)."\n", -19, 0);
                 continue;
             }
 
@@ -501,12 +516,13 @@ EOF;
                     unset($defaults['_canonical_route']);
                 }
                 $state->default .= sprintf(
-                    "%s => array(%s, %s, %s, %s),\n",
+                    "%s => array(%s, %s, %s, %s, %s),\n",
                     $state->mark,
                     self::export(array('_route' => $name) + $defaults),
                     self::export($vars),
                     self::export(array_flip($route->getMethods()) ?: null),
-                    self::export(array_flip($route->getSchemes()) ?: null)
+                    self::export(array_flip($route->getSchemes()) ?: null),
+                    self::export($hasTrailingSlash)
                 );
             } else {
                 $prevRegex = $compiledRoute->getRegex();
@@ -518,7 +534,7 @@ EOF;
 
                 $state->switch .= <<<EOF
         case {$state->mark}:
-{$combine}{$this->compileRoute($route, $name, false)}
+{$combine}{$this->compileRoute($route, $name, false, $hasTrailingSlash)}
             break;
 
 EOF;
@@ -533,8 +549,15 @@ EOF;
      */
     private function compileSwitchDefault(bool $hasVars, bool $matchHost): string
     {
+        $code = sprintf("
+            if ('/' !== \$pathinfo && \$hasTrailingSlash !== ('/' === \$pathinfo[-1])) {
+                %s;
+            }\n",
+            $this->supportsRedirections ? 'return null' : 'break'
+        );
+
         if ($hasVars) {
-            $code = <<<EOF
+            $code .= <<<EOF
 
             foreach (\$vars as \$i => \$v) {
                 if (isset(\$matches[1 + \$i])) {
@@ -544,7 +567,7 @@ EOF;
 
 EOF;
         } elseif ($matchHost) {
-            $code = <<<EOF
+            $code .= <<<EOF
 
             if (\$requiredHost) {
                 if ('#' !== \$requiredHost[0] ? \$requiredHost !== \$host : !preg_match(\$requiredHost, \$host, \$hostMatches)) {
@@ -557,8 +580,6 @@ EOF;
             }
 
 EOF;
-        } else {
-            $code = '';
         }
 
         $code .= <<<EOF
@@ -587,9 +608,22 @@ EOF;
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, string $name, bool $checkHost): string
+    private function compileRoute(Route $route, string $name, bool $checkHost, bool $hasTrailingSlash): string
     {
-        $code = '';
+        $code = "        // $name";
+
+        if ('/' !== $route->getPath()) {
+            $code .= sprintf("
+        if ('/' !== \$pathinfo && '/' %s \$pathinfo[-1]) {
+            %s;
+        }\n",
+                $hasTrailingSlash ? '!==' : '===',
+                $this->supportsRedirections ? 'return null' : 'break'
+            );
+        } else {
+            $code .= "\n";
+        }
+
         $compiledRoute = $route->compile();
         $conditions = array();
         $matches = (bool) $compiledRoute->getPathVariables();
@@ -617,12 +651,11 @@ EOF;
 
         if ($conditions) {
             $code .= <<<EOF
-        // $name
         if ($conditions) {
 
 EOF;
         } else {
-            $code .= "            // {$name}\n";
+            $code = $this->indent($code);
         }
 
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);

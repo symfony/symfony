@@ -141,6 +141,25 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertSame(array('_route' => 'foo'), $matcher->match('/foo'));
     }
 
+    public function testFallbackPage()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/'));
+        $coll->add('bar', new Route('/{name}'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->expects($this->once())->method('redirect')->with('/foo/', 'foo')->will($this->returnValue(array('_route' => 'foo')));
+        $this->assertSame(array('_route' => 'foo'), $matcher->match('/foo'));
+
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo'));
+        $coll->add('bar', new Route('/{name}/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo')->will($this->returnValue(array('_route' => 'foo')));
+        $this->assertSame(array('_route' => 'foo'), $matcher->match('/foo/'));
+    }
+
     public function testMissingTrailingSlashAndScheme()
     {
         $coll = new RouteCollection();

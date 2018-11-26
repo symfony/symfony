@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-11-25T16:09:52Z
+
+3.4 totally misses the root exception when it's a built-in console `ExceptionInterface` instance, no matter the verbosity (https://github.com/symfony/symfony/pull/24131). Should we consider it a bug?
+
+edit: I think so, rebased on 3.4

@@ -307,9 +307,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the application root dir (path of the project's composer file).
-     *
-     * @return string The project root dir
+     * {@inheritdoc}
      */
     public function getProjectDir()
     {

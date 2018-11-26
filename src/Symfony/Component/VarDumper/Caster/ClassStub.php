@@ -74,8 +74,8 @@ class ClassStub extends ConstStub
         } catch (\ReflectionException $e) {
             return;
         } finally {
-            if (0 < $i = strrpos($identifier, '\\')) {
-                $this->attr['ellipsis'] = \strlen($identifier) - $i;
+            if (0 < $i = strrpos($this->value, '\\')) {
+                $this->attr['ellipsis'] = \strlen($this->value) - $i;
                 $this->attr['ellipsis-type'] = 'class';
                 $this->attr['ellipsis-tail'] = 1;
             }

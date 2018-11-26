@@ -126,6 +126,13 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function getRootDir();
 
     /**
+     * Gets the application root dir (path of the project's composer file).
+     *
+     * @return string The project root dir
+     */
+    public function getProjectDir();
+
+    /**
      * Gets the current container.
      *
      * @return ContainerInterface A ContainerInterface instance

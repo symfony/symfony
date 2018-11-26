@@ -51,7 +51,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
     public function loadTokenBySeries($series)
     {
         // the alias for lastUsed works around case insensitivity in PostgreSQL
-        $sql = 'SELECT class, username, value, lastUsed as last_used'
+        $sql = 'SELECT class, username, value, lastUsed AS last_used'
             .' FROM rememberme_token WHERE series=:series';
         $paramValues = array('series' => $series);
         $paramTypes = array('series' => \PDO::PARAM_STR);

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T18:13:58Z
+
+Thanks for the PR. Can you have a look at test failures please?
+
+---------------------------------------------------------------------------
+
+by alekitto at 2018-10-20T20:08:16Z
+
+I’ve initially sumbitted the PR on a wrong base branch and I changed it later, but the build has not restarted, could you please restart it or should I push another commit to rebuild it?
+Another thing: fabbot.io complains about a line that I’ve not touched, should I edit it or leave it as is?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2018-10-22T15:39:48Z
+
+@alekitto you can simply amend your commit and push it again (`git commit --amend && git push -f`) :)

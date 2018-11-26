@@ -353,7 +353,7 @@ return \$catalogue;
 EOF
             ,
             $locale,
-            var_export($this->catalogues[$locale]->all(), true),
+            var_export($this->getAllMessages($this->catalogues[$locale]), true),
             $fallbackContent
         );
 
@@ -379,7 +379,7 @@ EOF
                 ,
                 $fallbackSuffix,
                 $fallback,
-                var_export($fallbackCatalogue->all(), true),
+                var_export($this->getAllMessages($fallbackCatalogue), true),
                 $currentSuffix,
                 $fallbackSuffix
             );
@@ -418,7 +418,7 @@ EOF
                 $this->initializeCatalogue($fallback);
             }
 
-            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
+            $fallbackCatalogue = new MessageCatalogue($fallback, $this->getAllMessages($this->catalogues[$fallback]));
             foreach ($this->catalogues[$fallback]->getResources() as $resource) {
                 $fallbackCatalogue->addResource($resource);
             }
@@ -486,5 +486,22 @@ EOF
         }
 
         return $this->configCacheFactory;
+    }
+
+    private function getAllMessages(MessageCatalogueInterface $catalogue): array
+    {
+        $allMessages = array();
+
+        foreach ($catalogue->all() as $domain => $messages) {
+            if ($intlMessages = $catalogue->all($domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+                $allMessages[$domain.MessageCatalogue::INTL_DOMAIN_SUFFIX] = $intlMessages;
+                $messages = array_diff_key($messages, $intlMessages);
+            }
+            if ($messages) {
+                $allMessages[$domain] = $messages;
+            }
+        }
+
+        return $allMessages;
     }
 }

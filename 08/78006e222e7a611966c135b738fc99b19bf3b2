@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-24T04:11:13Z
+
+👎 https://github.com/symfony/symfony/issues/29287#issuecomment-441342123
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T09:07:47Z
+
+Behavior a) is what most people use since a very long time. Changing it would break symfony.com. We cannot break URLs without being 200% sure we should do it. The logic in the php dumper that provides behavior a) is non-trivial. I wouldn't call it a mistake but a design choice. Feature-wise, the behavior makes a lot of sense to me: later routes should not impact previous routes.
+(http/https redirections are very different: nobody deals with them URL per URL.)
+
+I did ask because that was not obvious at first, but the arguments we gathered are sound. b) is the bug.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-24T10:14:00Z
+
+To me a) is a bug . Why no just fix symfony.com until more people complain about this?  Then we can reevaluate re-adding a bogus feature that only existed because of implementation details.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T10:19:09Z
+
+The patch for symfony.com will be totally unexpected, looking a lot like a workaround for a WTF behavior in core.
+
+Here is the route in practice:
+
+- `/blog/` => map to specific controller
+- [...] many unrelated routes
+- `/{page}` => fallback route to mini CMS-like pages.
+
+The fact that the fallback exists is totally unrelated to the fact that `/blog` redirects to `/blog/`. `/{page}` is certainly not the correct fallback for it. The redirection is.
+
+People will complain *if* we change the current behavior. e.g. symfony.com would break. And I'm sure many others will also.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-24T10:28:27Z
+
+You can either make {page} placeholder not accept "blog" (which seems like a logical solution to prevent collision with the blog route) or create a /blog route explicitly that redirects to /blog/.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T10:33:06Z
+
+Sure I can, but there are more routes than just `/blog/` - an exclusion list is going to be a significant maintenance burden - one that we don't have to do right now. Same for the explicit redirection.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-11-24T10:41:30Z
+
+I understand you both @Tobion and @nicolas-grekas. I would slightly prefer b) if we were talking about a new routing system, but in any case, we cannot introduce a BC break on routes now (if symfony.com is affected, we can be sure that we will have tons of people angry of we change the behavior, even of we do so only in 4.2/master).
+
+So, to me, a) is the only option at this stage (maybe a note in the docs is in order here).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-24T10:54:02Z
+
+Go ahead then. But you probably want to implement the same logic for the opposite redirection which will get pretty ugly https://symfony.com/blog/new-in-symfony-4-1-smarter-url-redirections
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T10:57:22Z
+
+@Tobion agreed, that's done in #29298
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-11-24T11:01:49Z
+
+Actually which this logic in place, it might be claener to have the route compiler generate a regex with an optional trailing slash in the first place. That seems more logical to me than changing the regex later on. This way debug:router makes it also more self-explaining.
+When the matcher does not support redirection: just match with and without trailing slash. When it has redirection support just redirect to the correct one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T15:39:42Z
+
+The fact that the original path contains a trailing slash or not is required to decide which is the canonical path we redirect to. I'd prefer keeping the current way to do so to make the patch as light as possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-26T08:41:48Z
+
+Now targeting 3.4, let 2.8 in peace.

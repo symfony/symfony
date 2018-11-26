@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-21T09:24:41Z
+
+Hi @PF4Public, thanks for you PR. Would you mind rebasing/retargetting for branch 2.7? 2.3 is not maintained anymore and 2.7 will go out of maintenance in 10 days btw)
+
+---------------------------------------------------------------------------
+
+by PF4Public at 2018-05-21T18:30:04Z
+
+Hi @nicolas-grekas
+Looks like I did it, please check if I've done it corectly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-21T18:38:49Z
+
+We now need to figure out how not to break existing apps.
+
+---------------------------------------------------------------------------
+
+by PF4Public at 2018-05-21T18:58:49Z
+
+Should I rebase it against newest version, which allows BC breaks?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-05-21T20:02:49Z
+
+We always strive for creating a continuous upgrade path so that there is never a hard BC break. This means e.g. triggering a deprecation notice when applicable, etc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:51:45Z
+
+How can we move forward here?
+
+---------------------------------------------------------------------------
+
+by PF4Public at 2018-10-10T11:50:19Z
+
+Since this change could in fact break existing installations, it probably needs to be done in two steps: with deprecation notice first.
+Sadly, I simply do not know, how are such situations handled in Symfony.
+Alternatively we can do `isset($row['lastUsed']) ? $row['lastUsed'] : $row['lastused']`, like @sstok suggested. But I'm not sure, which makes the best fix...
+
+---------------------------------------------------------------------------
+
+by PF4Public at 2018-11-24T22:34:54Z
+
+@nicolas-grekas , Thank you for fixing this. You've found a really clever way!

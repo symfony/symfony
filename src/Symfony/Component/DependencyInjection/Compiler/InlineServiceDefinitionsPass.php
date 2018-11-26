@@ -53,6 +53,9 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             $analyzedContainer = new ContainerBuilder();
             $analyzedContainer->setAliases($container->getAliases());
             $analyzedContainer->setDefinitions($container->getDefinitions());
+            foreach ($container->getExpressionLanguageProviders() as $provider) {
+                $analyzedContainer->addExpressionLanguageProvider($provider);
+            }
         } else {
             $analyzedContainer = $container;
         }

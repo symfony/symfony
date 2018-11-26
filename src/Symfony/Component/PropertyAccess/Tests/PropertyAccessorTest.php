@@ -582,6 +582,15 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'publicGetSetter'));
     }
 
+    public function testAttributeWithSpecialChars()
+    {
+        $obj = new \stdClass();
+        $obj->{'@foo'} = 'bar';
+
+        $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
+        $this->assertSame('bar', $propertyAccessor->getValue($obj, '@foo'));
+    }
+
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      * @expectedExceptionMessage Expected argument of type "Countable", "string" given

@@ -7,6 +7,38 @@ in 4.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.2.0...v4.2.1
 
+* 4.2.0-RC1 (2018-11-26)
+
+ * bug #29332 [PropertyAccess] make cache keys encoding bijective (nicolas-grekas)
+ * bug #29298 [Routing] fix trailing slash redirection when using RedirectableUrlMatcher (nicolas-grekas)
+ * bug #29297 [Routing] fix trailing slash redirection when using RedirectableUrlMatcher (nicolas-grekas)
+ * bug #29313 [PropertyAccessor] fix encoding of cache keys (nicolas-grekas)
+ * bug #29328 [HttpKernel] handle anonymous classes when generating the dumped container class name (nicolas-grekas)
+ * bug #28917 [DoctrineBridge] catch errors while converting to db values in data collector (alekitto)
+ * bug #29317 [WebProfiler] Detect non-file paths in file viewer (ro0NL)
+ * bug #29305 [EventDispatcher] Unwrap wrapped listeners internally (ro0NL)
+ * bug #29302 [Contracts][Cache] allow retrieving metadata of cached items (nicolas-grekas)
+ * bug #29315 [DI] fix copying expression providers when analyzing the service graph (nicolas-grekas)
+ * bug #27314 [DoctrineBridge] fix case sensitivity issue in RememberMe\DoctrineTokenProvider (PF4Public)
+ * bug #29310 [MonologBridge] Return empty list for unknown requests (ro0NL)
+ * bug #29316 [VarDumper] Fix ClassStub ellipsis (ro0NL)
+ * bug #29300 [Translation] fix dumping catalogues cache (nicolas-grekas)
+ * bug #29308 [Translation] Use XLIFF source rather than resname when there's no target (thewilkybarkid)
+ * bug #26244 [BrowserKit] fixed BC Break for HTTP_HOST header (brizzz)
+ * bug #28147 [DomCrawler] exclude fields inside "template" tags (Gorjunov)
+ * bug #29260 [Lock] Fixed PdoStore::putOffExpiration(), PdoStore::getHashedKey() (PavelPrischepa)
+ * bug #29222 [Dotenv] properly parse backslashes in unquoted env vars (xabbuh)
+ * bug #29256 [HttpFoundation] Fixed absolute Request URI with default port (thomasbisignani)
+ * bug #29274 [Routing] Remove duplicate schemes and methods for invokable controllers (claudusd)
+ * bug #29285 [HttpKernel][WebProfilerBundle] Getting the cached client mime type instead of guessing it again (yceruto)
+ * bug #29271 [HttpFoundation] Fix trailing space for mime-type with parameters (Sascha Dens)
+ * feature #29167 [Messenger] Add a trait for synchronous query & command buses (ogizanagi)
+ * bug #29243 [Cache] fix optimizing Psr6Cache for AdapterInterface pools (nicolas-grekas)
+ * bug #29247 [DI] fix taking lazy services into account when dumping the container (nicolas-grekas)
+ * bug #29249 [Form] Fixed empty data for compound date interval (HeahDude)
+ * bug #29265 [Bridge/PhpUnit] Use composer to download phpunit (nicolas-grekas)
+ * bug #28769 [FrameworkBundle] deal with explicitly enabled workflow nodes (xabbuh)
+
 * 4.2.0-BETA2 (2018-11-16)
 
  * bug #29190 [Debug][HttpKernel] remove frames added by DebugClassLoader in stack traces (nicolas-grekas)

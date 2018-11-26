@@ -58,6 +58,9 @@ class DebugProcessorTest extends TestCase
 
         $this->assertCount(2, $processor->getLogs($request));
         $this->assertSame(1, $processor->countErrors($request));
+
+        $this->assertCount(0, $processor->getLogs(new Request()));
+        $this->assertSame(0, $processor->countErrors(new Request()));
     }
 
     /**

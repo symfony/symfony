@@ -67,8 +67,8 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
             @trigger_error(sprintf('The "%s()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
 
-        if (1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) && isset($this->records[$hash = spl_object_hash($request)])) {
-            return $this->records[$hash];
+        if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
+            return $this->records[spl_object_hash($request)] ?? array();
         }
 
         if (0 === \count($this->records)) {
@@ -89,8 +89,8 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
             @trigger_error(sprintf('The "%s()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
 
-        if (1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) && isset($this->errorCount[$hash = spl_object_hash($request)])) {
-            return $this->errorCount[$hash];
+        if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
+            return $this->errorCount[spl_object_hash($request)] ?? 0;
         }
 
         return array_sum($this->errorCount);

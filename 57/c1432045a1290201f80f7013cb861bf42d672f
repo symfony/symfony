@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2018-08-15T08:14:52Z
+
+>  I think better to exclude values only instead of excluding fields at all
+
+Could you elaborate on why it's better?
+
+---------------------------------------------------------------------------
+
+by Gorjunov at 2018-08-15T19:53:32Z
+
+In this case it represents browser's behavior - element is accessible (e.g. by JS), but server will not get values on form submit. (if I understand right that `Form:: getValues()` is same as form submit in browser)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-18T11:40:37Z
+
+The way this is currently implemented could be understood as a new feature because it's adding a new method. If we can do without the new method, that'd be better to qualify as bugfix.
+
+> better to exclude values only instead of excluding fields at all
+
+Shouldn't the `$fields` be *not* populated with tags inside template instead?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-19T12:22:53Z
+
+this should indeed be implemented when populating the list of fields, as the form in the DOM does not have this field in this case in a browser. It is not only about the submission skipping the values.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-24T20:46:00Z
+
+Tests should also be updated to test that the Form does not contain the corresponding field at all (`has` returns false for this field name)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T22:30:54Z
+
+@stof test added

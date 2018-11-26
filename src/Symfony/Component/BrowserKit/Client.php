@@ -280,11 +280,17 @@ abstract class Client
             ++$this->redirectCount;
         }
 
+        $originalUri = $uri;
+
         $uri = $this->getAbsoluteUri($uri);
 
         $server = array_merge($this->server, $server);
 
-        if (isset($server['HTTPS'])) {
+        if (!empty($server['HTTP_HOST']) && null === parse_url($originalUri, PHP_URL_HOST)) {
+            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
+        }
+
+        if (isset($server['HTTPS']) && null === parse_url($originalUri, PHP_URL_SCHEME)) {
             $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 

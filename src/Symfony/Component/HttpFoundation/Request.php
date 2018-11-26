@@ -1419,7 +1419,7 @@ class Request
     {
         $canonicalMimeType = null;
         if (false !== $pos = strpos($mimeType, ';')) {
-            $canonicalMimeType = substr($mimeType, 0, $pos);
+            $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 
         if (null === static::$formats) {
@@ -1586,7 +1586,7 @@ class Request
      *
      * @see https://tools.ietf.org/html/rfc7231#section-4.2.3
      *
-     * @return bool
+     * @return bool True for GET and HEAD, false otherwise
      */
     public function isMethodCacheable()
     {

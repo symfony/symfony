@@ -679,7 +679,7 @@ class ClientTest extends TestCase
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
         $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
-        $this->assertEquals('http://www.example.com/https/www.example.com', $client->getRequest()->getUri());
+        $this->assertEquals('https://www.example.com/https/www.example.com', $client->getRequest()->getUri());
 
         $server = $client->getRequest()->getServer();
 
@@ -693,7 +693,24 @@ class ClientTest extends TestCase
         $this->assertEquals('new-server-key-value', $server['NEW_SERVER_KEY']);
 
         $this->assertArrayHasKey('HTTPS', $server);
-        $this->assertFalse($server['HTTPS']);
+        $this->assertTrue($server['HTTPS']);
+    }
+
+    public function testRequestWithRelativeUri()
+    {
+        $client = new TestClient();
+
+        $client->request('GET', '/', array(), array(), array(
+            'HTTP_HOST' => 'testhost',
+            'HTTPS' => true,
+        ));
+        $this->assertEquals('https://testhost/', $client->getRequest()->getUri());
+
+        $client->request('GET', 'https://www.example.com/', array(), array(), array(
+            'HTTP_HOST' => 'testhost',
+            'HTTPS' => false,
+        ));
+        $this->assertEquals('https://www.example.com/', $client->getRequest()->getUri());
     }
 
     public function testInternalRequest()

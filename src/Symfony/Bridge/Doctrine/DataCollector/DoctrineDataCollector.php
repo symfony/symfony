@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\DataCollector;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -146,7 +147,14 @@ class DoctrineDataCollector extends DataCollector
                 }
                 if ($type instanceof Type) {
                     $query['types'][$j] = $type->getBindingType();
-                    $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
+                    try {
+                        $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
+                    } catch (\TypeError $e) {
+                        // Error thrown while processing params, query is not explainable.
+                        $query['explainable'] = false;
+                    } catch (ConversionException $e) {
+                        $query['explainable'] = false;
+                    }
                 }
             }
 

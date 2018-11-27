@@ -250,7 +250,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     /*
      * Returns a more explicit 
-     * definition of the supplied 
+     * definition of the supplied
      * variable as a string
      *
      * @param $var
@@ -259,7 +259,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     private function varToString($var): string
     {
         if (\is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+            return sprintf('Object(%s)', \get_class($var));
         }
 
         if (\is_array($var)) {
@@ -271,7 +271,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             return sprintf('Array(%s)', implode(', ', $a));
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return sprintf('Resource(%s)', get_resource_type($var));
         }
 

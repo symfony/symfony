@@ -258,11 +258,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function varToString($var): string
     {
-        if (is_object($var)) {
+        if (\is_object($var)) {
             return sprintf('Object(%s)', get_class($var));
         }
 
-        if (is_array($var)) {
+        if (\is_array($var)) {
             $a = array();
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));

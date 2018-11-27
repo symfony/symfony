@@ -122,7 +122,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\File':
             case 'Symfony\Component\Validator\Constraints\Image':
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\FileType', array('attr' => ['accept' => implode(', ', $constraint->mimeTypes)]), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\FileType', array('attr' => array('accept' => implode(', ', $constraint->mimeTypes))), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Language':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\LanguageType', array(), Guess::HIGH_CONFIDENCE);

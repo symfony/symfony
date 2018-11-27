@@ -251,9 +251,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /*
-     * Returns a more explicit 
-     * definition of the supplied
-     * variable as a string
+     * Returns a more explicit  definition of the supplied variable 
+     * as a string
      *
      * @param $var
      * @return string

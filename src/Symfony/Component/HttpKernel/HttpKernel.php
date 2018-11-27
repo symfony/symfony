@@ -249,7 +249,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /*
-     * Returns a more explict 
+     * Returns a more explicit 
      * definition of the supplied 
      * variable as a string
      *

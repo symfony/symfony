@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
-use Symfony\Component\Translation\Loader\IcuResFileLoader;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Translation\Loader\IcuResFileLoader;
 
 /**
  * @requires extension intl

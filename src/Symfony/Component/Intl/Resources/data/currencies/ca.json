@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.43.65",
     "Names": {
         "ADP": [
             "ADP",
@@ -266,7 +266,7 @@
             "iuan xinès extracontinental"
         ],
         "CNY": [
-            "¥",
+            "CNY",
             "iuan xinès"
         ],
         "COP": [
@@ -279,7 +279,7 @@
         ],
         "CRC": [
             "CRC",
-            "colón costa-riqueny"
+            "colon costa-riqueny"
         ],
         "CSD": [
             "CSD",
@@ -680,6 +680,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya maurità (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya maurità"
         ],
         "MTL": [
@@ -744,7 +748,7 @@
         ],
         "NIO": [
             "NIO",
-            "córdoba oro nicaragüenca"
+            "córdoba nicaragüenc"
         ],
         "NLG": [
             "NLG",
@@ -908,6 +912,10 @@
         ],
         "STD": [
             "STD",
+            "dobra de São Tomé i Príncipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra de São Tomé i Príncipe"
         ],
         "SUR": [
@@ -916,7 +924,7 @@
         ],
         "SVC": [
             "SVC",
-            "colón salvadorenc"
+            "colon salvadorenc"
         ],
         "SYP": [
             "SYP",
@@ -1028,6 +1036,10 @@
         ],
         "VEF": [
             "VEF",
+            "bolívar veneçolà (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "bolívar veneçolà"
         ],
         "VND": [

@@ -12,14 +12,16 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -33,8 +35,14 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     private $translationDomain;
     private $serverParams;
 
-    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, bool $defaultEnabled = true, string $defaultFieldName = '_token', TranslatorInterface $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
+    /**
+     * @param TranslatorInterface|null $translator
+     */
+    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, bool $defaultEnabled = true, string $defaultFieldName = '_token', $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
     {
+        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 4 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+        }
         $this->defaultTokenManager = $defaultTokenManager;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
@@ -59,7 +67,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             ->addEventSubscriber(new CsrfValidationListener(
                 $options['csrf_field_name'],
                 $options['csrf_token_manager'],
-                $options['csrf_token_id'] ?: ($builder->getName() ?: get_class($builder->getType()->getInnerType())),
+                $options['csrf_token_id'] ?: ($builder->getName() ?: \get_class($builder->getType()->getInnerType())),
                 $options['csrf_message'],
                 $this->translator,
                 $this->translationDomain,
@@ -79,7 +87,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
-            $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: get_class($form->getConfig()->getType()->getInnerType()));
+            $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: \get_class($form->getConfig()->getType()->getInnerType()));
             $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symfony\Component\Form\Extension\Core\Type\HiddenType', $data, array(
@@ -107,8 +115,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        return array(FormType::class);
     }
 }

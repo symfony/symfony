@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
@@ -23,12 +23,7 @@ class IntegerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addViewTransformer(
-            new IntegerToLocalizedStringTransformer(
-                $options['scale'],
-                $options['grouping'],
-                $options['rounding_mode']
-        ));
+        $builder->addViewTransformer(new IntegerToLocalizedStringTransformer($options['grouping'], $options['rounding_mode']));
     }
 
     /**
@@ -37,8 +32,6 @@ class IntegerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            // default scale is locale specific (usually around 3)
-            'scale' => null,
             'grouping' => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
@@ -55,7 +48,9 @@ class IntegerType extends AbstractType
             IntegerToLocalizedStringTransformer::ROUND_CEILING,
         ));
 
+        $resolver->setDefined('scale');
         $resolver->setAllowedTypes('scale', array('null', 'int'));
+        $resolver->setDeprecated('scale');
     }
 
     /**

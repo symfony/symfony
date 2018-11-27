@@ -44,13 +44,18 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
 
-            $coreThemePath = dirname(dirname($reflClass->getFileName())).'/Resources/views/Form';
+            $coreThemePath = \dirname(\dirname($reflClass->getFileName())).'/Resources/views/Form';
             $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array($coreThemePath));
 
-            $paths = $container->getDefinition('twig.cache_warmer')->getArgument(2);
+            $paths = $container->getDefinition('twig.template_iterator')->getArgument(2);
             $paths[$coreThemePath] = null;
-            $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $paths);
             $container->getDefinition('twig.template_iterator')->replaceArgument(2, $paths);
+
+            if ($container->hasDefinition('twig.cache_warmer')) {
+                $paths = $container->getDefinition('twig.cache_warmer')->getArgument(2);
+                $paths[$coreThemePath] = null;
+                $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $paths);
+            }
         }
 
         if ($container->has('router')) {
@@ -59,6 +64,7 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->has('fragment.handler')) {
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
+            $container->getDefinition('twig.runtime.httpkernel')->addTag('twig.runtime');
 
             // inject Twig in the hinclude service if Twig is the only registered templating engine
             if ((!$container->hasParameter('templating.engines') || array('twig') == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
@@ -69,13 +75,25 @@ class ExtensionPass implements CompilerPassInterface
             }
         }
 
+        if (!$container->has('http_kernel')) {
+            $container->removeDefinition('twig.controller.preview_error');
+        }
+
         if ($container->has('request_stack')) {
             $container->getDefinition('twig.extension.httpfoundation')->addTag('twig.extension');
         }
 
         if ($container->getParameter('kernel.debug')) {
             $container->getDefinition('twig.extension.profiler')->addTag('twig.extension');
-            $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
+
+            // only register if the improved version from DebugBundle is *not* present
+            if (!$container->has('twig.extension.dump')) {
+                $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
+            }
+        }
+
+        if ($container->has('web_link.add_link_header_listener')) {
+            $container->getDefinition('twig.extension.weblink')->addTag('twig.extension');
         }
 
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');

@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher as BaseTraceableEventDispatcher;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Collects some data about event listeners.

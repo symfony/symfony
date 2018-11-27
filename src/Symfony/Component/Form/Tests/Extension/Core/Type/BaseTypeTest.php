@@ -145,6 +145,28 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertSame($view, $form->getViewData());
     }
 
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
+    {
+        $builder = $this->factory->createBuilder($this->getTestedType());
+
+        if ($builder->getCompound()) {
+            $emptyData = array();
+            foreach ($builder as $field) {
+                // empty children should map null (model data) in the compound view data
+                $emptyData[$field->getName()] = null;
+            }
+        } else {
+            // simple fields share the view and the model format, unless they use a transformer
+            $expectedData = $emptyData;
+        }
+
+        $form = $builder->setEmptyData($emptyData)->getForm()->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
     protected function getTestedType()
     {
         return static::TESTED_TYPE;

@@ -12,8 +12,8 @@
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\Node;
 
 class NodeTest extends TestCase
 {

@@ -5,8 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="security.authentication.trust_resolver.anonymous_class">Symfony\Component\Security\Core\Authentication\Token\AnonymousToken</parameter>
-        <parameter key="security.authentication.trust_resolver.rememberme_class">Symfony\Component\Security\Core\Authentication\Token\RememberMeToken</parameter>
+        <parameter key="security.authentication.trust_resolver.anonymous_class">null</parameter>
+        <parameter key="security.authentication.trust_resolver.rememberme_class">null</parameter>
         <parameter key="security.role_hierarchy.roles" type="collection" />
     </parameters>
 
@@ -27,19 +27,14 @@
         <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" />
 
         <service id="security.helper" class="Symfony\Component\Security\Core\Security">
-            <argument type="service">
-                <service class="Symfony\Component\DependencyInjection\ServiceLocator">
-                    <tag name="container.service_locator" />
-                    <argument type="collection">
-                        <argument key="security.token_storage" type="service" id="security.token_storage" />
-                        <argument key="security.authorization_checker" type="service" id="security.authorization_checker" />
-                    </argument>
-                </service>
+            <argument type="service_locator">
+                <argument key="security.token_storage" type="service" id="security.token_storage" />
+                <argument key="security.authorization_checker" type="service" id="security.authorization_checker" />
             </argument>
         </service>
         <service id="Symfony\Component\Security\Core\Security" alias="security.helper" />
 
-        <service id="security.user_value_resolver" class="Symfony\Bundle\SecurityBundle\SecurityUserValueResolver">
+        <service id="security.user_value_resolver" class="Symfony\Component\Security\Http\Controller\UserValueResolver">
             <argument type="service" id="security.token_storage" />
             <tag name="controller.argument_value_resolver" priority="40" />
         </service>
@@ -62,6 +57,11 @@
         <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">
             <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
+        <service id="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface" alias="security.authentication.session_strategy" />
+
+        <service id="security.authentication.session_strategy_noop" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy" public="false">
+            <argument>none</argument>
+        </service>
 
         <service id="security.encoder_factory.generic" class="Symfony\Component\Security\Core\Encoder\EncoderFactory">
             <argument type="collection" />
@@ -79,7 +79,9 @@
 
         <service id="security.user_checker" class="Symfony\Component\Security\Core\User\UserChecker" />
 
-        <service id="security.expression_language" class="Symfony\Component\Security\Core\Authorization\ExpressionLanguage" />
+        <service id="security.expression_language" class="Symfony\Component\Security\Core\Authorization\ExpressionLanguage">
+            <argument type="service" id="cache.security_expression_language"></argument>
+        </service>
 
         <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" public="true">
             <argument type="service" id="request_stack" />
@@ -95,6 +97,7 @@
         <service id="security.role_hierarchy" class="Symfony\Component\Security\Core\Role\RoleHierarchy">
             <argument>%security.role_hierarchy.roles%</argument>
         </service>
+        <service id="Symfony\Component\Security\Core\Role\RoleHierarchyInterface" alias="security.role_hierarchy" />
 
 
         <!-- Security Voters -->
@@ -115,6 +118,7 @@
         <service id="security.access.expression_voter" class="Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter">
             <argument type="service" id="security.expression_language" />
             <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.authorization_checker" />
             <argument type="service" id="security.role_hierarchy" on-invalid="null" />
             <tag name="security.voter" priority="245" />
         </service>
@@ -137,6 +141,7 @@
         <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
+            <argument />  <!-- LogoutListener -->
             <argument />  <!-- FirewallConfig -->
         </service>
 
@@ -162,8 +167,14 @@
         </service>
 
         <!-- Provisioning -->
+        <service id="security.user.provider.missing" class="Symfony\Component\Security\Core\User\MissingUserProvider" abstract="true">
+            <argument /> <!-- firewall -->
+        </service>
+
         <service id="security.user.provider.in_memory" class="Symfony\Component\Security\Core\User\InMemoryUserProvider" abstract="true" />
-        <service id="security.user.provider.in_memory.user" class="Symfony\Component\Security\Core\User\User" abstract="true" />
+        <service id="security.user.provider.in_memory.user" class="Symfony\Component\Security\Core\User\User" abstract="true">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.1.</deprecated>
+        </service>
 
         <service id="security.user.provider.ldap" class="Symfony\Component\Security\Core\User\LdapUserProvider" abstract="true">
             <argument /> <!-- security.ldap.ldap -->
@@ -190,6 +201,18 @@
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />
+        </service>
+
+        <!-- Cache -->
+        <service id="cache.security_expression_language" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <!-- Cache Warmers -->
+        <service id="security.cache_warmer.expression" class="Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer">
+            <tag name="kernel.cache_warmer" />
+            <argument type="collection" /> <!-- expressions -->
+            <argument type="service" id="security.expression_language" />
         </service>
     </services>
 </container>

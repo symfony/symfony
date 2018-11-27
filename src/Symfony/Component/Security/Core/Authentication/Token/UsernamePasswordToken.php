@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\Role\Role;
+
 /**
  * UsernamePasswordToken implements a username and password token.
  *
@@ -41,7 +43,7 @@ class UsernamePasswordToken extends AbstractToken
         $this->credentials = $credentials;
         $this->providerKey = $providerKey;
 
-        parent::setAuthenticated(count($roles) > 0);
+        parent::setAuthenticated(\count($roles) > 0);
     }
 
     /**

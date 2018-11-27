@@ -1,0 +1,21 @@
+{
+    "class": "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\FooType",
+    "block_prefix": "foo",
+    "options": {
+        "own": [
+            "bar"
+        ],
+        "overridden": [],
+        "parent": [],
+        "extension": [],
+        "required": [
+            "foo"
+        ]
+    },
+    "parent_types": [
+        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType"
+    ],
+    "type_extensions": [
+        "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension"
+    ]
+}

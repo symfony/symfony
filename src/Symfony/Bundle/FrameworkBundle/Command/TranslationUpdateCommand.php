@@ -12,14 +12,15 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
@@ -31,7 +32,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  *
- * @final since version 3.4
+ * @final
  */
 class TranslationUpdateCommand extends Command
 {
@@ -64,9 +65,9 @@ class TranslationUpdateCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
-                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
+                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
@@ -76,7 +77,7 @@ class TranslationUpdateCommand extends Command
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
-of a given bundle or the app folder. It can display them or merge the new ones into the translation files.
+of a given bundle or the default translations directory. It can display them or merge the new ones into the translation files.
 
 When new translation strings are found it can automatically add a prefix to the translation
 message.
@@ -85,7 +86,7 @@ Example running against a Bundle (AcmeBundle)
   <info>php %command.full_name% --dump-messages en AcmeBundle</info>
   <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
 
-Example running against app messages (app/Resources folder)
+Example running against default messages directory
   <info>php %command.full_name% --dump-messages en</info>
   <info>php %command.full_name% --force --prefix="new_" fr</info>
 EOF
@@ -110,24 +111,39 @@ EOF
 
         // check format
         $supportedFormats = $this->writer->getFormats();
-        if (!in_array($input->getOption('output-format'), $supportedFormats)) {
+        if (!\in_array($input->getOption('output-format'), $supportedFormats, true)) {
             $errorIo->error(array('Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.'));
 
             return 1;
         }
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
+        $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
-        $transPaths = array($kernel->getRootDir().'/Resources/translations');
+        $transPaths = array();
+        if (is_dir($dir = $rootDir.'/Resources/translations')) {
+            if ($dir !== $this->defaultTransPath) {
+                $notice = sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
+                @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
+            }
+            $transPaths[] = $dir;
+        }
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = array($kernel->getRootDir().'/Resources/views');
+        $viewsPaths = array();
+        if (is_dir($dir = $rootDir.'/Resources/views')) {
+            if ($dir !== $this->defaultViewsPath) {
+                $notice = sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
+                @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
+            }
+            $viewsPaths[] = $dir;
+        }
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
-        $currentName = 'app folder';
+        $currentName = 'default directory';
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
@@ -135,23 +151,45 @@ EOF
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
                 $transPaths = array($foundBundle->getPath().'/Resources/translations');
                 if ($this->defaultTransPath) {
-                    $transPaths[] = $this->defaultTransPath.'/'.$foundBundle->getName();
+                    $transPaths[] = $this->defaultTransPath;
                 }
-                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(), $foundBundle->getName());
+                if (is_dir($dir = sprintf('%s/Resources/%s/translations', $rootDir, $foundBundle->getName()))) {
+                    $transPaths[] = $dir;
+                    $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $foundBundle->getName(), $dir);
+                    @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
+                }
                 $viewsPaths = array($foundBundle->getPath().'/Resources/views');
                 if ($this->defaultViewsPath) {
-                    $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$foundBundle->getName();
+                    $viewsPaths[] = $this->defaultViewsPath;
                 }
-                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(), $foundBundle->getName());
+                if (is_dir($dir = sprintf('%s/Resources/%s/views', $rootDir, $foundBundle->getName()))) {
+                    $viewsPaths[] = $dir;
+                    $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $foundBundle->getName(), $dir);
+                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
+                }
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
-                $transPaths = array($input->getArgument('bundle').'/Resources/translations');
-                $viewsPaths = array($input->getArgument('bundle').'/Resources/views');
-                $currentName = $transPaths[0];
+                $path = $input->getArgument('bundle');
 
-                if (!is_dir($transPaths[0])) {
-                    throw new \InvalidArgumentException(sprintf('<error>"%s" is neither an enabled bundle nor a directory.</error>', $transPaths[0]));
+                $transPaths = array($path.'/translations');
+                if (is_dir($dir = $path.'/Resources/translations')) {
+                    if ($dir !== $this->defaultTransPath) {
+                        @trigger_error(sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/translations'), E_USER_DEPRECATED);
+                    }
+                    $transPaths[] = $dir;
+                }
+
+                $viewsPaths = array($path.'/templates');
+                if (is_dir($dir = $path.'/Resources/views')) {
+                    if ($dir !== $this->defaultViewsPath) {
+                        @trigger_error(sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/templates'), E_USER_DEPRECATED);
+                    }
+                    $viewsPaths[] = $dir;
+                }
+
+                if (!is_dir($transPaths[0]) && !isset($transPaths[1])) {
+                    throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         }
@@ -189,7 +227,7 @@ EOF
             : new MergeOperation($currentCatalogue, $extractedCatalogue);
 
         // Exit if no messages found.
-        if (!count($operation->getDomains())) {
+        if (!\count($operation->getDomains())) {
             $errorIo->warning('No translation messages were found.');
 
             return;
@@ -215,7 +253,7 @@ EOF
                     }, array_keys($operation->getObsoleteMessages($domain)))
                 );
 
-                $domainMessagesCount = count($list);
+                $domainMessagesCount = \count($list);
 
                 $io->section(sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
                 $io->listing($list);
@@ -223,7 +261,7 @@ EOF
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
-            if ('xlf' == $input->getOption('output-format')) {
+            if ('xlf' === $input->getOption('output-format')) {
                 $errorIo->comment('Xliff output version is <info>1.2</info>');
             }
 

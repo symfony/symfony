@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
 use Symfony\Component\PropertyInfo\Type;
@@ -30,7 +31,7 @@ class AbstractPropertyInfoExtractorTest extends TestCase
     protected function setUp()
     {
         $extractors = array(new NullExtractor(), new DummyExtractor());
-        $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);
+        $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
     }
 
     public function testInstanceOf()
@@ -39,6 +40,7 @@ class AbstractPropertyInfoExtractorTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface', $this->propertyInfo);
         $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface', $this->propertyInfo);
         $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface', $this->propertyInfo);
+        $this->assertInstanceOf(PropertyInitializableExtractorInterface::class, $this->propertyInfo);
     }
 
     public function testGetShortDescription()
@@ -69,5 +71,10 @@ class AbstractPropertyInfoExtractorTest extends TestCase
     public function testGetProperties()
     {
         $this->assertEquals(array('a', 'b'), $this->propertyInfo->getProperties('Foo'));
+    }
+
+    public function testIsInitializable()
+    {
+        $this->assertTrue($this->propertyInfo->isInitializable('Foo', 'bar', array()));
     }
 }

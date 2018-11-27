@@ -31,17 +31,33 @@ class ButtonTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
+     */
+    public function testSetParentOnSubmittedButton()
+    {
+        $button = $this->getButtonBuilder('button')
+            ->getForm()
+        ;
+
+        $button->submit('');
+
+        $button->setParent($this->getFormBuilder('form')->getForm());
+    }
+
+    /**
      * @dataProvider getDisabledStates
      */
     public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result)
     {
         $form = $this->getFormBuilder('form')
             ->setDisabled($parentDisabled)
-            ->getForm();
+            ->getForm()
+        ;
 
         $button = $this->getButtonBuilder('button')
             ->setDisabled($buttonDisabled)
-            ->getForm();
+            ->getForm()
+        ;
 
         $button->setParent($form);
 

@@ -34,7 +34,7 @@ class SubmitButton extends Button implements ClickableInterface
     /**
      * Submits data to the button.
      *
-     * @param null|string $submittedData The data
+     * @param string|null $submittedData The data
      * @param bool        $clearMissing  Not used
      *
      * @return $this
@@ -43,6 +43,12 @@ class SubmitButton extends Button implements ClickableInterface
      */
     public function submit($submittedData, $clearMissing = true)
     {
+        if ($this->getConfig()->getDisabled()) {
+            $this->clicked = false;
+
+            return $this;
+        }
+
         parent::submit($submittedData, $clearMissing);
 
         $this->clicked = null !== $submittedData;

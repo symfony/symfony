@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.43.94",
     "Names": {
         "aa": "afar",
         "ab": "abchaziska",
@@ -30,6 +30,7 @@
         "aro": "araoniska",
         "arp": "arapaho",
         "arq": "algerisk arabiska",
+        "ars": "najdiarabiska",
         "arw": "arawakiska",
         "ary": "marockansk arabiska",
         "arz": "egyptisk arabiska",
@@ -366,7 +367,6 @@
         "ms": "malajiska",
         "mt": "maltesiska",
         "mua": "mundang",
-        "mul": "flera språk",
         "mus": "muskogee",
         "mwl": "mirandesiska",
         "mwr": "marwari",
@@ -375,7 +375,7 @@
         "mye": "myene",
         "myv": "erjya",
         "mzn": "mazanderani",
-        "na": "nauriska",
+        "na": "nauruanska",
         "nan": "min nan",
         "nap": "napolitanska",
         "naq": "nama",
@@ -569,7 +569,6 @@
         "uga": "ugaritiska",
         "uk": "ukrainska",
         "umb": "umbundu",
-        "und": "obestämt språk",
         "ur": "urdu",
         "uz": "uzbekiska",
         "vai": "vaj",
@@ -614,7 +613,6 @@
         "zh_Hant": "traditionell kinesiska",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "inget språkligt innehåll",
         "zza": "zazaiska"
     }
 }

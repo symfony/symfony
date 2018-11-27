@@ -26,6 +26,7 @@
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
+            <argument type="service" id="debug.file_link_formatter" />
         </service>
 
         <service id="web_profiler.csp.handler" class="Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler">
@@ -56,6 +57,13 @@
             <argument type="service" id="request_stack" on-invalid="ignore" />
             <argument>%kernel.project_dir%</argument>
             <argument>/_profiler/open?file=%%f&amp;line=%%l#line%%l</argument>
+        </service>
+
+        <service id="debug.file_link_formatter.url_format" class="string">
+            <factory class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" method="generateUrlFormat" />
+            <argument type="service" id="router" />
+            <argument>_profiler_open_file</argument>
+            <argument>?file=%%f&amp;line=%%l#line%%l</argument>
         </service>
     </services>
 </container>

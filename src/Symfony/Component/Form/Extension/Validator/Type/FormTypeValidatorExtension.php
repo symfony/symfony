@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -49,7 +50,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
         // Constraint should always be converted to an array
         $constraintsNormalizer = function (Options $options, $constraints) {
-            return is_object($constraints) ? array($constraints) : (array) $constraints;
+            return \is_object($constraints) ? array($constraints) : (array) $constraints;
         };
 
         $resolver->setDefaults(array(
@@ -67,8 +68,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        return array(FormType::class);
     }
 }

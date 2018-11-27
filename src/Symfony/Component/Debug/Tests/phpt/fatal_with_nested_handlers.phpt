@@ -7,7 +7,7 @@ namespace Symfony\Component\Debug;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
-    $vendor = dirname($vendor);
+    $vendor = \dirname($vendor);
 }
 require $vendor.'/vendor/autoload.php';
 
@@ -24,7 +24,9 @@ var_dump(array(
 $eHandler[0]->setExceptionHandler('print_r');
 
 if (true) {
-    class Broken implements \Serializable {};
+    class Broken implements \Serializable
+    {
+    }
 }
 
 ?>

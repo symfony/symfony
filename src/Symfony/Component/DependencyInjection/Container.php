@@ -14,11 +14,13 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Container is a dependency injection container.
@@ -41,8 +43,10 @@ class Container implements ResettableContainerInterface
 {
     protected $parameterBag;
     protected $services = array();
+    protected $privates = array();
     protected $fileMap = array();
     protected $methodMap = array();
+    protected $factories = array();
     protected $aliases = array();
     protected $loading = array();
     protected $resolving = array();
@@ -142,6 +146,13 @@ class Container implements ResettableContainerInterface
      */
     public function set($id, $service)
     {
+        // Runs the internal initializer; used by the dumped container to include always-needed files
+        if (isset($this->privates['service_container']) && $this->privates['service_container'] instanceof \Closure) {
+            $initialize = $this->privates['service_container'];
+            unset($this->privates['service_container']);
+            $initialize();
+        }
+
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
@@ -209,20 +220,20 @@ class Container implements ResettableContainerInterface
      */
     public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
     {
-        if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-        }
+        return $this->services[$id]
+            ?? $this->services[$id = $this->aliases[$id] ?? $id]
+            ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? array($this, 'make'))($id, $invalidBehavior));
+    }
 
-        // Re-use shared service instance if it exists.
-        if (isset($this->services[$id])) {
-            return $this->services[$id];
-        }
-        if ('service_container' === $id) {
-            return $this;
-        }
-
+    /**
+     * Creates a service.
+     *
+     * As a separate method to allow "get()" to use the really fast `??` operator.
+     */
+    private function make(string $id, int $invalidBehavior)
+    {
         if (isset($this->loading[$id])) {
-            throw new ServiceCircularReferenceException($id, array_keys($this->loading));
+            throw new ServiceCircularReferenceException($id, array_merge(array_keys($this->loading), array($id)));
         }
 
         $this->loading[$id] = true;
@@ -254,8 +265,11 @@ class Container implements ResettableContainerInterface
 
             $alternatives = array();
             foreach ($this->getServiceIds() as $knownId) {
+                if ('' === $knownId || '.' === $knownId[0]) {
+                    continue;
+                }
                 $lev = levenshtein($id, $knownId);
-                if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
                     $alternatives[] = $knownId;
                 }
             }
@@ -289,7 +303,18 @@ class Container implements ResettableContainerInterface
      */
     public function reset()
     {
-        $this->services = array();
+        $services = $this->services + $this->privates;
+        $this->services = $this->factories = $this->privates = array();
+
+        foreach ($services as $service) {
+            try {
+                if ($service instanceof ResetInterface) {
+                    $service->reset();
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
     }
 
     /**
@@ -388,6 +413,30 @@ class Container implements ResettableContainerInterface
         } finally {
             unset($this->resolving[$envName]);
         }
+    }
+
+    /**
+     * @internal
+     */
+    final protected function getService($registry, $id, $method, $load)
+    {
+        if ('service_container' === $id) {
+            return $this;
+        }
+        if (\is_string($load)) {
+            throw new RuntimeException($load);
+        }
+        if (null === $method) {
+            return false !== $registry ? $this->{$registry}[$id] ?? null : null;
+        }
+        if (false !== $registry) {
+            return $this->{$registry}[$id] ?? $this->{$registry}[$id] = $load ? $this->load($method) : $this->{$method}();
+        }
+        if (!$load) {
+            return $this->{$method}();
+        }
+
+        return ($factory = $this->factories[$id] ?? $this->factories['service_container'][$id] ?? null) ? $factory() : $this->load($method);
     }
 
     private function __clone()

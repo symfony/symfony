@@ -83,7 +83,7 @@ class AppVariable
         }
 
         $user = $token->getUser();
-        if (is_object($user)) {
+        if (\is_object($user)) {
             return $user;
         }
     }
@@ -169,7 +169,7 @@ class AppVariable
             return $session->getFlashBag()->all();
         }
 
-        if (is_string($types)) {
+        if (\is_string($types)) {
             return $session->getFlashBag()->get($types);
         }
 

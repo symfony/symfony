@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @group legacy
+ */
 class CachePoolPassTest extends TestCase
 {
     private $cachePoolPass;
@@ -31,10 +34,8 @@ class CachePoolPassTest extends TestCase
     public function testNamespaceArgumentIsReplaced()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
-        $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
         $adapter = new Definition();
         $adapter->setAbstract(true);
         $adapter->addTag('cache.pool');
@@ -47,15 +48,14 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('D07rhFx97S', $cachePool->getArgument(0));
+        $this->assertSame('z3X945Jbf5', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.name', 'app');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
 
         $container->register('cache.adapter.array', ArrayAdapter::class)->addArgument(0);
 
@@ -71,9 +71,7 @@ class CachePoolPassTest extends TestCase
     public function testArgsAreReplaced()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
-        $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('cache.prefix.seed', 'foo');
         $cachePool = new Definition();
         $cachePool->addTag('cache.pool', array(
@@ -89,8 +87,28 @@ class CachePoolPassTest extends TestCase
 
         $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
         $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('itantF+pIq', $cachePool->getArgument(1));
+        $this->assertSame('tQNhcV-8xa', $cachePool->getArgument(1));
         $this->assertSame(3, $cachePool->getArgument(2));
+    }
+
+    public function testWithNameAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('cache.prefix.seed', 'foo');
+        $cachePool = new Definition();
+        $cachePool->addTag('cache.pool', array(
+            'name' => 'foobar',
+            'provider' => 'foobar',
+        ));
+        $cachePool->addArgument(null);
+        $cachePool->addArgument(null);
+        $cachePool->addArgument(null);
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $this->assertSame('+naTpPa4Sm', $cachePool->getArgument(1));
     }
 
     /**
@@ -100,10 +118,8 @@ class CachePoolPassTest extends TestCase
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.name', 'app');
-        $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.root_dir', 'foo');
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
         $adapter = new Definition();
         $adapter->setAbstract(true);
         $adapter->addTag('cache.pool');

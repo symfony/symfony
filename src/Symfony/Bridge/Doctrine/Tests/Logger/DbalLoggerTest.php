@@ -145,7 +145,7 @@ class DbalLoggerTest extends TestCase
         ;
 
         $testStringArray = array('é', 'á', 'ű', 'ő', 'ú', 'ö', 'ü', 'ó', 'í');
-        $testStringCount = count($testStringArray);
+        $testStringCount = \count($testStringArray);
 
         $shortString = '';
         $longString = '';

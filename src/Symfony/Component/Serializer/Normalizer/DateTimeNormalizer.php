@@ -20,13 +20,12 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
+class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';
 
-    private $format;
-    private $timezone;
+    private $defaultContext;
 
     private static $supportedTypes = array(
         \DateTimeInterface::class => true,
@@ -34,10 +33,24 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         \DateTime::class => true,
     );
 
-    public function __construct(?string $format = \DateTime::RFC3339, \DateTimeZone $timezone = null)
+    /**
+     * @param array $defaultContext
+     */
+    public function __construct($defaultContext = array(), \DateTimeZone $timezone = null)
     {
-        $this->format = $format;
-        $this->timezone = $timezone;
+        $this->defaultContext = array(
+            self::FORMAT_KEY => \DateTime::RFC3339,
+            self::TIMEZONE_KEY => null,
+        );
+
+        if (!\is_array($defaultContext)) {
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+
+            $defaultContext = array(self::FORMAT_KEY => (string) $defaultContext);
+            $defaultContext[self::TIMEZONE_KEY] = $timezone;
+        }
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -51,14 +64,14 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
         }
 
-        $format = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $dateTimeFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
         $timezone = $this->getTimezone($context);
 
         if (null !== $timezone) {
             $object = (new \DateTimeImmutable('@'.$object->getTimestamp()))->setTimezone($timezone);
         }
 
-        return $object->format($format);
+        return $object->format($dateTimeFormat);
     }
 
     /**
@@ -76,8 +89,12 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $dateTimeFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : null;
+        $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
+
+        if ('' === $data || null === $data) {
+            throw new NotNormalizableValueException('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        }
 
         if (null !== $dateTimeFormat) {
             $object = \DateTime::class === $class ? \DateTime::createFromFormat($dateTimeFormat, $data, $timezone) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data, $timezone);
@@ -113,6 +130,14 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return __CLASS__ === \get_class($this);
+    }
+
+    /**
      * Formats datetime errors.
      *
      * @return string[]
@@ -130,8 +155,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     private function getTimezone(array $context)
     {
-        $dateTimeZone = array_key_exists(self::TIMEZONE_KEY, $context) ? $context[self::TIMEZONE_KEY] : $this->timezone;
-
+        $dateTimeZone = $context[self::TIMEZONE_KEY] ?? $this->defaultContext[self::TIMEZONE_KEY];
         if (null === $dateTimeZone) {
             return null;
         }

@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class User implements AdvancedUserInterface
+final class User implements UserInterface, EquatableInterface, AdvancedUserInterface
 {
     private $username;
     private $password;
@@ -116,5 +116,45 @@ final class User implements AdvancedUserInterface
      */
     public function eraseCredentials()
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEqualTo(UserInterface $user)
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->getSalt() !== $user->getSalt()) {
+            return false;
+        }
+
+        if ($this->getUsername() !== $user->getUsername()) {
+            return false;
+        }
+
+        if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
+            return false;
+        }
+
+        if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
+            return false;
+        }
+
+        if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
+            return false;
+        }
+
+        if ($this->isEnabled() !== $user->isEnabled()) {
+            return false;
+        }
+
+        return true;
     }
 }

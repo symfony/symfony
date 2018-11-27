@@ -93,31 +93,17 @@ class Connection extends AbstractConnection
         $resolver->setAllowedTypes('debug', 'bool');
         $resolver->setDefault('referrals', false);
         $resolver->setAllowedTypes('referrals', 'bool');
+        $resolver->setDefault('options', function (OptionsResolver $options, Options $parent) {
+            $options->setDefined(array_map('strtolower', array_keys((new \ReflectionClass(ConnectionOptions::class))->getConstants())));
 
-        $resolver->setNormalizer('options', function (Options $options, $value) {
-            if (true === $options['debug']) {
-                $value['debug_level'] = 7;
+            if (true === $parent['debug']) {
+                $options->setDefault('debug_level', 7);
             }
 
-            if (!isset($value['protocol_version'])) {
-                $value['protocol_version'] = $options['version'];
-            }
-
-            if (!isset($value['referrals'])) {
-                $value['referrals'] = $options['referrals'];
-            }
-
-            return $value;
-        });
-
-        $resolver->setAllowedValues('options', function (array $values) {
-            foreach ($values as $name => $value) {
-                if (!ConnectionOptions::isOption($name)) {
-                    return false;
-                }
-            }
-
-            return true;
+            $options->setDefaults(array(
+                'protocol_version' => $parent['version'],
+                'referrals' => $parent['referrals'],
+            ));
         });
     }
 
@@ -137,15 +123,15 @@ class Connection extends AbstractConnection
             throw new LdapException(sprintf('Could not connect to Ldap server: %s.', ldap_error($this->connection)));
         }
 
-        if ('tls' === $this->config['encryption'] && false === ldap_start_tls($this->connection)) {
+        if ('tls' === $this->config['encryption'] && false === @ldap_start_tls($this->connection)) {
             throw new LdapException(sprintf('Could not initiate TLS connection: %s.', ldap_error($this->connection)));
         }
     }
 
     private function disconnect()
     {
-        if ($this->connection && is_resource($this->connection)) {
-            ldap_close($this->connection);
+        if ($this->connection && \is_resource($this->connection)) {
+            ldap_unbind($this->connection);
         }
 
         $this->connection = null;

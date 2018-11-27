@@ -101,7 +101,7 @@ class JsonResponse extends Response
             );
             $parts = explode('.', $callback);
             foreach ($parts as $part) {
-                if (!preg_match($pattern, $part) || in_array($part, $reserved, true)) {
+                if (!preg_match($pattern, $part) || \in_array($part, $reserved, true)) {
                     throw new \InvalidArgumentException('The callback name is not valid.');
                 }
             }
@@ -142,7 +142,7 @@ class JsonResponse extends Response
         try {
             $data = json_encode($data, $this->encodingOptions);
         } catch (\Exception $e) {
-            if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+            if ('Exception' === \get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                 throw $e->getPrevious() ?: $e;
             }
             throw $e;

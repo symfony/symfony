@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * support selecting the format to use by setting the environment variable `VAR_DUMPER_FORMAT` to `html` or `cli`
+
+4.1.0
+-----
+
+ * added a `ServerDumper` to send serialized Data clones to a server
+ * added a `ServerDumpCommand` and `DumpServer` to run a server collecting
+   and displaying dumps on a single place with multiple formats support
+ * added `CliDescriptor` and `HtmlDescriptor` descriptors for `server:dump` CLI and HTML formats support
+
 4.0.0
 -----
 

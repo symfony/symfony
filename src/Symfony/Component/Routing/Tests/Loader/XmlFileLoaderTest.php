@@ -83,6 +83,45 @@ class XmlFileLoaderTest extends TestCase
         }
     }
 
+    public function testLoadLocalized()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('localized.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $this->assertEquals('/route', $routeCollection->get('localized.fr')->getPath());
+        $this->assertEquals('/path', $routeCollection->get('localized.en')->getPath());
+    }
+
+    public function testLocalizedImports()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routeCollection = $loader->load('importer-with-locale.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
+        $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+    }
+
+    public function testLocalizedImportsOfNotLocalizedRoutes()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routeCollection = $loader->load('importer-with-locale-imports-non-localized-route.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $this->assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
+        $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
@@ -362,6 +401,27 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('import_override_defaults.xml');
     }
 
+    public function testImportRouteWithGlobMatchingSingleFile()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/glob')));
+        $routeCollection = $loader->load('import_single.xml');
+
+        $route = $routeCollection->get('bar_route');
+        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+    }
+
+    public function testImportRouteWithGlobMatchingMultipleFiles()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/glob')));
+        $routeCollection = $loader->load('import_multiple.xml');
+
+        $route = $routeCollection->get('bar_route');
+        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('baz_route');
+        $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
+    }
+
     public function testImportRouteWithNamePrefix()
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));
@@ -371,5 +431,14 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('/blog', $routeCollection->get('app_blog')->getPath());
         $this->assertNotNull($routeCollection->get('api_app_blog'));
         $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
+    }
+
+    public function testImportRouteWithNoTrailingSlash()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_no_trailing_slash')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
+        $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
     }
 }

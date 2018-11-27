@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.44",
+    "Version": "2.1.44.91",
     "Names": {
         "AC": "Ascension Island",
         "AD": "Andorra",
@@ -72,7 +72,6 @@
         "ER": "Eritrea",
         "ES": "Spain",
         "ET": "Ethiopia",
-        "EZ": "Eurozone",
         "FI": "Finland",
         "FJ": "Fiji",
         "FK": "Falkland Islands",
@@ -237,7 +236,6 @@
         "UA": "Ukraine",
         "UG": "Uganda",
         "UM": "U.S. Outlying Islands",
-        "UN": "United Nations",
         "US": "United States",
         "UY": "Uruguay",
         "UZ": "Uzbekistan",
@@ -250,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis & Futuna",
         "WS": "Samoa",
+        "XA": "Pseudo-Accents",
+        "XB": "Pseudo-Bidi",
         "XK": "Kosovo",
         "YE": "Yemen",
         "YT": "Mayotte",

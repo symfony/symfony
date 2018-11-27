@@ -17,7 +17,7 @@ namespace Symfony\Component\Form\Util;
  * Contrary to \ArrayIterator, this iterator recognizes changes in the original
  * array during iteration.
  *
- * You can wrap the iterator into a {@link \RecursiveIterator} in order to
+ * You can wrap the iterator into a {@link \RecursiveIteratorIterator} in order to
  * enter any child form that inherits its parent's data and iterate the children
  * of that form as well.
  *

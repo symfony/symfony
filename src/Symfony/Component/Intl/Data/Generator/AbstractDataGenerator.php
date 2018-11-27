@@ -12,10 +12,10 @@
 namespace Symfony\Component\Intl\Data\Generator;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
-use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
+use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
 /**
  * The rule for compiling the currency bundle.

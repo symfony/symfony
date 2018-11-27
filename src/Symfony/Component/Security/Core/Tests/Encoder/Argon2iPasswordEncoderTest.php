@@ -28,6 +28,14 @@ class Argon2iPasswordEncoderTest extends TestCase
         }
     }
 
+    public function testValidationWithConfig()
+    {
+        $encoder = new Argon2iPasswordEncoder(8, 4, 1);
+        $result = $encoder->encodePassword(self::PASSWORD, null);
+        $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD, null));
+        $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
+    }
+
     public function testValidation()
     {
         $encoder = new Argon2iPasswordEncoder();

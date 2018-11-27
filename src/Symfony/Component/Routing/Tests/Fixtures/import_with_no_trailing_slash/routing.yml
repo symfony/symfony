@@ -1,0 +1,10 @@
+app:
+    resource: ../controller/routing.yml
+    name_prefix: a_
+    prefix: /slash
+
+api:
+    resource: ../controller/routing.yml
+    name_prefix: b_
+    prefix: /no-slash
+    trailing_slash_on_root: false

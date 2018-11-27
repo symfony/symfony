@@ -14,12 +14,12 @@ namespace Symfony\Component\WebLink\Tests\EventListener;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

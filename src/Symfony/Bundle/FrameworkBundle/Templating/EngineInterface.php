@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\EngineInterface as BaseEngineInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\EngineInterface as BaseEngineInterface;
 
 /**
  * EngineInterface is the interface each engine must implement.

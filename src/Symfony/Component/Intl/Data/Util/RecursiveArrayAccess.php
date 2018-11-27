@@ -24,7 +24,7 @@ class RecursiveArrayAccess
     {
         foreach ($indices as $index) {
             // Use array_key_exists() for arrays, isset() otherwise
-            if (is_array($array)) {
+            if (\is_array($array)) {
                 if (array_key_exists($index, $array)) {
                     $array = $array[$index];
                     continue;
@@ -36,10 +36,7 @@ class RecursiveArrayAccess
                 }
             }
 
-            throw new OutOfBoundsException(sprintf(
-                'The index %s does not exist.',
-                $index
-            ));
+            throw new OutOfBoundsException(sprintf('The index %s does not exist.', $index));
         }
 
         return $array;

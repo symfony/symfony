@@ -12,12 +12,12 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ProfilerTest extends TestCase
 {
@@ -44,7 +44,7 @@ class ProfilerTest extends TestCase
     public function testReset()
     {
         $collector = $this->getMockBuilder(DataCollectorInterface::class)
-            ->setMethods(['collect', 'getName', 'reset'])
+            ->setMethods(array('collect', 'getName', 'reset'))
             ->getMock();
         $collector->expects($this->any())->method('getName')->willReturn('mock');
         $collector->expects($this->once())->method('reset');
@@ -84,7 +84,7 @@ class ProfilerTest extends TestCase
 
     protected function setUp()
     {
-        $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
+        $this->tmp = tempnam(sys_get_temp_dir(), 'sf_profiler');
         if (file_exists($this->tmp)) {
             @unlink($this->tmp);
         }

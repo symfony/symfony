@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 
-class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
+class DateTimeToRfc3339TransformerTest extends TestCase
 {
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
@@ -66,6 +67,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
             array('UTC', 'UTC', '2010-02-03 04:05:00 UTC', '2010-02-03T04:05Z'),
             array('America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:00 America/New_York', '2010-02-03T17:05+08:00'),
             array('Europe/Amsterdam', 'Europe/Amsterdam', '2013-08-21 10:30:00 Europe/Amsterdam', '2013-08-21T08:30:00Z'),
+            array('UTC', 'UTC', '2018-10-03T10:00:00.000Z', '2018-10-03T10:00:00.000Z'),
         ));
     }
 
@@ -106,9 +108,9 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
         $transformer = new DateTimeToRfc3339Transformer($toTz, $fromTz);
 
         if (null !== $to) {
-            $this->assertDateTimeEquals(new \DateTime($to), $transformer->reverseTransform($from));
+            $this->assertEquals(new \DateTime($to), $transformer->reverseTransform($from));
         } else {
-            $this->assertSame($to, $transformer->reverseTransform($from));
+            $this->assertNull($transformer->reverseTransform($from));
         }
     }
 
@@ -132,12 +134,25 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     }
 
     /**
+     * @dataProvider invalidDateStringProvider
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsValidDateString()
+    public function testReverseTransformExpectsValidDateString($date)
     {
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');
 
-        $transformer->reverseTransform('2010-2010-2010');
+        $transformer->reverseTransform($date);
+    }
+
+    public function invalidDateStringProvider()
+    {
+        return array(
+            'invalid month' => array('2010-2010-01'),
+            'invalid day' => array('2010-10-2010'),
+            'no date' => array('x'),
+            'cookie format' => array('Saturday, 01-May-2010 04:05:00 Z'),
+            'RFC 822 format' => array('Sat, 01 May 10 04:05:00 +0000'),
+            'RSS format' => array('Sat, 01 May 2010 04:05:00 +0000'),
+        );
     }
 }

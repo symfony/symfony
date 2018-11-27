@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
@@ -141,7 +141,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
     {
-        $bundleDir = dirname($bundle->getFileName());
+        $bundleDir = \dirname($bundle->getFileName());
 
         if (!$bundleConfig['type']) {
             $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir, $container);
@@ -153,7 +153,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (in_array($bundleConfig['type'], array('annotation', 'staticphp'))) {
+            if (\in_array($bundleConfig['type'], array('annotation', 'staticphp'))) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
@@ -240,7 +240,7 @@ abstract class AbstractDoctrineExtension extends Extension
             throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
+        if (!\in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
             throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php" or '.
                 '"staticphp" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. '.
                 'You can register them by adding a new driver to the '.
@@ -272,7 +272,7 @@ abstract class AbstractDoctrineExtension extends Extension
             // add the closest existing directory as a resource
             $resource = $dir.'/'.$configPath;
             while (!is_dir($resource)) {
-                $resource = dirname($resource);
+                $resource = \dirname($resource);
             }
             $container->fileExists($resource, false);
 
@@ -365,9 +365,9 @@ abstract class AbstractDoctrineExtension extends Extension
             if ($container->hasParameter('cache.prefix.seed')) {
                 $seed = '.'.$container->getParameterBag()->resolveValue($container->getParameter('cache.prefix.seed'));
             } else {
-                $seed = '_'.$container->getParameter('kernel.root_dir');
+                $seed = '_'.$container->getParameter('kernel.project_dir');
             }
-            $seed .= '.'.$container->getParameter('kernel.name').'.'.$container->getParameter('kernel.environment').'.'.$container->getParameter('kernel.debug');
+            $seed .= '.'.$container->getParameter('kernel.container_class');
             $namespace = 'sf_'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.ContainerBuilder::hash($seed);
 
             $cacheDriver['namespace'] = $namespace;
@@ -444,7 +444,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Search for a manager that is declared as 'auto_mapping' = true.
      *
-     * @return null|string The name of the manager. If no one manager is found, returns null
+     * @return string|null The name of the manager. If no one manager is found, returns null
      *
      * @throws \LogicException
      */

@@ -12,18 +12,20 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
+use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
 use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @final since version 3.4
+ * @final
  */
 class WorkflowDumpCommand extends Command
 {
@@ -38,14 +40,16 @@ class WorkflowDumpCommand extends Command
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
-                new InputOption('label', 'l', InputArgument::OPTIONAL, 'Labels a graph'),
+                new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Labels a graph'),
+                new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
             ))
             ->setDescription('Dump a workflow')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a
-workflow in DOT format
+workflow in different formats
 
-    %command.full_name% <workflow name> | dot -Tpng > workflow.png
+<info>DOT</info>:  %command.full_name% <workflow name> | dot -Tpng > workflow.png
+<info>PUML</info>: %command.full_name% <workflow name> --dump-format=puml | java -jar plantuml.jar -p > workflow.png
 
 EOF
             )
@@ -59,14 +63,24 @@ EOF
     {
         $container = $this->getApplication()->getKernel()->getContainer();
         $serviceId = $input->getArgument('name');
+
         if ($container->has('workflow.'.$serviceId)) {
             $workflow = $container->get('workflow.'.$serviceId);
-            $dumper = new GraphvizDumper();
+            $type = 'workflow';
         } elseif ($container->has('state_machine.'.$serviceId)) {
             $workflow = $container->get('state_machine.'.$serviceId);
-            $dumper = new StateMachineGraphvizDumper();
+            $type = 'state_machine';
         } else {
-            throw new \InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
+            throw new InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
+        }
+
+        if ('puml' === $input->getOption('dump-format')) {
+            $transitionType = 'workflow' === $type ? PlantUmlDumper::WORKFLOW_TRANSITION : PlantUmlDumper::STATEMACHINE_TRANSITION;
+            $dumper = new PlantUmlDumper($transitionType);
+        } elseif ('workflow' === $type) {
+            $dumper = new GraphvizDumper();
+        } else {
+            $dumper = new StateMachineGraphvizDumper();
         }
 
         $marking = new Marking();
@@ -75,11 +89,13 @@ EOF
             $marking->mark($place);
         }
 
-        $options = array();
-        $label = $input->getOption('label');
-        if (null !== $label && '' !== trim($label)) {
-            $options = array('graph' => array('label' => $label));
-        }
+        $options = array(
+            'name' => $serviceId,
+            'nofooter' => true,
+            'graph' => array(
+                'label' => $input->getOption('label'),
+            ),
+        );
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
     }
 }

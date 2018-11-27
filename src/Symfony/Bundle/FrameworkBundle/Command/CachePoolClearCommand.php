@@ -13,8 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -77,7 +78,7 @@ EOF
                 } elseif ($pool instanceof Psr6CacheClearer) {
                     $clearers[$id] = $pool;
                 } else {
-                    throw new \InvalidArgumentException(sprintf('"%s" is not a cache pool nor a cache clearer.', $id));
+                    throw new InvalidArgumentException(sprintf('"%s" is not a cache pool nor a cache clearer.', $id));
                 }
             }
         }

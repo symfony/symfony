@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.44.91",
     "Names": {
         "AC": "Île de l’Ascension",
         "AD": "Andorre",
@@ -72,7 +72,6 @@
         "ER": "Érythrée",
         "ES": "Espagne",
         "ET": "Éthiopie",
-        "EZ": "zone euro",
         "FI": "Finlande",
         "FJ": "Fidji",
         "FK": "Îles Malouines",
@@ -224,7 +223,7 @@
         "TG": "Togo",
         "TH": "Thaïlande",
         "TJ": "Tadjikistan",
-        "TK": "Tokélaou",
+        "TK": "Tokelau",
         "TL": "Timor oriental",
         "TM": "Turkménistan",
         "TN": "Tunisie",
@@ -237,7 +236,6 @@
         "UA": "Ukraine",
         "UG": "Ouganda",
         "UM": "Îles mineures éloignées des États-Unis",
-        "UN": "Nations Unies",
         "US": "États-Unis",
         "UY": "Uruguay",
         "UZ": "Ouzbékistan",

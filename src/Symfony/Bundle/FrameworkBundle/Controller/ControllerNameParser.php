@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * (Bundle\BlogBundle\Controller\PostController::indexAction).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.1
  */
 class ControllerNameParser
 {
@@ -41,8 +44,12 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
+        if (2 > \func_num_args() || func_get_arg(1)) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         $parts = explode(':', $controller);
-        if (3 !== count($parts) || in_array('', $parts, true)) {
+        if (3 !== \count($parts) || \in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
@@ -86,6 +93,8 @@ class ControllerNameParser
      */
     public function build($controller)
     {
+        @trigger_error(sprintf('The %s class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+
         if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));
         }
@@ -109,7 +118,7 @@ class ControllerNameParser
      */
     private function findAlternative(string $nonExistentBundleName): ?string
     {
-        $bundleNames = array_map(function ($b) {
+        $bundleNames = array_map(function (BundleInterface $b) {
             return $b->getName();
         }, $this->kernel->getBundles());
 
@@ -122,7 +131,7 @@ class ControllerNameParser
             }
 
             $lev = levenshtein($nonExistentBundleName, $bundleName);
-            if ($lev <= strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
+            if ($lev <= \strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
                 $alternative = $bundleName;
                 $shortest = $lev;
             }

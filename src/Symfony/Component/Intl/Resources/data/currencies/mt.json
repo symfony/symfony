@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.43.94",
     "Names": {
         "AED": [
             "AED",
@@ -341,6 +341,10 @@
             "MRO",
             "MRO"
         ],
+        "MRU": [
+            "MRU",
+            "MRU"
+        ],
         "MTL": [
             "MTL",
             "Lira Maltija"
@@ -489,6 +493,10 @@
             "STD",
             "STD"
         ],
+        "STN": [
+            "STN",
+            "STN"
+        ],
         "SYP": [
             "SYP",
             "SYP"
@@ -556,6 +564,10 @@
         "VEF": [
             "VEF",
             "VEF"
+        ],
+        "VES": [
+            "VES",
+            "VES"
         ],
         "VND": [
             "₫",

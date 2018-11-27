@@ -12,17 +12,18 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
 {
@@ -46,12 +47,12 @@ class DateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $dateFormat = is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
+        $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
         $timeFormat = \IntlDateFormatter::NONE;
         $calendar = \IntlDateFormatter::GREGORIAN;
-        $pattern = is_string($options['format']) ? $options['format'] : null;
+        $pattern = \is_string($options['format']) ? $options['format'] : null;
 
-        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+        if (!\in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
@@ -75,7 +76,33 @@ class DateType extends AbstractType
 
             $yearOptions = $monthOptions = $dayOptions = array(
                 'error_bubbling' => true,
+                'empty_data' => '',
             );
+            // when the form is compound the entries of the array are ignored in favor of children data
+            // so we need to handle the cascade setting here
+            $emptyData = $builder->getEmptyData() ?: array();
+
+            if (isset($emptyData['year'])) {
+                $yearOptions['empty_data'] = $emptyData['year'];
+            }
+            if (isset($emptyData['month'])) {
+                $monthOptions['empty_data'] = $emptyData['month'];
+            }
+            if (isset($emptyData['day'])) {
+                $dayOptions['empty_data'] = $emptyData['day'];
+            }
+
+            if (isset($options['invalid_message'])) {
+                $dayOptions['invalid_message'] = $options['invalid_message'];
+                $monthOptions['invalid_message'] = $options['invalid_message'];
+                $yearOptions['invalid_message'] = $options['invalid_message'];
+            }
+
+            if (isset($options['invalid_message_parameters'])) {
+                $dayOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $monthOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $yearOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+            }
 
             $formatter = new \IntlDateFormatter(
                 \Locale::getDefault(),
@@ -123,7 +150,9 @@ class DateType extends AbstractType
             ;
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime_immutable' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
             ));
@@ -157,7 +186,7 @@ class DateType extends AbstractType
             $pattern = $form->getConfig()->getAttribute('formatter')->getPattern();
 
             // remove special characters unless the format was explicitly specified
-            if (!is_string($options['format'])) {
+            if (!\is_string($options['format'])) {
                 // remove quoted strings first
                 $pattern = preg_replace('/\'[^\']+\'/', '', $pattern);
 
@@ -192,7 +221,7 @@ class DateType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (is_array($placeholder)) {
+            if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
                 return array_merge(
@@ -209,7 +238,7 @@ class DateType extends AbstractType
         };
 
         $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
-            if (is_array($choiceTranslationDomain)) {
+            if (\is_array($choiceTranslationDomain)) {
                 $default = false;
 
                 return array_replace(
@@ -250,6 +279,9 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'empty_data' => function (Options $options) {
+                return $options['compound'] ? array() : '';
+            },
             'choice_translation_domain' => false,
         ));
 
@@ -258,6 +290,7 @@ class DateType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetime_immutable',
             'string',
             'timestamp',
             'array',

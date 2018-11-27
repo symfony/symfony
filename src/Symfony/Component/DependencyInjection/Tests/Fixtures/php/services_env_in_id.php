@@ -19,11 +19,6 @@ class ProjectServiceContainer extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
-
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
@@ -35,12 +30,6 @@ class ProjectServiceContainer extends Container
         );
 
         $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
     }
 
     public function compile()
@@ -128,7 +117,7 @@ class ProjectServiceContainer extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *

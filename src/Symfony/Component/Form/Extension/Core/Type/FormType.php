@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -80,6 +80,7 @@ class FormType extends BaseType
             }
         }
 
+        $formConfig = $form->getConfig();
         $view->vars = array_replace($view->vars, array(
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
@@ -88,9 +89,11 @@ class FormType extends BaseType
             'required' => $form->isRequired(),
             'size' => null,
             'label_attr' => $options['label_attr'],
-            'compound' => $form->getConfig()->getCompound(),
-            'method' => $form->getConfig()->getMethod(),
-            'action' => $form->getConfig()->getAction(),
+            'help' => $options['help'],
+            'help_attr' => $options['help_attr'],
+            'compound' => $formConfig->getCompound(),
+            'method' => $formConfig->getMethod(),
+            'action' => $formConfig->getAction(),
             'submitted' => $form->isSubmitted(),
         ));
     }
@@ -121,7 +124,7 @@ class FormType extends BaseType
 
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
-            return isset($options['data']) && is_object($options['data']) ? get_class($options['data']) : null;
+            return isset($options['data']) && \is_object($options['data']) ? \get_class($options['data']) : null;
         };
 
         // Derive "empty_data" closure from "data_class" option
@@ -177,10 +180,14 @@ class FormType extends BaseType
             'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
+            'help' => null,
+            'help_attr' => array(),
         ));
 
         $resolver->setAllowedTypes('label_attr', 'array');
         $resolver->setAllowedTypes('upload_max_size_message', array('callable'));
+        $resolver->setAllowedTypes('help', array('string', 'null'));
+        $resolver->setAllowedTypes('help_attr', 'array');
     }
 
     /**

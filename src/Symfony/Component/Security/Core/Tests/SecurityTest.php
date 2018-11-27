@@ -64,8 +64,32 @@ class SecurityTest extends TestCase
 
         yield array('string_username', null);
 
+        //yield array(new StringishUser(), null); // 5.0 behavior
+
         $user = new User('nice_user', 'foo');
         yield array($user, $user);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Accessing the user object "Symfony\Component\Security\Core\Tests\StringishUser" that is not an instance of "Symfony\Component\Security\Core\User\UserInterface" from "Symfony\Component\Security\Core\Security::getUser()" is deprecated since Symfony 4.2, use "getToken()->getUser()" instead.
+     */
+    public function testGetUserLegacy()
+    {
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token->expects($this->any())
+            ->method('getUser')
+            ->will($this->returnValue($user = new StringishUser()));
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+
+        $tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $container = $this->createContainer('security.token_storage', $tokenStorage);
+
+        $security = new Security($container);
+        $this->assertSame($user, $security->getUser());
     }
 
     public function testIsGranted()
@@ -93,5 +117,13 @@ class SecurityTest extends TestCase
             ->will($this->returnValue($serviceObject));
 
         return $container;
+    }
+}
+
+class StringishUser
+{
+    public function __toString()
+    {
+        return 'stringish_user';
     }
 }

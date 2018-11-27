@@ -17,10 +17,12 @@
     ],
     "require": {
         "php": "^7.1.3",
+        "symfony/contracts": "^1.0",
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
         "symfony/config": "~3.4|~4.0",
+        "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/intl": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
@@ -32,10 +34,13 @@
         "symfony/dependency-injection": "<3.4",
         "symfony/yaml": "<3.4"
     },
+    "provide": {
+        "symfony/translation-contracts-implementation": "1.0"
+    },
     "suggest": {
         "symfony/config": "",
         "symfony/yaml": "",
-        "psr/log": "To use logging capability in translator"
+        "psr/log-implementation": "To use logging capability in translator"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\": "" },
@@ -46,7 +51,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

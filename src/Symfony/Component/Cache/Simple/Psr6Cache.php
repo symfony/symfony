@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Cache\Simple;
 
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheException as Psr6CacheException;
-use Psr\SimpleCache\CacheInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheException as SimpleCacheException;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
@@ -30,27 +30,36 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     use ProxyTrait;
 
     private $createCacheItem;
+    private $cacheItemPrototype;
 
     public function __construct(CacheItemPoolInterface $pool)
     {
         $this->pool = $pool;
 
-        if ($pool instanceof AbstractAdapter) {
-            $this->createCacheItem = \Closure::bind(
-                function ($key, $value, $allowInt = false) {
-                    if ($allowInt && is_int($key)) {
-                        $key = (string) $key;
-                    } else {
-                        CacheItem::validateKey($key);
-                    }
-                    $f = $this->createCacheItem;
-
-                    return $f($key, $value, false);
-                },
-                $pool,
-                AbstractAdapter::class
-            );
+        if (!$pool instanceof AdapterInterface) {
+            return;
         }
+        $cacheItemPrototype = &$this->cacheItemPrototype;
+        $createCacheItem = \Closure::bind(
+            function ($key, $value, $allowInt = false) use (&$cacheItemPrototype) {
+                $item = clone $cacheItemPrototype;
+                $item->key = $allowInt && \is_int($key) ? (string) $key : CacheItem::validateKey($key);
+                $item->value = $value;
+                $item->isHit = false;
+
+                return $item;
+            },
+            null,
+            CacheItem::class
+        );
+        $this->createCacheItem = function ($key, $value, $allowInt = false) use ($createCacheItem) {
+            if (null === $this->cacheItemPrototype) {
+                $this->get($allowInt && \is_int($key) ? (string) $key : $key);
+            }
+            $this->createCacheItem = $createCacheItem;
+
+            return $createCacheItem($key, $value, $allowInt);
+        };
     }
 
     /**
@@ -64,6 +73,10 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
             throw $e;
         } catch (Psr6CacheException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+        }
+        if (null === $this->cacheItemPrototype) {
+            $this->cacheItemPrototype = clone $item;
+            $this->cacheItemPrototype->set(null);
         }
 
         return $item->isHit() ? $item->get() : $default;
@@ -121,8 +134,8 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
-            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
+        } elseif (!\is_array($keys)) {
+            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
 
         try {
@@ -146,9 +159,9 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
      */
     public function setMultiple($values, $ttl = null)
     {
-        $valuesIsArray = is_array($values);
+        $valuesIsArray = \is_array($values);
         if (!$valuesIsArray && !$values instanceof \Traversable) {
-            throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', is_object($values) ? get_class($values) : gettype($values)));
+            throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
         $items = array();
 
@@ -166,7 +179,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
                 $items = $this->pool->getItems($items);
             } else {
                 foreach ($values as $key => $value) {
-                    if (is_int($key)) {
+                    if (\is_int($key)) {
                         $key = (string) $key;
                     }
                     $items[$key] = $this->pool->getItem($key)->set($value);
@@ -199,8 +212,8 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     {
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
-        } elseif (!is_array($keys)) {
-            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', is_object($keys) ? get_class($keys) : gettype($keys)));
+        } elseif (!\is_array($keys)) {
+            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
 
         try {

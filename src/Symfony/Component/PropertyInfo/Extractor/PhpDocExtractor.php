@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
 {
@@ -53,6 +53,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {
+        if (!class_exists(DocBlockFactory::class)) {
+            throw new \LogicException(sprintf('Unable to use the "%s" class as the "phpdocumentor/reflection-docblock" package is not installed.', __CLASS__));
+        }
+
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
         $this->phpDocTypeHelper = new PhpDocTypeHelper();
@@ -131,14 +135,16 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $types = array();
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
-            $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
+            if ($tag && null !== $tag->getType()) {
+                $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
+            }
         }
 
         if (!isset($types[0])) {
             return;
         }
 
-        if (!in_array($prefix, $this->arrayMutatorPrefixes)) {
+        if (!\in_array($prefix, $this->arrayMutatorPrefixes)) {
             return $types;
         }
 
@@ -155,25 +161,21 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $ucFirstProperty = ucfirst($property);
 
-        try {
-            switch (true) {
-                case $docBlock = $this->getDocBlockFromProperty($class, $property):
-                    $data = array($docBlock, self::PROPERTY, null);
-                    break;
+        switch (true) {
+            case $docBlock = $this->getDocBlockFromProperty($class, $property):
+                $data = array($docBlock, self::PROPERTY, null);
+                break;
 
-                case list($docBlock) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
-                    $data = array($docBlock, self::ACCESSOR, null);
-                    break;
+            case list($docBlock) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
+                $data = array($docBlock, self::ACCESSOR, null);
+                break;
 
-                case list($docBlock, $prefix) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
-                    $data = array($docBlock, self::MUTATOR, $prefix);
-                    break;
+            case list($docBlock, $prefix) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
+                $data = array($docBlock, self::MUTATOR, $prefix);
+                break;
 
-                default:
-                    $data = array(null, null, null);
-            }
-        } catch (\InvalidArgumentException $e) {
-            $data = array(null, null, null);
+            default:
+                $data = array(null, null, null);
         }
 
         return $this->docBlocks[$propertyHash] = $data;
@@ -188,7 +190,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return null;
         }
 
-        return $this->docBlockFactory->create($reflectionProperty, $this->contextFactory->createFromReflector($reflectionProperty));
+        try {
+            return $this->docBlockFactory->create($reflectionProperty, $this->contextFactory->createFromReflector($reflectionProperty->getDeclaringClass()));
+        } catch (\InvalidArgumentException $e) {
+            return null;
+        }
     }
 
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
@@ -220,6 +226,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return null;
         }
 
-        return array($this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix);
+        try {
+            return array($this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix);
+        } catch (\InvalidArgumentException $e) {
+            return null;
+        }
     }
 }

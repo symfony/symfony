@@ -27,11 +27,11 @@ class Registry
      * @param Workflow                 $workflow
      * @param SupportStrategyInterface $supportStrategy
      *
-     * @deprecated since version 4.1, to be removed in 5.0. Use addWorkflow() instead.
+     * @deprecated since Symfony 4.1, use addWorkflow() instead
      */
     public function add(Workflow $workflow, $supportStrategy)
     {
-        @trigger_error(sprintf('%s is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), E_USER_DEPRECATED);
         $this->workflows[] = array($workflow, $supportStrategy);
     }
 
@@ -60,7 +60,24 @@ class Registry
         }
 
         if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_class($subject)));
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', \get_class($subject)));
+        }
+
+        return $matched;
+    }
+
+    /**
+     * @param object $subject
+     *
+     * @return Workflow[]
+     */
+    public function all($subject): array
+    {
+        $matched = array();
+        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+            if ($supportStrategy->supports($workflow, $subject)) {
+                $matched[] = $workflow;
+            }
         }
 
         return $matched;

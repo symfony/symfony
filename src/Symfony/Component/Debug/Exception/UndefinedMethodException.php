@@ -26,6 +26,9 @@ class UndefinedMethodException extends FatalErrorException
             $previous->getSeverity(),
             $previous->getFile(),
             $previous->getLine(),
+            null,
+            true,
+            null,
             $previous->getPrevious()
         );
         $this->setTrace($previous->getTrace());

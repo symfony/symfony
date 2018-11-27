@@ -1,7 +1,18 @@
 CHANGELOG
 =========
 
-4.4.0
+4.2.0
+-----
+
+ * deprecated support for legacy templates directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`, use `templates/` and `templates/bundles/<BundleName>/` instead.
+
+4.1.0
+-----
+
+ * added priority to Twig extensions 
+ * deprecated relying on the default value (`false`) of the `twig.strict_variables` configuration option. The `%kernel.debug%` parameter will be the new default in 5.0
+
+4.0.0
 -----
 
  * removed `ContainerAwareRuntimeLoader`

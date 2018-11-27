@@ -1,0 +1,34 @@
+
+Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
+==========================================================================
+
+ ------------------------- 
+  Options                  
+ ------------------------- 
+  action                   
+  attr                     
+  auto_initialize          
+  block_name               
+  by_reference             
+  compound                 
+  data                     
+  data_class               
+  disabled                 
+  empty_data               
+  error_bubbling           
+  help                     
+  help_attr                
+  inherit_data             
+  label                    
+  label_attr               
+  label_format             
+  mapped                   
+  method                   
+  post_max_size_message    
+  property_path            
+  required                 
+  translation_domain       
+  trim                     
+  upload_max_size_message  
+ ------------------------- 
+

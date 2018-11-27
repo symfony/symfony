@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
-use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
+use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
 class BinaryNodeTest extends AbstractNodeTest

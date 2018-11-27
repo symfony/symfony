@@ -72,7 +72,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
             $response->setLastModified(null);
         }
 
-        if (!$response->isFresh()) {
+        if (!$response->isFresh() || !$response->isCacheable()) {
             $this->cacheable = false;
         }
 

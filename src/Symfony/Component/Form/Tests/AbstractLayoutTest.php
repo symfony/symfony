@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\SkippedTestError;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
@@ -23,7 +24,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
         }
 
@@ -58,7 +59,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function assertMatchesXpath($html, $expression, $count = 1)
     {
-        $dom = new \DomDocument('UTF-8');
+        $dom = new \DOMDocument('UTF-8');
         try {
             // Wrap in <root> node so we can load HTML with multiple tags at
             // the top level
@@ -112,6 +113,11 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     abstract protected function renderForm(FormView $view, array $vars = array());
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
+
+    protected function renderHelp(FormView $view)
+    {
+        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', \get_class($this)));
+    }
 
     abstract protected function renderErrors(FormView $view);
 
@@ -404,6 +410,66 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@type="button"]
     [@name="myform[mybutton]"]
     [.="[trans]form.myform_mybutton[/trans]"]
+'
+        );
+    }
+
+    public function testHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'Help text test!',
+        ));
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+'/p
+    [@id="name_help"]
+    [@class="help-text"]
+    [.="[trans]Help text test![/trans]"]
+'
+        );
+    }
+
+    public function testHelpNotSet()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html, '/p', 0);
+    }
+
+    public function testHelpSetLinkFromWidget()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'Help text test!',
+        ));
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        // Test if renderHelp method is implemented (throw SkippedTestError if not)
+        $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+'//input
+    [@aria-describedby="name_help"]
+'
+        );
+    }
+
+    public function testHelpNotSetNotLinkedFromWidget()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        // Test if renderHelp method is implemented (throw SkippedTestError if not)
+        $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+'//input
+    [not(@aria-describedby)]
 '
         );
     }
@@ -1433,9 +1499,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="datetime"]
+    [@type="datetime-local"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06Z"]
+    [@value="2011-02-03T04:05:06"]
 '
         );
     }
@@ -1453,9 +1519,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="datetime"]
+    [@type="datetime-local"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06Z"]
+    [@value="2011-02-03T04:05:06"]
 '
         );
     }

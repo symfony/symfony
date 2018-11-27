@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests\Locale;
 
+use Symfony\Component\Intl\Locale\Locale;
+
 class LocaleTest extends AbstractLocaleTest
 {
     /**
@@ -19,6 +21,17 @@ class LocaleTest extends AbstractLocaleTest
     public function testAcceptFromHttp()
     {
         $this->call('acceptFromHttp', 'pt-br,en-us;q=0.7,en;q=0.5');
+    }
+
+    public function testCanonicalize()
+    {
+        $this->assertSame('en', $this->call('canonicalize', ''));
+        $this->assertSame('en', $this->call('canonicalize', '.utf8'));
+        $this->assertSame('fr_FR', $this->call('canonicalize', 'FR-fr'));
+        $this->assertSame('fr_FR', $this->call('canonicalize', 'FR-fr.utf8'));
+        $this->assertSame('uz_Latn', $this->call('canonicalize', 'UZ-lATN'));
+        $this->assertSame('uz_Cyrl_UZ', $this->call('canonicalize', 'UZ-cYRL-uz'));
+        $this->assertSame('123', $this->call('canonicalize', 123));
     }
 
     /**
@@ -159,8 +172,8 @@ class LocaleTest extends AbstractLocaleTest
 
     protected function call($methodName)
     {
-        $args = array_slice(func_get_args(), 1);
+        $args = \array_slice(\func_get_args(), 1);
 
-        return call_user_func_array(array('Symfony\Component\Intl\Locale\Locale', $methodName), $args);
+        return Locale::{$methodName}(...$args);
     }
 }

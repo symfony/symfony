@@ -34,6 +34,18 @@ class TimezoneTypeTest extends BaseTypeTest
         parent::testSubmitNull($expected, $norm, '');
     }
 
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'Africa/Kinshasa', $expectedData = 'Africa/Kinshasa')
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
     public function testDateTimeZoneInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), array('input' => 'datetimezone'));
@@ -53,6 +65,10 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertEquals(array(new \DateTimeZone('Europe/Amsterdam'), new \DateTimeZone('Europe/Paris')), $form->getData());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
+     */
     public function testFilterByRegions()
     {
         $choices = $this->factory->create(static::TESTED_TYPE, null, array('regions' => \DateTimeZone::EUROPE))

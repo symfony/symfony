@@ -13,8 +13,9 @@ namespace Symfony\Bridge\Monolog\Tests;
 
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Component\HttpFoundation\Request;
 
 class LoggerTest extends TestCase
 {
@@ -23,7 +24,7 @@ class LoggerTest extends TestCase
         $handler = new TestHandler();
         $logger = new Logger(__METHOD__, array($handler));
 
-        $this->assertTrue($logger->error('error message'));
+        $logger->error('error message');
         $this->assertSame(array(), $logger->getLogs());
     }
 
@@ -32,7 +33,7 @@ class LoggerTest extends TestCase
         $handler = new TestHandler();
         $logger = new Logger(__METHOD__, array($handler));
 
-        $this->assertTrue($logger->error('error message'));
+        $logger->error('error message');
         $this->assertSame(0, $logger->countErrors());
     }
 
@@ -42,8 +43,8 @@ class LoggerTest extends TestCase
         $processor = new DebugProcessor();
         $logger = new Logger(__METHOD__, array($handler), array($processor));
 
-        $this->assertTrue($logger->error('error message'));
-        $this->assertSame(1, count($logger->getLogs()));
+        $logger->error('error message');
+        $this->assertCount(1, $logger->getLogs());
     }
 
     public function testCountErrorsWithDebugProcessor()
@@ -52,15 +53,15 @@ class LoggerTest extends TestCase
         $processor = new DebugProcessor();
         $logger = new Logger(__METHOD__, array($handler), array($processor));
 
-        $this->assertTrue($logger->debug('test message'));
-        $this->assertTrue($logger->info('test message'));
-        $this->assertTrue($logger->notice('test message'));
-        $this->assertTrue($logger->warning('test message'));
+        $logger->debug('test message');
+        $logger->info('test message');
+        $logger->notice('test message');
+        $logger->warning('test message');
 
-        $this->assertTrue($logger->error('test message'));
-        $this->assertTrue($logger->critical('test message'));
-        $this->assertTrue($logger->alert('test message'));
-        $this->assertTrue($logger->emergency('test message'));
+        $logger->error('test message');
+        $logger->critical('test message');
+        $logger->alert('test message');
+        $logger->emergency('test message');
 
         $this->assertSame(4, $logger->countErrors());
     }
@@ -71,12 +72,27 @@ class LoggerTest extends TestCase
         $logger = new Logger('test', array($handler));
         $logger->pushProcessor(new DebugProcessor());
 
-        $logger->addInfo('test');
+        $logger->info('test');
         $this->assertCount(1, $logger->getLogs());
         list($record) = $logger->getLogs();
 
         $this->assertEquals('test', $record['message']);
         $this->assertEquals(Logger::INFO, $record['priority']);
+    }
+
+    public function testGetLogsWithDebugProcessor3()
+    {
+        $request = new Request();
+        $processor = $this->getMockBuilder(DebugProcessor::class)->getMock();
+        $processor->expects($this->once())->method('getLogs')->with($request);
+        $processor->expects($this->once())->method('countErrors')->with($request);
+
+        $handler = new TestHandler();
+        $logger = new Logger('test', array($handler));
+        $logger->pushProcessor($processor);
+
+        $logger->getLogs($request);
+        $logger->countErrors($request);
     }
 
     public function testClear()
@@ -85,10 +101,43 @@ class LoggerTest extends TestCase
         $logger = new Logger('test', array($handler));
         $logger->pushProcessor(new DebugProcessor());
 
-        $logger->addInfo('test');
+        $logger->info('test');
         $logger->clear();
 
         $this->assertEmpty($logger->getLogs());
         $this->assertSame(0, $logger->countErrors());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Bridge\Monolog\Logger::getLogs()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallGetLogsWithoutArgument()
+    {
+        $loggerChild = new ClassThatInheritLogger('test');
+        $loggerChild->getLogs();
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Bridge\Monolog\Logger::countErrors()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallCountErrorsWithoutArgument()
+    {
+        $loggerChild = new ClassThatInheritLogger('test');
+        $loggerChild->countErrors();
+    }
+}
+
+class ClassThatInheritLogger extends Logger
+{
+    public function getLogs()
+    {
+        parent::getLogs();
+    }
+
+    public function countErrors()
+    {
+        parent::countErrors();
     }
 }

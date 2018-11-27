@@ -8,14 +8,14 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
   Default          Value: null          %s 
                                         %s 
                    Closure(s): [        %s 
-                     Closure {          %s 
+                     Closure%s{%w
                        parameters: 1    %s 
-                       file: "%s%eExtension%eCore%eType%eFormType.php"                     
+                       file: "%s%eExtension%eCore%eType%eFormType.php"%w
                        line: "%s to %s" %s 
                      },                 %s 
-                     Closure {          %s 
+                     Closure%s{%w
                        parameters: 2    %s 
-                       file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php"  
+                       file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php"%w
                        line: "%s to %s" %s 
                      }                  %s 
                    ]                    %s 

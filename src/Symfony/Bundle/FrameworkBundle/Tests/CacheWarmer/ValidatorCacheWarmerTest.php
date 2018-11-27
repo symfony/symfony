@@ -13,7 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\ValidatorBuilder;
 
 class ValidatorCacheWarmerTest extends TestCase
@@ -29,26 +31,15 @@ class ValidatorCacheWarmerTest extends TestCase
         $file = sys_get_temp_dir().'/cache-validator.php';
         @unlink($file);
 
-        $fallbackPool = new ArrayAdapter();
-
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 
-        $values = require $file;
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
-        $this->assertInternalType('array', $values);
-        $this->assertCount(2, $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person', $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author', $values);
-
-        $values = $fallbackPool->getValues();
-
-        $this->assertInternalType('array', $values);
-        $this->assertCount(2, $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person', $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author', $values);
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
     public function testWarmUpWithAnnotations()
@@ -60,28 +51,17 @@ class ValidatorCacheWarmerTest extends TestCase
         $file = sys_get_temp_dir().'/cache-validator-with-annotations.php';
         @unlink($file);
 
-        $fallbackPool = new ArrayAdapter();
-
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
 
-        $values = require $file;
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
-        $this->assertInternalType('array', $values);
-        $this->assertCount(1, $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category', $values);
+        $item = $arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category');
+        $this->assertTrue($item->isHit());
 
-        // Simple check to make sure that at least one constraint is actually cached, in this case the "id" property Type.
-        $this->assertContains('"int"', $values['Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category']);
-
-        $values = $fallbackPool->getValues();
-
-        $this->assertInternalType('array', $values);
-        $this->assertCount(2, $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category', $values);
-        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.SubCategory', $values);
+        $this->assertInstanceOf(ClassMetadata::class, $item->get());
     }
 
     public function testWarmUpWithoutLoader()
@@ -91,21 +71,9 @@ class ValidatorCacheWarmerTest extends TestCase
         $file = sys_get_temp_dir().'/cache-validator-without-loaders.php';
         @unlink($file);
 
-        $fallbackPool = new ArrayAdapter();
-
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
-        $warmer->warmUp(dirname($file));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp(\dirname($file));
 
         $this->assertFileExists($file);
-
-        $values = require $file;
-
-        $this->assertInternalType('array', $values);
-        $this->assertCount(0, $values);
-
-        $values = $fallbackPool->getValues();
-
-        $this->assertInternalType('array', $values);
-        $this->assertCount(0, $values);
     }
 }

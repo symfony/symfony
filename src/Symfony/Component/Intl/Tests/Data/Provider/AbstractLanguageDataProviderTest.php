@@ -534,6 +534,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'sog',
         'sq',
         'sr',
+        'sr_ME',
         'srn',
         'srr',
         'ss',

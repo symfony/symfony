@@ -27,7 +27,7 @@ class VariableNodeDefinition extends NodeDefinition
      */
     protected function instantiateNode()
     {
-        return new VariableNode($this->name, $this->parent);
+        return new VariableNode($this->name, $this->parent, $this->pathSeparator);
     }
 
     /**

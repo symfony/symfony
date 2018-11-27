@@ -18,7 +18,7 @@ use Symfony\Component\Workflow\Workflow;
 /**
  * @author Andreas Kleemann <akleemann@inviqa.com>
  *
- * @deprecated since version 4.1, to be removed in 5.0. Use InstanceOfSupportStrategy instead
+ * @deprecated since Symfony 4.1, use InstanceOfSupportStrategy instead
  */
 final class ClassInstanceSupportStrategy implements SupportStrategyInterface
 {

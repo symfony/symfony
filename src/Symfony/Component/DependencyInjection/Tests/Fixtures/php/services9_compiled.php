@@ -19,11 +19,6 @@ class ProjectServiceContainer extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
-
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
@@ -53,6 +48,7 @@ class ProjectServiceContainer extends Container
             'lazy_context_ignore_invalid_ref' => 'getLazyContextIgnoreInvalidRefService',
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
+            'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
         );
@@ -61,12 +57,6 @@ class ProjectServiceContainer extends Container
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
         );
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
     }
 
     public function compile()
@@ -88,6 +78,7 @@ class ProjectServiceContainer extends Container
             'configurator_service_simple' => true,
             'decorated.pif-pouf' => true,
             'decorator_service.inner' => true,
+            'errored_definition' => true,
             'factory_simple' => true,
             'inlined' => true,
             'new_factory' => true,
@@ -241,7 +232,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = ($this->privates['factory_simple'] ?? $this->getFactorySimpleService())->getInstance();
+        return $this->services['factory_service_simple'] = $this->getFactorySimpleService()->getInstance();
     }
 
     /**
@@ -299,7 +290,6 @@ class ProjectServiceContainer extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a = new \Bar();
-
         $a->pub = 'pub';
         $a->setBaz(($this->services['baz'] ?? $this->getBazService()));
 
@@ -373,6 +363,16 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the public 'runtime_error' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getRuntimeErrorService()
+    {
+        return $this->services['runtime_error'] = new \stdClass($this->throw('Service "errored_definition" is broken.'));
+    }
+
+    /**
      * Gets the public 'service_from_static_method' shared service.
      *
      * @return \Bar\FooClass
@@ -406,7 +406,7 @@ class ProjectServiceContainer extends Container
     {
         @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 
-        return $this->privates['factory_simple'] = new \SimpleFactoryClass('foo');
+        return new \SimpleFactoryClass('foo');
     }
 
     public function getParameter($name)
@@ -454,7 +454,7 @@ class ProjectServiceContainer extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -477,5 +477,10 @@ class ProjectServiceContainer extends Container
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
         );
+    }
+
+    protected function throw($message)
+    {
+        throw new RuntimeException($message);
     }
 }

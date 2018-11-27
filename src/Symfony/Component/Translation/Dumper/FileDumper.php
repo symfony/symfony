@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Translation\Dumper;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\RuntimeException;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * FileDumper is an implementation of DumperInterface that dump a message catalogue to file(s).
@@ -45,13 +45,13 @@ abstract class FileDumper implements DumperInterface
     /**
      * Sets backup flag.
      *
-     * @param bool
+     * @param bool $backup
      *
-     * @deprecated since version 4.1, to be removed in 5.0
+     * @deprecated since Symfony 4.1
      */
     public function setBackup($backup)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
 
         if (false !== $backup) {
             throw new \LogicException('The backup feature is no longer supported.');
@@ -71,12 +71,31 @@ abstract class FileDumper implements DumperInterface
         foreach ($messages->getDomains() as $domain) {
             $fullpath = $options['path'].'/'.$this->getRelativePath($domain, $messages->getLocale());
             if (!file_exists($fullpath)) {
-                $directory = dirname($fullpath);
+                $directory = \dirname($fullpath);
                 if (!file_exists($directory) && !@mkdir($directory, 0777, true)) {
                     throw new RuntimeException(sprintf('Unable to create directory "%s".', $directory));
                 }
             }
-            // save file
+
+            $intlDomain = $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX;
+            $intlMessages = $messages->all($intlDomain);
+
+            if ($intlMessages) {
+                $intlPath = $options['path'].'/'.$this->getRelativePath($intlDomain, $messages->getLocale());
+                file_put_contents($intlPath, $this->formatCatalogue($messages, $intlDomain, $options));
+
+                $messages->replace(array(), $intlDomain);
+
+                try {
+                    if ($messages->all($domain)) {
+                        file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
+                    }
+                    continue;
+                } finally {
+                    $messages->replace($intlMessages, $intlDomain);
+                }
+            }
+
             file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
         }
     }

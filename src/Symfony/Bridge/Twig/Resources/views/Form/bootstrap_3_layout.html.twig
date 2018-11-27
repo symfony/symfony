@@ -14,6 +14,24 @@
     {{- parent() -}}
 {%- endblock button_widget %}
 
+{% block money_widget -%}
+    {% set prepend = not (money_pattern starts with '{{') %}
+    {% set append = not (money_pattern ends with '}}') %}
+    {% if prepend or append %}
+        <div class="input-group">
+            {% if prepend %}
+                <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
+            {% endif %}
+            {{- block('form_widget_simple') -}}
+            {% if append %}
+                <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
+            {% endif %}
+        </div>
+    {% else %}
+        {{- block('form_widget_simple') -}}
+    {% endif %}
+{%- endblock money_widget %}
+
 {% block checkbox_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {% if 'checkbox-inline' in parent_label_class %}
@@ -89,9 +107,14 @@
 {# Rows #}
 
 {% block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
         {{- form_label(form) -}}
-        {{- form_widget(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </div>
 {%- endblock form_row %}
@@ -149,3 +172,19 @@
     {% if form is not rootform %}</span>{% else %}</div>{% endif %}
     {%- endif %}
 {%- endblock form_errors %}
+
+{# Help #}
+
+{% block form_help -%}
+    {%- if help is not empty -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
+
+        <span id="{{ id }}_help" {% for attrname, attrvalue in help_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if translation_domain is same as(false) -%}
+                {{- help -}}
+            {%- else -%}
+                {{- help|trans({}, translation_domain) -}}
+            {%- endif -%}
+        </span>
+    {%- endif -%}
+{%- endblock form_help %}

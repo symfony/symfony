@@ -1,10 +1,10 @@
-<div class="trace-line-header break-long-words {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ prefix }}-{{ i }}" data-toggle-initial="{{ _display_code_snippet ? 'display' }}">
+<div class="trace-line-header break-long-words {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ prefix }}-{{ i }}" data-toggle-initial="{{ style == 'expanded' ? 'display' }}">
     {% if trace.file|default(false) %}
         <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
         <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>
     {% endif %}
 
-    {% if trace.function %}
+    {% if style != 'compact' and trace.function %}
         <span class="trace-class">{{ trace.class|abbr_class }}</span>{% if trace.type is not empty %}<span class="trace-type">{{ trace.type }}</span>{% endif %}<span class="trace-method">{{ trace.function }}</span><span class="trace-arguments">({{ trace.args|format_args }})</span>
     {% endif %}
 
@@ -17,6 +17,7 @@
         <span class="block trace-file-path">
             in
             <a href="{{ file_link }}">{{ file_path_parts[:-1]|join(constant('DIRECTORY_SEPARATOR')) }}{{ constant('DIRECTORY_SEPARATOR') }}<strong>{{ file_path_parts|last }}</strong></a>
+            {%- if style == 'compact' and trace.function %}<span class="trace-type">{{ trace.type }}</span><span class="trace-method">{{ trace.function }}</span>{% endif %}
             (line {{ line_number }})
         </span>
     {% endif %}

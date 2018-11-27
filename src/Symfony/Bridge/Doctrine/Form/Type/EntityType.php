@@ -28,8 +28,8 @@ class EntityType extends DoctrineType
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
-            if (is_callable($queryBuilder)) {
-                $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+            if (\is_callable($queryBuilder)) {
+                $queryBuilder = \call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
 
                 if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                     throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');

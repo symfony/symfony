@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use Guard instead.', SimpleAuthenticationHandler::class), E_USER_DEPRECATED);
 
 /**
  * Class to proxy authentication success/failure handlers.
@@ -26,6 +28,8 @@ use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
  * the default handlers are triggered.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since Symfony 4.2, use Guard instead.
  */
 class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterface, AuthenticationSuccessHandlerInterface
 {
@@ -55,7 +59,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     {
         if ($this->simpleAuthenticator instanceof AuthenticationSuccessHandlerInterface) {
             if ($this->logger) {
-                $this->logger->debug('Selected an authentication success handler.', array('handler' => get_class($this->simpleAuthenticator)));
+                $this->logger->debug('Selected an authentication success handler.', array('handler' => \get_class($this->simpleAuthenticator)));
             }
 
             $response = $this->simpleAuthenticator->onAuthenticationSuccess($request, $token);
@@ -64,7 +68,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
             }
 
             if (null !== $response) {
-                throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null to use the default success handler, or a Response object', get_class($this->simpleAuthenticator)));
+                throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null to use the default success handler, or a Response object', \get_class($this->simpleAuthenticator)));
             }
         }
 
@@ -82,7 +86,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     {
         if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {
             if ($this->logger) {
-                $this->logger->debug('Selected an authentication failure handler.', array('handler' => get_class($this->simpleAuthenticator)));
+                $this->logger->debug('Selected an authentication failure handler.', array('handler' => \get_class($this->simpleAuthenticator)));
             }
 
             $response = $this->simpleAuthenticator->onAuthenticationFailure($request, $exception);
@@ -91,7 +95,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
             }
 
             if (null !== $response) {
-                throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationFailure method must return null to use the default failure handler, or a Response object', get_class($this->simpleAuthenticator)));
+                throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationFailure method must return null to use the default failure handler, or a Response object', \get_class($this->simpleAuthenticator)));
             }
         }
 

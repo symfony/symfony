@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\AccountExpiredException;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
 
 /**
  * UserChecker checks the user account flags.
@@ -28,8 +28,12 @@ class UserChecker implements UserCheckerInterface
      */
     public function checkPreAuth(UserInterface $user)
     {
-        if (!$user instanceof AdvancedUserInterface) {
+        if (!$user instanceof AdvancedUserInterface && !$user instanceof User) {
             return;
+        }
+
+        if ($user instanceof AdvancedUserInterface && !$user instanceof User) {
+            @trigger_error(sprintf('Calling "%s()" with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.', __METHOD__), E_USER_DEPRECATED);
         }
 
         if (!$user->isAccountNonLocked()) {
@@ -56,8 +60,12 @@ class UserChecker implements UserCheckerInterface
      */
     public function checkPostAuth(UserInterface $user)
     {
-        if (!$user instanceof AdvancedUserInterface) {
+        if (!$user instanceof AdvancedUserInterface && !$user instanceof User) {
             return;
+        }
+
+        if ($user instanceof AdvancedUserInterface && !$user instanceof User) {
+            @trigger_error(sprintf('Calling "%s()" with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.', __METHOD__), E_USER_DEPRECATED);
         }
 
         if (!$user->isCredentialsNonExpired()) {

@@ -17,7 +17,11 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "doctrine/common": "~2.4",
+        "doctrine/collections": "~1.0",
+        "doctrine/event-manager": "~1.0",
+        "doctrine/persistence": "~1.0",
+        "symfony/contracts": "^1.0",
+        "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
@@ -25,6 +29,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/form": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/messenger": "~4.2",
         "symfony/property-access": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/proxy-manager-bridge": "~3.4|~4.0",
@@ -32,9 +37,12 @@
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/validator": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.6",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
-        "doctrine/orm": "^2.4.5"
+        "doctrine/orm": "^2.4.5",
+        "doctrine/reflection": "~1.0"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
@@ -57,7 +65,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

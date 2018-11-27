@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * AccessDecisionManager is the base class for all access decision managers
@@ -42,7 +42,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function __construct(iterable $voters = array(), string $strategy = self::STRATEGY_AFFIRMATIVE, bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
-        if (!is_callable(array($this, $strategyMethod))) {
+        if (!\is_callable(array($this, $strategyMethod))) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
 

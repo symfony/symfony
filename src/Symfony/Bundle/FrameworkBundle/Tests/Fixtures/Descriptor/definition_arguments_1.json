@@ -10,12 +10,12 @@
     "arguments": [
         {
             "type": "service",
-            "id": "definition2"
+            "id": ".definition_2"
         },
         "%parameter%",
         {
             "class": "inline_service",
-            "public": true,
+            "public": false,
             "synthetic": false,
             "lazy": false,
             "shared": true,
@@ -33,11 +33,11 @@
             "foo",
             {
                 "type": "service",
-                "id": "definition2"
+                "id": ".definition_2"
             },
             {
                 "class": "inline_service",
-                "public": true,
+                "public": false,
                 "synthetic": false,
                 "lazy": false,
                 "shared": true,
@@ -56,7 +56,7 @@
             },
             {
                 "type": "service",
-                "id": "definition_2"
+                "id": ".definition_2"
             }
         ]
     ],

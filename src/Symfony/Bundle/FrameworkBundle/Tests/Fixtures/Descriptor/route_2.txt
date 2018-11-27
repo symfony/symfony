@@ -1,17 +1,17 @@
-+--------------+---------------------------------------------------------+
-|[32m Property     [39m|[32m Value                                                   [39m|
-+--------------+---------------------------------------------------------+
-| Route Name   |                                                         |
-| Path         | /name/add                                               |
-| Path Regex   | #^/name/add$#s                                          |
-| Host         | localhost                                               |
-| Host Regex   | #^localhost$#si                                         |
-| Scheme       | http|https                                              |
-| Method       | PUT|POST                                                |
-| Requirements | NO CUSTOM                                               |
-| Class        | Symfony\Component\Routing\Route                         |
-| Defaults     | NONE                                                    |
-[39;49m| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler[39;49m[39;49m |[39;49m
-[39;49m|              | [39;49m[39;49mopt1: val1[39;49m[39;49m                                              |[39;49m
-[39;49m|              | [39;49mopt2: val2                                              |
-+--------------+---------------------------------------------------------+
++--------------+-------------------------------------------------------------------+
+|[32m Property     [39m|[32m Value                                                             [39m|
++--------------+-------------------------------------------------------------------+
+| Route Name   |                                                                   |
+| Path         | /name/add                                                         |
+| Path Regex   | #PATH_REGEX#                                                      |
+| Host         | localhost                                                         |
+| Host Regex   | #HOST_REGEX#                                                      |
+| Scheme       | http|https                                                        |
+| Method       | PUT|POST                                                          |
+| Requirements | NO CUSTOM                                                         |
+| Class        | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub |
+| Defaults     | NONE                                                              |
+[39;49m| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler[39;49m[39;49m           |[39;49m
+[39;49m|              | [39;49m[39;49mopt1: val1[39;49m[39;49m                                                        |[39;49m
+[39;49m|              | [39;49mopt2: val2                                                        |
++--------------+-------------------------------------------------------------------+

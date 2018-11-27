@@ -40,7 +40,7 @@ class EncoderFactory implements EncoderFactoryInterface
             $encoderKey = $encoderName;
         } else {
             foreach ($this->encoders as $class => $encoder) {
-                if ((is_object($user) && $user instanceof $class) || (!is_object($user) && (is_subclass_of($user, $class) || $user == $class))) {
+                if ((\is_object($user) && $user instanceof $class) || (!\is_object($user) && (is_subclass_of($user, $class) || $user == $class))) {
                     $encoderKey = $class;
                     break;
                 }
@@ -48,7 +48,7 @@ class EncoderFactory implements EncoderFactoryInterface
         }
 
         if (null === $encoderKey) {
-            throw new \RuntimeException(sprintf('No encoder has been configured for account "%s".', is_object($user) ? get_class($user) : $user));
+            throw new \RuntimeException(sprintf('No encoder has been configured for account "%s".', \is_object($user) ? \get_class($user) : $user));
         }
 
         if (!$this->encoders[$encoderKey] instanceof PasswordEncoderInterface) {
@@ -111,7 +111,11 @@ class EncoderFactory implements EncoderFactoryInterface
             case 'argon2i':
                 return array(
                     'class' => Argon2iPasswordEncoder::class,
-                    'arguments' => array(),
+                    'arguments' => array(
+                        $config['memory_cost'],
+                        $config['time_cost'],
+                        $config['threads'],
+                    ),
                 );
         }
 

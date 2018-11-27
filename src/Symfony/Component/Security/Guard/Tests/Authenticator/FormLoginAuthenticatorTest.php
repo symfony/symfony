@@ -91,12 +91,6 @@ class FormLoginAuthenticatorTest extends TestCase
             ->setDefaultSuccessRedirectUrl(self::DEFAULT_SUCCESS_URL)
         ;
     }
-
-    protected function tearDown()
-    {
-        $this->request = null;
-        $this->requestWithSession = null;
-    }
 }
 
 class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator

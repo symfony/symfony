@@ -13,17 +13,11 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LazyChoiceTypeExtension extends AbstractTypeExtension
 {
-    private $extendedType;
-
-    public function __construct($extendedType = ChoiceType::class)
-    {
-        $this->extendedType = $extendedType;
-    }
+    public static $extendedType;
 
     /**
      * {@inheritdoc}
@@ -41,8 +35,8 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return $this->extendedType;
+        return array(self::$extendedType);
     }
 }

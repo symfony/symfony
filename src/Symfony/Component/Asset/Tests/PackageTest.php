@@ -13,8 +13,8 @@ namespace Symfony\Component\Asset\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Package;
-use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class PackageTest extends TestCase
 {

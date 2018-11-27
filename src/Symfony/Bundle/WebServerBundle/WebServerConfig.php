@@ -32,7 +32,7 @@ class WebServerConfig
             throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: %s).', $documentRoot, implode(', ', $this->getFrontControllerFileNames($env))));
         }
 
-        putenv('APP_FRONT_CONTROLLER='.$file);
+        $_ENV['APP_FRONT_CONTROLLER'] = $file;
 
         $this->documentRoot = $documentRoot;
         $this->env = $env;
@@ -99,6 +99,22 @@ class WebServerConfig
     public function getAddress()
     {
         return $this->hostname.':'.$this->port;
+    }
+
+    /**
+     * @return string contains resolved hostname if available, empty string otherwise
+     */
+    public function getDisplayAddress()
+    {
+        if ('0.0.0.0' !== $this->hostname) {
+            return '';
+        }
+
+        if (false === $localHostname = gethostname()) {
+            return '';
+        }
+
+        return gethostbyname($localHostname).':'.$this->port;
     }
 
     private function findFrontController($documentRoot, $env)

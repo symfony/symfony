@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Simple;
 
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PdoTrait;
 
@@ -24,6 +25,9 @@ class PdoCache extends AbstractCache implements PruneableInterface
      * You can either pass an existing database connection as PDO instance or
      * a Doctrine DBAL Connection or a DSN string that will be used to
      * lazy-connect to the database when the cache is actually used.
+     *
+     * When a Doctrine DBAL Connection is passed, the cache table is created
+     * automatically when possible. Otherwise, use the createTable() method.
      *
      * List of available options:
      *  * db_table: The name of the table [default: cache_items]
@@ -41,8 +45,8 @@ class PdoCache extends AbstractCache implements PruneableInterface
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = array())
+    public function __construct($connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = array(), MarshallerInterface $marshaller = null)
     {
-        $this->init($connOrDsn, $namespace, $defaultLifetime, $options);
+        $this->init($connOrDsn, $namespace, $defaultLifetime, $options, $marshaller);
     }
 }

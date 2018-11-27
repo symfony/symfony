@@ -34,7 +34,7 @@ class TemplateFilenameParser implements TemplateNameParserInterface
         $parts = explode('/', str_replace('\\', '/', $name));
 
         $elements = explode('.', array_pop($parts));
-        if (3 > count($elements)) {
+        if (3 > \count($elements)) {
             return false;
         }
         $engine = array_pop($elements);

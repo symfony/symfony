@@ -1,7 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -10,30 +9,10 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 {
+    use PhpMatcherTrait;
+
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-    }
-
-    public function match($rawPathinfo)
-    {
-        $allow = array();
-        $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
-        $context = $this->context;
-        $request = $this->request;
-        $requestMethod = $canonicalMethod = $context->getMethod();
-        $scheme = $context->getScheme();
-
-        if ('HEAD' === $requestMethod) {
-            $canonicalMethod = 'GET';
-        }
-
-
-        if ('/' === $pathinfo) {
-            throw new Symfony\Component\Routing\Exception\NoConfigurationException();
-        }
-
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }

@@ -1,6 +1,56 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * using the default context is the new recommended way to configure normalizers and encoders
+ * added a `skip_null_values` context option to not serialize properties with a `null` values
+ * `AbstractNormalizer::handleCircularReference` is now final and receives
+   two optional extra arguments: the format and the context
+ * added support for XML comment encoding (encoding `['#comment' => ' foo ']` results `<!-- foo -->`)
+ * added optional `int[] $encoderIgnoredNodeTypes` argument to `XmlEncoder::__construct`
+   to configure node types to be ignored during encoding
+ * added `AdvancedNameConverterInterface` to access the class,
+   the format and the context in a name converter
+ * the `AbstractNormalizer::handleCircularReference()` method will have two new `$format`
+   and `$context` arguments in version 5.0, not defining them is deprecated
+ * deprecated creating a `Serializer` with normalizers which do not implement
+   either `NormalizerInterface` or `DenormalizerInterface`
+ * deprecated creating a `Serializer` with normalizers which do not implement
+   either `NormalizerInterface` or `DenormalizerInterface`
+ * deprecated creating a `Serializer` with encoders which do not implement
+   either `EncoderInterface` or `DecoderInterface`
+ * added the optional `$objectClassResolver` argument in `AbstractObjectNormalizer`
+   and `ObjectNormalizer` constructor
+ * added `MetadataAwareNameConverter` to configure the serialized name of properties through metadata
+ * `YamlEncoder` now handles the `.yml` extension too
+ * `AbstractNormalizer::$circularReferenceLimit`, `AbstractNormalizer::$circularReferenceHandler`,
+   `AbstractNormalizer::$callbacks`, `AbstractNormalizer::$ignoredAttributes`,
+   `AbstractNormalizer::$camelizedAttributes`, `AbstractNormalizer::setCircularReferenceLimit()`,
+   `AbstractNormalizer::setCircularReferenceHandler()`, `AbstractNormalizer::setCallbacks()` and
+   `AbstractNormalizer::setIgnoredAttributes()` are deprecated, use the default context instead.
+ * `AbstractObjectNormalizer::$maxDepthHandler` and `AbstractObjectNormalizer::setMaxDepthHandler()`
+   are deprecated, use the default context instead.
+ * passing configuration options directly to the constructor of `CsvEncoder`, `JsonDecode` and
+   `XmlEncoder` is deprecated since Symfony 4.2, use the default context instead.
+
+4.1.0
+-----
+
+ * added `CacheableSupportsMethodInterface` for normalizers and denormalizers that use
+   only the type and the format in their `supports*()` methods
+ * added `MissingConstructorArgumentsException` new exception for deserialization failure
+   of objects that needs data insertion in constructor
+ * added an optional `default_constructor_arguments` option of context to specify a default data in
+   case the object is not initializable by its constructor because of data missing
+ * added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
+ * added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
+   maximum depth is reached
+ * added optional `int[] $ignoredNodeTypes` argument to `XmlEncoder::__construct`. XML decoding now
+   ignores comment node types by default.
+ * added `ConstraintViolationListNormalizer`
+
 4.0.0
 -----
 
@@ -20,7 +70,8 @@ CHANGELOG
  * added support for serializing `DateInterval` objects
  * added getter for extra attributes in `ExtraAttributesException`
  * improved `CsvEncoder` to handle variable nested structures
- * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable 
+ * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable
+ * added `$context` when checking for encoding, decoding and normalizing in `Serializer`
 
 3.3.0
 -----

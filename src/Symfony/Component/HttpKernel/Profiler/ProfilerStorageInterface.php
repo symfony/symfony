@@ -14,6 +14,14 @@ namespace Symfony\Component\HttpKernel\Profiler;
 /**
  * ProfilerStorageInterface.
  *
+ * This interface exists for historical reasons. The only supported
+ * implementation is FileProfilerStorage.
+ *
+ * As the profiler must only be used on non-production servers, the file storage
+ * is more than enough and no other implementations will ever be supported.
+ *
+ * @internal since 4.2
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface ProfilerStorageInterface

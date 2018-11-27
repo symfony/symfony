@@ -69,7 +69,7 @@ class TraceableUrlMatcher extends UrlMatcher
                     $r = new Route($route->getPath(), $route->getDefaults(), array($n => $regex), $route->getOptions());
                     $cr = $r->compile();
 
-                    if (in_array($n, $cr->getVariables()) && !preg_match($cr->getRegex(), $pathinfo)) {
+                    if (\in_array($n, $cr->getVariables()) && !preg_match($cr->getRegex(), $pathinfo)) {
                         $this->addTrace(sprintf('Requirement for "%s" does not match (%s)', $n, $regex), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
                         continue 2;
@@ -94,7 +94,7 @@ class TraceableUrlMatcher extends UrlMatcher
                     $method = 'GET';
                 }
 
-                if (!in_array($method, $requiredMethods)) {
+                if (!\in_array($method, $requiredMethods)) {
                     $this->allow = array_merge($this->allow, $requiredMethods);
 
                     $this->addTrace(sprintf('Method "%s" does not match any of the required methods (%s)', $this->context->getMethod(), implode(', ', $requiredMethods)), self::ROUTE_ALMOST_MATCHES, $name, $route);

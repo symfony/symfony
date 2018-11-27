@@ -43,9 +43,9 @@ class XPathExpr
         return $this->element;
     }
 
-    public function addCondition(string $condition): XPathExpr
+    public function addCondition(string $condition): self
     {
-        $this->condition = $this->condition ? sprintf('%s and (%s)', $this->condition, $condition) : $condition;
+        $this->condition = $this->condition ? sprintf('(%s) and (%s)', $this->condition, $condition) : $condition;
 
         return $this;
     }
@@ -55,7 +55,7 @@ class XPathExpr
         return $this->condition;
     }
 
-    public function addNameTest(): XPathExpr
+    public function addNameTest(): self
     {
         if ('*' !== $this->element) {
             $this->addCondition('name() = '.Translator::getXpathLiteral($this->element));
@@ -65,7 +65,7 @@ class XPathExpr
         return $this;
     }
 
-    public function addStarPrefix(): XPathExpr
+    public function addStarPrefix(): self
     {
         $this->path .= '*/';
 
@@ -77,7 +77,7 @@ class XPathExpr
      *
      * @return $this
      */
-    public function join(string $combiner, XPathExpr $expr): XPathExpr
+    public function join(string $combiner, self $expr): self
     {
         $path = $this->__toString().$combiner;
 

@@ -21,9 +21,9 @@ interface DumperInterface
     /**
      * Dumps a scalar value.
      *
-     * @param Cursor $cursor The Cursor position in the dump
-     * @param string $type   The PHP type of the value being dumped
-     * @param scalar $value  The scalar value being dumped
+     * @param Cursor                $cursor The Cursor position in the dump
+     * @param string                $type   The PHP type of the value being dumped
+     * @param string|int|float|bool $value  The scalar value being dumped
      */
     public function dumpScalar(Cursor $cursor, $type, $value);
 

@@ -1,7 +1,0 @@
-SVN information
-===============
-
-URL: http://source.icu-project.org/repos/icu/tags/release-60-2/icu4c/source
-Revision: 40727
-Author: yoshito
-Date: 2017-12-13T20:01:38.026283Z

@@ -16,7 +16,7 @@
             <tag name="monolog.logger" channel="php" />
             <argument>null</argument><!-- Exception handler -->
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>-1</argument><!-- Log levels map for enabled error levels -->
+            <argument>null</argument><!-- Log levels map for enabled error levels -->
             <argument>%debug.error_handler.throw_at%</argument>
             <argument>true</argument>
             <argument type="service" id="debug.file_link_formatter"></argument>

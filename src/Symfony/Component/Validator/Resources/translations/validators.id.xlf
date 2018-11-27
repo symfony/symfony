@@ -314,6 +314,10 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Ini bukan Business Identifier Code (BIC) yang sah.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Galat</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

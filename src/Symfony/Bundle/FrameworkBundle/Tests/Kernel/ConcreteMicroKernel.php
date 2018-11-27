@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -72,8 +72,8 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->add('/', 'kernel:halloweenAction');
-        $routes->add('/danger', 'kernel:dangerousAction');
+        $routes->add('/', 'kernel::halloweenAction');
+        $routes->add('/danger', 'kernel::dangerousAction');
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)

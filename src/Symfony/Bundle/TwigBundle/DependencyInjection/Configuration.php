@@ -29,12 +29,12 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('twig');
+        $treeBuilder = new TreeBuilder('twig');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
-                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
+                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception::showAction')->end()
             ->end()
         ;
 
@@ -54,9 +54,9 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form_themes')
                     ->addDefaultChildrenIfNoneSet()
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
-                    ->example(array('MyBundle::form.html.twig'))
+                    ->example(array('@My/form.html.twig'))
                     ->validate()
-                        ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                        ->ifTrue(function ($v) { return !\in_array('form_div_layout.html.twig', $v); })
                         ->then(function ($v) {
                             return array_merge(array('form_div_layout.html.twig'), $v);
                         })
@@ -76,8 +76,9 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
+                        ->normalizeKeys(false)
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return is_string($v) && 0 === strpos($v, '@'); })
+                            ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {
                                 if (0 === strpos($v, '@@')) {
                                     return substr($v, 1);
@@ -88,7 +89,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                if (is_array($v)) {
+                                if (\is_array($v)) {
                                     $keys = array_keys($v);
                                     sort($keys);
 
@@ -127,7 +128,13 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
-                ->booleanNode('strict_variables')->end()
+                ->booleanNode('strict_variables')
+                    ->defaultValue(function () {
+                        @trigger_error('Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.', E_USER_DEPRECATED);
+
+                        return false;
+                    })
+                ->end()
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
                 ->scalarNode('default_path')
@@ -142,7 +149,7 @@ class Configuration implements ConfigurationInterface
                         ->then(function ($paths) {
                             $normalized = array();
                             foreach ($paths as $path => $namespace) {
-                                if (is_array($namespace)) {
+                                if (\is_array($namespace)) {
                                     // xml
                                     $path = $namespace['value'];
                                     $namespace = $namespace['namespace'];

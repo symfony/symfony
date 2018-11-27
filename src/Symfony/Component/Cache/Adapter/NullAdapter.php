@@ -13,11 +13,12 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
-class NullAdapter implements AdapterInterface
+class NullAdapter implements AdapterInterface, CacheInterface
 {
     private $createCacheItem;
 
@@ -34,6 +35,14 @@ class NullAdapter implements AdapterInterface
             $this,
             CacheItem::class
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
+    {
+        return $callback(($this->createCacheItem)());
     }
 
     /**
@@ -108,6 +117,14 @@ class NullAdapter implements AdapterInterface
     public function commit()
     {
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $key): bool
+    {
+        return $this->deleteItem($key);
     }
 
     private function generateItems(array $keys)

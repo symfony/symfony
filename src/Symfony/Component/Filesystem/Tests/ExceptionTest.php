@@ -12,8 +12,8 @@
 namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Test class for Filesystem.

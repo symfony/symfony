@@ -21,6 +21,8 @@ class FooTestCase
     {
         @trigger_error('silenced foo deprecation', E_USER_DEPRECATED);
         trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+        @trigger_error('silenced foo deprecation', E_USER_DEPRECATED);
+        trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
     }
 
     public function testNonLegacyBar()

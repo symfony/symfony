@@ -19,6 +19,6 @@ class AnnotationReaderPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         // simulate using "annotation_reader" in a compiler pass
-        $container->get('annotation_reader');
+        $container->get('test.annotation_reader');
     }
 }

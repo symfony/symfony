@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,9 +20,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\RebootableInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Clear and Warmup the cache.
@@ -29,7 +30,7 @@ use Symfony\Component\Finder\Finder;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class CacheClearCommand extends Command
 {
@@ -73,6 +74,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $fs = $this->filesystem;
         $io = new SymfonyStyle($input, $output);
 
         $kernel = $this->getApplication()->getKernel();
@@ -80,13 +82,10 @@ EOF
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
         $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
+        $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
-        }
-
-        if ($this->filesystem->exists($oldCacheDir)) {
-            $this->filesystem->remove($oldCacheDir);
+            throw new RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
@@ -95,20 +94,80 @@ EOF
         // The current event dispatcher is stale, let's not use it anymore
         $this->getApplication()->setDispatcher(new EventDispatcher());
 
-        if ($input->getOption('no-warmup')) {
-            $this->filesystem->rename($realCacheDir, $oldCacheDir);
+        $containerFile = (new \ReflectionObject($kernel->getContainer()))->getFileName();
+        $containerDir = basename(\dirname($containerFile));
+
+        // the warmup cache dir name must have the same length as the real one
+        // to avoid the many problems in serialized resources files
+        $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
+
+        if ($output->isVerbose() && $fs->exists($warmupDir)) {
+            $io->comment('Clearing outdated warmup directory...');
+        }
+        $fs->remove($warmupDir);
+
+        if ($_SERVER['REQUEST_TIME'] <= filemtime($containerFile) && filemtime($containerFile) <= time()) {
+            if ($output->isVerbose()) {
+                $io->comment('Cache is fresh.');
+            }
+            if (!$input->getOption('no-warmup') && !$input->getOption('no-optional-warmers')) {
+                if ($output->isVerbose()) {
+                    $io->comment('Warming up optional cache...');
+                }
+                $warmer = $kernel->getContainer()->get('cache_warmer');
+                // non optional warmers already ran during container compilation
+                $warmer->enableOnlyOptionalWarmers();
+                $warmer->warmUp($realCacheDir);
+            }
         } else {
-            $this->warmupCache($input, $output, $realCacheDir, $oldCacheDir);
-        }
+            $fs->mkdir($warmupDir);
 
-        if ($output->isVerbose()) {
-            $io->comment('Removing old cache directory...');
-        }
+            if (!$input->getOption('no-warmup')) {
+                if ($output->isVerbose()) {
+                    $io->comment('Warming up cache...');
+                }
+                $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
+            }
 
-        try {
-            $this->filesystem->remove($oldCacheDir);
-        } catch (IOException $e) {
-            $io->warning($e->getMessage());
+            if (!$fs->exists($warmupDir.'/'.$containerDir)) {
+                $fs->rename($realCacheDir.'/'.$containerDir, $warmupDir.'/'.$containerDir);
+                touch($warmupDir.'/'.$containerDir.'.legacy');
+            }
+
+            if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
+                foreach ($mounts as $mount) {
+                    $mount = \array_slice(explode(' ', $mount), 1, -3);
+                    if (!\in_array(array_pop($mount), array('vboxsf', 'nfs'))) {
+                        continue;
+                    }
+                    $mount = implode(' ', $mount).'/';
+
+                    if (0 === strpos($realCacheDir, $mount)) {
+                        $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
+                        $oldCacheDir = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($oldCacheDir) {
+                $fs->rename($realCacheDir, $oldCacheDir);
+            } else {
+                $fs->remove($realCacheDir);
+            }
+            $fs->rename($warmupDir, $realCacheDir);
+
+            if ($output->isVerbose()) {
+                $io->comment('Removing old cache directory...');
+            }
+
+            try {
+                $fs->remove($oldCacheDir);
+            } catch (IOException $e) {
+                if ($output->isVerbose()) {
+                    $io->warning($e->getMessage());
+                }
+            }
         }
 
         if ($output->isVerbose()) {
@@ -116,34 +175,6 @@ EOF
         }
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-    }
-
-    private function warmupCache(InputInterface $input, OutputInterface $output, string $realCacheDir, string $oldCacheDir)
-    {
-        $io = new SymfonyStyle($input, $output);
-
-        // the warmup cache dir name must have the same length than the real one
-        // to avoid the many problems in serialized resources files
-        $realCacheDir = realpath($realCacheDir);
-        $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
-
-        if ($this->filesystem->exists($warmupDir)) {
-            if ($output->isVerbose()) {
-                $io->comment('Clearing outdated warmup directory...');
-            }
-            $this->filesystem->remove($warmupDir);
-        }
-
-        if ($output->isVerbose()) {
-            $io->comment('Warming up cache...');
-        }
-        $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
-
-        $this->filesystem->rename($realCacheDir, $oldCacheDir);
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            sleep(1);  // workaround for Windows PHP rename bug
-        }
-        $this->filesystem->rename($warmupDir, $realCacheDir);
     }
 
     private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true)
@@ -156,11 +187,12 @@ EOF
         $kernel->reboot($warmupDir);
 
         // warmup temporary dir
-        $warmer = $kernel->getContainer()->get('cache_warmer');
         if ($enableOptionalWarmers) {
-            $warmer->enableOptionalWarmers();
+            $warmer = $kernel->getContainer()->get('cache_warmer');
+            // non optional warmers already ran during container compilation
+            $warmer->enableOnlyOptionalWarmers();
+            $warmer->warmUp($warmupDir);
         }
-        $warmer->warmUp($warmupDir);
 
         // fix references to cached files with the real cache directory name
         $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));

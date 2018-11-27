@@ -1,6 +1,10 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.43.65",
     "Names": {
+        "AMD": [
+            "AMD",
+            "dram"
+        ],
         "JPY": [
             "¥",
             "yen"
@@ -8,6 +12,10 @@
         "MYR": [
             "MYR",
             "ringit"
+        ],
+        "STN": [
+            "STN",
+            "dobra santotomense"
         ],
         "THB": [
             "THB",

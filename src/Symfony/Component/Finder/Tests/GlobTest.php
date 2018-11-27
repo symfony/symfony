@@ -32,9 +32,9 @@ class GlobTest extends TestCase
         $regex = Glob::toRegex('/**/*.neon');
 
         foreach ($finder->in(__DIR__) as $k => $v) {
-            $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            $k = str_replace(\DIRECTORY_SEPARATOR, '/', $k);
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);
@@ -49,9 +49,9 @@ class GlobTest extends TestCase
         $regex = Glob::toRegex('/**/*.neon', false);
 
         foreach ($finder->in(__DIR__) as $k => $v) {
-            $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            $k = str_replace(\DIRECTORY_SEPARATOR, '/', $k);
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);
@@ -66,9 +66,9 @@ class GlobTest extends TestCase
         $regex = Glob::toRegex('/Fixtures/one/**');
 
         foreach ($finder->in(__DIR__) as $k => $v) {
-            $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            $k = str_replace(\DIRECTORY_SEPARATOR, '/', $k);
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);
@@ -83,9 +83,9 @@ class GlobTest extends TestCase
         $regex = Glob::toRegex('/Fixtures/one/**', false);
 
         foreach ($finder->in(__DIR__) as $k => $v) {
-            $k = str_replace(DIRECTORY_SEPARATOR, '/', $k);
-            if (preg_match($regex, substr($k, strlen(__DIR__)))) {
-                $match[] = substr($k, 10 + strlen(__DIR__));
+            $k = str_replace(\DIRECTORY_SEPARATOR, '/', $k);
+            if (preg_match($regex, substr($k, \strlen(__DIR__)))) {
+                $match[] = substr($k, 10 + \strlen(__DIR__));
             }
         }
         sort($match);

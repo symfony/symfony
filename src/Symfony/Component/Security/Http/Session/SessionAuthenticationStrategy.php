@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Session;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The default session strategy implementation.
@@ -47,6 +47,8 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
                 return;
 
             case self::MIGRATE:
+                // Note: this logic is duplicated in several authentication listeners
+                // until Symfony 5.0 due to a security fix with BC compat
                 $request->getSession()->migrate(true);
 
                 return;

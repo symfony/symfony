@@ -47,6 +47,16 @@ class Dummy extends ParentDummy
     public $collection;
 
     /**
+     * @var string[][]
+     */
+    public $nestedCollection;
+
+    /**
+     * @var mixed[]
+     */
+    public $mixedCollection;
+
+    /**
      * @var ParentDummy
      */
     public $B;
@@ -69,11 +79,41 @@ class Dummy extends ParentDummy
     public $g;
 
     /**
+     * @var ?string
+     */
+    public $h;
+
+    /**
+     * @var ?string|int
+     */
+    public $i;
+
+    /**
+     * @var ?\DateTime
+     */
+    public $j;
+
+    /**
      * This should not be removed.
      *
      * @var
      */
     public $emptyVar;
+
+    /**
+     * @var \Iterator<string>
+     */
+    public $iteratorCollection;
+
+    /**
+     * @var \Iterator<integer,string>
+     */
+    public $iteratorCollectionWithKey;
+
+    /**
+     * @var \Iterator<integer,\Iterator<integer,string>>
+     */
+    public $nestedIterators;
 
     public static function getStatic()
     {
@@ -125,6 +165,20 @@ class Dummy extends ParentDummy
     }
 
     public function get123()
+    {
+    }
+
+    /**
+     * @param self $self
+     */
+    public function setSelf(self $self)
+    {
+    }
+
+    /**
+     * @param parent $realParent
+     */
+    public function setRealParent(parent $realParent)
     {
     }
 }

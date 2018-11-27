@@ -12,9 +12,9 @@
 namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Tests\Resource\ResourceStub;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
+use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ResourceCheckerConfigCacheTest extends TestCase
 {

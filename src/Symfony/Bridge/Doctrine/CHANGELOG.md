@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`,
+   an instance of `EntityManagerInterface` should be injected instead
+ * added support for `simple_array` type
+ * the `DoctrineTransactionMiddlewareFactory` class has been removed
+
+4.1.0
+-----
+
+ * added support for datetime immutable types in form type guesser
+
 4.0.0
 -----
 

@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * UrlGenerator can generate a URL or a path for any route in the RouteCollection
@@ -36,6 +36,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected $strictRequirements = true;
 
     protected $logger;
+
+    private $defaultLocale;
 
     /**
      * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
@@ -65,11 +67,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     );
 
-    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null)
+    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->routes = $routes;
         $this->context = $context;
         $this->logger = $logger;
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -109,7 +112,21 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
-        if (null === $route = $this->routes->get($name)) {
+        $route = null;
+        $locale = $parameters['_locale']
+            ?? $this->context->getParameter('_locale')
+            ?: $this->defaultLocale;
+
+        if (null !== $locale) {
+            do {
+                if (null !== ($route = $this->routes->get($name.'.'.$locale)) && $route->getDefault('_canonical_route') === $name) {
+                    unset($parameters['_locale']);
+                    break;
+                }
+            } while (false !== $locale = strstr($locale, '_', true));
+        }
+
+        if (null === $route = $route ?? $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 
@@ -181,57 +198,56 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $schemeAuthority = '';
-        if ($host = $this->context->getHost()) {
-            $scheme = $this->context->getScheme();
+        $host = $this->context->getHost();
+        $scheme = $this->context->getScheme();
 
-            if ($requiredSchemes) {
-                if (!in_array($scheme, $requiredSchemes, true)) {
-                    $referenceType = self::ABSOLUTE_URL;
-                    $scheme = current($requiredSchemes);
-                }
+        if ($requiredSchemes) {
+            if (!\in_array($scheme, $requiredSchemes, true)) {
+                $referenceType = self::ABSOLUTE_URL;
+                $scheme = current($requiredSchemes);
             }
+        }
 
-            if ($hostTokens) {
-                $routeHost = '';
-                foreach ($hostTokens as $token) {
-                    if ('variable' === $token[0]) {
-                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
-                            if ($this->strictRequirements) {
-                                throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
-                            }
-
-                            if ($this->logger) {
-                                $this->logger->error($message, array('parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]));
-                            }
-
-                            return;
+        if ($hostTokens) {
+            $routeHost = '';
+            foreach ($hostTokens as $token) {
+                if ('variable' === $token[0]) {
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
                         }
 
-                        $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
-                    } else {
-                        $routeHost = $token[1].$routeHost;
-                    }
-                }
+                        if ($this->logger) {
+                            $this->logger->error($message, array('parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]));
+                        }
 
-                if ($routeHost !== $host) {
-                    $host = $routeHost;
-                    if (self::ABSOLUTE_URL !== $referenceType) {
-                        $referenceType = self::NETWORK_PATH;
+                        return;
                     }
+
+                    $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
+                } else {
+                    $routeHost = $token[1].$routeHost;
                 }
             }
 
-            if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
-                $port = '';
-                if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
-                    $port = ':'.$this->context->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
-                    $port = ':'.$this->context->getHttpsPort();
+            if ($routeHost !== $host) {
+                $host = $routeHost;
+                if (self::ABSOLUTE_URL !== $referenceType) {
+                    $referenceType = self::NETWORK_PATH;
                 }
-
-                $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
-                $schemeAuthority .= $host.$port;
             }
+        }
+
+        if ((self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) && !empty($host)) {
+            $port = '';
+            if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
+                $port = ':'.$this->context->getHttpPort();
+            } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
+                $port = ':'.$this->context->getHttpsPort();
+            }
+
+            $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
+            $schemeAuthority .= $host.$port;
         }
 
         if (self::RELATIVE_PATH === $referenceType) {
@@ -246,10 +262,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         });
 
         // extract fragment
-        $fragment = '';
-        if (isset($defaults['_fragment'])) {
-            $fragment = $defaults['_fragment'];
-        }
+        $fragment = $defaults['_fragment'] ?? '';
 
         if (isset($extra['_fragment'])) {
             $fragment = $extra['_fragment'];
@@ -309,7 +322,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $targetDirs[] = $targetFile;
-        $path = str_repeat('../', count($sourceDirs)).implode('/', $targetDirs);
+        $path = str_repeat('../', \count($sourceDirs)).implode('/', $targetDirs);
 
         // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used

@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Värdet är inte en giltig epost-adress.</target>
+                <target>Värdet är inte en giltig e-postadress.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -313,6 +313,10 @@
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Detta är inte en giltig BIC-kod.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Fel</target>
             </trans-unit>
         </body>
     </file>

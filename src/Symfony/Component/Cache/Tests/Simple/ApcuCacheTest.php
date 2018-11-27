@@ -23,10 +23,10 @@ class ApcuCacheTest extends CacheTestCase
 
     public function createSimpleCache($defaultLifetime = 0)
     {
-        if (!function_exists('apcu_fetch') || !ini_get('apc.enabled') || ('cli' === PHP_SAPI && !ini_get('apc.enable_cli'))) {
+        if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) || ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
             $this->markTestSkipped('APCu extension is required.');
         }
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Fails transiently on Windows.');
         }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
@@ -28,5 +29,41 @@ class SemaphoreStoreTest extends AbstractStoreTest
     protected function getStore()
     {
         return new SemaphoreStore();
+    }
+
+    public function testResourceRemoval()
+    {
+        $initialCount = $this->getOpenedSemaphores();
+        $store = new SemaphoreStore();
+        $key = new Key(uniqid(__METHOD__, true));
+        $store->waitAndSave($key);
+
+        $this->assertGreaterThan($initialCount, $this->getOpenedSemaphores(), 'Semaphores should have been created');
+
+        $store->delete($key);
+        $this->assertEquals($initialCount, $this->getOpenedSemaphores(), 'All semaphores should be removed');
+    }
+
+    private function getOpenedSemaphores()
+    {
+        if ('Darwin' === PHP_OS) {
+            $lines = explode(PHP_EOL, trim(`ipcs -s`));
+            if (-1 === $start = array_search('Semaphores:', $lines)) {
+                throw new \Exception('Failed to extract list of opened semaphores. Expected a Semaphore list, got '.implode(PHP_EOL, $lines));
+            }
+
+            return \count(\array_slice($lines, ++$start));
+        }
+
+        $lines = explode(PHP_EOL, trim(`LC_ALL=C ipcs -su`));
+        if ('------ Semaphore Status --------' !== $lines[0]) {
+            throw new \Exception('Failed to extract list of opened semaphores. Expected a Semaphore status, got '.implode(PHP_EOL, $lines));
+        }
+        list($key, $value) = explode(' = ', $lines[1]);
+        if ('used arrays' !== $key) {
+            throw new \Exception('Failed to extract list of opened semaphores. Expected a "used arrays" key, got '.implode(PHP_EOL, $lines));
+        }
+
+        return (int) $value;
     }
 }

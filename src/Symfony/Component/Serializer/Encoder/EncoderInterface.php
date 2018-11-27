@@ -27,7 +27,7 @@ interface EncoderInterface
      * @param string $format  Format name
      * @param array  $context Options that normalizers/encoders have access to
      *
-     * @return scalar
+     * @return string|int|float|bool
      *
      * @throws UnexpectedValueException
      */

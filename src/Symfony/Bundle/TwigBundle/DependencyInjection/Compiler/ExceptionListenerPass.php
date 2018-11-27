@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Registers the Twig exception listener if Twig is registered as a templating engine.
@@ -32,7 +32,7 @@ class ExceptionListenerPass implements CompilerPassInterface
             $container->removeDefinition('twig.exception_listener');
         } elseif ($container->hasParameter('templating.engines')) {
             $engines = $container->getParameter('templating.engines');
-            if (!in_array('twig', $engines)) {
+            if (!\in_array('twig', $engines)) {
                 $container->removeDefinition('twig.exception_listener');
             }
         }

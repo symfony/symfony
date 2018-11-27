@@ -21,6 +21,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @group legacy
+ */
 class SecurityUserValueResolverTest extends TestCase
 {
     public function testResolveNoToken()
@@ -40,7 +43,7 @@ class SecurityUserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new SecurityUserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', get_class($mock), false, false, null);
+        $metadata = new ArgumentMetadata('foo', \get_class($mock), false, false, null);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }

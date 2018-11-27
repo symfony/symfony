@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Compiler pass to register tagged services that require a service locator.
@@ -56,27 +56,27 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         }
         $class = $value->getClass();
 
-        if (!is_subclass_of($class, ServiceSubscriberInterface::class)) {
-            if (!class_exists($class, false)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $this->currentId));
-            }
-
+        if (!$r = $this->container->getReflectionClass($class)) {
+            throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $this->currentId));
+        }
+        if (!$r->isSubclassOf(ServiceSubscriberInterface::class)) {
             throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $this->currentId, ServiceSubscriberInterface::class));
         }
-        $this->container->addObjectResource($class);
+        $class = $r->name;
+
         $subscriberMap = array();
-        $declaringClass = (new \ReflectionMethod($class, 'getSubscribedServices'))->class;
 
         foreach ($class::getSubscribedServices() as $key => $type) {
-            if (!is_string($type) || !preg_match('/^\??[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $type)) {
-                throw new InvalidArgumentException(sprintf('"%s::getSubscribedServices()" must return valid PHP types for service "%s" key "%s", "%s" returned.', $class, $this->currentId, $key, is_string($type) ? $type : gettype($type)));
+            if (!\is_string($type) || !preg_match('/^\??[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $type)) {
+                throw new InvalidArgumentException(sprintf('"%s::getSubscribedServices()" must return valid PHP types for service "%s" key "%s", "%s" returned.', $class, $this->currentId, $key, \is_string($type) ? $type : \gettype($type)));
             }
             if ($optionalBehavior = '?' === $type[0]) {
                 $type = substr($type, 1);
                 $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             }
-            if (is_int($key)) {
+            if (\is_int($name = $key)) {
                 $key = $type;
+                $name = null;
             }
             if (!isset($serviceMap[$key])) {
                 if (!$autowire) {
@@ -85,12 +85,18 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $serviceMap[$key] = new Reference($type);
             }
 
-            $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $declaringClass, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+            if (false !== $i = strpos($name, '::get')) {
+                $name = lcfirst(substr($name, 5 + $i));
+            } elseif (false !== strpos($name, '::')) {
+                $name = null;
+            }
+
+            $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $name);
             unset($serviceMap[$key]);
         }
 
         if ($serviceMap = array_keys($serviceMap)) {
-            $message = sprintf(1 < count($serviceMap) ? 'keys "%s" do' : 'key "%s" does', str_replace('%', '%%', implode('", "', $serviceMap)));
+            $message = sprintf(1 < \count($serviceMap) ? 'keys "%s" do' : 'key "%s" does', str_replace('%', '%%', implode('", "', $serviceMap)));
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 

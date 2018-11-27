@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.43.50",
     "Names": {
         "AC": "Otok Ascension",
         "AD": "Andora",
@@ -72,7 +72,6 @@
         "ER": "Eritreja",
         "ES": "Španjolska",
         "ET": "Etiopija",
-        "EZ": "eurozona",
         "FI": "Finska",
         "FJ": "Fidži",
         "FK": "Falklandski otoci",
@@ -186,7 +185,7 @@
         "PM": "Sveti Petar i Mikelon",
         "PN": "Otoci Pitcairn",
         "PR": "Portoriko",
-        "PS": "Palestinsko Područje",
+        "PS": "Palestinsko područje",
         "PT": "Portugal",
         "PW": "Palau",
         "PY": "Paragvaj",
@@ -237,7 +236,6 @@
         "UA": "Ukrajina",
         "UG": "Uganda",
         "UM": "Mali udaljeni otoci SAD-a",
-        "UN": "Ujedinjeni narodi",
         "US": "Sjedinjene Američke Države",
         "UY": "Urugvaj",
         "UZ": "Uzbekistan",

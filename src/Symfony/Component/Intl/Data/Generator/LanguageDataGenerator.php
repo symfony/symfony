@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Intl\Data\Generator;
 
+use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\RuntimeException;
-use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 
 /**
  * The rule for compiling the language bundle.
@@ -82,6 +82,12 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'za' => 'zha',
         'zh' => 'zho',
     );
+    private static $blacklist = array(
+        'mul' => true, // Multiple languages
+        'mis' => true, // Uncoded language
+        'und' => true, // Unknown language
+        'zxx' => true, // No linguistic content
+    );
 
     /**
      * Collects all available language codes.
@@ -126,7 +132,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
             $data = array(
                 'Version' => $localeBundle['Version'],
-                'Names' => iterator_to_array($localeBundle['Languages']),
+                'Names' => self::generateLanguageNames($localeBundle),
             );
 
             $this->languageCodes = array_merge($this->languageCodes, array_keys($data['Names']));
@@ -157,11 +163,14 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return array(
             'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
-            'Aliases' => array_map(function (\ResourceBundle $bundle) {
-                return $bundle['replacement'];
-            }, iterator_to_array($metadataBundle['alias']['language'])),
+            'Aliases' => array_column(iterator_to_array($metadataBundle['alias']['language']), 'replacement'),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
         );
+    }
+
+    private static function generateLanguageNames(ArrayAccessibleResourceBundle $localeBundle): array
+    {
+        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$blacklist);
     }
 
     private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle)
@@ -171,36 +180,23 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         foreach ($aliases as $alias => $language) {
             $language = $language['replacement'];
-            if (2 === strlen($language) && 3 === strlen($alias)) {
+            if (2 === \strlen($language) && 3 === \strlen($alias)) {
                 if (isset(self::$preferredAlpha2ToAlpha3Mapping[$language])) {
                     // Validate to prevent typos
                     if (!isset($aliases[self::$preferredAlpha2ToAlpha3Mapping[$language]])) {
-                        throw new RuntimeException(
-                            'The statically set three-letter mapping '.
-                            self::$preferredAlpha2ToAlpha3Mapping[$language].' '.
-                            'for the language code '.$language.' seems to be '.
-                            'invalid. Typo?'
-                        );
+                        throw new RuntimeException('The statically set three-letter mapping '.self::$preferredAlpha2ToAlpha3Mapping[$language].' for the language code '.$language.' seems to be invalid. Typo?');
                     }
 
                     $alpha3 = self::$preferredAlpha2ToAlpha3Mapping[$language];
                     $alpha2 = $aliases[$alpha3]['replacement'];
 
                     if ($language !== $alpha2) {
-                        throw new RuntimeException(
-                            'The statically set three-letter mapping '.$alpha3.' '.
-                            'for the language code '.$language.' seems to be '.
-                            'an alias for '.$alpha2.'. Wrong mapping?'
-                        );
+                        throw new RuntimeException('The statically set three-letter mapping '.$alpha3.' for the language code '.$language.' seems to be an alias for '.$alpha2.'. Wrong mapping?');
                     }
 
                     $alpha2ToAlpha3[$language] = $alpha3;
                 } elseif (isset($alpha2ToAlpha3[$language])) {
-                    throw new RuntimeException(
-                        'Multiple three-letter mappings exist for the language '.
-                        'code '.$language.'. Please add one of them to the '.
-                        'property $preferredAlpha2ToAlpha3Mapping.'
-                    );
+                    throw new RuntimeException('Multiple three-letter mappings exist for the language code '.$language.'. Please add one of them to the property $preferredAlpha2ToAlpha3Mapping.');
                 } else {
                     $alpha2ToAlpha3[$language] = $alias;
                 }

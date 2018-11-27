@@ -12,12 +12,12 @@
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -70,7 +70,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     $this->urlGenerator->generate('_profiler', array('token' => $response->headers->get('X-Debug-Token')), UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
-                $response->headers->set('X-Debug-Error', get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
+                $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
             }
         }
 

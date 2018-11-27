@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * Added ability to display the current hostname address if available when binding to 0.0.0.0
+
 3.4.0
 -----
 

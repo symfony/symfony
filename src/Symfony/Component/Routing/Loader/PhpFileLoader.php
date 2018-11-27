@@ -36,7 +36,7 @@ class PhpFileLoader extends FileLoader
     public function load($file, $type = null)
     {
         $path = $this->locator->locate($file);
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
 
         // the closure forbids access to the private scope in the included file
         $loader = $this;
@@ -46,7 +46,7 @@ class PhpFileLoader extends FileLoader
 
         $result = $load($path);
 
-        if ($result instanceof \Closure) {
+        if (\is_object($result) && \is_callable($result)) {
             $collection = new RouteCollection();
             $result(new RoutingConfigurator($collection, $this, $path, $file), $this);
         } else {
@@ -63,7 +63,7 @@ class PhpFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
+        return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
     }
 }
 

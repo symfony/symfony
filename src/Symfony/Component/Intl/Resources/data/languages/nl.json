@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.45.14",
     "Names": {
         "aa": "Afar",
         "ab": "Abchazisch",
@@ -29,6 +29,7 @@
         "aro": "Araona",
         "arp": "Arapaho",
         "arq": "Algerijns Arabisch",
+        "ars": "Nadjdi-Arabisch",
         "arw": "Arawak",
         "ary": "Marokkaans Arabisch",
         "arz": "Egyptisch Arabisch",
@@ -354,7 +355,6 @@
         "ms": "Maleis",
         "mt": "Maltees",
         "mua": "Mundang",
-        "mul": "Meerdere talen",
         "mus": "Creek",
         "mwl": "Mirandees",
         "mwr": "Marwari",
@@ -552,7 +552,6 @@
         "uga": "Oegaritisch",
         "uk": "Oekraïens",
         "umb": "Umbundu",
-        "und": "onbekende taal",
         "ur": "Urdu",
         "uz": "Oezbeeks",
         "vai": "Vai",
@@ -595,7 +594,6 @@
         "zh": "Chinees",
         "zu": "Zoeloe",
         "zun": "Zuni",
-        "zxx": "geen linguïstische inhoud",
         "zza": "Zaza"
     }
 }

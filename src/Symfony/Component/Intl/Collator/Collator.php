@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Intl\Collator;
 
-use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Locale\Locale;
 

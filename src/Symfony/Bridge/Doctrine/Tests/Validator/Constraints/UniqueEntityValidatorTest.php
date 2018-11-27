@@ -16,23 +16,23 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Test\TestRepositoryFactory;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\Employee;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Employee;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
-use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -482,7 +482,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
-            ->setParameter('{{ value }}', 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity") identified by (id => 1)')
+            ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue($entity1)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause(array($associated, $associated2))
@@ -628,6 +628,34 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $entity = new SingleIntIdEntity(1, null);
 
         $this->validator->validate($entity, $constraint);
+    }
+
+    public function testValidateUniquenessOnNullResult()
+    {
+        $repository = $this->createRepositoryMock();
+        $repository
+             ->method('find')
+             ->will($this->returnValue(null))
+        ;
+
+        $this->em = $this->createEntityManagerMock($repository);
+        $this->registry = $this->createRegistryMock($this->em);
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+        ));
+
+        $entity = new SingleIntIdEntity(1, null);
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validator->validate($entity, $constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidateInheritanceUniqueness()

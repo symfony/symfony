@@ -25,10 +25,6 @@ class PhpFilesCacheTest extends CacheTestCase
 
     public function createSimpleCache()
     {
-        if (!PhpFilesCache::isSupported()) {
-            $this->markTestSkipped('OPcache extension is not enabled.');
-        }
-
         return new PhpFilesCache('sf-cache');
     }
 

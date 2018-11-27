@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()`
+   and `Logger::countErrors()` will have a new `$request` argument in version 5.0, not defining
+   it is deprecated
+
+4.1.0
+-----
+
+ * `WebProcessor` now implements `EventSubscriberInterface` in order to be easily autoconfigured
+
 4.0.0
 -----
 

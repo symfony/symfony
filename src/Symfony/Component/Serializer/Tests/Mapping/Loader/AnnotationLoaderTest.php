@@ -83,6 +83,16 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
+    public function testLoadSerializedName()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
+        $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+    }
+
     public function testLoadClassMetadataAndMerge()
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');

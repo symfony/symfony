@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -28,6 +29,9 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 {
     protected function processValue($value, $isRoot = false)
     {
+        if ($value instanceof ServiceLocatorArgument) {
+            return self::register($this->container, $value->getValues());
+        }
         if (!$value instanceof Definition || !$value->hasTag('container.service_locator')) {
             return parent::processValue($value, $isRoot);
         }
@@ -37,7 +41,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         }
 
         $arguments = $value->getArguments();
-        if (!isset($arguments[0]) || !is_array($arguments[0])) {
+        if (!isset($arguments[0]) || !\is_array($arguments[0])) {
             throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
         }
 
@@ -46,7 +50,13 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                 continue;
             }
             if (!$v instanceof Reference) {
-                throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set, "%s" found for key "%s".', $this->currentId, is_object($v) ? get_class($v) : gettype($v), $k));
+                throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set, "%s" found for key "%s".', $this->currentId, \is_object($v) ? \get_class($v) : \gettype($v), $k));
+            }
+
+            if (\is_int($k)) {
+                unset($arguments[0][$k]);
+
+                $k = (string) $v;
             }
             $arguments[0][$k] = new ServiceClosureArgument($v);
         }
@@ -54,7 +64,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
         $value->setArguments($arguments);
 
-        $id = 'service_locator.'.ContainerBuilder::hash($value);
+        $id = '.service_locator.'.ContainerBuilder::hash($value);
 
         if ($isRoot) {
             if ($id !== $this->currentId) {
@@ -80,7 +90,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     {
         foreach ($refMap as $id => $ref) {
             if (!$ref instanceof Reference) {
-                throw new InvalidArgumentException(sprintf('Invalid service locator definition: only services can be referenced, "%s" found for key "%s". Inject parameter values using constructors instead.', is_object($ref) ? get_class($ref) : gettype($ref), $id));
+                throw new InvalidArgumentException(sprintf('Invalid service locator definition: only services can be referenced, "%s" found for key "%s". Inject parameter values using constructors instead.', \is_object($ref) ? \get_class($ref) : \gettype($ref), $id));
             }
             $refMap[$id] = new ServiceClosureArgument($ref);
         }
@@ -91,7 +101,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             ->setPublic(false)
             ->addTag('container.service_locator');
 
-        if (!$container->has($id = 'service_locator.'.ContainerBuilder::hash($locator))) {
+        if (!$container->has($id = '.service_locator.'.ContainerBuilder::hash($locator))) {
             $container->setDefinition($id, $locator);
         }
 
@@ -103,6 +113,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             $container->register($id .= '.'.$callerId, ServiceLocator::class)
                 ->setPublic(false)
                 ->setFactory(array(new Reference($locatorId), 'withContext'))
+                ->addTag('container.service_locator_context', array('id' => $callerId))
                 ->addArgument($callerId)
                 ->addArgument(new Reference('service_container'));
         }

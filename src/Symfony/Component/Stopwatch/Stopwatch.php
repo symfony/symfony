@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Stopwatch;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Stopwatch provides a way to profile code.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Stopwatch
+class Stopwatch implements ResetInterface
 {
     /**
      * @var bool
@@ -85,7 +87,7 @@ class Stopwatch
     {
         $this->stop('__section__');
 
-        if (1 == count($this->activeSections)) {
+        if (1 == \count($this->activeSections)) {
             throw new \LogicException('There is no started section to stop.');
         }
 

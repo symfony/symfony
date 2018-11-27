@@ -68,7 +68,7 @@ class ComposerResource implements SelfCheckingResourceInterface, \Serializable
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
-                $v = dirname(dirname($r->getFileName()));
+                $v = \dirname(\dirname($r->getFileName()));
                 if (file_exists($v.'/composer/installed.json')) {
                     self::$runtimeVendors[$v] = @filemtime($v.'/composer/installed.json');
                 }

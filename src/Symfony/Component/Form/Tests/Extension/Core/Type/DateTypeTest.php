@@ -64,7 +64,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2010-06-02');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('2010-06-02', $form->getViewData());
     }
 
@@ -80,7 +80,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2010');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-01-01 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-01-01 UTC'), $form->getData());
         $this->assertEquals('2010', $form->getViewData());
     }
 
@@ -101,7 +101,29 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2.6.2010');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
+    }
+
+    public function testSubmitFromSingleTextDateTimeImmutable()
+    {
+        // we test against "de_DE", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_DE');
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'datetime_immutable',
+        ));
+
+        $form->submit('2.6.2010');
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
+        $this->assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
@@ -194,7 +216,7 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
 
@@ -217,7 +239,7 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
 
@@ -254,7 +276,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('06*2010*02');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
@@ -468,7 +490,7 @@ class DateTypeTest extends BaseTypeTest
 
         // 2010-06-02 00:00:00 UTC
         // 2010-06-01 20:00:00 UTC-4
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
@@ -974,5 +996,45 @@ class DateTypeTest extends BaseTypeTest
         $this->assertNull($form->getData());
         $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(array('year' => '', 'month' => '', 'day' => ''), $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => $widget,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateTime::createFromFormat('Y-m-d H:i:s', '2018-11-11 00:00:00');
+
+        return array(
+            'Simple field' => array('single_text', '2018-11-11', $expectedData),
+            'Compound text fields' => array('text', array('year' => '2018', 'month' => '11', 'day' => '11'), $expectedData),
+            'Compound choice fields' => array('choice', array('year' => '2018', 'month' => '11', 'day' => '11'), $expectedData),
+        );
     }
 }

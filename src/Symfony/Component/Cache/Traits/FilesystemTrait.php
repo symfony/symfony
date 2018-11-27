@@ -23,6 +23,8 @@ trait FilesystemTrait
 {
     use FilesystemCommonTrait;
 
+    private $marshaller;
+
     /**
      * @return bool
      */
@@ -36,9 +38,9 @@ trait FilesystemTrait
                 continue;
             }
 
-            if ($time >= (int) $expiresAt = fgets($h)) {
+            if (($expiresAt = (int) fgets($h)) && $time >= $expiresAt) {
                 fclose($h);
-                $pruned = isset($expiresAt[0]) && @unlink($file) && !file_exists($file) && $pruned;
+                $pruned = @unlink($file) && !file_exists($file) && $pruned;
             } else {
                 fclose($h);
             }
@@ -60,17 +62,15 @@ trait FilesystemTrait
             if (!file_exists($file) || !$h = @fopen($file, 'rb')) {
                 continue;
             }
-            if ($now >= (int) $expiresAt = fgets($h)) {
+            if (($expiresAt = (int) fgets($h)) && $now >= $expiresAt) {
                 fclose($h);
-                if (isset($expiresAt[0])) {
-                    @unlink($file);
-                }
+                @unlink($file);
             } else {
                 $i = rawurldecode(rtrim(fgets($h)));
                 $value = stream_get_contents($h);
                 fclose($h);
                 if ($i === $id) {
-                    $values[$id] = parent::unserialize($value);
+                    $values[$id] = $this->marshaller->unmarshall($value);
                 }
             }
         }
@@ -93,17 +93,19 @@ trait FilesystemTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        $ok = true;
-        $expiresAt = time() + ($lifetime ?: 31557600); // 31557600s = 1 year
+        $expiresAt = $lifetime ? (time() + $lifetime) : 0;
+        $values = $this->marshaller->marshall($values, $failed);
 
         foreach ($values as $id => $value) {
-            $ok = $this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".serialize($value), $expiresAt) && $ok;
+            if (!$this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".$value, $expiresAt)) {
+                $failed[] = $id;
+            }
         }
 
-        if (!$ok && !is_writable($this->directory)) {
+        if ($failed && !is_writable($this->directory)) {
             throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
         }
 
-        return $ok;
+        return $failed;
     }
 }

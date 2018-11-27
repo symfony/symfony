@@ -76,13 +76,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             return;
         }
-        if (!is_string($propertyPath)) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path constructor needs a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPath". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
+        if (!\is_string($propertyPath)) {
+            throw new InvalidArgumentException(sprintf('The property path constructor needs a string or an instance of "Symfony\Component\PropertyAccess\PropertyPath". Got: "%s"', \is_object($propertyPath) ? \get_class($propertyPath) : \gettype($propertyPath)));
         }
 
         if ('' === $propertyPath) {
@@ -107,21 +102,16 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             $this->elements[] = $element;
 
-            $position += strlen($matches[1]);
+            $position += \strlen($matches[1]);
             $remaining = $matches[4];
             $pattern = '/^(\.([^\.|\[]++)|\[([^\]]++)\])(.*)/';
         }
 
         if ('' !== $remaining) {
-            throw new InvalidPropertyPathException(sprintf(
-                'Could not parse property path "%s". Unexpected token "%s" at position %d',
-                $propertyPath,
-                $remaining[0],
-                $position
-            ));
+            throw new InvalidPropertyPathException(sprintf('Could not parse property path "%s". Unexpected token "%s" at position %d', $propertyPath, $remaining[0], $position));
         }
 
-        $this->length = count($this->elements);
+        $this->length = \count($this->elements);
     }
 
     /**

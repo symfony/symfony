@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Security\Http\RememberMe;
 
-use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
+use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
@@ -47,7 +47,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
         // Delete cookie from the tokenProvider
         if (null !== ($cookie = $request->cookies->get($this->options['name']))
-            && 2 === count($parts = $this->decodeCookie($cookie))
+            && 2 === \count($parts = $this->decodeCookie($cookie))
         ) {
             list($series) = $parts;
             $this->tokenProvider->deleteTokenBySeries($series);
@@ -59,7 +59,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
-        if (2 !== count($cookieParts)) {
+        if (2 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie is invalid.');
         }
 
@@ -83,8 +83,10 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
-                $this->options['secure'],
-                $this->options['httponly']
+                $this->options['secure'] ?? $request->isSecure(),
+                $this->options['httponly'],
+                false,
+                $this->options['samesite'] ?? null
             )
         );
 
@@ -101,7 +103,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(
-                get_class($user = $token->getUser()),
+                \get_class($user = $token->getUser()),
                 $user->getUsername(),
                 $series,
                 $tokenValue,
@@ -116,8 +118,10 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
-                $this->options['secure'],
-                $this->options['httponly']
+                $this->options['secure'] ?? $request->isSecure(),
+                $this->options['httponly'],
+                false,
+                $this->options['samesite'] ?? null
             )
         );
     }

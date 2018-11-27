@@ -1,13 +1,36 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * the default value of the "$secure" and "$samesite" arguments of Cookie's constructor
+   will respectively change from "false" to "null" and from "null" to "lax" in Symfony
+   5.0, you should define their values explicitly or use "Cookie::create()" instead.
+ * added `matchPort()` in RequestMatcher
+
+4.1.3
+-----
+
+ * [BC BREAK] Support for the IIS-only `X_ORIGINAL_URL` and `X_REWRITE_URL`
+   HTTP headers has been dropped for security reasons.
+
 4.1.0
 -----
 
- * Passing the file size to the constructor of the `UploadedFile` class is deprecated and won't be
-   supported anymore in 5.0.
-
+ * Query string normalization uses `parse_str()` instead of custom parsing logic.
+ * Passing the file size to the constructor of the `UploadedFile` class is deprecated.
  * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
+ * added `RedisSessionHandler` to use Redis as a session storage
+ * The `get()` method of the `AcceptHeader` class now takes into account the
+   `*` and `*/*` default values (if they are present in the Accept HTTP header)
+   when looking for items.
+ * deprecated `Request::getSession()` when no session has been set. Use `Request::hasSession()` instead.
+ * added `CannotWriteFileException`, `ExtensionFileException`, `FormSizeFileException`,
+   `IniSizeFileException`, `NoFileException`, `NoTmpDirFileException`, `PartialFileException` to
+   handle failed `UploadedFile`.
+ * added `MigratingSessionHandler` for migrating between two session handlers without losing sessions
+ * added `HeaderUtils`.
 
 4.0.0
 -----
@@ -26,8 +49,8 @@ CHANGELOG
    method (by not passing `false` as its argument) is not supported anymore and
    throws a `\BadMethodCallException`
  * the `WriteCheckSessionHandler`, `NativeSessionHandler` and `NativeProxy` classes have been removed
- * setting session save handlers that do not implement `\SessionHandlerInterface` in 
-   `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a 
+ * setting session save handlers that do not implement `\SessionHandlerInterface` in
+   `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a
    `\TypeError`
 
 3.4.0

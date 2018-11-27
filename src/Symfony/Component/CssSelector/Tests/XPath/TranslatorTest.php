@@ -37,9 +37,9 @@ class TranslatorTest extends TestCase
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(count($elementsId), $elements);
+        $this->assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
-            $this->assertTrue(in_array($element->attributes()->id, $elementsId));
+            $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
         }
     }
 
@@ -54,10 +54,10 @@ class TranslatorTest extends TestCase
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(count($elementsId), $elementsId);
+        $this->assertCount(\count($elementsId), $elementsId);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
-                $this->assertTrue(in_array($element->attributes()->id, $elementsId));
+                $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
             }
         }
         libxml_clear_errors();
@@ -102,18 +102,20 @@ class TranslatorTest extends TestCase
             array('e[foo^="bar"]', "e[@foo and starts-with(@foo, 'bar')]"),
             array('e[foo$="bar"]', "e[@foo and substring(@foo, string-length(@foo)-2) = 'bar']"),
             array('e[foo*="bar"]', "e[@foo and contains(@foo, 'bar')]"),
+            array('e[foo!="bar"]', "e[not(@foo) or @foo != 'bar']"),
+            array('e[foo!="bar"][foo!="baz"]', "e[(not(@foo) or @foo != 'bar') and (not(@foo) or @foo != 'baz')]"),
             array('e[hreflang|="en"]', "e[@hreflang and (@hreflang = 'en' or starts-with(@hreflang, 'en-'))]"),
-            array('e:nth-child(1)', "*/*[name() = 'e' and (position() = 1)]"),
-            array('e:nth-last-child(1)', "*/*[name() = 'e' and (position() = last() - 0)]"),
-            array('e:nth-last-child(2n+2)', "*/*[name() = 'e' and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"),
+            array('e:nth-child(1)', "*/*[(name() = 'e') and (position() = 1)]"),
+            array('e:nth-last-child(1)', "*/*[(name() = 'e') and (position() = last() - 0)]"),
+            array('e:nth-last-child(2n+2)', "*/*[(name() = 'e') and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"),
             array('e:nth-of-type(1)', '*/e[position() = 1]'),
             array('e:nth-last-of-type(1)', '*/e[position() = last() - 0]'),
             array('div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 0]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"),
-            array('e:first-child', "*/*[name() = 'e' and (position() = 1)]"),
-            array('e:last-child', "*/*[name() = 'e' and (position() = last())]"),
+            array('e:first-child', "*/*[(name() = 'e') and (position() = 1)]"),
+            array('e:last-child', "*/*[(name() = 'e') and (position() = last())]"),
             array('e:first-of-type', '*/e[position() = 1]'),
             array('e:last-of-type', '*/e[position() = last()]'),
-            array('e:only-child', "*/*[name() = 'e' and (last() = 1)]"),
+            array('e:only-child', "*/*[(name() = 'e') and (last() = 1)]"),
             array('e:only-of-type', 'e[last() = 1]'),
             array('e:empty', 'e[not(*) and not(string-length())]'),
             array('e:EmPTY', 'e[not(*) and not(string-length())]'),
@@ -127,7 +129,7 @@ class TranslatorTest extends TestCase
             array('e:nOT(*)', 'e[0]'),
             array('e f', 'e/descendant-or-self::*/f'),
             array('e > f', 'e/f'),
-            array('e + f', "e/following-sibling::*[name() = 'f' and (position() = 1)]"),
+            array('e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"),
             array('e ~ f', 'e/following-sibling::f'),
             array('div#container p', "div[@id = 'container']/descendant-or-self::*/p"),
         );

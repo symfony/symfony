@@ -11,24 +11,24 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SwitchUserListener allows a user to impersonate another one temporarily
@@ -95,7 +95,7 @@ class SwitchUserListener implements ListenerInterface
 
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
-            $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+            $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
             $response = new RedirectResponse($request->getUri(), 302);
 
             $event->setResponse($response);
@@ -126,7 +126,9 @@ class SwitchUserListener implements ListenerInterface
             throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
         }
 
-        if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
+        $user = $this->provider->loadUserByUsername($username);
+
+        if (false === $this->accessDecisionManager->decide($token, array($this->role), $user)) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($this->role);
 
@@ -137,7 +139,6 @@ class SwitchUserListener implements ListenerInterface
             $this->logger->info('Attempting to switch to user.', array('username' => $username));
         }
 
-        $user = $this->provider->loadUserByUsername($username);
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();

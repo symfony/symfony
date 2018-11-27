@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @Annotation
@@ -30,6 +32,17 @@ class Expression extends Constraint
 
     public $message = 'This value is not valid.';
     public $expression;
+    public $values = array();
+
+    public function __construct($options = null)
+    {
+        if (!class_exists(ExpressionLanguage::class)) {
+            // throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint.', __CLASS__));
+            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/expression-language" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        }
+
+        parent::__construct($options);
+    }
 
     /**
      * {@inheritdoc}

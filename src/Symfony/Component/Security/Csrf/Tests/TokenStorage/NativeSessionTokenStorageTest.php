@@ -113,4 +113,32 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
         $this->assertFalse($this->storage->hasToken('token_id'));
     }
+
+    public function testClearRemovesAllTokensFromTheConfiguredNamespace()
+    {
+        $this->storage->setToken('foo', 'bar');
+        $this->storage->clear();
+
+        $this->assertFalse($this->storage->hasToken('foo'));
+        $this->assertArrayNotHasKey(self::SESSION_NAMESPACE, $_SESSION);
+    }
+
+    public function testClearDoesNotRemoveSessionValuesFromOtherNamespaces()
+    {
+        $_SESSION['foo']['bar'] = 'baz';
+        $this->storage->clear();
+
+        $this->assertArrayHasKey('foo', $_SESSION);
+        $this->assertArrayHasKey('bar', $_SESSION['foo']);
+        $this->assertSame('baz', $_SESSION['foo']['bar']);
+    }
+
+    public function testClearDoesNotRemoveNonNamespacedSessionValues()
+    {
+        $_SESSION['foo'] = 'baz';
+        $this->storage->clear();
+
+        $this->assertArrayHasKey('foo', $_SESSION);
+        $this->assertSame('baz', $_SESSION['foo']);
+    }
 }

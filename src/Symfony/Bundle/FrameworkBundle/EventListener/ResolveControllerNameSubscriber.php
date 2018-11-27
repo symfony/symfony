@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Guarantees that the _controller key is parsed into its final format.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since Symfony 4.1
  */
 class ResolveControllerNameSubscriber implements EventSubscriberInterface
 {
@@ -33,9 +35,9 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
     public function onKernelRequest(GetResponseEvent $event)
     {
         $controller = $event->getRequest()->attributes->get('_controller');
-        if (is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
+        if (\is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
-            $event->getRequest()->attributes->set('_controller', $this->parser->parse($controller));
+            $event->getRequest()->attributes->set('_controller', $this->parser->parse($controller, false));
         }
     }
 

@@ -12,11 +12,11 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
@@ -44,12 +44,8 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $expectedProviders = array(
             'security.user.provider.concrete.default',
-            'security.user.provider.concrete.default_foo',
             'security.user.provider.concrete.digest',
-            'security.user.provider.concrete.digest_foo',
             'security.user.provider.concrete.basic',
-            'security.user.provider.concrete.basic_foo',
-            'security.user.provider.concrete.basic_bar',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
         );
@@ -75,7 +71,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map('strval', $arguments['index_0']->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_2']);
+            $configDef = $container->getDefinition((string) $arguments['index_3']);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -88,7 +84,7 @@ abstract class CompleteConfigurationTest extends TestCase
             array(
                 'simple',
                 'security.user_checker',
-                'security.request_matcher.6tndozi',
+                '.security.request_matcher.xmi9dcw',
                 false,
             ),
             array(
@@ -103,7 +99,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 null,
                 null,
                 array(
-                    'logout',
                     'switch_user',
                     'x509',
                     'remote_user',
@@ -115,13 +110,13 @@ abstract class CompleteConfigurationTest extends TestCase
                 array(
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
-                    'stateless' => true,
+                    'stateless' => false,
                 ),
             ),
             array(
                 'host',
                 'security.user_checker',
-                'security.request_matcher.and0kk1',
+                '.security.request_matcher.iw4hyjb',
                 true,
                 false,
                 'security.user.provider.concrete.default',
@@ -158,7 +153,6 @@ abstract class CompleteConfigurationTest extends TestCase
             array(),
             array(
                 'security.channel_listener',
-                'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
@@ -239,12 +233,12 @@ abstract class CompleteConfigurationTest extends TestCase
             $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
-            $i = count($matcherIds);
+            $i = \count($matcherIds);
             if (1 === $i) {
                 $this->assertEquals(array('ROLE_USER'), $attributes);
                 $this->assertEquals('https', $channel);
                 $this->assertEquals(
-                    array('/blog/524', null, array('GET', 'POST')),
+                    array('/blog/524', null, array('GET', 'POST'), array(), array(), null, 8000),
                     $requestMatcher->getArguments()
                 );
             } elseif (2 === $i) {
@@ -289,6 +283,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'key_length' => 40,
                 'ignore_case' => false,
                 'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ),
             'JMS\FooBundle\Entity\User3' => array(
                 'algorithm' => 'md5',
@@ -298,6 +295,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'encode_as_base64' => true,
                 'iterations' => 5000,
                 'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => array(
@@ -311,16 +311,57 @@ abstract class CompleteConfigurationTest extends TestCase
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    public function testArgon2iEncoder()
+    public function testEncodersWithLibsodium()
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
 
-        $this->assertSame(array(array('JMS\FooBundle\Entity\User7' => array(
-            'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-            'arguments' => array(),
-        ))), $this->getContainer('argon2i_encoder')->getDefinition('security.encoder_factory.generic')->getArguments());
+        $container = $this->getContainer('argon2i_encoder');
+
+        $this->assertEquals(array(array(
+            'JMS\FooBundle\Entity\User1' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
+                'arguments' => array(false),
+            ),
+            'JMS\FooBundle\Entity\User2' => array(
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+            ),
+            'JMS\FooBundle\Entity\User3' => array(
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+            ),
+            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+            'JMS\FooBundle\Entity\User5' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
+                'arguments' => array('sha1', false, 5, 30),
+            ),
+            'JMS\FooBundle\Entity\User6' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
+                'arguments' => array(15),
+            ),
+            'JMS\FooBundle\Entity\User7' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+                'arguments' => array(256, 1, 2),
+            ),
+        )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testRememberMeThrowExceptionsDefault()
@@ -373,11 +414,22 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "strategy" and "service" cannot be used together.
+     * @expectedExceptionMessage Invalid configuration for path "security.access_decision_manager": "strategy" and "service" cannot be used together.
      */
     public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
     {
-        $container = $this->getContainer('access_decision_manager_service_and_strategy');
+        $this->getContainer('access_decision_manager_service_and_strategy');
+    }
+
+    public function testAccessDecisionManagerOptionsAreNotOverriddenByImplicitStrategy()
+    {
+        $container = $this->getContainer('access_decision_manager_customized_config');
+
+        $accessDecisionManagerDefinition = $container->getDefinition('security.access.decision_manager');
+
+        $this->assertSame(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $accessDecisionManagerDefinition->getArgument(1));
+        $this->assertTrue($accessDecisionManagerDefinition->getArgument(2));
+        $this->assertFalse($accessDecisionManagerDefinition->getArgument(3));
     }
 
     /**
@@ -410,11 +462,57 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "simple_form" security listener is deprecated Symfony 4.2, use Guard instead.
+     */
+    public function testSimpleAuth()
+    {
+        $container = $this->getContainer('simple_auth');
+        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
+        $listeners = array();
+        $configs = array();
+        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
+            $contextDef = $container->getDefinition($contextId);
+            $arguments = $contextDef->getArguments();
+            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+
+            $configDef = $container->getDefinition((string) $arguments['index_3']);
+            $configs[] = array_values($configDef->getArguments());
+        }
+
+        $this->assertSame(array(array(
+            'simple_auth',
+            'security.user_checker',
+            null,
+            true,
+            false,
+            'security.user.provider.concrete.default',
+            'simple_auth',
+            'security.authentication.form_entry_point.simple_auth',
+            null,
+            null,
+            array('simple_form', 'anonymous',
+            ),
+            null,
+        )), $configs);
+
+        $this->assertSame(array(array(
+            'security.channel_listener',
+            'security.context_listener.0',
+            'security.authentication.listener.simple_form.simple_auth',
+            'security.authentication.listener.anonymous.simple_auth',
+            'security.access_listener',
+        )), $listeners);
+    }
+
     protected function getContainer($file)
     {
-        $file = $file.'.'.$this->getFileExtension();
+        $file .= '.'.$this->getFileExtension();
 
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
         $security = new SecurityExtension();
         $container->registerExtension($security);
 

@@ -13,11 +13,11 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Strategy\UnanimousStrategy;
-use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\Strategy\StrategyInterface;
+use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -58,7 +58,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /** @var CombinedStore */
     private $store;
 
-    public function setup()
+    protected function setUp()
     {
         $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
         $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();

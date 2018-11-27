@@ -11,28 +11,28 @@
 
 namespace Symfony\Bundle\FrameworkBundle\HttpCache;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
-use Symfony\Component\HttpKernel\HttpCache\Esi;
-use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Manages HTTP cache objects in a Container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class HttpCache extends BaseHttpCache
+class HttpCache extends BaseHttpCache
 {
     protected $cacheDir;
     protected $kernel;
 
     /**
-     * @param HttpKernelInterface $kernel   An HttpKernelInterface instance
-     * @param string              $cacheDir The cache directory (default used if null)
+     * @param KernelInterface $kernel   A KernelInterface instance
+     * @param string          $cacheDir The cache directory (default used if null)
      */
-    public function __construct(HttpKernelInterface $kernel, string $cacheDir = null)
+    public function __construct(KernelInterface $kernel, string $cacheDir = null)
     {
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;

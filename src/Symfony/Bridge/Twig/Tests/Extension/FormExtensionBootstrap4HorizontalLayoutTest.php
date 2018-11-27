@@ -12,13 +12,13 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractBootstrap4HorizontalLayoutTest;
+use Twig\Environment;
 
 /**
  * Class providing test cases for the Bootstrap 4 Twig form theme.
@@ -44,7 +44,7 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
 
@@ -68,6 +68,11 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
         }
 
         return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
+    }
+
+    protected function renderHelp(FormView $view)
+    {
+        return (string) $this->renderer->searchAndRenderBlock($view, 'help');
     }
 
     protected function renderErrors(FormView $view)

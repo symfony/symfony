@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\Workflow;
 /**
  * @author Andreas Kleemann <akleemann@inviqa.com>
  *
- * @deprecated since version 4.1, to be removed in 5.0. Use WorkflowSupportStrategyInterface instead
+ * @deprecated since Symfony 4.1, use WorkflowSupportStrategyInterface instead
  */
 interface SupportStrategyInterface
 {

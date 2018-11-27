@@ -34,7 +34,7 @@ class FileBagTest extends TestCase
     public function testShouldConvertsUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', null, 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
 
         $bag = new FileBag(array('file' => array(
             'name' => basename($tmpFile),
@@ -89,7 +89,7 @@ class FileBagTest extends TestCase
     public function testShouldConvertUploadedFilesWithPhpBug()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', null, 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
 
         $bag = new FileBag(array(
             'child' => array(
@@ -118,7 +118,7 @@ class FileBagTest extends TestCase
     public function testShouldConvertNestedUploadedFilesWithPhpBug()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', null, 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
 
         $bag = new FileBag(array(
             'child' => array(
@@ -147,7 +147,7 @@ class FileBagTest extends TestCase
     public function testShouldNotConvertNestedUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', null, 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
         $bag = new FileBag(array('image' => array('file' => $file)));
 
         $files = $bag->all();
@@ -156,7 +156,10 @@ class FileBagTest extends TestCase
 
     protected function createTempFile()
     {
-        return tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
+        $tempFile = tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
+        file_put_contents($tempFile, '1');
+
+        return $tempFile;
     }
 
     protected function setUp()

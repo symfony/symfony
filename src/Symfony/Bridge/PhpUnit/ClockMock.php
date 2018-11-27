@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ * @author Dominic Tubach <dominic.tubach@to.com>
  */
 class ClockMock
 {
@@ -66,12 +67,21 @@ class ClockMock
             return self::$now;
         }
 
-        return sprintf('%0.6f %d', self::$now - (int) self::$now, (int) self::$now);
+        return sprintf('%0.6f00 %d', self::$now - (int) self::$now, (int) self::$now);
+    }
+
+    public static function date($format, $timestamp = null)
+    {
+        if (null === $timestamp) {
+            $timestamp = self::time();
+        }
+
+        return \date($format, $timestamp);
     }
 
     public static function register($class)
     {
-        $self = get_called_class();
+        $self = \get_called_class();
 
         $mockedNs = array(substr($class, 0, strrpos($class, '\\')));
         if (0 < strpos($class, '\\Tests\\')) {
@@ -81,7 +91,7 @@ class ClockMock
             $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
-            if (function_exists($ns.'\time')) {
+            if (\function_exists($ns.'\time')) {
                 continue;
             }
             eval(<<<EOPHP
@@ -105,6 +115,11 @@ function sleep(\$s)
 function usleep(\$us)
 {
     return \\$self::usleep(\$us);
+}
+
+function date(\$format, \$timestamp = null)
+{
+    return \\$self::date(\$format, \$timestamp);
 }
 
 EOPHP

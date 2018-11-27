@@ -49,7 +49,7 @@
             <http-basic />
             <form-login />
             <anonymous />
-            <switch-user stateless="true" />
+            <switch-user />
             <x509 />
             <remote-user />
             <user-checker />
@@ -72,7 +72,7 @@
         <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
         <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
 
-        <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" />
+        <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" port="8000" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUsername() matches '/^admin/'" path="/blog/524" />
     </config>

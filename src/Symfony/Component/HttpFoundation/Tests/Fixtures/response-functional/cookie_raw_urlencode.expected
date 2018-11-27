@@ -1,0 +1,10 @@
+
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: no-cache, private
+    [2] => Date: Sat, 12 Nov 1955 20:04:00 GMT
+    [3] => Set-Cookie: ?*():@&+$/%#[]=?*():@&+$/%#[]; path=/
+    [4] => Set-Cookie: ?*():@&+$/%#[]=?*():@&+$/%#[]; path=/
+)
+shutdown

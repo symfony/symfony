@@ -37,7 +37,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
         $salt = '';
         $saltBegins = strrpos($mergedPasswordSalt, '{');
 
-        if (false !== $saltBegins && $saltBegins + 1 < strlen($mergedPasswordSalt)) {
+        if (false !== $saltBegins && $saltBegins + 1 < \strlen($mergedPasswordSalt)) {
             $salt = substr($mergedPasswordSalt, $saltBegins + 1, -1);
             $password = substr($mergedPasswordSalt, 0, $saltBegins);
         }
@@ -93,6 +93,6 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      */
     protected function isPasswordTooLong($password)
     {
-        return strlen($password) > static::MAX_PASSWORD_LENGTH;
+        return \strlen($password) > static::MAX_PASSWORD_LENGTH;
     }
 }

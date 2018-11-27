@@ -1,0 +1,39 @@
+imports:
+    - { resource: ./../config/default.yml }
+services:
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            -   host: 'localhost'
+                port: 389
+                options:
+                    protocol_version: 3
+                    referrals: false
+security:
+    providers:
+        ldap:
+            ldap:
+                service: Symfony\Component\Ldap\Ldap
+                base_dn: 'dc=onfroy,dc=net'
+                search_dn: ''
+                search_password: ''
+                default_roles: ROLE_USER
+                uid_key: uid
+
+    firewalls:
+        main:
+            pattern:  ^/login
+            stateless: true
+            anonymous: true
+            json_login_ldap:
+                check_path: /login
+                require_previous_session: false
+                service: Symfony\Component\Ldap\Ldap
+                dn_string: ''
+                username_path: user.login
+                password_path: user.password
+
+    access_control:
+        - { path: ^/, roles: ROLE_USER }

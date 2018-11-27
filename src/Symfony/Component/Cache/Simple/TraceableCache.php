@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Simple;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * An adapter that collects data about all cache calls.
@@ -37,7 +38,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
      */
     public function get($key, $default = null)
     {
-        $miss = null !== $default && is_object($default) ? $default : $this->miss;
+        $miss = null !== $default && \is_object($default) ? $default : $this->miss;
         $event = $this->start(__FUNCTION__);
         try {
             $value = $this->pool->get($key, $miss);
@@ -109,7 +110,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
                 }
             };
             $values = $values();
-        } elseif (is_array($values)) {
+        } elseif (\is_array($values)) {
             $event->result['keys'] = array_keys($values);
         }
 
@@ -125,7 +126,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
      */
     public function getMultiple($keys, $default = null)
     {
-        $miss = null !== $default && is_object($default) ? $default : $this->miss;
+        $miss = null !== $default && \is_object($default) ? $default : $this->miss;
         $event = $this->start(__FUNCTION__);
         try {
             $result = $this->pool->getMultiple($keys, $miss);
@@ -200,7 +201,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
      */
     public function reset()
     {
-        if (!$this->pool instanceof ResettableInterface) {
+        if (!$this->pool instanceof ResetInterface) {
             return;
         }
         $event = $this->start(__FUNCTION__);

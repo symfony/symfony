@@ -13,7 +13,9 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ButtonBuilder;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\SubmitButtonBuilder;
 
 class FormBuilderTest extends TestCase
@@ -226,6 +228,14 @@ class FormBuilderTest extends TestCase
 
         $this->assertEmpty($children->getValue($config));
         $this->assertEmpty($unresolvedChildren->getValue($config));
+    }
+
+    public function testGetButtonBuilderBeforeExplicitlyResolvingAllChildren()
+    {
+        $builder = new FormBuilder('name', null, $this->dispatcher, (new FormFactoryBuilder())->getFormFactory());
+        $builder->add('submit', SubmitType::class);
+
+        $this->assertInstanceOf(ButtonBuilder::class, $builder->get('submit'));
     }
 
     private function getFormBuilder($name = 'name')

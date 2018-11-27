@@ -38,7 +38,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
     public function testExpectsStringCompatibleType()
     {

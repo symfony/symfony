@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -123,6 +123,10 @@
         ],
         "MRO": [
             "MRO",
+            "Ugwiya ya Moritani (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Ugwiya ya Moritani"
         ],
         "MUR": [
@@ -179,6 +183,10 @@
         ],
         "STD": [
             "STD",
+            "Dobra ya Sao Tomé mpé Presipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "Dobra ya Sao Tomé mpé Presipe"
         ],
         "SZL": [

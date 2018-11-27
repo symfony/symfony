@@ -114,6 +114,7 @@
                  parent="security.authentication.listener.abstract"
                  public="false"
                  abstract="true">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.2.</deprecated>
         </service>
 
         <service id="security.authentication.simple_success_failure_handler" class="Symfony\Component\Security\Http\Authentication\SimpleAuthenticationHandler" abstract="true">
@@ -122,6 +123,7 @@
             <argument type="service" id="security.authentication.success_handler" />
             <argument type="service" id="security.authentication.failure_handler" />
             <argument type="service" id="logger" on-invalid="null" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.2.</deprecated>
         </service>
 
         <service id="security.authentication.listener.simple_preauth" class="Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener" abstract="true">
@@ -132,6 +134,8 @@
             <argument /> <!-- Authenticator -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
+            <argument type="service" id="security.authentication.trust_resolver" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.2.</deprecated>
         </service>
 
         <service id="security.authentication.listener.x509" class="Symfony\Component\Security\Http\Firewall\X509AuthenticationListener" abstract="true">
@@ -199,6 +203,8 @@
             <argument /> <!-- Simple Authenticator -->
             <argument /> <!-- User Provider -->
             <argument /> <!-- Provider-shared Key -->
+            <argument>null</argument> <!-- UserChecker -->
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.2.</deprecated>
         </service>
 
         <service id="security.authentication.provider.pre_authenticated" class="Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider" abstract="true">

@@ -6,7 +6,7 @@
             <tag name="bar" />
         </instanceof>
 
-        <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" />
+        <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" public="true" />
         <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface" alias="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" />
     </services>
 </container>

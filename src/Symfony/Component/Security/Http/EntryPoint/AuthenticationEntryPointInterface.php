@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Implement this interface for any classes that will be called to "start"
@@ -31,10 +31,14 @@ interface AuthenticationEntryPointInterface
      * response that "helps" the user start into the authentication process.
      *
      * Examples:
-     *  A) For a form login, you might redirect to the login page
-     *      return new RedirectResponse('/login');
-     *  B) For an API token authentication system, you return a 401 response
-     *      return new Response('Auth header required', 401);
+     *
+     * - For a form login, you might redirect to the login page
+     *
+     *     return new RedirectResponse('/login');
+     *
+     * - For an API token authentication system, you return a 401 response
+     *
+     *     return new Response('Auth header required', 401);
      *
      * @param Request                 $request       The request that resulted in an AuthenticationException
      * @param AuthenticationException $authException The exception that started the authentication process

@@ -21,21 +21,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
 {
-    private $resolverServiceId;
+    private $controllerLocator;
 
-    public function __construct(string $resolverServiceId = 'argument_resolver.service')
+    public function __construct(string $controllerLocator = 'argument_resolver.controller_locator')
     {
-        $this->resolverServiceId = $resolverServiceId;
+        $this->controllerLocator = $controllerLocator;
     }
 
     public function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition($this->resolverServiceId)) {
-            return;
-        }
-
-        $serviceResolver = $container->getDefinition($this->resolverServiceId);
-        $controllerLocator = $container->getDefinition((string) $serviceResolver->getArgument(0));
+        $controllerLocator = $container->findDefinition($this->controllerLocator);
         $controllers = $controllerLocator->getArgument(0);
 
         foreach ($controllers as $controller => $argumentRef) {
@@ -47,8 +42,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;
-                $action = substr(strrchr($controller, ':'), 1);
-                $id = substr($controller, 0, -1 - strlen($action));
+                list($id, $action) = explode('::', $controller);
                 $controllerDef = $container->getDefinition($id);
                 foreach ($controllerDef->getMethodCalls() as list($method)) {
                     if (0 === strcasecmp($action, $method)) {
@@ -57,9 +51,9 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
                     }
                 }
                 if (!$reason) {
-                    if ($controllerDef->getClass() === $id) {
-                        $controllers[$id.'::'.$action] = $argumentRef;
-                    }
+                    // Deprecated since Symfony 4.1. See Symfony\Component\HttpKernel\Controller\ContainerControllerResolver
+                    $controllers[$id.':'.$action] = $argumentRef;
+
                     if ('__invoke' === $action) {
                         $controllers[$id] = $argumentRef;
                     }

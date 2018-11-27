@@ -174,7 +174,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Returns the parameter value converted to boolean.
      *
      * @param string $key     The parameter key
-     * @param mixed  $default The default value if the parameter key does not exist
+     * @param bool   $default The default value if the parameter key does not exist
      *
      * @return bool The filtered value
      */
@@ -200,12 +200,12 @@ class ParameterBag implements \IteratorAggregate, \Countable
         $value = $this->get($key, $default);
 
         // Always turn $options into an array - this allows filter_var option shortcuts.
-        if (!is_array($options) && $options) {
+        if (!\is_array($options) && $options) {
             $options = array('flags' => $options);
         }
 
         // Add a convenience check for arrays.
-        if (is_array($value) && !isset($options['flags'])) {
+        if (\is_array($value) && !isset($options['flags'])) {
             $options['flags'] = FILTER_REQUIRE_ARRAY;
         }
 
@@ -229,6 +229,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->parameters);
+        return \count($this->parameters);
     }
 }

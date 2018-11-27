@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 
 /**
  * This replaces all ChildDefinition instances with their equivalent fully
@@ -25,6 +26,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
+    private $currentPath;
+
     protected function processValue($value, $isRoot = false)
     {
         if (!$value instanceof Definition) {
@@ -36,6 +39,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $value = $this->container->getDefinition($this->currentId);
         }
         if ($value instanceof ChildDefinition) {
+            $this->currentPath = array();
             $value = $this->resolveDefinition($value);
             if ($isRoot) {
                 $this->container->setDefinition($this->currentId, $value);
@@ -56,6 +60,8 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
     {
         try {
             return $this->doResolveDefinition($definition);
+        } catch (ServiceCircularReferenceException $e) {
+            throw $e;
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
             $r->setAccessible(true);
@@ -69,6 +75,13 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
     {
         if (!$this->container->has($parent = $definition->getParent())) {
             throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
+        }
+
+        $searchKey = array_search($parent, $this->currentPath);
+        $this->currentPath[] = $parent;
+
+        if (false !== $searchKey) {
+            throw new ServiceCircularReferenceException($parent, \array_slice($this->currentPath, $searchKey));
         }
 
         $parentDef = $this->container->findDefinition($parent);
@@ -100,7 +113,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setAutowired($parentDef->isAutowired());
         $def->setChanges($parentDef->getChanges());
 
-        $def->setBindings($parentDef->getBindings());
+        $def->setBindings($definition->getBindings() + $parentDef->getBindings());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
@@ -147,7 +160,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             if (is_numeric($k)) {
                 $def->addArgument($v);
             } elseif (0 === strpos($k, 'index_')) {
-                $def->replaceArgument((int) substr($k, strlen('index_')), $v);
+                $def->replaceArgument((int) substr($k, \strlen('index_')), $v);
             } else {
                 $def->setArgument($k, $v);
             }
@@ -161,6 +174,10 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         // append method calls
         if ($calls = $definition->getMethodCalls()) {
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
+        }
+
+        foreach (array_merge($parentDef->getErrors(), $definition->getErrors()) as $v) {
+            $def->addError($v);
         }
 
         // these attributes are always taken from the child

@@ -12,16 +12,17 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -70,7 +71,27 @@ class TimeType extends AbstractType
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
                 'error_bubbling' => true,
+                'empty_data' => '',
             );
+            // when the form is compound the entries of the array are ignored in favor of children data
+            // so we need to handle the cascade setting here
+            $emptyData = $builder->getEmptyData() ?: array();
+
+            if (isset($emptyData['hour'])) {
+                $hourOptions['empty_data'] = $emptyData['hour'];
+            }
+
+            if (isset($options['invalid_message'])) {
+                $hourOptions['invalid_message'] = $options['invalid_message'];
+                $minuteOptions['invalid_message'] = $options['invalid_message'];
+                $secondOptions['invalid_message'] = $options['invalid_message'];
+            }
+
+            if (isset($options['invalid_message_parameters'])) {
+                $hourOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $minuteOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+                $secondOptions['invalid_message_parameters'] = $options['invalid_message_parameters'];
+            }
 
             if ('choice' === $options['widget']) {
                 $hours = $minutes = array();
@@ -123,17 +144,25 @@ class TimeType extends AbstractType
             $builder->add('hour', self::$widgets[$options['widget']], $hourOptions);
 
             if ($options['with_minutes']) {
+                if (isset($emptyData['minute'])) {
+                    $minuteOptions['empty_data'] = $emptyData['minute'];
+                }
                 $builder->add('minute', self::$widgets[$options['widget']], $minuteOptions);
             }
 
             if ($options['with_seconds']) {
+                if (isset($emptyData['second'])) {
+                    $secondOptions['empty_data'] = $emptyData['second'];
+                }
                 $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
             }
 
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime_immutable' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
             ));
@@ -189,7 +218,7 @@ class TimeType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (is_array($placeholder)) {
+            if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
                 return array_merge(
@@ -206,7 +235,7 @@ class TimeType extends AbstractType
         };
 
         $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
-            if (is_array($choiceTranslationDomain)) {
+            if (\is_array($choiceTranslationDomain)) {
                 $default = false;
 
                 return array_replace(
@@ -243,6 +272,9 @@ class TimeType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class' => null,
+            'empty_data' => function (Options $options) {
+                return $options['compound'] ? array() : '';
+            },
             'compound' => $compound,
             'choice_translation_domain' => false,
         ));
@@ -252,6 +284,7 @@ class TimeType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetime_immutable',
             'string',
             'timestamp',
             'array',

@@ -12,11 +12,11 @@
 namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class UrlGeneratorTest extends TestCase
 {
@@ -476,6 +476,38 @@ class UrlGeneratorTest extends TestCase
         $routes = $this->getRoutes('test', new Route('/', array(), array('locale' => 'en|de|fr'), array(), '{locale}.FooBar.com'));
         $generator = $this->getGenerator($routes);
         $this->assertSame('//EN.FooBar.com/app.php/', $generator->generate('test', array('locale' => 'EN'), UrlGeneratorInterface::NETWORK_PATH));
+    }
+
+    public function testDefaultHostIsUsedWhenContextHostIsEmpty()
+    {
+        $routes = $this->getRoutes('test', new Route('/route', array('domain' => 'my.fallback.host'), array('domain' => '.+'), array(), '{domain}', array('http')));
+
+        $generator = $this->getGenerator($routes);
+        $generator->getContext()->setHost('');
+
+        $this->assertSame('http://my.fallback.host/app.php/route', $generator->generate('test', array(), UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    public function testDefaultHostIsUsedWhenContextHostIsEmptyAndSchemeIsNot()
+    {
+        $routes = $this->getRoutes('test', new Route('/route', array('domain' => 'my.fallback.host'), array('domain' => '.+'), array(), '{domain}', array('http', 'https')));
+
+        $generator = $this->getGenerator($routes);
+        $generator->getContext()->setHost('');
+        $generator->getContext()->setScheme('https');
+
+        $this->assertSame('https://my.fallback.host/app.php/route', $generator->generate('test', array(), UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    public function testAbsoluteUrlFallbackToRelativeIfHostIsEmptyAndSchemeIsNot()
+    {
+        $routes = $this->getRoutes('test', new Route('/route', array(), array(), array(), '', array('http', 'https')));
+
+        $generator = $this->getGenerator($routes);
+        $generator->getContext()->setHost('');
+        $generator->getContext()->setScheme('https');
+
+        $this->assertSame('/app.php/route', $generator->generate('test', array(), UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     public function testGenerateNetworkPath()

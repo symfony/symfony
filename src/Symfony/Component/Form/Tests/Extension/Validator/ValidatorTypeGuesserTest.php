@@ -16,11 +16,11 @@ use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 

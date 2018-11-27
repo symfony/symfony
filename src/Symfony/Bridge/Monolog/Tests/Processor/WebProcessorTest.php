@@ -49,6 +49,8 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
         $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
+
+        Request::setTrustedProxies(array(), -1);
     }
 
     public function testCanBeConstructedWithExtraFields()

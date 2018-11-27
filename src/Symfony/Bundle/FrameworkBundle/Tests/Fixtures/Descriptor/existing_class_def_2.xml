@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\ClassWithoutDocComment" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file=""/>

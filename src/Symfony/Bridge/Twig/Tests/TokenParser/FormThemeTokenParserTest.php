@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Twig\Tests\TokenParser;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
+use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Twig\Environment;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;

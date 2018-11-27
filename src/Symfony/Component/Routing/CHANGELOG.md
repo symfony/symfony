@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added fallback to cultureless locale for internationalized routes
+
 4.0.0
 -----
 

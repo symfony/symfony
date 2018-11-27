@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.1",
+    "Version": "2.1.39.11",
     "Names": {
         "AED": [
             "AED",
@@ -123,6 +123,10 @@
         ],
         "MRO": [
             "MRO",
+            "ugîya tî Moritanïi (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ugîya tî Moritanïi"
         ],
         "MUR": [
@@ -175,6 +179,10 @@
         ],
         "STD": [
             "STD",
+            "dôbra tî Sâô Tomë na Prinsîpe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dôbra tî Sâô Tomë na Prinsîpe"
         ],
         "SZL": [

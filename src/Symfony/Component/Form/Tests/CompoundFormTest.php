@@ -17,9 +17,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 class CompoundFormTest extends AbstractFormTest
 {
@@ -595,9 +595,9 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequest($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
-
+        file_put_contents($path, 'zaza');
         $values = array(
             'author' => array(
                 'name' => 'Bernhard',
@@ -630,7 +630,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', null, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
@@ -643,8 +643,9 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
+        file_put_contents($path, 'zaza');
 
         $values = array(
             'name' => 'Bernhard',
@@ -676,7 +677,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', null, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
@@ -690,8 +691,9 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
+        file_put_contents($path, 'zaza');
 
         $files = array(
             'image' => array(
@@ -714,7 +716,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', null, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
 
         $this->assertEquals($file, $form->getData());
 
@@ -726,8 +728,9 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
+        file_put_contents($path, 'zaza');
 
         $values = array(
             'name' => 'Bernhard',
@@ -876,6 +879,48 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame($nestedError, $nestedErrorsAsArray[0]);
     }
 
+    public function testClearErrors()
+    {
+        $this->form->addError(new FormError('Error 1'));
+        $this->form->addError(new FormError('Error 2'));
+
+        $this->assertCount(2, $this->form->getErrors());
+
+        $this->form->clearErrors();
+
+        $this->assertCount(0, $this->form->getErrors());
+    }
+
+    public function testClearErrorsShallow()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError(new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->form->clearErrors(false);
+
+        $this->assertCount(0, $this->form->getErrors(false));
+        $this->assertCount(1, $this->form->getErrors(true));
+    }
+
+    public function testClearErrorsDeep()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->form->clearErrors(true);
+
+        $this->assertCount(0, $this->form->getErrors(false));
+        $this->assertCount(0, $this->form->getErrors(true));
+    }
+
     // Basic cases are covered in SimpleFormTest
     public function testCreateViewWithChildren()
     {
@@ -1012,6 +1057,28 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->submit(array());
 
         $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testDisabledButtonIsNotSubmitted()
+    {
+        $button = new SubmitButtonBuilder('submit');
+        $submit = $button
+            ->setDisabled(true)
+            ->getForm();
+
+        $form = $this->createForm()
+            ->add($this->getBuilder('text')->getForm())
+            ->add($submit)
+        ;
+
+        $form->submit(array(
+            'text' => '',
+            'submit' => '',
+        ));
+
+        $this->assertTrue($submit->isDisabled());
+        $this->assertFalse($submit->isClicked());
+        $this->assertFalse($submit->isSubmitted());
     }
 
     protected function createForm()

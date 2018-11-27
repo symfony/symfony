@@ -58,7 +58,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeOption($object, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
         }
     }
 
@@ -98,6 +98,8 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         $this->overriddenOptions = array_filter($this->overriddenOptions);
+        $this->parentOptions = array_filter($this->parentOptions);
+        $this->extensionOptions = array_filter($this->extensionOptions);
         $this->requiredOptions = $optionsResolver->getRequiredOptions();
 
         $this->parents = array_keys($this->parents);
@@ -106,7 +108,10 @@ abstract class Descriptor implements DescriptorInterface
 
     protected function getOptionDefinition(OptionsResolver $optionsResolver, $option)
     {
-        $definition = array('required' => $optionsResolver->isRequired($option));
+        $definition = array(
+            'required' => $optionsResolver->isRequired($option),
+            'deprecated' => $optionsResolver->isDeprecated($option),
+        );
 
         $introspector = new OptionsResolverIntrospector($optionsResolver);
 
@@ -116,6 +121,7 @@ abstract class Descriptor implements DescriptorInterface
             'allowedTypes' => 'getAllowedTypes',
             'allowedValues' => 'getAllowedValues',
             'normalizer' => 'getNormalizer',
+            'deprecationMessage' => 'getDeprecationMessage',
         );
 
         foreach ($map as $key => $method) {
@@ -126,12 +132,44 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
+        if (isset($definition['deprecationMessage']) && \is_string($definition['deprecationMessage'])) {
+            $definition['deprecationMessage'] = strtr($definition['deprecationMessage'], array('%name%' => $option));
+        }
+
         return $definition;
+    }
+
+    protected function filterOptionsByDeprecated(ResolvedFormTypeInterface $type)
+    {
+        $deprecatedOptions = array();
+        $resolver = $type->getOptionsResolver();
+        foreach ($resolver->getDefinedOptions() as $option) {
+            if ($resolver->isDeprecated($option)) {
+                $deprecatedOptions[] = $option;
+            }
+        }
+
+        $filterByDeprecated = function (array $options) use ($deprecatedOptions) {
+            foreach ($options as $class => $opts) {
+                if ($deprecated = array_intersect($deprecatedOptions, $opts)) {
+                    $options[$class] = $deprecated;
+                } else {
+                    unset($options[$class]);
+                }
+            }
+
+            return $options;
+        };
+
+        $this->ownOptions = array_intersect($deprecatedOptions, $this->ownOptions);
+        $this->overriddenOptions = $filterByDeprecated($this->overriddenOptions);
+        $this->parentOptions = $filterByDeprecated($this->parentOptions);
+        $this->extensionOptions = $filterByDeprecated($this->extensionOptions);
     }
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type)
     {
-        $this->parents[$class = get_class($type->getInnerType())] = array();
+        $this->parents[$class = \get_class($type->getInnerType())] = array();
 
         if (null !== $type->getParent()) {
             $optionsResolver = clone $this->getParentOptionsResolver($type->getParent());
@@ -153,7 +191,7 @@ abstract class Descriptor implements DescriptorInterface
         foreach ($type->getTypeExtensions() as $extension) {
             $inheritedOptions = $optionsResolver->getDefinedOptions();
             $extension->configureOptions($optionsResolver);
-            $this->extensions[get_class($extension)] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
+            $this->extensions[\get_class($extension)] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
         }
     }
 }

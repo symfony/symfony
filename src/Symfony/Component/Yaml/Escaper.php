@@ -78,7 +78,7 @@ class Escaper
     {
         // Determines if a PHP value is entirely composed of a value that would
         // require single quoting in YAML.
-        if (in_array(strtolower($value), array('null', '~', 'true', 'false', 'y', 'n', 'yes', 'no', 'on', 'off'))) {
+        if (\in_array(strtolower($value), array('null', '~', 'true', 'false', 'y', 'n', 'yes', 'no', 'on', 'off'))) {
             return true;
         }
 

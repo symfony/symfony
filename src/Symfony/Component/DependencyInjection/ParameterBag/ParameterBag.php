@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -76,18 +76,18 @@ class ParameterBag implements ParameterBagInterface
             $alternatives = array();
             foreach ($this->parameters as $key => $parameterValue) {
                 $lev = levenshtein($name, $key);
-                if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
+                if ($lev <= \strlen($name) / 3 || false !== strpos($key, $name)) {
                     $alternatives[] = $key;
                 }
             }
 
             $nonNestedAlternative = null;
-            if (!count($alternatives) && false !== strpos($name, '.')) {
+            if (!\count($alternatives) && false !== strpos($name, '.')) {
                 $namePartsLength = array_map('strlen', explode('.', $name));
                 $key = substr($name, 0, -1 * (1 + array_pop($namePartsLength)));
-                while (count($namePartsLength)) {
+                while (\count($namePartsLength)) {
                     if ($this->has($key)) {
-                        if (is_array($this->get($key))) {
+                        if (\is_array($this->get($key))) {
                             $nonNestedAlternative = $key;
                         }
                         break;
@@ -171,16 +171,16 @@ class ParameterBag implements ParameterBagInterface
      */
     public function resolveValue($value, array $resolving = array())
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $args = array();
             foreach ($value as $k => $v) {
-                $args[$this->resolveValue($k, $resolving)] = $this->resolveValue($v, $resolving);
+                $args[\is_string($k) ? $this->resolveValue($k, $resolving) : $k] = $this->resolveValue($v, $resolving);
             }
 
             return $args;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value) || 2 > \strlen($value)) {
             return $value;
         }
 
@@ -229,8 +229,8 @@ class ParameterBag implements ParameterBagInterface
 
             $resolved = $this->get($key);
 
-            if (!is_string($resolved) && !is_numeric($resolved)) {
-                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
+            if (!\is_string($resolved) && !is_numeric($resolved)) {
+                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, \gettype($resolved), $value));
             }
 
             $resolved = (string) $resolved;
@@ -250,11 +250,11 @@ class ParameterBag implements ParameterBagInterface
      */
     public function escapeValue($value)
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return str_replace('%', '%%', $value);
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $result = array();
             foreach ($value as $k => $v) {
                 $result[$k] = $this->escapeValue($v);
@@ -271,11 +271,11 @@ class ParameterBag implements ParameterBagInterface
      */
     public function unescapeValue($value)
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return str_replace('%%', '%', $value);
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $result = array();
             foreach ($value as $k => $v) {
                 $result[$k] = $this->unescapeValue($v);

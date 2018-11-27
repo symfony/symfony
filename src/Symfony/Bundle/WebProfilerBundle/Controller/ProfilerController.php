@@ -129,9 +129,7 @@ class ProfilerController
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
-        $session = $request->getSession();
-
-        if (null !== $session && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+        if ($request->hasSession() && ($session = $request->getSession()) && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }
@@ -182,7 +180,7 @@ class ProfilerController
             $this->cspHandler->disableCsp();
         }
 
-        if (null === $session = $request->getSession()) {
+        if (!$request->hasSession()) {
             $ip =
             $method =
             $statusCode =
@@ -192,6 +190,8 @@ class ProfilerController
             $limit =
             $token = null;
         } else {
+            $session = $request->getSession();
+
             $ip = $request->query->get('ip', $session->get('_profiler_search_ip'));
             $method = $request->query->get('method', $session->get('_profiler_search_method'));
             $statusCode = $request->query->get('status_code', $session->get('_profiler_search_status_code'));
@@ -291,7 +291,9 @@ class ProfilerController
         $limit = $request->query->get('limit');
         $token = $request->query->get('token');
 
-        if (null !== $session = $request->getSession()) {
+        if ($request->hasSession()) {
+            $session = $request->getSession();
+
             $session->set('_profiler_search_ip', $ip);
             $session->set('_profiler_search_method', $method);
             $session->set('_profiler_search_status_code', $statusCode);
@@ -366,7 +368,7 @@ class ProfilerController
         $file = $request->query->get('file');
         $line = $request->query->get('line');
 
-        $filename = $this->baseDir.DIRECTORY_SEPARATOR.$file;
+        $filename = $this->baseDir.\DIRECTORY_SEPARATOR.$file;
 
         if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {
             throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));

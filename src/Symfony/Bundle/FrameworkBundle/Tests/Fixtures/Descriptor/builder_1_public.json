@@ -13,6 +13,19 @@
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
             "tags": []
+        },
+        "service_container": {
+            "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
+            "public": true,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "description": "ContainerInterface is the interface implemented by service container classes.",
+            "file": null,
+            "tags": []
         }
     },
     "aliases": {
@@ -21,7 +34,5 @@
             "public": true
         }
     },
-    "services": {
-        "service_container": "Symfony\\Component\\DependencyInjection\\ContainerBuilder"
-    }
+    "services": []
 }

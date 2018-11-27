@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\AnnotationReaderPass;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\Config\CustomConfig;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class TestBundle extends Bundle
 {
@@ -27,6 +28,6 @@ class TestBundle extends Bundle
 
         $extension->setCustomConfig(new CustomConfig());
 
-        $container->addCompilerPass(new AnnotationReaderPass());
+        $container->addCompilerPass(new AnnotationReaderPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }

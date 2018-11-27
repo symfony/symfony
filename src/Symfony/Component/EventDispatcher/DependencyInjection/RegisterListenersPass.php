@@ -12,8 +12,8 @@
 namespace Symfony\Component\EventDispatcher\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -68,6 +68,10 @@ class RegisterListenersPass implements CompilerPassInterface
                         '/[^a-z0-9]/i',
                     ), function ($matches) { return strtoupper($matches[0]); }, $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
+
+                    if (null !== ($class = $container->getDefinition($id)->getClass()) && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod($event['method']) && $r->hasMethod('__invoke')) {
+                        $event['method'] = '__invoke';
+                    }
                 }
 
                 $definition->addMethodCall('addListener', array($event['event'], array(new ServiceClosureArgument(new Reference($id)), $event['method']), $priority));
@@ -84,17 +88,15 @@ class RegisterListenersPass implements CompilerPassInterface
             $def = $container->getDefinition($id);
 
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
-            $class = $container->getParameterBag()->resolveValue($def->getClass());
-            $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
+            $class = $def->getClass();
 
-            if (!is_subclass_of($class, $interface)) {
-                if (!class_exists($class, false)) {
-                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
-                }
-
-                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+            if (!$r = $container->getReflectionClass($class)) {
+                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
-            $container->addObjectResource($class);
+            if (!$r->isSubclassOf(EventSubscriberInterface::class)) {
+                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, EventSubscriberInterface::class));
+            }
+            $class = $r->name;
 
             ExtractingEventDispatcher::$subscriber = $class;
             $extractingDispatcher->addSubscriber($extractingDispatcher);

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 
 class XliffFileLoaderTest extends TestCase
 {
@@ -66,7 +66,7 @@ class XliffFileLoaderTest extends TestCase
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/resname.xlf', 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo'), $catalogue->all('domain1'));
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo', 'qux' => 'qux source'), $catalogue->all('domain1'));
     }
 
     public function testIncompleteResource()
@@ -227,5 +227,34 @@ class XliffFileLoaderTest extends TestCase
         $this->assertEquals('target', $metadata['notes'][1]['appliesTo']);
         $this->assertEquals('quality', $metadata['notes'][1]['category']);
         $this->assertEquals('Fuzzy', $metadata['notes'][1]['content']);
+    }
+
+    public function testLoadVersion2WithMultiSegmentUnit()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-2.0-multi-segment-unit.xlf';
+        $catalog = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertSame('en', $catalog->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalog->getResources());
+        $this->assertFalse(libxml_get_last_error());
+
+        // test for "foo" metadata
+        $this->assertTrue($catalog->defines('foo', 'domain1'));
+        $metadata = $catalog->getMetadata('foo', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(1, $metadata['notes']);
+
+        $this->assertSame('processed', $metadata['notes'][0]['category']);
+        $this->assertSame('true', $metadata['notes'][0]['content']);
+
+        // test for "bar" metadata
+        $this->assertTrue($catalog->defines('bar', 'domain1'));
+        $metadata = $catalog->getMetadata('bar', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(1, $metadata['notes']);
+
+        $this->assertSame('processed', $metadata['notes'][0]['category']);
+        $this->assertSame('true', $metadata['notes'][0]['content']);
     }
 }

@@ -12,10 +12,12 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -28,31 +30,30 @@ class AddConsoleCommandPassTest extends TestCase
     public function testProcess($public)
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->setParameter('my-command.class', 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
 
+        $id = 'my-command';
         $definition = new Definition('%my-command.class%');
         $definition->setPublic($public);
         $definition->addTag('console.command');
-        $container->setDefinition('my-command', $definition);
+        $container->setDefinition($id, $definition);
 
         $container->compile();
 
-        $alias = 'console.command.symfony_component_console_tests_dependencyinjection_mycommand';
+        $alias = 'console.command.public_alias.my-command';
 
         if ($public) {
             $this->assertFalse($container->hasAlias($alias));
-            $id = 'my-command';
         } else {
-            $id = $alias;
             // The alias is replaced by a Definition by the ReplaceAliasByActualDefinitionPass
             // in case the original service is private
-            $this->assertFalse($container->hasDefinition('my-command'));
+            $this->assertFalse($container->hasDefinition($id));
             $this->assertTrue($container->hasDefinition($alias));
         }
 
         $this->assertTrue($container->hasParameter('console.command.ids'));
-        $this->assertSame(array($alias => $id), $container->getParameter('console.command.ids'));
+        $this->assertSame(array($public ? $id : $alias), $container->getParameter('console.command.ids'));
     }
 
     public function testProcessRegistersLazyCommands()
@@ -73,8 +74,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
         $this->assertSame(array('my:command' => 'my-command', 'my:alias' => 'my-command'), $commandLoader->getArgument(1));
         $this->assertEquals(array(array('my-command' => new ServiceClosureArgument(new TypedReference('my-command', MyCommand::class)))), $commandLocator->getArguments());
-        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_mycommand' => 'my-command'), $container->getParameter('console.command.ids'));
-        $this->assertSame(array('my-command' => true), $container->getParameter('console.lazy_command.ids'));
+        $this->assertSame(array(), $container->getParameter('console.command.ids'));
         $this->assertSame(array(array('setName', array('my:command')), array('setAliases', array(array('my:alias')))), $command->getMethodCalls());
     }
 
@@ -96,8 +96,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
         $this->assertSame(array('default' => 'with-default-name'), $commandLoader->getArgument(1));
         $this->assertEquals(array(array('with-default-name' => new ServiceClosureArgument(new TypedReference('with-default-name', NamedCommand::class)))), $commandLocator->getArguments());
-        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_namedcommand' => 'with-default-name'), $container->getParameter('console.command.ids'));
-        $this->assertSame(array('with-default-name' => true), $container->getParameter('console.lazy_command.ids'));
+        $this->assertSame(array(), $container->getParameter('console.command.ids'));
 
         $container = new ContainerBuilder();
         $container
@@ -127,7 +126,7 @@ class AddConsoleCommandPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         $definition = new Definition('Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
         $definition->addTag('console.command');
@@ -145,7 +144,7 @@ class AddConsoleCommandPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         $definition = new Definition('SplObjectStorage');
         $definition->addTag('console.command');
@@ -170,10 +169,82 @@ class AddConsoleCommandPassTest extends TestCase
 
         (new AddConsoleCommandPass())->process($container);
 
-        $alias1 = 'console.command.symfony_component_console_tests_dependencyinjection_mycommand';
-        $alias2 = $alias1.'_my-command2';
-        $this->assertTrue($container->hasAlias($alias1));
-        $this->assertTrue($container->hasAlias($alias2));
+        $aliasPrefix = 'console.command.public_alias.';
+        $this->assertTrue($container->hasAlias($aliasPrefix.'my-command1'));
+        $this->assertTrue($container->hasAlias($aliasPrefix.'my-command2'));
+    }
+
+    public function testProcessOnChildDefinitionWithClass()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';
+
+        $parentId = 'my-parent-command';
+        $childId = 'my-child-command';
+
+        $parentDefinition = new Definition(/* no class */);
+        $parentDefinition->setAbstract(true)->setPublic(false);
+
+        $childDefinition = new ChildDefinition($parentId);
+        $childDefinition->addTag('console.command')->setPublic(true);
+        $childDefinition->setClass($className);
+
+        $container->setDefinition($parentId, $parentDefinition);
+        $container->setDefinition($childId, $childDefinition);
+
+        $container->compile();
+        $command = $container->get($childId);
+
+        $this->assertInstanceOf($className, $command);
+    }
+
+    public function testProcessOnChildDefinitionWithParentClass()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';
+
+        $parentId = 'my-parent-command';
+        $childId = 'my-child-command';
+
+        $parentDefinition = new Definition($className);
+        $parentDefinition->setAbstract(true)->setPublic(false);
+
+        $childDefinition = new ChildDefinition($parentId);
+        $childDefinition->addTag('console.command')->setPublic(true);
+
+        $container->setDefinition($parentId, $parentDefinition);
+        $container->setDefinition($childId, $childDefinition);
+
+        $container->compile();
+        $command = $container->get($childId);
+
+        $this->assertInstanceOf($className, $command);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The definition for "my-child-command" has no class.
+     */
+    public function testProcessOnChildDefinitionWithoutClass()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+
+        $parentId = 'my-parent-command';
+        $childId = 'my-child-command';
+
+        $parentDefinition = new Definition();
+        $parentDefinition->setAbstract(true)->setPublic(false);
+
+        $childDefinition = new ChildDefinition($parentId);
+        $childDefinition->addTag('console.command')->setPublic(true);
+
+        $container->setDefinition($parentId, $parentDefinition);
+        $container->setDefinition($childId, $childDefinition);
+
+        $container->compile();
     }
 }
 

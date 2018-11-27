@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -52,9 +52,7 @@ class ValidationListener implements EventSubscriberInterface
 
         if ($form->isRoot()) {
             // Validate the form in group "Default"
-            $violations = $this->validator->validate($form);
-
-            foreach ($violations as $violation) {
+            foreach ($this->validator->validate($form) as $violation) {
                 // Allow the "invalid" constraint to be put onto
                 // non-synchronized forms
                 // ConstraintViolation::getConstraint() must not expect to provide a constraint as long as Symfony\Component\Validator\ExecutionContext exists (before 3.0)

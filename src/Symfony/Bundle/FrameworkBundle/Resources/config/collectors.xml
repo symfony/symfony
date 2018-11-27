@@ -12,7 +12,7 @@
             <call method="setKernel"><argument type="service" id="kernel" on-invalid="ignore" /></call>
         </service>
 
-        <service id="data_collector.request" class="Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector">
+        <service id="data_collector.request" class="Symfony\Component\HttpKernel\DataCollector\RequestDataCollector">
             <tag name="kernel.event_subscriber" />
             <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="335" />
         </service>
@@ -35,6 +35,7 @@
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument>%kernel.cache_dir%/%kernel.container_class%</argument>
+            <argument type="service" id="request_stack" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">

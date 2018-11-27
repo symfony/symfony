@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 
+use Symfony\Bundle\DebugBundle\Command\ServerDumpPlaceholderCommand;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -40,12 +41,32 @@ class DebugExtension extends Extension
             ->addMethodCall('setMinDepth', array($config['min_depth']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
 
-        if (null !== $config['dump_destination']) {
+        if (null === $config['dump_destination']) {
+            $container->getDefinition('var_dumper.command.server_dump')
+                ->setClass(ServerDumpPlaceholderCommand::class)
+            ;
+        } elseif (0 === strpos($config['dump_destination'], 'tcp://')) {
+            $container->getDefinition('debug.dump_listener')
+                ->replaceArgument(2, new Reference('var_dumper.server_connection'))
+            ;
+            $container->getDefinition('data_collector.dump')
+                ->replaceArgument(4, new Reference('var_dumper.server_connection'))
+            ;
+            $container->getDefinition('var_dumper.dump_server')
+                ->replaceArgument(0, $config['dump_destination'])
+            ;
+            $container->getDefinition('var_dumper.server_connection')
+                ->replaceArgument(0, $config['dump_destination'])
+            ;
+        } else {
             $container->getDefinition('var_dumper.cli_dumper')
                 ->replaceArgument(0, $config['dump_destination'])
             ;
             $container->getDefinition('data_collector.dump')
                 ->replaceArgument(4, new Reference('var_dumper.cli_dumper'))
+            ;
+            $container->getDefinition('var_dumper.command.server_dump')
+                ->setClass(ServerDumpPlaceholderCommand::class)
             ;
         }
     }

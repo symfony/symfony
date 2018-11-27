@@ -18,15 +18,6 @@ class DefinitionTest extends TestCase
         $this->assertEquals('a', $definition->getInitialPlace());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     */
-    public function testAddPlacesInvalidArgument()
-    {
-        $places = array('a"', 'e"');
-        $definition = new Definition($places, array());
-    }
-
     public function testSetInitialPlace()
     {
         $places = range('a', 'e');

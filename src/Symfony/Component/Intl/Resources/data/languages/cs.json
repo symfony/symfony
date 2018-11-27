@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.11",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "afarština",
         "ab": "abcházština",
@@ -26,10 +26,11 @@
         "ar": "arabština",
         "ar_001": "arabština (moderní standardní)",
         "arc": "aramejština",
-        "arn": "mapudungunština",
+        "arn": "mapudungun",
         "aro": "araonština",
         "arp": "arapažština",
         "arq": "arabština (alžírská)",
+        "ars": "arabština (Nadžd)",
         "arw": "arawacké jazyky",
         "ary": "arabština (marocká)",
         "arz": "arabština (egyptská)",
@@ -359,7 +360,6 @@
         "ms": "malajština",
         "mt": "maltština",
         "mua": "mundang",
-        "mul": "více jazyků",
         "mus": "kríkština",
         "mwl": "mirandština",
         "mwr": "márvárština",
@@ -561,7 +561,6 @@
         "uga": "ugaritština",
         "uk": "ukrajinština",
         "umb": "umbundu",
-        "und": "neznámý jazyk",
         "ur": "urdština",
         "uz": "uzbečtina",
         "vai": "vai",
@@ -605,7 +604,6 @@
         "zh_Hans": "čínština (zjednodušená)",
         "zu": "zuluština",
         "zun": "zunijština",
-        "zxx": "žádný jazykový obsah",
         "zza": "zaza"
     }
 }

@@ -38,6 +38,7 @@ abstract class CacheTestCase extends SimpleCacheTest
         }
 
         $cache = $this->createSimpleCache(2);
+        $cache->clear();
 
         $cache->set('key.dlt', 'value');
         sleep(1);
@@ -46,6 +47,8 @@ abstract class CacheTestCase extends SimpleCacheTest
 
         sleep(2);
         $this->assertNull($cache->get('key.dlt'));
+
+        $cache->clear();
     }
 
     public function testNotUnserializable()
@@ -55,6 +58,7 @@ abstract class CacheTestCase extends SimpleCacheTest
         }
 
         $cache = $this->createSimpleCache();
+        $cache->clear();
 
         $cache->set('foo', new NotUnserializable());
 
@@ -65,6 +69,8 @@ abstract class CacheTestCase extends SimpleCacheTest
         foreach ($cache->getMultiple(array('foo')) as $value) {
         }
         $this->assertNull($value);
+
+        $cache->clear();
     }
 
     public function testPrune()
@@ -79,6 +85,7 @@ abstract class CacheTestCase extends SimpleCacheTest
 
         /** @var PruneableInterface|CacheInterface $cache */
         $cache = $this->createSimpleCache();
+        $cache->clear();
 
         $cache->set('foo', 'foo-val', new \DateInterval('PT05S'));
         $cache->set('bar', 'bar-val', new \DateInterval('PT10S'));
@@ -120,6 +127,8 @@ abstract class CacheTestCase extends SimpleCacheTest
         $cache->prune();
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
+
+        $cache->clear();
     }
 }
 

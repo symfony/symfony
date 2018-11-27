@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @Annotation
@@ -28,4 +30,19 @@ class Locale extends Constraint
     );
 
     public $message = 'This value is not a valid locale.';
+    public $canonicalize = false;
+
+    public function __construct($options = null)
+    {
+        if (!($options['canonicalize'] ?? false)) {
+            @trigger_error('The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.', E_USER_DEPRECATED);
+        }
+
+        if (!class_exists(Intl::class)) {
+            // throw new LogicException(sprintf('The "symfony/intl" component is required to use the "%s" constraint.', __CLASS__));
+            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/intl" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        }
+
+        parent::__construct($options);
+    }
 }

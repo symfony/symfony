@@ -44,6 +44,6 @@ final class FormatExceptionContext
         $before = str_replace("\n", '\n', substr($this->data, max(0, $this->cursor - 20), min(20, $this->cursor)));
         $after = str_replace("\n", '\n', substr($this->data, $this->cursor, 20));
 
-        return '...'.$before.$after."...\n".str_repeat(' ', strlen($before) + 2).'^ line '.$this->lineno.' offset '.$this->cursor;
+        return '...'.$before.$after."...\n".str_repeat(' ', \strlen($before) + 2).'^ line '.$this->lineno.' offset '.$this->cursor;
     }
 }

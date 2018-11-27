@@ -33,7 +33,7 @@ class SubRequestController implements ContainerAwareInterface
         // ...to check that the FragmentListener still references the right Request
         // when rendering another fragment after the error occurred
         // should render en/html instead of fr/json
-        $content .= $handler->render(new ControllerReference('TestBundle:SubRequest:fragment'));
+        $content .= $handler->render(new ControllerReference(self::class.'::fragmentAction'));
 
         // forces the LocaleListener to set fr for the locale...
         // should render fr/json

@@ -51,7 +51,7 @@ class TraceableFirewallListenerTest extends TestCase
             ->expects($this->once())
             ->method('getListeners')
             ->with($request)
-            ->willReturn(array(array($listener), null));
+            ->willReturn(array(array($listener), null, null));
 
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
@@ -60,6 +60,6 @@ class TraceableFirewallListenerTest extends TestCase
         $this->assertCount(1, $listeners);
         $this->assertSame($response, $listeners[0]['response']);
         $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
-        $this->assertSame(get_class($listener), (string) $listeners[0]['stub']);
+        $this->assertSame(\get_class($listener), (string) $listeners[0]['stub']);
     }
 }

@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `EntryManager::applyOperations`
+
+4.1.0
+-----
+
+ * Added support for adding values to multi-valued attributes
+ * Added support for removing values from multi-valued attributes
+
 4.0.0
 -----
 

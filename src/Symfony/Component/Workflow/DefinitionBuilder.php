@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Workflow;
 
-use Symfony\Component\Workflow\Exception\InvalidArgumentException;
+use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
  * Builds a definition.
@@ -25,6 +25,7 @@ class DefinitionBuilder
     private $places = array();
     private $transitions = array();
     private $initialPlace;
+    private $metadataStore;
 
     /**
      * @param string[]     $places
@@ -41,7 +42,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlace);
+        return new Definition($this->places, $this->transitions, $this->initialPlace, $this->metadataStore);
     }
 
     /**
@@ -49,11 +50,12 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function reset()
+    public function clear()
     {
         $this->places = array();
         $this->transitions = array();
         $this->initialPlace = null;
+        $this->metadataStore = null;
 
         return $this;
     }
@@ -77,10 +79,6 @@ class DefinitionBuilder
      */
     public function addPlace($place)
     {
-        if (!preg_match('{^[\w_-]+$}', $place)) {
-            throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
-        }
-
         if (!$this->places) {
             $this->initialPlace = $place;
         }
@@ -126,5 +124,27 @@ class DefinitionBuilder
         $this->transitions[] = $transition;
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMetadataStore(MetadataStoreInterface $metadataStore)
+    {
+        $this->metadataStore = $metadataStore;
+
+        return $this;
+    }
+
+    /**
+     * @deprecated since Symfony 4.1, use the clear() method instead.
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "clear()" method instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->clear();
     }
 }

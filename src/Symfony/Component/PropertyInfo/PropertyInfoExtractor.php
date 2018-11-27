@@ -16,27 +16,30 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
-class PropertyInfoExtractor implements PropertyInfoExtractorInterface
+class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
 {
     private $listExtractors;
     private $typeExtractors;
     private $descriptionExtractors;
     private $accessExtractors;
+    private $initializableExtractors;
 
     /**
-     * @param iterable|PropertyListExtractorInterface[]        $listExtractors
-     * @param iterable|PropertyTypeExtractorInterface[]        $typeExtractors
-     * @param iterable|PropertyDescriptionExtractorInterface[] $descriptionExtractors
-     * @param iterable|PropertyAccessExtractorInterface[]      $accessExtractors
+     * @param iterable|PropertyListExtractorInterface[]          $listExtractors
+     * @param iterable|PropertyTypeExtractorInterface[]          $typeExtractors
+     * @param iterable|PropertyDescriptionExtractorInterface[]   $descriptionExtractors
+     * @param iterable|PropertyAccessExtractorInterface[]        $accessExtractors
+     * @param iterable|PropertyInitializableExtractorInterface[] $initializableExtractors
      */
-    public function __construct(iterable $listExtractors = array(), iterable $typeExtractors = array(), iterable $descriptionExtractors = array(), iterable $accessExtractors = array())
+    public function __construct(iterable $listExtractors = array(), iterable $typeExtractors = array(), iterable $descriptionExtractors = array(), iterable $accessExtractors = array(), iterable $initializableExtractors = array())
     {
         $this->listExtractors = $listExtractors;
         $this->typeExtractors = $typeExtractors;
         $this->descriptionExtractors = $descriptionExtractors;
         $this->accessExtractors = $accessExtractors;
+        $this->initializableExtractors = $initializableExtractors;
     }
 
     /**
@@ -88,6 +91,14 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    {
+        return $this->extract($this->initializableExtractors, 'isInitializable', array($class, $property, $context));
+    }
+
+    /**
      * Iterates over registered extractors and return the first value found.
      *
      * @return mixed
@@ -95,8 +106,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
     private function extract(iterable $extractors, string $method, array $arguments)
     {
         foreach ($extractors as $extractor) {
-            $value = call_user_func_array(array($extractor, $method), $arguments);
-            if (null !== $value) {
+            if (null !== $value = $extractor->{$method}(...$arguments)) {
                 return $value;
             }
         }

@@ -44,7 +44,7 @@ class LoaderTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Exception\FileLoaderLoadException
+     * @expectedException \Symfony\Component\Config\Exception\LoaderLoadException
      */
     public function testResolveWhenResolverCannotFindLoader()
     {
@@ -109,7 +109,7 @@ class ProjectLoader1 extends Loader
 
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
+        return \is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 
     public function getType()

@@ -72,7 +72,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
         if (null === $value) {
             return;
         }
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
         if ('' === $value) {

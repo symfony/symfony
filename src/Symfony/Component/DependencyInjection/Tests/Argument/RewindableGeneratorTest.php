@@ -46,7 +46,7 @@ class RewindableGeneratorTest extends TestCase
         $this->assertSame(0, $called, 'Count callback is called lazily');
         $this->assertCount(3, $generator);
 
-        count($generator);
+        \count($generator);
 
         $this->assertSame(1, $called, 'Count callback is called only once');
     }

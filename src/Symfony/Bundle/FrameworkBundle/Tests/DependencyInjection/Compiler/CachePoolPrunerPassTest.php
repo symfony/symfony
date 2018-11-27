@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPrunerPass;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
@@ -20,12 +19,15 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @group legacy
+ */
 class CachePoolPrunerPassTest extends TestCase
 {
     public function testCompilerPassReplacesCommandArgument()
     {
         $container = new ContainerBuilder();
-        $container->register(CachePoolPruneCommand::class)->addArgument(array());
+        $container->register('console.command.cache_pool_prune')->addArgument(array());
         $container->register('pool.foo', FilesystemAdapter::class)->addTag('cache.pool');
         $container->register('pool.bar', PhpFilesAdapter::class)->addTag('cache.pool');
 
@@ -36,7 +38,7 @@ class CachePoolPrunerPassTest extends TestCase
             'pool.foo' => new Reference('pool.foo'),
             'pool.bar' => new Reference('pool.bar'),
         );
-        $argument = $container->getDefinition(CachePoolPruneCommand::class)->getArgument(0);
+        $argument = $container->getDefinition('console.command.cache_pool_prune')->getArgument(0);
 
         $this->assertInstanceOf(IteratorArgument::class, $argument);
         $this->assertEquals($expected, $argument->getValues());
@@ -44,27 +46,17 @@ class CachePoolPrunerPassTest extends TestCase
 
     public function testCompilePassIsIgnoredIfCommandDoesNotExist()
     {
-        $container = $this
-            ->getMockBuilder(ContainerBuilder::class)
-            ->setMethods(array('hasDefinition', 'getDefinition', 'findTaggedServiceIds'))
-            ->getMock();
+        $container = new ContainerBuilder();
 
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('hasDefinition')
-            ->with(CachePoolPruneCommand::class)
-            ->will($this->returnValue(false));
-
-        $container
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $container
-            ->expects($this->never())
-            ->method('findTaggedServiceIds');
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $pass = new CachePoolPrunerPass();
         $pass->process($container);
+
+        // the container is untouched (i.e. no new definitions or aliases)
+        $this->assertCount($definitionsBefore, $container->getDefinitions());
+        $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
     /**
@@ -74,7 +66,7 @@ class CachePoolPrunerPassTest extends TestCase
     public function testCompilerPassThrowsOnInvalidDefinitionClass()
     {
         $container = new ContainerBuilder();
-        $container->register(CachePoolPruneCommand::class)->addArgument(array());
+        $container->register('console.command.cache_pool_prune')->addArgument(array());
         $container->register('pool.not-found', NotFound::class)->addTag('cache.pool');
 
         $pass = new CachePoolPrunerPass();

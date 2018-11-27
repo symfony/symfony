@@ -12,19 +12,20 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class RequestDataCollectorTest extends TestCase
 {
@@ -195,6 +196,58 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame('n/a', $c->getController());
     }
 
+    public function testItAddsRedirectedAttributesWhenRequestContainsSpecificCookie()
+    {
+        $request = $this->createRequest();
+        $request->cookies->add(array(
+            'sf_redirect' => '{}',
+        ));
+
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+
+        $c = new RequestDataCollector();
+        $c->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $this->createResponse()));
+
+        $this->assertTrue($request->attributes->get('_redirected'));
+    }
+
+    public function testItSetsARedirectCookieIfTheResponseIsARedirection()
+    {
+        $c = new RequestDataCollector();
+
+        $response = $this->createResponse();
+        $response->setStatusCode(302);
+        $response->headers->set('Location', '/somewhere-else');
+
+        $c->collect($request = $this->createRequest(), $response);
+        $c->lateCollect();
+
+        $cookie = $this->getCookieByName($response, 'sf_redirect');
+
+        $this->assertNotEmpty($cookie->getValue());
+        $this->assertSame('lax', $cookie->getSameSite());
+        $this->assertFalse($cookie->isSecure());
+    }
+
+    public function testItCollectsTheRedirectionAndClearTheCookie()
+    {
+        $c = new RequestDataCollector();
+
+        $request = $this->createRequest();
+        $request->attributes->set('_redirected', true);
+        $request->cookies->add(array(
+            'sf_redirect' => '{"method": "POST"}',
+        ));
+
+        $c->collect($request, $response = $this->createResponse());
+        $c->lateCollect();
+
+        $this->assertEquals('POST', $c->getRedirect()['method']);
+
+        $cookie = $this->getCookieByName($response, 'sf_redirect');
+        $this->assertNull($cookie->getValue());
+    }
+
     protected function createRequest($routeParams = array('name' => 'foo'))
     {
         $request = Request::create('http://test.com/foo?bar=baz');
@@ -223,9 +276,9 @@ class RequestDataCollectorTest extends TestCase
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('X-Foo-Bar', null);
-        $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true));
-        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800')));
-        $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12'));
+        $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true, false, null));
+        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800'), '/', null, false, true, false, null));
+        $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12', '/', null, false, true, false, null));
 
         return $response;
     }
@@ -268,5 +321,16 @@ class RequestDataCollectorTest extends TestCase
     public function __invoke()
     {
         throw new \LogicException('Unexpected method call');
+    }
+
+    private function getCookieByName(Response $response, $name)
+    {
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($cookie->getName() == $name) {
+                return $cookie;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('Cookie named "%s" is not in response', $name));
     }
 }

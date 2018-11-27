@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -98,7 +99,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
             $message .= sprintf("\n\nDid you mean \"%s\"?", $guess);
         }
 
-        throw new \LogicException($message);
+        throw new LogicException($message);
     }
 
     public function validateConfiguration(ExtensionInterface $extension, $configuration)
@@ -108,7 +109,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
 
         if (!$configuration instanceof ConfigurationInterface) {
-            throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
+            throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', \get_class($configuration)));
         }
     }
 

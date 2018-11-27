@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.22",
+    "Version": "2.1.43.65",
     "Names": {
         "AC": "Illa de l’Ascensió",
         "AD": "Andorra",
@@ -72,7 +72,6 @@
         "ER": "Eritrea",
         "ES": "Espanya",
         "ET": "Etiòpia",
-        "EZ": "zona euro",
         "FI": "Finlàndia",
         "FJ": "Fiji",
         "FK": "Illes Malvines",
@@ -237,7 +236,6 @@
         "UA": "Ucraïna",
         "UG": "Uganda",
         "UM": "Illes Perifèriques Menors dels EUA",
-        "UN": "Nacions Unides",
         "US": "Estats Units",
         "UY": "Uruguai",
         "UZ": "Uzbekistan",

@@ -13,11 +13,13 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Emulates the invalid behavior if the reference is not found within the
@@ -29,6 +31,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
 {
     private $container;
     private $signalingException;
+    private $currentId;
 
     /**
      * Process the ContainerBuilder to resolve invalid references.
@@ -63,10 +66,13 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             $value->setArguments($this->processValue($value->getArguments(), 0));
             $value->setProperties($this->processValue($value->getProperties(), 1));
             $value->setMethodCalls($this->processValue($value->getMethodCalls(), 2));
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             $i = 0;
 
             foreach ($value as $k => $v) {
+                if (!$rootLevel) {
+                    $this->currentId = $k;
+                }
                 try {
                     if (false !== $i && $k !== $i++) {
                         $i = false;
@@ -90,12 +96,20 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 $value = array_values($value);
             }
         } elseif ($value instanceof Reference) {
-            $id = (string) $value;
-
-            if ($this->container->has($id)) {
+            if ($this->container->has($id = (string) $value)) {
                 return $value;
             }
             $invalidBehavior = $value->getInvalidBehavior();
+
+            if (ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior && $value instanceof TypedReference && !$this->container->has($id)) {
+                $e = new ServiceNotFoundException($id, $this->currentId);
+
+                // since the error message varies by $id and $this->currentId, so should the id of the dummy errored definition
+                $this->container->register($id = sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())
+                    ->addError($e->getMessage());
+
+                return new TypedReference($id, $value->getType(), $value->getInvalidBehavior());
+            }
 
             // resolve invalid behavior
             if (ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {

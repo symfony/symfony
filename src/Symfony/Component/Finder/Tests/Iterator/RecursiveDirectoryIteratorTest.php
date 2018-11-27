@@ -43,8 +43,8 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         }
 
         $contains = array(
-            'ftp://speedtest.tele2.net'.DIRECTORY_SEPARATOR.'1000GB.zip',
-            'ftp://speedtest.tele2.net'.DIRECTORY_SEPARATOR.'100GB.zip',
+            'ftp://speedtest.tele2.net'.\DIRECTORY_SEPARATOR.'1000GB.zip',
+            'ftp://speedtest.tele2.net'.\DIRECTORY_SEPARATOR.'100GB.zip',
         );
         $actual = array();
 

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.91",
     "Names": {
         "AC": "Debesbraukšanas sala",
         "AD": "Andora",
@@ -72,7 +72,6 @@
         "ER": "Eritreja",
         "ES": "Spānija",
         "ET": "Etiopija",
-        "EZ": "Eirozona",
         "FI": "Somija",
         "FJ": "Fidži",
         "FK": "Folklenda salas",
@@ -80,7 +79,7 @@
         "FO": "Fēru salas",
         "FR": "Francija",
         "GA": "Gabona",
-        "GB": "Lielbritānija",
+        "GB": "Apvienotā Karaliste",
         "GD": "Grenāda",
         "GE": "Gruzija",
         "GF": "Francijas Gviāna",
@@ -237,7 +236,6 @@
         "UA": "Ukraina",
         "UG": "Uganda",
         "UM": "ASV Mazās Aizjūras salas",
-        "UN": "Apvienoto Nāciju Organizācija",
         "US": "Amerikas Savienotās Valstis",
         "UY": "Urugvaja",
         "UZ": "Uzbekistāna",

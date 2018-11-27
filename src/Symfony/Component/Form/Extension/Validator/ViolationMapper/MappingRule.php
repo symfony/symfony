@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\ErrorMappingException;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -46,7 +46,7 @@ class MappingRule
      *
      * @param string $propertyPath The property path to match against the rule
      *
-     * @return null|FormInterface The mapped form or null
+     * @return FormInterface|null The mapped form or null
      */
     public function match($propertyPath)
     {
@@ -64,7 +64,7 @@ class MappingRule
      */
     public function isPrefix($propertyPath)
     {
-        $length = strlen($propertyPath);
+        $length = \strlen($propertyPath);
         $prefix = substr($this->propertyPath, 0, $length);
         $next = isset($this->propertyPath[$length]) ? $this->propertyPath[$length] : null;
 

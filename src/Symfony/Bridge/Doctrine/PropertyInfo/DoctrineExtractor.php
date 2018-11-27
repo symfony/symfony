@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -27,11 +28,22 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
 {
+    private $entityManager;
     private $classMetadataFactory;
 
-    public function __construct(ClassMetadataFactory $classMetadataFactory)
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct($entityManager)
     {
-        $this->classMetadataFactory = $classMetadataFactory;
+        if ($entityManager instanceof EntityManagerInterface) {
+            $this->entityManager = $entityManager;
+        } elseif ($entityManager instanceof ClassMetadataFactory) {
+            @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), E_USER_DEPRECATED);
+            $this->classMetadataFactory = $entityManager;
+        } else {
+            throw new \InvalidArgumentException(sprintf('$entityManager must be an instance of "%s", "%s" given.', EntityManagerInterface::class, \is_object($entityManager) ? \get_class($entityManager) : \gettype($entityManager)));
+        }
     }
 
     /**
@@ -40,7 +52,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     public function getProperties($class, array $context = array())
     {
         try {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class);
+            $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
             return;
         } catch (OrmMappingException $exception) {
@@ -66,7 +78,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     public function getTypes($class, $property, array $context = array())
     {
         try {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class);
+            $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
             return;
         } catch (OrmMappingException $exception) {
@@ -95,8 +107,18 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
                 if (isset($associationMapping['indexBy'])) {
                     $indexProperty = $associationMapping['indexBy'];
-                    $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                    /** @var ClassMetadataInfo $subMetadata */
+                    $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
                     $typeOfField = $subMetadata->getTypeOfField($indexProperty);
+
+                    if (null === $typeOfField) {
+                        $associationMapping = $subMetadata->getAssociationMapping($indexProperty);
+
+                        /** @var ClassMetadataInfo $subMetadata */
+                        $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($indexProperty);
+                        $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                        $typeOfField = $subMetadata->getTypeOfField($indexProperty);
+                    }
 
                     $collectionKeyType = $this->getPhpType($typeOfField);
                 }

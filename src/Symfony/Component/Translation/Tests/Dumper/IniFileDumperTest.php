@@ -12,8 +12,8 @@
 namespace Symfony\Component\Translation\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Dumper\IniFileDumper;
+use Symfony\Component\Translation\MessageCatalogue;
 
 class IniFileDumperTest extends TestCase
 {

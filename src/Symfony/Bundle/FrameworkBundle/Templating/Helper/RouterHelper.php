@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * RouterHelper manages links between pages in a template context.

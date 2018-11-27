@@ -12,17 +12,16 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder as CustomNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder as CustomNodeBuilder;
 
 class TreeBuilderTest extends TestCase
 {
     public function testUsingACustomNodeBuilder()
     {
-        $builder = new TreeBuilder();
-        $root = $builder->root('custom', 'array', new CustomNodeBuilder());
+        $builder = new TreeBuilder('custom', 'array', new CustomNodeBuilder());
 
-        $nodeBuilder = $root->children();
+        $nodeBuilder = $builder->getRootNode()->children();
 
         $this->assertInstanceOf('Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder', $nodeBuilder);
 
@@ -33,39 +32,36 @@ class TreeBuilderTest extends TestCase
 
     public function testOverrideABuiltInNodeType()
     {
-        $builder = new TreeBuilder();
-        $root = $builder->root('override', 'array', new CustomNodeBuilder());
+        $builder = new TreeBuilder('override', 'array', new CustomNodeBuilder());
 
-        $definition = $root->children()->variableNode('variable');
+        $definition = $builder->getRootNode()->children()->variableNode('variable');
 
         $this->assertInstanceOf('Symfony\Component\Config\Tests\Fixtures\Builder\VariableNodeDefinition', $definition);
     }
 
     public function testAddANodeType()
     {
-        $builder = new TreeBuilder();
-        $root = $builder->root('override', 'array', new CustomNodeBuilder());
+        $builder = new TreeBuilder('override', 'array', new CustomNodeBuilder());
 
-        $definition = $root->children()->barNode('variable');
+        $definition = $builder->getRootNode()->children()->barNode('variable');
 
         $this->assertInstanceOf('Symfony\Component\Config\Tests\Fixtures\Builder\BarNodeDefinition', $definition);
     }
 
     public function testCreateABuiltInNodeTypeWithACustomNodeBuilder()
     {
-        $builder = new TreeBuilder();
-        $root = $builder->root('builtin', 'array', new CustomNodeBuilder());
+        $builder = new TreeBuilder('builtin', 'array', new CustomNodeBuilder());
 
-        $definition = $root->children()->booleanNode('boolean');
+        $definition = $builder->getRootNode()->children()->booleanNode('boolean');
 
         $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition', $definition);
     }
 
     public function testPrototypedArrayNodeUseTheCustomNodeBuilder()
     {
-        $builder = new TreeBuilder();
-        $root = $builder->root('override', 'array', new CustomNodeBuilder());
+        $builder = new TreeBuilder('override', 'array', new CustomNodeBuilder());
 
+        $root = $builder->getRootNode();
         $root->prototype('bar')->end();
 
         $this->assertInstanceOf('Symfony\Component\Config\Tests\Fixtures\BarNode', $root->getNode(true)->getPrototype());
@@ -73,9 +69,9 @@ class TreeBuilderTest extends TestCase
 
     public function testAnExtendedNodeBuilderGetsPropagatedToTheChildren()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('propagation');
 
-        $builder->root('propagation')
+        $builder->getRootNode()
             ->children()
                 ->setNodeClass('extended', 'Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition')
                 ->node('foo', 'extended')->end()
@@ -99,9 +95,9 @@ class TreeBuilderTest extends TestCase
 
     public function testDefinitionInfoGetsTransferredToNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('test');
 
-        $builder->root('test')->info('root info')
+        $builder->getRootNode()->info('root info')
             ->children()
                 ->node('child', 'variable')->info('child info')->defaultValue('default')
             ->end()
@@ -116,9 +112,9 @@ class TreeBuilderTest extends TestCase
 
     public function testDefinitionExampleGetsTransferredToNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('test');
 
-        $builder->root('test')
+        $builder->getRootNode()
             ->example(array('key' => 'value'))
             ->children()
                 ->node('child', 'variable')->info('child info')->defaultValue('default')->example('example')
@@ -130,5 +126,75 @@ class TreeBuilderTest extends TestCase
 
         $this->assertInternalType('array', $tree->getExample());
         $this->assertEquals('example', $children['child']->getExample());
+    }
+
+    public function testDefaultPathSeparatorIsDot()
+    {
+        $builder = new TreeBuilder('propagation');
+
+        $builder->getRootNode()
+            ->children()
+                ->node('foo', 'variable')->end()
+                ->arrayNode('child')
+                    ->children()
+                        ->node('foo', 'variable')
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
+
+        $node = $builder->buildTree();
+        $children = $node->getChildren();
+
+        $this->assertArrayHasKey('foo', $children);
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\BaseNode', $children['foo']);
+        $this->assertSame('propagation.foo', $children['foo']->getPath());
+
+        $this->assertArrayHasKey('child', $children);
+        $childChildren = $children['child']->getChildren();
+
+        $this->assertArrayHasKey('foo', $childChildren);
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\BaseNode', $childChildren['foo']);
+        $this->assertSame('propagation.child.foo', $childChildren['foo']->getPath());
+    }
+
+    public function testPathSeparatorIsPropagatedToChildren()
+    {
+        $builder = new TreeBuilder('propagation');
+
+        $builder->getRootNode()
+            ->children()
+                ->node('foo', 'variable')->end()
+                ->arrayNode('child')
+                    ->children()
+                        ->node('foo', 'variable')
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
+
+        $builder->setPathSeparator('/');
+        $node = $builder->buildTree();
+        $children = $node->getChildren();
+
+        $this->assertArrayHasKey('foo', $children);
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\BaseNode', $children['foo']);
+        $this->assertSame('propagation/foo', $children['foo']->getPath());
+
+        $this->assertArrayHasKey('child', $children);
+        $childChildren = $children['child']->getChildren();
+
+        $this->assertArrayHasKey('foo', $childChildren);
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\BaseNode', $childChildren['foo']);
+        $this->assertSame('propagation/child/foo', $childChildren['foo']->getPath());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation A tree builder without a root node is deprecated since Symfony 4.2 and will not be supported anymore in 5.0.
+     */
+    public function testInitializingTreeBuildersWithoutRootNode()
+    {
+        new TreeBuilder();
     }
 }

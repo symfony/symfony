@@ -26,11 +26,12 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     use Traits\PublicTrait;
     use Traits\ShareTrait;
     use Traits\TagTrait;
+    use Traits\BindTrait;
 
     /**
      * Defines an instanceof-conditional to be applied to following service definitions.
      */
-    final public function instanceof(string $fqcn): InstanceofConfigurator
+    final public function instanceof(string $fqcn): self
     {
         return $this->parent->instanceof($fqcn);
     }

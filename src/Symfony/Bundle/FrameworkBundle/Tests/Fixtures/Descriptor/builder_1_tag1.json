@@ -1,6 +1,6 @@
 {
     "definitions": {
-        "definition_2": {
+        ".definition_2": {
             "class": "Full\\Qualified\\Class2",
             "public": false,
             "synthetic": true,

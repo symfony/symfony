@@ -12,8 +12,8 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class InputDefinitionTest extends TestCase
@@ -374,8 +374,9 @@ class InputDefinitionTest extends TestCase
 
             array(new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED))), '<foo>', 'puts arguments in angle brackets'),
             array(new InputDefinition(array(new InputArgument('foo'))), '[<foo>]', 'puts optional arguments in square brackets'),
-            array(new InputDefinition(array(new InputArgument('foo', InputArgument::IS_ARRAY))), '[<foo>]...', 'uses an ellipsis for array arguments'),
-            array(new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY))), '<foo> (<foo>)...', 'uses parenthesis and ellipsis for required array arguments'),
+            array(new InputDefinition(array(new InputArgument('foo'), new InputArgument('bar'))), '[<foo> [<bar>]]', 'chains optional arguments inside brackets'),
+            array(new InputDefinition(array(new InputArgument('foo', InputArgument::IS_ARRAY))), '[<foo>...]', 'uses an ellipsis for array arguments'),
+            array(new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY))), '<foo>...', 'uses an ellipsis for required array arguments'),
 
             array(new InputDefinition(array(new InputOption('foo'), new InputArgument('foo', InputArgument::REQUIRED))), '[--foo] [--] <foo>', 'puts [--] between options and arguments'),
         );

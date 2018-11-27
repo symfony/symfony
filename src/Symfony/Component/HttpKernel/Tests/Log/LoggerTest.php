@@ -34,7 +34,7 @@ class LoggerTest extends TestCase
 
     protected function setUp()
     {
-        $this->tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'log';
+        $this->tmpFile = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'log';
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile);
     }
 

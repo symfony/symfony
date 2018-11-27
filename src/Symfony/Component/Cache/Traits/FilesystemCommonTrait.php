@@ -34,14 +34,14 @@ trait FilesystemCommonTrait
             if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
                 throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
-            $directory .= DIRECTORY_SEPARATOR.$namespace;
+            $directory .= \DIRECTORY_SEPARATOR.$namespace;
         }
         if (!file_exists($directory)) {
             @mkdir($directory, 0777, true);
         }
-        $directory .= DIRECTORY_SEPARATOR;
+        $directory .= \DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
-        if ('\\' === DIRECTORY_SEPARATOR && strlen($directory) > 234) {
+        if ('\\' === \DIRECTORY_SEPARATOR && \strlen($directory) > 234) {
             throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
         }
 
@@ -56,7 +56,7 @@ trait FilesystemCommonTrait
         $ok = true;
 
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
+            $ok = ($file->isDir() || $this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;
@@ -71,10 +71,15 @@ trait FilesystemCommonTrait
 
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            $ok = (!file_exists($file) || @unlink($file) || !file_exists($file)) && $ok;
+            $ok = (!file_exists($file) || $this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;
+    }
+
+    protected function doUnlink($file)
+    {
+        return @unlink($file);
     }
 
     private function write($file, $data, $expiresAt = null)
@@ -98,8 +103,9 @@ trait FilesystemCommonTrait
 
     private function getFile($id, $mkdir = false)
     {
-        $hash = str_replace('/', '-', base64_encode(hash('sha256', static::class.$id, true)));
-        $dir = $this->directory.strtoupper($hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR);
+        // Use MD5 to favor speed over security, which is not an issue here
+        $hash = str_replace('/', '-', base64_encode(hash('md5', static::class.$id, true)));
+        $dir = $this->directory.strtoupper($hash[0].\DIRECTORY_SEPARATOR.$hash[1].\DIRECTORY_SEPARATOR);
 
         if ($mkdir && !file_exists($dir)) {
             @mkdir($dir, 0777, true);

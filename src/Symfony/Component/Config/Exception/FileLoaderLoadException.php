@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Exception;
  * Exception class for when a resource cannot be loaded or imported.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @deprecated since Symfony 4.2, use LoaderLoadException instead.
  */
 class FileLoaderLoadException extends \Exception
 {
@@ -57,7 +59,7 @@ class FileLoaderLoadException extends \Exception
 
         // Is the resource located inside a bundle?
         if ('@' === $resource[0]) {
-            $parts = explode(DIRECTORY_SEPARATOR, $resource);
+            $parts = explode(\DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
             $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
             $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
@@ -75,11 +77,11 @@ class FileLoaderLoadException extends \Exception
 
     protected function varToString($var)
     {
-        if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+        if (\is_object($var)) {
+            return sprintf('Object(%s)', \get_class($var));
         }
 
-        if (is_array($var)) {
+        if (\is_array($var)) {
             $a = array();
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
@@ -88,7 +90,7 @@ class FileLoaderLoadException extends \Exception
             return sprintf('Array(%s)', implode(', ', $a));
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return sprintf('Resource(%s)', get_resource_type($var));
         }
 

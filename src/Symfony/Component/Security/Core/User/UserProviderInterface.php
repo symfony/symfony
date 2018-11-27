@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 /**
  * Represents a class that loads UserInterface objects from some source for the authentication system.
@@ -57,7 +57,8 @@ interface UserProviderInterface
      *
      * @return UserInterface
      *
-     * @throws UnsupportedUserException if the user is not supported
+     * @throws UnsupportedUserException  if the user is not supported
+     * @throws UsernameNotFoundException if the user is not found
      */
     public function refreshUser(UserInterface $user);
 

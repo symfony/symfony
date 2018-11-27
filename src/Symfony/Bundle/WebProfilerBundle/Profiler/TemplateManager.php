@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\WebProfilerBundle\Profiler;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;

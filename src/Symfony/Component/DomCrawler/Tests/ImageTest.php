@@ -27,6 +27,27 @@ class ImageTest extends TestCase
         new Image($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
+    public function testBaseUriIsOptionalWhenImageUrlIsAbsolute()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><img alt="foo" src="https://example.com/foo" /></html>');
+
+        $image = new Image($dom->getElementsByTagName('img')->item(0));
+        $this->assertSame('https://example.com/foo', $image->getUri());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><img alt="foo" src="/foo" /></html>');
+
+        $image = new Image($dom->getElementsByTagName('img')->item(0), 'example.com');
+        $image->getUri();
+    }
+
     /**
      * @dataProvider getGetUriTests
      */

@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * TemplateNameParser converts template names from the short notation

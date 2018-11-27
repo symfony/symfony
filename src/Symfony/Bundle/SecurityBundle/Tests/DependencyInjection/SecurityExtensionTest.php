@@ -12,10 +12,15 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -119,6 +124,33 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
+    public function testGuardHandlerIsPassedStatelessFirewalls()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '^/admin',
+                    'http_basic' => null,
+                ),
+                'stateless_firewall' => array(
+                    'pattern' => '/.*',
+                    'stateless' => true,
+                    'http_basic' => null,
+                ),
+            ),
+        ));
+
+        $container->compile();
+        $definition = $container->getDefinition('security.authentication.guard_handler');
+        $this->assertSame(array('stateless_firewall'), $definition->getArgument(2));
+    }
+
     public function testSwitchUserNotStatelessOnStatelessFirewall()
     {
         $container = $this->getRawContainer();
@@ -132,7 +164,7 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'stateless' => true,
                     'http_basic' => null,
-                    'switch_user' => array('stateless' => false),
+                    'switch_user' => true,
                 ),
             ),
         ));
@@ -186,9 +218,190 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    public function testPerListenerProviderWithRememberMe()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'first' => array('id' => 'foo'),
+                'second' => array('id' => 'bar'),
+            ),
+
+            'firewalls' => array(
+                'default' => array(
+                    'form_login' => array('provider' => 'second'),
+                    'remember_me' => array('secret' => 'baz'),
+                ),
+            ),
+        ));
+
+        $container->compile();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRegisterRequestMatchersWithAllowIfExpression()
+    {
+        $container = $this->getRawContainer();
+
+        $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array(),
+                ),
+            ),
+            'access_control' => array(
+                array('path' => '/', 'allow_if' => $rawExpression),
+            ),
+        ));
+
+        $container->compile();
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $this->assertCount(3, $args);
+        $expressionId = $args[1][0];
+        $this->assertTrue($container->hasDefinition($expressionId));
+        $expressionDef = $container->getDefinition($expressionId);
+        $this->assertSame(Expression::class, $expressionDef->getClass());
+        $this->assertSame($rawExpression, $expressionDef->getArgument(0));
+
+        $this->assertTrue($container->hasDefinition('security.cache_warmer.expression'));
+        $this->assertEquals(
+            new IteratorArgument(array(new Reference($expressionId))),
+            $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
+        );
+    }
+
+    public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array(),
+                ),
+            ),
+        ));
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
+    }
+
+    public function testRegisterTheUserProviderAlias()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertTrue($container->hasAlias(UserProviderInterface::class));
+    }
+
+    public function testDoNotRegisterTheUserProviderAliasWithMultipleProviders()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'first' => array('id' => 'foo'),
+                'second' => array('id' => 'bar'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array('provider' => 'second'),
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertFalse($container->has(UserProviderInterface::class));
+    }
+
+    /**
+     * @dataProvider sessionConfigurationProvider
+     */
+    public function testRememberMeCookieInheritFrameworkSessionCookie($config, $samesite, $secure)
+    {
+        $container = $this->getRawContainer();
+
+        $container->registerExtension(new FrameworkExtension());
+        $container->setParameter('kernel.bundles_metadata', array());
+        $container->setParameter('kernel.project_dir', __DIR__);
+        $container->setParameter('kernel.root_dir', __DIR__);
+        $container->setParameter('kernel.cache_dir', __DIR__);
+
+        $container->loadFromExtension('security', array(
+            'firewalls' => array(
+                'default' => array(
+                    'form_login' => null,
+                    'remember_me' => array('secret' => 'baz'),
+                ),
+            ),
+        ));
+        $container->loadFromExtension('framework', array(
+            'session' => $config,
+        ));
+
+        $container->compile();
+
+        $definition = $container->getDefinition('security.authentication.rememberme.services.simplehash.default');
+
+        $this->assertEquals($samesite, $definition->getArgument(3)['samesite']);
+        $this->assertEquals($secure, $definition->getArgument(3)['secure']);
+    }
+
+    public function sessionConfigurationProvider()
+    {
+        return array(
+            array(
+                false,
+                null,
+                false,
+            ),
+            array(
+                array(
+                    'cookie_secure' => true,
+                    'cookie_samesite' => 'lax',
+                    'save_path' => null,
+                ),
+                'lax',
+                true,
+            ),
+        );
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
         $security = new SecurityExtension();
         $container->registerExtension($security);
 

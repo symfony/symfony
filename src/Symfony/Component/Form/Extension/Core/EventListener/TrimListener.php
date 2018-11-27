@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\StringUtil;
 
 /**
@@ -27,7 +27,7 @@ class TrimListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if (!is_string($data)) {
+        if (!\is_string($data)) {
             return;
         }
 

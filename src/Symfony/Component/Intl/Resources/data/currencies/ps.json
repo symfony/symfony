@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.36.86",
+    "Version": "2.1.43.94",
     "Names": {
         "AED": [
             "AED",
@@ -369,6 +369,10 @@
             "MRO",
             "MRO"
         ],
+        "MRU": [
+            "MRU",
+            "MRU"
+        ],
         "MUR": [
             "MUR",
             "MUR"
@@ -517,6 +521,10 @@
             "STD",
             "STD"
         ],
+        "STN": [
+            "STN",
+            "STN"
+        ],
         "SYP": [
             "SYP",
             "SYP"
@@ -583,7 +591,11 @@
         ],
         "VEF": [
             "VEF",
-            "VEF"
+            "VEF (2008–2018)"
+        ],
+        "VES": [
+            "VES",
+            "VES"
         ],
         "VND": [
             "₫",

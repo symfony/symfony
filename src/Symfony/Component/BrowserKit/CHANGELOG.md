@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * The method `Client::submit()` will have a new `$serverParameters` argument 
+   in version 5.0, not defining it is deprecated
+ * Added ability to read the "samesite" attribute of cookies using `Cookie::getSameSite()`
+
 3.4.0
 -----
 
@@ -22,7 +29,7 @@ CHANGELOG
 -----
 
  * [BC BREAK] `Client::followRedirect()` won't redirect responses with
-   a non-3xx Status Code and `Location` header anymore, as per 
+   a non-3xx Status Code and `Location` header anymore, as per
    http://tools.ietf.org/html/rfc2616#section-14.30
 
  * added `Client::getInternalRequest()` and `Client::getInternalResponse()` to

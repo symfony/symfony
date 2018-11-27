@@ -60,6 +60,8 @@ class ConsoleFormatter implements FormatterInterface
             'date_format' => self::SIMPLE_DATE,
             'colors' => true,
             'multiline' => false,
+            'level_name_format' => '%-9s',
+            'ignore_empty_context_and_extra' => true,
         ), $options);
 
         if (class_exists(VarCloner::class)) {
@@ -100,26 +102,22 @@ class ConsoleFormatter implements FormatterInterface
 
         $levelColor = self::$levelColorMap[$record['level']];
 
-        if ($this->options['multiline']) {
-            $separator = "\n";
+        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
+            $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['context']);
         } else {
-            $separator = ' ';
+            $context = '';
         }
 
-        $context = $this->dumpData($record['context']);
-        if ($context) {
-            $context = $separator.$context;
-        }
-
-        $extra = $this->dumpData($record['extra']);
-        if ($extra) {
-            $extra = $separator.$extra;
+        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['extra'])) {
+            $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['extra']);
+        } else {
+            $extra = '';
         }
 
         $formatted = strtr($this->options['format'], array(
             '%datetime%' => $record['datetime']->format($this->options['date_format']),
             '%start_tag%' => sprintf('<%s>', $levelColor),
-            '%level_name%' => sprintf('%-9s', $record['level_name']),
+            '%level_name%' => sprintf($this->options['level_name_format'], $record['level_name']),
             '%end_tag%' => '</>',
             '%channel%' => $record['channel'],
             '%message%' => $this->replacePlaceHolder($record)['message'],

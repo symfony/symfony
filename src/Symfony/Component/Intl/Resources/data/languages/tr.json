@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "Afar",
         "ab": "Abhazca",
@@ -30,13 +30,14 @@
         "aro": "Araona",
         "arp": "Arapaho Dili",
         "arq": "Cezayir Arapçası",
+        "ars": "Necd Arapçası",
         "arw": "Arawak Dili",
         "ary": "Fas Arapçası",
         "arz": "Mısır Arapçası",
         "as": "Assamca",
         "asa": "Asu",
         "ase": "Amerikan İşaret Dili",
-        "ast": "Asturyasca",
+        "ast": "Asturyasça",
         "av": "Avar Dili",
         "avk": "Kotava",
         "awa": "Awadhi",
@@ -166,8 +167,8 @@
         "fi": "Fince",
         "fil": "Filipince",
         "fit": "Tornedalin Fincesi",
-        "fj": "Fiji Dili",
-        "fo": "Faroe Dili",
+        "fj": "Fiji dili",
+        "fo": "Faroe dili",
         "fon": "Fon",
         "fr": "Fransızca",
         "fr_CA": "Kanada Fransızcası",
@@ -367,7 +368,6 @@
         "ms": "Malayca",
         "mt": "Maltaca",
         "mua": "Mundang",
-        "mul": "Birden Fazla Dil",
         "mus": "Krikçe",
         "mwl": "Miranda dili",
         "mwr": "Marvari",
@@ -570,7 +570,6 @@
         "uga": "Ugarit dili",
         "uk": "Ukraynaca",
         "umb": "Umbundu",
-        "und": "Bilinmeyen Dil",
         "ur": "Urduca",
         "uz": "Özbekçe",
         "vai": "Vai",
@@ -615,7 +614,6 @@
         "zh_Hant": "Geleneksel Çince",
         "zu": "Zuluca",
         "zun": "Zunice",
-        "zxx": "Dilbilim içeriği yok",
         "zza": "Zazaca"
     }
 }

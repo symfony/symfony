@@ -12,11 +12,11 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * The context of a validation run.
@@ -97,7 +97,7 @@ interface ExecutionContextInterface
      *     {
      *         $validator = $this->context->getValidator();
      *
-     *         $violations = $validator->validateValue($value, new Length(array('min' => 3)));
+     *         $violations = $validator->validate($value, new Length(array('min' => 3)));
      *
      *         if (count($violations) > 0) {
      *             // ...

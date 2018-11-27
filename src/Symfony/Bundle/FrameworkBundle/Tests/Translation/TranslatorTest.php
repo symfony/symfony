@@ -14,9 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Filesystem\Filesystem;
 
 class TranslatorTest extends TestCase
 {
@@ -24,7 +24,7 @@ class TranslatorTest extends TestCase
 
     protected function setUp()
     {
-        $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
+        $this->tmpDir = sys_get_temp_dir().'/sf_translation';
         $this->deleteTmpDir();
     }
 
@@ -52,12 +52,25 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array('%count%' => 0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array('%count%' => 1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTransChoiceWithoutCaching()
+    {
+        $translator = $this->getTranslator($this->getLoader());
+        $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+
+        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
     }
 
     public function testTransWithCaching()
@@ -70,10 +83,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array('%count%' => 0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array('%count%' => 1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
@@ -88,12 +101,35 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTransChoiceWithCaching()
+    {
+        // prime the cache
+        $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
+        $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+
+        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+
+        // do it another time as the cache is primed now
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader->expects($this->never())->method('load');
+
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
+        $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+
+        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
     }
 
     /**

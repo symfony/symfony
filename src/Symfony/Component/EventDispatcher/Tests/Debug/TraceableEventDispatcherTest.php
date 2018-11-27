@@ -13,10 +13,10 @@ namespace Symfony\Component\EventDispatcher\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class TraceableEventDispatcherTest extends TestCase
@@ -153,6 +153,31 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(2, $dispatcher->getCalledListeners());
     }
 
+    public function testItReturnsNoOrphanedEventsWhenCreated()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertEmpty($events);
+    }
+
+    public function testItReturnsOrphanedEventsAfterDispatch()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->dispatch('foo');
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertCount(1, $events);
+        $this->assertEquals(array('foo'), $events);
+    }
+
+    public function testItDoesNotReturnHandledEvents()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', function () {});
+        $tdispatcher->dispatch('foo');
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertEmpty($events);
+    }
+
     public function testLogger()
     {
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
@@ -245,6 +270,17 @@ class TraceableEventDispatcherTest extends TestCase
         $eventDispatcher->dispatch('foo');
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
+    }
+
+    public function testClearOrphanedEvents()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->dispatch('foo');
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertCount(1, $events);
+        $tdispatcher->reset();
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertCount(0, $events);
     }
 }
 

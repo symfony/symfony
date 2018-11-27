@@ -22,7 +22,7 @@ class ConsensusStrategyTest extends TestCase
     /** @var ConsensusStrategy */
     private $strategy;
 
-    public function setup()
+    protected function setUp()
     {
         $this->strategy = new ConsensusStrategy();
     }
@@ -82,7 +82,7 @@ class ConsensusStrategyTest extends TestCase
     /**
      * @dataProvider provideIndeterminate
      */
-    public function canBeMet($success, $failure, $total, $isMet)
+    public function testCanBeMet($success, $failure, $total, $isMet)
     {
         $this->assertSame($isMet, $this->strategy->canBeMet($failure, $total));
     }

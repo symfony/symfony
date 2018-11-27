@@ -14,8 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
  *
- * @final since version 3.4
+ * @final
  */
 class EventDispatcherDebugCommand extends Command
 {

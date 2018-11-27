@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
-use Symfony\Bridge\Twig\Node\TransNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\BlockNode;
 use Twig\Node\Expression\ArrayExpression;
@@ -64,7 +64,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
             return $node;
         }
 
-        if ($node instanceof FilterExpression && in_array($node->getNode('filter')->getAttribute('value'), array('trans', 'transchoice'))) {
+        if ($node instanceof FilterExpression && \in_array($node->getNode('filter')->getAttribute('value'), array('trans', 'transchoice'))) {
             $arguments = $node->getNode('arguments');
             $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
             if ($this->isNamedArguments($arguments)) {
@@ -119,7 +119,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
     private function isNamedArguments($arguments)
     {
         foreach ($arguments as $name => $node) {
-            if (!is_int($name)) {
+            if (!\is_int($name)) {
                 return true;
             }
         }

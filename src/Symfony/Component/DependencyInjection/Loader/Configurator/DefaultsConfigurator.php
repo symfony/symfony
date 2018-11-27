@@ -34,12 +34,12 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
      */
     final public function tag(string $name, array $attributes = array())
     {
-        if (!is_string($name) || '' === $name) {
+        if ('' === $name) {
             throw new InvalidArgumentException('The tag name in "_defaults" must be a non-empty string.');
         }
 
         foreach ($attributes as $attribute => $value) {
-            if (!is_scalar($value) && null !== $value) {
+            if (null !== $value && !is_scalar($value)) {
                 throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type.', $name, $attribute));
             }
         }

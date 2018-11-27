@@ -13,8 +13,9 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class RememberMeFactory implements SecurityFactoryInterface
 {
@@ -25,6 +26,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         'domain' => null,
         'secure' => false,
         'httponly' => true,
+        'samesite' => null,
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',
     );
@@ -94,7 +96,7 @@ class RememberMeFactory implements SecurityFactoryInterface
                 $userProviders[] = new Reference('security.user.provider.concrete.'.$providerName);
             }
         }
-        if (0 === count($userProviders)) {
+        if (0 === \count($userProviders)) {
             throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
         }
 
@@ -139,7 +141,11 @@ class RememberMeFactory implements SecurityFactoryInterface
         ;
 
         foreach ($this->options as $name => $value) {
-            if (is_bool($value)) {
+            if ('secure' === $name) {
+                $builder->enumNode($name)->values(array(true, false, 'auto'))->defaultValue('auto' === $value ? null : $value);
+            } elseif ('samesite' === $name) {
+                $builder->enumNode($name)->values(array(null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT))->defaultValue($value);
+            } elseif (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
             } else {
                 $builder->scalarNode($name)->defaultValue($value);

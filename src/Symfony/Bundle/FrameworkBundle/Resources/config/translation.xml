@@ -21,6 +21,7 @@
             </call>
         </service>
         <service id="Symfony\Component\Translation\TranslatorInterface" alias="translator" />
+        <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="translator" />
 
         <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator">
             <argument type="service" id="translator.logging.inner" />
@@ -29,7 +30,7 @@
         </service>
 
         <service id="translator.formatter.default" class="Symfony\Component\Translation\Formatter\MessageFormatter">
-            <argument type="service" id="translator.selector" />
+            <argument type="service" id="identity_translator" />
         </service>
 
         <service id="translation.loader.php" class="Symfony\Component\Translation\Loader\PhpFileLoader">
@@ -126,10 +127,13 @@
         </service>
 
         <service id="translation.reader" class="Symfony\Component\Translation\Reader\TranslationReader" />
+        <service id="Symfony\Component\Translation\Reader\TranslationReaderInterface" alias="translation.reader" />
 
         <service id="translation.extractor" class="Symfony\Component\Translation\Extractor\ChainExtractor" />
+        <service id="Symfony\Component\Translation\Extractor\ExtractorInterface" alias="translation.extractor" />
 
         <service id="translation.writer" class="Symfony\Component\Translation\Writer\TranslationWriter" />
+        <service id="Symfony\Component\Translation\Writer\TranslationWriterInterface" alias="translation.writer" />
 
         <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
             <tag name="container.service_subscriber" id="translator" />

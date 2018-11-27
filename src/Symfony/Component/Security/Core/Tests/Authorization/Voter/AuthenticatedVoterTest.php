@@ -23,7 +23,7 @@ class AuthenticatedVoterTest extends TestCase
      */
     public function testVote($authenticated, $attributes, $expected)
     {
-        $voter = new AuthenticatedVoter($this->getResolver());
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
         $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
@@ -49,14 +49,6 @@ class AuthenticatedVoterTest extends TestCase
             array('fully', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_GRANTED),
             array('remembered', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_DENIED),
             array('anonymously', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_DENIED),
-        );
-    }
-
-    protected function getResolver()
-    {
-        return new AuthenticationTrustResolver(
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken',
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken'
         );
     }
 

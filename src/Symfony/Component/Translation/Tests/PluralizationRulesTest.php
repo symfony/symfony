@@ -26,6 +26,8 @@ use Symfony\Component\Translation\PluralizationRules;
  * The goal to cover all languages is to far fetched so this test case is smaller.
  *
  * @author Clemens Tolboom clemens@build2be.nl
+ *
+ * @group legacy
  */
 class PluralizationRulesTest extends TestCase
 {
@@ -100,9 +102,9 @@ class PluralizationRulesTest extends TestCase
         foreach ($matrix as $langCode => $data) {
             $indexes = array_flip($data);
             if ($expectSuccess) {
-                $this->assertEquals($nplural, count($indexes), "Langcode '$langCode' has '$nplural' plural forms.");
+                $this->assertEquals($nplural, \count($indexes), "Langcode '$langCode' has '$nplural' plural forms.");
             } else {
-                $this->assertNotEquals((int) $nplural, count($indexes), "Langcode '$langCode' has '$nplural' plural forms.");
+                $this->assertNotEquals((int) $nplural, \count($indexes), "Langcode '$langCode' has '$nplural' plural forms.");
             }
         }
     }

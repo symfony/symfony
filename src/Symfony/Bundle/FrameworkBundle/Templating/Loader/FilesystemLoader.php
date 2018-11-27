@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
-use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Templating\Loader\LoaderInterface;
+use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**

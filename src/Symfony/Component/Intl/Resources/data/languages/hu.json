@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.43.65",
     "Names": {
         "aa": "afar",
         "ab": "abház",
@@ -25,6 +25,7 @@
         "arc": "arámi",
         "arn": "mapucse",
         "arp": "arapaho",
+        "ars": "nedzsdi arab",
         "arw": "aravak",
         "as": "asszámi",
         "asa": "asu",
@@ -319,7 +320,6 @@
         "ms": "maláj",
         "mt": "máltai",
         "mua": "mundang",
-        "mul": "többszörös nyelvek",
         "mus": "krík",
         "mwl": "mirandéz",
         "mwr": "márvári",
@@ -493,7 +493,6 @@
         "uga": "ugariti",
         "uk": "ukrán",
         "umb": "umbundu",
-        "und": "ismeretlen nyelv",
         "ur": "urdu",
         "uz": "üzbég",
         "vai": "vai",
@@ -530,7 +529,6 @@
         "zh_Hant": "hagyományos kínai",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "nincs nyelvészeti tartalom",
         "zza": "zaza"
     }
 }

@@ -4,18 +4,11 @@ namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\DefinitionBuilder;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
 class DefinitionBuilderTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     */
-    public function testAddPlaceInvalidName()
-    {
-        $builder = new DefinitionBuilder(array('a"', 'b'));
-    }
-
     public function testSetInitialPlace()
     {
         $builder = new DefinitionBuilder(array('a', 'b'));
@@ -51,5 +44,15 @@ class DefinitionBuilderTest extends TestCase
         $this->assertCount(2, $definition->getPlaces());
         $this->assertEquals('a', $definition->getPlaces()['a']);
         $this->assertEquals('b', $definition->getPlaces()['b']);
+    }
+
+    public function testSetMetadataStore()
+    {
+        $builder = new DefinitionBuilder(array('a'));
+        $metadataStore = new InMemoryMetadataStore();
+        $builder->setMetadataStore($metadataStore);
+        $definition = $builder->build();
+
+        $this->assertSame($metadataStore, $definition->getMetadataStore());
     }
 }

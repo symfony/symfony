@@ -45,6 +45,15 @@ class MemcachedCacheTest extends CacheTestCase
         return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
+    public function testCreatePersistentConnectionShouldNotDupServerList()
+    {
+        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('persistent_id' => 'persistent'));
+        $this->assertCount(1, $instance->getServerList());
+
+        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('persistent_id' => 'persistent'));
+        $this->assertCount(1, $instance->getServerList());
+    }
+
     public function testOptions()
     {
         $client = MemcachedCache::createConnection(array(), array(
@@ -137,7 +146,7 @@ class MemcachedCacheTest extends CacheTestCase
             'localhost',
             11222,
         );
-        if (ini_get('memcached.use_sasl')) {
+        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
             yield array(
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -154,7 +163,7 @@ class MemcachedCacheTest extends CacheTestCase
             '/var/local/run/memcached.socket',
             0,
         );
-        if (ini_get('memcached.use_sasl')) {
+        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
             yield array(
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',

@@ -14,14 +14,14 @@ namespace Symfony\Component\Finder;
 /**
  * Glob matches globbing patterns against text.
  *
- *   if match_glob("foo.*", "foo.bar") echo "matched\n";
+ *     if match_glob("foo.*", "foo.bar") echo "matched\n";
  *
- * // prints foo.bar and foo.baz
- * $regex = glob_to_regex("foo.*");
- * for (array('foo.bar', 'foo.baz', 'foo', 'bar') as $t)
- * {
- *   if (/$regex/) echo "matched: $car\n";
- * }
+ *     // prints foo.bar and foo.baz
+ *     $regex = glob_to_regex("foo.*");
+ *     for (array('foo.bar', 'foo.baz', 'foo', 'bar') as $t)
+ *     {
+ *         if (/$regex/) echo "matched: $car\n";
+ *     }
  *
  * Glob implements glob(3) style matching that can be used to match
  * against text, rather than fetching names from a filesystem.
@@ -51,7 +51,7 @@ class Glob
         $escaping = false;
         $inCurlies = 0;
         $regex = '';
-        $sizeGlob = strlen($glob);
+        $sizeGlob = \strlen($glob);
         for ($i = 0; $i < $sizeGlob; ++$i) {
             $car = $glob[$i];
             if ($firstByte && $strictLeadingDot && '.' !== $car) {

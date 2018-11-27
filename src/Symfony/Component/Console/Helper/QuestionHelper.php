@@ -17,9 +17,10 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.
@@ -46,13 +47,23 @@ class QuestionHelper extends Helper
         }
 
         if (!$input->isInteractive()) {
-            if ($question instanceof ChoiceQuestion) {
+            $default = $question->getDefault();
+
+            if (null !== $default && $question instanceof ChoiceQuestion) {
                 $choices = $question->getChoices();
 
-                return $choices[$question->getDefault()];
+                if (!$question->isMultiselect()) {
+                    return isset($choices[$default]) ? $choices[$default] : $default;
+                }
+
+                $default = explode(',', $default);
+                foreach ($default as $k => $v) {
+                    $v = trim($v);
+                    $default[$k] = isset($choices[$v]) ? $choices[$v] : $v;
+                }
             }
 
-            return $question->getDefault();
+            return $default;
         }
 
         if ($input instanceof StreamableInputInterface && $stream = $input->getStream()) {
@@ -89,7 +100,7 @@ class QuestionHelper extends Helper
     /**
      * Asks the question to the user.
      *
-     * @return bool|mixed|null|string
+     * @return bool|mixed|string|null
      *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
@@ -120,10 +131,14 @@ class QuestionHelper extends Helper
                 $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question, $inputStream, is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
+            $ret = trim($this->autocomplete($output, $question, $inputStream, \is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
         }
 
-        $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
+        if ($output instanceof ConsoleSectionOutput) {
+            $output->addContent($ret);
+        }
+
+        $ret = \strlen($ret) > 0 ? $ret : $question->getDefault();
 
         if ($normalizer = $question->getNormalizer()) {
             return $normalizer($ret);
@@ -184,7 +199,7 @@ class QuestionHelper extends Helper
         $i = 0;
         $ofs = -1;
         $matches = $autocomplete;
-        $numMatches = count($matches);
+        $numMatches = \count($matches);
 
         $sttyMode = shell_exec('stty -g');
 
@@ -209,7 +224,7 @@ class QuestionHelper extends Helper
                 if (0 === $i) {
                     $ofs = -1;
                     $matches = $autocomplete;
-                    $numMatches = count($matches);
+                    $numMatches = \count($matches);
                 } else {
                     $numMatches = 0;
                 }
@@ -233,13 +248,13 @@ class QuestionHelper extends Helper
                     $ofs += ('A' === $c[2]) ? -1 : 1;
                     $ofs = ($numMatches + $ofs) % $numMatches;
                 }
-            } elseif (ord($c) < 32) {
+            } elseif (\ord($c) < 32) {
                 if ("\t" === $c || "\n" === $c) {
                     if ($numMatches > 0 && -1 !== $ofs) {
                         $ret = $matches[$ofs];
                         // Echo out remaining chars for current match
                         $output->write(substr($ret, $i));
-                        $i = strlen($ret);
+                        $i = \strlen($ret);
                     }
 
                     if ("\n" === $c) {
@@ -261,7 +276,7 @@ class QuestionHelper extends Helper
 
                 foreach ($autocomplete as $value) {
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (0 === strpos($value, $ret) && $i !== strlen($value)) {
+                    if (0 === strpos($value, $ret)) {
                         $matches[$numMatches++] = $value;
                     }
                 }
@@ -296,7 +311,7 @@ class QuestionHelper extends Helper
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream): string
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 
             // handle code running from a phar
@@ -366,7 +381,7 @@ class QuestionHelper extends Helper
             }
 
             try {
-                return call_user_func($question->getValidator(), $interviewer());
+                return \call_user_func($question->getValidator(), $interviewer());
             } catch (RuntimeException $e) {
                 throw $e;
             } catch (\Exception $error) {

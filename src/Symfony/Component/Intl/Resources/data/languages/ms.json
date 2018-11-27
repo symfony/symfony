@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.37.5",
+    "Version": "2.1.44.91",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazia",
@@ -23,6 +23,7 @@
         "arn": "Mapuche",
         "arp": "Arapaho",
         "arq": "Arab Algeria",
+        "ars": "Arab Najdi",
         "ary": "Arab Maghribi",
         "arz": "Arab Mesir",
         "as": "Assam",
@@ -274,7 +275,6 @@
         "ms": "Melayu",
         "mt": "Malta",
         "mua": "Mundang",
-        "mul": "Pelbagai Bahasa",
         "mus": "Creek",
         "mwl": "Mirandese",
         "my": "Burma",
@@ -413,7 +413,6 @@
         "ug": "Uyghur",
         "uk": "Ukraine",
         "umb": "Umbundu",
-        "und": "Bahasa Tidak Diketahui",
         "ur": "Urdu",
         "uz": "Uzbekistan",
         "vai": "Vai",
@@ -442,7 +441,6 @@
         "zh_Hant": "Cina Tradisional",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Tiada kandungan linguistik",
         "zza": "Zaza"
     }
 }

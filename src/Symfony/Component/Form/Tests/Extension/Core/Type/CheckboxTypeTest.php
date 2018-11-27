@@ -173,8 +173,53 @@ class CheckboxTypeTest extends BaseTypeTest
         );
     }
 
+    /**
+     * @dataProvider provideCustomFalseValues
+     */
+    public function testCustomFalseValues($falseValue)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'false_values' => array($falseValue),
+        ));
+        $form->submit($falseValue);
+        $this->assertFalse($form->getData());
+    }
+
+    public function provideCustomFalseValues()
+    {
+        return array(
+            array(''),
+            array('false'),
+            array('0'),
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testDontAllowNonArrayFalseValues()
+    {
+        $this->expectExceptionMessageRegExp('/"false_values" with value "invalid" is expected to be of type "array"/');
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'false_values' => 'invalid',
+        ));
+    }
+
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull(false, false, null);
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = true)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view data is transformed to the string true value
+        $this->assertSame('1', $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
     }
 }

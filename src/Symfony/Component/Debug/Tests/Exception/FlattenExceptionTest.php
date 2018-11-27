@@ -12,21 +12,22 @@
 namespace Symfony\Component\Debug\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class FlattenExceptionTest extends TestCase
@@ -37,6 +38,12 @@ class FlattenExceptionTest extends TestCase
         $this->assertEquals('403', $flattened->getStatusCode());
 
         $flattened = FlattenException::create(new \RuntimeException());
+        $this->assertEquals('500', $flattened->getStatusCode());
+
+        $flattened = FlattenException::createFromThrowable(new \DivisionByZeroError(), 403);
+        $this->assertEquals('403', $flattened->getStatusCode());
+
+        $flattened = FlattenException::createFromThrowable(new \DivisionByZeroError());
         $this->assertEquals('500', $flattened->getStatusCode());
 
         $flattened = FlattenException::create(new NotFoundHttpException());
@@ -111,10 +118,10 @@ class FlattenExceptionTest extends TestCase
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testFlattenHttpException(\Exception $exception, $statusCode)
+    public function testFlattenHttpException(\Throwable $exception)
     {
-        $flattened = FlattenException::create($exception);
-        $flattened2 = FlattenException::create($exception);
+        $flattened = FlattenException::createFromThrowable($exception);
+        $flattened2 = FlattenException::createFromThrowable($exception);
 
         $flattened->setPrevious($flattened2);
 
@@ -123,13 +130,33 @@ class FlattenExceptionTest extends TestCase
         $this->assertInstanceOf($flattened->getClass(), $exception, 'The class is set to the class of the original exception');
     }
 
+    public function testWrappedThrowable()
+    {
+        $exception = new FatalThrowableError(new \DivisionByZeroError('Ouch', 42));
+        $flattened = FlattenException::create($exception);
+
+        $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
+        $this->assertSame(42, $flattened->getCode(), 'The code is copied from the original error.');
+        $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
+    }
+
+    public function testThrowable()
+    {
+        $error = new \DivisionByZeroError('Ouch', 42);
+        $flattened = FlattenException::createFromThrowable($error);
+
+        $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
+        $this->assertSame(42, $flattened->getCode(), 'The code is copied from the original error.');
+        $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
+    }
+
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testPrevious(\Exception $exception, $statusCode)
+    public function testPrevious(\Throwable $exception)
     {
-        $flattened = FlattenException::create($exception);
-        $flattened2 = FlattenException::create($exception);
+        $flattened = FlattenException::createFromThrowable($exception);
+        $flattened2 = FlattenException::createFromThrowable($exception);
 
         $flattened->setPrevious($flattened2);
 
@@ -144,41 +171,41 @@ class FlattenExceptionTest extends TestCase
 
         $flattened = FlattenException::create($exception)->getPrevious();
 
-        $this->assertEquals($flattened->getMessage(), 'Parse error: Oh noes!', 'The message is copied from the original exception.');
+        $this->assertEquals($flattened->getMessage(), 'Oh noes!', 'The message is copied from the original exception.');
         $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
-        $this->assertEquals($flattened->getClass(), 'Symfony\Component\Debug\Exception\FatalThrowableError', 'The class is set to the class of the original exception');
+        $this->assertEquals($flattened->getClass(), 'ParseError', 'The class is set to the class of the original exception');
     }
 
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testLine(\Exception $exception)
+    public function testLine(\Throwable $exception)
     {
-        $flattened = FlattenException::create($exception);
+        $flattened = FlattenException::createFromThrowable($exception);
         $this->assertSame($exception->getLine(), $flattened->getLine());
     }
 
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testFile(\Exception $exception)
+    public function testFile(\Throwable $exception)
     {
-        $flattened = FlattenException::create($exception);
+        $flattened = FlattenException::createFromThrowable($exception);
         $this->assertSame($exception->getFile(), $flattened->getFile());
     }
 
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testToArray(\Exception $exception, $statusCode)
+    public function testToArray(\Throwable $exception, string $expectedClass)
     {
-        $flattened = FlattenException::create($exception);
+        $flattened = FlattenException::createFromThrowable($exception);
         $flattened->setTrace(array(), 'foo.php', 123);
 
         $this->assertEquals(array(
             array(
                 'message' => 'test',
-                'class' => 'Exception',
+                'class' => $expectedClass,
                 'trace' => array(array(
                     'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123,
                     'args' => array(),
@@ -187,10 +214,24 @@ class FlattenExceptionTest extends TestCase
         ), $flattened->toArray());
     }
 
+    public function testCreate()
+    {
+        $exception = new NotFoundHttpException(
+            'test',
+            new \RuntimeException('previous', 123)
+        );
+
+        $this->assertSame(
+            FlattenException::createFromThrowable($exception)->toArray(),
+            FlattenException::create($exception)->toArray()
+        );
+    }
+
     public function flattenDataProvider()
     {
         return array(
-            array(new \Exception('test', 123), 500),
+            array(new \Exception('test', 123), 'Exception'),
+            array(new \Error('test', 123), 'Error'),
         );
     }
 
@@ -290,6 +331,19 @@ class FlattenExceptionTest extends TestCase
 
         $this->assertContains('*SKIPPED over 10000 entries*', $serializeTrace);
         $this->assertNotContains('*value1*', $serializeTrace);
+    }
+
+    public function testAnonymousClass()
+    {
+        $flattened = FlattenException::create(new class() extends \RuntimeException {
+        });
+
+        $this->assertSame('RuntimeException@anonymous', $flattened->getClass());
+
+        $flattened = FlattenException::create(new \Exception(sprintf('Class "%s" blah.', \get_class(new class() extends \RuntimeException {
+        }))));
+
+        $this->assertSame('Class "RuntimeException@anonymous" blah.', $flattened->getMessage());
     }
 
     private function createException($foo)

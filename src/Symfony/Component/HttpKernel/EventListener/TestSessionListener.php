@@ -18,15 +18,16 @@ use Psr\Container\ContainerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.3
+ * @final
  */
 class TestSessionListener extends AbstractTestSessionListener
 {
     private $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, array $sessionOptions = array())
     {
         $this->container = $container;
+        parent::__construct($sessionOptions);
     }
 
     protected function getSession()

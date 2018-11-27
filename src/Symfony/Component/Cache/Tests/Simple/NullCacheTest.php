@@ -47,7 +47,7 @@ class NullCacheTest extends TestCase
         $count = 0;
 
         foreach ($items as $key => $item) {
-            $this->assertTrue(in_array($key, $keys), 'Cache key can not change.');
+            $this->assertContains($key, $keys, 'Cache key can not change.');
             $this->assertSame($default, $item);
 
             // Remove $key for $keys

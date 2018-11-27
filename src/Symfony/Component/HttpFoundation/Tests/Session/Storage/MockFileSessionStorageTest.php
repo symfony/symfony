@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 
 /**
  * Test class for MockFileSessionStorage.
@@ -35,7 +35,7 @@ class MockFileSessionStorageTest extends TestCase
 
     protected function setUp()
     {
-        $this->sessionDir = sys_get_temp_dir().'/sf2test';
+        $this->sessionDir = sys_get_temp_dir().'/sftest';
         $this->storage = $this->getStorage();
     }
 

@@ -72,7 +72,7 @@ class TextBundleWriter implements BundleWriterInterface
      */
     private function writeResource($file, $value, $indentation, $requireBraces = true)
     {
-        if (is_int($value)) {
+        if (\is_int($value)) {
             $this->writeInteger($file, $value);
 
             return;
@@ -82,13 +82,13 @@ class TextBundleWriter implements BundleWriterInterface
             $value = iterator_to_array($value);
         }
 
-        if (is_array($value)) {
-            $intValues = count($value) === count(array_filter($value, 'is_int'));
+        if (\is_array($value)) {
+            $intValues = \count($value) === \count(array_filter($value, 'is_int'));
 
             $keys = array_keys($value);
 
             // check that the keys are 0-indexed and ascending
-            $intKeys = $keys === range(0, count($keys) - 1);
+            $intKeys = $keys === range(0, \count($keys) - 1);
 
             if ($intValues && $intKeys) {
                 $this->writeIntVector($file, $value, $indentation);
@@ -107,7 +107,7 @@ class TextBundleWriter implements BundleWriterInterface
             return;
         }
 
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             $value = $value ? 'true' : 'false';
         }
 
@@ -206,7 +206,7 @@ class TextBundleWriter implements BundleWriterInterface
      */
     private function writeTable($file, $value, $indentation, $fallback = true)
     {
-        if (!is_array($value) && !$value instanceof \Traversable) {
+        if (!\is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array or \Traversable');
         }
 

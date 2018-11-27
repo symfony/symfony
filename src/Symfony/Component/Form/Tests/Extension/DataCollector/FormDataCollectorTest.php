@@ -353,7 +353,7 @@ class FormDataCollectorTest extends TestCase
         $form2View = new FormView();
         $child1View = new FormView();
         $child1View->vars['is_selected'] = function ($choice, array $values) {
-            return in_array($choice, $values, true);
+            return \in_array($choice, $values, true);
         };
 
         $form1->add($child1);
@@ -690,9 +690,9 @@ class FormDataCollectorTest extends TestCase
 
         $this->assertTrue($formData['has_children_error']);
         $this->assertTrue($child1Data['has_children_error']);
-        $this->assertFalse(isset($child11Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
+        $this->assertArrayNotHasKey('has_children_error', $child11Data, 'The leaf data does not contains "has_children_error" property.');
         $this->assertFalse($child2Data['has_children_error']);
-        $this->assertFalse(isset($child21Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
+        $this->assertArrayNotHasKey('has_children_error', $child21Data, 'The leaf data does not contains "has_children_error" property.');
     }
 
     public function testReset()

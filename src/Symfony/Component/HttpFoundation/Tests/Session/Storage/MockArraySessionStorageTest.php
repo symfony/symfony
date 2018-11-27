@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Test class for MockArraySessionStorage.
@@ -48,7 +48,7 @@ class MockArraySessionStorageTest extends TestCase
         $this->data = array(
             $this->attributes->getStorageKey() => array('foo' => 'bar'),
             $this->flashes->getStorageKey() => array('notice' => 'hello'),
-            );
+        );
 
         $this->storage = new MockArraySessionStorage();
         $this->storage->registerBag($this->flashes);

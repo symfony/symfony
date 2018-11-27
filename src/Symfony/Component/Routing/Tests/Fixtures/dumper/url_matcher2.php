@@ -1,7 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -10,340 +9,107 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher
 {
+    use PhpMatcherTrait;
+
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-    }
-
-    public function match($rawPathinfo)
-    {
-        $allow = array();
-        $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
-        $context = $this->context;
-        $request = $this->request;
-        $requestMethod = $canonicalMethod = $context->getMethod();
-        $scheme = $context->getScheme();
-
-        if ('HEAD' === $requestMethod) {
-            $canonicalMethod = 'GET';
-        }
-
-
-        if (0 === strpos($pathinfo, '/foo')) {
-            // foo
-            if (preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo')), array (  'def' => 'test',));
-            }
-
-            // foofoo
-            if ('/foofoo' === $pathinfo) {
-                return array (  'def' => 'test',  '_route' => 'foofoo',);
-            }
-
-        }
-
-        elseif (0 === strpos($pathinfo, '/bar')) {
-            // bar
-            if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
-                    goto not_bar;
-                }
-
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
-            }
-            not_bar:
-
-            // barhead
-            if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
-                    goto not_barhead;
-                }
-
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
-            }
-            not_barhead:
-
-        }
-
-        elseif (0 === strpos($pathinfo, '/test')) {
-            if (0 === strpos($pathinfo, '/test/baz')) {
-                // baz
-                if ('/test/baz' === $pathinfo) {
-                    return array('_route' => 'baz');
-                }
-
-                // baz2
-                if ('/test/baz.html' === $pathinfo) {
-                    return array('_route' => 'baz2');
-                }
-
-                // baz3
-                if ('/test/baz3' === $trimmedPathinfo) {
-                    $ret = array('_route' => 'baz3');
-                    if (substr($pathinfo, -1) !== '/') {
-                        return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz3'));
-                    }
-
-                    return $ret;
-                }
-
-            }
-
-            // baz4
-            if (preg_match('#^/test/(?P<foo>[^/]++)/?$#s', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
-                if (substr($pathinfo, -1) !== '/') {
-                    return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz4'));
-                }
-
-                return $ret;
-            }
-
-            // baz5
-            if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ('POST' !== $canonicalMethod) {
-                    $allow[] = 'POST';
-                    goto not_baz5;
-                }
-
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
-            }
-            not_baz5:
-
-            // baz.baz6
-            if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ('PUT' !== $canonicalMethod) {
-                    $allow[] = 'PUT';
-                    goto not_bazbaz6;
-                }
-
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
-            }
-            not_bazbaz6:
-
-        }
-
-        // quoter
-        if (preg_match('#^/(?P<quoter>[\']+)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'quoter')), array ());
-        }
-
-        // space
-        if ('/spa ce' === $pathinfo) {
-            return array('_route' => 'space');
-        }
-
-        if (0 === strpos($pathinfo, '/a')) {
-            if (0 === strpos($pathinfo, '/a/b\'b')) {
-                // foo1
-                if (preg_match('#^/a/b\'b/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo1')), array ());
-                }
-
-                // bar1
-                if (preg_match('#^/a/b\'b/(?P<bar>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar1')), array ());
-                }
-
-            }
-
-            // overridden
-            if (preg_match('#^/a/(?P<var>.*)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'overridden')), array ());
-            }
-
-            if (0 === strpos($pathinfo, '/a/b\'b')) {
-                // foo2
-                if (preg_match('#^/a/b\'b/(?P<foo1>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo2')), array ());
-                }
-
-                // bar2
-                if (preg_match('#^/a/b\'b/(?P<bar1>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar2')), array ());
-                }
-
-            }
-
-        }
-
-        elseif (0 === strpos($pathinfo, '/multi')) {
-            // helloWorld
-            if (0 === strpos($pathinfo, '/multi/hello') && preg_match('#^/multi/hello(?:/(?P<who>[^/]++))?$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'helloWorld')), array (  'who' => 'World!',));
-            }
-
-            // hey
-            if ('/multi/hey' === $trimmedPathinfo) {
-                $ret = array('_route' => 'hey');
-                if (substr($pathinfo, -1) !== '/') {
-                    return array_replace($ret, $this->redirect($rawPathinfo.'/', 'hey'));
-                }
-
-                return $ret;
-            }
-
-            // overridden2
-            if ('/multi/new' === $pathinfo) {
-                return array('_route' => 'overridden2');
-            }
-
-        }
-
-        // foo3
-        if (preg_match('#^/(?P<_locale>[^/]++)/b/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo3')), array ());
-        }
-
-        // bar3
-        if (preg_match('#^/(?P<_locale>[^/]++)/b/(?P<bar>[^/]++)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar3')), array ());
-        }
-
-        if (0 === strpos($pathinfo, '/aba')) {
-            // ababa
-            if ('/ababa' === $pathinfo) {
-                return array('_route' => 'ababa');
-            }
-
-            // foo4
-            if (preg_match('#^/aba/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo4')), array ());
-            }
-
-        }
-
-        $host = $context->getHost();
-
-        if (preg_match('#^a\\.example\\.com$#si', $host, $hostMatches)) {
-            // route1
-            if ('/route1' === $pathinfo) {
-                return array('_route' => 'route1');
-            }
-
-            // route2
-            if ('/c2/route2' === $pathinfo) {
-                return array('_route' => 'route2');
-            }
-
-        }
-
-        if (preg_match('#^b\\.example\\.com$#si', $host, $hostMatches)) {
-            // route3
-            if ('/c2/route3' === $pathinfo) {
-                return array('_route' => 'route3');
-            }
-
-        }
-
-        if (preg_match('#^a\\.example\\.com$#si', $host, $hostMatches)) {
-            // route4
-            if ('/route4' === $pathinfo) {
-                return array('_route' => 'route4');
-            }
-
-        }
-
-        if (preg_match('#^c\\.example\\.com$#si', $host, $hostMatches)) {
-            // route5
-            if ('/route5' === $pathinfo) {
-                return array('_route' => 'route5');
-            }
-
-        }
-
-        // route6
-        if ('/route6' === $pathinfo) {
-            return array('_route' => 'route6');
-        }
-
-        if (preg_match('#^(?P<var1>[^\\.]++)\\.example\\.com$#si', $host, $hostMatches)) {
-            if (0 === strpos($pathinfo, '/route1')) {
-                // route11
-                if ('/route11' === $pathinfo) {
-                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'route11')), array ());
-                }
-
-                // route12
-                if ('/route12' === $pathinfo) {
-                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'route12')), array (  'var1' => 'val',));
-                }
-
-                // route13
-                if (0 === strpos($pathinfo, '/route13') && preg_match('#^/route13/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($hostMatches, $matches, array('_route' => 'route13')), array ());
-                }
-
-                // route14
-                if (0 === strpos($pathinfo, '/route14') && preg_match('#^/route14/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($hostMatches, $matches, array('_route' => 'route14')), array (  'var1' => 'val',));
-                }
-
-            }
-
-        }
-
-        if (preg_match('#^c\\.example\\.com$#si', $host, $hostMatches)) {
-            // route15
-            if (0 === strpos($pathinfo, '/route15') && preg_match('#^/route15/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'route15')), array ());
-            }
-
-        }
-
-        // route16
-        if (0 === strpos($pathinfo, '/route16') && preg_match('#^/route16/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'route16')), array (  'var1' => 'val',));
-        }
-
-        // route17
-        if ('/route17' === $pathinfo) {
-            return array('_route' => 'route17');
-        }
-
-        // a
-        if ('/a/a...' === $pathinfo) {
-            return array('_route' => 'a');
-        }
-
-        if (0 === strpos($pathinfo, '/a/b')) {
-            // b
-            if (preg_match('#^/a/b/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'b')), array ());
-            }
-
-            // c
-            if (0 === strpos($pathinfo, '/a/b/c') && preg_match('#^/a/b/c/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'c')), array ());
-            }
-
-        }
-
-        // secure
-        if ('/secure' === $pathinfo) {
-            $ret = array('_route' => 'secure');
-            $requiredSchemes = array (  'https' => 0,);
-            if (!isset($requiredSchemes[$scheme])) {
-                return array_replace($ret, $this->redirect($rawPathinfo, 'secure', key($requiredSchemes)));
-            }
-
-            return $ret;
-        }
-
-        // nonsecure
-        if ('/nonsecure' === $pathinfo) {
-            $ret = array('_route' => 'nonsecure');
-            $requiredSchemes = array (  'http' => 0,);
-            if (!isset($requiredSchemes[$scheme])) {
-                return array_replace($ret, $this->redirect($rawPathinfo, 'nonsecure', key($requiredSchemes)));
-            }
-
-            return $ret;
-        }
-
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
+        $this->matchHost = true;
+        $this->staticRoutes = array(
+            '/test/baz' => array(array(array('_route' => 'baz'), null, null, null, false, null)),
+            '/test/baz.html' => array(array(array('_route' => 'baz2'), null, null, null, false, null)),
+            '/test/baz3' => array(array(array('_route' => 'baz3'), null, null, null, true, null)),
+            '/foofoo' => array(array(array('_route' => 'foofoo', 'def' => 'test'), null, null, null, false, null)),
+            '/spa ce' => array(array(array('_route' => 'space'), null, null, null, false, null)),
+            '/multi/new' => array(array(array('_route' => 'overridden2'), null, null, null, false, null)),
+            '/multi/hey' => array(array(array('_route' => 'hey'), null, null, null, true, null)),
+            '/ababa' => array(array(array('_route' => 'ababa'), null, null, null, false, null)),
+            '/route1' => array(array(array('_route' => 'route1'), 'a.example.com', null, null, false, null)),
+            '/c2/route2' => array(array(array('_route' => 'route2'), 'a.example.com', null, null, false, null)),
+            '/route4' => array(array(array('_route' => 'route4'), 'a.example.com', null, null, false, null)),
+            '/c2/route3' => array(array(array('_route' => 'route3'), 'b.example.com', null, null, false, null)),
+            '/route5' => array(array(array('_route' => 'route5'), 'c.example.com', null, null, false, null)),
+            '/route6' => array(array(array('_route' => 'route6'), null, null, null, false, null)),
+            '/route11' => array(array(array('_route' => 'route11'), '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null, false, null)),
+            '/route12' => array(array(array('_route' => 'route12', 'var1' => 'val'), '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null, false, null)),
+            '/route17' => array(array(array('_route' => 'route17'), null, null, null, false, null)),
+            '/secure' => array(array(array('_route' => 'secure'), null, null, array('https' => 0), false, null)),
+            '/nonsecure' => array(array(array('_route' => 'nonsecure'), null, null, array('http' => 0), false, null)),
+        );
+        $this->regexpList = array(
+            0 => '{^(?'
+                .'|(?:(?:[^./]*+\\.)++)(?'
+                    .'|/foo/(baz|symfony)(*:47)'
+                    .'|/bar(?'
+                        .'|/([^/]++)(*:70)'
+                        .'|head/([^/]++)(*:90)'
+                    .')'
+                    .'|/test/([^/]++)(?'
+                        .'|(*:115)'
+                    .')'
+                    .'|/([\']+)(*:131)'
+                    .'|/a/(?'
+                        .'|b\'b/([^/]++)(?'
+                            .'|(*:160)'
+                            .'|(*:168)'
+                        .')'
+                        .'|(.*)(*:181)'
+                        .'|b\'b/([^/]++)(?'
+                            .'|(*:204)'
+                            .'|(*:212)'
+                        .')'
+                    .')'
+                    .'|/multi/hello(?:/([^/]++))?(*:248)'
+                    .'|/([^/]++)/b/([^/]++)(?'
+                        .'|(*:279)'
+                        .'|(*:287)'
+                    .')'
+                    .'|/aba/([^/]++)(*:309)'
+                .')|(?i:([^\\.]++)\\.example\\.com)\\.(?'
+                    .'|/route1(?'
+                        .'|3/([^/]++)(*:371)'
+                        .'|4/([^/]++)(*:389)'
+                    .')'
+                .')|(?i:c\\.example\\.com)\\.(?'
+                    .'|/route15/([^/]++)(*:441)'
+                .')|(?:(?:[^./]*+\\.)++)(?'
+                    .'|/route16/([^/]++)(*:489)'
+                    .'|/a/(?'
+                        .'|a\\.\\.\\.(*:510)'
+                        .'|b/(?'
+                            .'|([^/]++)(*:531)'
+                            .'|c/([^/]++)(*:549)'
+                        .')'
+                    .')'
+                .')'
+                .')(?:/?)$}sD',
+        );
+        $this->dynamicRoutes = array(
+            47 => array(array(array('_route' => 'foo', 'def' => 'test'), array('bar'), null, null, false, null)),
+            70 => array(array(array('_route' => 'bar'), array('foo'), array('GET' => 0, 'HEAD' => 1), null, false, null)),
+            90 => array(array(array('_route' => 'barhead'), array('foo'), array('GET' => 0), null, false, null)),
+            115 => array(
+                array(array('_route' => 'baz4'), array('foo'), null, null, true, null),
+                array(array('_route' => 'baz5'), array('foo'), array('POST' => 0), null, true, null),
+                array(array('_route' => 'baz.baz6'), array('foo'), array('PUT' => 0), null, true, null),
+            ),
+            131 => array(array(array('_route' => 'quoter'), array('quoter'), null, null, false, null)),
+            160 => array(array(array('_route' => 'foo1'), array('foo'), array('PUT' => 0), null, false, null)),
+            168 => array(array(array('_route' => 'bar1'), array('bar'), null, null, false, null)),
+            181 => array(array(array('_route' => 'overridden'), array('var'), null, null, false, null)),
+            204 => array(array(array('_route' => 'foo2'), array('foo1'), null, null, false, null)),
+            212 => array(array(array('_route' => 'bar2'), array('bar1'), null, null, false, null)),
+            248 => array(array(array('_route' => 'helloWorld', 'who' => 'World!'), array('who'), null, null, false, null)),
+            279 => array(array(array('_route' => 'foo3'), array('_locale', 'foo'), null, null, false, null)),
+            287 => array(array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null, false, null)),
+            309 => array(array(array('_route' => 'foo4'), array('foo'), null, null, false, null)),
+            371 => array(array(array('_route' => 'route13'), array('var1', 'name'), null, null, false, null)),
+            389 => array(array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null, false, null)),
+            441 => array(array(array('_route' => 'route15'), array('name'), null, null, false, null)),
+            489 => array(array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null, false, null)),
+            510 => array(array(array('_route' => 'a'), array(), null, null, false, null)),
+            531 => array(array(array('_route' => 'b'), array('var'), null, null, false, null)),
+            549 => array(array(array('_route' => 'c'), array('var'), null, null, false, null)),
+        );
     }
 }

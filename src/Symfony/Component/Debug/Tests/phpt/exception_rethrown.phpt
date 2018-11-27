@@ -7,7 +7,7 @@ namespace Symfony\Component\Debug;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
-    $vendor = dirname($vendor);
+    $vendor = \dirname($vendor);
 }
 require $vendor.'/vendor/autoload.php';
 
@@ -26,7 +26,6 @@ ErrorHandler::register()->setDefaultLogger(new TestLogger());
 ini_set('display_errors', 1);
 
 throw new \Exception('foo');
-
 ?>
 --EXPECTF--
 Uncaught Exception: foo

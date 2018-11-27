@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -23,16 +22,8 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 {
     public function testGetInstanceCreatesValidator()
     {
-        $class = get_class($this->getMockForAbstractClass(ConstraintValidator::class));
-
-        $constraint = $this->getMockBuilder(Constraint::class)->getMock();
-        $constraint
-            ->expects($this->once())
-            ->method('validatedBy')
-            ->will($this->returnValue($class));
-
         $factory = new ContainerConstraintValidatorFactory(new Container());
-        $this->assertInstanceOf($class, $factory->getInstance($constraint));
+        $this->assertInstanceOf(DummyConstraintValidator::class, $factory->getInstance(new DummyConstraint()));
     }
 
     public function testGetInstanceReturnsExistingValidator()
@@ -45,30 +36,13 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
     public function testGetInstanceReturnsService()
     {
-        $service = 'validator_constraint_service';
-        $validator = $this->getMockForAbstractClass(ConstraintValidator::class);
-
-        // mock ContainerBuilder b/c it implements TaggedContainerInterface
-        $container = $this->getMockBuilder(ContainerBuilder::class)->setMethods(array('get', 'has'))->getMock();
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with($service)
-            ->willReturn($validator);
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with($service)
-            ->willReturn(true);
-
-        $constraint = $this->getMockBuilder(Constraint::class)->getMock();
-        $constraint
-            ->expects($this->once())
-            ->method('validatedBy')
-            ->will($this->returnValue($service));
+        $validator = new DummyConstraintValidator();
+        $container = new Container();
+        $container->set(DummyConstraintValidator::class, $validator);
 
         $factory = new ContainerConstraintValidatorFactory($container);
-        $this->assertSame($validator, $factory->getInstance($constraint));
+
+        $this->assertSame($validator, $factory->getInstance(new DummyConstraint()));
     }
 
     /**
@@ -84,5 +58,20 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
         $factory = new ContainerConstraintValidatorFactory(new Container());
         $factory->getInstance($constraint);
+    }
+}
+
+class DummyConstraint extends Constraint
+{
+    public function validatedBy()
+    {
+        return DummyConstraintValidator::class;
+    }
+}
+
+class DummyConstraintValidator extends ConstraintValidator
+{
+    public function validate($value, Constraint $constraint)
+    {
     }
 }

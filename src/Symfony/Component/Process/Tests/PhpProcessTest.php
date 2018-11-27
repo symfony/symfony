@@ -43,6 +43,6 @@ PHP
         $process->wait();
         $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
 
-        $this->assertSame(PHP_VERSION.PHP_SAPI, $process->getOutput());
+        $this->assertSame(PHP_VERSION.\PHP_SAPI, $process->getOutput());
     }
 }

@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\User\LdapUserProvider;
-use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * @requires extension ldap

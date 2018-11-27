@@ -29,6 +29,11 @@ class RequestMatcher implements RequestMatcherInterface
     private $host;
 
     /**
+     * @var int|null
+     */
+    private $port;
+
+    /**
      * @var string[]
      */
     private $methods = array();
@@ -56,13 +61,14 @@ class RequestMatcher implements RequestMatcherInterface
      * @param array                $attributes
      * @param string|string[]|null $schemes
      */
-    public function __construct(string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = array(), $schemes = null)
+    public function __construct(string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = array(), $schemes = null, int $port = null)
     {
         $this->matchPath($path);
         $this->matchHost($host);
         $this->matchMethod($methods);
         $this->matchIps($ips);
         $this->matchScheme($schemes);
+        $this->matchPort($port);
 
         foreach ($attributes as $k => $v) {
             $this->matchAttribute($k, $v);
@@ -87,6 +93,16 @@ class RequestMatcher implements RequestMatcherInterface
     public function matchHost($regexp)
     {
         $this->host = $regexp;
+    }
+
+    /**
+     * Adds a check for the the URL port.
+     *
+     * @param int|null $port The port number to connect to
+     */
+    public function matchPort(int $port = null)
+    {
+        $this->port = $port;
     }
 
     /**
@@ -145,11 +161,11 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matches(Request $request)
     {
-        if ($this->schemes && !in_array($request->getScheme(), $this->schemes, true)) {
+        if ($this->schemes && !\in_array($request->getScheme(), $this->schemes, true)) {
             return false;
         }
 
-        if ($this->methods && !in_array($request->getMethod(), $this->methods, true)) {
+        if ($this->methods && !\in_array($request->getMethod(), $this->methods, true)) {
             return false;
         }
 
@@ -167,12 +183,16 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
+        if (null !== $this->port && 0 < $this->port && $request->getPort() !== $this->port) {
+            return false;
+        }
+
         if (IpUtils::checkIp($request->getClientIp(), $this->ips)) {
             return true;
         }
 
         // Note to future implementors: add additional checks above the
         // foreach above or else your check might not be run!
-        return 0 === count($this->ips);
+        return 0 === \count($this->ips);
     }
 }

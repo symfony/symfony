@@ -32,7 +32,7 @@ class CustomFilterIterator extends \FilterIterator
     public function __construct(\Iterator $iterator, array $filters)
     {
         foreach ($filters as $filter) {
-            if (!is_callable($filter)) {
+            if (!\is_callable($filter)) {
                 throw new \InvalidArgumentException('Invalid PHP callback.');
             }
         }
@@ -51,7 +51,7 @@ class CustomFilterIterator extends \FilterIterator
         $fileinfo = $this->current();
 
         foreach ($this->filters as $filter) {
-            if (false === call_user_func($filter, $fileinfo)) {
+            if (false === \call_user_func($filter, $fileinfo)) {
                 return false;
             }
         }

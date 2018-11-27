@@ -44,7 +44,7 @@ class DotenvTest extends TestCase
             array('FOO=${FOO', "Unclosed braces on variable expansion in \".env\" at line 1.\n...FOO=\${FOO...\n           ^ line 1 offset 9"),
         );
 
-        if ('\\' !== DIRECTORY_SEPARATOR) {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
             $tests[] = array('FOO=$((1dd2))', "Issue expanding a command (%s\n) in \".env\" at line 1.\n...FOO=$((1dd2))...\n               ^ line 1 offset 13");
         }
 
@@ -66,6 +66,20 @@ class DotenvTest extends TestCase
         $_ENV['REMOTE'] = 'remote';
 
         $tests = array(
+            // backslashes
+            array('FOO=foo\\\\bar', array('FOO' => 'foo\\bar')),
+            array("FOO='foo\\\\bar'", array('FOO' => 'foo\\\\bar')),
+            array('FOO="foo\\\\bar"', array('FOO' => 'foo\\bar')),
+
+            // escaped backslash in front of variable
+            array("BAR=bar\nFOO=foo\\\\\$BAR", array('BAR' => 'bar', 'FOO' => 'foo\\bar')),
+            array("BAR=bar\nFOO='foo\\\\\$BAR'", array('BAR' => 'bar', 'FOO' => 'foo\\\\$BAR')),
+            array("BAR=bar\nFOO=\"foo\\\\\$BAR\"", array('BAR' => 'bar', 'FOO' => 'foo\\bar')),
+
+            array('FOO=foo\\\\\\$BAR', array('FOO' => 'foo\\$BAR')),
+            array('FOO=\'foo\\\\\\$BAR\'', array('FOO' => 'foo\\\\\\$BAR')),
+            array('FOO="foo\\\\\\$BAR"', array('FOO' => 'foo\\$BAR')),
+
             // spaces
             array('FOO=bar', array('FOO' => 'bar')),
             array(' FOO=bar ', array('FOO' => 'bar')),
@@ -139,7 +153,7 @@ class DotenvTest extends TestCase
             array('FOO=$NOTDEFINED', array('FOO' => '')),
         );
 
-        if ('\\' !== DIRECTORY_SEPARATOR) {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
             $tests = array_merge($tests, array(
                 // command expansion
                 array('FOO=$(echo foo)', array('FOO' => 'foo')),
@@ -171,7 +185,103 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new DotEnv())->load($path1, $path2);
+        (new Dotenv())->load($path1, $path2);
+
+        $foo = getenv('FOO');
+        $bar = getenv('BAR');
+
+        putenv('FOO');
+        putenv('BAR');
+        unlink($path1);
+        unlink($path2);
+        rmdir($tmpdir);
+
+        $this->assertSame('BAR', $foo);
+        $this->assertSame('BAZ', $bar);
+    }
+
+    public function testLoadEnv()
+    {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_SERVER['FOO']);
+        unset($_SERVER['BAR']);
+        putenv('FOO');
+        putenv('BAR');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path = tempnam($tmpdir, 'sf-');
+
+        // .env
+
+        file_put_contents($path, 'FOO=BAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('BAR', getenv('FOO'));
+        $this->assertSame('dev', getenv('TEST_APP_ENV'));
+
+        // .env.local
+
+        file_put_contents("$path.local", 'FOO=localBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('localBAR', getenv('FOO'));
+
+        // special case for test
+
+        $_SERVER['TEST_APP_ENV'] = 'test';
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('BAR', getenv('FOO'));
+
+        // .env.dev
+
+        unset($_SERVER['TEST_APP_ENV']);
+        file_put_contents("$path.dev", 'FOO=devBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devBAR', getenv('FOO'));
+
+        // .env.dev.local
+
+        file_put_contents("$path.dev.local", 'FOO=devlocalBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devlocalBAR', getenv('FOO'));
+
+        // .env.dist
+
+        unlink($path);
+        file_put_contents("$path.dist", 'BAR=distBAR');
+        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('distBAR', getenv('BAR'));
+
+        putenv('FOO');
+        putenv('BAR');
+        unlink("$path.dist");
+        unlink("$path.local");
+        unlink("$path.dev");
+        unlink("$path.dev.local");
+        rmdir($tmpdir);
+    }
+
+    public function testOverload()
+    {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_SERVER['FOO']);
+        unset($_SERVER['BAR']);
+
+        putenv('FOO=initial_foo_value');
+        putenv('BAR=initial_bar_value');
+        $_ENV['FOO'] = 'initial_foo_value';
+        $_ENV['BAR'] = 'initial_bar_value';
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, 'FOO=BAR');
+        file_put_contents($path2, 'BAR=BAZ');
+
+        (new Dotenv())->overload($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -199,7 +309,7 @@ class DotenvTest extends TestCase
     {
         $originalValue = $_SERVER['argc'];
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('argc' => 'new_value'));
 
         $this->assertSame($originalValue, $_SERVER['argc']);
@@ -210,7 +320,7 @@ class DotenvTest extends TestCase
         putenv('TEST_ENV_VAR=original_value');
         $_SERVER['TEST_ENV_VAR'] = 'original_value';
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'));
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
@@ -220,12 +330,24 @@ class DotenvTest extends TestCase
     {
         $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('HTTP_TEST_ENV_VAR' => 'env_value'));
 
         $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
         $this->assertSame('env_value', $_ENV['HTTP_TEST_ENV_VAR']);
         $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
+    }
+
+    public function testEnvVarIsOverriden()
+    {
+        putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
+
+        $dotenv = new Dotenv();
+        $dotenv->populate(array('TEST_ENV_VAR_OVERRIDEN' => 'new_value'), true);
+
+        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
+        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);
+        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
     }
 
     public function testMemorizingLoadedVarsNamesInSpecialVar()
@@ -242,7 +364,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('APP_DEBUG' => '1', 'DATABASE_URL' => 'mysql://root@localhost/db'));
 
         $this->assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
@@ -259,7 +381,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('APP_DEBUG' => '0', 'DATABASE_URL' => 'mysql://root@localhost/db'));
         $dotenv->populate(array('DATABASE_URL' => 'sqlite:///somedb.sqlite'));
 
@@ -268,14 +390,14 @@ class DotenvTest extends TestCase
 
     public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar()
     {
-        putenv('SYMFONY_DOTENV_VARS=FOO,BAR,BAZ');
+        putenv('SYMFONY_DOTENV_VARS='.$_SERVER['SYMFONY_DOTENV_VARS'] = 'FOO,BAR,BAZ');
 
         putenv('FOO=foo');
         putenv('BAR=bar');
         putenv('BAZ=baz');
         putenv('DOCUMENT_ROOT=/var/www');
 
-        $dotenv = new DotEnv();
+        $dotenv = new Dotenv();
         $dotenv->populate(array('FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot'));
 
         $this->assertSame('foo1', getenv('FOO'));

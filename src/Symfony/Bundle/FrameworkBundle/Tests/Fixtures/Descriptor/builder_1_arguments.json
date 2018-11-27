@@ -12,12 +12,12 @@
             "arguments": [
                 {
                     "type": "service",
-                    "id": "definition2"
+                    "id": ".definition_2"
                 },
                 "%parameter%",
                 {
                     "class": "inline_service",
-                    "public": true,
+                    "public": false,
                     "synthetic": false,
                     "lazy": false,
                     "shared": true,
@@ -35,11 +35,11 @@
                     "foo",
                     {
                         "type": "service",
-                        "id": "definition2"
+                        "id": ".definition_2"
                     },
                     {
                         "class": "inline_service",
-                        "public": true,
+                        "public": false,
                         "synthetic": false,
                         "lazy": false,
                         "shared": true,
@@ -58,13 +58,27 @@
                     },
                     {
                         "type": "service",
-                        "id": "definition_2"
+                        "id": ".definition_2"
                     }
                 ]
             ],
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
+            "tags": []
+        },
+        "service_container": {
+            "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
+            "public": true,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "description": "ContainerInterface is the interface implemented by service container classes.",
+            "arguments": [],
+            "file": null,
             "tags": []
         }
     },
@@ -74,7 +88,5 @@
             "public": true
         }
     },
-    "services": {
-        "service_container": "Symfony\\Component\\DependencyInjection\\ContainerBuilder"
-    }
+    "services": []
 }

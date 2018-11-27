@@ -12,8 +12,8 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 
 class YamlFileLoaderTest extends TestCase
 {

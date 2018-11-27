@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Twig\Environment;
 
 /**
  * Renders a form into HTML using a rendering engine.
@@ -131,6 +132,9 @@ class FormRenderer implements FormRendererInterface
         $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
         if ($renderOnlyOnce && $view->isRendered()) {
+            // This is not allowed, because it would result in rendering same IDs multiple times, which is not valid.
+            @trigger_error(sprintf('You are calling "form_%s" for field "%s" which has already been rendered before, trying to render fields which were already rendered is deprecated since Symfony 4.2 and will throw an exception in 5.0.', $blockNameSuffix, $view->vars['name']), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('Field "%s" has already been rendered. Save result of previous  render call to variable and output that instead.', $view->vars['name']));
             return '';
         }
 
@@ -173,7 +177,7 @@ class FormRenderer implements FormRendererInterface
             foreach ($view->vars['block_prefixes'] as $blockNamePrefix) {
                 $blockNameHierarchy[] = $blockNamePrefix.'_'.$blockNameSuffix;
             }
-            $hierarchyLevel = count($blockNameHierarchy) - 1;
+            $hierarchyLevel = \count($blockNameHierarchy) - 1;
 
             $hierarchyInit = true;
         } else {
@@ -217,7 +221,7 @@ class FormRenderer implements FormRendererInterface
 
         // Escape if no resource exists for this block
         if (!$resource) {
-            if (count($blockNameHierarchy) !== count(array_unique($blockNameHierarchy))) {
+            if (\count($blockNameHierarchy) !== \count(array_unique($blockNameHierarchy))) {
                 throw new LogicException(sprintf('Unable to render the form because the block names array contains duplicates: "%s".', implode('", "', array_reverse($blockNameHierarchy))));
             }
 
@@ -281,5 +285,21 @@ class FormRenderer implements FormRendererInterface
     public function humanize($text)
     {
         return ucfirst(strtolower(trim(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
+    }
+
+    /**
+     * @internal
+     */
+    public function encodeCurrency(Environment $environment, $text, $widget = '')
+    {
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
+        }
+
+        return str_replace('{{ widget }}', $widget, $text);
     }
 }

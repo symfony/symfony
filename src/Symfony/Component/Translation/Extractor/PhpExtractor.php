@@ -208,7 +208,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     } elseif (self::MESSAGE_TOKEN === $item) {
                         $message = $this->getValue($tokenIterator);
 
-                        if (count($sequence) === ($sequenceKey + 1)) {
+                        if (\count($sequence) === ($sequenceKey + 1)) {
                             break;
                         }
                     } elseif (self::METHOD_ARGUMENTS_TOKEN === $item) {

@@ -41,7 +41,7 @@ class ExpressionLanguage extends BaseExpressionLanguage
 
             $errors = $variables['validator']->validate($object, null, $groups);
 
-            return 0 === count($errors);
+            return 0 === \count($errors);
         });
     }
 }

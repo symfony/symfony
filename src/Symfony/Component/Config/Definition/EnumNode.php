@@ -22,14 +22,14 @@ class EnumNode extends ScalarNode
 {
     private $values;
 
-    public function __construct(?string $name, NodeInterface $parent = null, array $values = array())
+    public function __construct(?string $name, NodeInterface $parent = null, array $values = array(), string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
         $values = array_unique($values);
         if (empty($values)) {
             throw new \InvalidArgumentException('$values must contain at least one element.');
         }
 
-        parent::__construct($name, $parent);
+        parent::__construct($name, $parent, $pathSeparator);
         $this->values = $values;
     }
 
@@ -42,17 +42,21 @@ class EnumNode extends ScalarNode
     {
         $value = parent::finalizeValue($value);
 
-        if (!in_array($value, $this->values, true)) {
-            $ex = new InvalidConfigurationException(sprintf(
-                'The value %s is not allowed for path "%s". Permissible values: %s',
-                json_encode($value),
-                $this->getPath(),
-                implode(', ', array_map('json_encode', $this->values))));
+        if (!\in_array($value, $this->values, true)) {
+            $ex = new InvalidConfigurationException(sprintf('The value %s is not allowed for path "%s". Permissible values: %s', json_encode($value), $this->getPath(), implode(', ', array_map('json_encode', $this->values))));
             $ex->setPath($this->getPath());
 
             throw $ex;
         }
 
         return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function allowPlaceholders(): bool
+    {
+        return false;
     }
 }

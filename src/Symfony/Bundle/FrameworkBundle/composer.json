@@ -18,16 +18,16 @@
     "require": {
         "php": "^7.1.3",
         "ext-xml": "*",
-        "symfony/cache": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/config": "~3.4|~4.0",
-        "symfony/event-dispatcher": "~3.4|~4.0",
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/cache": "~4.2",
+        "symfony/dependency-injection": "^4.2",
+        "symfony/config": "~4.2",
+        "symfony/event-dispatcher": "^4.1",
+        "symfony/http-foundation": "^4.1.2",
+        "symfony/http-kernel": "^4.2",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/routing": "~3.4|~4.0"
+        "symfony/routing": "^4.1"
     },
     "require-dev": {
         "doctrine/cache": "~1.0",
@@ -39,18 +39,19 @@
         "symfony/dom-crawler": "~3.4|~4.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/security": "~3.4|~4.0",
-        "symfony/form": "~3.4|~4.0",
+        "symfony/form": "^4.2",
         "symfony/expression-language": "~3.4|~4.0",
+        "symfony/messenger": "^4.2",
         "symfony/process": "~3.4|~4.0",
         "symfony/security-core": "~3.4|~4.0",
         "symfony/security-csrf": "~3.4|~4.0",
-        "symfony/serializer": "~3.4|~4.0",
+        "symfony/serializer": "^4.2",
         "symfony/stopwatch": "~3.4|~4.0",
-        "symfony/translation": "~3.4|~4.0",
+        "symfony/translation": "~4.2",
         "symfony/templating": "~3.4|~4.0",
-        "symfony/validator": "~4.1",
+        "symfony/validator": "^4.1",
         "symfony/var-dumper": "~3.4|~4.0",
-        "symfony/workflow": "~3.4|~4.0",
+        "symfony/workflow": "^4.1",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/lock": "~3.4|~4.0",
@@ -65,16 +66,20 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/asset": "<3.4",
         "symfony/console": "<3.4",
-        "symfony/form": "<3.4",
+        "symfony/dotenv": "<4.2",
+        "symfony/form": "<4.2",
+        "symfony/messenger": "<4.2",
         "symfony/property-info": "<3.4",
-        "symfony/serializer": "<3.4",
+        "symfony/serializer": "<4.2",
         "symfony/stopwatch": "<3.4",
-        "symfony/translation": "<3.4",
+        "symfony/translation": "<4.2",
+        "symfony/twig-bridge": "<4.1.1",
         "symfony/validator": "<4.1",
-        "symfony/workflow": "<3.4"
+        "symfony/workflow": "<4.1"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",
+        "phpdocumentor/reflection-docblock": "For display additional information in debug:container",
         "symfony/console": "For using the console commands",
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",
@@ -92,7 +97,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

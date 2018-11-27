@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class RedirectController
 {
@@ -46,29 +46,37 @@ class RedirectController
      * In case the route name is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param Request    $request          The request instance
-     * @param string     $route            The route name to redirect to
-     * @param bool       $permanent        Whether the redirection is permanent
-     * @param bool|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
+     * @param Request    $request           The request instance
+     * @param string     $route             The route name to redirect to
+     * @param bool       $permanent         Whether the redirection is permanent
+     * @param bool|array $ignoreAttributes  Whether to ignore attributes or an array of attributes to ignore
+     * @param bool       $keepRequestMethod Wheter redirect action should keep HTTP request method
      *
      * @throws HttpException In case the route name is empty
      */
-    public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false): Response
+    public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false, bool $keepRequestMethod = false, bool $keepQueryParams = false): Response
     {
         if ('' == $route) {
             throw new HttpException($permanent ? 410 : 404);
         }
 
         $attributes = array();
-        if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
+        if (false === $ignoreAttributes || \is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
-            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes']);
+            $attributes = $keepQueryParams ? array_merge($request->query->all(), $attributes) : $attributes;
+            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['keepRequestMethod'], $attributes['keepQueryParams']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
             }
         }
 
-        return new RedirectResponse($this->router->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
+        if ($keepRequestMethod) {
+            $statusCode = $permanent ? 308 : 307;
+        } else {
+            $statusCode = $permanent ? 301 : 302;
+        }
+
+        return new RedirectResponse($this->router->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $statusCode);
     }
 
     /**
@@ -80,22 +88,27 @@ class RedirectController
      * In case the path is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param Request     $request   The request instance
-     * @param string      $path      The absolute path or URL to redirect to
-     * @param bool        $permanent Whether the redirect is permanent or not
-     * @param string|null $scheme    The URL scheme (null to keep the current one)
-     * @param int|null    $httpPort  The HTTP port (null to keep the current one for the same scheme or the default configured port)
-     * @param int|null    $httpsPort The HTTPS port (null to keep the current one for the same scheme or the default configured port)
+     * @param Request     $request           The request instance
+     * @param string      $path              The absolute path or URL to redirect to
+     * @param bool        $permanent         Whether the redirect is permanent or not
+     * @param string|null $scheme            The URL scheme (null to keep the current one)
+     * @param int|null    $httpPort          The HTTP port (null to keep the current one for the same scheme or the default configured port)
+     * @param int|null    $httpsPort         The HTTPS port (null to keep the current one for the same scheme or the default configured port)
+     * @param bool        $keepRequestMethod Wheter redirect action should keep HTTP request method
      *
      * @throws HttpException In case the path is empty
      */
-    public function urlRedirectAction(Request $request, string $path, bool $permanent = false, string $scheme = null, int $httpPort = null, int $httpsPort = null): Response
+    public function urlRedirectAction(Request $request, string $path, bool $permanent = false, string $scheme = null, int $httpPort = null, int $httpsPort = null, bool $keepRequestMethod = false): Response
     {
         if ('' == $path) {
             throw new HttpException($permanent ? 410 : 404);
         }
 
-        $statusCode = $permanent ? 301 : 302;
+        if ($keepRequestMethod) {
+            $statusCode = $permanent ? 308 : 307;
+        } else {
+            $statusCode = $permanent ? 301 : 302;
+        }
 
         // redirect if the path is a full URL
         if (parse_url($path, PHP_URL_SCHEME)) {

@@ -138,14 +138,14 @@ class DebugClassLoader
         try {
             if ($this->isFinder && !isset($this->loaded[$class])) {
                 $this->loaded[$class] = true;
-                if ($file = $this->classLoader[0]->findFile($class) ?: false) {
-                    $wasCached = \function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file);
-
+                if (!$file = $this->classLoader[0]->findFile($class) ?: false) {
+                    // no-op
+                } elseif (\function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file)) {
                     require $file;
 
-                    if ($wasCached) {
-                        return;
-                    }
+                    return;
+                } else {
+                    require $file;
                 }
             } else {
                 \call_user_func($this->classLoader, $class);

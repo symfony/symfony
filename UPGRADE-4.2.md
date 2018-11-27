@@ -373,6 +373,7 @@ Validator
  * The `checkMX` and `checkHost` options of the `Email` constraint are deprecated
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final
+ * The `ValidatorTypeGuesser` can now guess the type of accepted files and out it into the FileType
  * Deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
  * Using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl` is deprecated
  * Using the `Email` constraint in strict mode without `egulias/email-validator` is deprecated

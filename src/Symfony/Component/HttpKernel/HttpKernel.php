@@ -248,6 +248,14 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         }
     }
 
+    /*
+     * Returns a more explict 
+     * definition of the supplied 
+     * variable as a string
+     *
+     * @param $var
+     * @return string
+     */
     private function varToString($var): string
     {
         if (is_object($var)) {

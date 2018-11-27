@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderVersusSetter;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
@@ -721,5 +722,15 @@ class PropertyAccessorTest extends TestCase
 
         self::assertEquals(array('test@email.com'), $object->getEmails());
         self::assertNull($object->getEmail());
+    }
+
+    public function testAdderHasHigherPriorityThanPluralSetter()
+    {
+        $object = new TestAdderVersusSetter();
+
+        $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
+        $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
+
+        self::assertEquals(array('test@email.com'), $object->getEmails());
     }
 }

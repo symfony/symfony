@@ -687,7 +687,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getWriteAccessInfo($class, $property, $value)
     {
-        $key = str_replace('\\', '.', $class).'..'.$property;
+        $useAdderAndRemover = \is_array($value) || $value instanceof \Traversable;
+        $key = str_replace('\\', '.', $class).'..'.$property.'..'.(int) $useAdderAndRemover;
 
         if (isset($this->writePropertyCache[$key])) {
             return $this->writePropertyCache[$key];
@@ -706,6 +707,16 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
         $camelized = $this->camelize($property);
         $singulars = (array) Inflector::singularize($camelized);
+
+        if ($useAdderAndRemover && !\in_array($camelized, $singulars)) {
+            $methods = $this->findAdderAndRemover($reflClass, $singulars);
+
+            if (null !== $methods) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
+                $access[self::ACCESS_ADDER] = $methods[0];
+                $access[self::ACCESS_REMOVER] = $methods[1];
+            }
+        }
 
         if (!isset($access[self::ACCESS_TYPE])) {
             $setter = 'set'.$camelized;
@@ -728,22 +739,16 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
                 $access[self::ACCESS_NAME] = $setter;
             } elseif (null !== $methods = $this->findAdderAndRemover($reflClass, $singulars)) {
-                if (\is_array($value) || $value instanceof \Traversable) {
-                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
-                    $access[self::ACCESS_ADDER] = $methods[0];
-                    $access[self::ACCESS_REMOVER] = $methods[1];
-                } else {
-                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
-                    $access[self::ACCESS_NAME] = sprintf(
-                        'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
-                        'the new value must be an array or an instance of \Traversable, '.
-                        '"%s" given.',
-                        $property,
-                        $reflClass->name,
-                        implode('()", "', $methods),
-                        \is_object($value) ? \get_class($value) : \gettype($value)
-                    );
-                }
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
+                $access[self::ACCESS_NAME] = sprintf(
+                    'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
+                    'the new value must be an array or an instance of \Traversable, '.
+                    '"%s" given.',
+                    $property,
+                    $reflClass->name,
+                    implode('()", "', $methods),
+                    \is_object($value) ? \get_class($value) : \gettype($value)
+                );
             } else {
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                 $access[self::ACCESS_NAME] = sprintf(

@@ -155,17 +155,18 @@ class PhpDumper extends Dumper
         }
 
         (new AnalyzeServiceReferencesPass(false, !$this->getProxyDumper() instanceof NullDumper))->process($this->container);
+        $checkedNodes = array();
         $this->circularReferences = array();
-        foreach (array(true, false) as $byConstructor) {
-            foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
-                if (!$node->getValue() instanceof Definition) {
-                    continue;
-                }
-                $currentPath = array($id => true);
-                $this->analyzeCircularReferences($node->getOutEdges(), $currentPath, $id, $byConstructor);
+        foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
+            if (!$node->getValue() instanceof Definition) {
+                continue;
+            }
+            if (!isset($checkedNodes[$id])) {
+                $this->analyzeCircularReferences($id, $node->getOutEdges(), $checkedNodes);
             }
         }
         $this->container->getCompiler()->getServiceReferenceGraph()->clear();
+        $checkedNodes = array();
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -301,12 +302,12 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function analyzeCircularReferences(array $edges, &$currentPath, $sourceId, $byConstructor)
+    private function analyzeCircularReferences($sourceId, array $edges, &$checkedNodes, &$currentPath = array())
     {
+        $checkedNodes[$sourceId] = true;
+        $currentPath[$sourceId] = $sourceId;
+
         foreach ($edges as $edge) {
-            if ($byConstructor && !$edge->isReferencedByConstructor()) {
-                continue;
-            }
             $node = $edge->getDestNode();
             $id = $node->getId();
 
@@ -315,20 +316,42 @@ EOF;
             } elseif (isset($currentPath[$id])) {
                 $currentId = $id;
                 foreach (array_reverse($currentPath) as $parentId) {
-                    if (!isset($this->circularReferences[$parentId][$currentId])) {
-                        $this->circularReferences[$parentId][$currentId] = $byConstructor;
-                    }
+                    $this->circularReferences[$parentId][$currentId] = $currentId;
                     if ($parentId === $id) {
                         break;
                     }
                     $currentId = $parentId;
                 }
-            } else {
-                $currentPath[$id] = $id;
-                $this->analyzeCircularReferences($node->getOutEdges(), $currentPath, $id, $byConstructor);
-                unset($currentPath[$id]);
+            } elseif (!isset($checkedNodes[$id])) {
+                $this->analyzeCircularReferences($id, $node->getOutEdges(), $checkedNodes, $currentPath);
+            } elseif (isset($this->circularReferences[$id])) {
+                $this->connectCircularReferences($id, $currentPath);
             }
         }
+        unset($currentPath[$sourceId]);
+    }
+
+    private function connectCircularReferences($sourceId, &$currentPath, &$subPath = array())
+    {
+        $subPath[$sourceId] = $sourceId;
+        $currentPath[$sourceId] = $sourceId;
+
+        foreach ($this->circularReferences[$sourceId] as $id) {
+            if (isset($currentPath[$id])) {
+                $currentId = $id;
+                foreach (array_reverse($currentPath) as $parentId) {
+                    $this->circularReferences[$parentId][$currentId] = $currentId;
+                    if ($parentId === $id) {
+                        break;
+                    }
+                    $currentId = $parentId;
+                }
+            } elseif (!isset($subPath[$id]) && isset($this->circularReferences[$id])) {
+                $this->connectCircularReferences($id, $currentPath, $subPath);
+            }
+        }
+        unset($currentPath[$sourceId]);
+        unset($subPath[$sourceId]);
     }
 
     private function collectLineage($class, array &$lineage)
@@ -569,8 +592,11 @@ EOF;
 
         if (\is_array($callable)) {
             if ($callable[0] instanceof Reference
-                || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))) {
-                return sprintf("        %s->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
+            ) {
+                $callable[0] = $this->dumpValue($callable[0]);
+
+                return sprintf('        '.('$' === $callable[0][0] ? '%s' : '(%s)')."->%s(\$%s);\n", $callable[0], $callable[1], $variableName);
             }
 
             $class = $this->dumpValue($callable[0]);
@@ -724,7 +750,7 @@ EOF;
 
         $hasSelfRef = isset($this->circularReferences[$id][$targetId]);
         $forConstructor = $forConstructor && !isset($this->definitionVariables[$definition]);
-        $code = $hasSelfRef && $this->circularReferences[$id][$targetId] && !$forConstructor ? $this->addInlineService($id, $definition, $definition) : '';
+        $code = $hasSelfRef && !$forConstructor ? $this->addInlineService($id, $definition, $definition) : '';
 
         if (isset($this->referenceVariables[$targetId]) || (2 > $callCount && (!$hasSelfRef || !$forConstructor))) {
             return $code;

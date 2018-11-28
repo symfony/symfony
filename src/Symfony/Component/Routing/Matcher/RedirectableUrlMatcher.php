@@ -32,18 +32,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
             }
 
             if ($this->allowSchemes) {
-                redirect_scheme:
-                $scheme = $this->context->getScheme();
-                $this->context->setScheme(current($this->allowSchemes));
-                try {
-                    $ret = parent::match($pathinfo);
-
-                    return $this->redirect($pathinfo, $ret['_route'] ?? null, $this->context->getScheme()) + $ret;
-                } catch (ExceptionInterface $e2) {
-                    throw $e;
-                } finally {
-                    $this->context->setScheme($scheme);
-                }
+                return $this->redirectScheme($pathinfo, $e);
             } elseif ('/' === $pathinfo) {
                 throw $e;
             } else {
@@ -54,11 +43,26 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
                     return $this->redirect($pathinfo, $ret['_route'] ?? null) + $ret;
                 } catch (ExceptionInterface $e2) {
                     if ($this->allowSchemes) {
-                        goto redirect_scheme;
+                        return $this->redirectScheme($pathinfo, $e);
                     }
                     throw $e;
                 }
             }
+        }
+    }
+
+    private function redirectScheme(string $pathinfo, ResourceNotFoundException $originalException)
+    {
+        $scheme = $this->context->getScheme();
+        $this->context->setScheme(current($this->allowSchemes));
+        try {
+            $ret = parent::match($pathinfo);
+
+            return $this->redirect($pathinfo, $ret['_route'] ?? null, $this->context->getScheme()) + $ret;
+        } catch (ExceptionInterface $e) {
+            throw $originalException;
+        } finally {
+            $this->context->setScheme($scheme);
         }
     }
 }

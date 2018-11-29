@@ -1,10 +1,9 @@
 language: php
 
 dist: trusty
-sudo: false
 
 git:
-    depth: 1
+    depth: 2
 
 addons:
     apt_packages:
@@ -136,14 +135,16 @@ before_install:
           phpenv global $PHP
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
 
-          # install libsodium
-          sudo add-apt-repository ppa:ondrej/php -y
-          sudo apt-get update -q
-          sudo apt-get install libsodium-dev -y
+          if ! php --ri sodium > /dev/null; then
+              # install libsodium
+              sudo add-apt-repository ppa:ondrej/php -y
+              sudo apt-get update -q
+              sudo apt-get install libsodium-dev -y
+              tfold ext.libsodium tpecl libsodium sodium.so $INI
+          fi
 
           tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-          tfold ext.libsodium tpecl libsodium sodium.so $INI
-          tfold ext.mongodb tpecl mongodb-1.5.0 mongodb.so $INI
+          tfold ext.mongodb tpecl mongodb-1.5.2 mongodb.so $INI
       done
 
     - |
@@ -205,7 +206,7 @@ install:
               break
           fi
           phpenv global $PHP
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.2; composer require --dev --no-update mongodb/mongodb)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then

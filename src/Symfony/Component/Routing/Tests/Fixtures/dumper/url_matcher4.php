@@ -66,8 +66,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 }
                 list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
 
-                if ('/' !== $pathinfo && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                    break;
+                if ('/' !== $pathinfo) {
+                    if (!$hasTrailingSlash && '/' === $pathinfo[-1]) {
+                        break;
+                    }
+                    if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
+                        break;
+                    }
                 }
 
                 $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);

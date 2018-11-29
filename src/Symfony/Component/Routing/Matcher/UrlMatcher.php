@@ -160,8 +160,13 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if ($supportsTrailingSlash && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                return;
+            if ($supportsTrailingSlash) {
+                if (!$hasTrailingSlash && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1))) {
+                    return;
+                }
+                if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
+                    return;
+                }
             }
 
             $hostMatches = array();

@@ -550,9 +550,15 @@ EOF;
     private function compileSwitchDefault(bool $hasVars, bool $matchHost): string
     {
         $code = sprintf("
-            if ('/' !== \$pathinfo && \$hasTrailingSlash !== ('/' === \$pathinfo[-1])) {
-                %s;
+            if ('/' !== \$pathinfo) {
+                if (!\$hasTrailingSlash && '/' === \$pathinfo[-1]%s) {
+                    %s;
+                }
+                if (\$hasTrailingSlash && '/' !== \$pathinfo[-1]) {
+                    %2\$s;
+                }
             }\n",
+            $hasVars ? ' && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n[\'MARK\']' : '',
             $this->supportsRedirections ? 'return null' : 'break'
         );
 

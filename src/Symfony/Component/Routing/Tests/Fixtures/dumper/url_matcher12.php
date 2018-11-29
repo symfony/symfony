@@ -63,8 +63,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
 
-                        if ('/' !== $pathinfo && $hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                            break;
+                        if ('/' !== $pathinfo) {
+                            if (!$hasTrailingSlash && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                                break;
+                            }
+                            if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
+                                break;
+                            }
                         }
 
                         foreach ($vars as $i => $v) {

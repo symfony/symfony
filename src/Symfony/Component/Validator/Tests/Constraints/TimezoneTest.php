@@ -33,6 +33,9 @@ class TimezoneTest extends TestCase
             'message' => 'myMessage',
             'zone' => \DateTimeZone::ALL,
         ));
+
+        // Make an assertion in order to avoid this test to be marked as risky
+        $this->assertInstanceOf(Timezone::class, $constraint);
     }
 
     /**

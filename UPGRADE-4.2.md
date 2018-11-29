@@ -199,7 +199,10 @@ Messenger
 ---------
 
  * The `MiddlewareInterface::handle()` and `SenderInterface::send()` methods must now return an `Envelope` instance.
- * The return value of handlers is ignored. If you used to return a value, e.g in query bus handlers, you can either:
+ * The return value of handlers isn't forwarded anymore by middleware and buses. 
+   If you used to return a value, e.g in query bus handlers, you can either:
+    - get the result from the `HandledStamp` in the envelope returned by the bus.
+    - use the `HandleTrait` to leverage a message bus, expecting a single, synchronous message handling and returning its result.
     - make your `Query` mutable to allow setting & getting a result:
       ```php
       // When dispatching:
@@ -209,15 +212,6 @@ Messenger
       // In your handler:
       $query->setResult($yourResult);
       ```
-    - define a callable on your `Query` to be called in your handler:
-      ```php
-      // When dispatching:
-      $bus->dispatch(new Query([$this, 'onResult']));
-
-      // In your handler:
-      $query->executeCallback($yourResult);
-      ```
-
  * The `EnvelopeAwareInterface` was removed and the `MiddlewareInterface::handle()` method now requires an `Envelope` object
    as first argument. When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
    If you use your own `MessageBusInterface` implementation, you must wrap the message in an `Envelope` before passing it to middleware.  

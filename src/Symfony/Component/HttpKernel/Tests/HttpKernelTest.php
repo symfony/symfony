@@ -139,6 +139,26 @@ class HttpKernelTest extends TestCase
         $this->assertEquals($expectedStatusCode, $response->getStatusCode());
     }
 
+    public function testReportException()
+    {
+        $exceptionHasBeenReported = false;
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) use (&$exceptionHasBeenReported) {
+            $exceptionHasBeenReported = true;
+            $event->setResponse(new Response());
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () use (&$kernel) {
+            $kernel->reportException(new \Exception());
+            return new Response();
+        });
+
+        $kernel->handle(new Request());
+
+        $this->assertTrue($exceptionHasBeenReported);
+    }
+
     public function getSpecificStatusCodes()
     {
         return array(

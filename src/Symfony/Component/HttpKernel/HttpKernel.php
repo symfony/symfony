@@ -222,6 +222,22 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
+     * Reports an exception to the exception listeners.
+     *
+     * @param \Exception $e An \Exception instance
+     */
+    public function reportException(\Exception $e)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $type = $this->requestStack->getParentRequest()
+            ? HttpKernelInterface::SUB_REQUEST
+            : HttpKernelInterface::MASTER_REQUEST;
+
+        $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
+        $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+    }
+
+    /**
      * Handles an exception by trying to convert it to a Response.
      *
      * @param \Exception $e       An \Exception instance

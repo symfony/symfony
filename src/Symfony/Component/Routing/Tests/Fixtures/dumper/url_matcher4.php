@@ -32,6 +32,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
                     break;
                 }
+
                 $ret = array('_route' => 'put_and_post');
                 if (!isset(($a = array('PUT' => 0, 'POST' => 1))[$requestMethod])) {
                     $allow += $a;
@@ -44,6 +45,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
                     break;
                 }
+
                 $ret = array('_route' => 'put_and_get_and_head');
                 if (!isset(($a = array('PUT' => 0, 'GET' => 1, 'HEAD' => 2))[$canonicalMethod])) {
                     $allow += $a;
@@ -67,10 +69,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
 
                 if ('/' !== $pathinfo) {
-                    if (!$hasTrailingSlash && '/' === $pathinfo[-1]) {
-                        break;
-                    }
-                    if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
+                    if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
                         break;
                     }
                 }

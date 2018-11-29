@@ -84,11 +84,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
 
                 if ('/' !== $pathinfo) {
-                    if (!$hasTrailingSlash && '/' === $pathinfo[-1]) {
-                        return null;
-                    }
-                    if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
-                        return null;
+                    if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                        if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                            return null;
+                        }
+                        break;
                     }
                 }
 
@@ -127,11 +127,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
 
                         if ('/' !== $pathinfo) {
-                            if (!$hasTrailingSlash && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                                return null;
+                            if ('/' === $pathinfo[-1]) {
+                                if (preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                                    $matches = $n;
+                                } else {
+                                    $hasTrailingSlash = true;
+                                }
                             }
-                            if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
-                                return null;
+
+                            if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                                if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                                    return null;
+                                }
+                                break;
                             }
                         }
 

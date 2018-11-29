@@ -92,11 +92,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
 
                 if ('/' !== $pathinfo) {
-                    if (!$hasTrailingSlash && '/' === $pathinfo[-1]) {
-                        return null;
-                    }
-                    if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
-                        return null;
+                    if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                        if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                            return null;
+                        }
+                        break;
                     }
                 }
 
@@ -182,15 +182,23 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         $matches = array('foo' => $matches[1] ?? null);
 
                         // baz4
-                        if ('/' !== $pathinfo && '/' !== $pathinfo[-1]) {
+                        if ('/' !== $pathinfo[-1]) {
                             return null;
                         }
+                        if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        }
+
                         return $this->mergeDefaults(array('_route' => 'baz4') + $matches, array());
 
                         // baz5
-                        if ('/' !== $pathinfo && '/' !== $pathinfo[-1]) {
-                            return null;
+                        if ('/' !== $pathinfo[-1]) {
+                            break;
                         }
+                        if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        }
+
                         $ret = $this->mergeDefaults(array('_route' => 'baz5') + $matches, array());
                         if (!isset(($a = array('POST' => 0))[$requestMethod])) {
                             $allow += $a;
@@ -201,9 +209,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         not_baz5:
 
                         // baz.baz6
-                        if ('/' !== $pathinfo && '/' !== $pathinfo[-1]) {
-                            return null;
+                        if ('/' !== $pathinfo[-1]) {
+                            break;
                         }
+                        if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        }
+
                         $ret = $this->mergeDefaults(array('_route' => 'baz.baz6') + $matches, array());
                         if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
                             $allow += $a;
@@ -218,9 +230,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         $matches = array('foo' => $matches[1] ?? null);
 
                         // foo1
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
-                            return null;
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                            break;
                         }
+
                         $ret = $this->mergeDefaults(array('_route' => 'foo1') + $matches, array());
                         if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
                             $allow += $a;
@@ -235,9 +248,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         $matches = array('foo1' => $matches[1] ?? null);
 
                         // foo2
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             return null;
                         }
+
                         return $this->mergeDefaults(array('_route' => 'foo2') + $matches, array());
 
                         break;
@@ -245,9 +259,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         $matches = array('_locale' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
 
                         // foo3
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             return null;
                         }
+
                         return $this->mergeDefaults(array('_route' => 'foo3') + $matches, array());
 
                         break;
@@ -275,11 +290,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
 
                         if ('/' !== $pathinfo) {
-                            if (!$hasTrailingSlash && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                                return null;
+                            if ('/' === $pathinfo[-1]) {
+                                if (preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                                    $matches = $n;
+                                } else {
+                                    $hasTrailingSlash = true;
+                                }
                             }
-                            if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
-                                return null;
+
+                            if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                                if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                                    return null;
+                                }
+                                break;
                             }
                         }
 

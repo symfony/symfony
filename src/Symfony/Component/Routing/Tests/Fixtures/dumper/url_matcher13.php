@@ -45,15 +45,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         $matches = array('foo' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
 
                         // r1
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             break;
                         }
+
                         return $this->mergeDefaults(array('_route' => 'r1') + $matches, array());
 
                         // r2
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             break;
                         }
+
                         return $this->mergeDefaults(array('_route' => 'r2') + $matches, array());
 
                         break;

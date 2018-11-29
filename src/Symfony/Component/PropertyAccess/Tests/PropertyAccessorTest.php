@@ -708,7 +708,27 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
         $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
 
-        self::assertEquals(array('test@email.com'), $object->getEmails());
-        self::assertNull($object->getEmail());
+        $this->assertEquals(array('test@email.com'), $object->getEmails());
+        $this->assertNull($object->getEmail());
+    }
+
+    public function testAdderAndRemoverArePreferredOverSetter()
+    {
+        $object = new TestPluralAdderRemoverAndSetter();
+
+        $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
+        $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
+
+        $this->assertEquals(array('test@email.com'), $object->getEmails());
+    }
+
+    public function testAdderAndRemoverArePreferredOverSetterForSameSingularAndPlural()
+    {
+        $object = new TestPluralAdderRemoverAndSetterSameSingularAndPlural();
+
+        $this->propertyAccessor->isWritable($object, 'aircraft'); //cache access info
+        $this->propertyAccessor->setValue($object, 'aircraft', array('aeroplane'));
+
+        $this->assertEquals(array('aeroplane'), $object->getAircraft());
     }
 }

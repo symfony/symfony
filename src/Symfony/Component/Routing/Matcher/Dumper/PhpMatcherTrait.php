@@ -130,7 +130,7 @@ trait PhpMatcherTrait
                         continue;
                     }
 
-                    if ('/' === $pathinfo || $hasTrailingSlash === ('/' === $pathinfo[-1])) {
+                    if ('/' === $pathinfo || (!$hasTrailingSlash ? '/' !== $pathinfo[-1] || !preg_match($regex, substr($pathinfo, 0, -1), $n) || $m !== (int) $n['MARK'] : '/' === $pathinfo[-1])) {
                         // no-op
                     } elseif ($this instanceof RedirectableUrlMatcherInterface) {
                         return null;

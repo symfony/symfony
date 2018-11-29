@@ -683,6 +683,15 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
     }
 
+    public function testSlashVariant()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo/{bar}', array(), array('bar' => '.*')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('a', $matcher->match('/foo/')['_route']);
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

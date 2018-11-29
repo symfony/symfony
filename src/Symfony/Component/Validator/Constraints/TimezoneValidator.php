@@ -35,39 +35,32 @@ class TimezoneValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $value = (string) $value;
-        $zone = null !== $constraint->zone ? $constraint->zone : \DateTimeZone::ALL;
 
         // @see: https://bugs.php.net/bug.php?id=75928
         if ($constraint->countryCode) {
-            $timezoneIds = \DateTimeZone::listIdentifiers($zone, $constraint->countryCode);
+            $timezoneIds = \DateTimeZone::listIdentifiers($constraint->zone, $constraint->countryCode);
         } else {
-            $timezoneIds = \DateTimeZone::listIdentifiers($zone);
+            $timezoneIds = \DateTimeZone::listIdentifiers($constraint->zone);
         }
 
-        if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
+        if ($timezoneIds && !\in_array($value, $timezoneIds, true)) {
             if ($constraint->countryCode) {
                 $code = Timezone::NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR;
-            } elseif (null !== $constraint->zone) {
+            } elseif (\DateTimeZone::ALL !== $constraint->zone) {
                 $code = Timezone::NO_SUCH_TIMEZONE_IN_ZONE_ERROR;
             } else {
                 $code = Timezone::NO_SUCH_TIMEZONE_ERROR;
             }
 
-            $violation = $this->context->buildViolation($constraint->message);
-
-            foreach ($this->generateValidationMessage($constraint->zone, $constraint->countryCode) as $placeholder => $message) {
-                $violation->setParameter($placeholder, $message);
-            }
-
-            $violation
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode($code)
-                ->addViolation()
-            ;
+                ->addViolation();
         }
     }
 
@@ -80,35 +73,23 @@ class TimezoneValidator extends ConstraintValidator
     }
 
     /**
-     * Generates the replace parameters which are used in validation message.
-     *
-     * @param int|null    $zone
-     * @param string|null $countryCode
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    private function generateValidationMessage(int $zone = null, string $countryCode = null): array
+    protected function formatValue($value, $format = 0)
     {
-        $values = array(
-            '{{ country_code_message }}' => '',
-            '{{ zone_message }}' => '',
-        );
-
-        if (null !== $zone) {
-            if (\DateTimeZone::PER_COUNTRY !== $zone) {
+        $value = parent::formatValue($value, $format);
+        if ($value) {
+            if (\DateTimeZone::PER_COUNTRY !== $value) {
                 $r = new \ReflectionClass(\DateTimeZone::class);
                 $consts = $r->getConstants();
-                if ($zoneFound = array_search($zone, $consts, true)) {
-                    $values['{{ zone_message }}'] = ' at "'.$zoneFound.'" zone';
-                } else {
-                    $values['{{ zone_message }}'] = ' at zone with identifier '.$zone;
+                if ($zoneFound = array_search($value, $consts, true)) {
+                    return $zoneFound;
                 }
-            }
-            if ($countryCode) {
-                $values['{{ country_code_message }}'] = ' for ISO 3166-1 country code "'.$countryCode.'"';
+
+                return $value;
             }
         }
 
-        return $values;
+        return $value;
     }
 }

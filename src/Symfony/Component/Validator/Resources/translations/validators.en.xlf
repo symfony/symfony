@@ -326,6 +326,10 @@
                 <source>This value should be a multiple of {{ compared_value }}.</source>
                 <target>This value should be a multiple of {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="85">
+                <source>This value is not a valid timezone.</source>
+                <target>This value is not a valid timezone.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

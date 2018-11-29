@@ -106,7 +106,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidTimezones
      */
-    public function testInvalidTimezonesWithoutZone(string $timezone, string $zoneMessage, string $countryCodeMessage)
+    public function testInvalidTimezonesWithoutZone(string $timezone)
     {
         $constraint = new Timezone(array(
             'message' => 'myMessage',
@@ -115,8 +115,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ zone_message }}', $zoneMessage)
-            ->setParameter('{{ country_code_message }}', $countryCodeMessage)
+            ->setParameter('{{ value }}', '"'.$timezone.'"')
             ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
             ->assertRaised();
     }
@@ -124,16 +123,16 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidTimezones(): iterable
     {
         return array(
-            array('Buenos_Aires/Argentina/America', '', ''),
-            array('Mayotte/Indian', '', ''),
-            array('foobar', '', ''),
+            array('Buenos_Aires/Argentina/America'),
+            array('Mayotte/Indian'),
+            array('foobar'),
         );
     }
 
     /**
      * @dataProvider getInvalidGroupedTimezones
      */
-    public function testInvalidGroupedTimezones(string $timezone, int $what, string $zoneMessage, string $countryCodeMessage)
+    public function testInvalidGroupedTimezones(string $timezone, int $what)
     {
         $constraint = new Timezone(array(
             'zone' => $what,
@@ -143,8 +142,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ zone_message }}', $zoneMessage)
-            ->setParameter('{{ country_code_message }}', $countryCodeMessage)
+            ->setParameter('{{ value }}', '"'.$timezone.'"')
             ->setCode(Timezone::NO_SUCH_TIMEZONE_IN_ZONE_ERROR)
             ->assertRaised();
     }
@@ -152,11 +150,11 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidGroupedTimezones(): iterable
     {
         return array(
-            array('Antarctica/McMurdo', \DateTimeZone::AMERICA, ' at "AMERICA" zone', ''),
-            array('America/Barbados', \DateTimeZone::ANTARCTICA, ' at "ANTARCTICA" zone', ''),
-            array('Europe/Kiev', \DateTimeZone::ARCTIC, ' at "ARCTIC" zone', ''),
-            array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN, ' at "INDIAN" zone', ''),
-            array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN | \DateTimeZone::ANTARCTICA, ' at zone with identifier 260', ''),
+            array('Antarctica/McMurdo', \DateTimeZone::AMERICA),
+            array('America/Barbados', \DateTimeZone::ANTARCTICA),
+            array('Europe/Kiev', \DateTimeZone::ARCTIC),
+            array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN),
+            array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN | \DateTimeZone::ANTARCTICA),
         );
     }
 
@@ -197,7 +195,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidGroupedTimezonesByCountry
      */
-    public function testInvalidGroupedTimezonesByCountry(string $timezone, int $what, string $country, string $zoneMessage, string $countryCodeMessage)
+    public function testInvalidGroupedTimezonesByCountry(string $timezone, int $what, string $country)
     {
         $constraint = new Timezone(array(
             'message' => 'myMessage',
@@ -208,8 +206,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ zone_message }}', $zoneMessage)
-            ->setParameter('{{ country_code_message }}', $countryCodeMessage)
+            ->setParameter('{{ value }}', '"'.$timezone.'"')
             ->setCode(Timezone::NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR)
             ->assertRaised();
     }
@@ -217,8 +214,8 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidGroupedTimezonesByCountry(): iterable
     {
         return array(
-            array('America/Argentina/Cordoba', \DateTimeZone::PER_COUNTRY, 'FR', '', ' for ISO 3166-1 country code "FR"'),
-            array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'PT', '', ' for ISO 3166-1 country code "PT"'),
+            array('America/Argentina/Cordoba', \DateTimeZone::PER_COUNTRY, 'FR'),
+            array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'PT'),
         );
     }
 
@@ -248,8 +245,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ zone_message }}', '')
-            ->setParameter('{{ country_code_message }}', '')
+            ->setParameter('{{ value }}', '"'.$timezone.'"')
             ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
             ->assertRaised();
     }

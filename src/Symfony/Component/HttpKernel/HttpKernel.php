@@ -207,6 +207,21 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
+     * Dispatches an exception to the KernelEvents::EXCEPTION listeners.
+     *
+     * @param \Exception $e       An \Exception instance
+     * @param Request    $request A Request instance
+     * @param int        $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     */
+    private function dispatchException(\Exception $e, Request $request, int $type): GetResponseForExceptionEvent
+    {
+        $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
+        $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+
+        return $event;
+    }
+
+    /**
      * Handles an exception by trying to convert it to a Response.
      *
      * @param \Exception $e       An \Exception instance
@@ -217,8 +232,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleException(\Exception $e, Request $request, int $type): Response
     {
-        $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
-        $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+        $event = $this->dispatchException($e, $request, $type);
 
         // a listener might have replaced the exception
         $e = $event->getException();

@@ -1635,7 +1635,10 @@ class FrameworkExtension extends Extension
         }
         foreach (array('doctrine', 'psr6', 'redis', 'memcached', 'pdo') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
-                $container->setAlias('cache.'.$name, new Alias(CachePoolPass::getServiceProvider($container, $config[$name]), false));
+                if (!$container->hasDefinition($alias = CachePoolPass::getServiceProvider($container, $config[$name]))) {
+                    continue;
+                }
+                $container->setAlias('cache.'.$name, new Alias($alias, false));
             }
         }
         foreach (array('app', 'system') as $name) {

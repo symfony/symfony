@@ -514,24 +514,24 @@ class NumberToLocalizedStringTransformerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @dataProvider nanRepresentationProvider
      *
      * @see https://github.com/symfony/symfony/issues/3161
      */
-    public function testReverseTransformDisallowsNaN()
+    public function testReverseTransformDisallowsNaN($nan)
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $transformer->reverseTransform('NaN');
+        $transformer->reverseTransform($nan);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
-    public function testReverseTransformDisallowsNaN2()
+    public function nanRepresentationProvider()
     {
-        $transformer = new NumberToLocalizedStringTransformer();
-
-        $transformer->reverseTransform('nan');
+        return array(
+            array('nan'),
+            array('NaN'), // see https://github.com/symfony/symfony/issues/3161
+            array('NAN'),
+        );
     }
 
     /**

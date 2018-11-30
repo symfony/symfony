@@ -135,11 +135,12 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();
             $staticPrefix = $compiledRoute->getStaticPrefix();
+            $requiredMethods = $route->getMethods();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
             if ('' === $staticPrefix || 0 === strpos($pathinfo, $staticPrefix)) {
                 // no-op
-            } elseif (!$supportsTrailingSlash) {
+            } elseif (!$supportsTrailingSlash || ($requiredMethods && !\in_array('GET', $requiredMethods))) {
                 continue;
             } elseif ('/' === $staticPrefix[-1] && substr($staticPrefix, 0, -1) === $pathinfo) {
                 return;
@@ -161,11 +162,18 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             }
 
             if ($supportsTrailingSlash) {
-                if (!$hasTrailingSlash && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1))) {
-                    return;
+                if ('/' === $pathinfo[-1]) {
+                    if (preg_match($regex, substr($pathinfo, 0, -1), $m)) {
+                        $matches = $m;
+                    } else {
+                        $hasTrailingSlash = true;
+                    }
                 }
-                if ($hasTrailingSlash && '/' !== $pathinfo[-1]) {
-                    return;
+                if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                    if (!$requiredMethods || \in_array('GET', $requiredMethods)) {
+                        return;
+                    }
+                    continue;
                 }
             }
 
@@ -181,7 +189,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             }
 
             $hasRequiredScheme = !$route->getSchemes() || $route->hasScheme($this->context->getScheme());
-            if ($requiredMethods = $route->getMethods()) {
+            if ($requiredMethods) {
                 // HEAD and GET are equivalent as per RFC
                 if ('HEAD' === $method = $this->context->getMethod()) {
                     $method = 'GET';

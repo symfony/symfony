@@ -130,12 +130,20 @@ trait PhpMatcherTrait
                         continue;
                     }
 
-                    if ('/' === $pathinfo || (!$hasTrailingSlash ? '/' !== $pathinfo[-1] || !preg_match($regex, substr($pathinfo, 0, -1), $n) || $m !== (int) $n['MARK'] : '/' === $pathinfo[-1])) {
-                        // no-op
-                    } elseif ($this instanceof RedirectableUrlMatcherInterface) {
-                        return null;
-                    } else {
-                        continue;
+                    if ('/' !== $pathinfo) {
+                        if ('/' === $pathinfo[-1]) {
+                            if (preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                                $matches = $n;
+                            } else {
+                                $hasTrailingSlash = true;
+                            }
+                        }
+                        if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                            if ($this instanceof RedirectableUrlMatcherInterface && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                                return null;
+                            }
+                            continue;
+                        }
                     }
 
                     foreach ($vars as $i => $v) {

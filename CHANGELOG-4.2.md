@@ -7,6 +7,16 @@ in 4.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.2.0...v4.2.1
 
+* 4.2.0 (2018-11-30)
+
+ * bug #29343 [Form] Handle all case variants of "nan" when parsing a number (mwhudson, xabbuh)
+ * bug #29373 [Routing] fix trailing slash redirection (nicolas-grekas)
+ * bug #29355 [PropertyAccess] calculate cache keys for property setters depending on the value (xabbuh)
+ * bug #29369 [DI] fix combinatorial explosion when analyzing the service graph (nicolas-grekas)
+ * bug #29349 [Debug] workaround opcache bug mutating "$this" !?! (nicolas-grekas)
+ * bug #29344 Fixes sprintf(): Too few arguments in Translator (stephanedelprat)
+ * bug #29318 [Console] Move back root exception to stack trace in verbose mode (chalasr)
+
 * 4.2.0-RC1 (2018-11-26)
 
  * bug #29332 [PropertyAccess] make cache keys encoding bijective (nicolas-grekas)

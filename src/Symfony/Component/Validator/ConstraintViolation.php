@@ -85,11 +85,25 @@ class ConstraintViolation implements ConstraintViolationInterface
             $class .= '.';
         }
 
+        $context = '';
         if ('' !== $code) {
-            $code = ' (code '.$code.')';
+            $context .= 'code '.$this->code.', ';
+        }
+        $context .= 'invalid value ';
+        if (\is_object($this->invalidValue)) {
+            $invalidObjectClass = \get_class($this->invalidValue);
+            $context .= 'c' === $invalidObjectClass[0] && 0 === strpos($invalidObjectClass, "class@anonymous\0") ? get_parent_class($invalidObjectClass).'@anonymous' : $invalidObjectClass;
+        } elseif (\is_array($this->invalidValue)) {
+            $context .= 'array';
+        } elseif (\is_resource($this->invalidValue)) {
+            $context .= \get_resource_type($this->invalidValue);
+        } elseif (null === $this->invalidValue || \is_bool($this->invalidValue)) {
+            $context .= var_export($this->invalidValue, true);
+        } else {
+            $context .= (string) $this->invalidValue;
         }
 
-        return $class.$propertyPath.":\n    ".$this->getMessage().$code;
+        return $class.$propertyPath.":\n    ".$this->getMessage().' ('.$context.')';
     }
 
     /**

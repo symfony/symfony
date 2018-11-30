@@ -29,7 +29,7 @@ class ConstraintViolationTest extends TestCase
 
         $expected = <<<'EOF'
 Root.property.path:
-    Array
+    Array (invalid value NULL)
 EOF;
 
         $this->assertSame($expected, (string) $violation);
@@ -48,7 +48,7 @@ EOF;
 
         $expected = <<<'EOF'
 Array.some_value:
-    42 cannot be used here
+    42 cannot be used here (invalid value NULL)
 EOF;
 
         $this->assertSame($expected, (string) $violation);
@@ -69,7 +69,7 @@ EOF;
 
         $expected = <<<'EOF'
 Array.some_value:
-    42 cannot be used here (code 0)
+    42 cannot be used here (code 0, invalid value NULL)
 EOF;
 
         $this->assertSame($expected, (string) $violation);
@@ -79,7 +79,7 @@ EOF;
     {
         $expected = <<<'EOF'
 Array.some_value:
-    42 cannot be used here
+    42 cannot be used here (invalid value NULL)
 EOF;
 
         $violation = new ConstraintViolation(
@@ -107,5 +107,46 @@ EOF;
         );
 
         $this->assertSame($expected, (string) $violation);
+    }
+
+    /**
+     * @dataProvider getInvalidValues
+     */
+    public function testInvalidValuesToString($invalidValue, $invalidValueAsString)
+    {
+        $violation = new ConstraintViolation(
+            '42 cannot be used here',
+            'this is the message template',
+            array(),
+            array('some_value' => 42),
+            'some_value',
+            $invalidValue
+        );
+
+        $expected = <<<'EOF'
+Array.some_value:
+    42 cannot be used here (invalid value %s)
+EOF;
+        $expected = sprintf($expected, $invalidValueAsString);
+
+        $this->assertSame($expected, (string) $violation);
+    }
+
+    public function getInvalidValues(): iterable
+    {
+        return array(
+            array(null, 'NULL'),
+            array(true, 'true'),
+            array(false, 'false'),
+            array('', ''),
+            array(' ', ' '),
+            array(0, '0'),
+            array('0', '0'),
+            array(array(), 'array'),
+            array(new \stdClass(), 'stdClass'),
+            array(new class() {
+            }, '@anonymous'),
+            array(tmpfile(), 'stream'),
+        );
     }
 }

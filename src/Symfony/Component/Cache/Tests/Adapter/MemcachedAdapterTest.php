@@ -192,4 +192,9 @@ class MemcachedAdapterTest extends AdapterTestCase
             array(\Memcached::OPT_SOCKET_RECV_SIZE => 1, \Memcached::OPT_SOCKET_SEND_SIZE => 2, \Memcached::OPT_RETRY_TIMEOUT => 8),
         );
     }
+
+    public function testClear()
+    {
+        $this->assertTrue($this->createCachePool()->clear());
+    }
 }

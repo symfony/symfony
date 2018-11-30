@@ -260,7 +260,7 @@ trait MemcachedTrait
      */
     protected function doClear($namespace)
     {
-        return false;
+        return '' === $namespace && $this->getClient()->flush();
     }
 
     private function checkResultCode($result)

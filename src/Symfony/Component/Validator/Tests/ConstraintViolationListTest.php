@@ -113,15 +113,15 @@ class ConstraintViolationListTest extends TestCase
 
         $expected = <<<'EOF'
 Root:
-    Error 1
+    Error 1 (invalid value NULL)
 Root.foo.bar:
-    Error 2
+    Error 2 (invalid value NULL)
 Root[baz]:
-    Error 3
+    Error 3 (invalid value NULL)
 foo.bar:
-    Error 4
+    Error 4 (invalid value NULL)
 [baz]:
-    Error 5
+    Error 5 (invalid value NULL)
 
 EOF;
 

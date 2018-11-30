@@ -3,6 +3,7 @@
 $container->loadFromExtension('framework', array(
     'serializer' => true,
     'messenger' => array(
+        'serializer' => 'messenger.transport.symfony_serializer',
         'routing' => array(
             'Symfony\Component\Messenger\Tests\Fixtures\DummyMessage' => array('amqp', 'audit'),
             'Symfony\Component\Messenger\Tests\Fixtures\SecondMessage' => array(

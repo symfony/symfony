@@ -1059,7 +1059,7 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->children()
-                                ->scalarNode('id')->defaultValue('messenger.transport.symfony_serializer')->end()
+                                ->scalarNode('id')->defaultValue(!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'messenger.transport.symfony_serializer' : null)->end()
                                 ->scalarNode('format')->defaultValue('json')->end()
                                 ->arrayNode('context')
                                     ->normalizeKeys(false)

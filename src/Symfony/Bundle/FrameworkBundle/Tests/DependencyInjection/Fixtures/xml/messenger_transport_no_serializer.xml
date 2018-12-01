@@ -8,6 +8,7 @@
     <framework:config>
         <framework:serializer enabled="false" />
         <framework:messenger>
+            <framework:serializer id="messenger.transport.symfony_serializer" />
             <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
         </framework:messenger>
     </framework:config>

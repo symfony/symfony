@@ -8,7 +8,7 @@
     <framework:config>
         <framework:serializer enabled="true" />
         <framework:messenger>
-            <framework:serializer format="csv">
+            <framework:serializer id="messenger.transport.symfony_serializer" format="csv">
                 <framework:context>
                     <framework:enable_max_depth>true</framework:enable_max_depth>
                 </framework:context>

@@ -38,6 +38,7 @@ final class ConnectionOptions
     const ERROR_STRING = 0x32;
     const MATCHED_DN = 0x33;
     const DEBUG_LEVEL = 0x5001;
+    const TIMEOUT = 0x5002;
     const NETWORK_TIMEOUT = 0x5005;
     const X_SASL_MECH = 0x6100;
     const X_SASL_REALM = 0x6101;

@@ -164,11 +164,11 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             return false;
         }
 
-        if (!$this->graph->hasNode($id)) {
-            return true;
-        }
-
         if (!$definition->isShared()) {
+            if (!$this->graph->hasNode($id)) {
+                return true;
+            }
+
             foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
                 $srcId = $edge->getSourceNode()->getId();
                 $this->connectedIds[$srcId] = true;
@@ -182,6 +182,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 
         if ($definition->isPublic()) {
             return false;
+        }
+
+        if (!$this->graph->hasNode($id)) {
+            return true;
         }
 
         if ($this->currentId == $id) {

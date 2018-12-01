@@ -29,6 +29,7 @@ Config
    ```
 
  * Deprecated `FileLoaderLoadException`, use `LoaderLoadException` instead.
+ * Deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
 
 Console
 -------

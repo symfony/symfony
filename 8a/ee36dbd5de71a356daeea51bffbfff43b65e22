@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-22T19:38:06Z
+
+What about making the whole class final? That'd be even better to me :)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2018-10-23T09:48:53Z
+
+> What about making the whole class final? That'd be even better to me :)
+
+Making the whole class final is more protective and might indeed be better for future similar problems.
+
+In this case we should mark the `ErrorHandler` class final too I guess (you suggested it to me previously).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-23T09:49:12Z
+
+Would work for me.

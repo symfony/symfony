@@ -638,7 +638,7 @@ class NumberFormatter
     /**
      * Not supported. Set a text attribute.
      *
-     * @param int $attr  An attribute specifier, one of the text attribute constants
+     * @param int    $attr  An attribute specifier, one of the text attribute constants
      * @param string $value The attribute value
      *
      * @return bool true on success or false on failure

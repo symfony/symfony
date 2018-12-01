@@ -61,6 +61,8 @@ class Workflow implements WorkflowInterface
 
             // update the subject with the new marking
             $this->markingStore->setMarking($subject, $marking);
+
+            $this->entered($subject, null, $marking);
         }
 
         // check that the subject has a known place
@@ -331,7 +333,7 @@ class Workflow implements WorkflowInterface
         }
     }
 
-    private function entered($subject, Transition $transition, Marking $marking): void
+    private function entered($subject, Transition $transition = null, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -342,8 +344,10 @@ class Workflow implements WorkflowInterface
         $this->dispatcher->dispatch('workflow.entered', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.entered', $this->name), $event);
 
-        foreach ($transition->getTos() as $place) {
-            $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
+        if ($transition) {
+            foreach ($transition->getTos() as $place) {
+                $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
+            }
         }
     }
 

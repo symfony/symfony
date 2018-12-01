@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-25T07:35:07Z
+
+why not stick with `env(SOME): 'default'` in code?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-10-25T08:10:43Z
+
+@ro0NL because sometime the env variable exist, but the processing doesn't. See my examples.
+
+```
+secret: '%env(fallback:this secret is not secret:file:THIS_FILE_ONLY_EXIST_IN_PRODUCTION)%'
+charset: '%env(fallback:utf8:key:charset:json:DATABASE_CONFIG)%'
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-25T08:29:12Z
+
+understood. Im a bit skeptical about making values part of the prefix string, but i cant think of anything better either.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-25T13:28:42Z
+
+That won't work as the `%env(...)%` allows only a very limited set of characters between the brackets - on purpose. The fallback should be given as an environment variable. Or maybe a parameter name.
+What about this: `%env(catch:...:param)%`? `param` would be the name of a parameter that would define the fallback value.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-11-05T09:55:28Z
+
+Thank your for the review @ro0NL , changed the logic in the PR to trap only the `NotFound` exceptions. Because it was a mistake to catch RuntimeException.
+And move the fallback parameter next to the keyWord to be consistent with other processors
+
+```
+// previous
+%env(catch:origin:fallback)%
+
+// after
+%env(default:fallback:origin)%
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:07:37Z
+
+@jderusse your examples are great as always ... but would this feature require any changes in Symfony apps? (both when using it as a stand-alone component and when using it as part of a full-stack Symfony app). Thanks!
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-11-07T15:05:27Z
+
+@javiereguiluz Same implementation thant https://github.com/symfony/symfony/pull/28975 :wink:
+So the response is yes, it works out of the box

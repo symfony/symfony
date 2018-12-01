@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2018-11-07T17:45:59Z
+
+`_key` isn't accurate. It's a node name, so maybe `_name` would be more suitable?
+
+---------------------------------------------------------------------------
+
+by andrey-helldar at 2018-11-07T19:36:33Z
+
+The hardest thing in development is to come up with a variable name. :)
+
+I considered different names: `_name`, `_key`, `_tag`... and settled on two: `_key` and `_name`,
+
+I think you're right. `_name` more appropriate name.

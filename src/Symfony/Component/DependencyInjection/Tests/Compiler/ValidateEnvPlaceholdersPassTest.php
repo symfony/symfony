@@ -215,7 +215,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
      * NOT LEGACY (test exception in 5.0).
      *
      * @group legacy
-     * @expectedDeprecation Setting path "env_extension.scalar_node_not_empty_validated" to an environment variable is deprecated since Symfony 4.2. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.
+     * @expectedDeprecation Setting path "env_extension.scalar_node_not_empty_validated" to an environment variable is deprecated since Symfony 4.3. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.
      */
     public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
     {

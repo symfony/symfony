@@ -31,7 +31,7 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class PropertyAccessor implements PropertyAccessorInterface
+class PropertyAccessor implements PropertyAccessorInterface, ObjectPropertyAccessorInterface
 {
     private const VALUE = 0;
     private const REF = 1;
@@ -815,5 +815,36 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         return $apcu;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyValue($object, string $property)
+    {
+        $zval = array(
+            self::VALUE => $object,
+        );
+
+        return $this->readProperty($zval, $property)[self::VALUE];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPropertyValue($object, string $property, $value)
+    {
+        $zval = array(
+            self::VALUE => $object,
+        );
+
+        try {
+            $this->writeProperty($zval, $property, $value);
+        } catch (\TypeError $e) {
+            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $property);
+
+            // It wasn't thrown in this class so rethrow it
+            throw $e;
+        }
     }
 }

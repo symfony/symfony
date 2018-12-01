@@ -82,6 +82,13 @@ class EnvParametersResource implements SelfCheckingResourceInterface, \Serializa
         $this->variables = $unserialized['variables'];
     }
 
+    /**
+     *  Return an array containing server variables where the
+     *  array key starts with the $prefix variable defined
+     *  in the construsctor 
+     *
+     * @return array $variables
+     */
     private function findVariables()
     {
         $variables = array();

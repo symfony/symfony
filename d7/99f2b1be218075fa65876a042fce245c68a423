@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:37:36Z
+
+@lmatte7 thanks for contributing this (and congrats on your first Symfony contribution!)
+
+In order to update the Symfony Docs about LDAP, we'd need to know which changes are required to use this feature:
+
+* This is the doc when using LDAP as a stand-alone component: https://symfony.com/doc/current/components/ldap.html Should we just add this new option to the list of options? If so, which is the default value of this option?
+* This is the doc when using LDAP as part of a Symfony app: https://symfony.com/doc/current/security/ldap.html  Do you think we should change/update anything?
+
+Thanks a lot!
+
+---------------------------------------------------------------------------
+
+by lmatte7 at 2018-11-07T15:31:24Z
+
+@javiereguiluz thanks for the comment, I'm excited about being able to contribute!
+
+Looking at the current docs I don't believe this option will need to be added specifically to any page. [This](https://symfony.com/doc/current/components/ldap.html) page links out to show all of the available connection options, so as long as the option will be listed [here](https://api.symfony.com/4.1/Symfony/Component/Ldap/Adapter/ExtLdap/ConnectionOptions.html) it aligns with the current documentation.
+
+As for a default option, I don't see one while looking through the PHP documentation or source code. I don't believe this option has a value until it is manually set by the code, and this aligns with my testing of this issue as well.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T15:47:31Z
+
+@lmatte7 great! Thanks a lot for checking the docs. This is much appreciated!

@@ -42,7 +42,7 @@ trait TargetPathTrait
      */
     private function getTargetPath(SessionInterface $session, $providerKey)
     {
-        return $session->get('_security.'.$providerKey.'.target_path');
+        return $session->get('_security.'.$providerKey.'.target_path', '');
     }
 
     /**

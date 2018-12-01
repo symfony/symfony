@@ -38,7 +38,7 @@ trait TargetPathTrait
      * @param SessionInterface $session
      * @param string           $providerKey The name of your firewall
      *
-     * @return string
+     * @return string|null
      */
     private function getTargetPath(SessionInterface $session, $providerKey)
     {

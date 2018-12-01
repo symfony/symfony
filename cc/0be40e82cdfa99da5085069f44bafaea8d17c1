@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-17T17:46:05Z
+
+Could you improve the PR and commit title please also? (I'd suggest to squash commits while doing so)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-18T12:08:47Z
+
+Thanks, LGTM, except the test failure of course.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-23T09:07:25Z
+
+Thanks @ro0NL for the comments, good catch!
+@sylfabre OK to you with the comments? They all make sense to me (please rebase also.)
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2018-09-24T16:33:43Z
+
+@nicolas-grekas @ro0NL I've rebased and updated the PR as per your comments.
+
+I've also updated accordingly the code I used as source for my feature
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T21:24:52Z
+
+@sylfabre up to address the remaining comments?
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2018-10-22T15:50:02Z
+
+> @sylfabre up to address the remaining comments?
+
+I've rebased the branch onto master and there is one question for you
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-22T16:09:32Z
+
+> we need to decide if we add the $constraint instanceof Bic and throw (BC break-ish) or trigger deprecation
+
+easy to decide: no BC breaks :)
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2018-11-05T11:05:46Z
+
+@ro0NL tests are now green :)

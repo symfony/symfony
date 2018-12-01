@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+* Added return of element name (`_name`) in `extract()` method.
+
 4.2.0
 -----
 

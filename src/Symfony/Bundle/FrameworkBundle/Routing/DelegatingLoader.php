@@ -95,7 +95,7 @@ class DelegatingLoader extends BaseDelegatingLoader
 
             if (1 === substr_count($controller, ':')) {
                 $nonDeprecatedNotation = str_replace(':', '::', $controller);
-                @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1, use "%s" instead.', $nonDeprecatedNotation), E_USER_DEPRECATED);
+                // TODO deprecate this in 5.1
             }
 
             $route->setDefault('_controller', $controller);

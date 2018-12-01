@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
@@ -268,7 +269,7 @@ class ConfigurationTest extends TestCase
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
-                'default_pdo_provider' => 'doctrine.dbal.default_connection',
+                'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
             ),
             'workflows' => array(
                 'enabled' => false,

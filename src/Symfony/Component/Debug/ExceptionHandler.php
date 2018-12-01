@@ -26,6 +26,8 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.3
  */
 class ExceptionHandler
 {

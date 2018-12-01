@@ -45,6 +45,8 @@ use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 4.3
  */
 class ErrorHandler
 {

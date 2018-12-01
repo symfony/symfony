@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -882,7 +883,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
-                        ->scalarNode('default_pdo_provider')->defaultValue('doctrine.dbal.default_connection')->end()
+                        ->scalarNode('default_pdo_provider')->defaultValue(class_exists(Connection::class) ? 'database_connection' : null)->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
@@ -1059,7 +1060,7 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->children()
-                                ->scalarNode('id')->defaultValue('messenger.transport.symfony_serializer')->end()
+                                ->scalarNode('id')->defaultValue(!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'messenger.transport.symfony_serializer' : null)->end()
                                 ->scalarNode('format')->defaultValue('json')->end()
                                 ->arrayNode('context')
                                     ->normalizeKeys(false)

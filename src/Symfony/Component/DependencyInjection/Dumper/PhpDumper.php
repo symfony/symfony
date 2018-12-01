@@ -594,9 +594,7 @@ EOF;
             if ($callable[0] instanceof Reference
                 || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
             ) {
-                $callable[0] = $this->dumpValue($callable[0]);
-
-                return sprintf('        '.('$' === $callable[0][0] ? '%s' : '(%s)')."->%s(\$%s);\n", $callable[0], $callable[1], $variableName);
+                return sprintf("        %s->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
             }
 
             $class = $this->dumpValue($callable[0]);
@@ -1824,6 +1822,7 @@ EOF;
                 if ($definition->isShared()) {
                     $code = sprintf('$this->services[\'%s\'] = %s', $id, $code);
                 }
+                $code = "($code)";
             } elseif ($this->asFiles && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code = sprintf("\$this->load('%s.php')", $this->generateMethodName($id));
             } else {

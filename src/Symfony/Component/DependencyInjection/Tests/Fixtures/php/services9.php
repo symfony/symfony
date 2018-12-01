@@ -126,7 +126,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configured_service_simple'] = $instance = new \stdClass();
 
-        ${($_ = isset($this->services['configurator_service_simple']) ? $this->services['configurator_service_simple'] : $this->services['configurator_service_simple'] = new \ConfClass('bar')) && false ?: '_'}->configureStdClass($instance);
+        ${($_ = isset($this->services['configurator_service_simple']) ? $this->services['configurator_service_simple'] : ($this->services['configurator_service_simple'] = new \ConfClass('bar'))) && false ?: '_'}->configureStdClass($instance);
 
         return $instance;
     }

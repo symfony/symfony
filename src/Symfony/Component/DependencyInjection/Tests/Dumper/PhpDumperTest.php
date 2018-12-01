@@ -752,7 +752,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(false);
         $container->register('public_foo', 'stdClass')
             ->setPublic(true)
-            ->addArgument(new Expression('service("private_foo")'));
+            ->addArgument(new Expression('service("private_foo").bar'));
 
         $container->compile();
         $dumper = new PhpDumper($container);

@@ -85,7 +85,7 @@ class EnvParametersResource implements SelfCheckingResourceInterface, \Serializa
     /**
      *  Return an array containing server variables where the
      *  array key starts with the $prefix variable defined
-     *  in the construsctor 
+     *  in the construsctor.
      *
      * @return array $variables
      */

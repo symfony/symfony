@@ -1,0 +1,158 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-14T13:24:20Z
+
+Correct. Test added.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-15T18:33:04Z
+
+Thinking a bit more about this, I think it will prevent legitimate configs. Can we throw only when a custome config validator is also used?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-15T18:38:44Z
+
+You mean `validate()` right? I dont see how that's related?
+
+From the issue, even without the validation rule, our conclusion remains right? We cant test an env placeholder to be empty yes/no during compile, so we abstain.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-15T18:50:25Z
+
+Abstaining would mean not throwing unless we're sure this gonna be empty.
+Here we can trivially break existing apps that eg use DATABASE_URL without providing any alternative, while it currently works.
+It's related since the linked issue is exactly about that: combining cannot be empty with a validator.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-15T19:18:30Z
+
+> Abstaining would mean not throwing
+
+only as of 5.0 and when not removing `cannotBeEmpty()` :)
+
+I see your point though, we're having the same discussion as in #26747 which lead to this change in the first place.
+
+Basically we changed the solution, now with an upgrade path via deprecation. That's at least valid on the technical side to me. We can debate about empty envs in practice, but we cant deny its possibility.
+
+I thought about allowing e.g. `bool:` and `int:` (see `isValueEmpty()` in `BooleanNode` and `NumericNode`), but from Symfony perspective all envs are nullable :(
+
+I think to solve the linked issue, #28838 alone is sufficient (it's about getting `null` not an empty string).
+
+Tend to prefer the current behavior and assume envs not being empty compared to a conditional throw =/ So we could close here, the goal for 5.0 was noble though :)
+
+> without providing any alternative, while it currently works.
+
+ideally we'd infer empty yes/no from the prefix (e.g. `%(not-empty:SOME)%`)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-15T19:37:03Z
+
+I got it :joy:  checking for custom validators would (at least) avoid ever passing an empty string (or null for that matter) to closures, which would always be unexpected. And affects less apps, sure :)
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-16T09:45:27Z
+
+I think we need to have a `forbidRuntimeValues` or something like that, which would allow authors to tell the Config component that this value must be known at compile time, to allow providing a better error message. It is quite common to have *some* settings for which supporting an env placeholder will never be possible (settings supporting a service id for instance).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T10:55:47Z
+
+that could work yes, and basically let the config author control
+https://github.com/symfony/symfony/blob/97c8fac856fe99339058161f2c7d657524f097bd/src/Symfony/Component/Config/Definition/BaseNode.php#L469
+
+how does it relate to `cannotBeEmpty()`? Should we continue with this PR alogn with the suggestion to only trigger in case of custom validators?
+
+Or would a new `forbidRuntimeValues()` supersede it?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-16T15:38:10Z
+
+@ro0NL I would say that in 5.0, `cannotBeEmpty` would automatically imply `forbidRuntimeValues` (as it would be performing a compile-time validation)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-16T15:44:03Z
+
+As explained above, I don't think this would be appropriate. It's very common to use an env var in a cannotbeempty option and have things just work. Breaking these without providing alternatives is a bad plan we should avoid IMHO.
+I'm still thinking we should only conflict when a custom validator is defined, and let the rest in peace.
+This feature is complex enough to not add more complexity on top...
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-16T15:47:38Z
+
+@nicolas-grekas there is no way to guarantee that the env variable will be non-empty at runtime. So if your code is fine with that, it means it does not actually care about forbidding the empty value.
+
+but anyway, I'm fine with having `forbidRuntimeValues` separate from `cannotBeEmpty`. I still think it makes sense to provide `forbidRuntimeValues` (there are use cases for that, and I already got bug reports in some bundles I maintain because of people trying to use env variables in a place where we were not supporting them and so ending up with `%env(...)%` as part of the service name for the alias)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-16T15:50:11Z
+
+> if your code is fine with that, it means it does not actually care about forbidding the empty value
+
+If the env var is always set in practice, the code never has to deal with empty value, that's why it works.
+
+> makes sense to provide forbidRuntimeValues
+
+could be, but let's not hurry for it, as again complexity is high enough. Let's find a real use case first.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T15:55:04Z
+
+I'm glad we're on the same level here, in terms of understanding and settling. I agree with @nicolas-grekas to not rush the complexity with new features.
+
+We should also investigate the other way around: assume envs will not be empty during runtime (check for that). If that's 9/10 cases, a opt-in thru env-prefix to indicate "could be empty" could also do it.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-16T15:56:20Z
+
+@nicolas-grekas the first real-world use case is in DoctrineBundle. the default entity manager cannot be changed using an env variable
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-16T16:28:46Z
+
+And we also have many similar cases in Symfony itself, where some settings are necessary at compile time (look at SecurityBundle for instance)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-16T18:52:47Z
+
+Ready. I've added comments to clarify the intend as much as possible :) hope it's clear like this.
+
+See #28896 for the other discussion.
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-17T06:30:29Z
+
+> assume envs will not be empty during runtime (check for that).
+
+I like this idea, we could even deprecate empty env vars and throw when one is defined in 5.0!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:29:12Z
+
+@ro0NL could you please create a Symfony Docs issue for this? If possible, please review the existing docs to tell us if this new feature requires to change/remove anything in the current docs. And also, please tell us if we need to add something new. Thanks a lot!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-08T08:38:08Z
+
+im hesitating we should tell ppl :)

@@ -12,9 +12,11 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\ObjectPropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -32,13 +34,21 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     private $discriminatorCache = [];
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         if (!\class_exists(PropertyAccess::class)) {
             throw new LogicException('The ObjectNormalizer class requires the "PropertyAccess" component. Install "symfony/property-access" to use it.');
         }
 
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+
+        if (null !== $propertyAccessor && !$propertyAccessor instanceof ObjectPropertyAccessorInterface && !$propertyAccessor instanceof PropertyAccessorInterface) {
+            throw new InvalidArgumentException(sprintf('Argument 3 passed to %s() must be an instance of %s or an instance of %s or null, %s given.', __METHOD__, ObjectPropertyAccessorInterface::class, PropertyAccessorInterface::class, \gettype($propertyAccessor)));
+        }
+
+        if (null !== $propertyAccessor && !$propertyAccessor instanceof ObjectPropertyAccessorInterface) {
+            @trigger_error(sprintf('Passing an instance of %s as the 3rd argument to "%s()" is deprecated since Symfony 4.3. Pass a %s instance instead.', PropertyAccessorInterface::class, __METHOD__, ObjectPropertyAccessorInterface::class), E_USER_DEPRECATED);
+        }
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -121,7 +131,12 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
+        return $attribute === $this->discriminatorCache[$cacheKey]
+            ? $this->classDiscriminatorResolver->getTypeForMappedObject($object)
+            : ($this->propertyAccessor instanceof ObjectPropertyAccessorInterface
+                ? $this->propertyAccessor->getPropertyValue($object, $attribute)
+                : $this->propertyAccessor->getValue($object, $attribute)
+            );
     }
 
     /**
@@ -130,7 +145,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
         try {
-            $this->propertyAccessor->setValue($object, $attribute, $value);
+            if ($this->propertyAccessor instanceof ObjectPropertyAccessorInterface) {
+                $this->propertyAccessor->setPropertyValue($object, $attribute, $value);
+            } else {
+                $this->propertyAccessor->setValue($object, $attribute, $value);
+            }
         } catch (NoSuchPropertyException $exception) {
             // Properties not found are ignored
         }

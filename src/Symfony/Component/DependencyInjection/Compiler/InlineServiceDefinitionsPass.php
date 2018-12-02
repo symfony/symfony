@@ -98,7 +98,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             }
 
             foreach ($graph->getNode($id)->getInEdges() as $edge) {
-                if ($edge->isWeak()) {
+                if ($edge->isWeak() || $edge->isLazy()) {
                     return false;
                 }
             }
@@ -122,7 +122,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         $isReferencedByConstructor = false;
         foreach ($graph->getNode($id)->getInEdges() as $edge) {
             $isReferencedByConstructor = $isReferencedByConstructor || $edge->isReferencedByConstructor();
-            if ($edge->isWeak()) {
+            if ($edge->isWeak() || $edge->isLazy()) {
                 return false;
             }
             $ids[] = $edge->getSourceNode()->getId();

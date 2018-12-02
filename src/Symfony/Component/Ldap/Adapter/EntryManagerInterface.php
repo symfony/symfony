@@ -66,9 +66,9 @@ interface EntryManagerInterface
     /**
      * Adds values to an entry's multi-valued attribute from the LDAP server.
      *
-     * @param \Symfony\Component\Ldap\Entry $entry
+     * @param Entry  $entry
      * @param string $attribute
-     * @param array $values
+     * @param array  $values
      *
      * @throws NotBoundException
      * @throws LdapException
@@ -78,9 +78,9 @@ interface EntryManagerInterface
     /**
      * Removes values from an entry's multi-valued attribute from the LDAP server.
      *
-     * @param \Symfony\Component\Ldap\Entry $entry
+     * @param Entry  $entry
      * @param string $attribute
-     * @param array $values
+     * @param array  $values
      *
      * @throws NotBoundException
      * @throws LdapException

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added support for denormalization of constructor arguments to an array of objects
+
 4.2.0
 -----
 

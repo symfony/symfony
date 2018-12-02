@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T19:39:25Z
+
+I changed L602 recently and I think it should be reverted as it's a very local workaround. Can you have a look please?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-01T19:58:17Z
+
+@nicolas-grekas done

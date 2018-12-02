@@ -56,6 +56,6 @@ class ProjectServiceContainer extends Container
      */
     protected function getPublicFooService()
     {
-        return $this->services['public_foo'] = new \stdClass(new \stdClass());
+        return $this->services['public_foo'] = new \stdClass((new \stdClass())->bar);
     }
 }

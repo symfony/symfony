@@ -67,7 +67,7 @@ trait PhpMatcherTrait
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): ?array
+    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): array
     {
         $allow = $allowSchemes = array();
         $pathinfo = rawurldecode($rawPathinfo) ?: '/';
@@ -91,7 +91,7 @@ trait PhpMatcherTrait
             if ('/' === $pathinfo || $hasTrailingSlash === ('/' === $pathinfo[-1])) {
                 // no-op
             } elseif ($this instanceof RedirectableUrlMatcherInterface) {
-                return null;
+                return $allow = $allowSchemes = array();
             } else {
                 continue;
             }
@@ -140,7 +140,7 @@ trait PhpMatcherTrait
                         }
                         if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
                             if ($this instanceof RedirectableUrlMatcherInterface && (!$requiredMethods || isset($requiredMethods['GET']))) {
-                                return null;
+                                return $allow = $allowSchemes = array();
                             }
                             continue;
                         }
@@ -176,6 +176,6 @@ trait PhpMatcherTrait
             throw new NoConfigurationException();
         }
 
-        return null;
+        return array();
     }
 }

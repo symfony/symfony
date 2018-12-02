@@ -161,10 +161,10 @@ EOF;
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): ?array
+    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): array
 
 EOF
-                .$code."\n        return null;\n    }";
+                .$code."\n        return array();\n    }";
         }
 
         return "    public function match(\$rawPathinfo)\n".$code."\n        throw \$allow ? new MethodNotAllowedException(array_keys(\$allow)) : new ResourceNotFoundException();\n    }";
@@ -565,7 +565,7 @@ EOF;
                 }\n" : '',
             $this->supportsRedirections ? "
                     if (!\$requiredMethods || isset(\$requiredMethods['GET'])) {
-                        return null;
+                        return \$allow = \$allowSchemes = array();
                     }" : ''
         );
 
@@ -638,7 +638,7 @@ EOF;
             %s;
         }\n\n",
                 $hasTrailingSlash ? '!==' : '===',
-                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return null' : 'break'
+                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return $allow = $allowSchemes = array()' : 'break'
             );
         } elseif ($hasTrailingSlash) {
             $code .= sprintf("
@@ -648,14 +648,14 @@ EOF;
         if ('/' !== \$pathinfo && preg_match(\$regex, substr(\$pathinfo, 0, -1), \$n) && \$m === (int) \$n['MARK']) {
             \$matches = \$n;
         }\n\n",
-                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return null' : 'break'
+                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return $allow = $allowSchemes = array()' : 'break'
             );
         } else {
             $code .= sprintf("
         if ('/' !== \$pathinfo && '/' === \$pathinfo[-1] && preg_match(\$regex, substr(\$pathinfo, 0, -1), \$n) && \$m === (int) \$n['MARK']) {
             %s;
         }\n\n",
-                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return null' : 'break'
+                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return $allow = $allowSchemes = array()' : 'break'
             );
         }
 

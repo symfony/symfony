@@ -192,6 +192,8 @@ class VarExporterTest extends TestCase
         $value->bis = new \ReflectionClass($value);
 
         yield array('wakeup-refl', $value);
+
+        yield array('abstract-parent', new ConcreteClass());
     }
 }
 
@@ -318,5 +320,18 @@ final class FinalStdClass extends \stdClass
     public function __clone()
     {
         throw new \BadMethodCallException('Should not be called.');
+    }
+}
+
+abstract class AbstractClass
+{
+    protected $foo;
+}
+
+class ConcreteClass extends AbstractClass
+{
+    public function __construct()
+    {
+        $this->foo = 123;
     }
 }

@@ -68,10 +68,7 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
-     * Adds values to an entry's multi-valued attribute from the LDAP server.
-     *
-     * @throws NotBoundException
-     * @throws LdapException
+     * {@inheritdoc}
      */
     public function addAttributeValues(Entry $entry, string $attribute, array $values)
     {
@@ -83,10 +80,7 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
-     * Removes values from an entry's multi-valued attribute from the LDAP server.
-     *
-     * @throws NotBoundException
-     * @throws LdapException
+     * {@inheritdoc}
      */
     public function removeAttributeValues(Entry $entry, string $attribute, array $values)
     {

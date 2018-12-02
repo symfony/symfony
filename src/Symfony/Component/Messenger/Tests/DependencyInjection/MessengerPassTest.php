@@ -102,8 +102,12 @@ class MessengerPassTest extends TestCase
 
         (new ResolveClassPass())->process($container);
         (new MessengerPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        $this->assertInstanceOf(HandleMessageMiddleware::class, $container->get($commandBusId.'.middleware.handle_message'));
 
         $commandBusHandlersLocatorDefinition = $container->getDefinition($commandBusId.'.messenger.handlers_locator');
+
         $this->assertSame(HandlersLocator::class, $commandBusHandlersLocatorDefinition->getClass());
         $this->assertEquals(
             array(
@@ -113,7 +117,10 @@ class MessengerPassTest extends TestCase
             $commandBusHandlersLocatorDefinition->getArgument(0)
         );
 
+        $this->assertInstanceOf(HandleMessageMiddleware::class, $container->get($queryBusId.'.middleware.handle_message'));
+
         $queryBusHandlersLocatorDefinition = $container->getDefinition($queryBusId.'.messenger.handlers_locator');
+
         $this->assertSame(HandlersLocator::class, $queryBusHandlersLocatorDefinition->getClass());
         $this->assertEquals(
             array(

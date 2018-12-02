@@ -176,7 +176,7 @@ class MessengerPass implements CompilerPassInterface
             $container->register($locatorId = $bus.'.messenger.handlers_locator', HandlersLocator::class)
                 ->setArgument(0, $handlersLocatorMappingByBus[$bus] ?? array())
             ;
-            if ($container->has($handleMessageId = $bus.'.middleware.handle_message')) {
+            if ($container->has($handleMessageId = $bus.'.middleware.handle_message') || $container->has($handleMessageId = 'messenger.middleware.handle_message')) {
                 $container->getDefinition($handleMessageId)
                     ->replaceArgument(0, new Reference($locatorId))
                 ;
@@ -276,10 +276,17 @@ class MessengerPass implements CompilerPassInterface
         foreach ($middlewareCollection as $middlewareItem) {
             $id = $middlewareItem['id'];
             $arguments = $middlewareItem['arguments'] ?? array();
-            if (!$container->has($messengerMiddlewareId = 'messenger.middleware.'.$id)) {
+            // Check custom bus middleware service with: bus_id.middleware.middleware_id
+            if (!$container->has($messengerMiddlewareId = $busId.'.middleware.'.$id)) {
                 $messengerMiddlewareId = $id;
             }
 
+            // Check custom bus middleware service with: middleware_id
+            if (!$container->has($messengerMiddlewareId)) {
+                $messengerMiddlewareId = 'messenger.middleware.'.$id;
+            }
+
+            // Check custom bus middleware service with: messenger.middleware.middleware_id
             if (!$container->has($messengerMiddlewareId)) {
                 throw new RuntimeException(sprintf('Invalid middleware: service "%s" not found.', $id));
             }

@@ -331,7 +331,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected function getRootService()
     {
-        return $this->services['root'] = new \stdClass(${($_ = isset($this->services['level2']) ? $this->services['level2'] : $this->getLevel2Service()) && false ?: '_'}, ${($_ = isset($this->services['multiuse1']) ? $this->services['multiuse1'] : $this->services['multiuse1'] = new \stdClass()) && false ?: '_'});
+        return $this->services['root'] = new \stdClass(${($_ = isset($this->services['level2']) ? $this->services['level2'] : $this->getLevel2Service()) && false ?: '_'}, ${($_ = isset($this->services['multiuse1']) ? $this->services['multiuse1'] : ($this->services['multiuse1'] = new \stdClass())) && false ?: '_'});
     }
 
     /**
@@ -397,7 +397,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected function getLevel4Service()
     {
-        return $this->services['level4'] = new \stdClass(${($_ = isset($this->services['multiuse1']) ? $this->services['multiuse1'] : $this->services['multiuse1'] = new \stdClass()) && false ?: '_'}, ${($_ = isset($this->services['level5']) ? $this->services['level5'] : $this->getLevel5Service()) && false ?: '_'});
+        return $this->services['level4'] = new \stdClass(${($_ = isset($this->services['multiuse1']) ? $this->services['multiuse1'] : ($this->services['multiuse1'] = new \stdClass())) && false ?: '_'}, ${($_ = isset($this->services['level5']) ? $this->services['level5'] : $this->getLevel5Service()) && false ?: '_'});
     }
 
     /**

@@ -355,7 +355,7 @@ class ProjectServiceContainer extends Container
     {
         return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
             yield 0 => ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'};
-            yield 1 => ${($_ = isset($this->services['tagged_iterator_foo']) ? $this->services['tagged_iterator_foo'] : $this->services['tagged_iterator_foo'] = new \Bar()) && false ?: '_'};
+            yield 1 => ${($_ = isset($this->services['tagged_iterator_foo']) ? $this->services['tagged_iterator_foo'] : ($this->services['tagged_iterator_foo'] = new \Bar())) && false ?: '_'};
         }, 2));
     }
 

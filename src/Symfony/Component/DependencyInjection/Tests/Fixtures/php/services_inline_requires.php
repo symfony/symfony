@@ -110,7 +110,7 @@ class ProjectServiceContainer extends Container
         include_once $this->targetDirs[1].'/includes/HotPath/C2.php';
         include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
 
-        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3()) && false ?: '_'});
+        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] : ($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3())) && false ?: '_'});
     }
 
     /**

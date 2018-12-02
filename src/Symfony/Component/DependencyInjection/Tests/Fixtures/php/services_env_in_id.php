@@ -73,7 +73,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        return $this->services['bar'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : $this->services['bar_%env(BAR)%'] = new \stdClass()) && false ?: '_'});
+        return $this->services['bar'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : ($this->services['bar_%env(BAR)%'] = new \stdClass())) && false ?: '_'});
     }
 
     /**
@@ -83,7 +83,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : $this->services['bar_%env(BAR)%'] = new \stdClass()) && false ?: '_'}, array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
+        return $this->services['foo'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : ($this->services['bar_%env(BAR)%'] = new \stdClass())) && false ?: '_'}, array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
     }
 
     /**

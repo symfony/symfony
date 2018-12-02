@@ -107,7 +107,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     {
         $this->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : $this->services['foo3'] = new \stdClass()) && false ?: '_'};
+        $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : ($this->services['foo3'] = new \stdClass())) && false ?: '_'};
 
         return $instance;
     }

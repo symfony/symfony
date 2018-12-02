@@ -83,11 +83,10 @@ class EnvParametersResource implements SelfCheckingResourceInterface, \Serializa
     }
 
     /**
-     *  Return an array containing server variables where the
-     *  array key starts with the $prefix variable defined
-     *  in the construsctor.
+     *  Find environment variables starting with
+     *  the $prefix property.
      *
-     * @return array $variables
+     * @return array
      */
     private function findVariables()
     {

@@ -62,4 +62,28 @@ interface EntryManagerInterface
      * @throws LdapException
      */
     public function remove(Entry $entry);
+
+    /**
+     * Adds values to an entry's multi-valued attribute from the LDAP server.
+     *
+     * @param Entry  $entry
+     * @param string $attribute
+     * @param array  $values
+     *
+     * @throws NotBoundException
+     * @throws LdapException
+     */
+    public function addAttributeValues(Entry $entry, string $attribute, array $values);
+
+    /**
+     * Removes values from an entry's multi-valued attribute from the LDAP server.
+     *
+     * @param Entry  $entry
+     * @param string $attribute
+     * @param array  $values
+     *
+     * @throws NotBoundException
+     * @throws LdapException
+     */
+    public function removeAttributeValues(Entry $entry, string $attribute, array $values);
 }

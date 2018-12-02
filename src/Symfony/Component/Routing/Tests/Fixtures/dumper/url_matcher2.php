@@ -50,7 +50,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): ?array
+    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): array
     {
         $allow = $allowSchemes = array();
         $pathinfo = rawurldecode($rawPathinfo) ?: '/';
@@ -94,7 +94,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' !== $pathinfo) {
                     if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
                         if (!$requiredMethods || isset($requiredMethods['GET'])) {
-                            return null;
+                            return $allow = $allowSchemes = array();
                         }
                         break;
                     }
@@ -183,7 +183,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // baz4
                         if ('/' !== $pathinfo[-1]) {
-                            return null;
+                            return $allow = $allowSchemes = array();
                         }
                         if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
@@ -249,7 +249,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // foo2
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                            return null;
+                            return $allow = $allowSchemes = array();
                         }
 
                         return $this->mergeDefaults(array('_route' => 'foo2') + $matches, array());
@@ -260,7 +260,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // foo3
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                            return null;
+                            return $allow = $allowSchemes = array();
                         }
 
                         return $this->mergeDefaults(array('_route' => 'foo3') + $matches, array());
@@ -300,7 +300,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                             if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
                                 if (!$requiredMethods || isset($requiredMethods['GET'])) {
-                                    return null;
+                                    return $allow = $allowSchemes = array();
                                 }
                                 break;
                             }
@@ -338,6 +338,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             throw new Symfony\Component\Routing\Exception\NoConfigurationException();
         }
 
-        return null;
+        return array();
     }
 }

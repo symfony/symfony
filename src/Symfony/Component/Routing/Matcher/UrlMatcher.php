@@ -143,9 +143,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             } elseif (!$supportsTrailingSlash || ($requiredMethods && !\in_array('GET', $requiredMethods))) {
                 continue;
             } elseif ('/' === $staticPrefix[-1] && substr($staticPrefix, 0, -1) === $pathinfo) {
-                return;
+                return $this->allow = $this->allowSchemes = array();
             } elseif ('/' === $pathinfo[-1] && substr($pathinfo, 0, -1) === $staticPrefix) {
-                return;
+                return $this->allow = $this->allowSchemes = array();
             } else {
                 continue;
             }
@@ -171,7 +171,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 }
                 if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
                     if (!$requiredMethods || \in_array('GET', $requiredMethods)) {
-                        return;
+                        return $this->allow = $this->allowSchemes = array();
                     }
                     continue;
                 }
@@ -212,6 +212,8 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, isset($status[1]) ? $status[1] : array()));
         }
+
+        return array();
     }
 
     /**

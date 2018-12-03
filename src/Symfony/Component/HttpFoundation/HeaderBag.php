@@ -101,9 +101,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns a header value by name.
      *
-     * @param string               $key     The header name
-     * @param string|string[]|null $default The default value
-     * @param bool                 $first   Whether to return the first value or all header values
+     * @param string      $key     The header name
+     * @param string|null $default The default value
+     * @param bool        $first   Whether to return the first value or all header values
      *
      * @return string|string[]|null The first header value or default value if $first is true, an array of values otherwise
      */

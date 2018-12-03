@@ -30,7 +30,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             case '/put_and_post':
                 // put_and_post
                 if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
-                    break;
+                    goto not_put_and_post;
                 }
 
                 $ret = array('_route' => 'put_and_post');
@@ -43,7 +43,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 not_put_and_post:
                 // put_and_get_and_head
                 if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
-                    break;
+                    goto not_put_and_get_and_head;
                 }
 
                 $ret = array('_route' => 'put_and_get_and_head');

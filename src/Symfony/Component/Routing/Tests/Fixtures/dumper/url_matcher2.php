@@ -93,7 +93,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 if ('/' !== $pathinfo) {
                     if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                        if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                        if ((!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
                             return $allow = $allowSchemes = array();
                         }
                         break;
@@ -183,17 +183,21 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // baz4
                         if ('/' !== $pathinfo[-1]) {
-                            return $allow = $allowSchemes = array();
+                            if ('GET' === $canonicalMethod) {
+                                return $allow = $allowSchemes = array();
+                            }
+                            goto not_baz4;
                         }
                         if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         }
 
                         return $this->mergeDefaults(array('_route' => 'baz4') + $matches, array());
+                        not_baz4:
 
                         // baz5
                         if ('/' !== $pathinfo[-1]) {
-                            break;
+                            goto not_baz5;
                         }
                         if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
@@ -210,7 +214,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // baz.baz6
                         if ('/' !== $pathinfo[-1]) {
-                            break;
+                            goto not_bazbaz6;
                         }
                         if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
@@ -231,7 +235,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // foo1
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                            break;
+                            goto not_foo1;
                         }
 
                         $ret = $this->mergeDefaults(array('_route' => 'foo1') + $matches, array());
@@ -249,10 +253,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // foo2
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                            return $allow = $allowSchemes = array();
+                            if ('GET' === $canonicalMethod) {
+                                return $allow = $allowSchemes = array();
+                            }
+                            goto not_foo2;
                         }
 
                         return $this->mergeDefaults(array('_route' => 'foo2') + $matches, array());
+                        not_foo2:
 
                         break;
                     case 279:
@@ -260,10 +268,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         // foo3
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                            return $allow = $allowSchemes = array();
+                            if ('GET' === $canonicalMethod) {
+                                return $allow = $allowSchemes = array();
+                            }
+                            goto not_foo3;
                         }
 
                         return $this->mergeDefaults(array('_route' => 'foo3') + $matches, array());
+                        not_foo3:
 
                         break;
                     default:
@@ -299,7 +311,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                             }
 
                             if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                                if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                                if ((!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
                                     return $allow = $allowSchemes = array();
                                 }
                                 break;

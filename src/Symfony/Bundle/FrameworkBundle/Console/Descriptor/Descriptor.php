@@ -292,7 +292,7 @@ abstract class Descriptor implements DescriptorInterface
      */
     public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
-        $resolvedClass = null;
+        $resolvedClass = $class;
 
         if (!interface_exists(DocBlockFactoryInterface::class)) {
             return '';

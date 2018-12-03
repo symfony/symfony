@@ -6,9 +6,12 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     ],
     null,
     [
-        'Symfony\\Component\\VarExporter\\Tests\\ConcreteClass' => [
+        'Symfony\\Component\\VarExporter\\Tests\\AbstractClass' => [
             'foo' => [
                 123,
+            ],
+            'bar' => [
+                234,
             ],
         ],
     ],

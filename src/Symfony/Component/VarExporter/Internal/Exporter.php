@@ -125,7 +125,8 @@ class Exporter
                     $c = 'stdClass';
                 } elseif ('*' === $n[1]) {
                     $n = substr($n, 3);
-                    if ('Error' === $c = $class) {
+                    $c = $reflector->getProperty($n)->class;
+                    if ('Error' === $c) {
                         $c = 'TypeError';
                     } elseif ('Exception' === $c) {
                         $c = 'ErrorException';

@@ -90,7 +90,7 @@ trait PhpMatcherTrait
 
             if ('/' === $pathinfo || $hasTrailingSlash === ('/' === $pathinfo[-1])) {
                 // no-op
-            } elseif ($this instanceof RedirectableUrlMatcherInterface) {
+            } elseif ($this instanceof RedirectableUrlMatcherInterface && (!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
                 return $allow = $allowSchemes = array();
             } else {
                 continue;
@@ -139,7 +139,7 @@ trait PhpMatcherTrait
                             }
                         }
                         if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                            if ($this instanceof RedirectableUrlMatcherInterface && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                            if ($this instanceof RedirectableUrlMatcherInterface && (!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
                                 return $allow = $allowSchemes = array();
                             }
                             continue;

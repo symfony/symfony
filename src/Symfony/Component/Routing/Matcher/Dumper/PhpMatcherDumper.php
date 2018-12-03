@@ -564,7 +564,7 @@ EOF;
                     }
                 }\n" : '',
             $this->supportsRedirections ? "
-                    if (!\$requiredMethods || isset(\$requiredMethods['GET'])) {
+                    if ((!\$requiredMethods || isset(\$requiredMethods['GET'])) && 'GET' === \$canonicalMethod) {
                         return \$allow = \$allowSchemes = array();
                     }" : ''
         );
@@ -628,34 +628,44 @@ EOF;
         $matches = (bool) $compiledRoute->getPathVariables();
         $hostMatches = (bool) $compiledRoute->getHostVariables();
         $methods = array_flip($route->getMethods());
+        $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
         $code = "        // $name";
 
         if ('/' === $route->getPath()) {
             $code .= "\n";
         } elseif (!$matches) {
             $code .= sprintf("
-        if ('/' !== \$pathinfo && '/' %s \$pathinfo[-1]) {
-            %s;
+        if ('/' !== \$pathinfo && '/' %s \$pathinfo[-1]) {%s
+            goto $gotoname;
         }\n\n",
                 $hasTrailingSlash ? '!==' : '===',
-                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return $allow = $allowSchemes = array()' : 'break'
+                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? "
+            if ('GET' === \$canonicalMethod) {
+                return \$allow = \$allowSchemes = array();
+            }" : ''
             );
         } elseif ($hasTrailingSlash) {
             $code .= sprintf("
-        if ('/' !== \$pathinfo[-1]) {
-            %s;
+        if ('/' !== \$pathinfo[-1]) {%s
+            goto $gotoname;
         }
         if ('/' !== \$pathinfo && preg_match(\$regex, substr(\$pathinfo, 0, -1), \$n) && \$m === (int) \$n['MARK']) {
             \$matches = \$n;
         }\n\n",
-                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return $allow = $allowSchemes = array()' : 'break'
+                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? "
+            if ('GET' === \$canonicalMethod) {
+                return \$allow = \$allowSchemes = array();
+            }" : ''
             );
         } else {
             $code .= sprintf("
-        if ('/' !== \$pathinfo && '/' === \$pathinfo[-1] && preg_match(\$regex, substr(\$pathinfo, 0, -1), \$n) && \$m === (int) \$n['MARK']) {
-            %s;
+        if ('/' !== \$pathinfo && '/' === \$pathinfo[-1] && preg_match(\$regex, substr(\$pathinfo, 0, -1), \$n) && \$m === (int) \$n['MARK']) {%s
+            goto $gotoname;
         }\n\n",
-                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? 'return $allow = $allowSchemes = array()' : 'break'
+                $this->supportsRedirections && (!$methods || isset($methods['GET'])) ? "
+            if ('GET' === \$canonicalMethod) {
+                return \$allow = \$allowSchemes = array();
+            }" : ''
             );
         }
 
@@ -686,8 +696,6 @@ EOF;
         } else {
             $code = $this->indent($code);
         }
-
-        $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
 
         // the offset where the return value is appended below, with indendation
         $retOffset = 12 + \strlen($code);
@@ -770,16 +778,10 @@ EOF;
             $code = substr_replace($code, 'return', $retOffset, 6);
         }
         if ($conditions) {
-            $code .= "        }\n";
-        } elseif ($schemes || $methods) {
-            $code .= '    ';
+            $code = $this->indent($code)."            }\n";
         }
 
-        if ($schemes || $methods) {
-            $code .= "        $gotoname:\n";
-        }
-
-        return $conditions ? $this->indent($code) : $code;
+        return $code."            $gotoname:\n";
     }
 
     private function getExpressionLanguage()

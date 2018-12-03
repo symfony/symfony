@@ -81,7 +81,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 if ('/' !== $pathinfo) {
                     if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                        if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                        if ((!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
                             return $allow = $allowSchemes = array();
                         }
                         break;
@@ -148,7 +148,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                             }
 
                             if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                                if (!$requiredMethods || isset($requiredMethods['GET'])) {
+                                if ((!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
                                     return $allow = $allowSchemes = array();
                                 }
                                 break;

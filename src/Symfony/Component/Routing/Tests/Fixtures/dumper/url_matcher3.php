@@ -30,12 +30,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             case '/with-condition':
                 // with-condition
                 if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
-                    break;
+                    goto not_withcondition;
                 }
 
                 if (($context->getMethod() == "GET")) {
                     return array('_route' => 'with-condition');
                 }
+                not_withcondition:
                 break;
             default:
                 $routes = array(

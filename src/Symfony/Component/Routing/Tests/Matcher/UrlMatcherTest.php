@@ -720,6 +720,17 @@ class UrlMatcherTest extends TestCase
             'customerId' => '123',
         );
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
+
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/api/customers/{customerId}/contactpersons/', array(), array(), array(), '', array(), array('get')));
+        $coll->add('b', new Route('/api/customers/{customerId}/contactpersons', array(), array(), array(), '', array(), array('post')));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'POST'));
+        $expected = array(
+            '_route' => 'b',
+            'customerId' => '123',
+        );
+        $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

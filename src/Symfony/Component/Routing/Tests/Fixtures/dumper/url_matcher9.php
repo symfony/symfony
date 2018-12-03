@@ -33,14 +33,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 if (preg_match('#^(?P<d>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
                     return $this->mergeDefaults(array('_route' => 'a') + $hostMatches, array());
                 }
+                not_a:
                 // c
                 if (preg_match('#^(?P<e>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
                     return $this->mergeDefaults(array('_route' => 'c') + $hostMatches, array());
                 }
+                not_c:
                 // b
                 if ('d.c.b.a' === $host) {
                     return array('_route' => 'b');
                 }
+                not_b:
                 break;
         }
 

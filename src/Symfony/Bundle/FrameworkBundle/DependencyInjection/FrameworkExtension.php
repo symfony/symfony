@@ -525,7 +525,7 @@ class FrameworkExtension extends Extension
                     }
                     if ($transition['metadata']) {
                         $transitionsMetadataDefinition->addMethodCall('attach', array(
-                            $transitionDefinition,
+                            new Reference($transitionId),
                             $transition['metadata'],
                         ));
                     }
@@ -547,7 +547,7 @@ class FrameworkExtension extends Extension
                             }
                             if ($transition['metadata']) {
                                 $transitionsMetadataDefinition->addMethodCall('attach', array(
-                                    $transitionDefinition,
+                                    new Reference($transitionId),
                                     $transition['metadata'],
                                 ));
                             }

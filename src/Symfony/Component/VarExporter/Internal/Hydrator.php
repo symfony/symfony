@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
+use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -59,7 +61,10 @@ class Hydrator
             };
         }
 
-        $classReflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
+        if (!\class_exists($class) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
+            throw new ClassNotFoundException($class);
+        }
+        $classReflector = new \ReflectionClass($class);
 
         if (!$classReflector->isInternal()) {
             return self::$hydrators[$class] = (self::$hydrators['stdClass'] ?? self::getHydrator('stdClass'))->bindTo(null, $class);

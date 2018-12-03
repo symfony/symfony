@@ -326,6 +326,12 @@ final class FinalStdClass extends \stdClass
 abstract class AbstractClass
 {
     protected $foo;
+    private $bar;
+
+    protected function setBar($bar)
+    {
+        $this->bar = $bar;
+    }
 }
 
 class ConcreteClass extends AbstractClass
@@ -333,5 +339,6 @@ class ConcreteClass extends AbstractClass
     public function __construct()
     {
         $this->foo = 123;
+        $this->setBar(234);
     }
 }

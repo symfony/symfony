@@ -6,7 +6,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     ]),
     null,
     [
-        'Symfony\\Component\\VarExporter\\Tests\\FinalError' => [
+        'TypeError' => [
             'file' => [
                 \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
             ],

@@ -118,6 +118,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        // HEAD and GET are equivalent as per RFC
+        if ('HEAD' === $method = $this->context->getMethod()) {
+            $method = 'GET';
+        }
         $supportsTrailingSlash = '/' !== $pathinfo && '' !== $pathinfo && $this instanceof RedirectableUrlMatcherInterface;
 
         foreach ($routes as $name => $route) {
@@ -128,7 +132,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
             if ('' === $staticPrefix || 0 === strpos($pathinfo, $staticPrefix)) {
                 // no-op
-            } elseif (!$supportsTrailingSlash || ($requiredMethods && !\in_array('GET', $requiredMethods))) {
+            } elseif (!$supportsTrailingSlash || ($requiredMethods && !\in_array('GET', $requiredMethods)) || 'GET' !== $method) {
                 continue;
             } elseif ('/' === substr($staticPrefix, -1) && substr($staticPrefix, 0, -1) === $pathinfo) {
                 return $this->allow = array();
@@ -149,7 +153,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             }
 
             if ($hasTrailingSlash && '/' !== substr($pathinfo, -1)) {
-                if (!$requiredMethods || \in_array('GET', $requiredMethods)) {
+                if ((!$requiredMethods || \in_array('GET', $requiredMethods)) && 'GET' === $method) {
                     return $this->allow = array();
                 }
                 continue;
@@ -168,11 +172,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             // check HTTP method requirement
             if ($requiredMethods) {
-                // HEAD and GET are equivalent as per RFC
-                if ('HEAD' === $method = $this->context->getMethod()) {
-                    $method = 'GET';
-                }
-
                 if (!\in_array($method, $requiredMethods)) {
                     if (self::REQUIREMENT_MATCH === $status[0]) {
                         $this->allow = array_merge($this->allow, $requiredMethods);

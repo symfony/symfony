@@ -111,6 +111,22 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
+     * Moves an entry on the Ldap server.
+     *
+     * @throws NotBoundException if the connection has not been previously bound.
+     * @throws LdapException if an error is thrown during the rename operation.
+     */
+    public function move(Entry $entry, string $newParent)
+    {
+        $con = $this->getConnectionResource();
+        $rdn = $this->parseRdnFromEntry($entry);
+        // deleteOldRdn does not matter here, since the Rdn will not be changing in the move.
+        if (!@ldap_rename($con, $entry->getDn(), $rdn, $newParent, true)) {
+            throw new LdapException(sprintf('Could not move entry "%s" to "%s": %s.', $entry->getDn(), $newParent, ldap_error($con)));
+        }
+    }
+
+    /**
      * Get the connection resource, but first check if the connection is bound.
      */
     private function getConnectionResource()
@@ -138,5 +154,14 @@ class EntryManager implements EntryManagerInterface
         if (!@ldap_modify_batch($this->getConnectionResource(), $dn, $operationsMapped)) {
             throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": "%s".', $dn, ldap_error($this->getConnectionResource())));
         }
+    }
+
+   private function parseRdnFromEntry(Entry $entry)
+    {
+        if (!preg_match('/^([^,]+),/', $entry->getDn(), $matches)) {
+            throw new LdapException(sprintf('Entry "%s" malformed, could not parse RDN', $entry->getDn()));
+        }
+
+        return $matches[1];
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `EntryManager::move`, not implementing it is deprecated
+
 4.2.0
 -----
 

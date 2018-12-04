@@ -19,6 +19,8 @@ use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @deprecated since Symfony 4.3
  */
 class ValidateWorkflowsPass implements CompilerPassInterface
 {

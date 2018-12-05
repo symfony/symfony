@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Util;
 
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,6 +24,9 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInte
 
     public function __construct(TranslatorInterface $translator)
     {
+        if (!$translator instanceof LocaleAwareInterface) {
+            throw new \InvalidArgumentException(sprintf('The translator passed to "%s()" must implement "%s".', __METHOD__, LocaleAwareInterface::class));
+        }
         $this->translator = $translator;
     }
 

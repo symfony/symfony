@@ -75,10 +75,15 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (false === strpos($request->getRequestFormat(), 'json')
-            && false === strpos($request->getContentType(), 'json')
-        ) {
-            return;
+        
+        try {
+            if (false === strpos($request->getRequestFormat(), 'json')
+                && false === strpos($request->getContentType(), 'json')
+            ) {
+                throw new BadRequestHttpException('Invalid content type');
+            }
+        } catch (BadRequestHttpException $e) {
+                $request->setRequestFormat('json');
         }
 
         if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {

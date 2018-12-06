@@ -8,16 +8,17 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_attr                 FormType             FormType                  FormTypeCsrfExtension  
   choice_label               -------------------- ------------------------- ----------------------- 
   choice_loader               compound             action                    csrf_field_name        
-  choice_name                 data_class           attr                      csrf_message           
-  choice_translation_domain   empty_data           auto_initialize           csrf_protection        
-  choice_value                error_bubbling       block_name                csrf_token_id          
-  choices                     trim                 by_reference              csrf_token_manager     
-  choices_as_values                                data                                             
-  expanded                                         disabled                                         
-  group_by                                         inherit_data                                     
-  multiple                                         label                                            
-  placeholder                                      label_attr                                       
-  preferred_choices                                label_format                                     
+  choice_name                 data_class           allow_file_upload         csrf_message           
+  choice_translation_domain   empty_data           attr                      csrf_protection        
+  choice_value                error_bubbling       auto_initialize           csrf_token_id          
+  choices                     trim                 block_name                csrf_token_manager     
+  choices_as_values                                by_reference                                     
+  expanded                                         data                                             
+  group_by                                         disabled                                         
+  multiple                                         inherit_data                                     
+  placeholder                                      label                                            
+  preferred_choices                                label_attr                                       
+                                                   label_format                                     
                                                    mapped                                           
                                                    method                                           
                                                    post_max_size_message                            

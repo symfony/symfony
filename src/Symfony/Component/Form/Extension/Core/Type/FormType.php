@@ -178,6 +178,7 @@ class FormType extends BaseType
             'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
+            'allow_file_upload' => false,
         ));
 
         $resolver->setAllowedTypes('label_attr', 'array');

@@ -1837,15 +1837,23 @@ class Request
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
 
-            // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path, only use URL path
-            $uriComponents = parse_url($requestUri);
+            if ('' !== $requestUri && '/' === $requestUri[0]) {
+                // To only use path and query remove the fragment.
+                if (false !== $pos = strpos($requestUri, '#')) {
+                    $requestUri = substr($requestUri, 0, $pos);
+                }
+            } else {
+                // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path,
+                // only use URL path.
+                $uriComponents = parse_url($requestUri);
 
-            if (isset($uriComponents['path'])) {
-                $requestUri = $uriComponents['path'];
-            }
+                if (isset($uriComponents['path'])) {
+                    $requestUri = $uriComponents['path'];
+                }
 
-            if (isset($uriComponents['query'])) {
-                $requestUri .= '?'.$uriComponents['query'];
+                if (isset($uriComponents['query'])) {
+                    $requestUri .= '?'.$uriComponents['query'];
+                }
             }
         } elseif ($this->server->has('ORIG_PATH_INFO')) {
             // IIS 5.0, PHP as CGI

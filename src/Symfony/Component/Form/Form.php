@@ -537,6 +537,11 @@ class Form implements \IteratorAggregate, FormInterface
             $submittedData = null;
         } elseif (is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
+        } elseif ($this->config->getOption('allow_file_upload')) {
+            // no-op
+        } elseif ($this->config->getRequestHandler()->isFileUpload($submittedData)) {
+            $submittedData = null;
+            $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
         }
 
         $dispatcher = $this->config->getEventDispatcher();
@@ -546,6 +551,10 @@ class Form implements \IteratorAggregate, FormInterface
         $viewData = null;
 
         try {
+            if (null !== $this->transformationFailure) {
+                throw $this->transformationFailure;
+            }
+
             // Hook to change content of the data submitted by the browser
             if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
                 $event = new FormEvent($this, $submittedData);

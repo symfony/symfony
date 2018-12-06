@@ -105,6 +105,7 @@ class FileType extends AbstractType
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'multiple' => false,
+            'allow_file_upload' => true,
         ));
     }
 

@@ -208,8 +208,8 @@ EOF
             $io->table(array('Namespace', 'Paths'), $this->buildTableRows($paths));
         }
 
-        if ($wronBundles = $this->findWrongBundleOverrides()) {
-            foreach ($this->buildWarningMessages($wronBundles) as $message) {
+        if ($wrongBundles = $this->findWrongBundleOverrides()) {
+            foreach ($this->buildWarningMessages($wrongBundles) as $message) {
                 $io->warning($message);
             }
         }
@@ -253,13 +253,7 @@ EOF
         }
 
         foreach ($namespaces as $namespace) {
-            $paths = array_map(function ($path) {
-                if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
-                    $path = ltrim(substr($path, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
-                }
-
-                return $path;
-            }, $loader->getPaths($namespace));
+            $paths = array_map(array($this, 'getRelativePath'), $loader->getPaths($namespace));
 
             if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
                 $namespace = '(None)';
@@ -368,53 +362,38 @@ EOF
 
         if ($this->rootDir && $this->projectDir) {
             $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
-            $relativePath = ltrim(substr($this->rootDir.'/Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
-            $bundleNames = array_reduce(
-                $folders,
-                function ($carry, $absolutePath) use ($relativePath) {
-                    if (0 === strpos($absolutePath, $this->projectDir)) {
-                        $name = basename(\dirname($absolutePath));
-                        $path = $relativePath.$name;
-                        $carry[$name] = $path;
-                    }
+            $relativePath = ltrim(substr($this->rootDir.\DIRECTORY_SEPARATOR.'Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+            $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
+                if (0 === strpos($absolutePath, $this->projectDir)) {
+                    $name = basename(\dirname($absolutePath));
+                    $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
+                    $carry[$name] = $path;
 
-                    return $carry;
-                },
-                $bundleNames
-            );
+                    @trigger_error(sprintf('Templates directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $absolutePath, $this->twigDefaultPath.'/bundles/'.$name), E_USER_DEPRECATED);
+                }
+
+                return $carry;
+            }, $bundleNames);
         }
 
         if ($this->twigDefaultPath && $this->projectDir) {
             $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
-            $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
-            $bundleNames = array_reduce(
-                $folders,
-                function ($carry, $absolutePath) use ($relativePath) {
-                    if (0 === strpos($absolutePath, $this->projectDir)) {
-                        $path = ltrim(substr($absolutePath, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
-                        $name = ltrim(substr($path, \strlen($relativePath)), \DIRECTORY_SEPARATOR);
-                        $carry[$name] = $path;
-                    }
+            $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
+            $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
+                if (0 === strpos($absolutePath, $this->projectDir)) {
+                    $name = basename($absolutePath);
+                    $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
+                    $carry[$name] = $path;
+                }
 
-                    return $carry;
-                },
-                $bundleNames
-            );
+                return $carry;
+            }, $bundleNames);
         }
 
-        if (\count($bundleNames)) {
-            $notFoundBundles = array_diff_key($bundleNames, $this->bundlesMetadata);
-            if (\count($notFoundBundles)) {
-                $alternatives = array();
-                foreach ($notFoundBundles as $notFoundBundle => $path) {
-                    $alternatives[$path] = array();
-                    foreach ($this->bundlesMetadata as $name => $bundle) {
-                        $lev = levenshtein($notFoundBundle, $name);
-                        if ($lev <= \strlen($notFoundBundle) / 3 || false !== strpos($name, $notFoundBundle)) {
-                            $alternatives[$path][] = $name;
-                        }
-                    }
-                }
+        if ($notFoundBundles = array_diff_key($bundleNames, $this->bundlesMetadata)) {
+            $alternatives = array();
+            foreach ($notFoundBundles as $notFoundBundle => $path) {
+                $alternatives[$path] = $this->findAlternatives($notFoundBundle, array_keys($this->bundlesMetadata));
             }
         }
 

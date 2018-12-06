@@ -42,6 +42,52 @@ class DebugCommandTest extends TestCase
         $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
     }
 
+    public function testWarningsWrongBundleOverriding()
+    {
+        $bundleMetadata = array(
+            'TwigBundle' => 'vendor/twig-bundle/',
+            'WebProfilerBundle' => 'vendor/web-profiler-bundle/',
+        );
+        $defaultPath = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'templates';
+
+        $tester = $this->createCommandTester(array(), $bundleMetadata, $defaultPath);
+        $ret = $tester->execute(array('--filter' => 'unknown', '--format' => 'json'), array('decorated' => false));
+
+        $expected = array('warnings' => array(
+            'Path "templates/bundles/UnknownBundle" not matching any bundle found',
+            'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
+        ));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Templates directory "%sResources/BarBundle/views" is deprecated since Symfony 4.2, use "%stemplates/bundles/BarBundle" instead.
+     */
+    public function testDeprecationForWrongBundleOverridingInLegacyPath()
+    {
+        $bundleMetadata = array(
+            'TwigBundle' => 'vendor/twig-bundle/',
+            'WebProfilerBundle' => 'vendor/web-profiler-bundle/',
+        );
+        $defaultPath = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'templates';
+        $rootDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+
+        $tester = $this->createCommandTester(array(), $bundleMetadata, $defaultPath, $rootDir);
+        $ret = $tester->execute(array('--filter' => 'unknown', '--format' => 'json'), array('decorated' => false));
+
+        $expected = array('warnings' => array(
+            'Path "Resources/BarBundle" not matching any bundle found',
+            'Path "templates/bundles/UnknownBundle" not matching any bundle found',
+            'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
+        ));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
+    }
+
     /**
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Malformed namespaced template name "@foo" (expecting "@namespace/template_name").
@@ -233,7 +279,7 @@ TXT
         );
     }
 
-    private function createCommandTester(array $paths = array()): CommandTester
+    private function createCommandTester(array $paths = array(), array $bundleMetadata = array(), string $defaultPath = null, string $rootDir = null): CommandTester
     {
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader(array(), $projectDir);
@@ -246,7 +292,7 @@ TXT
         }
 
         $application = new Application();
-        $application->add(new DebugCommand(new Environment($loader), $projectDir));
+        $application->add(new DebugCommand(new Environment($loader), $projectDir, $bundleMetadata, $defaultPath, $rootDir));
         $command = $application->find('debug:twig');
 
         return new CommandTester($command);

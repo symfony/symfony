@@ -7,6 +7,11 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.49 (2018-12-06)
+
+ * security #cve-2018-19790 [Security\Http] detect bad redirect targets using backslashes (xabbuh)
+ * security #cve-2018-19789 [Form] Filter file uploads out of regular form types (nicolas-grekas)
+
 * 2.8.48 (2018-11-26)
 
  * bug #28917 [DoctrineBridge] catch errors while converting to db values in data collector (alekitto)

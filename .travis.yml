@@ -144,7 +144,7 @@ before_install:
           fi
 
           tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
-          tfold ext.mongodb tpecl mongodb-1.5.2 mongodb.so $INI
+          tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
       done
 
     - |
@@ -206,7 +206,7 @@ install:
               break
           fi
           phpenv global $PHP
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.5.2; composer require --dev --no-update mongodb/mongodb)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then

@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-03T07:44:44Z
+
+Flushing clears completely the Memcache server, while clear should only affect the very items that are in one logical pool (ie same key prefix). Invalidation works already by using an incrementing version number as prefix.
+
+---------------------------------------------------------------------------
+
+by raitocz at 2018-12-03T07:48:07Z
+
+@nicolas-grekas But if you pass option to not use versioning?
+
+```php
+$adapter = new MemcachedAdapter($client, $namespace);
+$adapter->enableVersioning(false);
+```
+
+---------------------------------------------------------------------------
+
+by raitocz at 2018-12-06T09:59:15Z
+
+@nicolas-grekas How long it will take before it gets merged? Thx

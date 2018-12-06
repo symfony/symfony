@@ -712,7 +712,7 @@ class CompoundFormTest extends AbstractFormTest
             'REQUEST_METHOD' => $method,
         ));
 
-        $form = $this->getBuilder('image')
+        $form = $this->getBuilder('image', null, null, array('allow_file_upload' => true))
             ->setMethod($method)
             ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
@@ -1086,6 +1086,21 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertTrue($submit->isDisabled());
         $this->assertFalse($submit->isClicked());
         $this->assertFalse($submit->isSubmitted());
+    }
+
+    public function testFileUpload()
+    {
+        $reqHandler = new HttpFoundationRequestHandler();
+        $this->form->add($this->getBuilder('foo')->setRequestHandler($reqHandler)->getForm());
+        $this->form->add($this->getBuilder('bar')->setRequestHandler($reqHandler)->getForm());
+
+        $this->form->submit(array(
+            'foo' => 'Foo',
+            'bar' => new UploadedFile(__FILE__, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK),
+        ));
+
+        $this->assertSame('Submitted data was expected to be text or number, file upload given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
+        $this->assertNull($this->form->get('bar')->getData());
     }
 
     protected function createForm()

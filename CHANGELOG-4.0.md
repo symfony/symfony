@@ -7,6 +7,11 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.15 (2018-12-06)
+
+ * security `#cve-2018-19790 <https://symfony.com/cve-2018-19790>`_ [Security\Http] detect bad redirect targets using backslashes (@xabbuh)
+ * security `#cve-2018-19789 <https://symfony.com/cve-2018-19789>`_ [Form] Filter file uploads out of regular form types (@nicolas-grekas)
+
 * 4.0.14 (2018-08-01)
 
  * security #cve-2018-14774 [HttpKernel] fix trusted headers management in HttpCache and InlineFragmentRenderer (nicolas-grekas)

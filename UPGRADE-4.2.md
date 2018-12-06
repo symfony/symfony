@@ -68,6 +68,7 @@ Finder
 Form
 ----
 
+ * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `getExtendedType()` method of the `FormTypeExtensionInterface` is deprecated and will be removed in 5.0. Type
    extensions must implement the static `getExtendedTypes()` method instead and return an iterable of extended types.
 
@@ -381,6 +382,7 @@ TwigBundle
 Validator
 ---------
 
+ * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `checkMX` and `checkHost` options of the `Email` constraint are deprecated
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final

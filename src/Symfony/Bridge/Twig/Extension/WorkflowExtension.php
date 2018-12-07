@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\Workflow;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -32,15 +33,23 @@ class WorkflowExtension extends AbstractExtension
 
     public function getFunctions()
     {
-        return array(
+        $functions = array(
             new TwigFunction('workflow_can', array($this, 'canTransition')),
-            new TwigFunction('workflow_could', array($this, 'couldTransition')),
             new TwigFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
-            new TwigFunction('workflow_possible_transitions', array($this, 'getPossibleTransitions')),
             new TwigFunction('workflow_has_marked_place', array($this, 'hasMarkedPlace')),
             new TwigFunction('workflow_marked_places', array($this, 'getMarkedPlaces')),
             new TwigFunction('workflow_metadata', array($this, 'getMetadata')),
         );
+
+        if (method_exists(Workflow::class, 'could')) {
+            $functions[] = new TwigFunction('workflow_could', array($this, 'couldTransition'));
+        }
+
+        if (method_exists(Workflow::class, 'getPossibleTransitions')) {
+            $functions[] = new TwigFunction('workflow_possible_transitions', array($this, 'getPossibleTransitions'));
+        }
+
+        return $functions;
     }
 
     /**

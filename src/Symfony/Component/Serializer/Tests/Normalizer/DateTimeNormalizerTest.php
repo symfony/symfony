@@ -143,14 +143,14 @@ class DateTimeNormalizerTest extends TestCase
         );
 
         yield array(
-            '2018-12-01T21:03:06.067634',
+            '2018-12-01T19:03:06.067634',
             'Y-m-d\TH:i:s.u',
             \DateTime::createFromFormat(
                 'Y-m-d\TH:i:s.u',
                 '2018-12-01T18:03:06.067634',
                 new \DateTimeZone('UTC')
             ),
-            new \DateTimeZone('Europe/Moscow'),
+            new \DateTimeZone('Europe/Berlin'),
         );
     }
 

@@ -69,7 +69,6 @@ class WorkflowExtensionTest extends TestCase
         $this->assertFalse($this->extension->canTransition($subject, 't2'));
     }
 
-
     public function testCouldTransition()
     {
         $subject = new \stdClass();

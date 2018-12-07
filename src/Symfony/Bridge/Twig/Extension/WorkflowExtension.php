@@ -58,7 +58,7 @@ class WorkflowExtension extends AbstractExtension
     }
 
     /**
-     * Returnstrue if there is a transition which is defined for the state
+     * Returnstrue if there is a transition which is defined for the state.
      *
      * @param object $subject        A subject
      * @param string $transitionName A transition
@@ -85,7 +85,7 @@ class WorkflowExtension extends AbstractExtension
     }
 
     /**
-     * Returns all transitions defined for the state
+     * Returns all transitions defined for the state.
      *
      * @param object $subject A subject
      * @param string $name    A workflow name

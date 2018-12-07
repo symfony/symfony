@@ -34,7 +34,9 @@ class WorkflowExtension extends AbstractExtension
     {
         return array(
             new TwigFunction('workflow_can', array($this, 'canTransition')),
+            new TwigFunction('workflow_could', array($this, 'couldTransition')),
             new TwigFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
+            new TwigFunction('workflow_possible_transitions', array($this, 'getPossibleTransitions')),
             new TwigFunction('workflow_has_marked_place', array($this, 'hasMarkedPlace')),
             new TwigFunction('workflow_marked_places', array($this, 'getMarkedPlaces')),
             new TwigFunction('workflow_metadata', array($this, 'getMetadata')),
@@ -56,6 +58,20 @@ class WorkflowExtension extends AbstractExtension
     }
 
     /**
+     * Returnstrue if there is a transition which is defined for the state
+     *
+     * @param object $subject        A subject
+     * @param string $transitionName A transition
+     * @param string $name           A workflow name
+     *
+     * @return bool true if there is a transition which is defined for the state
+     */
+    public function couldTransition($subject, $transitionName, $name = null)
+    {
+        return $this->workflowRegistry->get($subject, $name)->could($subject, $transitionName);
+    }
+
+    /**
      * Returns all enabled transitions.
      *
      * @param object $subject A subject
@@ -66,6 +82,19 @@ class WorkflowExtension extends AbstractExtension
     public function getEnabledTransitions($subject, $name = null)
     {
         return $this->workflowRegistry->get($subject, $name)->getEnabledTransitions($subject);
+    }
+
+    /**
+     * Returns all transitions defined for the state
+     *
+     * @param object $subject A subject
+     * @param string $name    A workflow name
+     *
+     * @return Transition[] All defined transitions for the state
+     */
+    public function getPossibleTransitions($subject, $name = null)
+    {
+        return $this->workflowRegistry->get($subject, $name)->getPossibleTransitions($subject);
     }
 
     /**

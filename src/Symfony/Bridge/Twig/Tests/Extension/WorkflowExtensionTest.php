@@ -69,12 +69,34 @@ class WorkflowExtensionTest extends TestCase
         $this->assertFalse($this->extension->canTransition($subject, 't2'));
     }
 
+
+    public function testCouldTransition()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array();
+
+        $this->assertTrue($this->extension->couldTransition($subject, 't1'));
+        $this->assertFalse($this->extension->couldTransition($subject, 't2'));
+    }
+
     public function testGetEnabledTransitions()
     {
         $subject = new \stdClass();
         $subject->marking = array();
 
         $transitions = $this->extension->getEnabledTransitions($subject);
+
+        $this->assertCount(1, $transitions);
+        $this->assertInstanceOf(Transition::class, $transitions[0]);
+        $this->assertSame('t1', $transitions[0]->getName());
+    }
+
+    public function testGetPossibleTransitions()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array();
+
+        $transitions = $this->extension->getPossibleTransitions($subject);
 
         $this->assertCount(1, $transitions);
         $this->assertInstanceOf(Transition::class, $transitions[0]);

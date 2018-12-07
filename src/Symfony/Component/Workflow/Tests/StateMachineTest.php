@@ -42,6 +42,36 @@ class StateMachineTest extends TestCase
         $this->assertTrue($net->can($subject, 't3'));
     }
 
+    public function testCould()
+    {
+        $definition = $this->createComplexStateMachineDefinition();
+
+        $net = new StateMachine($definition);
+        $subject = new \stdClass();
+
+        // If you are in place "a" you should be able to apply "t1"
+        $subject->marking = 'a';
+        $this->assertTrue($net->could($subject, 't1'));
+        $subject->marking = 'd';
+        $this->assertTrue($net->could($subject, 't1'));
+
+        $subject->marking = 'b';
+        $this->assertFalse($net->could($subject, 't1'));
+    }
+
+    public function testCouldWithMultipleTransition()
+    {
+        $definition = $this->createComplexStateMachineDefinition();
+
+        $net = new StateMachine($definition);
+        $subject = new \stdClass();
+
+        // If you are in place "b" you should be able to apply "t1" and "t2"
+        $subject->marking = 'b';
+        $this->assertTrue($net->could($subject, 't2'));
+        $this->assertTrue($net->could($subject, 't3'));
+    }
+
     public function testBuildTransitionBlockerList()
     {
         $definition = $this->createComplexStateMachineDefinition();

@@ -105,6 +105,35 @@ class Workflow implements WorkflowInterface
     }
 
     /**
+     * Returns true if there is a transition which is defined for the state
+     *
+     * @param object $subject        A subject
+     * @param string $transitionName A transition
+     *
+     * @return bool true if there is a transition which is defined for the state
+     */
+    public function could($subject, $transitionName)
+    {
+        $transitions = $this->definition->getTransitions();
+        $marking = $this->getMarking($subject);
+
+        foreach ($transitions as $transition) {
+            if ($transition->getName() !== $transitionName) {
+                continue;
+            }
+            foreach ($transition->getFroms() as $place) {
+                if (!$marking->has($place)) {
+                    continue 2;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function buildTransitionBlockerList($subject, string $transitionName): TransitionBlockerList
@@ -240,6 +269,30 @@ class Workflow implements WorkflowInterface
     public function getMetadataStore(): MetadataStoreInterface
     {
         return $this->definition->getMetadataStore();
+    }
+
+    /**
+     * Returns all transitions defined for the state
+     *
+     * @param object $subject A subject
+     *
+     * @return Transition[] All defined transitions for the state
+     */
+    public function getPossibleTransitions($subject)
+    {
+        $enabled = array();
+        $marking = $this->getMarking($subject);
+
+        foreach ($this->definition->getTransitions() as $transition) {
+            foreach ($transition->getFroms() as $place) {
+                if (!$marking->has($place)) {
+                    continue 2;
+                }
+            }
+            $enabled[] = $transition;
+        }
+
+        return $enabled;
     }
 
     private function buildTransitionBlockerListForTransition($subject, Marking $marking, Transition $transition)

@@ -181,6 +181,75 @@ class WorkflowTest extends TestCase
         $this->assertTrue($workflow->can($subject, 'to_a'));
     }
 
+    public function testCouldWithUnexistingTransition()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $this->assertFalse($workflow->could($subject, 'foobar'));
+    }
+
+    public function testCould()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $this->assertTrue($workflow->could($subject, 't1'));
+        $this->assertFalse($workflow->could($subject, 't2'));
+
+        $subject->marking = array('b' => 1);
+
+        $this->assertFalse($workflow->could($subject, 't1'));
+        // In a workflow net, all "from" places should contain a token to enable
+        // the transition.
+        $this->assertFalse($workflow->could($subject, 't2'));
+
+        $subject->marking = array('b' => 1, 'c' => 1);
+
+        $this->assertFalse($workflow->could($subject, 't1'));
+        $this->assertTrue($workflow->could($subject, 't2'));
+
+        $subject->marking = array('f' => 1);
+
+        $this->assertFalse($workflow->could($subject, 't5'));
+        $this->assertTrue($workflow->could($subject, 't6'));
+    }
+
+    public function testCouldWithGuard()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        $this->assertTrue($workflow->could($subject, 't1'));
+    }
+
+    public function testCouldWithSameNameTransition()
+    {
+        $definition = $this->createWorkflowWithSameNameTransition();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $this->assertTrue($workflow->could($subject, 'a_to_bc'));
+        $this->assertFalse($workflow->could($subject, 'b_to_c'));
+        $this->assertFalse($workflow->could($subject, 'to_a'));
+
+        $subject->marking = array('b' => 1);
+        $this->assertFalse($workflow->could($subject, 'a_to_bc'));
+        $this->assertTrue($workflow->could($subject, 'b_to_c'));
+        $this->assertTrue($workflow->could($subject, 'to_a'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\UndefinedTransitionException
      * @expectedExceptionMessage Transition "404 Not Found" is not defined for workflow "unnamed".
@@ -537,6 +606,52 @@ class WorkflowTest extends TestCase
 
         $subject->marking = array('b' => 1, 'c' => 1);
         $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(3, $transitions);
+        $this->assertSame('b_to_c', $transitions[0]->getName());
+        $this->assertSame('to_a', $transitions[1]->getName());
+        $this->assertSame('to_a', $transitions[2]->getName());
+    }
+
+    public function testGetPossibleTransitions()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(1, $transitions);
+        $this->assertSame('t1', $transitions[0]->getName());
+
+        $subject->marking = array('d' => 1);
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(2, $transitions);
+        $this->assertSame('t3', $transitions[0]->getName());
+        $this->assertSame('t4', $transitions[1]->getName());
+
+        $subject->marking = array('c' => 1, 'e' => 1);
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(1, $transitions);
+        $this->assertSame('t5', $transitions[0]->getName());
+    }
+
+    public function testGetPossibleTransitionsWithSameNameTransition()
+    {
+        $definition = $this->createWorkflowWithSameNameTransition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(1, $transitions);
+        $this->assertSame('a_to_bc', $transitions[0]->getName());
+
+        $subject->marking = array('b' => 1, 'c' => 1);
+        $transitions = $workflow->getPossibleTransitions($subject);
         $this->assertCount(3, $transitions);
         $this->assertSame('b_to_c', $transitions[0]->getName());
         $this->assertSame('to_a', $transitions[1]->getName());

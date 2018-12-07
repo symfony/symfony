@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added options `iban` and `ibanPropertyPath` to Bic constraint
+ * added UATP cards support to `CardSchemeValidator`
 
 4.2.0
 -----

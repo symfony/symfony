@@ -73,6 +73,7 @@ class WorkflowExtensionTest extends TestCase
     {
         if (!method_exists(Workflow::class, 'could')) {
             $this->markTestSkipped('Workflow has no \'could\' method');
+
             return;
         }
 
@@ -99,6 +100,7 @@ class WorkflowExtensionTest extends TestCase
     {
         if (!method_exists(Workflow::class, 'getPossibleTransitions')) {
             $this->markTestSkipped('Workflow has no \'getPossibleTransitions\' method');
+
             return;
         }
 

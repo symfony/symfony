@@ -55,6 +55,12 @@
                 <span>{{ collector.route|default('n/a') }}</span>
             </div>
 
+            {%- set keystemplates = profile.collectors['twig'].getTemplates|keys|default(false) -%}
+            <div class="sf-toolbar-info-piece">
+                <b>Main template</b>
+                <span>{{ keystemplates|first }}</span>
+            </div>
+
             <div class="sf-toolbar-info-piece">
                 <b>Has session</b>
                 <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>

@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * Trigger `entered` event for subject entering in the Workflow for the first time
- * Added `could` and `getPossibleTransistions` which give a unguarded view on the defined transitions
+ * Added `could` and `getPossibleTransitions` which give an unguarded view on the defined transitions
 
 4.1.0
 -----

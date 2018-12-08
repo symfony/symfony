@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T08:52:13Z
+
+Now with tests, ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T12:34:11Z
+
+> Why do we need to check for the multiple option here? Such a hard coded knowledge about type specific options looks suspicious to me.
+
+"multiple" is exactly the info we're missing to decide if we allow arrays or not: form types that know how to deal with array of values don't have to be compound, and "multiple" is their way to express they still deal with arrays. Note that this is already what we use, that's why the patch is so simple yet it works and  tests are green.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T07:49:29Z
+
+Can we check if the type is actual multiple, i.e. `getOption('multiple', false)` instead of `hasOption('multiple')`.
+
+Is the same check needed vice versa? If the submitted data is scalar and the type is compound/multiple?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-26T08:04:19Z
+
+@ro0nl that's how I first wrote the patch, but the tests broke all around. The reason is that we don't need to decide if arrays are allowed. Instead we need to decide if arrays *are dealt with* at the form type level. All form types that declare multiple true/false can do that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-26T08:43:45Z
+
+Now targeting 3.4, let 2.8 in peace.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-07T08:51:58Z
+
+rebased - ready

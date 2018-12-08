@@ -14,6 +14,7 @@ Installation
 * Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
   Support" (LTS) versions and has a [release process][6] that is predictable and
   business-friendly.
+* 
 
 Documentation
 -------------

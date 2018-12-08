@@ -22,20 +22,43 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class SentStamp implements StampInterface
 {
+    /**
+     * @var string
+     */
     private $senderClass;
+
+    /**
+     * @var string|null
+     */
     private $senderAlias;
 
+    /**
+     * SentStamp constructor.
+     *
+     * @param string $senderClass
+     * @param string|null $senderAlias
+     */
     public function __construct(string $senderClass, string $senderAlias = null)
     {
         $this->senderAlias = $senderAlias;
         $this->senderClass = $senderClass;
     }
 
+    /**
+     * Returns sender class
+     *
+     * @return string
+     */
     public function getSenderClass(): string
     {
         return $this->senderClass;
     }
 
+    /**
+     * Returns sender alias
+     *
+     * @return string|null
+     */
     public function getSenderAlias(): ?string
     {
         return $this->senderAlias;

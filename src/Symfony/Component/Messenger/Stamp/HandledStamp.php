@@ -23,8 +23,19 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class HandledStamp implements StampInterface
 {
+    /**
+     * @var mixed
+     */
     private $result;
+
+    /**
+     * @var string
+     */
     private $callableName;
+
+    /**
+     * @var string
+     */
     private $handlerAlias;
 
     /**
@@ -38,7 +49,13 @@ final class HandledStamp implements StampInterface
     }
 
     /**
+     * @param callable $handler
      * @param mixed $result The returned value of the message handler
+     * @param string|null $handlerAlias
+     *
+     * @return HandledStamp
+     *
+     * @throws \ReflectionException
      */
     public static function fromCallable(callable $handler, $result, string $handlerAlias = null): self
     {
@@ -77,11 +94,17 @@ final class HandledStamp implements StampInterface
         return $this->result;
     }
 
+    /**
+     * @return string
+     */
     public function getCallableName(): string
     {
         return $this->callableName;
     }
 
+    /**
+     * @return string|null
+     */
     public function getHandlerAlias(): ?string
     {
         return $this->handlerAlias;

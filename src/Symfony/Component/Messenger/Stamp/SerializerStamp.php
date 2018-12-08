@@ -18,13 +18,24 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class SerializerStamp implements StampInterface
 {
+    /**
+     * @var array
+     */
     private $context;
 
+    /**
+     * SerializerStamp constructor.
+     *
+     * @param array $context
+     */
     public function __construct(array $context)
     {
         $this->context = $context;
     }
 
+    /**
+     * @return array
+     */
     public function getContext(): array
     {
         return $this->context;

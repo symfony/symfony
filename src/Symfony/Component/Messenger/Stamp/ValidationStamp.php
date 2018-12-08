@@ -20,9 +20,14 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 final class ValidationStamp implements StampInterface
 {
+    /**
+     * @var string[]|GroupSequence
+     */
     private $groups;
 
     /**
+     * ValidationStamp constructor.
+     *
      * @param string[]|GroupSequence $groups
      */
     public function __construct($groups)
@@ -30,6 +35,9 @@ final class ValidationStamp implements StampInterface
         $this->groups = $groups;
     }
 
+    /**
+     * @return string[]|GroupSequence
+     */
     public function getGroups()
     {
         return $this->groups;

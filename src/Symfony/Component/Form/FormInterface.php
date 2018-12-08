@@ -112,6 +112,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to this form
+     *
      * @deprecated Use either getErrorIterator or getAllErrors
      */
     public function getErrors($deep = false, $flatten = true);
@@ -119,7 +120,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns an array of errors for this form.
      *
-     * @return Array|FormError[] An array with all errors found in the form
+     * @return array|FormError[] An array with all errors found in the form
      */
     public function getAllErrors();
 
@@ -147,9 +148,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed When the field is not submitted, the default data is returned.
+     * @return mixed when the field is not submitted, the default data is returned.
      *               When the field is submitted, the normalized submitted data is
-     *               returned if the field is valid, null otherwise.
+     *               returned if the field is valid, null otherwise
      */
     public function getNormData();
 

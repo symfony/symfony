@@ -108,7 +108,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to the form
-     *                           and the child forms.
+     *                           and the child forms
      */
     public function getAllErrors();
 
@@ -117,7 +117,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to the top
-     *                           level of this form.
+     *                           level of this form
      */
     public function getOnlyGlobalErrors();
 

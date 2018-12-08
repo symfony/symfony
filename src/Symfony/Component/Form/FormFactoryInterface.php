@@ -12,6 +12,14 @@
 namespace Symfony\Component\Form;
 
 /**
+ * The form factory object should be used to create any and all form objects in your application.
+ *
+ * Regardless of how you architect your application, remember that you should
+ * only have one form factory and that you'll need to be able to access it
+ * throughout your application.
+ *
+ * @see https://symfony.com/doc/current/components/form.html#accessing-the-form-factory
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormFactoryInterface

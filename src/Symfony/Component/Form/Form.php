@@ -771,7 +771,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      */
     public function getAllErrors()
     {
-        return $this->getErrorIterator(true, false)->all();
+        return $this->getErrorIterator(true, true)->all();
     }
 
     /**

@@ -802,6 +802,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * {@inheritdoc}
+     */
+    public function getAllErrors()
+    {
+        return $this->getErrors(true);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @return $this
      */

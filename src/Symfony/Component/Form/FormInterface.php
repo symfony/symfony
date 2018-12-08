@@ -104,6 +104,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getErrors($deep = false, $flatten = true);
 
     /**
+     * Returns the list of the current form and all child forms.
+     *
+     * @return FormErrorIterator An iterator over the {@link FormError}
+     *                           instances that where added to the form and the child forms.
+     */
+    public function getAllErrors();
+
+    /**
      * Updates the form with default data.
      *
      * @param mixed $modelData The data formatted as expected for the underlying object

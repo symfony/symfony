@@ -62,6 +62,12 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             array('0'),
             array('090909'),
             array(90909),
+            array(new class() {
+                public function __toString()
+                {
+                    return '090909';
+                }
+            }),
         );
     }
 
@@ -88,6 +94,12 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         return array(
             array('abcd'),
             array('090foo'),
+            array(new class() {
+                public function __toString()
+                {
+                    return 'abcd';
+                }
+            }),
         );
     }
 }

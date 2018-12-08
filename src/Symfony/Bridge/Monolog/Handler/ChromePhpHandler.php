@@ -31,6 +31,8 @@ class ChromePhpHandler extends BaseChromePhpHandler
 
     /**
      * Adds the headers to the response once it's created.
+     *
+     * @param FilterResponseEvent $event
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

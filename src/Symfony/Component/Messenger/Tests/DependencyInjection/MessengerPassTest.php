@@ -391,7 +391,7 @@ class MessengerPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentHandler": method "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentHandler::__invoke()" must have exactly one argument corresponding to the message it handles.
+     * @expectedExceptionMessage Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentHandler": method "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentHandler::__invoke()" requires at least one argument, first one being the message it handles.
      */
     public function testMissingArgumentHandler()
     {

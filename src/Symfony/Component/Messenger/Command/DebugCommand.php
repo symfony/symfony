@@ -84,7 +84,7 @@ EOF
             foreach ($handlersByMessage as $message => $handlers) {
                 $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $message));
                 foreach ($handlers as $handler) {
-                    $tableRows[] = array(sprintf('    handled by <info>%s</>', $handler));
+                    $tableRows[] = array(sprintf('    handled by <info>%s</info>', $handler));
                 }
             }
 

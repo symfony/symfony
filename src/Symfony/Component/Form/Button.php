@@ -194,6 +194,22 @@ class Button implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAllErrors()
+    {
+        return $this->getErrors(true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOnlyGlobalErrors()
+    {
+        return $this->getErrors();
+    }
+
+    /**
      * Unsupported method.
      *
      * This method should not be invoked.

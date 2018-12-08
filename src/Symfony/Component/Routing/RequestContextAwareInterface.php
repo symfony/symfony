@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Routing;
 
+/**
+ * Describes the RequestContextAware interface.
+ */
 interface RequestContextAwareInterface
 {
     /**

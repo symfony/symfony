@@ -49,8 +49,8 @@ final class HandledStamp implements StampInterface
     }
 
     /**
-     * @param callable $handler
-     * @param mixed $result The returned value of the message handler
+     * @param callable    $handler
+     * @param mixed       $result       The returned value of the message handler
      * @param string|null $handlerAlias
      *
      * @return HandledStamp

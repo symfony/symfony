@@ -35,7 +35,7 @@ final class SentStamp implements StampInterface
     /**
      * SentStamp constructor.
      *
-     * @param string $senderClass
+     * @param string      $senderClass
      * @param string|null $senderAlias
      */
     public function __construct(string $senderClass, string $senderAlias = null)
@@ -45,7 +45,7 @@ final class SentStamp implements StampInterface
     }
 
     /**
-     * Returns sender class
+     * Returns sender class.
      *
      * @return string
      */
@@ -55,7 +55,7 @@ final class SentStamp implements StampInterface
     }
 
     /**
-     * Returns sender alias
+     * Returns sender alias.
      *
      * @return string|null
      */

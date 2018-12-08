@@ -7,6 +7,33 @@ in 4.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.2.0...v4.2.1
 
+* 4.2.1 (2018-12-06)
+
+ * security #cve-2018-19790 [Security\Http] detect bad redirect targets using backslashes (xabbuh)
+ * security #cve-2018-19789 [Form] Filter file uploads out of regular form types (nicolas-grekas)
+ * bug #29481 [TwigBridge] Deprecating legacy Twig paths in DebugCommand and simplifications (yceruto)
+ * bug #29436 [Cache] Fixed Memcached adapter doClear()to call flush() (raitocz)
+ * bug #29482 Fixes sprintf(): Too few arguments in MessageFormatter::choiceFormat (stephanedelprat)
+ * bug #29461 [Contracts] extract LocaleAwareInterface out of TranslatorInterface (nicolas-grekas)
+ * bug #29446 [VarExporter] fix dumping private properties from abstract classes (nicolas-grekas)
+ * bug #29441 [Routing] ignore trailing slash for non-GET requests (nicolas-grekas)
+ * bug #29445 [FrameworkBundle] Fix empty output for debug:autowiring when reflection-docblock is not installed (chalasr)
+ * bug #29444 [Workflow] Fixed BC break for Workflow metadata (lyrixx)
+ * bug #29432 [DI] dont inline when lazy edges are found (nicolas-grekas)
+ * bug #29413 [Serializer] fixed DateTimeNormalizer to maintain microseconds when a different timezone required (rvitaliy)
+ * bug #29424 [Routing] fix taking verb into account when redirecting (nicolas-grekas)
+ * bug #29418 [VarExporter] fix dumping protected property from abstract classes (nicolas-grekas)
+ * bug #29414 [DI] Fix dumping expressions accessing single-use private services (chalasr)
+ * bug #28853 [LDAP] Add TIMEOUT Option to LDAP Connection Options (lmatte7)
+ * bug #29399 [FrameworkBundle] define doctrine as default_pdo_provider only if the package is installed (nicolas-grekas)
+ * bug #29375 [Validator] Allow `ConstraintViolation::__toString()` to expose codes that are not null or emtpy strings (phansys)
+ * bug #29376 [EventDispatcher] Fix eventListener wrapper loop in TraceableEventDispatcher (jderusse)
+ * bug #29386 undeprecate the single-colon notation for controllers (fbourigault)
+ * bug #29393 [DI] fix edge case in InlineServiceDefinitionsPass (nicolas-grekas)
+ * bug #29394 [Config] fix path exclusion during glob discovery (nicolas-grekas)
+ * bug #29395 [FrameworkBundle][Messenger] Restore check for messenger serializer default id (ogizanagi)
+ * bug #29380 [Routing] fix greediness of trailing slash (nicolas-grekas)
+
 * 4.2.0 (2018-11-30)
 
  * bug #29343 [Form] Handle all case variants of "nan" when parsing a number (mwhudson, xabbuh)

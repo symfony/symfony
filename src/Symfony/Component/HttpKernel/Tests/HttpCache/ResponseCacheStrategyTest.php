@@ -237,4 +237,91 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('s-maxage'));
         $this->assertFalse($masterResponse->isValidateable());
     }
+
+    /**
+     * @dataProvider cacheControlMergingProvider
+     */
+    public function testCacheControlMerging(array $expects, array $master, array $surrogates)
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+        $buildResponse = function ($config) {
+            $response = new Response();
+
+            foreach ($config as $key => $value) {
+                switch ($key) {
+                    case 'max-age':
+                        $response->setMaxAge($value);
+                        break;
+
+                    case 's-maxage':
+                        $response->setSharedMaxAge($value);
+                        break;
+
+                    case 'private':
+                        $response->setPrivate();
+                        break;
+
+                    case 'public':
+                        $response->setPublic();
+                        break;
+
+                    default:
+                        $response->headers->addCacheControlDirective($key, $value);
+                }
+            }
+
+            return $response;
+        };
+
+        foreach ($surrogates as $config) {
+            $cacheStrategy->add($buildResponse($config));
+        }
+
+        $response = $buildResponse($master);
+        $cacheStrategy->update($response);
+
+        foreach ($expects as $key => $value) {
+            if (true === $value) {
+                $this->assertTrue($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must have "%s" flag', $key));
+            } elseif (false === $value) {
+                $this->assertFalse($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must NOT have "%s" flag', $key));
+            } else {
+                $this->assertEquals($value, $response->headers->getCacheControlDirective($key), sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
+            }
+        }
+    }
+
+    public function cacheControlMergingProvider()
+    {
+        return array(
+            'combining public and private responses' => array(
+                array('must-revalidate' => false, 'private' => true),
+                array('public' => true),
+                array(
+                    array('private' => true),
+                ),
+            ),
+            'surrogate has no-cache' => array(
+                array('no-cache' => true, 'public' => false),
+                array('public' => true),
+                array(
+                    array('no-cache' => true),
+                ),
+            ),
+            'surrogate has no-store' => array(
+                array('no-store' => true, 'public' => false),
+                array('public' => true),
+                array(
+                    array('no-store' => true),
+                ),
+            ),
+            'resolve to lowest possible max-age' => array(
+                array('public' => false, 'private' => true, 's-maxage' => false, 'max-age' => 60),
+                array('public' => true, 'max-age' => 3600),
+                array(
+                    array('private' => true, 'max-age' => 60),
+                ),
+            ),
+        );
+    }
 }

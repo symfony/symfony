@@ -293,34 +293,87 @@ class ResponseCacheStrategyTest extends TestCase
 
     public function cacheControlMergingProvider()
     {
-        return array(
-            'combining public and private responses' => array(
-                array('must-revalidate' => false, 'private' => true),
+        yield 'result is public if all responses are public' => array(
+            array('private' => false, 'public' => true),
+            array('public' => true),
+            array(
                 array('public' => true),
-                array(
-                    array('private' => true),
-                ),
             ),
-            'surrogate has no-cache' => array(
-                array('no-cache' => true, 'public' => false),
-                array('public' => true),
-                array(
-                    array('no-cache' => true),
-                ),
+        );
+
+        yield 'result is private by default' => array(
+            array('private' => true, 'public' => false),
+            array('public' => true),
+            array(
+                array(),
             ),
-            'surrogate has no-store' => array(
-                array('no-store' => true, 'public' => false),
-                array('public' => true),
-                array(
-                    array('no-store' => true),
-                ),
+        );
+
+        yield 'combines public and private responses' => array(
+            array('must-revalidate' => false, 'private' => true, 'public' => false),
+            array('public' => true),
+            array(
+                array('private' => true),
             ),
-            'resolve to lowest possible max-age' => array(
-                array('public' => false, 'private' => true, 's-maxage' => false, 'max-age' => 60),
-                array('public' => true, 'max-age' => 3600),
-                array(
-                    array('private' => true, 'max-age' => 60),
-                ),
+        );
+
+        yield 'inherits no-cache from surrogates' => array(
+            array('no-cache' => true, 'public' => false),
+            array('public' => true),
+            array(
+                array('no-cache' => true),
+            ),
+        );
+
+        yield 'inherits no-store from surrogate' => array(
+            array('no-store' => true, 'public' => false),
+            array('public' => true),
+            array(
+                array('no-store' => true),
+            ),
+        );
+
+        yield 'resolve to lowest possible max-age' => array(
+            array('public' => false, 'private' => true, 's-maxage' => false, 'max-age' => 60),
+            array('public' => true, 'max-age' => 3600),
+            array(
+                array('private' => true, 'max-age' => 60),
+            ),
+        );
+
+        yield 'resolves multiple max-age' => array(
+            array('public' => false, 'private' => true, 's-maxage' => false, 'max-age' => 60),
+            array('private' => true, 'max-age' => 100),
+            array(
+                array('private' => true, 'max-age' => 3600),
+                array('public' => true, 'max-age' => 60, 's-maxage' => 60),
+                array('private' => true, 'max-age' => 60),
+            ),
+        );
+
+        yield 'merge max-age and s-maxage' => array(
+            array('public' => true, 's-maxage' => 60, 'max-age' => null),
+            array('public' => true, 's-maxage' => 3600),
+            array(
+                array('public' => true, 'max-age' => 60),
+            ),
+        );
+
+        yield 'result is private when combining private responses' => array(
+            array('no-cache' => false, 'must-revalidate' => false, 'private' => true),
+            array('s-maxage' => 60, 'private' => true),
+            array(
+                array('s-maxage' => 60, 'private' => true),
+            ),
+        );
+
+        yield 'result can have s-maxage and max-age' => array(
+            array('public' => true, 'private' => false, 's-maxage' => 60, 'max-age' => 30),
+            array('s-maxage' => 100, 'max-age' => 2000),
+            array(
+                array('s-maxage' => 1000, 'max-age' => 30),
+                array('s-maxage' => 500, 'max-age' => 500),
+                array('s-maxage' => 60, 'max-age' => 1000),
             ),
         );
     }

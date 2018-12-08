@@ -82,6 +82,26 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     }
 
     /**
+     * Returns an array of ForError.
+     *
+     * @return array|FormError[]
+     */
+    public function all()
+    {
+        $flattenedErrors = array();
+        foreach ($this->errors as $error) {
+            if ($error instanceof self) {
+                $subErrors = $error->all();
+                array_walk_recursive($subErrors, function($input) use (&$flattenedErrors) { $return[] = $x; });
+            } else {
+                $flattenedErrors[] = $error;
+            }
+        }
+        
+        return $flattenedErrors;
+    }
+
+    /**
      * Returns the iterated form.
      *
      * @return FormInterface The form whose errors are iterated by this object

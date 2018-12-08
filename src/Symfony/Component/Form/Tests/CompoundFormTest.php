@@ -808,12 +808,12 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
     }
 
-    public function testGetErrors()
+    public function testgetErrorIterator()
     {
         $this->form->addError($error1 = new FormError('Error 1'));
         $this->form->addError($error2 = new FormError('Error 2'));
 
-        $errors = $this->form->getErrors();
+        $errors = $this->form->getErrorIterator();
 
         $this->assertSame(
              "ERROR: Error 1\n".
@@ -833,7 +833,7 @@ class CompoundFormTest extends AbstractFormTest
         $childForm->addError($nestedError = new FormError('Nested Error'));
         $this->form->add($childForm);
 
-        $errors = $this->form->getErrors(true);
+        $errors = $this->form->getErrorIterator(true);
 
         $this->assertSame(
              "ERROR: Error 1\n".
@@ -857,7 +857,7 @@ class CompoundFormTest extends AbstractFormTest
         $childForm->addError($nestedError = new FormError('Nested Error'));
         $this->form->add($childForm);
 
-        $errors = $this->form->getErrors(true, false);
+        $errors = $this->form->getErrorIterator(true, false);
 
         $this->assertSame(
              "ERROR: Error 1\n".
@@ -884,11 +884,11 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->addError(new FormError('Error 1'));
         $this->form->addError(new FormError('Error 2'));
 
-        $this->assertCount(2, $this->form->getErrors());
+        $this->assertCount(2, $this->form->getErrorIterator());
 
         $this->form->clearErrors();
 
-        $this->assertCount(0, $this->form->getErrors());
+        $this->assertCount(0, $this->form->getErrorIterator());
     }
 
     public function testClearErrorsShallow()
@@ -902,8 +902,8 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->form->clearErrors(false);
 
-        $this->assertCount(0, $this->form->getErrors(false));
-        $this->assertCount(1, $this->form->getErrors(true));
+        $this->assertCount(0, $this->form->getErrorIterator(false));
+        $this->assertCount(1, $this->form->getErrorIterator(true));
     }
 
     public function testClearErrorsDeep()
@@ -917,8 +917,28 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->form->clearErrors(true);
 
-        $this->assertCount(0, $this->form->getErrors(false));
-        $this->assertCount(0, $this->form->getErrors(true));
+        $this->assertCount(0, $this->form->getErrorIterator(false));
+        $this->assertCount(0, $this->form->getErrorIterator(true));
+    }
+
+    public function testGetAllErrorsWithoutChildren()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $this->assertCount(2, $this->form->getAllErrors());
+    }
+
+    public function testGetAllErrorsWithChildren()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->assertCount(3, $this->form->getAllErrors());
     }
 
     // Basic cases are covered in SimpleFormTest

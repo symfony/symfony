@@ -92,12 +92,12 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
         foreach ($this->errors as $error) {
             if ($error instanceof self) {
                 $subErrors = $error->all();
-                array_walk_recursive($subErrors, function($input) use (&$flattenedErrors) { $return[] = $x; });
+                array_walk_recursive($subErrors, function($input) use (&$flattenedErrors) { $flattenedErrors[] = $input; });
             } else {
                 $flattenedErrors[] = $error;
             }
         }
-        
+
         return $flattenedErrors;
     }
 

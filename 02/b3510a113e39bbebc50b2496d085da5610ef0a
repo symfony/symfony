@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-08T15:35:54Z
+
+I think patches like these are treated as bugfixes, so should be targetting 3.4
+
+---------------------------------------------------------------------------
+
+by raulfraile at 2018-12-09T09:58:58Z
+
+@fabpot thanks for the comments! It's now rebased and targetting `3.4`

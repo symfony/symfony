@@ -1,7 +1,8 @@
 require('../components/_reset.css');
 
-import tabs from '../components/tabs';
+import {default as createTabs} from '../components/tabs';
+import {addEventListener} from '../components/_event';
 
-global.Sfjs = {
-    createTabs: tabs,
-};
+addEventListener(document, 'DOMContentLoaded', function() {
+    createTabs();
+});

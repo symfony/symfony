@@ -114,10 +114,9 @@ class Workflow implements WorkflowInterface
      */
     public function could($subject, $transitionName)
     {
-        $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
 
-        foreach ($transitions as $transition) {
+        foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $transitionName) {
                 continue;
             }

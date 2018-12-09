@@ -1,6 +1,4 @@
-require('./_vars.css');
-require('./tabs.css');
-
+import './tabs.css';
 import {hasClass, addClass, removeClass} from './_classlist';
 import {addEventListener} from './_event';
 

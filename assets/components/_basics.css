@@ -1,0 +1,136 @@
+html, body  {
+    height: 100%;
+    width: 100%;
+}
+body {
+    background-color: var(--page-background);
+    color: var(--base-6);
+    display: flex;
+    flex-direction: column;
+    font_family: var(--font-sans-serif);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+h2, h3, h4 {
+    font-weight: 500;
+    margin: 1.5em 0 .5em;
+}
+h2 + h3,
+h3 + h4 {
+    margin-top: 1em;
+}
+h2 {
+    font-size: 24px;
+}
+h3 {
+    font-size: 21px;
+}
+h4 {
+    font-size: 18px;
+}
+h2 span, h3 span, h4 span,
+h2 small, h3 small, h4 small {
+    color: var(--color-muted);
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 16px;
+    margin-bottom: 1em;
+}
+
+a {
+    color: #218BC3;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+a.link-inverse {
+    text-decoration: underline;
+}
+a.link-inverse:hover {
+    text-decoration: none;
+}
+a:active,
+a:hover {
+    outline: 0;
+}
+
+h2 a,
+h3 a,
+h4 a {
+    text-decoration: underline;
+}
+h2 a:hover,
+h3 a:hover,
+h4 a:hover {
+    text-decoration: none;
+}
+
+abbr {
+    border-bottom: 1px dotted var(--base-5);
+    cursor: help;
+}
+
+code, pre {
+    font-family: monospace;
+    font-size: 13px;
+}
+
+button {
+    font-family: var(--font-sans-serif);
+}
+
+table, tr, th, td {
+    background: var(--table-background);
+    border-collapse: collapse;
+    line-height: 1.5;
+    vertical-align: top;
+}
+table {
+    background: var(--base-0);
+    border: var(--border);
+    box-shadow: var(--shadow);
+    margin: 1em 0;
+    width: 100%;
+}
+table th, table td {
+    padding: 8px 10px;
+}
+table th {
+    font-weight: bold;
+    text-align: left;
+}
+table thead th {
+    background-color: var(--table-header);
+}
+table thead th.key {
+    width: 19%;
+}
+table thead.small th {
+    font-size: 12px;
+    padding: 4px 10px;
+}
+table tbody th,
+table tbody td {
+    border: 1px solid var(--base-2);
+    border-width: 1px 0;
+    font-family: monospace;
+    font-size: 13px;
+}
+table tbody div {
+    margin: .25em 0;
+}
+table tbody ul {
+    margin: 0;
+    padding: 0 0 0 1em;
+}
+table thead th.num-col,
+table tbody td.num-col {
+    text-align: center;
+}

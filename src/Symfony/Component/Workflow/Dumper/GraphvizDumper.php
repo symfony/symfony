@@ -63,6 +63,8 @@ class GraphvizDumper implements DumperInterface
      */
     protected function findPlaces(Definition $definition, Marking $marking = null)
     {
+        $workflowMetadata = $definition->getMetadataStore();
+
         $places = [];
 
         foreach ($definition->getPlaces() as $place) {
@@ -73,6 +75,15 @@ class GraphvizDumper implements DumperInterface
             if ($marking && $marking->has($place)) {
                 $attributes['color'] = '#FF0000';
                 $attributes['shape'] = 'doublecircle';
+            }
+            $backgroundColor = $workflowMetadata->getMetadata('bg_color', $place);
+            if (null !== $backgroundColor) {
+                $attributes['style'] = 'filled';
+                $attributes['fillcolor'] = $backgroundColor;
+            }
+            $label = $workflowMetadata->getMetadata('label', $place);
+            if (null !== $label) {
+                $attributes['name'] = $label;
             }
             $places[$place] = [
                 'attributes' => $attributes,
@@ -87,12 +98,23 @@ class GraphvizDumper implements DumperInterface
      */
     protected function findTransitions(Definition $definition)
     {
+        $workflowMetadata = $definition->getMetadataStore();
+
         $transitions = [];
 
         foreach ($definition->getTransitions() as $transition) {
+            $attributes = ['shape' => 'box', 'regular' => true];
+
+            $backgroundColor = $workflowMetadata->getMetadata('bg_color', $transition);
+            if (null !== $backgroundColor) {
+                $attributes['style'] = 'filled';
+                $attributes['fillcolor'] = $backgroundColor;
+            }
+            $name = $workflowMetadata->getMetadata('label', $transition) ?? $transition->getName();
+
             $transitions[] = [
-                'attributes' => ['shape' => 'box', 'regular' => true],
-                'name' => $transition->getName(),
+                'attributes' => $attributes,
+                'name' => $name,
             ];
         }
 
@@ -107,7 +129,14 @@ class GraphvizDumper implements DumperInterface
         $code = '';
 
         foreach ($places as $id => $place) {
-            $code .= sprintf("  place_%s [label=\"%s\", shape=circle%s];\n", $this->dotize($id), $this->escape($id), $this->addAttributes($place['attributes']));
+            if (isset($place['attributes']['name'])) {
+                $placeName = $place['attributes']['name'];
+                unset($place['attributes']['name']);
+            } else {
+                $placeName = $id;
+            }
+
+            $code .= sprintf("  place_%s [label=\"%s\", shape=circle%s];\n", $this->dotize($id), $this->escape($placeName), $this->addAttributes($place['attributes']));
         }
 
         return $code;
@@ -121,7 +150,7 @@ class GraphvizDumper implements DumperInterface
         $code = '';
 
         foreach ($transitions as $place) {
-            $code .= sprintf("  transition_%s [label=\"%s\", shape=box%s];\n", $this->dotize($place['name']), $this->escape($place['name']), $this->addAttributes($place['attributes']));
+            $code .= sprintf("  transition_%s [label=\"%s\",%s];\n", $this->dotize($place['name']), $this->escape($place['name']), $this->addAttributes($place['attributes']));
         }
 
         return $code;
@@ -132,19 +161,23 @@ class GraphvizDumper implements DumperInterface
      */
     protected function findEdges(Definition $definition)
     {
+        $workflowMetadata = $definition->getMetadataStore();
+
         $dotEdges = [];
 
         foreach ($definition->getTransitions() as $transition) {
+            $transitionName = $workflowMetadata->getMetadata('label', $transition) ?? $transition->getName();
+
             foreach ($transition->getFroms() as $from) {
                 $dotEdges[] = [
                     'from' => $from,
-                    'to' => $transition->getName(),
+                    'to' => $transitionName,
                     'direction' => 'from',
                 ];
             }
             foreach ($transition->getTos() as $to) {
                 $dotEdges[] = [
-                    'from' => $transition->getName(),
+                    'from' => $transitionName,
                     'to' => $to,
                     'direction' => 'to',
                 ];
@@ -209,7 +242,7 @@ class GraphvizDumper implements DumperInterface
         return \is_bool($value) ? ($value ? '1' : '0') : \addslashes($value);
     }
 
-    private function addAttributes(array $attributes): string
+    protected function addAttributes(array $attributes): string
     {
         $code = [];
 
@@ -217,7 +250,7 @@ class GraphvizDumper implements DumperInterface
             $code[] = sprintf('%s="%s"', $k, $this->escape($v));
         }
 
-        return $code ? ', '.implode(', ', $code) : '';
+        return $code ? ' '.implode(' ', $code) : '';
     }
 
     private function addOptions(array $options): string

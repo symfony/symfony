@@ -6,6 +6,19 @@ CHANGELOG
 
  * Trigger `entered` event for subject entering in the Workflow for the first time
  * Added a context to `Workflow::apply()`. The `MethodMarkingStore` could be used to leverage this feature.
+ * Add style to transitions by declaring metadata:
+        ```        
+        $places = range('a', 'b');
+        $transition = new Transition('t1', 'a', 'b');
+        $transitions[] = $transition;
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transition] = [
+            'color' => 'Red',
+            'arrow_color' => '#00ff00',
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], [], $transitionsMetadata);
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
+        ```
 
 4.1.0
 -----

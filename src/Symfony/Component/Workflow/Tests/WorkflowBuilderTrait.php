@@ -3,6 +3,7 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
@@ -14,12 +15,21 @@ trait WorkflowBuilderTrait
         $transitions = [];
         $transitions[] = new Transition('t1', 'a', ['b', 'c']);
         $transitions[] = new Transition('t2', ['b', 'c'], 'd');
-        $transitions[] = new Transition('t3', 'd', 'e');
+        $transitionWithMetadataDumpStyle = new Transition('t3', 'd', 'e');
+        $transitions[] = $transitionWithMetadataDumpStyle;
         $transitions[] = new Transition('t4', 'd', 'f');
         $transitions[] = new Transition('t5', 'e', 'g');
         $transitions[] = new Transition('t6', 'f', 'g');
 
-        return new Definition($places, $transitions);
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
+            'label' => 'My custom transition label 1',
+            'color' => 'Red',
+            'arrow_color' => 'Green',
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], [], $transitionsMetadata);
+
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
 
         // The graph looks like:
         // +---+     +----+     +---+     +----+     +----+     +----+     +----+     +----+     +---+
@@ -38,10 +48,28 @@ trait WorkflowBuilderTrait
         $places = range('a', 'c');
 
         $transitions = [];
-        $transitions[] = new Transition('t1', 'a', 'b');
-        $transitions[] = new Transition('t2', 'b', 'c');
+        $transitionWithMetadataDumpStyle = new Transition('t1', 'a', 'b');
+        $transitions[] = $transitionWithMetadataDumpStyle;
+        $transitionWithMetadataArrowColorPink = new Transition('t2', 'b', 'c');
+        $transitions[] = $transitionWithMetadataArrowColorPink;
 
-        return new Definition($places, $transitions);
+        $placesMetadata = [];
+        $placesMetadata['c'] = [
+            'bg_color' => 'DeepSkyBlue',
+        ];
+
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
+            'label' => 'My custom transition label 2',
+            'color' => 'Grey',
+            'arrow_color' => 'Purple',
+        ];
+        $transitionsMetadata[$transitionWithMetadataArrowColorPink] = [
+            'arrow_color' => 'Pink',
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], $placesMetadata, $transitionsMetadata);
+
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
 
         // The graph looks like:
         // +---+     +----+     +---+     +----+     +---+
@@ -82,13 +110,24 @@ trait WorkflowBuilderTrait
         $places = ['a', 'b', 'c', 'd'];
 
         $transitions[] = new Transition('t1', 'a', 'b');
-        $transitions[] = new Transition('t1', 'd', 'b');
-        $transitions[] = new Transition('t2', 'b', 'c');
+        $transitionWithMetadataDumpStyle = new Transition('t1', 'd', 'b');
+        $transitions[] = $transitionWithMetadataDumpStyle;
+        $transitionWithMetadataArrowColorBlue = new Transition('t2', 'b', 'c');
+        $transitions[] = $transitionWithMetadataArrowColorBlue;
         $transitions[] = new Transition('t3', 'b', 'd');
 
-        $definition = new Definition($places, $transitions);
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
+            'label' => 'My custom transition label 3',
+            'color' => 'Grey',
+            'arrow_color' => 'Red',
+        ];
+        $transitionsMetadata[$transitionWithMetadataArrowColorBlue] = [
+            'arrow_color' => 'Blue',
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], [], $transitionsMetadata);
 
-        return $definition;
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
 
         // The graph looks like:
         //                     t1

@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+cd assets/ && \
+yarn install && \
+yarn encore production && \
+cp build/profiler.* ../src/Symfony/Bundle/WebProfilerBundle/Resources/views/Asset/

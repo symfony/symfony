@@ -526,15 +526,10 @@ EOF;
                 );
             } else {
                 $prevRegex = $compiledRoute->getRegex();
-                $combine = '            $matches = array(';
-                foreach ($vars as $j => $m) {
-                    $combine .= sprintf('%s => $matches[%d] ?? null, ', self::export($m), 1 + $j);
-                }
-                $combine = $vars ? substr_replace($combine, ");\n\n", -2) : '';
 
                 $state->switch .= <<<EOF
         case {$state->mark}:
-{$combine}{$this->compileRoute($route, $name, false, $hasTrailingSlash)}
+{$this->compileRoute($route, $name, false, $hasTrailingSlash, $vars)}
             break;
 
 EOF;
@@ -621,7 +616,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, string $name, bool $checkHost, bool $hasTrailingSlash): string
+    private function compileRoute(Route $route, string $name, bool $checkHost, bool $hasTrailingSlash, array $vars = null): string
     {
         $compiledRoute = $route->compile();
         $conditions = array();
@@ -667,6 +662,14 @@ EOF;
                 return \$allow = \$allowSchemes = array();
             }" : ''
             );
+        }
+
+        if ($vars) {
+            $code .= '        $matches = array(';
+            foreach ($vars as $j => $m) {
+                $code .= sprintf('%s => $matches[%d] ?? null, ', self::export($m), 1 + $j);
+            }
+            $code = substr_replace($code, ");\n\n", -2);
         }
 
         if ($route->getCondition()) {

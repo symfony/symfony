@@ -82,7 +82,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     }
 
     /**
-     * Returns an array of ForError.
+     * Returns an array of FormError.
      *
      * @return array|FormError[]
      */

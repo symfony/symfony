@@ -100,6 +100,7 @@ table thead.small th {
 table tbody th,
 table tbody td {
     border: 1px solid var(--base-2);
+    border-width: 1px 0;
     font-family: monospace;
     font-size: 13px;
 }
@@ -115,7 +116,7 @@ table tbody td.num-col {
     text-align: center;
 }
 
-/* form */
+/* forms */
 button {
     font-family: var(--font-sans-serif);
 }
@@ -129,4 +130,12 @@ abbr {
 code, pre {
     font-family: monospace;
     font-size: 13px;
+}
+
+/* utils */
+.hidden {
+    display: none !important;
+}
+.block {
+    display: block !important;
 }

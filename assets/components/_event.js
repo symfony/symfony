@@ -10,4 +10,12 @@ if (!('addEventListener' in document.createElement('div'))) {
     };
 }
 
-export {addEventListener};
+function ready(callback) {
+    addEventListener(document, 'DOMContentLoaded', callback);
+}
+
+function click(el, callback) {
+    addEventListener(el, 'click', callback);
+}
+
+export {addEventListener, click, ready};

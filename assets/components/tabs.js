@@ -1,6 +1,6 @@
 import './tabs.css';
-import {hasClass, addClass, removeClass} from './_classlist';
-import {addEventListener} from './_event';
+import {hasClass, addClass, removeClass, show, hide, toggle} from './_classlist';
+import {click} from './_event';
 
 export default function() {
     var tabGroups = document.querySelectorAll('.sf-tabs:not([data-processed=true])');
@@ -18,8 +18,12 @@ export default function() {
 
             var tabNavigationItem = document.createElement('li');
             tabNavigationItem.setAttribute('data-tab-id', tabId);
-            if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
-            if (hasClass(tabs[j], 'disabled')) { addClass(tabNavigationItem, 'disabled'); }
+            if (hasClass(tabs[j], 'active')) {
+                selectedTabId = tabId;
+            }
+            if (hasClass(tabs[j], 'disabled')) {
+                addClass(tabNavigationItem, 'disabled');
+            }
             tabNavigationItem.innerHTML = tabTitle;
             tabNavigation.appendChild(tabNavigationItem);
 
@@ -37,15 +41,10 @@ export default function() {
 
         for (j = 0; j < tabNavigation.length; j++) {
             tabId = tabNavigation[j].getAttribute('data-tab-id');
-            document.getElementById(tabId).querySelector('.tab-title').className = 'hidden';
+            hide(document.getElementById(tabId).querySelector('.tab-title'));
+            toggle(document.getElementById(tabId), hasClass(tabNavigation[j], 'active'));
 
-            if (hasClass(tabNavigation[j], 'active')) {
-                document.getElementById(tabId).className = 'block';
-            } else {
-                document.getElementById(tabId).className = 'hidden';
-            }
-
-            addEventListener(tabNavigation[j], 'click', function(e) {
+            click(tabNavigation[j], function(e) {
                 var activeTab = e.target || e.srcElement;
 
                 // needed because when the tab contains HTML contents, user can click
@@ -57,14 +56,12 @@ export default function() {
                 // get the full list of tabs through the parent of the active tab element
                 var tabNavigation = activeTab.parentNode.children;
                 for (var k = 0; k < tabNavigation.length; k++) {
-                    var tabId = tabNavigation[k].getAttribute('data-tab-id');
-                    document.getElementById(tabId).className = 'hidden';
+                    hide(document.getElementById(tabNavigation[k].getAttribute('data-tab-id')));
                     removeClass(tabNavigation[k], 'active');
                 }
 
                 addClass(activeTab, 'active');
-                var activeTabId = activeTab.getAttribute('data-tab-id');
-                document.getElementById(activeTabId).className = 'block';
+                show(document.getElementById(activeTab.getAttribute('data-tab-id')));
             });
         }
 

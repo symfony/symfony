@@ -5,7 +5,7 @@
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}
 
-    Sfjs = (function() {
+    SfTwigjs = (function() {
         "use strict";
 
         if ('classList' in document.documentElement) {
@@ -274,10 +274,10 @@
         };
     })();
 
-    Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
-        Sfjs.createTabs();
-        Sfjs.createToggles();
-        Sfjs.createFilters();
+    SfTwigjs.addEventListener(document, 'DOMContentLoaded', function() {
+        SfTwigjs.createTabs();
+        SfTwigjs.createToggles();
+        SfTwigjs.createFilters();
     });
 
 /*]]>*/</script>

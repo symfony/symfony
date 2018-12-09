@@ -3,7 +3,6 @@
     --page-background: #f9f9f9;
     --color-text: #222;
     --color-muted: #999;
-    /* when updating any of these colors, do the same in toolbar.css.twig */
     --color-success: #4f805d;
     --color-warning: #a46a1f;
     --color-error: #b0413e;
@@ -35,7 +34,7 @@
 .theme-dark {
     --page-background: #36393e;
     --color-text: #e0e0e0;
-    --color-muted: #999;
+    --color-muted: #777;
     --tab-background: #555;
     --tab-color: #ccc;
     --tab-active-background: #888;
@@ -52,7 +51,6 @@
     --table-header: #555;
     --shadow: 0px 0px 1px rgba(32, 32, 32, .2);
     --border: 1px solid #666;
-    --color-muted: #777;
     --base-0: #2e3136;
     --base-1: #444;
     --base-2: #666;

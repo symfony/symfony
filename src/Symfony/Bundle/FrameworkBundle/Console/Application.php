@@ -62,15 +62,13 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->kernel->boot();
-
-        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
-
         $this->registerCommands();
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
         }
+
+        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
         return parent::doRun($input, $output);
     }

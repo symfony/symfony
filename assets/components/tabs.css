@@ -1,0 +1,47 @@
+.tab-navigation {
+    margin: 0 0 1em 0;
+    padding: 0;
+}
+.tab-navigation li {
+    background: var(--tab-background);
+    border: 1px solid var(--table-border);
+    color: var(--tab-color);
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0 0 0 -1px;
+    padding: .5em .75em;
+    z-index: 1;
+}
+.tab-navigation li .badge {
+    background-color: var(--base-1);
+    color: var(--base-4);
+    display: inline-block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 8px;
+    min-width: 10px;
+    padding: 1px 6px;
+    text-align: center;
+    white-space: nowrap;
+}
+.tab-navigation li.disabled {
+    background: var(--tab-disabled-background);
+    color: var(--tab-disabled-color);
+}
+.tab-navigation li.active {
+    background: var(--tab-active-background);
+    color: var(--tab-active-color);
+    z-index: 1100;
+}
+.tab-navigation li.active .badge {
+    background-color: var(--base-5);
+    color: var(--base-2);
+}
+.tab-content > *:first-child {
+    margin-top: 0;
+}
+.tab-navigation li .badge.status-warning { background: var(--color-warning); color: #FFF; }
+.tab-navigation li .badge.status-error { background: var(--color-error); color: #FFF; }
+
+.sf-tabs .tab:not(:first-child) { display: none; }

@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.22.0",
+    "webpack-notifier": "^1.6.0"
+  },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev-server": "encore dev-server",
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production --progress"
+  }
+}

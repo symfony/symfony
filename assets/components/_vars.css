@@ -1,5 +1,5 @@
 :root {
-    --font-sans-serif: 'Helvetica, Arial, sans-serif';
+    --font-sans-serif: Helvetica, Arial, sans-serif;
     --page-background: #f9f9f9;
     --color-text: #222;
     --color-muted: #999;

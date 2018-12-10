@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by enumag at 2018-11-10T21:56:20Z
+
+Oh you actually went and figured it out. Great work @ostrolucky! 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-10T21:57:21Z
+
+Wow! We need this in CliDumper also!
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-11-12T11:57:12Z
+
+Does it support `framework.ide` [configuration option](https://symfony.com/doc/current/reference/configuration/framework.html#ide)?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-12T12:09:29Z
+
+This PR doesn't use this functionality, it only enables its usage. Screenshot was just potential scenario, it would require work outside the scope.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-15T19:30:48Z
+
+Do we have any case where wrapping could need using the "id" attribute described in the linked doc?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-17T18:01:43Z
+
+I don't

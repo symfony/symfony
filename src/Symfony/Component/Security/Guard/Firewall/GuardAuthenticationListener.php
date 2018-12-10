@@ -97,13 +97,17 @@ class GuardAuthenticationListener implements ListenerInterface
     {
         $request = $event->getRequest();
         try {
-            if (null !== $this->logger) {
-                $this->logger->debug('Calling getCredentials() on guard authenticator.', array('firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)));
-            }
-
             // abort the execution of the authenticator if it doesn't support the request
             if ($guardAuthenticator instanceof AuthenticatorInterface) {
+                if (null !== $this->logger) {
+                    $this->logger->debug('Checking support on guard authenticator.', array('firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)));
+                }
+
                 if (!$guardAuthenticator->supports($request)) {
+                    if (null !== $this->logger) {
+                        $this->logger->debug('Guard authenticator does not support the request.', array('firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)));
+                    }
+
                     return;
                 }
                 // as there was a support for given request,
@@ -112,6 +116,10 @@ class GuardAuthenticationListener implements ListenerInterface
             } else {
                 // deprecated since version 3.4, to be removed in 4.0
                 $credentialsCanBeNull = true;
+            }
+
+            if (null !== $this->logger) {
+                $this->logger->debug('Calling getCredentials() on guard authenticator.', array('firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)));
             }
 
             // allow the authenticator to fetch authentication info from the request

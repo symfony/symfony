@@ -37,8 +37,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             } finally {
                 $this->context->setScheme($scheme);
             }
-        } elseif ('/' !== $pathinfo) {
-            $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
+        } elseif ('/' !== $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/') {
+            $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
             if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
                 return $this->redirect($pathinfo, $ret['_route']) + $ret;
             }
@@ -50,10 +50,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): array
+    private function doMatch(string $pathinfo, array &$allow = array(), array &$allowSchemes = array()): array
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
+        $pathinfo = rawurldecode($pathinfo) ?: '/';
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -61,7 +62,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $canonicalMethod = 'GET';
         }
 
-        switch ($trimmedPathinfo = '/' !== $pathinfo && '/' === $pathinfo[-1] ? substr($pathinfo, 0, -1) : $pathinfo) {
+        switch ($trimmedPathinfo) {
             default:
                 $routes = array(
                     '/a/11' => array(array('_route' => 'a_first'), null, null, null, false),
@@ -82,14 +83,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     break;
                 }
                 list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
-
-                if ('/' !== $pathinfo) {
-                    if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                        if ((!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
-                            return $allow = $allowSchemes = array();
-                        }
-                        break;
+                if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                    if ('GET' === $canonicalMethod && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                        return $allow = $allowSchemes = array();
                     }
+                    break;
                 }
 
                 $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
@@ -112,7 +110,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             0 => '{^(?'
                     .'|/([^/]++)(*:16)'
                     .'|/nested/([^/]++)(*:39)'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -120,25 +118,24 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            16 => array(array('_route' => 'a_wildcard'), array('param'), null, null, false),
-                            39 => array(array('_route' => 'nested_wildcard'), array('param'), null, null, false),
+                            16 => array(array('_route' => 'a_wildcard'), array('param'), null, null, false, true),
+                            39 => array(array('_route' => 'nested_wildcard'), array('param'), null, null, false, true),
                         );
 
-                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
+                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar) = $routes[$m];
 
-                        if ('/' !== $pathinfo) {
-                            if ('/' === $pathinfo[-1]) {
-                                if (preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                                    $matches = $n;
-                                } else {
-                                    $hasTrailingSlash = true;
-                                }
+                        if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
+                            // no-op
+                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        } else {
+                            $hasTrailingSlash = true;
+                        }
+                        if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                            if ('GET' === $canonicalMethod && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                                return $allow = $allowSchemes = array();
                             }
-
-                            if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                                if ((!$requiredMethods || isset($requiredMethods['GET'])) && 'GET' === $canonicalMethod) {
-                                    return $allow = $allowSchemes = array();
-                                }
+                            if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                                 break;
                             }
                         }

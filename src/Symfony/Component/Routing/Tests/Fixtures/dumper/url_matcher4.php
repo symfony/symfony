@@ -15,10 +15,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->context = $context;
     }
 
-    public function match($rawPathinfo)
+    public function match($pathinfo)
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
+        $pathinfo = rawurldecode($pathinfo) ?: '/';
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -26,10 +27,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             $canonicalMethod = 'GET';
         }
 
-        switch ($trimmedPathinfo = '/' !== $pathinfo && '/' === $pathinfo[-1] ? substr($pathinfo, 0, -1) : $pathinfo) {
+        switch ($trimmedPathinfo) {
             case '/put_and_post':
                 // put_and_post
-                if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                if ('/' !== $pathinfo && $trimmedPathinfo !== $pathinfo) {
                     goto not_put_and_post;
                 }
 
@@ -42,7 +43,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 return $ret;
                 not_put_and_post:
                 // put_and_get_and_head
-                if ('/' !== $pathinfo && '/' === $pathinfo[-1]) {
+                if ('/' !== $pathinfo && $trimmedPathinfo !== $pathinfo) {
                     goto not_put_and_get_and_head;
                 }
 
@@ -67,11 +68,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     break;
                 }
                 list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$trimmedPathinfo];
-
-                if ('/' !== $pathinfo) {
-                    if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                        break;
-                    }
+                if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                    break;
                 }
 
                 $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);

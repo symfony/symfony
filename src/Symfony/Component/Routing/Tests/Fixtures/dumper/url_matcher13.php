@@ -15,10 +15,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->context = $context;
     }
 
-    public function match($rawPathinfo)
+    public function match($pathinfo)
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
+        $pathinfo = rawurldecode($pathinfo) ?: '/';
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
         $host = strtolower($context->getHost());
@@ -35,7 +36,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         .'|(*:56)'
                     .')'
                 .')'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -43,7 +44,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 switch ($m = (int) $matches['MARK']) {
                     case 56:
                         // r1
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                        if ($trimmedPathinfo === $pathinfo) {
+                            // no-op
+                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        } elseif ('/' !== $pathinfo) {
                             goto not_r1;
                         }
 
@@ -53,7 +58,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         not_r1:
 
                         // r2
-                        if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
+                        if ($trimmedPathinfo === $pathinfo) {
+                            // no-op
+                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        } elseif ('/' !== $pathinfo) {
                             goto not_r2;
                         }
 

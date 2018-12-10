@@ -15,10 +15,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->context = $context;
     }
 
-    public function match($rawPathinfo)
+    public function match($pathinfo)
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
+        $pathinfo = rawurldecode($pathinfo) ?: '/';
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -45,7 +46,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             .')'
                         .')'
                     .')'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
 
         foreach ($regexList as $offset => $regex) {
@@ -53,26 +54,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            27 => array(array('_route' => 'r1'), array('foo'), null, null, false),
-                            38 => array(array('_route' => 'r10'), array('foo'), null, null, false),
-                            46 => array(array('_route' => 'r100'), array('foo'), null, null, false),
-                            59 => array(array('_route' => 'r2'), array('foo'), null, null, false),
-                            70 => array(array('_route' => 'r20'), array('foo'), null, null, false),
-                            78 => array(array('_route' => 'r200'), array('foo'), null, null, false),
+                            27 => array(array('_route' => 'r1'), array('foo'), null, null, false, false),
+                            38 => array(array('_route' => 'r10'), array('foo'), null, null, false, false),
+                            46 => array(array('_route' => 'r100'), array('foo'), null, null, false, false),
+                            59 => array(array('_route' => 'r2'), array('foo'), null, null, false, false),
+                            70 => array(array('_route' => 'r20'), array('foo'), null, null, false, false),
+                            78 => array(array('_route' => 'r200'), array('foo'), null, null, false, false),
                         );
 
-                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash) = $routes[$m];
+                        list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar) = $routes[$m];
 
-                        if ('/' !== $pathinfo) {
-                            if ('/' === $pathinfo[-1]) {
-                                if (preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
-                                    $matches = $n;
-                                } else {
-                                    $hasTrailingSlash = true;
-                                }
-                            }
-
-                            if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
+                        if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
+                            // no-op
+                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
+                        } else {
+                            $hasTrailingSlash = true;
+                        }
+                        if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                            if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                                 break;
                             }
                         }

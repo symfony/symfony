@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T09:50:57Z
+
+@ostrolucky thanks for the review!
+
+> Why is this not incorporated inside sortListeners function? Instead it repeats the logic but ignores sort marking and is used only during dispatching
+
+Because sortListeners has public side effect: it drive the return value of `getListeners()`.
+Changing would mean breaking BC.
+
+> How come? It makes extra operations (new closure, Closure::fromCallable call)
+
+and removes some. I did benchmark this, there is no measurable difference.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-18T10:08:17Z
+
+> it drive the return value of getListeners()
+
+> getListeners() should continue returning the exact listeners that where added
+
+I didn't mean to to imply you should save the optimization result into `sorted` property, you can still put it to `optimized`, but from inside sortListeners. That wouldn't change anything on public side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T10:13:55Z
+
+> you can still put it to optimized, but from inside sortListeners
+
+that could defeat the extra laziness added here (not instantiating lazy listeners when propagation is stopped before them)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-18T10:32:14Z
+
+> that could defeat the extra laziness added here (not instantiating lazy listeners when propagation is stopped before them)
+
+I don't see how would it defeat it :thinking: Only way that closure is replaced with delegated one is when it's executed, which will happen only during dispatching.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T10:35:24Z
+
+Because of the `$listener[0] = $listener[0]();` line, which is the one that is made lazy here.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-18T10:59:48Z
+
+I get that, but that line is executed only when outer closure is executed. I don't see why would moving construction of this closure to different place change when is it executed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-18T11:12:09Z
+
+Because we have to call that line to populate the sortedListeners property.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-19T23:58:01Z
+
+This closure trick increases speed by 0.6μs aggregated (8%). 0.15μs from that is just thanks to inlining getListeners call. So closure trick alone is 0.45μs. Measured with phpbench, 100 listeners attached (and all of them executed). Correlation on number of listeners is very linear.
+
+I don't think this is worth increased complexity and number of untested paths. Also, is there a PHP bug report? I think this is something better to be improved on language level.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-20T15:03:34Z
+
+We made current Symfony versions really fast because we made such changes. Small improvements for your bench can be a significant one for a specific use case. And it's already been proven that many small improvements aggregate to significant general ones.
+
+The real issue is having EventDispatcher mutable. We should inspect existing use cases where this is needed (if any) and consider deprecating if possible IMHO. But that shouldn't block this one.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-20T17:44:02Z
+
+Well if we decide it's worth it, can you at least properly comment this code, cover it by tests and notify upstream about workarounds we need to do to increase performance so there is at least some chance we can eventually remove them? This was proven successful with eg inlining constants in DI Container. Performance tweaks like this are killing readability and hence ability to debug and contribute a lot. As you can see from my questions there are lot of non-obvious things for other people.
+
+I still don't know in what case would `if ($listener[0] instanceof \Closure) {` condition be needed, because it's not covered by tests. And there is no longer even coverage for calling getListeners() call from dispatch().
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-20T18:03:42Z
+
+> I still don't know in what case would `if ($listener[0] instanceof \Closure) {` condition be needed, because it's not covered by tests.
+
+that part is the lazy-loading of the listener object.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-20T22:28:25Z
+
+I see that, I just don't see how can be listener modified outside of this proxy closure. But testcase would help me with that _wink wink_
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-21T14:33:30Z
+
+The discussed code path is now tested @ostrolucky, testMutatingWhilePropagationIsStopped.
+
+Don't be fooled by the diff stat, I just renamed `AbstractEventDispatcherTest` to `EventDispatcherTest` and added this test case.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-24T16:07:52Z
+
+Thanks. I can see now that same closure is evaluated by sortListeners and optimizeListeners might not re-triggered after that happens.

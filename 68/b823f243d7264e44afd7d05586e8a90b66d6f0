@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by gmponos at 2018-12-01T16:58:29Z
+
+The way tests are written adding a test does not add any value. If tests where using an actual session with a `MockSessionStorage` then it would have some value.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-01T17:05:23Z
+
+We can assert the default value is passed here
+
+https://github.com/symfony/symfony/blob/3b4e0389f483d50fc7e5965f37f6e25f0c36ee85/src/Symfony/Component/Security/Http/Tests/Util/TargetPathTraitTest.php#L34
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-02T09:58:06Z
+
+OR we should change the return type to `string|null`. Wouldn't it make more sense? Technically it would be safer at least (no BC break for sure).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-02T10:05:41Z
+
+for reference, same topic was somewhat discussed here: https://github.com/symfony/symfony/pull/23409#issuecomment-316284070
+
+tend to like the empty string here as well (over null), as it's a valid relative target URI as well. So no hassle with null checks required.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2018-12-02T10:13:58Z
+
+> OR we should change the return type to string|null. Wouldn't it make more sense? Technically it would be safer at least (no BC break for sure).
+
+Personally I have banned `empty` from my projects for being too loose.. So in this case I will still need to do `$value === '' || $value === null`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-02T10:22:23Z
+
+> I will still need to do $value === '' || $value === null
+
+what the code does is `if ($value = ...)` - no need for empty.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-02T10:22:49Z
+
+and the BC break argument is not a minor one!
+
+---------------------------------------------------------------------------
+
+by gmponos at 2018-12-02T10:50:13Z
+
+> what the code does is if ($value = ...) - no need for empty.
+
+Let me elaborate:
+
+I have a class that I use this trait. If we go with the solution of `string|null` then I will need to do this:
+
+```
+public function myFunct(){
+    ....
+    $value = $this->getTargetPath($session, $key);
+    if ($value === null || $value === ''){
+        return new RedirectResponse('myhomeurl');
+    }
+
+    return new RedirectResponse($value);
+}
+```
+
+if we go just with the `string` then the if statement above only needs to check about `$value === ''`
+
+> and the BC break argument is not a minor one!
+
+Never said it is minor.. except if you were not referring to me.. But since you mention it the BC it depends I believe in the way that you look at this.
+
+If someone was depending on the docbloc then it is not a BC.. That is what the code should do and it is just a bug fix. If someone was depending on the actual implementation and he was actually checking about `null` (like the code I have above) then you could say that it is a BC.
+
+My point of view tends towards to the direction that it is a bug. The docblock says string. If someone was depending on null he should commit  PR and never the less he should check against emtpy string as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-02T11:02:36Z
+
+The docblock is just a hint - it doesn't enforce anything.
+If anyone does `if (null !== $value = ...)`, their code will just break if we do this change.
+That's what I mean here by BC break.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2018-12-02T11:18:38Z
+
+Yea I know what you meant.. so let's not keep going in loops.. You said your PoV and I said mine.. In this specific case I believe there is no right or wrong so someone has to take a decision.
+
+> Wouldn't it make more sense?
+
+Judging by the above I feel that you are not certain either... and also the fact that @ro0NL posted an accepted PR doing otherwise. So I will need you (@nicolas-grekas) to give me the final direction. 😄
+
+Also I need to know what about tests.. If this is limited to a docblock change then no test changes is required since there is no way to actually reproduce this in the way they are written. Too much mocking that it will just make it silly. I would be happy to refactor tests as well on this PR using an actual `Session` with a `Mock` storage if you wish.
+
+If we stay with the change as is in my thinking tests should be all about giving `this` input and expecting `that` output.. So changing `with` methods is not one of my favorite things to do. Same as above.. I can proceed with refactoring test that would give more meaning.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-02T11:41:25Z
+
+My vote is for changing the type hint.
+I'd suggest to update the PR accordingly and give some time to others to chime in.

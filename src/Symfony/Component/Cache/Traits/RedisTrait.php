@@ -96,7 +96,7 @@ trait RedisTrait
             return 'file:'.($m[1] ?? '');
         }, $dsn);
 
-        if (false === $params = parse_url($dsn)) {
+        if (false === $params = parse_url($params)) {
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
         }
 

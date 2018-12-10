@@ -7,7 +7,7 @@ export default function() {
 
     // create the tab navigation for each group of tabs
     for (var i = 0; i < tabGroups.length; i++) {
-        var tabs = tabGroups[i].querySelectorAll('.tab');
+        var tabs = tabGroups[i].querySelectorAll(':scope > .tab');
         var tabNavigation = document.createElement('ul');
         addClass(tabNavigation, 'tab-navigation');
 
@@ -37,7 +37,7 @@ export default function() {
 
     // display the active tab and add the 'click' event listeners
     for (i = 0; i < tabGroups.length; i++) {
-        tabNavigation = tabGroups[i].querySelectorAll('.tab-navigation li');
+        tabNavigation = tabGroups[i].querySelectorAll(':scope > .tab-navigation li');
 
         for (j = 0; j < tabNavigation.length; j++) {
             tabId = tabNavigation[j].getAttribute('data-tab-id');

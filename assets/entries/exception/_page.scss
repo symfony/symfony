@@ -1,0 +1,17 @@
+html {
+    /* always display the vertical scrollbar to avoid jumps when toggling contents */
+    overflow-y: scroll;
+}
+body { background-color: #F9F9F9; color: #222; font: 14px/1.4 Helvetica, Arial, sans-serif; padding-bottom: 45px; }
+
+/* @fixme: applies on toolbar elements */
+a { cursor: pointer; text-decoration: none; }
+a:hover { text-decoration: underline; }
+abbr[title] { border-bottom: none; cursor: help; text-decoration: none; }
+
+code, pre { font: 13px/1.5 Consolas, Monaco, Menlo, "Ubuntu Mono", "Liberation Mono", monospace; }
+
+table, tr, th, td { background: #FFF; border-collapse: collapse; vertical-align: top; }
+table { background: #FFF; border: 1px solid #E0E0E0; box-shadow: 0px 0px 1px rgba(128, 128, 128, .2); margin: 1em 0; width: 100%; }
+table th, table td { border: solid #E0E0E0; border-width: 1px 0; padding: 8px 10px; }
+table th { background-color: #E0E0E0; font-weight: bold; text-align: left; }

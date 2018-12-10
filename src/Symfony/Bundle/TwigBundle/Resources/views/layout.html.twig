@@ -6,7 +6,10 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>{% block title %}{% endblock %}</title>
         <link rel="icon" type="image/png" href="{{ include('@Twig/images/favicon.png.base64') }}">
-        <style>{{ include('@Twig/exception.css.twig') }}</style>
+        <style>
+            {{ source('@Twig/Asset/exception.css') }}
+            {{ include('@Twig/exception.css.twig') }}
+        </style>
         {% block head %}{% endblock %}
     </head>
     <body>

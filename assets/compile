@@ -3,4 +3,5 @@
 cd assets/ && \
 yarn install && \
 yarn encore production && \
-cp build/profiler.* ../src/Symfony/Bundle/WebProfilerBundle/Resources/views/Asset/
+cp build/profiler.* ../src/Symfony/Bundle/WebProfilerBundle/Resources/views/Asset/ && \
+cp build/exception.* ../src/Symfony/Bundle/TwigBundle/Resources/views/Asset/

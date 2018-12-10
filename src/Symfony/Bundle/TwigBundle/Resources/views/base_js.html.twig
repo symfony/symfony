@@ -1,11 +1,12 @@
 {# This file is based on WebProfilerBundle/Resources/views/Profiler/base_js.html.twig.
    If you make any change in this file, verify the same change is needed in the other file. #}
 <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
+    {{ source('@Twig/Asset/exception.js') }}
     {# Caution: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}
 
-    SfTwigjs = (function() {
+    Sfjs = (function() {
         "use strict";
 
         if ('classList' in document.documentElement) {
@@ -35,76 +36,6 @@
 
         return {
             addEventListener: addEventListener,
-
-            createTabs: function() {
-                var tabGroups = document.querySelectorAll('.sf-tabs:not([data-processed=true])');
-
-                /* create the tab navigation for each group of tabs */
-                for (var i = 0; i < tabGroups.length; i++) {
-                    var tabs = tabGroups[i].querySelectorAll('.tab');
-                    var tabNavigation = document.createElement('ul');
-                    tabNavigation.className = 'tab-navigation';
-
-                    var selectedTabId = 'tab-' + i + '-0'; /* select the first tab by default */
-                    for (var j = 0; j < tabs.length; j++) {
-                        var tabId = 'tab-' + i + '-' + j;
-                        var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
-
-                        var tabNavigationItem = document.createElement('li');
-                        tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
-                        if (hasClass(tabs[j], 'disabled')) { addClass(tabNavigationItem, 'disabled'); }
-                        tabNavigationItem.innerHTML = tabTitle;
-                        tabNavigation.appendChild(tabNavigationItem);
-
-                        var tabContent = tabs[j].querySelector('.tab-content');
-                        tabContent.parentElement.setAttribute('id', tabId);
-                    }
-
-                    tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
-                    addClass(document.querySelector('[data-tab-id="' + selectedTabId + '"]'), 'active');
-                }
-
-                /* display the active tab and add the 'click' event listeners */
-                for (i = 0; i < tabGroups.length; i++) {
-                    tabNavigation = tabGroups[i].querySelectorAll('.tab-navigation li');
-
-                    for (j = 0; j < tabNavigation.length; j++) {
-                        tabId = tabNavigation[j].getAttribute('data-tab-id');
-                        document.getElementById(tabId).querySelector('.tab-title').className = 'hidden';
-
-                        if (hasClass(tabNavigation[j], 'active')) {
-                            document.getElementById(tabId).className = 'block';
-                        } else {
-                            document.getElementById(tabId).className = 'hidden';
-                        }
-
-                        tabNavigation[j].addEventListener('click', function(e) {
-                            var activeTab = e.target || e.srcElement;
-
-                            /* needed because when the tab contains HTML contents, user can click */
-                            /* on any of those elements instead of their parent '<li>' element */
-                            while (activeTab.tagName.toLowerCase() !== 'li') {
-                                activeTab = activeTab.parentNode;
-                            }
-
-                            /* get the full list of tabs through the parent of the active tab element */
-                            var tabNavigation = activeTab.parentNode.children;
-                            for (var k = 0; k < tabNavigation.length; k++) {
-                                var tabId = tabNavigation[k].getAttribute('data-tab-id');
-                                document.getElementById(tabId).className = 'hidden';
-                                removeClass(tabNavigation[k], 'active');
-                            }
-
-                            addClass(activeTab, 'active');
-                            var activeTabId = activeTab.getAttribute('data-tab-id');
-                            document.getElementById(activeTabId).className = 'block';
-                        });
-                    }
-
-                    tabGroups[i].setAttribute('data-processed', 'true');
-                }
-            },
 
             createToggles: function() {
                 var toggles = document.querySelectorAll('.sf-toggle:not([data-processed=true])');
@@ -274,10 +205,9 @@
         };
     })();
 
-    SfTwigjs.addEventListener(document, 'DOMContentLoaded', function() {
-        SfTwigjs.createTabs();
-        SfTwigjs.createToggles();
-        SfTwigjs.createFilters();
+    Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
+        Sfjs.createToggles();
+        Sfjs.createFilters();
     });
 
 /*]]>*/</script>

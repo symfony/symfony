@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T14:53:33Z
+
+Mocks don't work with root-namespaced functions, and it turns out that `*_exists()` are in the list of the calls we recommend root-aliasing... Which means this will have a very low reach. For this reason, I'm not sure we should maintain this...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-20T15:21:10Z
+
+ouch :( i didnt saw any root namespaced variant in code base. Also CS does not propose these functions (yet) right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T15:27:20Z
+
+Actually I was wrong sorry, `*_exists()` are not in the list!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:20:47Z
+
+@ro0NL thanks for creating https://github.com/symfony/symfony-docs/issues/10528 to track this feature in Symfony Docs. Much appreciated!
+
+Sadly, the docs issue is not very actionable because the description of this PR is a bit lacking. Please update it to explain which changes would this require for full Symfony apps and for apps that use this as a stand-alone component.
+
+If no changes are needed, please add some before/after examples or show what can we do now that wasn't possible before. Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-01T10:37:48Z
+
+should there be any annotation integration, ie. `@class-exists Some\Class Some\Other\Class`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T10:45:58Z
+
+I'm not sure - not if we don't have a use case.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-01T11:36:53Z
+
+#28898 could have one more test using `@class-not-exists Symfony\Component\VarDumper\Dumper\CliDumper` :angel:

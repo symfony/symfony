@@ -358,20 +358,9 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                         unset($data[$key]);
                         continue;
                     }
-                    try {
-                        if (null !== $constructorParameter->getClass()) {
-                            if (!$this->serializer instanceof DenormalizerInterface) {
-                                throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), static::class));
-                            }
-                            $parameterClass = $constructorParameter->getClass()->getName();
-                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $paramName));
-                        }
-                    } catch (\ReflectionException $e) {
-                        throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
-                    }
 
                     // Don't run set for a parameter passed to the constructor
-                    $params[] = $parameterData;
+                    $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
                     unset($data[$key]);
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
@@ -388,6 +377,27 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         }
 
         return new $class();
+    }
+
+    /**
+     * @internal
+     */
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
+    {
+        try {
+            if (null !== $parameter->getClass()) {
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $parameter->getClass(), static::class));
+                }
+                $parameterClass = $parameter->getClass()->getName();
+
+                return $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName));
+            }
+
+            return $parameterData;
+        } catch (\ReflectionException $e) {
+            throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $parameterName), 0, $e);
+        }
     }
 
     /**

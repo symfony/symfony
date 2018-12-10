@@ -305,6 +305,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
+     * @internal
+     */
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
+    {
+        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
+            return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
+        }
+
+        return $this->validateAndDenormalize($class->getName(), $parameterName, $parameterData, $format, $context);
+    }
+
+    /**
      * Sets an attribute and apply the name converter if necessary.
      *
      * @param string $attribute

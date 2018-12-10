@@ -40,6 +40,6 @@ class UploadValidatorExtensionTest extends TypeTestCase
         $extension->configureOptions($resolver);
         $options = $resolver->resolve();
 
-        $this->assertEquals('translated max {{ max }}!', \call_user_func($options['upload_max_size_message']));
+        $this->assertEquals('translated max {{ max }}!', $options['upload_max_size_message']());
     }
 }

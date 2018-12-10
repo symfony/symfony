@@ -96,7 +96,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
             if ($maxDepthReached) {
-                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue, $object, $attribute, $format, $context);
+                $attributeValue = ($this->maxDepthHandler)($attributeValue, $object, $attribute, $format, $context);
             }
 
             if (isset($this->callbacks[$attribute])) {
@@ -345,7 +345,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return (float) $data;
             }
 
-            if (\call_user_func('is_'.$builtinType, $data)) {
+            if (('is_'.$builtinType)($data)) {
                 return $data;
             }
         }

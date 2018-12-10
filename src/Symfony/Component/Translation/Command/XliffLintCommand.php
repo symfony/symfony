@@ -238,7 +238,7 @@ EOF
         };
 
         if (null !== $this->directoryIteratorProvider) {
-            return \call_user_func($this->directoryIteratorProvider, $directory, $default);
+            return ($this->directoryIteratorProvider)($directory, $default);
         }
 
         return $default($directory);
@@ -251,7 +251,7 @@ EOF
         };
 
         if (null !== $this->isReadableProvider) {
-            return \call_user_func($this->isReadableProvider, $fileOrDirectory, $default);
+            return ($this->isReadableProvider)($fileOrDirectory, $default);
         }
 
         return $default($fileOrDirectory);

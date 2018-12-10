@@ -51,7 +51,7 @@ class CustomFilterIterator extends \FilterIterator
         $fileinfo = $this->current();
 
         foreach ($this->filters as $filter) {
-            if (false === \call_user_func($filter, $fileinfo)) {
+            if (false === $filter($fileinfo)) {
                 return false;
             }
         }

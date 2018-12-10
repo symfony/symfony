@@ -53,7 +53,7 @@ class ChoiceValidator extends ConstraintValidator
             ) {
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
             }
-            $choices = \call_user_func($choices);
+            $choices = $choices();
         } else {
             $choices = $constraint->choices;
         }

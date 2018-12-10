@@ -313,13 +313,13 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         // the performance when the same value is escaped multiple times (e.g. loops)
         if (is_scalar($value)) {
             if (!isset(self::$escaperCache[$context][$value])) {
-                self::$escaperCache[$context][$value] = \call_user_func($this->getEscaper($context), $value);
+                self::$escaperCache[$context][$value] = $this->getEscaper($context)($value);
             }
 
             return self::$escaperCache[$context][$value];
         }
 
-        return \call_user_func($this->getEscaper($context), $value);
+        return $this->getEscaper($context)($value);
     }
 
     /**

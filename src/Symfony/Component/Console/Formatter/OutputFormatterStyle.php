@@ -52,6 +52,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     private $foreground;
     private $background;
+    private $href;
     private $options = array();
 
     /**
@@ -116,6 +117,11 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
 
         $this->background = static::$availableBackgroundColors[$color];
+    }
+
+    public function setHref(string $url): void
+    {
+        $this->href = $url;
     }
 
     /**
@@ -187,11 +193,14 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
             $setCodes[] = $this->background['set'];
             $unsetCodes[] = $this->background['unset'];
         }
-        if (\count($this->options)) {
-            foreach ($this->options as $option) {
-                $setCodes[] = $option['set'];
-                $unsetCodes[] = $option['unset'];
-            }
+
+        foreach ($this->options as $option) {
+            $setCodes[] = $option['set'];
+            $unsetCodes[] = $option['unset'];
+        }
+
+        if (null !== $this->href) {
+            $text = "\033]8;;$this->href\033\\$text\033]8;;\033\\";
         }
 
         if (0 === \count($setCodes)) {

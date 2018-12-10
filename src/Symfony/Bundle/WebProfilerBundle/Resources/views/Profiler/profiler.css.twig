@@ -957,7 +957,7 @@ tr.status-warning td {
 .filter-list-level li.active { cursor: n-resize; }
 .filter-list-level li.last-active { cursor: default; }
 .filter-list-level li.last-active:before { content: '\2714\00a0'; }
-.filter-list-choice li:before { content: '\2714\00a0'; color: var(--tab-background); }
+.filter-list-choice li:before { content: '\2714\00a0'; color: transparent; }
 .filter-list-choice li.active:before { color: unset; }
 
 {# Twig panel
@@ -1025,6 +1025,31 @@ table.logs .metadata {
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
     hyphens: auto;
+}
+
+{# Security panel
+   ========================================================================= #}
+#collector-content .decision-log .voter_result td {
+    border-top-width: 1px;
+    border-bottom-width: 0;
+    padding-bottom: 0;
+}
+
+#collector-content .decision-log .voter_details td {
+    border-top-width: 0;
+    border-bottom-width: 1px;
+    padding-bottom: 0;
+}
+
+#collector-content .decision-log .voter_details table {
+    border: 0;
+    margin: 0;
+    box-shadow: unset;
+}
+
+#collector-content .decision-log .voter_details table td {
+    border: 0;
+    padding: 0 0 8px 0;
 }
 
 {# Validator panel

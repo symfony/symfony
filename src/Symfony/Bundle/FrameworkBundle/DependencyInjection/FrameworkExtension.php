@@ -36,6 +36,8 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -68,7 +70,6 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\Sender\ChainSender;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -506,6 +507,7 @@ class FrameworkExtension extends Extension
 
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
+            $workflowId = sprintf('%s.%s', $type, $name);
 
             // Process Metadata (workflow + places (transition is done in the "create transition" block))
             $metadataStoreDefinition = new Definition(Workflow\Metadata\InMemoryMetadataStore::class, array(array(), array(), null));
@@ -524,14 +526,28 @@ class FrameworkExtension extends Extension
 
             // Create transitions
             $transitions = array();
+            $guardsConfiguration = array();
             $transitionsMetadataDefinition = new Definition(\SplObjectStorage::class);
+            // Global transition counter per workflow
+            $transitionCounter = 0;
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
                     $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
-                    $transitions[] = $transitionDefinition;
+                    $transitionDefinition->setPublic(false);
+                    $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
+                    $container->setDefinition($transitionId, $transitionDefinition);
+                    $transitions[] = new Reference($transitionId);
+                    if (isset($transition['guard'])) {
+                        $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
+                        $configuration->addArgument(new Reference($transitionId));
+                        $configuration->addArgument($transition['guard']);
+                        $configuration->setPublic(false);
+                        $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                        $guardsConfiguration[$eventName][] = $configuration;
+                    }
                     if ($transition['metadata']) {
                         $transitionsMetadataDefinition->addMethodCall('attach', array(
-                            $transitionDefinition,
+                            new Reference($transitionId),
                             $transition['metadata'],
                         ));
                     }
@@ -539,10 +555,21 @@ class FrameworkExtension extends Extension
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
                             $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
-                            $transitions[] = $transitionDefinition;
+                            $transitionDefinition->setPublic(false);
+                            $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
+                            $container->setDefinition($transitionId, $transitionDefinition);
+                            $transitions[] = new Reference($transitionId);
+                            if (isset($transition['guard'])) {
+                                $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
+                                $configuration->addArgument(new Reference($transitionId));
+                                $configuration->addArgument($transition['guard']);
+                                $configuration->setPublic(false);
+                                $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                                $guardsConfiguration[$eventName][] = $configuration;
+                            }
                             if ($transition['metadata']) {
                                 $transitionsMetadataDefinition->addMethodCall('attach', array(
-                                    $transitionDefinition,
+                                    new Reference($transitionId),
                                     $transition['metadata'],
                                 ));
                             }
@@ -581,7 +608,6 @@ class FrameworkExtension extends Extension
             }
 
             // Create Workflow
-            $workflowId = sprintf('%s.%s', $type, $name);
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
             if (isset($markingStoreDefinition)) {
@@ -618,16 +644,7 @@ class FrameworkExtension extends Extension
             }
 
             // Add Guard Listener
-            $guard = new Definition(Workflow\EventListener\GuardListener::class);
-            $guard->setPrivate(true);
-            $configuration = array();
-            foreach ($workflow['transitions'] as $config) {
-                $transitionName = $config['name'];
-
-                if (!isset($config['guard'])) {
-                    continue;
-                }
-
+            if ($guardsConfiguration) {
                 if (!class_exists(ExpressionLanguage::class)) {
                     throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
                 }
@@ -636,13 +653,11 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security".');
                 }
 
-                $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
-                $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
-                $configuration[$eventName] = $config['guard'];
-            }
-            if ($configuration) {
+                $guard = new Definition(Workflow\EventListener\GuardListener::class);
+                $guard->setPrivate(true);
+
                 $guard->setArguments(array(
-                    $configuration,
+                    $guardsConfiguration,
                     new Reference('workflow.security.expression_language'),
                     new Reference('security.token_storage'),
                     new Reference('security.authorization_checker'),
@@ -650,6 +665,9 @@ class FrameworkExtension extends Extension
                     new Reference('security.role_hierarchy'),
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ));
+                foreach ($guardsConfiguration as $eventName => $config) {
+                    $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
+                }
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);
@@ -796,10 +814,8 @@ class FrameworkExtension extends Extension
         if ($config['formats']) {
             $loader->load('request.xml');
 
-            $container
-                ->getDefinition('request.add_request_formats_listener')
-                ->replaceArgument(0, $config['formats'])
-            ;
+            $listener = $container->getDefinition('request.add_request_formats_listener');
+            $listener->replaceArgument(0, $config['formats']);
         }
     }
 
@@ -1491,7 +1507,7 @@ class FrameworkExtension extends Extension
     private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig, array $validationConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
-            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed.');
+            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
         $loader->load('messenger.xml');
@@ -1502,7 +1518,7 @@ class FrameworkExtension extends Extension
         } else {
             if ('messenger.transport.symfony_serializer' === $config['serializer']['id']) {
                 if (!$this->isConfigEnabled($container, $serializerConfig)) {
-                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".');
                 }
 
                 $container->getDefinition('messenger.transport.symfony_serializer')
@@ -1517,17 +1533,13 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (null === $config['default_bus']) {
-            if (\count($config['buses']) > 1) {
-                throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
-            }
-
+        if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
 
         $defaultMiddleware = array(
             'before' => array(array('id' => 'logging')),
-            'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
+            'after' => array(array('id' => 'send_message'), array('id' => 'handle_message')),
         );
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
@@ -1542,9 +1554,13 @@ class FrameworkExtension extends Extension
             }
 
             foreach ($middleware as $middlewareItem) {
-                if (!$validationConfig['enabled'] && 'messenger.middleware.validation' === $middlewareItem['id']) {
+                if (!$validationConfig['enabled'] && \in_array($middlewareItem['id'], array('validation', 'messenger.middleware.validation'), true)) {
                     throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
                 }
+            }
+
+            if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
+                array_unshift($middleware, array('id' => 'traceable', 'arguments' => array($busId)));
             }
 
             $container->setParameter($busId.'.middleware', $middleware);
@@ -1558,51 +1574,45 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$container->hasAlias('message_bus')) {
-            throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
-        }
-
         $senderAliases = array();
         foreach ($config['transports'] as $name => $transport) {
             if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
-                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
+                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".');
             }
 
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
                 ->setArguments(array($transport['dsn'], $transport['options']))
                 ->addTag('messenger.receiver', array('alias' => $name))
-                ->addTag('messenger.sender', array('alias' => $name))
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
         }
 
-        $messageToSenderIdMapping = array();
-        $messageToSendAndHandleMapping = array();
+        $messageToSendersMapping = array();
+        $messagesToSendAndHandle = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
+                throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
+            }
+            $senders = array();
+            foreach ($messageConfiguration['senders'] as $sender) {
+                $senders[$sender] = new Reference($senderAliases[$sender] ?? $sender);
             }
 
-            if (1 < \count($messageConfiguration['senders'])) {
-                $senders = array_map(function ($sender) use ($senderAliases) {
-                    return new Reference($senderAliases[$sender] ?? $sender);
-                }, $messageConfiguration['senders']);
-                $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
-                $chainSenderDefinition->addTag('messenger.sender');
-                $chainSenderId = '.messenger.chain_sender.'.$message;
-                $container->setDefinition($chainSenderId, $chainSenderDefinition);
-                $messageToSenderIdMapping[$message] = $chainSenderId;
-            } else {
-                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
-            }
+            $sendersId = 'messenger.senders.'.$message;
+            $container->register($sendersId, RewindableGenerator::class)
+                ->setFactory('current')
+                ->addArgument(array(new IteratorArgument($senders)));
+            $messageToSendersMapping[$message] = new Reference($sendersId);
 
-            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
+            $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 
-        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
-        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
+        $container->getDefinition('messenger.senders_locator')
+            ->replaceArgument(0, $messageToSendersMapping)
+            ->replaceArgument(1, $messagesToSendAndHandle)
+        ;
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
@@ -1640,8 +1650,10 @@ class FrameworkExtension extends Extension
                 $pool['adapter'] = '.'.$pool['adapter'].'.inner';
             }
             $definition = new ChildDefinition($pool['adapter']);
-            $container->registerAliasForArgument($name, CacheInterface::class);
-            $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            if (!\in_array($name, array('cache.app', 'cache.system'), true)) {
+                $container->registerAliasForArgument($name, CacheInterface::class);
+                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
+            }
 
             if ($pool['tags']) {
                 if ($config['pools'][$pool['tags']]['tags'] ?? false) {

@@ -97,6 +97,9 @@ class VarExporterTest extends TestCase
         $marshalledValue = include $fixtureFile;
 
         if (!$isStaticValue) {
+            if ($value instanceof MyWakeup) {
+                $value->bis = null;
+            }
             $this->assertDumpEquals($value, $marshalledValue);
         } else {
             $this->assertSame($value, $marshalledValue);
@@ -184,6 +187,13 @@ class VarExporterTest extends TestCase
         yield array('final-array-iterator', new FinalArrayIterator());
 
         yield array('final-stdclass', new FinalStdClass());
+
+        $value = new MyWakeup();
+        $value->bis = new \ReflectionClass($value);
+
+        yield array('wakeup-refl', $value);
+
+        yield array('abstract-parent', new ConcreteClass());
     }
 }
 
@@ -310,5 +320,25 @@ final class FinalStdClass extends \stdClass
     public function __clone()
     {
         throw new \BadMethodCallException('Should not be called.');
+    }
+}
+
+abstract class AbstractClass
+{
+    protected $foo;
+    private $bar;
+
+    protected function setBar($bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class ConcreteClass extends AbstractClass
+{
+    public function __construct()
+    {
+        $this->foo = 123;
+        $this->setBar(234);
     }
 }

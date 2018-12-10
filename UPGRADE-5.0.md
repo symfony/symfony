@@ -18,6 +18,7 @@ Config
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
  * The `Processor` class has been made final
  * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead.
+ * Using environment variables with `cannotBeEmpty()` if the value is validated with `validate()` will throw an exception.
 
 Console
 -------
@@ -126,7 +127,7 @@ Form
 FrameworkBundle
 ---------------
 
- * Removed support for `bundle:controller:action` and `service:action` syntaxes to reference controllers. Use `serviceOrFqcn::method`
+ * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
    instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
 
    Before:
@@ -136,11 +137,6 @@ FrameworkBundle
        path: /
        defaults:
            _controller: FrameworkBundle:Redirect:redirect
-
-   service_controller:
-       path: /
-       defaults:
-           _controller: app.my_controller:myAction
    ```
 
    After:
@@ -150,11 +146,6 @@ FrameworkBundle
        path: /
        defaults:
            _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
-
-   service_controller:
-       path: /
-       defaults:
-           _controller: app.my_controller::myAction
    ```
 
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.
@@ -164,12 +155,9 @@ FrameworkBundle
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `ContainerAwareCommand` class has been removed, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` console option and its "-e" shortcut have been removed,
-   set the "APP_ENV" environment variable instead.
- * The `--no-debug` console option has been removed, 
-   set the "APP_DEBUG" environment variable to "0" instead.
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
+ * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
 
 HttpFoundation
 --------------
@@ -275,7 +263,7 @@ Validator
  * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final
  * Removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
  * The `symfony/intl` component is now required for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints
- * The `egulias/email-validator` component is now required for using the `Email` constraint
+ * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
 
 Workflow
@@ -285,9 +273,3 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
-
-WebServerBundle
----------------
-
-* Omitting the `$environment` argument of  the `ServerRunCommand` and
-  `ServerStartCommand` constructors now throws a `\TypeError`.

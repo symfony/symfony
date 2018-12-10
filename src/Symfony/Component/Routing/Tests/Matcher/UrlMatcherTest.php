@@ -455,6 +455,9 @@ class UrlMatcherTest extends TestCase
     {
         $coll = new RouteCollection();
         $route = new Route('/foo/{bar}');
+        $route->setCondition('request.getBaseUrl() == "/bar"');
+        $coll->add('bar', $route);
+        $route = new Route('/foo/{bar}');
         $route->setCondition('request.getBaseUrl() == "/sub/front.php" and request.getPathInfo() == "/foo/bar"');
         $coll->add('foo', $route);
         $matcher = $this->getUrlMatcher($coll, new RequestContext('/sub/front.php'));
@@ -678,6 +681,59 @@ class UrlMatcherTest extends TestCase
 
         $matcher = $this->getUrlMatcher($coll);
         $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
+    }
+
+    public function testSlashVariant()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo/{bar}', array(), array('bar' => '.*')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('a', $matcher->match('/foo/')['_route']);
+    }
+
+    public function testSlashVariant2()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo/{bar}/', array(), array('bar' => '.*')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(array('_route' => 'a', 'bar' => 'bar'), $matcher->match('/foo/bar/'));
+    }
+
+    public function testSlashWithVerb()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{foo}', array(), array(), array(), '', array(), array('put', 'delete')));
+        $coll->add('b', new Route('/bar/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertSame(array('_route' => 'b'), $matcher->match('/bar/'));
+    }
+
+    public function testSlashAndVerbPrecedence()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/api/customers/{customerId}/contactpersons/', array(), array(), array(), '', array(), array('post')));
+        $coll->add('b', new Route('/api/customers/{customerId}/contactpersons', array(), array(), array(), '', array(), array('get')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $expected = array(
+            '_route' => 'b',
+            'customerId' => '123',
+        );
+        $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
+
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/api/customers/{customerId}/contactpersons/', array(), array(), array(), '', array(), array('get')));
+        $coll->add('b', new Route('/api/customers/{customerId}/contactpersons', array(), array(), array(), '', array(), array('post')));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'POST'));
+        $expected = array(
+            '_route' => 'b',
+            'customerId' => '123',
+        );
+        $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

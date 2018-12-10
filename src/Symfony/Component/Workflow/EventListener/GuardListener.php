@@ -28,17 +28,17 @@ class GuardListener
     private $configuration;
     private $expressionLanguage;
     private $tokenStorage;
-    private $authenticationChecker;
+    private $authorizationChecker;
     private $trustResolver;
     private $roleHierarchy;
     private $validator;
 
-    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
+    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
         $this->tokenStorage = $tokenStorage;
-        $this->authenticationChecker = $authenticationChecker;
+        $this->authorizationChecker = $authorizationChecker;
         $this->trustResolver = $trustResolver;
         $this->roleHierarchy = $roleHierarchy;
         $this->validator = $validator;
@@ -50,8 +50,21 @@ class GuardListener
             return;
         }
 
-        $expression = $this->configuration[$eventName];
+        $eventConfiguration = (array) $this->configuration[$eventName];
+        foreach ($eventConfiguration as $guard) {
+            if ($guard instanceof GuardExpression) {
+                if ($guard->getTransition() !== $event->getTransition()) {
+                    continue;
+                }
+                $this->validateGuardExpression($event, $guard->getExpression());
+            } else {
+                $this->validateGuardExpression($event, $guard);
+            }
+        }
+    }
 
+    private function validateGuardExpression(GuardEvent $event, string $expression)
+    {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);
             $event->addTransitionBlocker($blocker);
@@ -81,7 +94,7 @@ class GuardListener
                 return $role->getRole();
             }, $roles),
             // needed for the is_granted expression function
-            'auth_checker' => $this->authenticationChecker,
+            'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function
             'trust_resolver' => $this->trustResolver,
             // needed for the is_valid expression function

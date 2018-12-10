@@ -380,15 +380,13 @@ class ClientTest extends TestCase
             'password' => 'new password',
         ), 'PUT', array(
             'HTTP_USER_AGENT' => 'Symfony User Agent',
-            'HTTPS' => true,
         ));
 
-        $this->assertEquals('https://www.example.com/foo', $client->getRequest()->getUri(), '->submitForm() submit forms');
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submitForm() submit forms');
         $this->assertEquals('PUT', $client->getRequest()->getMethod(), '->submitForm() allows to change the method');
         $this->assertEquals('new username', $client->getRequest()->getParameters()['username'], '->submitForm() allows to override the form values');
         $this->assertEquals('new password', $client->getRequest()->getParameters()['password'], '->submitForm() allows to override the form values');
         $this->assertEquals('Symfony User Agent', $client->getRequest()->getServer()['HTTP_USER_AGENT'], '->submitForm() allows to change the $_SERVER parameters');
-        $this->assertTrue($client->getRequest()->getServer()['HTTPS'], '->submitForm() allows to change the $_SERVER parameters');
     }
 
     public function testSubmitFormNotFound()
@@ -838,7 +836,7 @@ class ClientTest extends TestCase
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
         $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
-        $this->assertEquals('http://www.example.com/https/www.example.com', $client->getRequest()->getUri());
+        $this->assertEquals('https://www.example.com/https/www.example.com', $client->getRequest()->getUri());
 
         $server = $client->getRequest()->getServer();
 
@@ -852,7 +850,24 @@ class ClientTest extends TestCase
         $this->assertEquals('new-server-key-value', $server['NEW_SERVER_KEY']);
 
         $this->assertArrayHasKey('HTTPS', $server);
-        $this->assertFalse($server['HTTPS']);
+        $this->assertTrue($server['HTTPS']);
+    }
+
+    public function testRequestWithRelativeUri()
+    {
+        $client = new TestClient();
+
+        $client->request('GET', '/', array(), array(), array(
+            'HTTP_HOST' => 'testhost',
+            'HTTPS' => true,
+        ));
+        $this->assertEquals('https://testhost/', $client->getRequest()->getUri());
+
+        $client->request('GET', 'https://www.example.com/', array(), array(), array(
+            'HTTP_HOST' => 'testhost',
+            'HTTPS' => false,
+        ));
+        $this->assertEquals('https://www.example.com/', $client->getRequest()->getUri());
     }
 
     public function testInternalRequest()

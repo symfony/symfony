@@ -20,6 +20,8 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -115,13 +117,15 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         return $count;
     }
 
-    public function getMessages(string $bus = null): iterable
+    public function getMessages(string $bus = null): array
     {
-        foreach ($this->data['messages'] ?? array() as $message) {
-            if (null === $bus || $bus === $message['bus']) {
-                yield $message;
-            }
+        if (null === $bus) {
+            return $this->data['messages'];
         }
+
+        return array_filter($this->data['messages'], function ($message) use ($bus) {
+            return $bus === $message['bus'];
+        });
     }
 
     public function getBuses(): array

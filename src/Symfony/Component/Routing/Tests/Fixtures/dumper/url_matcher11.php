@@ -17,46 +17,50 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $this->regexpList = array(
             0 => '{^(?'
                     .'|/(en|fr)/(?'
-                        .'|admin/post/(?'
-                            .'|(*:33)'
-                            .'|new(*:43)'
-                            .'|(\\d+)(*:55)'
-                            .'|(\\d+)/edit(*:72)'
-                            .'|(\\d+)/delete(*:91)'
-                        .')'
-                        .'|blog/(?'
-                            .'|(*:107)'
-                            .'|rss\\.xml(*:123)'
-                            .'|p(?'
-                                .'|age/([^/]++)(*:147)'
-                                .'|osts/([^/]++)(*:168)'
+                        .'|admin/post(?'
+                            .'|(*:32)'
+                            .'|/(?'
+                                .'|new(*:46)'
+                                .'|(\\d+)(*:58)'
+                                .'|(\\d+)/edit(*:75)'
+                                .'|(\\d+)/delete(*:94)'
                             .')'
-                            .'|comments/(\\d+)/new(*:195)'
-                            .'|search(*:209)'
+                        .')'
+                        .'|blog(?'
+                            .'|(*:110)'
+                            .'|/(?'
+                                .'|rss\\.xml(*:130)'
+                                .'|p(?'
+                                    .'|age/([^/]++)(*:154)'
+                                    .'|osts/([^/]++)(*:175)'
+                                .')'
+                                .'|comments/(\\d+)/new(*:202)'
+                                .'|search(*:216)'
+                            .')'
                         .')'
                         .'|log(?'
-                            .'|in(*:226)'
-                            .'|out(*:237)'
+                            .'|in(*:234)'
+                            .'|out(*:245)'
                         .')'
                     .')'
-                    .'|/(en|fr)?(*:256)'
-                .')$}sD',
+                    .'|/(en|fr)?(*:264)'
+                .')(?:/?)$}sD',
         );
         $this->dynamicRoutes = array(
-            33 => array(array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null, null)),
-            43 => array(array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null, null)),
-            55 => array(array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            72 => array(array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            91 => array(array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            107 => array(array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null, null)),
-            123 => array(array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null, null)),
-            147 => array(array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null, null)),
-            168 => array(array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null, null)),
-            195 => array(array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            209 => array(array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null, null)),
-            226 => array(array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null, null)),
-            237 => array(array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null, null)),
-            256 => array(array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null, null)),
+            32 => array(array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null, true, null)),
+            46 => array(array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null, false, null)),
+            58 => array(array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null, false, null)),
+            75 => array(array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null, false, null)),
+            94 => array(array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null, false, null)),
+            110 => array(array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null, true, null)),
+            130 => array(array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null, false, null)),
+            154 => array(array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null, false, null)),
+            175 => array(array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null, false, null)),
+            202 => array(array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null, false, null)),
+            216 => array(array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null, false, null)),
+            234 => array(array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null, false, null)),
+            245 => array(array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null, false, null)),
+            264 => array(array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null, false, null)),
         );
     }
 }

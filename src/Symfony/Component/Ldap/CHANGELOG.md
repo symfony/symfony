@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `EntryManager::applyOperations`
+ * Added timeout option to `ConnectionOptions`
 
 4.1.0
 -----

@@ -123,6 +123,8 @@ abstract class AbstractCloner implements ClonerInterface
         'IntlCalendar' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castIntlCalendar'),
         'IntlDateFormatter' => array('Symfony\Component\VarDumper\Caster\IntlCaster', 'castIntlDateFormatter'),
 
+        'Memcached' => array('Symfony\Component\VarDumper\Caster\MemcachedCaster', 'castMemcached'),
+
         ':curl' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'),
         ':dba' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'),
         ':dba persistent' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'),
@@ -174,7 +176,10 @@ abstract class AbstractCloner implements ClonerInterface
     public function addCasters(array $casters)
     {
         foreach ($casters as $type => $callback) {
-            $this->casters[strtolower($type)][] = \is_string($callback) && false !== strpos($callback, '::') ? explode('::', $callback, 2) : $callback;
+            $closure = &$this->casters[strtolower($type)][];
+            $closure = $callback instanceof \Closure ? $callback : static function (...$args) use ($callback, &$closure) {
+                return ($closure = \Closure::fromCallable($callback))(...$args);
+            };
         }
     }
 

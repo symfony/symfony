@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `ClassExistsMock`
+
 4.1.0
 -----
 

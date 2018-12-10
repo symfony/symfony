@@ -19,14 +19,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormatterInterface
+class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterface, ChoiceMessageFormatterInterface
 {
     private $translator;
+    private $intlFormatter;
 
     /**
      * @param TranslatorInterface|null $translator An identity translator to use as selector for pluralization
      */
-    public function __construct($translator = null)
+    public function __construct($translator = null, IntlFormatterInterface $intlFormatter = null)
     {
         if ($translator instanceof MessageSelector) {
             $translator = new IdentityTranslator($translator);
@@ -35,6 +36,7 @@ class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormat
         }
 
         $this->translator = $translator ?? new IdentityTranslator();
+        $this->intlFormatter = $intlFormatter ?? new IntlFormatter();
     }
 
     /**
@@ -51,12 +53,20 @@ class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormat
 
     /**
      * {@inheritdoc}
+     */
+    public function formatIntl(string $message, string $locale, array $parameters = array()): string
+    {
+        return $this->intlFormatter->formatIntl($message, $locale, $parameters);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @deprecated since Symfony 4.2, use format() with a %count% parameter instead
      */
     public function choiceFormat($message, $number, $locale, array $parameters = array())
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the format() one instead with a %count% parameter.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the format() one instead with a %%count%% parameter.', __METHOD__), E_USER_DEPRECATED);
 
         $parameters = array('%count%' => $number) + $parameters;
 

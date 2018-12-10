@@ -36,7 +36,7 @@ class ContainerControllerResolver extends ControllerResolver
     {
         if (1 === substr_count($controller, ':')) {
             $controller = str_replace(':', '::', $controller);
-            @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1. Use %s instead.', $controller), E_USER_DEPRECATED);
+            // TODO deprecate this in 5.1
         }
 
         return parent::createController($controller);

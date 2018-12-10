@@ -65,14 +65,13 @@ class ProjectServiceContainer extends Container
         $this->services['App\Bus'] = $instance = new \App\Bus($a);
 
         $b = ($this->privates['App\Schema'] ?? $this->getSchemaService());
+        $c = new \App\Registry();
+        $c->processor = array(0 => $a, 1 => $instance);
 
-        $d = new \App\Registry();
+        $d = new \App\Processor($c, $a);
 
-        $d->processor = array(0 => $a, 1 => $instance);
-        $c = new \App\Processor($d, $a);
-
-        $instance->handler1 = new \App\Handler1($a, $b, $c);
-        $instance->handler2 = new \App\Handler2($a, $b, $c);
+        $instance->handler1 = new \App\Handler1($a, $b, $d);
+        $instance->handler2 = new \App\Handler2($a, $b, $d);
 
         return $instance;
     }

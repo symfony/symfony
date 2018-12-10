@@ -353,6 +353,19 @@ class MarkdownDescriptor extends Descriptor
         if ($callable instanceof \Closure) {
             $string .= "\n- Type: `closure`";
 
+            $r = new \ReflectionFunction($callable);
+            if (false !== strpos($r->name, '{closure}')) {
+                return $this->write($string."\n");
+            }
+            $string .= "\n".sprintf('- Name: `%s`', $r->name);
+
+            if ($class = $r->getClosureScopeClass()) {
+                $string .= "\n".sprintf('- Class: `%s`', $class->name);
+                if (!$r->getClosureThis()) {
+                    $string .= "\n- Static: yes";
+                }
+            }
+
             return $this->write($string."\n");
         }
 

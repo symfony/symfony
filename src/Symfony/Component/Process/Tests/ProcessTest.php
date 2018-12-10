@@ -142,23 +142,12 @@ class ProcessTest extends TestCase
 
         $completeOutput = '';
         $result = $p->waitUntil(function ($type, $output) use (&$completeOutput) {
-            $completeOutput .= $output;
-            if (false !== strpos($output, 'One more')) {
-                return true;
-            }
-
-            return false;
+            return false !== strpos($completeOutput .= $output, 'One more');
         });
-        $p->stop();
         $this->assertTrue($result);
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            // Windows is slower
-            $this->assertLessThan(15, microtime(true) - $start);
-        } else {
-            $this->assertLessThan(2, microtime(true) - $start);
-        }
-        $this->assertEquals("First iteration output\nSecond iteration output\nOne more iteration output\n", $completeOutput);
+        $this->assertLessThan(20, microtime(true) - $start);
+        $this->assertStringStartsWith("First iteration output\nSecond iteration output\nOne more", $completeOutput);
+        $p->stop();
     }
 
     public function testWaitUntilCanReturnFalse()

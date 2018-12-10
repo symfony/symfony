@@ -21,13 +21,15 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  * Wraps all handlers in a single doctrine transaction.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
     private $managerRegistry;
     private $entityManagerName;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?string $entityManagerName)
+    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->entityManagerName = $entityManagerName;

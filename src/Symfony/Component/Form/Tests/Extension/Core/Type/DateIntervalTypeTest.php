@@ -410,4 +410,45 @@ class DateIntervalTypeTest extends BaseTypeTest
             'days' => '',
         ));
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(array('years' => '', 'months' => '', 'days' => ''), $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => $widget,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateInterval::createFromDateString('6 years and 4 months');
+
+        return array(
+            'Simple field' => array('single_text', 'P6Y4M0D', $expectedData),
+            'Compound text field' => array('text', array('years' => '06', 'months' => '04', 'days' => '00'), $expectedData),
+            'Compound integer field' => array('integer', array('years' => '6', 'months' => '4', 'days' => '0'), $expectedData),
+            'Compound choice field' => array('choice', array('years' => '6', 'months' => '4', 'days' => '0'), $expectedData),
+        );
+    }
 }

@@ -518,7 +518,7 @@ class XmlFileLoader extends FileLoader
                     try {
                         $arguments[$key] = new IteratorArgument($arg);
                     } catch (InvalidArgumentException $e) {
-                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="%s" only accepts collections of type="service" references in "%s".', $name, $file));
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="iterator" only accepts collections of type="service" references in "%s".', $name, $file));
                     }
                     break;
                 case 'service_locator':
@@ -526,7 +526,7 @@ class XmlFileLoader extends FileLoader
                     try {
                         $arguments[$key] = new ServiceLocatorArgument($arg);
                     } catch (InvalidArgumentException $e) {
-                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="%s" only accepts maps of type="service" references in "%s".', $name, $file));
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service_locator" only accepts maps of type="service" references in "%s".', $name, $file));
                     }
                     break;
                 case 'tagged':

@@ -59,7 +59,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        return $this->services['bar'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? $this->privates['bar_%env(BAR)%'] = new \stdClass()));
+        return $this->services['bar'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())));
     }
 
     /**
@@ -69,7 +69,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? $this->privates['bar_%env(BAR)%'] = new \stdClass()), array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
+        return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())), array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
     }
 
     public function getParameter($name)
@@ -117,7 +117,7 @@ class ProjectServiceContainer extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *

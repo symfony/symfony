@@ -57,17 +57,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $content = false;
         }
 
-        $requestFiles = array();
-        foreach ($request->files->all() as $files) {
-            foreach ($files as $fileName => $fileData) {
-                $requestFiles[] = array(
-                    'name' => $fileData->getClientOriginalName(),
-                    'mimetype' => $fileData->getMimeType(),
-                    'size' => $fileData->getSize(),
-                );
-            }
-        }
-
         $sessionMetadata = array();
         $sessionAttributes = array();
         $session = null;
@@ -106,7 +95,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'status_code' => $statusCode,
             'request_query' => $request->query->all(),
             'request_request' => $request->request->all(),
-            'request_files' => $requestFiles,
+            'request_files' => $request->files->all(),
             'request_headers' => $request->headers->all(),
             'request_server' => $request->server->all(),
             'request_cookies' => $request->cookies->all(),
@@ -210,7 +199,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function getRequestFiles()
     {
-        return $this->data['request_files']->getValue(true);
+        return new ParameterBag($this->data['request_files']->getValue());
     }
 
     public function getRequestHeaders()
@@ -420,12 +409,25 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         if ($controller instanceof \Closure) {
             $r = new \ReflectionFunction($controller);
 
-            return array(
+            $controller = array(
                 'class' => $r->getName(),
                 'method' => null,
                 'file' => $r->getFileName(),
                 'line' => $r->getStartLine(),
             );
+
+            if (false !== strpos($r->name, '{closure}')) {
+                return $controller;
+            }
+            $controller['method'] = $r->name;
+
+            if ($class = $r->getClosureScopeClass()) {
+                $controller['class'] = $class->name;
+            } else {
+                return $r->name;
+            }
+
+            return $controller;
         }
 
         if (\is_object($controller)) {

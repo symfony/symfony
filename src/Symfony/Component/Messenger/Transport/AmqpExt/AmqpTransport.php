@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @experimental in 4.2
  */
 class AmqpTransport implements TransportInterface
 {

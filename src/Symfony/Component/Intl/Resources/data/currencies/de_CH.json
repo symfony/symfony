@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.37",
+    "Version": "2.1.44.50",
     "Names": {
         "BYN": [
             "BYN",
@@ -13,13 +13,17 @@
             "EUR",
             "Euro"
         ],
-        "PEN": [
-            "PEN",
-            "Peruanischer Neuer Sol"
-        ],
         "STN": [
             "STN",
             "São-toméischer Dobra (2018)"
+        ],
+        "VEF": [
+            "VEF",
+            "Venezolanischer Bolívar"
+        ],
+        "VES": [
+            "VES",
+            "VES"
         ]
     }
 }

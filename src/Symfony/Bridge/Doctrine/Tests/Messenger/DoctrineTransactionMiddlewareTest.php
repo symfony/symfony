@@ -14,19 +14,15 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\Messenger\DummyMiddleware;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\Messenger\ThrowingMiddleware;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
-class DoctrineTransactionMiddlewareTest extends TestCase
+class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 {
     private $connection;
     private $entityManager;
     private $middleware;
-    private $stack;
 
     public function setUp()
     {
@@ -38,9 +34,7 @@ class DoctrineTransactionMiddlewareTest extends TestCase
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->method('getManager')->willReturn($this->entityManager);
 
-        $this->middleware = new DoctrineTransactionMiddleware($managerRegistry, null);
-
-        $this->stack = $this->createMock(StackInterface::class);
+        $this->middleware = new DoctrineTransactionMiddleware($managerRegistry);
     }
 
     public function testMiddlewareWrapsInTransactionAndFlushes()
@@ -54,15 +48,14 @@ class DoctrineTransactionMiddlewareTest extends TestCase
         $this->entityManager->expects($this->once())
             ->method('flush')
         ;
-        $this->stack
-            ->expects($this->once())
-            ->method('next')
-            ->willReturn(new DummyMiddleware())
-        ;
 
-        $this->middleware->handle(new Envelope(new \stdClass()), $this->stack);
+        $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Thrown from next middleware.
+     */
     public function testTransactionIsRolledBackOnException()
     {
         $this->connection->expects($this->once())
@@ -71,14 +64,7 @@ class DoctrineTransactionMiddlewareTest extends TestCase
         $this->connection->expects($this->once())
             ->method('rollBack')
         ;
-        $this->stack
-            ->expects($this->once())
-            ->method('next')
-            ->willReturn(new ThrowingMiddleware())
-        ;
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Thrown from middleware.');
 
-        $this->middleware->handle(new Envelope(new \stdClass()), $this->stack);
+        $this->middleware->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
     }
 }

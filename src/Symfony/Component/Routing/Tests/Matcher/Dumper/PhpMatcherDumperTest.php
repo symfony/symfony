@@ -472,9 +472,6 @@ class PhpMatcherDumperTest extends TestCase
         );
     }
 
-    /**
-     * @param $dumper
-     */
     private function generateDumpedMatcher(RouteCollection $collection, $redirectableStub = false)
     {
         $options = array('class' => $this->matcherClass);

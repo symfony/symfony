@@ -13,22 +13,22 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Transport\Sender\Locator\AbstractSenderLocator;
-use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
+use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @experimental in 4.2
  */
 class SendMessageMiddleware implements MiddlewareInterface
 {
-    private $senderLocator;
-    private $messagesToSendAndHandleMapping;
+    private $sendersLocator;
 
-    public function __construct(SenderLocatorInterface $senderLocator, array $messagesToSendAndHandleMapping = array())
+    public function __construct(SendersLocatorInterface $sendersLocator)
     {
-        $this->senderLocator = $senderLocator;
-        $this->messagesToSendAndHandleMapping = $messagesToSendAndHandleMapping;
+        $this->sendersLocator = $sendersLocator;
     }
 
     /**
@@ -36,22 +36,22 @@ class SendMessageMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if ($envelope->get(ReceivedStamp::class)) {
-            // It's a received message. Do not send it back:
+        if ($envelope->all(ReceivedStamp::class)) {
+            // it's a received message, do not send it back
+            return $stack->next()->handle($envelope, $stack);
+        }
+        $handle = false;
+        $sender = null;
+
+        foreach ($this->sendersLocator->getSenders($envelope, $handle) as $alias => $sender) {
+            $envelope = $sender->send($envelope)->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null));
+        }
+
+        if (null === $sender || $handle) {
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $sender = $this->senderLocator->getSender($envelope);
-
-        if ($sender) {
-            $envelope = $sender->send($envelope);
-
-            if (!AbstractSenderLocator::getValueFromMessageRouting($this->messagesToSendAndHandleMapping, $envelope)) {
-                // message has no corresponding handler
-                return $envelope;
-            }
-        }
-
-        return $stack->next()->handle($envelope, $stack);
+        // message should only be sent and not be handled by the next middleware
+        return $envelope;
     }
 }

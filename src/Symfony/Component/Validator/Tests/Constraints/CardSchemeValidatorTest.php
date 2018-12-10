@@ -103,6 +103,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             array('MASTERCARD', '2699999999999999'),
             array('MASTERCARD', '2709999999999999'),
             array('MASTERCARD', '2720995105105100'),
+            array('UATP', '110165309696173'),
             array('VISA', '4111111111111111'),
             array('VISA', '4012888888881881'),
             array('VISA', '4222222222222'),
@@ -133,6 +134,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             array('DISCOVER', '1117', CardScheme::INVALID_FORMAT_ERROR), // only last 4 digits
             array('MASTERCARD', '2721001234567890', CardScheme::INVALID_FORMAT_ERROR), // Not assigned yet
             array('MASTERCARD', '2220991234567890', CardScheme::INVALID_FORMAT_ERROR), // Not assigned yet
+            array('UATP', '11016530969617', CardScheme::INVALID_FORMAT_ERROR), // invalid length
         );
     }
 }

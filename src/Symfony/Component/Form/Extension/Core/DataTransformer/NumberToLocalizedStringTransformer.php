@@ -120,8 +120,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
-        // Convert fixed spaces to normal ones
-        $value = str_replace("\xc2\xa0", ' ', $value);
+        // Convert non-breaking and narrow non-breaking spaces to normal ones
+        $value = str_replace(array("\xc2\xa0", "\xe2\x80\xaf"), ' ', $value);
 
         return $value;
     }
@@ -146,7 +146,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             return;
         }
 
-        if ('NaN' === $value) {
+        if (\in_array($value, array('NaN', 'NAN', 'nan'), true)) {
             throw new TransformationFailedException('"NaN" is not a valid number');
         }
 

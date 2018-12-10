@@ -83,12 +83,12 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
             $this->hash = $this->computeHash();
         }
 
-        return serialize(array($this->prefix, $this->pattern, $this->recursive, $this->hash));
+        return serialize(array($this->prefix, $this->pattern, $this->recursive, $this->hash, $this->forExclusion, $this->excludedPrefixes));
     }
 
     public function unserialize($serialized)
     {
-        list($this->prefix, $this->pattern, $this->recursive, $this->hash) = unserialize($serialized);
+        list($this->prefix, $this->pattern, $this->recursive, $this->hash, $this->forExclusion, $this->excludedPrefixes) = unserialize($serialized) + array(4 => false, array());
     }
 
     public function getIterator()
@@ -96,9 +96,19 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
         if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {
             return;
         }
+        $prefix = str_replace('\\', '/', $this->prefix);
 
         if (0 !== strpos($this->prefix, 'phar://') && false === strpos($this->pattern, '/**/') && (\defined('GLOB_BRACE') || false === strpos($this->pattern, '{'))) {
             foreach (glob($this->prefix.$this->pattern, \defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $path) {
+                if ($this->excludedPrefixes) {
+                    $normalizedPath = str_replace('\\', '/', $path);
+                    do {
+                        if (isset($this->excludedPrefixes[$dirPath = $normalizedPath])) {
+                            continue 2;
+                        }
+                    } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
+                }
+
                 if (is_file($path)) {
                     yield $path => new \SplFileInfo($path);
                 }
@@ -145,9 +155,19 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
 
         $prefixLen = \strlen($this->prefix);
         foreach ($finder->followLinks()->sortByName()->in($this->prefix) as $path => $info) {
-            if (preg_match($regex, substr(str_replace('\\', '/', $path), $prefixLen)) && $info->isFile()) {
-                yield $path => $info;
+            $normalizedPath = str_replace('\\', '/', $path);
+            if (!preg_match($regex, substr($normalizedPath, $prefixLen)) || !$info->isFile()) {
+                continue;
             }
+            if ($this->excludedPrefixes) {
+                do {
+                    if (isset($this->excludedPrefixes[$dirPath = $normalizedPath])) {
+                        continue 2;
+                    }
+                } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
+            }
+
+            yield $path => $info;
         }
     }
 

@@ -28,7 +28,7 @@
         "psr/link": "^1.0",
         "psr/log": "~1.0",
         "psr/simple-cache": "^1.0",
-        "symfony/contracts": "^1.0",
+        "symfony/contracts": "^1.0.2",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
@@ -147,7 +147,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

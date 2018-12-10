@@ -254,11 +254,11 @@ class ObjectNormalizerTest extends TestCase
 
         $result = $normalizer->denormalize($data, DummyValueObject::class, 'json', array(
             'default_constructor_arguments' => array(
-                DummyValueObject::class => array('foo' => '', 'bar' => ''),
+                DummyValueObject::class => array('foo' => '', 'bar' => '', 'baz' => null),
             ),
         ));
 
-        $this->assertEquals(new DummyValueObject(10, ''), $result);
+        $this->assertEquals(new DummyValueObject(10, '', null), $result);
     }
 
     public function testGroupsNormalize()
@@ -1268,11 +1268,13 @@ class DummyValueObject
 {
     private $foo;
     private $bar;
+    private $baz;
 
-    public function __construct($foo, $bar)
+    public function __construct($foo, $bar, $baz)
     {
         $this->foo = $foo;
         $this->bar = $bar;
+        $this->baz = $baz;
     }
 }
 

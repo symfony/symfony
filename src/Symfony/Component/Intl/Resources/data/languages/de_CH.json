@@ -1,8 +1,9 @@
 {
-    "Version": "2.1.39.37",
+    "Version": "2.1.44.50",
     "Names": {
         "ace": "Aceh-Sprache",
         "ach": "Acholi-Sprache",
+        "ars": "Nadschd-Arabisch",
         "bas": "Basaa-Sprache",
         "be": "Weissrussisch",
         "bik": "Bikol-Sprache",

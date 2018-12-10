@@ -158,6 +158,12 @@ EOF
         foreach ($this->namespaces as $namespace) {
             if (class_exists($fqcn = $namespace.'\\'.$shortClassName)) {
                 $classes[] = $fqcn;
+            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName))) {
+                $classes[] = $fqcn;
+            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName).'Type')) {
+                $classes[] = $fqcn;
+            } elseif ('type' === substr($shortClassName, -4) && class_exists($fqcn = $namespace.'\\'.ucfirst(substr($shortClassName, 0, -4).'Type'))) {
+                $classes[] = $fqcn;
             }
         }
 

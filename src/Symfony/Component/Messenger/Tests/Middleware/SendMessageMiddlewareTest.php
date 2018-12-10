@@ -12,14 +12,15 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
-use Symfony\Component\Messenger\Transport\Sender\Locator\SenderLocatorInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SendMessageMiddlewareTest extends MiddlewareTestCase
 {
@@ -29,19 +30,24 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender));
+        $middleware = new SendMessageMiddleware(new SendersLocator(array(DummyMessage::class => array($sender))));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
-        $middleware->handle($envelope, $this->getStackMock(false));
+        $envelope = $middleware->handle($envelope, $this->getStackMock(false));
+
+        /* @var SentStamp $stamp */
+        $this->assertInstanceOf(SentStamp::class, $stamp = $envelope->last(SentStamp::class), 'it adds a sent stamp');
+        $this->assertNull($stamp->getSenderAlias());
+        $this->assertStringMatchesFormat('Mock_SenderInterface_%s', $stamp->getSenderClass());
     }
 
     public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
     {
-        $envelope = new Envelope(new DummyMessage('Hey'));
+        $envelope = new Envelope(new ChildDummyMessage('Hey'));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender));
+        $middleware = new SendMessageMiddleware(new SendersLocator(array(DummyMessage::class => array($sender))));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -54,9 +60,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
             DummyMessage::class => true,
-        ));
+        )));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -69,9 +75,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
             DummyMessage::class => true,
-        ));
+        )));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -84,9 +90,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
             DummyMessageInterface::class => true,
-        ));
+        )));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -99,9 +105,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
             '*' => true,
-        ));
+        )));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -113,8 +119,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator(null));
-        $handler = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
+        $middleware = new SendMessageMiddleware(new SendersLocator(array()));
 
         $middleware->handle($envelope, $this->getStackMock());
     }
@@ -125,25 +130,12 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new InMemorySenderLocator($sender));
+        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender))));
 
         $sender->expects($this->never())->method('send');
 
-        $middleware->handle($envelope, $this->getStackMock());
-    }
-}
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
 
-class InMemorySenderLocator implements SenderLocatorInterface
-{
-    private $sender;
-
-    public function __construct(?SenderInterface $sender)
-    {
-        $this->sender = $sender;
-    }
-
-    public function getSender(Envelope $envelope): ?SenderInterface
-    {
-        return $this->sender;
+        $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
     }
 }

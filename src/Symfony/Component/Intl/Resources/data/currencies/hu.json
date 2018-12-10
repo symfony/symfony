@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.43.65",
     "Names": {
         "ADP": [
             "ADP",
@@ -355,7 +355,7 @@
         ],
         "GBP": [
             "GBP",
-            "brit font"
+            "angol font"
         ],
         "GEK": [
             "GEK",
@@ -971,6 +971,10 @@
         ],
         "VEF": [
             "VEF",
+            "venezuelai bolivar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "venezuelai bolivar"
         ],
         "VND": [

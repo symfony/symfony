@@ -50,13 +50,16 @@
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\": "" },
         "exclude-from-classmap": [
-            "/Tests/"
+            "/Core/Tests/",
+            "/Csrf/Tests/",
+            "/Guard/Tests/",
+            "/Http/Tests/"
         ]
     },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

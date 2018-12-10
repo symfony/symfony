@@ -12,9 +12,11 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Handler\Locator\HandlerLocator;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class HandleMessageMiddlewareTest extends MiddlewareTestCase
@@ -26,8 +28,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $handler = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array(
-            DummyMessage::class => $handler,
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array(
+            DummyMessage::class => array($handler),
         )));
 
         $handler->expects($this->once())->method('__invoke')->with($message);
@@ -36,19 +38,68 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
     }
 
     /**
+     * @dataProvider itAddsHandledStampsProvider
+     */
+    public function testItAddsHandledStamps(array $handlers, array $expectedStamps)
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array(
+            DummyMessage::class => $handlers,
+        )));
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
+    }
+
+    public function itAddsHandledStampsProvider()
+    {
+        $first = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $first->method('__invoke')->willReturn('first result');
+        $firstClass = \get_class($first);
+
+        $second = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $second->method('__invoke')->willReturn(null);
+        $secondClass = \get_class($second);
+
+        yield 'A stamp is added' => array(
+            array($first),
+            array(new HandledStamp('first result', $firstClass.'::__invoke')),
+        );
+
+        yield 'A stamp is added per handler' => array(
+            array($first, $second),
+            array(
+                new HandledStamp('first result', $firstClass.'::__invoke'),
+                new HandledStamp(null, $secondClass.'::__invoke'),
+            ),
+        );
+
+        yield 'Yielded locator alias is used' => array(
+            array('first_alias' => $first, $second),
+            array(
+                new HandledStamp('first result', $firstClass.'::__invoke', 'first_alias'),
+                new HandledStamp(null, $secondClass.'::__invoke'),
+            ),
+        );
+    }
+
+    /**
      * @expectedException \Symfony\Component\Messenger\Exception\NoHandlerForMessageException
      * @expectedExceptionMessage No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
      */
     public function testThrowsNoHandlerException()
     {
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array()));
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array()));
 
         $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
     }
 
     public function testAllowNoHandlers()
     {
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array()), true);
+        $middleware = new HandleMessageMiddleware(new HandlersLocator(array()), true);
 
         $this->assertInstanceOf(Envelope::class, $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
     }

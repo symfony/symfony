@@ -34,7 +34,7 @@
         "doctrine/dbal": "~2.5",
         "predis/predis": "~1.1",
         "symfony/config": "~4.2",
-        "symfony/dependency-injection": "~3.4",
+        "symfony/dependency-injection": "~3.4|~4.1",
         "symfony/var-dumper": "^4.1.1"
     },
     "conflict": {
@@ -51,7 +51,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

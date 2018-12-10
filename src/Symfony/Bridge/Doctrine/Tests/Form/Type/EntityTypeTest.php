@@ -1482,4 +1482,43 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(), $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
+    {
+        $emptyData = '1';
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $this->persist(array($entity1));
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertSame($entity1, $form->getNormData());
+        $this->assertSame($entity1, $form->getData());
+    }
+
+    public function testSubmitNullMultipleUsesDefaultEmptyData()
+    {
+        $emptyData = array('1');
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $this->persist(array($entity1));
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'multiple' => true,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $collection = new ArrayCollection(array($entity1));
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($collection, $form->getNormData());
+        $this->assertEquals($collection, $form->getData());
+    }
 }

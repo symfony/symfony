@@ -137,7 +137,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             'localhost',
             11222,
         );
-        if (ini_get('memcached.use_sasl')) {
+        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
             yield array(
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -154,7 +154,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             '/var/local/run/memcached.socket',
             0,
         );
-        if (ini_get('memcached.use_sasl')) {
+        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
             yield array(
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',
@@ -191,6 +191,11 @@ class MemcachedAdapterTest extends AdapterTestCase
             array(\Memcached::OPT_RETRY_TIMEOUT => 8),
             array(\Memcached::OPT_SOCKET_RECV_SIZE => 1, \Memcached::OPT_SOCKET_SEND_SIZE => 2, \Memcached::OPT_RETRY_TIMEOUT => 8),
         );
+    }
+
+    public function testClear()
+    {
+        $this->assertTrue($this->createCachePool()->clear());
     }
 
     public function testMultiServerDsn()

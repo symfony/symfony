@@ -33,15 +33,18 @@ class ReflectionCaster
 
     public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested, $filter = 0)
     {
+        $prefix = Caster::PREFIX_VIRTUAL;
         $c = new \ReflectionFunction($c);
 
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
 
-        $stub->class .= self::getSignature($a);
+        if (false === strpos($c->name, '{closure}')) {
+            $stub->class = isset($a[$prefix.'class']) ? $a[$prefix.'class']->value.'::'.$c->name : $c->name;
+            unset($a[$prefix.'class']);
+        }
+        unset($a[$prefix.'extra']);
 
-        $prefix = Caster::PREFIX_DYNAMIC;
-        unset($a['name'], $a[$prefix.'this'], $a[$prefix.'parameter'], $a[Caster::PREFIX_VIRTUAL.'extra']);
-        $prefix = Caster::PREFIX_VIRTUAL;
+        $stub->class .= self::getSignature($a);
 
         if ($filter & Caster::EXCLUDE_VERBOSE) {
             $stub->cut += ($c->getFileName() ? 2 : 0) + \count($a);

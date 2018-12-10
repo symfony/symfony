@@ -1,9 +1,13 @@
 {
-    "Version": "2.1.41.97",
+    "Version": "2.1.41.45",
     "Names": {
         "VEF": [
             "Bs.",
             "bolívar venezolano"
+        ],
+        "VES": [
+            "Bs.S",
+            "bolívar soberano"
         ]
     }
 }

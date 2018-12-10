@@ -790,4 +790,44 @@ class TimeTypeTest extends BaseTypeTest
 
         parent::testSubmitNull($expected, $norm, $view);
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(array('hour' => '', 'minute' => ''), $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => $widget,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '1970-01-01 21:23');
+
+        return array(
+            'Simple field' => array('single_text', '21:23', $expectedData),
+            'Compound text field' => array('text', array('hour' => '21', 'minute' => '23'), $expectedData),
+            'Compound choice field' => array('choice', array('hour' => '21', 'minute' => '23'), $expectedData),
+        );
+    }
 }

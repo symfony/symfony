@@ -38,9 +38,9 @@ class DateIntervalType extends AbstractType
         'seconds',
     );
     private static $widgets = array(
-        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        'integer' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType',
-        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+        'text' => TextType::class,
+        'integer' => IntegerType::class,
+        'choice' => ChoiceType::class,
     );
 
     /**
@@ -96,31 +96,23 @@ class DateIntervalType extends AbstractType
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateIntervalToStringTransformer($format));
         } else {
-            $childOptions = array();
             foreach ($this->timeParts as $part) {
                 if ($options['with_'.$part]) {
-                    $childOptions[$part] = array(
+                    $childOptions = array(
                         'error_bubbling' => true,
                         'label' => $options['labels'][$part],
+                        // Append generic carry-along options
+                        'required' => $options['required'],
+                        'translation_domain' => $options['translation_domain'],
+                        // when compound the array entries are ignored, we need to cascade the configuration here
+                        'empty_data' => isset($options['empty_data'][$part]) ? $options['empty_data'][$part] : null,
                     );
                     if ('choice' === $options['widget']) {
-                        $childOptions[$part]['choice_translation_domain'] = false;
-                        $childOptions[$part]['choices'] = $options[$part];
-                        $childOptions[$part]['placeholder'] = $options['placeholder'][$part];
+                        $childOptions['choice_translation_domain'] = false;
+                        $childOptions['choices'] = $options[$part];
+                        $childOptions['placeholder'] = $options['placeholder'][$part];
                     }
-                }
-            }
-            // Append generic carry-along options
-            foreach (array('required', 'translation_domain') as $passOpt) {
-                foreach ($this->timeParts as $part) {
-                    if ($options['with_'.$part]) {
-                        $childOptions[$part][$passOpt] = $options[$passOpt];
-                    }
-                }
-            }
-            foreach ($this->timeParts as $part) {
-                if ($options['with_'.$part]) {
-                    $childForm = $builder->create($part, self::$widgets[$options['widget']], $childOptions[$part]);
+                    $childForm = $builder->create($part, self::$widgets[$options['widget']], $childOptions);
                     if ('integer' === $options['widget']) {
                         $childForm->addModelTransformer(
                             new ReversedTransformer(
@@ -132,7 +124,7 @@ class DateIntervalType extends AbstractType
                 }
             }
             if ($options['with_invert']) {
-                $builder->add('invert', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', array(
+                $builder->add('invert', CheckboxType::class, array(
                     'label' => $options['labels']['invert'],
                     'error_bubbling' => true,
                     'required' => false,
@@ -179,6 +171,9 @@ class DateIntervalType extends AbstractType
         $timeParts = $this->timeParts;
         $compound = function (Options $options) {
             return 'single_text' !== $options['widget'];
+        };
+        $emptyData = function (Options $options) {
+            return 'single_text' === $options['widget'] ? '' : array();
         };
 
         $placeholderDefault = function (Options $options) {
@@ -238,6 +233,7 @@ class DateIntervalType extends AbstractType
                 // this option.
                 'data_class' => null,
                 'compound' => $compound,
+                'empty_data' => $emptyData,
                 'labels' => array(),
             )
         );

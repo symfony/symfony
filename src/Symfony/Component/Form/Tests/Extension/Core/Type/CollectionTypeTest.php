@@ -408,4 +408,10 @@ class CollectionTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull(array(), array(), array());
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = array())
+    {
+        // resize form listener always set an empty array
+        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
 }

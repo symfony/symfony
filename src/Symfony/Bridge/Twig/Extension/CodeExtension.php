@@ -135,7 +135,7 @@ class CodeExtension extends AbstractExtension
      */
     public function fileExcerpt($file, $line, $srcContext = 3)
     {
-        if (is_readable($file)) {
+        if (is_file($file) && is_readable($file)) {
             // highlight_file could throw warnings
             // see https://bugs.php.net/bug.php?id=25725
             $code = @highlight_file($file, true);
@@ -158,6 +158,8 @@ class CodeExtension extends AbstractExtension
 
             return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
         }
+
+        return null;
     }
 
     /**

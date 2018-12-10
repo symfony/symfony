@@ -13,11 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
@@ -221,8 +223,20 @@ class Configuration implements ConfigurationInterface
                                 $workflows = $v;
                                 unset($workflows['enabled']);
 
-                                if (1 === \count($workflows) && isset($workflows[0]['enabled'])) {
+                                if (1 === \count($workflows) && isset($workflows[0]['enabled']) && 1 === \count($workflows[0])) {
                                     $workflows = array();
+                                }
+
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), array('audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_place', 'places', 'transitions')))) {
+                                    $workflows = $workflows['workflows'];
+                                }
+
+                                foreach ($workflows as $key => $workflow) {
+                                    if (isset($workflow['enabled']) && false === $workflow['enabled']) {
+                                        throw new LogicException(sprintf('Cannot disable a single workflow. Remove the configuration for the workflow "%s" instead.', $workflow['name']));
+                                    }
+
+                                    unset($workflows[$key]['enabled']);
                                 }
 
                                 $v = array(
@@ -492,7 +506,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->integerNode('metadata_update_threshold')
-                            ->defaultValue('0')
+                            ->defaultValue(0)
                             ->info('seconds to wait between 2 session metadata updates')
                         ->end()
                     ->end()
@@ -699,7 +713,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('en'))
                         ->end()
                         ->booleanNode('logging')->defaultValue(false)->end()
-                        ->scalarNode('formatter')->defaultValue(class_exists(\MessageFormatter::class) ? 'translator.formatter.default' : 'translator.formatter.symfony')->end()
+                        ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->scalarNode('default_path')
                             ->info('The default path used to load translations')
                             ->defaultValue('%kernel.project_dir%/translations')
@@ -869,7 +883,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
-                        ->scalarNode('default_pdo_provider')->defaultValue('doctrine.dbal.default_connection')->end()
+                        ->scalarNode('default_pdo_provider')->defaultValue(class_exists(Connection::class) ? 'database_connection' : null)->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
@@ -1046,7 +1060,7 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->children()
-                                ->scalarNode('id')->defaultValue('messenger.transport.symfony_serializer')->end()
+                                ->scalarNode('id')->defaultValue(!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'messenger.transport.symfony_serializer' : null)->end()
                                 ->scalarNode('format')->defaultValue('json')->end()
                                 ->arrayNode('context')
                                     ->normalizeKeys(false)
@@ -1077,7 +1091,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
-                        ->scalarNode('default_bus')->defaultValue(null)->end()
+                        ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
                             ->defaultValue(array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())))
                             ->useAttributeAsKey('name')

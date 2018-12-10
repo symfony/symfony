@@ -439,6 +439,28 @@ class PhpDumperTest extends TestCase
         $this->assertSame(array('foo', 'bar'), $container->getParameter('hello'));
     }
 
+    public function testDumpedDefaultEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fallback_param', 'baz');
+        $container->setParameter('fallback_env', '%env(foobar)%');
+        $container->setParameter('env(foobar)', 'foobaz');
+        $container->setParameter('env(foo)', '{"foo": "bar"}');
+        $container->setParameter('hello', '%env(default:fallback_param:bar)%');
+        $container->setParameter('hello-bar', '%env(default:fallback_env:key:baz:json:foo)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_default_env.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_DefaultParameters')));
+
+        require self::$fixturesPath.'/php/services_default_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_DefaultParameters();
+        $this->assertSame('baz', $container->getParameter('hello'));
+        $this->assertSame('foobaz', $container->getParameter('hello-bar'));
+    }
+
     public function testDumpedJsonEnvParameters()
     {
         $container = new ContainerBuilder();
@@ -799,7 +821,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(false);
         $container->register('public_foo', 'stdClass')
             ->setPublic(true)
-            ->addArgument(new Expression('service("private_foo")'));
+            ->addArgument(new Expression('service("private_foo").bar'));
 
         $container->compile();
         $dumper = new PhpDumper($container);
@@ -880,6 +902,8 @@ class PhpDumperTest extends TestCase
 
         $foo6 = $container->get('foo6');
         $this->assertEquals((object) array('bar6' => (object) array()), $foo6);
+
+        $this->assertInstanceOf(\stdClass::class, $container->get('root'));
     }
 
     public function provideAlmostCircular()

@@ -29,7 +29,7 @@ class TraceableMessageBusTest extends TestCase
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
-        $this->assertInstanceOf(Envelope::class, $traceableBus->dispatch($message));
+        $traceableBus->dispatch($message);
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
@@ -52,11 +52,11 @@ class TraceableMessageBusTest extends TestCase
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
-        $this->assertInstanceOf(Envelope::class, $traceableBus->dispatch($envelope));
+        $traceableBus->dispatch($envelope);
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $this->assertArraySubset(array(
             'message' => $message,
-            'stamps' => array($stamp),
+            'stamps' => array(array($stamp)),
             'caller' => array(
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,

@@ -195,6 +195,32 @@ class WorkflowTest extends TestCase
         $workflow->buildTransitionBlockerList($subject, '404 Not Found');
     }
 
+    public function testBuildTransitionBlockerList()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
+
+        $subject->marking = array('b' => 1);
+
+        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
+
+        $subject->marking = array('b' => 1, 'c' => 1);
+
+        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
+
+        $subject->marking = array('f' => 1);
+
+        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't5')->isEmpty());
+        $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't6')->isEmpty());
+    }
+
     public function testBuildTransitionBlockerListReturnsReasonsProvidedByMarking()
     {
         $definition = $this->createComplexWorkflowDefinition();
@@ -373,6 +399,8 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $eventNameExpected = array(
+            'workflow.entered',
+            'workflow.workflow_name.entered',
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.t1',

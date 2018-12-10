@@ -658,6 +658,8 @@ class Crawler implements \Countable, \IteratorAggregate
             foreach ($attributes as $attribute) {
                 if ('_text' === $attribute) {
                     $elements[] = $node->nodeValue;
+                } elseif ('_name' === $attribute) {
+                    $elements[] = $node->nodeName;
                 } else {
                     $elements[] = $node->getAttribute($attribute);
                 }

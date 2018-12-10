@@ -101,7 +101,7 @@ class RedisCaster
     }
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster
+     * @param \Redis|\RedisArray|\RedisCluster $redis
      */
     private static function getRedisOptions($redis, array $options = array()): EnumStub
     {

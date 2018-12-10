@@ -416,6 +416,8 @@ EOF
         $this->assertEquals(array(array(), array(), array()), $crawler->extract(array()), '->extract() returns empty arrays if the attribute list is empty');
 
         $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
+
+        $this->assertEquals(array(array('One', 'li'), array('Two', 'li'), array('Three', 'li')), $crawler->extract(array('_text', '_name')), '->extract() returns an array of extracted data from the node list');
     }
 
     public function testFilterXpathComplexQueries()

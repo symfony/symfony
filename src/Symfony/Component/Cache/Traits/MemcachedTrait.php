@@ -70,8 +70,8 @@ trait MemcachedTrait
      * - 'memcached://user:pass@localhost?weight=33'
      * - array(array('localhost', 11211, 33))
      *
-     * @param array[]|string|string[] An array of servers, a DSN, or an array of DSNs
-     * @param array                   An array of options
+     * @param array[]|string|string[] $servers An array of servers, a DSN, or an array of DSNs
+     * @param array                   $options An array of options
      *
      * @return \Memcached
      *
@@ -292,7 +292,7 @@ trait MemcachedTrait
      */
     protected function doClear($namespace)
     {
-        return false;
+        return '' === $namespace && $this->getClient()->flush();
     }
 
     private function checkResultCode($result)

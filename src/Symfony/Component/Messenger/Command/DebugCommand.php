@@ -22,6 +22,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * A console command to debug Messenger information.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class DebugCommand extends Command
 {
@@ -42,7 +44,7 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of %s)', implode(', ', array_keys($this->mapping))), null)
+            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of %s)', implode(', ', array_keys($this->mapping))))
             ->setDescription('Lists messages you can dispatch using the message buses')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be

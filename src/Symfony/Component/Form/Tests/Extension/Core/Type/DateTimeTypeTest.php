@@ -628,4 +628,47 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
     }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(
+            array('date' => array('year' => '', 'month' => '', 'day' => ''), 'time' => array('hour' => '', 'minute' => '')),
+            $form->getViewData()
+        );
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => $widget,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '2018-11-11 21:23');
+
+        return array(
+            'Simple field' => array('single_text', '2018-11-11T21:23:00', $expectedData),
+            'Compound text field' => array('text', array('date' => array('year' => '2018', 'month' => '11', 'day' => '11'), 'time' => array('hour' => '21', 'minute' => '23')), $expectedData),
+            'Compound choice field' => array('choice', array('date' => array('year' => '2018', 'month' => '11', 'day' => '11'), 'time' => array('hour' => '21', 'minute' => '23')), $expectedData),
+        );
+    }
 }

@@ -30,7 +30,7 @@ class DebugAutowiringCommandTest extends WebTestCase
         $tester->run(array('command' => 'debug:autowiring'));
 
         $this->assertContains('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
-        $this->assertContains('alias to http_kernel', $tester->getDisplay());
+        $this->assertContains('(http_kernel)', $tester->getDisplay());
     }
 
     public function testSearchArgument()

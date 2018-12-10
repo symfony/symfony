@@ -35,53 +35,56 @@ trait ContractsTrait
     /**
      * Wraps the callback passed to ->get() in a callable.
      *
-     * @param callable(ItemInterface, callable, CacheInterface):mixed $callbackWrapper
-     *
      * @return callable the previous callback wrapper
      */
-    public function setCallbackWrapper(callable $callbackWrapper): callable
+    public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
         $previousWrapper = $this->callbackWrapper;
-        $this->callbackWrapper = $callbackWrapper;
+        $this->callbackWrapper = $callbackWrapper ?? function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool) {
+            return $callback($item, $save);
+        };
 
         return $previousWrapper;
     }
 
-    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta)
+    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta, array &$metadata = null)
     {
         if (0 > $beta = $beta ?? 1.0) {
             throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', \get_class($this), $beta));
         }
 
-        static $save;
+        static $setMetadata;
 
-        $save = $save ?? \Closure::bind(
-            function (AdapterInterface $pool, ItemInterface $item, $value, float $startTime) {
-                if ($startTime && $item->expiry > $endTime = microtime(true)) {
+        $setMetadata = $setMetadata ?? \Closure::bind(
+            function (AdapterInterface $pool, ItemInterface $item, float $startTime) {
+                if ($item->expiry > $endTime = microtime(true)) {
                     $item->newMetadata[ItemInterface::METADATA_EXPIRY] = $item->expiry;
                     $item->newMetadata[ItemInterface::METADATA_CTIME] = 1000 * (int) ($endTime - $startTime);
                 }
-                $pool->save($item->set($value));
-
-                return $value;
             },
             null,
             CacheItem::class
         );
 
-        return $this->contractsGet($pool, $key, function (CacheItem $item) use ($pool, $callback, $save) {
+        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata) {
             // don't wrap nor save recursive calls
             if (null === $callbackWrapper = $this->callbackWrapper) {
-                return $callback($item);
+                $value = $callback($item, $save);
+                $save = false;
+
+                return $value;
             }
             $this->callbackWrapper = null;
-            $t = microtime(true);
+            $startTime = microtime(true);
 
             try {
-                return $save($pool, $item, $callbackWrapper($item, $callback, $pool), $t);
+                $value = $callbackWrapper($callback, $item, $save, $pool);
+                $setMetadata($pool, $item, $startTime);
+
+                return $value;
             } finally {
                 $this->callbackWrapper = $callbackWrapper;
             }
-        }, $beta);
+        }, $beta, $metadata);
     }
 }

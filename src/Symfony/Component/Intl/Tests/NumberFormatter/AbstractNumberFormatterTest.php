@@ -57,6 +57,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatCurrencyWithCurrencyStyle($value, $currency, $expected)
     {
+        IntlTestHelper::requireIntl($this, '63.1');
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
     }
@@ -64,9 +66,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
     public function formatCurrencyWithCurrencyStyleProvider()
     {
         return array(
-            array(100, 'ALL', 'ALL100'),
-            array(-100, 'ALL', '-ALL100'),
-            array(1000.12, 'ALL', 'ALL1,000'),
+            array(100, 'ALL', "ALL\xc2\xa0100"),
+            array(-100, 'ALL', "-ALL\xc2\xa0100"),
+            array(1000.12, 'ALL', "ALL\xc2\xa01,000"),
 
             array(100, 'JPY', '¥100'),
             array(-100, 'JPY', '-¥100'),
@@ -83,7 +85,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected)
     {
-        IntlTestHelper::requireIntl($this, '58.1');
+        IntlTestHelper::requireIntl($this, '63.1');
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
@@ -92,9 +94,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
     public function formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider()
     {
         return array(
-            array(100, 'CRC', 'CRC', '%s100.00'),
-            array(-100, 'CRC', 'CRC', '-%s100.00'),
-            array(1000.12, 'CRC', 'CRC', '%s1,000.12'),
+            array(100, 'CRC', 'CRC', "%s\xc2\xa0100.00"),
+            array(-100, 'CRC', 'CRC', "-%s\xc2\xa0100.00"),
+            array(1000.12, 'CRC', 'CRC', "%s\xc2\xa01,000.12"),
         );
     }
 
@@ -130,6 +132,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleSwissRounding($value, $currency, $symbol, $expected)
     {
+        IntlTestHelper::requireIntl($this, '62.1');
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -137,22 +141,22 @@ abstract class AbstractNumberFormatterTest extends TestCase
     public function formatCurrencyWithCurrencyStyleSwissRoundingProvider()
     {
         return array(
-            array(100, 'CHF', 'CHF', '%s100.00'),
-            array(-100, 'CHF', 'CHF', '-%s100.00'),
-            array(1000.12, 'CHF', 'CHF', '%s1,000.12'),
-            array('1000.12', 'CHF', 'CHF', '%s1,000.12'),
+            array(100, 'CHF', 'CHF', "%s\xc2\xa0100.00"),
+            array(-100, 'CHF', 'CHF', "-%s\xc2\xa0100.00"),
+            array(1000.12, 'CHF', 'CHF', "%s\xc2\xa01,000.12"),
+            array('1000.12', 'CHF', 'CHF', "%s\xc2\xa01,000.12"),
 
             // Rounding checks
-            array(1000.121, 'CHF', 'CHF', '%s1,000.12'),
-            array(1000.123, 'CHF', 'CHF', '%s1,000.12'),
-            array(1000.125, 'CHF', 'CHF', '%s1,000.12'),
-            array(1000.127, 'CHF', 'CHF', '%s1,000.13'),
-            array(1000.129, 'CHF', 'CHF', '%s1,000.13'),
+            array(1000.121, 'CHF', 'CHF', "%s\xc2\xa01,000.12"),
+            array(1000.123, 'CHF', 'CHF', "%s\xc2\xa01,000.12"),
+            array(1000.125, 'CHF', 'CHF', "%s\xc2\xa01,000.12"),
+            array(1000.127, 'CHF', 'CHF', "%s\xc2\xa01,000.13"),
+            array(1000.129, 'CHF', 'CHF', "%s\xc2\xa01,000.13"),
 
-            array(1200000.00, 'CHF', 'CHF', '%s1,200,000.00'),
-            array(1200000.1, 'CHF', 'CHF', '%s1,200,000.10'),
-            array(1200000.10, 'CHF', 'CHF', '%s1,200,000.10'),
-            array(1200000.101, 'CHF', 'CHF', '%s1,200,000.10'),
+            array(1200000.00, 'CHF', 'CHF', "%s\xc2\xa01,200,000.00"),
+            array(1200000.1, 'CHF', 'CHF', "%s\xc2\xa01,200,000.10"),
+            array(1200000.10, 'CHF', 'CHF', "%s\xc2\xa01,200,000.10"),
+            array(1200000.101, 'CHF', 'CHF', "%s\xc2\xa01,200,000.10"),
         );
     }
 
@@ -174,6 +178,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testFormatWithCurrencyStyle()
     {
+        IntlTestHelper::requireIntl($this, '63.1');
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals('¤1.00', $formatter->format(1));
     }
@@ -206,6 +212,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeInt32WithCurrencyStyle($formatter, $value, $expected, $message = '')
     {
+        IntlTestHelper::requireIntl($this, '63.1');
+
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_INT32);
         $this->assertEquals($expected, $formattedValue, $message);
     }
@@ -252,6 +260,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeInt64WithCurrencyStyle($formatter, $value, $expected)
     {
+        IntlTestHelper::requireIntl($this, '63.1');
+
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_INT64);
         $this->assertEquals($expected, $formattedValue);
     }
@@ -292,6 +302,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeDoubleWithCurrencyStyle($formatter, $value, $expected)
     {
+        IntlTestHelper::requireIntl($this, '63.1');
+
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_DOUBLE);
         $this->assertEquals($expected, $formattedValue);
     }
@@ -346,6 +358,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatFractionDigits($value, $expected, $fractionDigits = null, $expectedFractionDigits = 1)
     {
+        IntlTestHelper::requireIntl($this, '62.1');
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
 
         $attributeRet = null;
@@ -369,7 +383,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
             array(1.123, '1', 0, 0),
             array(1.123, '1.1', 1, 1),
             array(1.123, '1.12', 2, 2),
-            array(1.123, '1', -1, 0),
+            array(1.123, '1.123', -1, 0),
             array(1.123, '1', 'abc', 0),
         );
     }
@@ -603,6 +617,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testGetTextAttribute()
     {
+        IntlTestHelper::requireIntl($this, '63.1');
+
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
 
@@ -621,6 +637,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testParse($value, $expected, $message, $expectedPosition, $groupingUsed = true)
     {
+        IntlTestHelper::requireIntl($this, '62.1');
+
         $position = 0;
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::GROUPING_USED, $groupingUsed);
@@ -648,12 +666,40 @@ abstract class AbstractNumberFormatterTest extends TestCase
     {
         return array(
             array('prefix1', false, '->parse() does not parse a number with a string prefix.', 0),
+            array('prefix1', false, '->parse() does not parse a number with a string prefix.', 0, false),
             array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3),
+            array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3, false),
+            array('1,234.4suffix', 1234.4, '->parse() parses a number with a string suffix.', 7),
+            array('1,234.4suffix', 1.0, '->parse() parses a number with a string suffix.', 1, false),
             array('-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3),
-            array('-123,4', false, '->parse() does not parse when invalid grouping used.', 6),
-            array('-123,4567', false, '->parse() does not parse when invalid grouping used.', 9),
-            array('-123,,456', false, '->parse() does not parse when invalid grouping used.', 4),
+            array('-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3, false),
+            array(',4', false, '->parse() does not parse when invalid grouping used.', 0),
+            array(',4', false, '->parse() does not parse when invalid grouping used.', 0, false),
+            array('123,4', false, '->parse() does not parse when invalid grouping used.', 0),
+            array('123,4', 123.0, '->parse() truncates invalid grouping when grouping is disabled.', 3, false),
+            array('123,a4', 123.0, '->parse() truncates a string suffix.', 3),
+            array('123,a4', 123.0, '->parse() truncates a string suffix.', 3, false),
+            array('-123,4', false, '->parse() does not parse when invalid grouping used.', 1),
+            array('-123,4', -123.0, '->parse() truncates invalid grouping when grouping is disabled.', 4, false),
+            array('-123,4567', false, '->parse() does not parse when invalid grouping used.', 1),
+            array('-123,4567', -123.0, '->parse() truncates invalid grouping when grouping is disabled.', 4, false),
+            array('-123,456,789', -123456789.0, '->parse() parses a number with grouping.', 12),
+            array('-123,456,789', -123.0, '->parse() truncates a group if grouping is disabled.', 4, false),
+            array('-123,456,789.66', -123456789.66, '->parse() parses a number with grouping.', 15),
+            array('-123,456,789.66', -123.00, '->parse() truncates a group if grouping is disabled.', 4, false),
+            array('-123,456789.66', false, '->parse() does not parse when invalid grouping used.', 1),
+            array('-123,456789.66', -123.00, '->parse() truncates a group if grouping is disabled.', 4, false),
+            array('-123456,789.66', false, '->parse() does not parse when invalid grouping used.', 1),
+            array('-123456,789.66', -123456.00, '->parse() truncates a group if grouping is disabled.', 7, false),
+            array('-123,456,78', false, '->parse() does not parse when invalid grouping used.', 1),
+            array('-123,456,78', -123.0, '->parse() truncates a group if grouping is disabled.', 4, false),
+            array('-123,45,789', false, '->parse() does not parse when invalid grouping used.', 1),
+            array('-123,45,789', -123.0, '->parse() truncates a group if grouping is disabled.', 4, false),
+            array('-123,,456', -123.0, '->parse() parses when grouping is duplicated.', 4),
             array('-123,,456', -123.0, '->parse() parses when grouping is disabled.', 4, false),
+            array('-123,,4', -123.0, '->parse() parses when grouping is duplicated.', 4),
+            array('-123,,4', -123.0, '->parse() parses when grouping is duplicated.', 4, false),
+            array('239.', 239.0, '->parse() parses when string ends with decimal separator.', 4),
             array('239.', 239.0, '->parse() parses when string ends with decimal separator.', 4, false),
         );
     }

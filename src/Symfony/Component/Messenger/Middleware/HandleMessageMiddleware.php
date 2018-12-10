@@ -13,19 +13,22 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
-use Symfony\Component\Messenger\Handler\Locator\HandlerLocatorInterface;
+use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.2
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {
-    private $messageHandlerLocator;
+    private $handlersLocator;
     private $allowNoHandlers;
 
-    public function __construct(HandlerLocatorInterface $messageHandlerLocator, bool $allowNoHandlers = false)
+    public function __construct(HandlersLocatorInterface $handlersLocator, bool $allowNoHandlers = false)
     {
-        $this->messageHandlerLocator = $messageHandlerLocator;
+        $this->handlersLocator = $handlersLocator;
         $this->allowNoHandlers = $allowNoHandlers;
     }
 
@@ -36,9 +39,12 @@ class HandleMessageMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if (null !== $handler = $this->messageHandlerLocator->getHandler($envelope)) {
-            $handler($envelope->getMessage());
-        } elseif (!$this->allowNoHandlers) {
+        $handler = null;
+        $message = $envelope->getMessage();
+        foreach ($this->handlersLocator->getHandlers($envelope) as $alias => $handler) {
+            $envelope = $envelope->with(HandledStamp::fromCallable($handler, $handler($message), \is_string($alias) ? $alias : null));
+        }
+        if (null === $handler && !$this->allowNoHandlers) {
             throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));
         }
 

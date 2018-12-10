@@ -22,6 +22,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 class WrappedListener
 {
     private $listener;
+    private $optimizedListener;
     private $name;
     private $called;
     private $stoppedPropagation;
@@ -31,9 +32,10 @@ class WrappedListener
     private $stub;
     private static $hasClassStub;
 
-    public function __construct($listener, $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null)
+    public function __construct(callable $listener, ?string $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null)
     {
         $this->listener = $listener;
+        $this->optimizedListener = $listener instanceof \Closure ? $listener : \Closure::fromCallable($listener);
         $this->stopwatch = $stopwatch;
         $this->dispatcher = $dispatcher;
         $this->called = false;
@@ -108,7 +110,7 @@ class WrappedListener
 
         $e = $this->stopwatch->start($this->name, 'event_listener');
 
-        \call_user_func($this->listener, $event, $eventName, $this->dispatcher ?: $dispatcher);
+        \call_user_func($this->optimizedListener, $event, $eventName, $this->dispatcher ?: $dispatcher);
 
         if ($e->isStarted()) {
             $e->stop();

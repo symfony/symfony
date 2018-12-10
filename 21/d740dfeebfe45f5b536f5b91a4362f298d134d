@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-08T16:48:23Z
+
+Should be retargetted+rebased on the lower branch where the issue exists. (3.4 here)
+
+---------------------------------------------------------------------------
+
+by knuch at 2018-12-08T17:43:11Z
+
+@nicolas-grekas thanks for the feedback!
+
+- [x] 🎯 retargetting to 3.4
+- [x] 🏸squash + rebase
+
+---------------------------------------------------------------------------
+
+by knuch at 2018-12-08T17:52:07Z
+
+Done in collaboration with @emullaraj and @ohvitorino #SpaceTeam for potential co-authoring 😄
+
+with the help of @WengerK @gido @vints24 @stof @nicolas-grekas @xabbuh
+Thank you all for your support to my first contribution!

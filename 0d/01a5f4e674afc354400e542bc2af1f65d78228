@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by gregurco at 2018-12-03T19:12:25Z
+
+@derrabus thanks for review :+1: I changed comments.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-03T22:10:41Z
+
+That should be submitted on master: we shouldn't change the version on a patch release.
+
+---------------------------------------------------------------------------
+
+by gregurco at 2018-12-03T22:42:42Z
+
+@nicolas-grekas thank you for remark. Changed.
+
+---------------------------------------------------------------------------
+
+by gregurco at 2018-12-07T07:31:46Z
+
+@ostrolucky
+> This PR significantly changes current strategy from installing lowest working PHPUnit version for given PHP version to installing latest PHPUnit version.
+
+User is free to setup `SYMFONY_PHPUNIT_VERSION` env variable and to receive the version he/she wants. So, by default Symfony will setup the last available version for used PHP, what is good and also user has control on it.
+
+> It explains that PHP 7.2 can't be used with PHPUnit 5.
+
+The comment was wrong. PHPUnit 5 can be used with PHP 7.2 and also 7.3... so, that's why I changes the comment.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-07T09:50:40Z
+
+> User is free to setup SYMFONY_PHPUNIT_VERSION env variable and to receive the version he/she wants. So, by default Symfony will setup the last available version for used PHP, what is good and also user has control on it.
+
+I know, doesn't change the fact that it will by default update major phpunit version without asking.
+
+> The comment was wrong. PHPUnit 5 can be used with PHP 7.2 and also 7.3... so, that's why I changes the comment.
+
+In that case condition should have been removed to install PHPUnit 5, which would follow current strategy and there is no need for PHPUnit 6 and 7 at all. At the time there were issues with it https://github.com/symfony/symfony/pull/27370 but it appears it has been resolved since then.
+
+For the record, I *am* for using newer versions, but it needs to be highlighted that this PR is not about fixing the requirement, but about installing latest PHPUnit version possible for given PHP version, which changes the strategy that was used until now that was using oldest major working for given PHP version.
+
+---------------------------------------------------------------------------
+
+by gregurco at 2018-12-08T15:42:15Z
+
+@ostrolucky
+> ... it needs to be highlighted that this PR is not about fixing the requirement, but about installing latest PHPUnit version possible for given PHP version ...
+
+do you have any suggestions how to highlight that? Generally it's the single scope of this PR.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-08T15:45:05Z
+
+No need, I did highlight it with my comment. It needs comment from symfony members now
+
+status: needs review

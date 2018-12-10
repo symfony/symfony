@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T07:01:23Z
+
+AFAIK, these functions have no overheard when they're called with a `\`. That's because they're resolved at compile time. Would you mind verifying please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T09:08:09Z
+
+Verified here also, measurable perf gain confirmed (<10%).
+Actually, we wondered about this change before and concluded we cannot do it because of PHP5.5 support: `call_user_func($a)` accepts more callables than `$a()` in PHP5.5. see https://3v4l.org/NGGth
+Then, merging this into master is technically possible, but would open for years of merge conflicts we'll have to deal with weekly. I'd better not.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T09:15:12Z
+
+What we could do is wonder case by case when such a change is safe doing for 5.5 (ie no `foo::bar` style can possibly be used) and merge them on 3.4.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-25T09:48:35Z
+
+How do you solve these conflicts? Intellij knows how to resolve such simple conflicts automatically.
+![peek 2018-11-25 10-39](https://user-images.githubusercontent.com/496233/48977639-75674000-f09e-11e8-9854-bb4b83be1b6d.gif)
+
+I don't think there are much cases when we can safely assume `foo::bar` is not used
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-25T10:23:32Z
+
+Whatever the tool, not having to resolve anything is always going to be faster :)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-25T10:39:55Z
+
+You can even configure it to do this automatically every time without asking ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-30T17:56:43Z
+
+Closing as explained, thanks for submitting.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-01T02:47:02Z
+
+What makes you think this will cause conflicts on weekly basis? Those lines are rarely changed. I really don't see how are changes like https://github.com/symfony/symfony/pull/29245 preferable over this one. Performance gain is very similar but lot of places benefit from it instead of one, it has 0 complexity penalty nor change of behavior and very easy to solve conflicts. Lastly, if you are so worried about merge conflicts that are solvable automatically, you should fix your merge tool.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-12-01T08:25:51Z
+
+I tend to agree with @ostrolucky here. I'm not sure it will be such a pain, and if the gains are substantial, it might be worth reconsidering
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T08:35:59Z
+
+Then let's merge this in 4.1? 55 files modified, that's a lot of potential future conflicts I fear.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-06T22:24:33Z
+
+Should I rebase? I didn't base it on older branch because I wanted to convert as much calls as possible, there are some new places in 4.2 that are missing in 4.1. Will you apply it to rest of the places during merge?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-09T17:32:23Z
+
+Yes please rebase. We'll handle the 4.2-only sites either while merging or in another PR (eg you can keep this one for reference)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-09T23:14:22Z
+
+rebased, only fabpot failures not cause by my changes

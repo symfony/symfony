@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-12-04T12:29:50Z
+
+:+1: for the shortcut.
+
+I'd like also type `mydatetype` instead of `MyDateType`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-04T12:45:07Z
+
+i dont think we can conventionally change `mydate` to `MyDate`
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-12-04T12:55:47Z
+
+right, but we can change `MyDate` to `mydate` :)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-12-07T17:10:11Z
+
+@yceruto but that replacement is not the one you were asking for, as the input you asked for is `mydate`
+
+---------------------------------------------------------------------------
+
+by msvrtan at 2018-12-08T11:36:35Z
+
+In order to test your branch out, I rebased it locally with current master (and there were around 3k commits difference) and I have a bug to report:
+
+On symfony 4.2 based skeleton project, when I run `php bin/console debug:form urltype` I get
+```
+2018-12-08T11:32:46+00:00 [error] Error thrown while running command "debug:form urltype -vvv". Message: "Case mismatch between loaded and declared class names: "Symfony\Component\Form\Extension\Core\Type\urltype" vs "Symfony\Component\Form\Extension\Core\Type\UrlType"."
+2018-12-08T11:32:46+00:00 [debug] Command "debug:form urltype -vvv" exited with code "1"
+
+In DebugClassLoader.php line 185:
+
+  [RuntimeException]
+  Case mismatch between loaded and declared class names: "Symfony\Component\Form\Extension\Core\Type\urltype" vs "Symfony\Component\Form\Extension\Core\Type\UrlType".
+
+Exception trace:
+ () at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Debug/DebugClassLoader.php:185
+ Symfony\Component\Debug\DebugClassLoader->checkClass() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Debug/DebugClassLoader.php:161
+ Symfony\Component\Debug\DebugClassLoader->loadClass() at n/a:n/a
+ spl_autoload_call() at n/a:n/a
+ class_exists() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Form/Command/DebugCommand.php:159
+ Symfony\Component\Form\Command\DebugCommand->getFqcnTypeClass() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Form/Command/DebugCommand.php:119
+ Symfony\Component\Form\Command\DebugCommand->execute() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Command/Command.php:255
+ Symfony\Component\Console\Command\Command->run() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Application.php:919
+ Symfony\Component\Console\Application->doRunCommand() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Bundle/FrameworkBundle/Console/Application.php:89
+ Symfony\Bundle\FrameworkBundle\Console\Application->doRunCommand() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Application.php:262
+ Symfony\Component\Console\Application->doRun() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Bundle/FrameworkBundle/Console/Application.php:75
+ Symfony\Bundle\FrameworkBundle\Console\Application->doRun() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Application.php:145
+ Symfony\Component\Console\Application->run() at /work/noob/learning/symfonyconhackday/pr29452/bin/console:40
+
+```
+
+Same thing happens with `php bin/console debug:form urlType -vvv`
+
+```
+2018-12-08T11:33:35+00:00 [error] Error thrown while running command "debug:form urlType -vvv". Message: "Case mismatch between loaded and declared class names: "Symfony\Component\Form\Extension\Core\Type\urlType" vs "Symfony\Component\Form\Extension\Core\Type\UrlType"."
+2018-12-08T11:33:35+00:00 [debug] Command "debug:form urlType -vvv" exited with code "1"
+
+In DebugClassLoader.php line 185:
+
+  [RuntimeException]
+  Case mismatch between loaded and declared class names: "Symfony\Component\Form\Extension\Core\Type\urlType" vs "Symfony\Component\Form\Extension\Core\Type\UrlType".
+
+Exception trace:
+ () at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Debug/DebugClassLoader.php:185
+ Symfony\Component\Debug\DebugClassLoader->checkClass() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Debug/DebugClassLoader.php:161
+ Symfony\Component\Debug\DebugClassLoader->loadClass() at n/a:n/a
+ spl_autoload_call() at n/a:n/a
+ class_exists() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Form/Command/DebugCommand.php:159
+ Symfony\Component\Form\Command\DebugCommand->getFqcnTypeClass() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Form/Command/DebugCommand.php:119
+ Symfony\Component\Form\Command\DebugCommand->execute() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Command/Command.php:255
+ Symfony\Component\Console\Command\Command->run() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Application.php:919
+ Symfony\Component\Console\Application->doRunCommand() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Bundle/FrameworkBundle/Console/Application.php:89
+ Symfony\Bundle\FrameworkBundle\Console\Application->doRunCommand() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Application.php:262
+ Symfony\Component\Console\Application->doRun() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Bundle/FrameworkBundle/Console/Application.php:75
+ Symfony\Bundle\FrameworkBundle\Console\Application->doRun() at /work/noob/learning/symfonyconhackday/symfony/src/Symfony/Component/Console/Application.php:145
+ Symfony\Component\Console\Application->run() at /work/noob/learning/symfonyconhackday/pr29452/bin/console:40
+
+```
+while the `php bin/console debug:form url` does work as expected.
+
+IMO issue is not in your changes in the code but as you have based it on an older master or tag, there are additional changes needed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-08T16:01:38Z
+
+Hi @msvrtan ive rebased on latest master. On my machine everything is working as expected;
+
+```bash
+debug:form urltype
+
+Symfony\Component\Form\Extension\Core\Type\UrlType (Block prefix: "url")
+========================================================================
+
+debug:form urltype --no-debug
+
+Symfony\Component\Form\Extension\Core\Type\UrlType (Block prefix: "url")
+========================================================================
+```

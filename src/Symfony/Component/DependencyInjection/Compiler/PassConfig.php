@@ -51,12 +51,12 @@ class PassConfig
         $this->optimizationPasses = array(array(
             new ResolveChildDefinitionsPass(),
             new ServiceLocatorTagPass(),
+            new RegisterServiceSubscribersPass(),
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(false),
             new ResolveFactoryClassPass(),
             new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
-            new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
             new AutowireRequiredMethodsPass(),
             new ResolveBindingsPass(),

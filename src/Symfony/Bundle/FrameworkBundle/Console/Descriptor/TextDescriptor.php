@@ -56,7 +56,7 @@ class TextDescriptor extends Descriptor
 
             if ($showControllers) {
                 $controller = $route->getDefault('_controller');
-                $row[] = $this->formatCallable($controller);
+                $row[] = $controller ? $this->formatCallable($controller) : '';
             }
 
             $tableRows[] = $row;

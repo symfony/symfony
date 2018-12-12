@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-12T13:52:33Z
+
+We should prevent regressions on this one, at least with a comment or (ideally) with a new test case for PassConfig
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-12-12T14:01:13Z
+
+Do you think simply checking the order of the passes returned from `PassConfig::getPasses()` is sufficient?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-12T14:06:31Z
+
+A unit test wouldn't prevent anything IMHO. An integration one might be best!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-12T14:07:48Z
+
+That's for 3.4 btw!
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-12-12T14:13:33Z
+
+I switched to 3.4. I'll work on an integration test.
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-12-12T14:31:04Z
+
+Can I get some direction on the best place for an integration test for this would be?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-12T14:45:16Z
+
+@kbond https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/DependencyInjection/Tests/Compiler/IntegrationTest.php should be a good place
+
+---------------------------------------------------------------------------
+
+by kbond at 2018-12-12T15:26:11Z
+
+Wow, looked everywhere but the obvious place - thanks!
+
+Integration test added.

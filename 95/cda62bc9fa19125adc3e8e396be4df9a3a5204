@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-12-08T12:49:33Z
+
+#SymfonyConHackday2018
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-12-08T16:10:55Z
+
+I wondered about this alias before, but the serializer is configurable through the `framework.messenger.serializer.id` config.
+So what would you expect to be injected when setting this option to a different value than the `symfony_serializer` and typehinting Messenger's `SerializerInterface`?
+Shouldn't it alias `messenger.transport.serializer` instead?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-08T16:41:24Z
+
+Status: needs work
+(https://github.com/symfony/symfony/pull/29517#discussion_r240009367)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-09T17:23:47Z
+
+I think we prefer defining in xml and removing in the extension: that makes the xml more useful to eg IDE plugins that want to use it.
+
+---------------------------------------------------------------------------
+
+by karser at 2018-12-10T11:13:55Z
+
+@nicolas-grekas Did you mean this? please review

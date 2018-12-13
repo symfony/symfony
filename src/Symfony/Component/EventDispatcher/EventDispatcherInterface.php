@@ -46,7 +46,7 @@ interface EventDispatcherInterface
     /**
      * Adds an event subscriber.
      *
-     * The subscriber is asked for all the events he is
+     * The subscriber is asked for all the events it is
      * interested in and added as a listener for these events.
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);

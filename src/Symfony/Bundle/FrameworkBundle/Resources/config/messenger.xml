@@ -22,6 +22,7 @@
             <argument /> <!-- Format -->
             <argument type="collection" /> <!-- Context -->
         </service>
+        <service id="Symfony\Component\Messenger\Transport\Serialization\SerializerInterface" alias="messenger.transport.serializer" />
 
         <!-- Middleware -->
         <service id="messenger.middleware.handle_message" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">

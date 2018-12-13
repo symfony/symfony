@@ -70,6 +70,7 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -1530,6 +1531,7 @@ class FrameworkExtension extends Extension
                 $container->setAlias('messenger.transport.serializer', $config['serializer']['id']);
             } else {
                 $container->removeDefinition('messenger.transport.amqp.factory');
+                $container->removeDefinition(SerializerInterface::class);
             }
         }
 

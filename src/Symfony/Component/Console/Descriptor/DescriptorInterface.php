@@ -21,8 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 interface DescriptorInterface
 {
     /**
-     * Describes an object if the class that
-     * the object is an instance of, is supported.
+     * Describes an object if the class that the object is an instance of is supported.
      *
      * @param OutputInterface $output
      * @param object          $object

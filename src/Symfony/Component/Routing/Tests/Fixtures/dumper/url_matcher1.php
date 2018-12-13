@@ -139,8 +139,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 switch ($m = (int) $matches['MARK']) {
                     case 115:
-                        $matches = array('foo' => $matches[1] ?? null);
-
                         // baz4
                         if ('/' !== $pathinfo[-1]) {
                             goto not_baz4;
@@ -148,6 +146,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         if ('/' !== $pathinfo && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         }
+
+                        $matches = array('foo' => $matches[1] ?? null);
 
                         return $this->mergeDefaults(array('_route' => 'baz4') + $matches, array());
                         not_baz4:
@@ -188,12 +188,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                         break;
                     case 160:
-                        $matches = array('foo' => $matches[1] ?? null);
-
                         // foo1
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             goto not_foo1;
                         }
+
+                        $matches = array('foo' => $matches[1] ?? null);
 
                         $ret = $this->mergeDefaults(array('_route' => 'foo1') + $matches, array());
                         if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
@@ -206,24 +206,24 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                         break;
                     case 204:
-                        $matches = array('foo1' => $matches[1] ?? null);
-
                         // foo2
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             goto not_foo2;
                         }
+
+                        $matches = array('foo1' => $matches[1] ?? null);
 
                         return $this->mergeDefaults(array('_route' => 'foo2') + $matches, array());
                         not_foo2:
 
                         break;
                     case 279:
-                        $matches = array('_locale' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
-
                         // foo3
                         if ('/' !== $pathinfo && '/' === $pathinfo[-1] && preg_match($regex, substr($pathinfo, 0, -1), $n) && $m === (int) $n['MARK']) {
                             goto not_foo3;
                         }
+
+                        $matches = array('_locale' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
 
                         return $this->mergeDefaults(array('_route' => 'foo3') + $matches, array());
                         not_foo3:

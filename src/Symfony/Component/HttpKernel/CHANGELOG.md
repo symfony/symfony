@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * made `Symfony\Component\HttpKernel\EventListenerLocaleListener` set the default locale early
+
 4.2.0
 -----
 

@@ -93,15 +93,9 @@ class Registry
                     throw new NotInstantiableTypeException($class);
                 }
             }
-            if (null !== $proto && !$proto instanceof \Throwable) {
+            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
                 try {
-                    if (!$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
-                        serialize($proto);
-                    } elseif ($instantiableWithoutConstructor) {
-                        serialize($reflector->newInstanceWithoutConstructor());
-                    } else {
-                        serialize(unserialize(($proto instanceof \Serializable ? 'C:' : 'O:').\strlen($class).':"'.$class.'":0:{}'));
-                    }
+                    serialize($proto);
                 } catch (\Exception $e) {
                     throw new NotInstantiableTypeException($class, $e);
                 }

@@ -106,11 +106,6 @@ class LanguageType extends AbstractType implements ChoiceLoaderInterface
             return array();
         }
 
-        // If no callable is set, values are the same as choices
-        if (null === $value) {
-            return $values;
-        }
-
         return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 

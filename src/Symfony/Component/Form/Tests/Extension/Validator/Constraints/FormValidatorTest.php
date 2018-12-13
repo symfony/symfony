@@ -220,7 +220,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->getForm();
 
         // Launch transformer
-        $form->submit(array());
+        $form->submit('foo');
 
         $this->expectNoValidate();
 

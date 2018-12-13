@@ -209,7 +209,7 @@ class EventDispatcher implements EventDispatcherInterface
             if ($event->isPropagationStopped()) {
                 break;
             }
-            \call_user_func($listener, $event, $eventName, $this);
+            $listener($event, $eventName, $this);
         }
     }
 

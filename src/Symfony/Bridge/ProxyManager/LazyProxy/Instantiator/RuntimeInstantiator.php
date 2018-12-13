@@ -43,7 +43,7 @@ class RuntimeInstantiator implements InstantiatorInterface
         return $this->factory->createProxy(
             $this->factory->getGenerator()->getProxifiedClass($definition),
             function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
-                $wrappedInstance = \call_user_func($realInstantiator);
+                $wrappedInstance = $realInstantiator();
 
                 $proxy->setProxyInitializer(null);
 

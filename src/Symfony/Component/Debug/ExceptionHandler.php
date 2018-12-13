@@ -142,7 +142,7 @@ class ExceptionHandler
         $this->caughtBuffer = null;
 
         try {
-            \call_user_func($this->handler, $exception);
+            ($this->handler)($exception);
             $this->caughtLength = $caughtLength;
         } catch (\Exception $e) {
             if (!$caughtLength) {

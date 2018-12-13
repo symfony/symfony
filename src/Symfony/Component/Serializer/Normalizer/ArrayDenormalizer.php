@@ -53,7 +53,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
 
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
-            if (null !== $builtinType && !\call_user_func('is_'.$builtinType, $key)) {
+            if (null !== $builtinType && !('is_'.$builtinType)($key)) {
                 throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, \gettype($key)));
             }
 

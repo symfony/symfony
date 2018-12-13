@@ -84,6 +84,11 @@ class IntlCallbackChoiceLoaderTest extends TestCase
         );
     }
 
+    public function testLoadChoicesForValuesDropsNonExistentChoices()
+    {
+        $this->assertSame(array(), self::$loader->loadChoicesForValues(array('foo')));
+    }
+
     public function testLoadValuesForChoicesLoadsChoiceListOnFirstCall()
     {
         $this->assertSame(

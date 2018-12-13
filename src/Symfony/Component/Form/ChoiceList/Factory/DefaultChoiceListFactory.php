@@ -118,7 +118,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
         $key = $keys[$value];
-        $nextIndex = \is_int($index) ? $index++ : \call_user_func($index, $choice, $key, $value);
+        $nextIndex = \is_int($index) ? $index++ : $index($choice, $key, $value);
 
         // BC normalize label to accept a false value
         if (null === $label) {
@@ -127,7 +127,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         } elseif (false !== $label) {
             // If "choice_label" is set to false and "expanded" is true, the value false
             // should be passed on to the "label" option of the checkboxes/radio buttons
-            $dynamicLabel = \call_user_func($label, $choice, $key, $value);
+            $dynamicLabel = $label($choice, $key, $value);
             $label = false === $dynamicLabel ? false : (string) $dynamicLabel;
         }
 
@@ -137,11 +137,11 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $label,
             // The attributes may be a callable or a mapping from choice indices
             // to nested arrays
-            \is_callable($attr) ? \call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())
+            \is_callable($attr) ? $attr($choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())
         );
 
         // $isPreferred may be null if no choices are preferred
-        if ($isPreferred && \call_user_func($isPreferred, $choice, $key, $value)) {
+        if ($isPreferred && $isPreferred($choice, $key, $value)) {
             $preferredViews[$nextIndex] = $view;
         } else {
             $otherViews[$nextIndex] = $view;
@@ -200,7 +200,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
     private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        $groupLabel = \call_user_func($groupBy, $choice, $keys[$value], $value);
+        $groupLabel = $groupBy($choice, $keys[$value], $value);
 
         if (null === $groupLabel) {
             // If the callable returns null, don't group the choice

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CountryTypeTest extends BaseTypeTest
@@ -79,5 +80,15 @@ class CountryTypeTest extends BaseTypeTest
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'FR', $expectedData = 'FR')
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testInvalidChoiceValuesAreDropped()
+    {
+        $type = new CountryType();
+
+        $this->assertSame(array(), $type->loadChoicesForValues(array('foo')));
     }
 }

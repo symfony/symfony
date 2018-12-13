@@ -151,7 +151,7 @@ class DebugClassLoader
                     require $file;
                 }
             } else {
-                \call_user_func($this->classLoader, $class);
+                ($this->classLoader)($class);
                 $file = false;
             }
         } finally {
@@ -218,7 +218,7 @@ class DebugClassLoader
             $len = 0;
             $ns = '';
         } else {
-            $ns = \substr($class, 0, $len);
+            $ns = \str_replace('_', '\\', \substr($class, 0, $len));
         }
 
         // Detect annotations on the class
@@ -249,13 +249,13 @@ class DebugClassLoader
             if (!isset(self::$checkedClasses[$use])) {
                 $this->checkClass($use);
             }
-            if (isset(self::$deprecated[$use]) && \strncmp($ns, $use, $len)) {
+            if (isset(self::$deprecated[$use]) && \strncmp($ns, \str_replace('_', '\\', $use), $len)) {
                 $type = class_exists($class, false) ? 'class' : (interface_exists($class, false) ? 'interface' : 'trait');
                 $verb = class_exists($use, false) || interface_exists($class, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
 
                 $deprecations[] = sprintf('The "%s" %s %s "%s" that is deprecated%s.', $class, $type, $verb, $use, self::$deprecated[$use]);
             }
-            if (isset(self::$internal[$use]) && \strncmp($ns, $use, $len)) {
+            if (isset(self::$internal[$use]) && \strncmp($ns, \str_replace('_', '\\', $use), $len)) {
                 $deprecations[] = sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $class);
             }
         }

@@ -134,11 +134,11 @@ class PhpArrayCacheWrapper extends PhpArrayCache
 
     public function set($key, $value, $ttl = null)
     {
-        \call_user_func(\Closure::bind(function () use ($key, $value) {
+        (\Closure::bind(function () use ($key, $value) {
             $this->data[$key] = $value;
             $this->warmUp($this->data);
             list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
-        }, $this, PhpArrayCache::class));
+        }, $this, PhpArrayCache::class))();
 
         return true;
     }
@@ -148,13 +148,13 @@ class PhpArrayCacheWrapper extends PhpArrayCache
         if (!\is_array($values) && !$values instanceof \Traversable) {
             return parent::setMultiple($values, $ttl);
         }
-        \call_user_func(\Closure::bind(function () use ($values) {
+        (\Closure::bind(function () use ($values) {
             foreach ($values as $key => $value) {
                 $this->data[$key] = $value;
             }
             $this->warmUp($this->data);
             list($this->keys, $this->values) = eval(substr(file_get_contents($this->file), 6));
-        }, $this, PhpArrayCache::class));
+        }, $this, PhpArrayCache::class))();
 
         return true;
     }

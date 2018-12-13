@@ -37,7 +37,6 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -1602,12 +1601,7 @@ class FrameworkExtension extends Extension
                 $senders[$sender] = new Reference($senderAliases[$sender] ?? $sender);
             }
 
-            $sendersId = 'messenger.senders.'.$message;
-            $container->register($sendersId, RewindableGenerator::class)
-                ->setFactory('current')
-                ->addArgument(array(new IteratorArgument($senders)));
-            $messageToSendersMapping[$message] = new Reference($sendersId);
-
+            $messageToSendersMapping[$message] = new IteratorArgument($senders);
             $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 

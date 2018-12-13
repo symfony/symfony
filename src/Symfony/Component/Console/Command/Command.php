@@ -250,7 +250,7 @@ class Command
         $input->validate();
 
         if ($this->code) {
-            $statusCode = \call_user_func($this->code, $input, $output);
+            $statusCode = ($this->code)($input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
         }

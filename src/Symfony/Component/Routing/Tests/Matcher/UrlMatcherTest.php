@@ -177,6 +177,15 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => '$péß^a|'), $matcher->match('/bar'));
     }
 
+    public function testMatchImportantVariable()
+    {
+        $collection = new RouteCollection();
+        $collection->add('index', new Route('/index.{!_format}', array('_format' => 'xml')));
+
+        $matcher = $this->getUrlMatcher($collection);
+        $this->assertEquals(array('_route' => 'index', '_format' => 'xml'), $matcher->match('/index.xml'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */

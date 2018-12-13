@@ -156,21 +156,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $message = 'Parameter "{parameter}" for route "{route}" must match "{expected}" ("{given}" given) to generate a corresponding URL.';
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
+                $varName = $token[3];
+                if ($important = ('!' === $varName[0])) {
+                    $varName = substr($varName, 1);
+                }
+
+                if (!$optional || $important || !array_key_exists($varName, $defaults) || (null !== $mergedParams[$varName] && (string) $mergedParams[$varName] !== (string) $defaults[$varName])) {
                     // check requirement
-                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#'.(empty($token[4]) ? '' : 'u'), $mergedParams[$varName])) {
                         if ($this->strictRequirements) {
-                            throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
+                            throw new InvalidParameterException(strtr($message, array('{parameter}' => $varName, '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$varName])));
                         }
 
                         if ($this->logger) {
-                            $this->logger->error($message, array('parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]));
+                            $this->logger->error($message, array('parameter' => $varName, 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$varName]));
                         }
 
                         return;
                     }
 
-                    $url = $token[1].$mergedParams[$token[3]].$url;
+                    $url = $token[1].$mergedParams[$varName].$url;
                     $optional = false;
                 }
             } else {

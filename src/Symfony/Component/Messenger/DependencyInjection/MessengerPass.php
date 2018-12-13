@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -163,11 +162,7 @@ class MessengerPass implements CompilerPassInterface
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
             foreach ($handlersByMessage as $message => $handlerIds) {
                 $handlers = array_map(function (string $handlerId) { return new Reference($handlerId); }, $handlerIds);
-                $handlersId = "messenger.handlers.$bus.$message";
-                $definitions[$handlersId] = (new Definition(RewindableGenerator::class))
-                    ->setFactory('current')
-                    ->addArgument(array($handlers));
-                $handlersLocatorMappingByBus[$bus][$message] = new Reference($handlersId);
+                $handlersLocatorMappingByBus[$bus][$message] = new IteratorArgument($handlers);
             }
         }
         $container->addDefinitions($definitions);

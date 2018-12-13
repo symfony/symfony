@@ -55,6 +55,10 @@ class CliDumper extends AbstractDumper
     protected $collapseNextHash = false;
     protected $expandNextHash = false;
 
+    private $displayOptions = array(
+        'fileLinkFormat' => null,
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -76,6 +80,8 @@ class CliDumper extends AbstractDumper
                 'index' => '34',
             ));
         }
+
+        $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: 'file://%f';
     }
 
     /**
@@ -106,6 +112,16 @@ class CliDumper extends AbstractDumper
     public function setStyles(array $styles)
     {
         $this->styles = $styles + $this->styles;
+    }
+
+    /**
+     * Configures display options.
+     *
+     * @param array $displayOptions A map of display options to customize the behavior
+     */
+    public function setDisplayOptions(array $displayOptions)
+    {
+        $this->displayOptions = $displayOptions + $this->displayOptions;
     }
 
     /**
@@ -427,7 +443,9 @@ class CliDumper extends AbstractDumper
                 $value = substr($value, -$attr['ellipsis']);
             }
 
-            return $this->style('default', $prefix).$this->style($style, $value);
+            $value = $this->style('default', $prefix).$this->style($style, $value);
+
+            goto href;
         }
 
         $style = $this->styles[$style];
@@ -455,6 +473,16 @@ class CliDumper extends AbstractDumper
                 $value = substr($value, 0, -\strlen($endCchr));
             } else {
                 $value .= "\033[{$this->styles['default']}m";
+            }
+        }
+
+        href:
+        if ($this->colors) {
+            if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
+                $attr['href'] = $href;
+            }
+            if (isset($attr['href'])) {
+                $value = "\033]8;;{$attr['href']}\033\\{$value}\033]8;;\033\\";
             }
         }
 
@@ -593,5 +621,14 @@ class CliDumper extends AbstractDumper
         }
 
         return $result;
+    }
+
+    private function getSourceLink($file, $line)
+    {
+        if ($fmt = $this->displayOptions['fileLinkFormat']) {
+            return \is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+        }
+
+        return false;
     }
 }

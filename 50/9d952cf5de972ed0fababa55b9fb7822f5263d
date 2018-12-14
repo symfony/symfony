@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-14T09:44:40Z
+
+Another idea: mark it as `@internal`. Would that fix the issue?
+I've been suggesting we should mark *all* test classes as internal for precisely this reason.
+Nobody gave it a try, until today maybe :)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-12-14T09:51:15Z
+
+@nicolas-grekas just tried that and it didn't have the expected result, I've just hit "invalidate caches" to verify this behaviour after a clean inspection of PHPStorm and it still shows up first. It only receives a strike through once it's used in the current file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-14T10:01:59Z
+
+Didn't https://youtrack.jetbrains.com/issue/WI-37750 solve the issue? Can you check if you have the latest phpstorm version?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-12-14T10:27:37Z
+
+@nicolas-grekas I've updated it, it still shows it first.

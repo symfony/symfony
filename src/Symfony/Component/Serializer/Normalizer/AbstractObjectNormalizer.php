@@ -109,6 +109,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
             }
 
+            // Adding support for serialized-name
+            array_key_exists($attribute, $attributesMetadata) &&  $attributesMetadata[$attribute]->getSerializedName() !== null?
+                              $serializedName = $attributesMetadata[$attribute]->getSerializedName():
+                              $serializedName = $attribute;
+
             /**
              * @var $callback callable|null
              */
@@ -118,10 +123,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                $stack[$attribute] = $attributeValue;
+                $stack[$serializedName] = $attributeValue;
             }
 
-            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $context);
+            $data = $this->updateData($data, $serializedName, $attributeValue, $class, $format, $context);
         }
 
         foreach ($stack as $attribute => $attributeValue) {

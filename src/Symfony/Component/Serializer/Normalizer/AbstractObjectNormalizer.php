@@ -110,12 +110,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             // Adding support for serialized-name
-            array_key_exists($attribute, $attributesMetadata) &&  $attributesMetadata[$attribute]->getSerializedName() !== null?
-                              $serializedName = $attributesMetadata[$attribute]->getSerializedName():
+            array_key_exists($attribute, $attributesMetadata) && null !== $attributesMetadata[$attribute]->getSerializedName() ?
+                              $serializedName = $attributesMetadata[$attribute]->getSerializedName() :
                               $serializedName = $attribute;
 
             /**
-             * @var $callback callable|null
+             * @var callable|null
              */
             $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? $this->callbacks[$attribute] ?? null;
             if ($callback) {

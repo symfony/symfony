@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Không tìm thấy tên người dùng username.</target>
+                <target>Không tìm thấy tên người dùng.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
